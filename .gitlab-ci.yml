@@ -1,0 +1,77 @@
+image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
+
+stages:
+  - tests
+
+test_rma_frontend:
+  stage: tests
+  only:
+    changes:
+      - packages/rma-frontend/**/*
+    refs:
+      - merge_requests
+      - master
+  before_script:
+    - cd packages/rma-frontend
+    - npm install
+  script:
+    # set env variable for test
+    - export NODE_ENV=test
+    # Check Code Quality
+    - npm run lint
+    - npm run format:check
+    # Test backend unit tests
+    - npm run test
+    # Test backend e2e
+    - npm run e2e
+  tags:
+    - docker
+
+test_rma_mobile:
+  stage: tests
+  only:
+    changes:
+      - packages/rma-mobile/**/*
+    refs:
+      - merge_requests
+      - master
+  before_script:
+    - cd packages/rma-mobile
+    - npm install
+  script:
+    # Check Code Quality
+    - npm run lint
+    - npm run format:check
+    # set env variable for test
+    - export NODE_ENV=test
+    # Test frontend
+    - export DISPLAY=:99
+    - Xvfb :0 -ac -screen 0 1024x768x24 &
+    - npm run test
+    - npm run e2e
+  tags:
+    - docker
+
+test_rma_server:
+  stage: tests
+  only:
+    changes:
+      - packages/rma-server/**/*
+    refs:
+      - merge_requests
+      - master
+  before_script:
+    - cd packages/rma-server
+    - npm install
+  script:
+    # set env variable for test
+    - export NODE_ENV=test
+    # Check Code Quality
+    - npm run lint
+    - npm run format:check
+    # Test backend unit tests
+    - npm run test
+    # Test backend e2e
+    - npm run test:e2e
+  tags:
+    - docker
