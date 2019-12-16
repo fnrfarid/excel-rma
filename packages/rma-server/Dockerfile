@@ -1,8 +1,8 @@
 FROM node:latest
 # Copy app
-COPY . /home/craft/frappe-direct
+COPY . /home/craft/rma-server
 WORKDIR /home/craft/
-RUN cd frappe-direct \
+RUN cd rma-server \
     && npm install \
     && npm run build \
     && rm -fr node_modules \
@@ -21,13 +21,13 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh / # backwards compat
 
 # Add non root user
 RUN useradd -ms /bin/bash craft
-WORKDIR /home/craft/frappe-direct
-COPY --from=0 /home/craft/frappe-direct .
+WORKDIR /home/craft/rma-server
+COPY --from=0 /home/craft/rma-server .
 
 RUN chown -R craft:craft /home/craft
 
 # set project directory
-WORKDIR /home/craft/frappe-direct
+WORKDIR /home/craft/rma-server
 
 # Expose port
 EXPOSE 8800
