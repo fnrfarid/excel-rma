@@ -36,7 +36,7 @@ test_rma_mobile:
       - merge_requests
       - master
   before_script:
-    - packages/rma-mobile
+    - cd packages/rma-mobile
     - npm install
   script:
     # Check Code Quality
