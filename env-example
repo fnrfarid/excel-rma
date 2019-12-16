@@ -1,0 +1,5 @@
+DB_USER=admin
+DB_PASSWORD=admin
+DB_NAME=test_rma-server
+MONGODB_ROOT_PASSWORD=admin
+MONGODB_PASSWORD=admin
