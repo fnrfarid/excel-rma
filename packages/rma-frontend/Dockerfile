@@ -8,7 +8,7 @@ RUN cd rma-frontend \
 
 FROM nginx:latest
 
-COPY --from=0 /home/craft/rma-frontend/dist/rma-frontend /var/www/html
+COPY --from=0 /home/craft/rma-frontend/www /var/www/html
 COPY ./docker/nginx-default.conf.template /etc/nginx/conf.d/default.conf.template
 COPY ./docker/docker-entrypoint.sh /
 
