@@ -1,8 +1,7 @@
 DB_HOST=localhost
-DB_NAME=frappe-direct
+DB_NAME=rma-server
 DB_PASSWORD=admin
-DB_USER=frappe-direct
-CACHE_DB_NAME=token-cache
+DB_USER=rma-server
+CACHE_DB_NAME=cache-db
 CACHE_DB_PASSWORD=admin
-CACHE_DB_USER=token-cache
-MONGODB_ROOT_PASSWORD=admin
+CACHE_DB_USER=cache-db

@@ -2,9 +2,9 @@ export const ADMINISTRATOR = 'administrator';
 export const SYSTEM_MANAGER = 'System Manager';
 export const TOKEN = 'token';
 export const AUTHORIZATION = 'authorization';
-export const SERVICE = 'frappe-direct';
+export const SERVICE = 'rma-server';
 export const PUBLIC = 'public';
-export const APP_NAME = 'frappe-direct';
+export const APP_NAME = 'rma-server';
 export const SWAGGER_ROUTE = 'api-docs';
 export enum ConnectedServices {
   CommunicationServer = 'communication-server',
