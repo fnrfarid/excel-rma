@@ -5,7 +5,7 @@
   "homepage": "https://castlecraft.in",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --host \"direct.localhost\" --port 4700 --proxy-config proxy.config.json",
+    "start": "ng serve --host \"rma.localhost\" --port 4700 --proxy-config proxy.config.json",
     "build": "ng build",
     "test": "ng test",
     "lint": "tslint -c tslint.json './src/**/*.ts' './e2e/**/*.ts'",

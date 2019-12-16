@@ -84,17 +84,28 @@ export class AppComponent implements OnInit {
   }
 
   setupImplicitFlow(): void {
-    this.appService.getMessage().subscribe(response => {
-      if (response.message || !response.frontendCallbackURLs) return; // { message: PLEASE_RUN_SETUP }
-      this.appService.setInfoLocalStorage(response);
-      const frappe_auth_config = {
-        client_id: response.frontendClientId,
-        redirect_uri: response.appURL + CALLBACK_ENDPOINT,
-        response_type: TOKEN,
-        scope: SCOPE,
-      };
-      this.initiateLogin(response.authorizationURL, frappe_auth_config);
-      return;
+    this.appService.getMessage().subscribe({
+      next: response => {
+        if (
+          response &&
+          !response.frontendClientId &&
+          !response.appURL &&
+          !response.authorizationURL
+        ) {
+          return;
+        }
+
+        this.appService.setInfoLocalStorage(response);
+        const frappe_auth_config = {
+          client_id: response.frontendClientId,
+          redirect_uri: response.appURL + CALLBACK_ENDPOINT,
+          response_type: TOKEN,
+          scope: SCOPE,
+        };
+        this.initiateLogin(response.authorizationURL, frappe_auth_config);
+        return;
+      },
+      error: error => {},
     });
   }
 
