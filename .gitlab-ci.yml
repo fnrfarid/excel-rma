@@ -2,6 +2,8 @@ image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:
 
 stages:
   - tests
+  - pack
+  - deploy
 
 test_rma_frontend:
   stage: tests
@@ -75,3 +77,54 @@ test_rma_server:
     - npm run test:e2e
   tags:
     - docker
+
+pack_rma_server:
+  image: docker
+  stage: pack
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-server/**/*
+  before_script:
+    - apk add git
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - export VERSION=$(git tag --list "rma-server@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build -t rma-server packages/rma-server
+    - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION
+    - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:latest
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server
+
+pack_rma_frontend:
+  image: docker
+  stage: pack
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-frontend/**/*
+  before_script:
+    - apk add git
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - export VERSION=$(git tag --list "rma-frontend@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build -t rma-frontend packages/rma-frontend
+    - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
+    - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend
+
+deploy_staging:
+  image: dtzar/helm-kubectl:latest
+  only:
+    refs:
+      - master
+  stage: deploy
+  variables:
+    KUBECONFIG: /etc/deploy/config
+  before_script:
+    - mkdir -p /etc/deploy
+    - echo ${kube_config} | base64 -d > ${KUBECONFIG}
+    - kubectl config use-context staging
+  script:
+    - helm upgrade stg-rma -n staging helm-chart/rma-portal --reuse-values
