@@ -17,6 +17,18 @@ function checkEnv() {
     echo "DB_PASSWORD is not set"
     exit 1
   fi
+  if [[ -z "$CACHE_DB_NAME" ]]; then
+    echo "CACHE_DB_NAME is not set"
+    exit 1
+  fi
+  if [[ -z "$CACHE_DB_PASSWORD" ]]; then
+    echo "CACHE_DB_PASSWORD is not set"
+    exit 1
+  fi
+  if [[ -z "$CACHE_DB_USER" ]]; then
+    echo "CACHE_DB_USER is not set"
+    exit 1
+  fi
   if [[ -z "$NODE_ENV" ]]; then
     echo "NODE_ENV is not set"
     exit 1
