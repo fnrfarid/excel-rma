@@ -1,0 +1,16 @@
+FROM node:latest
+# Copy and build server
+COPY . /home/craft/rma-frontend
+WORKDIR /home/craft/
+RUN cd rma-frontend \
+    && npm install \
+    && npm run build
+
+FROM nginx:latest
+
+COPY --from=0 /home/craft/rma-frontend/dist/rma-frontend /var/www/html
+COPY ./docker/nginx-default.conf.template /etc/nginx/conf.d/default.conf.template
+COPY ./docker/docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

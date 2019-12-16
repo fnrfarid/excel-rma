@@ -1,0 +1,22 @@
+image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
+
+stages:
+  - tests
+
+test_excel_mobile:
+  stage: tests
+  before_script:
+    - npm install
+  script:
+    # Check Code Quality
+    - npm run lint
+    - npm run format:check
+    # set env variable for test
+    - export NODE_ENV=test
+    # Test frontend
+    - export DISPLAY=:99
+    - Xvfb :0 -ac -screen 0 1024x768x24 &
+    - npm run test
+    - npm run e2e
+  tags:
+    - docker

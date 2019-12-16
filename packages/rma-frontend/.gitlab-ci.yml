@@ -1,0 +1,25 @@
+image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
+
+stages:
+  - tests
+
+test_frappe_direct_server:
+  stage: tests
+  only:
+    refs:
+      - merge_requests
+      - master
+  before_script:
+    - npm install
+  script:
+    # set env variable for test
+    - export NODE_ENV=test
+    # Check Code Quality
+    - npm run lint
+    - npm run format:check
+    # Test backend unit tests
+    - npm run test
+    # Test backend e2e
+    - npm run e2e
+  tags:
+    - docker

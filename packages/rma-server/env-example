@@ -1,0 +1,8 @@
+DB_HOST=localhost
+DB_NAME=frappe-direct
+DB_PASSWORD=admin
+DB_USER=frappe-direct
+CACHE_DB_NAME=token-cache
+CACHE_DB_PASSWORD=admin
+CACHE_DB_USER=token-cache
+MONGODB_ROOT_PASSWORD=admin
