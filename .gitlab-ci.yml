@@ -1,5 +1,9 @@
 image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
 
+services:
+  - name: docker:dind
+    alias: docker
+
 stages:
   - tests
   - pack
