@@ -9,9 +9,9 @@ export class AddCustomerHandler implements ICommandHandler<AddCustomerCommand> {
     private manager: CustomerAggregateService,
   ) {}
   async execute(command: AddCustomerCommand) {
-    const { CustomerPayload, clientHttpRequest } = command;
+    const { customerPayload, clientHttpRequest } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await aggregate.addCustomer(CustomerPayload, clientHttpRequest);
+    await aggregate.addCustomer(customerPayload, clientHttpRequest);
     aggregate.commit();
   }
 }

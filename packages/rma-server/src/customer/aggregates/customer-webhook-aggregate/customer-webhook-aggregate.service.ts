@@ -126,7 +126,7 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
   }
 
   customerDeleted(customer: CustomerWebhookInterface) {
-    return this.customerService.deleteOne({ owner: customer.owner });
+    return from(this.customerService.deleteOne({ owner: customer.owner }));
   }
 
   customerUpdated(customerPayload: CustomerWebhookInterface) {
