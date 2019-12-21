@@ -18,6 +18,7 @@ import { DirectModule } from './direct/direct.module';
 import { CustomerWebhookController } from './customer/controllers/customer-webhook/customer-webhook.controller';
 import { CustomerWebhookAggregateService } from './customer/aggregates/customer-webhook-aggregate/customer-webhook-aggregate.service';
 import { CustomerModule } from './customer/customer.module';
+import { ItemModule } from './item/Item.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { CustomerModule } from './customer/customer.module';
     SystemSettingsModule,
     DirectModule,
     CustomerModule,
+    ItemModule,
   ],
   controllers: [AppController, CustomerWebhookController],
   providers: [AppService, CustomerWebhookAggregateService],

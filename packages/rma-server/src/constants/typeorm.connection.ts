@@ -15,6 +15,7 @@ import { TokenCache } from '../auth/entities/token-cache/token-cache.entity';
 import { FrappeToken } from '../direct/entities/frappe-token/frappe-token.entity';
 import { RequestState } from '../direct/entities/request-state/request-state.entity';
 import { Customer } from '../customer/entity/customer/customer.entity';
+import { Item } from '../item/entity/item/item.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -30,7 +31,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
     type: 'mongodb',
     logging: false,
     synchronize: true,
-    entities: [ServerSettings, FrappeToken, RequestState, Customer],
+    entities: [ServerSettings, FrappeToken, RequestState, Customer, Item],
     useNewUrlParser: true,
     w: 'majority',
     useUnifiedTopology: true,
