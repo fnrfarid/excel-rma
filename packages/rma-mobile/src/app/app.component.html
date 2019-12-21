@@ -10,7 +10,7 @@
         <ion-list>
           <ion-menu-toggle auto-hide="false">
             <ion-item routerDirection="'root'"
-              *ngIf="!loggedIn && !hideAuthButtons"
+              *ngIf="!loggedIn"
               routerLink="/"
               (click)="login()" class="clickable">
               <ion-icon slot="start" name="log-in"></ion-icon>
@@ -23,7 +23,7 @@
             </ion-item>
             <ion-item routerDirection="'root'"
               routerLink="/"
-              *ngIf="loggedIn && !hideAuthButtons"
+              *ngIf="loggedIn"
               (click)="logout()" class="clickable">
               <ion-icon slot="start" name="log-out"></ion-icon>
               <ion-label>Logout</ion-label>

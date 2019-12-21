@@ -9,9 +9,7 @@ import { ServerSettingsService } from '../../entities/server-settings/server-set
 import { ServerSettings } from '../../entities/server-settings/server-settings.entity';
 import {
   BEARER_HEADER_VALUE_PREFIX,
-  APPLICATION_JSON_CONTENT_TYPE,
   AUTHORIZATION,
-  CONTENT_TYPE_HEADER_KEY,
 } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import {
@@ -35,12 +33,9 @@ export class SettingsService extends AggregateRoot {
     return from(this.serverSettingsService.update(query, params));
   }
 
-  getHeaders(token: TokenCache) {
-    const headers = {};
-    headers[
-      AUTHORIZATION
-    ] = `${BEARER_HEADER_VALUE_PREFIX} ${token.accessToken}`;
-    headers[CONTENT_TYPE_HEADER_KEY] = APPLICATION_JSON_CONTENT_TYPE;
+  getAuthorizationHeaders(token: TokenCache) {
+    const headers: any = {};
+    headers[AUTHORIZATION] = BEARER_HEADER_VALUE_PREFIX + token.accessToken;
     return headers;
   }
 
