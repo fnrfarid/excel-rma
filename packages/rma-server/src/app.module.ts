@@ -19,6 +19,8 @@ import { CustomerWebhookController } from './customer/controllers/customer-webho
 import { CustomerWebhookAggregateService } from './customer/aggregates/customer-webhook-aggregate/customer-webhook-aggregate.service';
 import { CustomerModule } from './customer/customer.module';
 import { ItemModule } from './item/Item.module';
+import { SupplierModule } from './supplier/supplier.module';
+import { SupplierWebhookController } from './supplier/controllers/supplier-webhook/supplier-webhook.controller';
 
 @Module({
   imports: [
@@ -41,9 +43,14 @@ import { ItemModule } from './item/Item.module';
     SystemSettingsModule,
     DirectModule,
     CustomerModule,
+    SupplierModule,
     ItemModule,
   ],
-  controllers: [AppController, CustomerWebhookController],
+  controllers: [
+    AppController,
+    CustomerWebhookController,
+    SupplierWebhookController,
+  ],
   providers: [AppService, CustomerWebhookAggregateService],
 })
 export class AppModule {}
