@@ -15,10 +15,10 @@ import { TokenGuard } from '../../../auth/guards/token.guard';
 import { AddCustomerCommand } from '../../command/add-customer/add-customer.command';
 import { RemoveCustomerCommand } from '../../command/remove-customer/remove-customer.command';
 import { UpdateCustomerCommand } from '../../command/update-customer/update-customer.command';
-import { Customer } from '../../entity/customer/customer.entity';
 import { RetrieveCustomerQuery } from '../../query/get-customer/retrieve-customer.query';
 import { RetrieveCustomerListQuery } from '../../query/list-customer/retrieve-customer-list.query';
 import { CustomerDto } from '../../../customer/entity/customer/customer-dto';
+import { UpdateCustomerDto } from '../../entity/customer/update-customer-dto';
 
 @Controller('customer')
 export class CustomerController {
@@ -44,13 +44,13 @@ export class CustomerController {
 
   @Get('v1/get/:uuid')
   @UseGuards(TokenGuard)
-  async getClient(@Param('uuid') uuid, @Req() req) {
+  async getCustomer(@Param('uuid') uuid, @Req() req) {
     return await this.queryBus.execute(new RetrieveCustomerQuery(uuid, req));
   }
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  getClientList(
+  getCustomerList(
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
     @Query('search') search = '',
@@ -74,7 +74,7 @@ export class CustomerController {
   @Post('v1/update')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateClient(@Body() updatePayload: Customer) {
+  updateCustomer(@Body() updatePayload: UpdateCustomerDto) {
     return this.commandBus.execute(new UpdateCustomerCommand(updatePayload));
   }
 }

@@ -1,6 +1,6 @@
 import { ICommand } from '@nestjs/cqrs';
-import { Customer } from '../../entity/customer/customer.entity';
+import { UpdateCustomerDto } from '../../entity/customer/update-customer-dto';
 
 export class UpdateCustomerCommand implements ICommand {
-  constructor(public readonly updatePayload: Customer) {}
+  constructor(public readonly updatePayload: UpdateCustomerDto) {}
 }
