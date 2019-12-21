@@ -33,3 +33,4 @@ export const TOKEN_ENDPOINT =
 export const TWENTY_MINUTES_IN_SECONDS = 20 * 60; // 20 min * 60 sec;
 export const SCOPE = 'all openid';
 export const ACTIVE = 'Active';
+export const CUSTOMER_ALREADY_EXISTS = 'Customer already exists';

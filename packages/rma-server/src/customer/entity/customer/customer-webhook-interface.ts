@@ -6,8 +6,6 @@ export interface CustomerWebhookInterface {
   gst_category: string;
   customer_group: string;
   territory: string;
-  credit_limits: CreditLimitsInterface[];
-  company: string;
 }
 
 export interface CreditLimitsInterface {

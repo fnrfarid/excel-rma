@@ -1,5 +1,10 @@
 import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
 
+export class CustomerCreditLimit {
+  credit_limit: number;
+  company: string;
+}
+
 @Entity()
 export class Customer extends BaseEntity {
   @ObjectIdColumn()
@@ -33,5 +38,8 @@ export class Customer extends BaseEntity {
   territory: string;
 
   @Column()
-  credit_limit: string;
+  credit_limits: CustomerCreditLimit[];
+
+  @Column()
+  isSynced: boolean;
 }
