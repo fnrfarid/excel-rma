@@ -15,6 +15,9 @@ import { ConfigService } from './config/config.service';
 import { TerminusModule } from '@nestjs/terminus';
 import { TerminusOptionsService } from './system-settings/aggregates/terminus-options/terminus-options.service';
 import { DirectModule } from './direct/direct.module';
+import { CustomerWebhookController } from './customer/controllers/customer-webhook/customer-webhook.controller';
+import { CustomerWebhookAggregateService } from './customer/aggregates/customer-webhook-aggregate/customer-webhook-aggregate.service';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -36,8 +39,9 @@ import { DirectModule } from './direct/direct.module';
     AuthModule,
     SystemSettingsModule,
     DirectModule,
+    CustomerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, CustomerWebhookController],
+  providers: [AppService, CustomerWebhookAggregateService],
 })
 export class AppModule {}
