@@ -7,10 +7,11 @@ import { SupplierCommandManager } from './command';
 import { SupplierEventManager } from './event';
 import { SupplierController } from './controllers/supplier/supplier.controller';
 import { SupplierPoliciesService } from './policies/supplier-policies/supplier-policies.service';
+import { SupplierWebhookController } from './controllers/supplier-webhook/supplier-webhook.controller';
 
 @Module({
   imports: [SupplierEntitiesModule, CqrsModule, HttpModule],
-  controllers: [SupplierController],
+  controllers: [SupplierController, SupplierWebhookController],
   providers: [
     ...SupplierAggregatesManager,
     ...SupplierQueryManager,
@@ -18,6 +19,6 @@ import { SupplierPoliciesService } from './policies/supplier-policies/supplier-p
     ...SupplierCommandManager,
     SupplierPoliciesService,
   ],
-  exports: [SupplierEntitiesModule],
+  exports: [SupplierEntitiesModule, ...SupplierAggregatesManager],
 })
 export class SupplierModule {}
