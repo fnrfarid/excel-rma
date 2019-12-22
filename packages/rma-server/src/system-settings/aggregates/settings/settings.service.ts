@@ -1,26 +1,57 @@
 import {
   Injectable,
-  BadRequestException,
   NotImplementedException,
+  HttpService,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { Observable, from } from 'rxjs';
+import { Observable, from, forkJoin, throwError } from 'rxjs';
+import { switchMap, catchError, map } from 'rxjs/operators';
+import { randomBytes } from 'crypto';
 import { ServerSettingsService } from '../../entities/server-settings/server-settings.service';
 import { ServerSettings } from '../../entities/server-settings/server-settings.entity';
 import {
   BEARER_HEADER_VALUE_PREFIX,
   AUTHORIZATION,
+  TOKEN_ADD_ENDPOINT,
+  TOKEN_DELETE_ENDPOINT,
+  CONTENT_TYPE,
+  ACCEPT,
+  APPLICATION_JSON_CONTENT_TYPE,
+  SUPPLIER_AFTER_INSERT_ENDPOINT,
+  SUPPLIER_ON_UPDATE_ENDPOINT,
+  SUPPLIER_ON_TRASH_ENDPOINT,
+  CUSTOMER_AFTER_INSERT_ENDPOINT,
+  CUSTOMER_ON_UPDATE_ENDPOINT,
+  CUSTOMER_ON_TRASH_ENDPOINT,
+  ITEM_ON_UPDATE_ENDPOINT,
+  ITEM_ON_TRASH_ENDPOINT,
+  ITEM_AFTER_INSERT_ENDPOINT,
 } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
+import { PLEASE_RUN_SETUP } from '../../../constants/messages';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import {
-  PLEASE_RUN_SETUP,
-  SETUP_ALREADY_COMPLETE,
-} from '../../../constants/messages';
-import { randomBytes } from 'crypto';
+  getBearerTokenOnTrashWebhookData,
+  getBearerTokenAfterInsertWebhookData,
+  getSupplierAfterInsertWebhookData,
+  getSupplierOnUpdateWebhookData,
+  getSupplierOnTrashWebhookData,
+  getCustomerAfterInsertWebhookData,
+  getCustomerOnUpdateWebhookData,
+  getCustomerOnTrashWebhookData,
+  getItemAfterInsertWebhookData,
+  getItemOnUpdateWebhookData,
+  getItemOnTrashWebhookData,
+} from '../../../constants/webhook-data';
 
 @Injectable()
 export class SettingsService extends AggregateRoot {
-  constructor(private readonly serverSettingsService: ServerSettingsService) {
+  constructor(
+    private readonly serverSettingsService: ServerSettingsService,
+    private readonly clientToken: ClientTokenManagerService,
+    private readonly http: HttpService,
+  ) {
     super();
   }
 
@@ -39,25 +70,155 @@ export class SettingsService extends AggregateRoot {
     return headers;
   }
 
-  async setupFrappeWebhookKey() {
-    const settings = await this.serverSettingsService.find();
-    if (!settings) throw new NotImplementedException(PLEASE_RUN_SETUP);
-    if (settings.webhookApiKey)
-      throw new BadRequestException(SETUP_ALREADY_COMPLETE);
-    settings.webhookApiKey = this.randomBytes32();
-    settings.save();
-    return settings;
-  }
-
   async updateFrappeWebhookKey() {
     const settings = await this.serverSettingsService.find();
     if (!settings) throw new NotImplementedException(PLEASE_RUN_SETUP);
-    settings.webhookApiKey = this.randomBytes32();
+    settings.webhookApiKey = this.randomBytes();
     settings.save();
     return settings;
   }
 
-  randomBytes32() {
-    return randomBytes(32).toString('hex');
+  randomBytes(length: number = 64) {
+    return randomBytes(length).toString('hex');
+  }
+
+  setupWebhooks() {
+    let serverSettings: ServerSettings;
+    const headers = {};
+
+    headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
+    headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
+
+    return this.find().pipe(
+      switchMap(settings => {
+        serverSettings = settings;
+        return this.clientToken.getClientToken();
+      }),
+      switchMap(token => {
+        headers[AUTHORIZATION] = BEARER_HEADER_VALUE_PREFIX + token.accessToken;
+        return forkJoin(
+          // Item Webhooks
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getItemAfterInsertWebhookData(
+                serverSettings.appURL + ITEM_AFTER_INSERT_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getItemOnUpdateWebhookData(
+                serverSettings.appURL + ITEM_ON_UPDATE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getItemOnTrashWebhookData(
+                serverSettings.appURL + ITEM_ON_TRASH_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          // Customer Webhooks
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getCustomerAfterInsertWebhookData(
+                serverSettings.appURL + CUSTOMER_AFTER_INSERT_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getCustomerOnUpdateWebhookData(
+                serverSettings.appURL + CUSTOMER_ON_UPDATE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getCustomerOnTrashWebhookData(
+                serverSettings.appURL + CUSTOMER_ON_TRASH_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          // Supplier Webhooks
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getSupplierAfterInsertWebhookData(
+                serverSettings.appURL + SUPPLIER_AFTER_INSERT_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getSupplierOnUpdateWebhookData(
+                serverSettings.appURL + SUPPLIER_ON_UPDATE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getSupplierOnTrashWebhookData(
+                serverSettings.appURL + SUPPLIER_ON_TRASH_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          // OAuth Bearer Token Webhooks
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getBearerTokenAfterInsertWebhookData(
+                serverSettings.appURL + TOKEN_ADD_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getBearerTokenOnTrashWebhookData(
+                serverSettings.appURL + TOKEN_DELETE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+        );
+      }),
+      catchError(error => {
+        return throwError(new InternalServerErrorException(error));
+      }),
+    );
   }
 }

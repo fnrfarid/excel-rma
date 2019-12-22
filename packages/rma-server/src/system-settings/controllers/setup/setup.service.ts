@@ -1,8 +1,8 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { settingsAlreadyExists } from '../../../constants/exceptions';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
-import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
+import { SettingsService } from '../../aggregates/settings/settings.service';
 import {
   PROFILE_ENDPOINT,
   AUTH_ENDPOINT,
@@ -13,13 +13,10 @@ import {
 
 @Injectable()
 export class SetupService {
-  constructor(
-    protected readonly serverSettingsService: ServerSettingsService,
-    protected readonly http: HttpService,
-  ) {}
+  constructor(protected readonly settingsService: SettingsService) {}
 
   async setup(params) {
-    if (await this.serverSettingsService.count()) {
+    if (await this.settingsService.find().toPromise()) {
       throw settingsAlreadyExists;
     }
 
@@ -39,7 +36,7 @@ export class SetupService {
   }
 
   async getInfo() {
-    const info = await this.serverSettingsService.find();
+    const info = await this.settingsService.find().toPromise();
     if (info) {
       info._id = undefined;
       info.serviceAccountUser = undefined;
