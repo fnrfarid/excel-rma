@@ -13,20 +13,9 @@ import { ServerSettings } from '../../entities/server-settings/server-settings.e
 import {
   BEARER_HEADER_VALUE_PREFIX,
   AUTHORIZATION,
-  TOKEN_ADD_ENDPOINT,
-  TOKEN_DELETE_ENDPOINT,
   CONTENT_TYPE,
   ACCEPT,
   APPLICATION_JSON_CONTENT_TYPE,
-  SUPPLIER_AFTER_INSERT_ENDPOINT,
-  SUPPLIER_ON_UPDATE_ENDPOINT,
-  SUPPLIER_ON_TRASH_ENDPOINT,
-  CUSTOMER_AFTER_INSERT_ENDPOINT,
-  CUSTOMER_ON_UPDATE_ENDPOINT,
-  CUSTOMER_ON_TRASH_ENDPOINT,
-  ITEM_ON_UPDATE_ENDPOINT,
-  ITEM_ON_TRASH_ENDPOINT,
-  ITEM_AFTER_INSERT_ENDPOINT,
 } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { PLEASE_RUN_SETUP } from '../../../constants/messages';
@@ -44,6 +33,19 @@ import {
   getItemOnUpdateWebhookData,
   getItemOnTrashWebhookData,
 } from '../../../constants/webhook-data';
+import {
+  ITEM_AFTER_INSERT_ENDPOINT,
+  ITEM_ON_UPDATE_ENDPOINT,
+  ITEM_ON_TRASH_ENDPOINT,
+  CUSTOMER_AFTER_INSERT_ENDPOINT,
+  CUSTOMER_ON_UPDATE_ENDPOINT,
+  CUSTOMER_ON_TRASH_ENDPOINT,
+  SUPPLIER_AFTER_INSERT_ENDPOINT,
+  SUPPLIER_ON_UPDATE_ENDPOINT,
+  SUPPLIER_ON_TRASH_ENDPOINT,
+  TOKEN_ADD_ENDPOINT,
+  TOKEN_DELETE_ENDPOINT,
+} from '../../../constants/routes';
 
 @Injectable()
 export class SettingsService extends AggregateRoot {

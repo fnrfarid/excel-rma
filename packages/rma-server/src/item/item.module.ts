@@ -5,7 +5,7 @@ import { ItemQueryManager } from './query';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ItemController } from './controllers/item/item.controller';
 import { ItemPoliciesService } from './policies/item-policies/item-policies.service';
-import { ItemWebhookController } from './controllers/item-webhook/Item-webhook.controller';
+import { ItemWebhookController } from './controllers/item-webhook/item-webhook.controller';
 
 @Module({
   imports: [ItemEntitiesModule, CqrsModule, HttpModule],

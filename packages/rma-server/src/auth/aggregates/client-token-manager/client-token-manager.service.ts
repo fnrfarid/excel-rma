@@ -6,7 +6,7 @@ import { TokenCacheService } from '../../entities/token-cache/token-cache.servic
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import {
-  TEN_MINUTES_IN_SECONDS,
+  TWENTY_MINUTES_IN_SECONDS,
   PASSWORD,
   APP_WWW_FORM_URLENCODED,
   REFRESH_TOKEN,
@@ -41,7 +41,7 @@ export class ClientTokenManagerService {
           return this.getNewToken(settings);
         }
         const epochNow = Math.floor(new Date().valueOf() / 1000);
-        if (token.exp - TEN_MINUTES_IN_SECONDS > epochNow) {
+        if (token.exp - TWENTY_MINUTES_IN_SECONDS > epochNow) {
           return of(token);
         }
         return this.refreshExpiredToken(settings, token);
