@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ItemWebhookController } from './Item-webhook.controller';
+import { ItemWebhookController } from './item-webhook.controller';
 import { ItemWebhookAggregateService } from '../../aggregates/item-webhook-aggregate/item-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 
-describe('ItemWebhook Controller', () => {
+describe('ItemWebhookController', () => {
   let controller: ItemWebhookController;
 
   beforeEach(async () => {
