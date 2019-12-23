@@ -4,7 +4,6 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {
   TOKEN,
-  SCOPE,
   ACCESS_TOKEN,
   STATE,
   CALLBACK_ENDPOINT,
@@ -12,6 +11,8 @@ import {
   ACCESS_TOKEN_EXPIRY,
   EXPIRES_IN,
   TEN_MINUTES_IN_MS,
+  SCOPES_OPENID_ALL,
+  TWENTY_MINUTES_IN_SECONDS,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { interval, Subscription } from 'rxjs';
@@ -50,6 +51,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.setupSilentRefresh();
+    this.silentRefresh();
   }
 
   setUserSession() {
@@ -100,7 +102,7 @@ export class AppComponent implements OnInit {
           client_id: response.frontendClientId,
           redirect_uri: response.appURL + CALLBACK_ENDPOINT,
           response_type: TOKEN,
-          scope: SCOPE,
+          scope: SCOPES_OPENID_ALL,
         };
         this.initiateLogin(response.authorizationURL, frappe_auth_config);
         return;
@@ -133,18 +135,18 @@ export class AppComponent implements OnInit {
   }
 
   silentRefresh() {
-    const now = Date.now() / 1000;
+    const now = Math.floor(Date.now() / 1000);
     const expiry = localStorage.getItem(ACCESS_TOKEN_EXPIRY)
       ? Number(localStorage.getItem(ACCESS_TOKEN_EXPIRY))
       : now;
-    if (now > expiry - TEN_MINUTES_IN_MS) {
+    if (now > expiry - TWENTY_MINUTES_IN_SECONDS) {
       this.appService.getMessage().subscribe(response => {
         if (response.message) return;
         const frappe_auth_config = {
           client_id: response.frontendClientId,
           redirect_uri: response.appURL + SILENT_REFRESH_ENDPOINT,
           response_type: TOKEN,
-          scope: SCOPE,
+          scope: SCOPES_OPENID_ALL,
         };
         const url = this.getEncodedFrappeLoginUrl(
           response.authorizationURL,
