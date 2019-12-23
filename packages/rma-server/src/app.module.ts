@@ -18,6 +18,7 @@ import { DirectModule } from './direct/direct.module';
 import { CustomerModule } from './customer/customer.module';
 import { ItemModule } from './item/item.module';
 import { SupplierModule } from './supplier/supplier.module';
+import { SerialNoModule } from './serial-no/serial-no.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { SupplierModule } from './supplier/supplier.module';
     CustomerModule,
     SupplierModule,
     ItemModule,
+    SerialNoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
