@@ -7,6 +7,7 @@ import { CustomerDto } from '../../entity/customer/customer-dto';
 import { CustomerRemovedEvent } from '../../event/customer-removed/customer-removed.event';
 import { CustomerUpdatedEvent } from '../../event/customer-updated/customer-updated.event';
 import { Customer } from '../../entity/customer/customer.entity';
+import { UpdateCustomerDto } from '../../entity/customer/update-customer-dto';
 
 @Injectable()
 export class CustomerAggregateService extends AggregateRoot {
@@ -39,7 +40,7 @@ export class CustomerAggregateService extends AggregateRoot {
     this.apply(new CustomerRemovedEvent(customerFound));
   }
 
-  async updateCustomer(updatePayload: Customer) {
+  async updateCustomer(updatePayload: UpdateCustomerDto) {
     const customer = await this.customerService.findOne({
       uuid: updatePayload.uuid,
     });

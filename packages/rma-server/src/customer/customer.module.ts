@@ -7,10 +7,11 @@ import { CustomerCommandManager } from './command';
 import { CustomerEventManager } from './event';
 import { CustomerController } from './controllers/customer/customer.controller';
 import { CustomerPoliciesService } from './policies/customer-policies/customer-policies.service';
+import { CustomerWebhookController } from './controllers/customer-webhook/customer-webhook.controller';
 
 @Module({
   imports: [CustomerEntitiesModule, CqrsModule, HttpModule],
-  controllers: [CustomerController],
+  controllers: [CustomerController, CustomerWebhookController],
   providers: [
     ...CustomerAggregatesManager,
     ...CustomerQueryManager,
@@ -18,6 +19,6 @@ import { CustomerPoliciesService } from './policies/customer-policies/customer-p
     ...CustomerCommandManager,
     CustomerPoliciesService,
   ],
-  exports: [CustomerEntitiesModule],
+  exports: [CustomerEntitiesModule, ...CustomerAggregatesManager],
 })
 export class CustomerModule {}

@@ -39,17 +39,17 @@ export class SettingsController {
     );
   }
 
-  @Post('v1/setup_webhook_key')
-  // @Roles(ADMINISTRATOR)
-  // @UseGuards(TokenGuard, RoleGuard)
-  async setupFrappeWebhookApi() {
-    return await this.settingsService.setupFrappeWebhookKey();
-  }
-
   @Post('v1/update_webhook_key')
-  // @Roles(ADMINISTRATOR)
-  // @UseGuards(TokenGuard, RoleGuard)
+  @Roles(SYSTEM_MANAGER)
+  @UseGuards(TokenGuard, RoleGuard)
   updateFrappeServerApi() {
     return this.settingsService.updateFrappeWebhookKey();
+  }
+
+  @Post('v1/setup_webhooks')
+  @Roles(SYSTEM_MANAGER)
+  @UseGuards(TokenGuard, RoleGuard)
+  setupWebhooks() {
+    return this.settingsService.setupWebhooks();
   }
 }

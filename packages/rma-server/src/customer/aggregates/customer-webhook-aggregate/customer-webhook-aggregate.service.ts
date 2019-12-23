@@ -11,14 +11,7 @@ import {
 } from '../../entity/customer/customer-webhook-interface';
 import { CustomerService } from '../../entity/customer/customer.service';
 import { from, throwError, of } from 'rxjs';
-import {
-  switchMap,
-  map,
-  retryWhen,
-  delay,
-  retry,
-  concat,
-} from 'rxjs/operators';
+import { switchMap, map, retry } from 'rxjs/operators';
 import { CUSTOMER_ALREADY_EXISTS } from '../../../constants/app-strings';
 import { Customer } from '../../entity/customer/customer.entity';
 import * as uuidv4 from 'uuid/v4';
@@ -102,9 +95,7 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
                   ),
                 );
             }),
-            retryWhen(err =>
-              err.pipe(delay(3000), retry(3), concat(throwError(err))),
-            ),
+            retry(3),
           );
         }),
       )
@@ -126,7 +117,7 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
   }
 
   customerDeleted(customer: CustomerWebhookInterface) {
-    return this.customerService.deleteOne({ owner: customer.owner });
+    return from(this.customerService.deleteOne({ owner: customer.owner }));
   }
 
   customerUpdated(customerPayload: CustomerWebhookInterface) {

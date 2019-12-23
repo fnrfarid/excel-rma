@@ -96,7 +96,7 @@ pack_rma_server:
   script:
     - export VERSION=$(git tag --list "rma-server@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
     - docker build -t rma-server packages/rma-server
-    - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION
+    # - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION
     - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:latest
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server
 
@@ -114,7 +114,7 @@ pack_rma_frontend:
   script:
     - export VERSION=$(git tag --list "rma-frontend@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
     - docker build -t rma-frontend packages/rma-frontend
-    - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
+    # - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
     - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend
 

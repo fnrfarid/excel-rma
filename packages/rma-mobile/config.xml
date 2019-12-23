@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="in.castlecraft.excelrma" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Mobile app to connect with rma server</name>
-    <description>An awesome Ionic/Cordova app.</description>
+    <name>Excel RMA Mobile</name>
+    <description>Mobile app for Excel RMA</description>
     <author email="support@castlecraft.in" href="https://castlecraft.in/">Castlecraft Team</author>
     <content src="index.html" />
     <access origin="*" />

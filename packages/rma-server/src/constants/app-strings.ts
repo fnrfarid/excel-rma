@@ -34,3 +34,14 @@ export const TWENTY_MINUTES_IN_SECONDS = 20 * 60; // 20 min * 60 sec;
 export const SCOPE = 'all openid';
 export const ACTIVE = 'Active';
 export const CUSTOMER_ALREADY_EXISTS = 'Customer already exists';
+export const ITEM_ALREADY_EXISTS = 'Item already exists';
+export const SUPPLIER_ALREADY_EXISTS = 'Supplier already exists';
+export const ACCEPT = 'Accept';
+export const ITEM_METADATA_FILTER_FIELDS = [
+  'creation',
+  'modified',
+  'modified_by',
+  'parent',
+  'parentfield',
+  'parenttype',
+];

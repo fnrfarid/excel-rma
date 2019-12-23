@@ -75,7 +75,7 @@
     "tslint": "^5.20.1",
     "typescript": "^3.4.5"
   },
-  "description": "Mobile app to connect with rma server",
+  "description": "Mobile app for Excel RMA",
   "cordova": {
     "plugins": {
       "cordova-plugin-whitelist": {},
