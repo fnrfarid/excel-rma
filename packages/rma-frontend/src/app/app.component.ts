@@ -51,7 +51,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.setupSilentRefresh();
-    this.silentRefresh();
   }
 
   setUserSession() {
