@@ -28,8 +28,8 @@ export class CustomerAggregateService extends AggregateRoot {
     return customer;
   }
 
-  async getCustomerList(offset, limit, sort, search, clientHttpRequest) {
-    return this.customerService.list(offset, limit, search, sort);
+  async getCustomerList(offset, limit, search, sort, clientHttpRequest) {
+    return await this.customerService.list(offset, limit, search, sort);
   }
 
   async removeCustomer(uuid: string) {

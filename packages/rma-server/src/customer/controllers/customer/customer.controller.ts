@@ -50,7 +50,7 @@ export class CustomerController {
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  getCustomerList(
+  async getCustomerList(
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
     @Query('search') search = '',
@@ -60,12 +60,12 @@ export class CustomerController {
     if (sort !== 'ASC') {
       sort = 'DESC';
     }
-    return this.queryBus.execute(
+    return await this.queryBus.execute(
       new RetrieveCustomerListQuery(
         offset,
         limit,
-        sort,
         search,
+        sort,
         clientHttpRequest,
       ),
     );

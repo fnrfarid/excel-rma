@@ -1,6 +1,6 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class RetrieveCustomerListQuery implements IQuery {
+export class RetrieveItemListQuery implements IQuery {
   constructor(
     public offset: number,
     public limit: number,

@@ -153,6 +153,7 @@ export class ItemWebhookAggregateService extends AggregateRoot {
           });
           return of();
         }
+        itemPayload.isSynced = true;
         this.itemService
           .updateOne({ uuid: item.uuid }, { $set: itemPayload })
           .then(success => {})
