@@ -1,4 +1,20 @@
-export interface ItemDefaults {
+export interface BarcodesInterface {
+  name: string;
+  idx: number;
+  docstatus: number;
+  barcode: string;
+  barcode_type: string;
+}
+
+export interface UomInterface {
+  name: string;
+  idx: number;
+  docstatus: number;
+  conversion_factor: number;
+  uom: string;
+  doctype: string;
+}
+export interface ItemDefaultsInterface {
   company: string;
   default_warehouse: string;
   doctype: string;
@@ -28,6 +44,7 @@ export interface ItemWebhookInterface {
   last_purchase_rate: number;
   country_of_origin: string;
   is_sales_item: number;
+  isSynced?: boolean;
 }
 
 export interface ItemApiResponseInterface {
@@ -54,26 +71,9 @@ export interface ItemApiResponseInterface {
   last_purchase_rate: number;
   country_of_origin: string;
   is_sales_item: number;
-  barcodes: Barcodes[];
-  uoms: Uom[];
+  barcodes: BarcodesInterface[];
+  uoms: UomInterface[];
   attributes: any[];
-  item_defaults: ItemDefaults[];
+  item_defaults: ItemDefaultsInterface[];
   taxes: any[];
-}
-
-export interface Barcodes {
-  name: string;
-  idx: number;
-  docstatus: number;
-  barcode: string;
-  barcode_type: string;
-}
-
-export interface Uom {
-  name: string;
-  idx: number;
-  docstatus: number;
-  conversion_factor: number;
-  uom: string;
-  doctype: string;
 }

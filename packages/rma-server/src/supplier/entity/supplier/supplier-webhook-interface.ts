@@ -14,4 +14,5 @@ export interface SupplierWebhookInterface {
   docstatus: string;
   gst_category: string;
   export_type: string;
+  isSynced?: boolean;
 }
