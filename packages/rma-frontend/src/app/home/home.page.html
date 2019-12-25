@@ -25,15 +25,21 @@
 
 <ion-content *ngIf="loggedIn" class="card">
   <ion-grid style="height: 30%">
-    <ion-row class="ion-justify-content-center ion-align-items-center" style="height: 100%">
-        <ion-icon name="log-in"></ion-icon>&nbsp;Awesome!! Welcome to Excelbd...
+    <ion-row
+      class="ion-justify-content-center ion-align-items-center"
+      style="height: 100%"
+    >
+      <ion-icon name="log-in"></ion-icon>&nbsp;Awesome!! Welcome to Excelbd...
     </ion-row>
   </ion-grid>
 </ion-content>
 <ion-content *ngIf="!loggedIn" class="card">
-	<ion-grid style="height: 100%">
-		<ion-row class="ion-justify-content-center ion-align-items-center" style="height: 100%">
-        <ion-icon name="log-in"></ion-icon>&nbsp;Please Login to continue
-		</ion-row>
-	</ion-grid>
+  <ion-grid style="height: 100%">
+    <ion-row
+      class="ion-justify-content-center ion-align-items-center"
+      style="height: 100%"
+    >
+      <ion-icon name="log-in"></ion-icon>&nbsp;Please Login to continue
+    </ion-row>
+  </ion-grid>
 </ion-content>

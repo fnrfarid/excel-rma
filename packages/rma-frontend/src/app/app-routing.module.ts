@@ -17,6 +17,24 @@ const routes: Routes = [
     loadChildren: './callback/callback.module#CallbackPageModule',
   },
 
+  {
+    path: 'sales',
+    loadChildren: './sales-ui/sales/sales.module#SalesPageModule',
+  },
+  {
+    path: 'add-sales-invoice/:calledFrom',
+    loadChildren:
+      './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
+  },
+  {
+    path: 'add-purchase-invoice',
+    loadChildren:
+      './purchase-ui/add-purchase-invoice/add-purchase-invoice.module#AddPurchaseInvoicePageModule',
+  },
+  {
+    path: 'purchase',
+    loadChildren: './purchase-ui/purchase/purchase.module#PurchasePageModule',
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
