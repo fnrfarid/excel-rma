@@ -36,7 +36,7 @@ export class SupplierWebhookAggregateService extends AggregateRoot {
     const supplier = new Supplier();
     Object.assign(supplier, supplierWebhookPayload);
     supplier.uuid = uuidv4();
-    supplier.isSynced = false;
+    supplier.isSynced = true;
     return supplier;
   }
 
@@ -48,6 +48,7 @@ export class SupplierWebhookAggregateService extends AggregateRoot {
         if (!supplier) {
           return this.supplierCreated(supplierPayload);
         }
+        supplierPayload.isSynced = true;
         this.supplierService
           .updateOne({ uuid: supplier.uuid }, { $set: supplierPayload })
           .then(success => {})

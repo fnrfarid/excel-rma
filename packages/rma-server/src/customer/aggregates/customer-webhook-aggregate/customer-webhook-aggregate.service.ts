@@ -132,6 +132,7 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
           });
           return of();
         }
+        customer.isSynced = true;
         this.customerService
           .updateOne({ uuid: customer.uuid }, { $set: customerPayload })
           .then(success => {})

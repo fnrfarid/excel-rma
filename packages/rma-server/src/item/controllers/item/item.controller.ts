@@ -1,6 +1,6 @@
 import { Controller, Req, Param, Get, Query, UseGuards } from '@nestjs/common';
 import { RetrieveItemQuery } from '../../query/get-item/retrieve-item.query';
-import { RetrieveCustomerListQuery } from '../../query/list-customer/retrieve-customer-list.query';
+import { RetrieveItemListQuery } from '../../query/list-item/retrieve-item-list.query';
 import { QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 
@@ -27,13 +27,7 @@ export class ItemController {
       sort = 'DESC';
     }
     return this.queryBus.execute(
-      new RetrieveCustomerListQuery(
-        offset,
-        limit,
-        sort,
-        search,
-        clientHttpRequest,
-      ),
+      new RetrieveItemListQuery(offset, limit, sort, search, clientHttpRequest),
     );
   }
 }

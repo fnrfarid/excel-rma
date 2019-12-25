@@ -15,3 +15,4 @@ export const CUSTOMER_ON_TRASH_ENDPOINT = '/api/customer/webhook/v1/delete';
 export const ITEM_AFTER_INSERT_ENDPOINT = '/api/item/webhook/v1/create';
 export const ITEM_ON_UPDATE_ENDPOINT = '/api/item/webhook/v1/update';
 export const ITEM_ON_TRASH_ENDPOINT = '/api/item/webhook/v1/delete';
+export const FRAPPE_API_SERIAL_NO_ENDPOINT = '/api/resource/Serial%20No';

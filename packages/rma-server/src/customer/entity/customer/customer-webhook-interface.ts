@@ -6,6 +6,7 @@ export interface CustomerWebhookInterface {
   gst_category: string;
   customer_group: string;
   territory: string;
+  isSynced?: boolean;
 }
 
 export interface CreditLimitsInterface {

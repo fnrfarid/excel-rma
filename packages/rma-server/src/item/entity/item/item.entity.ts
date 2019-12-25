@@ -1,5 +1,27 @@
 import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
 
+export class Barcodes {
+  name: string;
+  idx: number;
+  docstatus: number;
+  barcode: string;
+  barcode_type: string;
+}
+
+export class Uom {
+  name: string;
+  idx: number;
+  docstatus: number;
+  conversion_factor: number;
+  uom: string;
+  doctype: string;
+}
+export class ItemDefaults {
+  company: string;
+  default_warehouse: string;
+  doctype: string;
+}
+
 @Entity()
 export class Item extends BaseEntity {
   @ObjectIdColumn()
@@ -76,6 +98,18 @@ export class Item extends BaseEntity {
 
   @Column()
   is_sales_item: number;
+
+  @Column()
+  taxes: any[];
+
+  @Column()
+  attributes: any[];
+
+  @Column()
+  uoms: Uom[];
+
+  @Column()
+  item_defaults: ItemDefaults[];
 
   @Column()
   isSynced: boolean;

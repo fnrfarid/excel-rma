@@ -6,6 +6,7 @@ import { CustomerAggregateService } from '../../aggregates/customer-aggregate/cu
 export class RetrieveCustomerListHandler
   implements IQueryHandler<RetrieveCustomerListQuery> {
   constructor(private readonly manager: CustomerAggregateService) {}
+
   async execute(query: RetrieveCustomerListQuery) {
     const { offset, limit, search, sort, clientHttpRequest } = query;
     return await this.manager.getCustomerList(

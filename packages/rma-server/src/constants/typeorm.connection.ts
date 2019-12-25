@@ -17,6 +17,7 @@ import { RequestState } from '../direct/entities/request-state/request-state.ent
 import { Customer } from '../customer/entity/customer/customer.entity';
 import { Item } from '../item/entity/item/item.entity';
 import { Supplier } from '../supplier/entity/supplier/supplier.entity';
+import { SerialNo } from '../serial-no/entity/serial-no/serial-no.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -39,6 +40,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       Customer,
       Item,
       Supplier,
+      SerialNo,
     ],
     useNewUrlParser: true,
     w: 'majority',
