@@ -10,8 +10,8 @@ import { PurchasePage } from './purchase.page';
 const routes: Routes = [
   {
     path: '',
-    component: PurchasePage
-  }
+    component: PurchasePage,
+  },
 ];
 
 @NgModule({
@@ -19,8 +19,8 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
   ],
-  declarations: [PurchasePage]
+  declarations: [PurchasePage],
 })
 export class PurchasePageModule {}

@@ -9,10 +9,9 @@ describe('AddPurchaseInvoicePage', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddPurchaseInvoicePage ],
+      declarations: [AddPurchaseInvoicePage],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
-    .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {
