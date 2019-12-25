@@ -13,6 +13,8 @@ spec:
       {{- include "rma-portal.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        timestamp: "{{ date "20060102150405" .Release.Time }}"
       labels:
         {{- include "rma-portal.selectorLabels" . | nindent 8 }}
     spec:
