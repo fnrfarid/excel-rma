@@ -1,0 +1,14 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SalesPageModule } from './sales/sales.module';
+import { AddSalesInvoicePageModule } from './add-sales-invoice/add-sales-invoice.module';
+import { SalesService } from './services/sales.service';
+
+@NgModule({
+  declarations: [],
+
+  imports: [CommonModule, SalesPageModule, AddSalesInvoicePageModule],
+  exports: [SalesPageModule, AddSalesInvoicePageModule],
+  providers: [SalesService],
+})
+export class SalesUiModule {}

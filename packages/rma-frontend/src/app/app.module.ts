@@ -10,6 +10,8 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppService } from './app.service';
+import { SalesUiModule } from './sales-ui/sales-ui.module';
+import { PurchaseUiModule } from './purchase-ui/purchase-ui.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +21,8 @@ import { AppService } from './app.service';
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
+    SalesUiModule,
+    PurchaseUiModule,
   ],
   providers: [
     AppService,
