@@ -1,6 +1,7 @@
 {
-  "/info": { "target": "http://localhost:8800", "secure": false, "logLevel": "debug" },
-  "/api": { "target": "http://localhost:8800", "secure": false, "logLevel": "debug" },
-  "/setup": { "target": "http://localhost:8800", "secure": false, "logLevel": "debug" },
-  "/settings": { "target": "http://localhost:8800", "secure": false, "logLevel": "debug" }
+  "/api": {
+    "target": "http://localhost:8800",
+    "secure": false,
+    "logLevel": "debug"
+  }
 }

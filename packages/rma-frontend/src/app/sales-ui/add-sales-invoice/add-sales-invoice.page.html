@@ -1,0 +1,121 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add Sales Invoice</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-grid no-padding>
+    <ion-row>
+      <ion-col offset="1" size="10">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-text color="tertiary">
+                Details
+              </ion-text>
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-grid no-padding>
+              <ion-row>
+                <ion-col size="5">
+                  <ion-item>
+                    <ion-label position="floating">Series</ion-label>
+                    <ion-select
+                      interface="popover"
+                      placeholder="Select Series"
+                      [(ngModel)]="salesInvoice.series"
+                    >
+                      <ion-select-option value="sinv">SINV-</ion-select-option>
+                      <ion-select-option value="sinvret"
+                        >SINV-RET-</ion-select-option
+                      >
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+                <ion-col offset="2" size="5">
+                  <ion-item>
+                    <ion-label position="floating">Company</ion-label>
+                    <ion-select
+                      interface="popover"
+                      placeholder="Select Company"
+                      [(ngModel)]="salesInvoice.company"
+                    >
+                      <ion-select-option value="Test Company"
+                        >Test Company</ion-select-option
+                      >
+                      <ion-select-option value="Siddhi Company"
+                        >Siddhi Company</ion-select-option
+                      >
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="5">
+                  <ion-item>
+                    <ion-label position="floating">Customer</ion-label>
+                    <ion-select
+                      interface="popover"
+                      placeholder="Select Customer"
+                      [(ngModel)]="salesInvoice.customer"
+                    >
+                      <ion-select-option
+                        [value]="customer"
+                        *ngFor="let customer of customerList"
+                        >{{customer.name}}</ion-select-option
+                      >
+                    </ion-select>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col offset="1" size="10">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-text color="tertiary">
+                Address
+              </ion-text>
+            </ion-card-title>
+            <!-- <button mat-raised-button color="primary">Primary</button> -->
+          </ion-card-header>
+          <ion-card-content *ngIf="salesInvoice.customer.name !== '' ">
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col size="5">
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Customer address</ion-label>
+                    {{salesInvoice.customer.addressLine1}}
+                    <br />
+                    {{salesInvoice.customer.addressLine2}}
+                    <br />
+                    {{salesInvoice.customer.city}} -
+                    {{salesInvoice.customer.pinCode}}
+                  </ion-item>
+                </ion-col>
+                <ion-col offset="2" size="5">
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Contact Person</ion-label>
+                    <!-- <ion-input
+                      disabled
+                      type="text"
+                      [(ngModel)]="salesInvoice.customer.name"
+                    ></ion-input> -->
+                    {{salesInvoice.customer.name}}
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

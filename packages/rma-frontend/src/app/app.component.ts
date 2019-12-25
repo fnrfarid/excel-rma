@@ -139,29 +139,46 @@ export class AppComponent implements OnInit {
       ? Number(localStorage.getItem(ACCESS_TOKEN_EXPIRY))
       : now;
     if (now > expiry - TWENTY_MINUTES_IN_SECONDS) {
-      this.appService.getMessage().subscribe(response => {
-        if (response.message) return;
-        const frappe_auth_config = {
-          client_id: response.frontendClientId,
-          redirect_uri: response.appURL + SILENT_REFRESH_ENDPOINT,
-          response_type: TOKEN,
-          scope: SCOPES_OPENID_ALL,
-        };
-        const url = this.getEncodedFrappeLoginUrl(
-          response.authorizationURL,
-          frappe_auth_config,
-        );
-        const existingIframe = document.getElementsByClassName('silent');
-        if (!existingIframe.length) {
-          const iframe = document.createElement('iframe');
-          iframe.className = 'silent';
-          iframe.setAttribute('src', url);
+      this.appService.getMessage().subscribe({
+        next: response => {
+          if (response.message) return;
+          const frappe_auth_config = {
+            client_id: response.frontendClientId,
+            redirect_uri: response.appURL + SILENT_REFRESH_ENDPOINT,
+            response_type: TOKEN,
+            scope: SCOPES_OPENID_ALL,
+          };
+          const url = this.getEncodedFrappeLoginUrl(
+            response.authorizationURL,
+            frappe_auth_config,
+          );
 
-          iframe.style.display = 'none';
+          const existingIframe = document.getElementsByClassName(
+            'silent-iframe',
+          );
 
-          return document.body.appendChild(iframe);
-        }
-        return existingIframe[0].setAttribute('src', url);
+          if (!existingIframe.length) {
+            const iframe = document.createElement('iframe');
+            iframe.onload = () => {
+              try {
+                (iframe.contentWindow || iframe.contentDocument).location.href;
+              } catch (err) {
+                this.initiateLogin(response.authorizationURL, {
+                  ...frappe_auth_config,
+                  ...{ redirect_uri: response.appURL + CALLBACK_ENDPOINT },
+                });
+              }
+            };
+            iframe.className = 'silent-iframe';
+            iframe.setAttribute('src', url);
+
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+          } else {
+            existingIframe[0].setAttribute('src', url);
+          }
+        },
+        error: error => {},
       });
     }
   }

@@ -29,6 +29,11 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
+              },
+              {
+                "glob": "silent-refresh.html",
+                "input": "src/",
+                "output": "/"
               }
             ],
             "styles": [
@@ -110,6 +115,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "/assets"
+              },
+              {
+                "glob": "silent-refresh.html",
+                "input": "src/",
+                "output": "/"
               }
             ]
           },
