@@ -18,6 +18,7 @@ import { Customer } from '../customer/entity/customer/customer.entity';
 import { Item } from '../item/entity/item/item.entity';
 import { Supplier } from '../supplier/entity/supplier/supplier.entity';
 import { SerialNo } from '../serial-no/entity/serial-no/serial-no.entity';
+import { SalesInvoice } from '../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -41,6 +42,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       Item,
       Supplier,
       SerialNo,
+      SalesInvoice,
     ],
     useNewUrlParser: true,
     w: 'majority',

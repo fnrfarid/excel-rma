@@ -19,6 +19,7 @@ import { CustomerModule } from './customer/customer.module';
 import { ItemModule } from './item/item.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { SerialNoModule } from './serial-no/serial-no.module';
+import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { SerialNoModule } from './serial-no/serial-no.module';
     DirectModule,
     CustomerModule,
     SupplierModule,
+    SalesInvoiceModule,
     ItemModule,
     SerialNoModule,
   ],
