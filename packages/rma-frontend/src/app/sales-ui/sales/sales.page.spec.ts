@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalesPage } from './sales.page';
+import { Location } from '@angular/common';
 
 describe('SalesPage', () => {
   let component: SalesPage;
@@ -11,6 +12,12 @@ describe('SalesPage', () => {
     TestBed.configureTestingModule({
       declarations: [SalesPage],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        {
+          provide: Location,
+          useValue: {},
+        },
+      ],
     }).compileComponents();
   }));
 

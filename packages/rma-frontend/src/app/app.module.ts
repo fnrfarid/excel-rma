@@ -12,6 +12,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppService } from './app.service';
 import { SalesUiModule } from './sales-ui/sales-ui.module';
 import { PurchaseUiModule } from './purchase-ui/purchase-ui.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,6 +24,7 @@ import { PurchaseUiModule } from './purchase-ui/purchase-ui.module';
     HttpClientModule,
     SalesUiModule,
     PurchaseUiModule,
+    BrowserAnimationsModule,
   ],
   providers: [
     AppService,

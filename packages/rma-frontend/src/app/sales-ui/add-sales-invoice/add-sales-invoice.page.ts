@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SalesInvoice } from '../../common/interfaces/sales.interface';
 import { Customer } from '../../common/interfaces/customer.interface';
+import { ItemsDataSource } from './items-datasource';
+import { SalesService } from '../services/sales.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -12,8 +15,14 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   calledFrom: string;
   customerList: Array<Customer>;
+  dataSource: ItemsDataSource;
 
-  constructor(private readonly route: ActivatedRoute) {
+  displayedColumns = ['item', 'quantity', 'rate'];
+  constructor(
+    private readonly route: ActivatedRoute,
+    private salesService: SalesService,
+    private location: Location,
+  ) {
     this.customerList = [
       {
         name: 'Hardik Bhanderi',
@@ -48,5 +57,13 @@ export class AddSalesInvoicePage implements OnInit {
     this.salesInvoice.series = '';
     this.salesInvoice.status = '';
     this.salesInvoice.uuid = '';
+    this.dataSource = new ItemsDataSource(this.salesService);
+    this.dataSource.loadItems();
+  }
+
+  addItem() {}
+
+  navigateBack() {
+    this.location.back();
   }
 }

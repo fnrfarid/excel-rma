@@ -51,6 +51,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.setupSilentRefresh();
+    const localToken = localStorage.getItem(ACCESS_TOKEN);
+    if (localToken) {
+      this.silentRefresh();
+    }
   }
 
   setUserSession() {
@@ -163,6 +167,7 @@ export class AppComponent implements OnInit {
               try {
                 (iframe.contentWindow || iframe.contentDocument).location.href;
               } catch (err) {
+                localStorage.clear();
                 this.initiateLogin(response.authorizationURL, {
                   ...frappe_auth_config,
                   ...{ redirect_uri: response.appURL + CALLBACK_ENDPOINT },
