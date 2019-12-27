@@ -1,6 +1,6 @@
 import { IEvent } from '@nestjs/cqrs';
-import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
+import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-update-dto';
 
 export class SalesInvoiceUpdatedEvent implements IEvent {
-  constructor(public updatePayload: SalesInvoice) {}
+  constructor(public updatePayload: SalesInvoiceUpdateDto) {}
 }
