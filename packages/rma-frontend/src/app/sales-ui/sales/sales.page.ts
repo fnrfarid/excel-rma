@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SalesService } from '../services/sales.service';
 import { SalesInvoice } from '../../common/interfaces/sales.interface';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-sales',
@@ -10,7 +11,7 @@ import { SalesInvoice } from '../../common/interfaces/sales.interface';
 export class SalesPage implements OnInit {
   salesInvoiceList: Array<SalesInvoice>;
 
-  constructor(private salesService: SalesService) {}
+  constructor(private salesService: SalesService, private location: Location) {}
 
   ngOnInit() {
     this.salesService.getSalesInvoiceList().subscribe({
@@ -19,5 +20,9 @@ export class SalesPage implements OnInit {
         this.salesInvoiceList = response;
       },
     });
+  }
+
+  navigateBack() {
+    this.location.back();
   }
 }

@@ -7,3 +7,10 @@ export class SalesInvoice {
   customer: Customer;
   company: string;
 }
+
+export class Item {
+  uuid: string;
+  name: string;
+  quantity: number;
+  rate: number;
+}
