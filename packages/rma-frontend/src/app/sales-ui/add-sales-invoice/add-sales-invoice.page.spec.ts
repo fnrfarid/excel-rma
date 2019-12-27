@@ -3,6 +3,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AddSalesInvoicePage } from './add-sales-invoice.page';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MaterialModule } from '../../material/material.module';
+import { Location } from '@angular/common';
 
 describe('AddSalesInvoicePage', () => {
   let component: AddSalesInvoicePage;
@@ -12,7 +14,13 @@ describe('AddSalesInvoicePage', () => {
     TestBed.configureTestingModule({
       declarations: [AddSalesInvoicePage],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      imports: [RouterTestingModule],
+      imports: [RouterTestingModule, MaterialModule],
+      providers: [
+        {
+          provide: Location,
+          useValue: {},
+        },
+      ],
     }).compileComponents();
   }));
 

@@ -1,20 +1,25 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>Sales</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="page-background">
-  <ion-grid no-padding>
+  <ion-grid class="ion-no-padding">
     <ion-row>
-      <ion-col offset="1" size="10">
+      <ion-col>
         <ion-card>
           <ion-card-header>
             <ion-row class="align">
               <ion-col>
                 <ion-card-title>
                   <ion-text color="tertiary">
-                    <h1>Sales Invoices</h1>
+                    Sales Invoices
                   </ion-text>
                 </ion-card-title>
               </ion-col>
@@ -28,10 +33,10 @@
               </ion-col>
             </ion-row>
           </ion-card-header>
-          <ion-card-content>
+          <ion-card-content class="ion-no-padding">
             <ion-list>
-              <ion-item>
-                <ion-grid no-padding>
+              <ion-item class="ion-no-padding">
+                <ion-grid class="ion-no-padding">
                   <ion-row>
                     <ion-col class="ion-text-center header-row">
                       Title
@@ -45,8 +50,12 @@
                   </ion-row>
                 </ion-grid>
               </ion-item>
-              <ion-item *ngFor="let invoice of salesInvoiceList" lines="none">
-                <ion-grid no-padding>
+              <ion-item
+                *ngFor="let invoice of salesInvoiceList"
+                class="ion-no-padding"
+                lines="none"
+              >
+                <ion-grid class="ion-no-padding">
                   <ion-row>
                     <ion-col class="ion-text-center">
                       {{invoice.customer.name}}
