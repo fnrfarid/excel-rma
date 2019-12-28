@@ -7,6 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule } from '@angular/forms';
 import { WarrantyService } from './warranty.service';
 import { of } from 'rxjs';
+import { Location } from '@angular/common';
 
 describe('WarrantyPage', () => {
   let component: WarrantyPage;
@@ -26,6 +27,10 @@ describe('WarrantyPage', () => {
           useValue: {
             findModels: (...args) => of({}),
           },
+        },
+        {
+          provide: Location,
+          useValue: {},
         },
       ],
       declarations: [WarrantyPage],
