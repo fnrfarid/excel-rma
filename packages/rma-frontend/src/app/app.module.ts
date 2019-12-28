@@ -13,6 +13,8 @@ import { AppService } from './app.service';
 import { SalesUiModule } from './sales-ui/sales-ui.module';
 import { PurchaseUiModule } from './purchase-ui/purchase-ui.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpErrorHandler } from './common/interfaces/services/http-error-handler/http-error-handler.service';
+import { MessageService } from './common/interfaces/services/message/message.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,6 +31,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   providers: [
     AppService,
     StatusBar,
+    MessageService,
+    HttpErrorHandler,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],

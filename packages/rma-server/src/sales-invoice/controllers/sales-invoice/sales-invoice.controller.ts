@@ -13,12 +13,13 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { SalesInvoiceDto } from '../../entity/sales-invoice/sales-invoice-dto';
+import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-update-dto';
 import { AddSalesInvoiceCommand } from '../../command/add-sales-invoice/add-sales-invoice.command';
 import { RemoveSalesInvoiceCommand } from '../../command/remove-sales-invoice/remove-sales-invoice.command';
-import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
 import { UpdateSalesInvoiceCommand } from '../../command/update-sales-invoice/update-sales-invoice.command';
 import { RetrieveSalesInvoiceListQuery } from '../../query/list-sales-invoice/retrieve-sales-invoice-list.query';
 import { RetrieveSalesInvoiceQuery } from '../../query/get-sales-invoice/retrieve-sales-invoice.query';
+import { SubmitSalesInvoiceCommand } from '../../command/submit-sales-invoice/submit-sales-invoice.command';
 
 @Controller('sales_invoice')
 export class SalesInvoiceController {
@@ -45,9 +46,18 @@ export class SalesInvoiceController {
   @Post('v1/update')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateClient(@Body() updatePayload: SalesInvoice) {
+  updateClient(@Body() updatePayload: SalesInvoiceUpdateDto) {
     return this.commandBus.execute(
       new UpdateSalesInvoiceCommand(updatePayload),
+    );
+  }
+
+  @Post('v1/submit')
+  @UseGuards(TokenGuard)
+  @UsePipes()
+  submitSalesInvoice(@Body() updatePayload: { uuid: string }, @Req() req) {
+    return this.commandBus.execute(
+      new SubmitSalesInvoiceCommand(updatePayload.uuid, req),
     );
   }
 

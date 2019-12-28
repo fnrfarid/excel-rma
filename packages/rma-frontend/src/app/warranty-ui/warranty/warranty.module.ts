@@ -5,14 +5,13 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { AddSalesInvoicePage } from './add-sales-invoice.page';
-import { MaterialModule } from '../../material/material.module';
-import { InlineEditComponent } from './inline-edit/inline-edit.component';
+import { WarrantyPage } from './warranty.page';
+import { MaterialModule } from 'src/app/material/material.module';
 
 const routes: Routes = [
   {
     path: '',
-    component: AddSalesInvoicePage,
+    component: WarrantyPage,
   },
 ];
 
@@ -20,11 +19,10 @@ const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
+    MaterialModule,
     IonicModule,
     RouterModule.forChild(routes),
-    MaterialModule,
   ],
-  declarations: [AddSalesInvoicePage, InlineEditComponent],
-  exports: [InlineEditComponent],
+  declarations: [WarrantyPage],
 })
-export class AddSalesInvoicePageModule {}
+export class WarrantyPageModule {}

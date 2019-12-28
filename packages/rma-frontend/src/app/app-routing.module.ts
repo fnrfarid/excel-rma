@@ -16,7 +16,10 @@ const routes: Routes = [
     path: 'callback',
     loadChildren: './callback/callback.module#CallbackPageModule',
   },
-
+  {
+    path: 'warranty',
+    loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
+  },
   {
     path: 'sales',
     loadChildren: './sales-ui/sales/sales.module#SalesPageModule',
@@ -34,6 +37,10 @@ const routes: Routes = [
   {
     path: 'purchase',
     loadChildren: './purchase-ui/purchase/purchase.module#PurchasePageModule',
+  },
+  {
+    path: 'warranty',
+    loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },

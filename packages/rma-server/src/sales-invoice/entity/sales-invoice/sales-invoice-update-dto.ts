@@ -7,76 +7,80 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class SalesInvoiceDto {
+export class SalesInvoiceUpdateDto {
   @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @IsOptional()
   @IsString()
   title: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   customer: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   company: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   posting_date: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   posting_time: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   set_posting_time: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   due_date: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   address_display: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   contact_person: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   contact_display: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   contact_email: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   territory: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   update_stock: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   total_qty: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   base_total: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   base_net_total: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   total: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   net_total: number;
 
@@ -117,61 +121,61 @@ export class SalesInvoiceDto {
 }
 
 export class TaxDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   charge_type: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   tax_amount: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   total: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   account_head: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   rate: number;
 }
 
 export class ItemDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   owner: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   item_code: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   item_name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   qty: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   rate: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   amount: number;
 }
