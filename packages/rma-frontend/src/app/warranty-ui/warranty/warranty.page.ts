@@ -3,6 +3,7 @@ import { MatPaginator, MatSort } from '@angular/material';
 import { WarrantyDataSource } from './warranty-datasource';
 import { WarrantyService } from './warranty.service';
 import { SERIAL_NO } from '../../constants/storage';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-warranty',
@@ -18,7 +19,10 @@ export class WarrantyPage implements OnInit {
   model: string;
   search: string = '';
 
-  constructor(private warrantyService: WarrantyService) {
+  constructor(
+    private warrantyService: WarrantyService,
+    private location: Location,
+  ) {
     this.model = SERIAL_NO;
   }
 
@@ -52,5 +56,9 @@ export class WarrantyPage implements OnInit {
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  }
+
+  navigateBack() {
+    this.location.back();
   }
 }
