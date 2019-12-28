@@ -32,6 +32,8 @@ import {
   getItemAfterInsertWebhookData,
   getItemOnUpdateWebhookData,
   getItemOnTrashWebhookData,
+  getSerialNoAfterInsertWebhookData,
+  getSerialNoUpdateWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
@@ -45,6 +47,8 @@ import {
   SUPPLIER_ON_TRASH_ENDPOINT,
   TOKEN_ADD_ENDPOINT,
   TOKEN_DELETE_ENDPOINT,
+  SERIAL_NO_AFTER_INSERT_ENDPOINT,
+  SERIAL_NO_ON_UPDATE_ENDPOINT,
 } from '../../../constants/routes';
 
 @Injectable()
@@ -211,6 +215,30 @@ export class SettingsService extends AggregateRoot {
               serverSettings.authServerURL + '/api/resource/Webhook',
               getBearerTokenOnTrashWebhookData(
                 serverSettings.appURL + TOKEN_DELETE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          // Serial No Token Webhooks
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getSerialNoAfterInsertWebhookData(
+                serverSettings.appURL + SERIAL_NO_AFTER_INSERT_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              getSerialNoUpdateWebhookData(
+                serverSettings.appURL + SERIAL_NO_ON_UPDATE_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },
