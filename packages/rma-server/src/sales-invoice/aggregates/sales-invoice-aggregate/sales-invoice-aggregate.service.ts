@@ -23,7 +23,6 @@ import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { FRAPPE_API_SERIAL_NO_ENDPOINT } from '../../../constants/routes';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
@@ -31,6 +30,8 @@ import {
   APPLICATION_JSON_CONTENT_TYPE,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
+import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
+import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -118,14 +119,14 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           const body = this.mapSalesInvoice(salesInvoice);
 
           return this.http.post(
-            settings.authServerURL + FRAPPE_API_SERIAL_NO_ENDPOINT,
+            settings.authServerURL + FRAPPE_API_SALES_INVOICE_ENDPOINT,
             body,
             {
               headers: {
                 [AUTHORIZATION]:
                   BEARER_HEADER_VALUE_PREFIX +
                   clientHttpRequest.token.accessToken,
-                [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
+                [CONTENT_TYPE]: APP_WWW_FORM_URLENCODED,
                 [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
               },
             },
@@ -146,7 +147,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           this.salesInvoiceService
             .updateOne(
               { uuid: salesInvoice.uuid },
-              { $set: { inQueue: false } },
+              { $set: { inQueue: false, isSynced: false, submitted: false } },
             )
             .then(updated => {})
             .catch(error => {});
@@ -155,8 +156,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   mapSalesInvoice(salesInvoice: SalesInvoice) {
-    const data = {
+    return {
       title: salesInvoice.title,
+      docstatus: 1,
       customer: salesInvoice.customer,
       company: salesInvoice.company,
       posting_date: salesInvoice.posting_date,
@@ -181,12 +183,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       pricing_rules: salesInvoice.pricing_rules,
       packed_items: salesInvoice.packed_items,
       timesheets: salesInvoice.timesheets,
-      taxes: salesInvoice,
+      taxes: salesInvoice.taxes,
       advances: salesInvoice.advances,
       payment_schedule: salesInvoice.payment_schedule,
       payments: salesInvoice.payments,
       sales_team: salesInvoice.sales_team,
     };
-    return data;
   }
 }
