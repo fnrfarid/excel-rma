@@ -35,6 +35,10 @@ const routes: Routes = [
     path: 'purchase',
     loadChildren: './purchase-ui/purchase/purchase.module#PurchasePageModule',
   },
+  {
+    path: 'warranty',
+    loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
