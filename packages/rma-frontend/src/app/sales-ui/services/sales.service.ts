@@ -44,31 +44,31 @@ export class SalesService {
 
     this.itemList = [
       {
-        uuid: '1',
+        itemCode: '1',
         name: 'TP Link Router',
         quantity: 10,
         rate: 2000,
       },
       {
-        uuid: '2',
+        itemCode: '2',
         name: 'LG Modem',
         quantity: 15,
         rate: 1500,
       },
       {
-        uuid: '3',
+        itemCode: '3',
         name: 'Intel NIC',
         quantity: 5,
         rate: 4000,
       },
       {
-        uuid: '4',
+        itemCode: '4',
         name: 'Network switch',
         quantity: 3,
         rate: 10000,
       },
       {
-        uuid: '5',
+        itemCode: '5',
         name: 'Line Driver',
         quantity: 2,
         rate: 17000,
@@ -100,13 +100,13 @@ export class SalesService {
 
   getItem(uuid: string) {
     let foundItem = {} as Item;
-    foundItem.uuid = '';
+    foundItem.itemCode = '';
     foundItem.name = '';
     foundItem.quantity = null;
     foundItem.rate = null;
 
     this.itemList.forEach(item => {
-      if (item.uuid === uuid) foundItem = item;
+      if (item.itemCode === uuid) foundItem = item;
     });
 
     return of(foundItem);

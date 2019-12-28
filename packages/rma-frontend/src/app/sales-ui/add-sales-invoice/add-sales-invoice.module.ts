@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { AddSalesInvoicePage } from './add-sales-invoice.page';
 import { MaterialModule } from '../../material/material.module';
+import { InlineEditComponent } from './inline-edit/inline-edit.component';
 
 const routes: Routes = [
   {
@@ -23,6 +24,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MaterialModule,
   ],
-  declarations: [AddSalesInvoicePage],
+  declarations: [AddSalesInvoicePage, InlineEditComponent],
+  exports: [InlineEditComponent],
 })
 export class AddSalesInvoicePageModule {}

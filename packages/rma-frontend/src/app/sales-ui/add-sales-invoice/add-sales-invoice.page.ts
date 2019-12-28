@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SalesInvoice } from '../../common/interfaces/sales.interface';
+import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { Customer } from '../../common/interfaces/customer.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
@@ -61,7 +61,34 @@ export class AddSalesInvoicePage implements OnInit {
     this.dataSource.loadItems();
   }
 
-  addItem() {}
+  addItem() {
+    const data = this.dataSource.data();
+    const item = {} as Item;
+    item.name = '';
+    item.quantity = 0;
+    item.rate = 0;
+    item.itemCode = '';
+    data.push(item);
+    this.dataSource.update(data);
+  }
+
+  updateItem(row: Item, name: string) {
+    if (name == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    row.name = name;
+    this.dataSource.update(copy);
+  }
+
+  updateQuantity(row: Item, quantity: number) {
+    if (quantity == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    row.quantity = quantity;
+    this.dataSource.update(copy);
+  }
 
   navigateBack() {
     this.location.back();
