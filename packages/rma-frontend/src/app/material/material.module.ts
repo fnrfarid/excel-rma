@@ -20,18 +20,20 @@ import {
   MatExpansionModule,
   MatAutocompleteModule,
 } from '@angular/material';
+import { SatPopoverModule } from '@ncstate/sat-popover';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
+    MatButtonModule,
     MatTableModule,
+    SatPopoverModule,
     MatSortModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
     MatToolbarModule,
-    MatButtonModule,
     MatSidenavModule,
     MatIconModule,
     MatListModule,
@@ -46,6 +48,7 @@ import {
   ],
   exports: [
     MatTableModule,
+    SatPopoverModule,
     MatSortModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,

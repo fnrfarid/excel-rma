@@ -43,3 +43,8 @@
 .header-row {
   font-weight: bold;
 }
+
+.split-pane-visible > .split-pane-side {
+  min-width: 200px !important;
+  max-width: 200px !important;
+}

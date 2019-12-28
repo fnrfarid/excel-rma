@@ -9,7 +9,7 @@ export class SalesInvoice {
 }
 
 export class Item {
-  uuid: string;
+  itemCode: string;
   name: string;
   quantity: number;
   rate: number;
