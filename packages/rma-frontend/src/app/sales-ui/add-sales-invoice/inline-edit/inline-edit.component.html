@@ -19,7 +19,23 @@
   </mat-form-field>
 
   <mat-form-field *ngIf="column === 'quantity'">
-    <input matInput maxLength="140" name="quantity" [(ngModel)]="quantity" />
+    <input
+      matInput
+      type="number"
+      maxLength="140"
+      name="quantity"
+      [(ngModel)]="quantity"
+    />
+  </mat-form-field>
+
+  <mat-form-field *ngIf="column === 'rate'">
+    <input
+      matInput
+      type="number"
+      maxLength="140"
+      name="rate"
+      [(ngModel)]="rate"
+    />
   </mat-form-field>
 
   <div class="actions">

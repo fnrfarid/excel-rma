@@ -3,6 +3,11 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalesPage } from './sales.page';
 import { Location } from '@angular/common';
+import { MaterialModule } from '../../material/material.module';
+import { FormsModule } from '@angular/forms';
+import { SalesService } from '../services/sales.service';
+import { of } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('SalesPage', () => {
   let component: SalesPage;
@@ -11,11 +16,18 @@ describe('SalesPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SalesPage],
+      imports: [MaterialModule, FormsModule, NoopAnimationsModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
           provide: Location,
           useValue: {},
+        },
+        {
+          provide: SalesService,
+          useValue: {
+            getSalesInvoiceList: (...args) => of({}),
+          },
         },
       ],
     }).compileComponents();

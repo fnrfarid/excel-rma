@@ -1,11 +1,12 @@
-import { Customer } from './customer.interface';
+// import { Customer } from './customer.interface';
 
 export class SalesInvoice {
   uuid: string;
-  status: string;
-  series: string;
-  customer: Customer;
+  customer: string;
   company: string;
+  addressDisplay: string;
+  total: number;
+  items: Array<Item>;
 }
 
 export class Item {
