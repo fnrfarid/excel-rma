@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { Customer } from '../../common/interfaces/customer.interface';
 import { ItemsDataSource } from './items-datasource';
-import { SalesService } from '../services/sales.service';
+// import { SalesService } from '../services/sales.service';
 import { Location } from '@angular/common';
 
 @Component({
@@ -17,10 +17,10 @@ export class AddSalesInvoicePage implements OnInit {
   customerList: Array<Customer>;
   dataSource: ItemsDataSource;
 
-  displayedColumns = ['item', 'quantity', 'rate'];
+  displayedColumns = ['item', 'quantity', 'rate', 'total'];
   constructor(
     private readonly route: ActivatedRoute,
-    private salesService: SalesService,
+    // private salesService: SalesService,
     private location: Location,
   ) {
     this.customerList = [
@@ -57,7 +57,7 @@ export class AddSalesInvoicePage implements OnInit {
     this.salesInvoice.series = '';
     this.salesInvoice.status = '';
     this.salesInvoice.uuid = '';
-    this.dataSource = new ItemsDataSource(this.salesService);
+    this.dataSource = new ItemsDataSource();
     this.dataSource.loadItems();
   }
 
@@ -72,12 +72,14 @@ export class AddSalesInvoicePage implements OnInit {
     this.dataSource.update(data);
   }
 
-  updateItem(row: Item, name: string) {
-    if (name == null) {
+  updateItem(row: Item, item: Item) {
+    if (item == null) {
       return;
     }
     const copy = this.dataSource.data().slice();
-    row.name = name;
+    row.name = item.name;
+    row.quantity = 1;
+    row.rate = item.rate;
     this.dataSource.update(copy);
   }
 
