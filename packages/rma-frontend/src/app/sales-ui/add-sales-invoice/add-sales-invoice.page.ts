@@ -16,7 +16,8 @@ export class AddSalesInvoicePage implements OnInit {
   calledFrom: string;
   customerList: Array<Customer>;
   dataSource: ItemsDataSource;
-
+  customer: Customer;
+  series: string;
   displayedColumns = ['item', 'quantity', 'rate', 'total'];
   constructor(
     private readonly route: ActivatedRoute,
@@ -46,17 +47,17 @@ export class AddSalesInvoicePage implements OnInit {
   ngOnInit() {
     this.calledFrom = this.route.snapshot.params.calledFrom;
     this.salesInvoice = {} as SalesInvoice;
+
     this.salesInvoice.company = '';
-    this.salesInvoice.customer = {} as Customer;
-    this.salesInvoice.customer.addressLine1 = '';
-    this.salesInvoice.customer.addressLine2 = '';
-    this.salesInvoice.customer.city = '';
-    this.salesInvoice.customer.name = '';
-    this.salesInvoice.customer.pinCode = '';
-    this.salesInvoice.customer.uuid = '';
-    this.salesInvoice.series = '';
-    this.salesInvoice.status = '';
-    this.salesInvoice.uuid = '';
+
+    this.customer = {} as Customer;
+    this.customer.addressLine1 = '';
+    this.customer.addressLine2 = '';
+    this.customer.city = '';
+    this.customer.name = '';
+    this.customer.pinCode = '';
+    this.customer.uuid = '';
+    this.series = '';
     this.dataSource = new ItemsDataSource();
     this.dataSource.loadItems();
   }
@@ -89,6 +90,15 @@ export class AddSalesInvoicePage implements OnInit {
     }
     const copy = this.dataSource.data().slice();
     row.quantity = quantity;
+    this.dataSource.update(copy);
+  }
+
+  updateRate(row: Item, rate: number) {
+    if (rate == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    row.rate = rate;
     this.dataSource.update(copy);
   }
 

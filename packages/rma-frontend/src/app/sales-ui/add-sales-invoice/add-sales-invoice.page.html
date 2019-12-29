@@ -30,7 +30,7 @@
                     <ion-select
                       interface="popover"
                       placeholder="Select Series"
-                      [(ngModel)]="salesInvoice.series"
+                      [(ngModel)]="series"
                     >
                       <ion-select-option value="sinv">SINV-</ion-select-option>
                       <ion-select-option value="sinvret"
@@ -64,7 +64,7 @@
                     <ion-select
                       interface="popover"
                       placeholder="Select Customer"
-                      [(ngModel)]="salesInvoice.customer"
+                      [(ngModel)]="customer"
                     >
                       <ion-select-option
                         [value]="customer"
@@ -91,18 +91,17 @@
             </ion-card-title>
             <!-- <button mat-raised-button color="primary">Primary</button> -->
           </ion-card-header>
-          <ion-card-content *ngIf="salesInvoice.customer.name !== '' ">
+          <ion-card-content *ngIf="customer.name !== '' ">
             <ion-grid class="ion-no-padding">
               <ion-row>
                 <ion-col size="5">
                   <ion-item lines="none">
                     <ion-label position="stacked">Customer address</ion-label>
-                    {{salesInvoice.customer.addressLine1}}
+                    {{customer.addressLine1}}
                     <br />
-                    {{salesInvoice.customer.addressLine2}}
+                    {{customer.addressLine2}}
                     <br />
-                    {{salesInvoice.customer.city}} -
-                    {{salesInvoice.customer.pinCode}}
+                    {{customer.city}} - {{customer.pinCode}}
                   </ion-item>
                 </ion-col>
                 <ion-col offset="2" size="5">
@@ -113,7 +112,7 @@
                       type="text"
                       [(ngModel)]="salesInvoice.customer.name"
                     ></ion-input> -->
-                    {{salesInvoice.customer.name}}
+                    {{customer.name}}
                   </ion-item>
                 </ion-col>
               </ion-row>
@@ -178,12 +177,10 @@
                     [satPopoverAnchor]="p"
                     (click)="p.open()"
                   >
-                    <ng-container *ngIf="row.quantity">
+                    <ng-container>
                       {{row.quantity}}
                     </ng-container>
-                    <span class="add-comment" *ngIf="!row.quantity">
-                      Quantity
-                    </span>
+
                     <sat-popover
                       #p
                       hasBackdrop
@@ -200,7 +197,27 @@
                 </ng-container>
                 <ng-container matColumnDef="rate">
                   <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
-                  <mat-cell *matCellDef="let row">{{row.rate}}</mat-cell>
+                  <mat-cell
+                    *matCellDef="let row"
+                    [satPopoverAnchor]="p"
+                    (click)="p.open()"
+                  >
+                    <ng-container>
+                      {{row.rate}}
+                    </ng-container>
+                    <sat-popover
+                      #p
+                      hasBackdrop
+                      xAlign="start"
+                      yAlign="start"
+                      (closed)="updateRate(row, $event)"
+                    >
+                      <inline-edit
+                        [value]="row.rate"
+                        column="rate"
+                      ></inline-edit>
+                    </sat-popover>
+                  </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="total">
                   <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>

@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { of } from 'rxjs';
-import { Customer } from '../../common/interfaces/customer.interface';
+// import { Customer } from '../../common/interfaces/customer.interface';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import {
+  AUTHORIZATION,
+  BEARER_TOKEN_PREFIX,
+  ACCESS_TOKEN,
+} from '../../constants/storage';
+import { LIST_SALES_INVOICE_ENDPOINT } from 'src/app/constants/url-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -10,37 +17,38 @@ export class SalesService {
   salesInvoiceList: Array<SalesInvoice>;
   itemList: Array<Item>;
 
-  constructor() {
-    this.salesInvoiceList = [
-      {
-        uuid: '1',
-        company: 'Test Company',
-        customer: {
-          name: 'Hardik Bhanderi',
-          uuid: '2',
-          addressLine1: 'C-42 , Sheetal Complex,',
-          addressLine2: 'SV Road , Dahisar(E)',
-          city: 'Mumbai',
-          pinCode: '400068',
-        },
-        series: 'SINV-00001',
-        status: 'Draft',
-      },
-      {
-        uuid: '2',
-        company: 'CastleCraft',
-        customer: {
-          name: 'Prafful Suthar',
-          uuid: '1',
-          addressLine1: 'C-42 , Sheetal Complex,',
-          addressLine2: 'SV Road , Dahisar(E)',
-          city: 'Mumbai',
-          pinCode: '400068',
-        },
-        series: 'SINV-00002',
-        status: 'Paid',
-      },
-    ];
+  constructor(private http: HttpClient) {
+    this.salesInvoiceList = [];
+    // this.salesInvoiceList = [
+    //   {
+    //     uuid: '1',
+    //     company: 'Test Company',
+    //     customer: {
+    //       name: 'Hardik Bhanderi',
+    //       uuid: '2',
+    //       addressLine1: 'C-42 , Sheetal Complex,',
+    //       addressLine2: 'SV Road , Dahisar(E)',
+    //       city: 'Mumbai',
+    //       pinCode: '400068',
+    //     },
+    //     series: 'SINV-00001',
+    //     status: 'Draft',
+    //   },
+    //   {
+    //     uuid: '2',
+    //     company: 'CastleCraft',
+    //     customer: {
+    //       name: 'Prafful Suthar',
+    //       uuid: '1',
+    //       addressLine1: 'C-42 , Sheetal Complex,',
+    //       addressLine2: 'SV Road , Dahisar(E)',
+    //       city: 'Mumbai',
+    //       pinCode: '400068',
+    //     },
+    //     series: 'SINV-00002',
+    //     status: 'Paid',
+    //   },
+    // ];
 
     this.itemList = [
       {
@@ -76,19 +84,33 @@ export class SalesService {
     ];
   }
 
-  getSalesInvoiceList() {
-    return of(this.salesInvoiceList);
+  getSalesInvoiceList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_SALES_INVOICE_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+    return this.http.get(url, {
+      params,
+      headers: this.getAuthorizationHeaders(),
+    });
   }
 
   getSalesInvoice(series: string) {
-    let foundInvoice = {} as SalesInvoice;
+    const foundInvoice = {} as SalesInvoice;
     foundInvoice.company = '';
-    foundInvoice.customer = {} as Customer;
-    foundInvoice.series = '';
-    foundInvoice.status = '';
+    foundInvoice.customer = '';
+    // foundInvoice.series = '';
+    // foundInvoice.status = '';
 
     this.salesInvoiceList.forEach(invoice => {
-      if (invoice.series === series) foundInvoice = invoice;
+      // if (invoice.series === series) foundInvoice = invoice;
     });
 
     return of(foundInvoice);
@@ -110,5 +132,13 @@ export class SalesService {
     });
 
     return of(foundItem);
+  }
+
+  getAuthorizationHeaders() {
+    const headers = {};
+    headers[AUTHORIZATION] = `${BEARER_TOKEN_PREFIX}${localStorage.getItem(
+      ACCESS_TOKEN,
+    )}`;
+    return headers;
   }
 }
