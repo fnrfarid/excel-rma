@@ -20,6 +20,7 @@ export class InlineEditComponent {
   set value(x) {
     this.itemFormControl.setValue(x);
     this.quantity = x;
+    this.rate = x;
     this._value = x;
   }
 
@@ -34,6 +35,8 @@ export class InlineEditComponent {
   /** Form model for the input. */
   comment = '';
   quantity: number = null;
+  rate: number = null;
+
   constructor(
     @Optional() @Host() public popover: SatPopover,
     private salesService: SalesService,
@@ -72,7 +75,8 @@ export class InlineEditComponent {
       if (this.column === 'item') {
         const selectedItem = this._filter(this.itemFormControl.value);
         this.popover.close(selectedItem[0]);
-      } else this.popover.close(this.quantity);
+      } else if (this.column === 'quantity') this.popover.close(this.quantity);
+      else this.popover.close(this.rate);
     }
   }
 
