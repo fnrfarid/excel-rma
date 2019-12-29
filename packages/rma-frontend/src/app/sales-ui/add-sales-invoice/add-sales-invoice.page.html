@@ -164,7 +164,10 @@
                       yAlign="start"
                       (closed)="updateItem(row, $event)"
                     >
-                      <inline-edit [value]="row.name"></inline-edit>
+                      <inline-edit
+                        [value]="row.name"
+                        column="item"
+                      ></inline-edit>
                     </sat-popover>
                   </mat-cell>
                 </ng-container>
@@ -188,13 +191,22 @@
                       yAlign="start"
                       (closed)="updateQuantity(row, $event)"
                     >
-                      <inline-edit [value]="row.quantity"></inline-edit>
+                      <inline-edit
+                        [value]="row.quantity"
+                        column="quantity"
+                      ></inline-edit>
                     </sat-popover>
                   </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="rate">
                   <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
                   <mat-cell *matCellDef="let row">{{row.rate}}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="total">
+                  <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+                  <mat-cell *matCellDef="let row"
+                    >{{row.rate * row.quantity}}</mat-cell
+                  >
                 </ng-container>
                 <mat-header-row
                   *matHeaderRowDef="displayedColumns; sticky: true"
