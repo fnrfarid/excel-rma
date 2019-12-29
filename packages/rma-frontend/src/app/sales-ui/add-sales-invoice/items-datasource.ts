@@ -1,14 +1,14 @@
 import { DataSource } from '@angular/cdk/table';
 import { Item } from '../../common/interfaces/sales.interface';
 import { BehaviorSubject } from 'rxjs';
-import { SalesService } from '../services/sales.service';
+// import { SalesService } from '../services/sales.service';
 
 // export interface
 
 export class ItemsDataSource extends DataSource<Item> {
   itemSubject = new BehaviorSubject<Item[]>([]);
 
-  constructor(private salesService: SalesService) {
+  constructor() {
     super();
   }
 
@@ -19,11 +19,7 @@ export class ItemsDataSource extends DataSource<Item> {
     this.itemSubject.complete();
   }
 
-  loadItems() {
-    this.salesService
-      .getItemList()
-      .subscribe(items => this.itemSubject.next(items));
-  }
+  loadItems() {}
 
   data() {
     return this.itemSubject.value;

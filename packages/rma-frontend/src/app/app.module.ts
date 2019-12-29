@@ -15,12 +15,15 @@ import { PurchaseUiModule } from './purchase-ui/purchase-ui.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpErrorHandler } from './common/interfaces/services/http-error-handler/http-error-handler.service';
 import { MessageService } from './common/interfaces/services/message/message.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
     BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
