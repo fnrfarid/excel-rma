@@ -7,7 +7,7 @@ import { AuthAggregates } from './aggregates';
 import { TokenCacheService } from './entities/token-cache/token-cache.service';
 import { TokenCache } from './entities/token-cache/token-cache.entity';
 import { TOKEN_CACHE_CONNECTION } from '../constants/typeorm.connection';
-// import { AuthSchedulers } from './schedulers';
+import { AuthSchedulers } from './schedulers';
 
 @Global()
 @Module({
@@ -19,7 +19,7 @@ import { TOKEN_CACHE_CONNECTION } from '../constants/typeorm.connection';
     TokenCacheService,
     RoleGuard,
     TokenGuard,
-    // ...AuthSchedulers,
+    ...AuthSchedulers,
     ...AuthAggregates,
   ],
   exports: [TokenCacheService, RoleGuard, TokenGuard, ...AuthAggregates],

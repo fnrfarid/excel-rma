@@ -45,3 +45,5 @@ export const ITEM_METADATA_FILTER_FIELDS = [
   'parentfield',
   'parenttype',
 ];
+export const NONE_PYTHON_STRING = 'None';
+export const HUNDRED_NUMBERSTRING = '100';

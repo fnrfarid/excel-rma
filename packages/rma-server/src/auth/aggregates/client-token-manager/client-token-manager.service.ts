@@ -122,8 +122,14 @@ export class ClientTokenManagerService {
     settings$
       .pipe(
         switchMap(settings => {
-          return this.http.get(
-            settings.revocationURL + '?token=' + token.accessToken,
+          return this.http.post(
+            settings.revocationURL,
+            stringify({ token: token.accessToken }),
+            {
+              headers: {
+                [CONTENT_TYPE]: APP_WWW_FORM_URLENCODED,
+              },
+            },
           );
         }),
       )
