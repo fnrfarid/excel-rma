@@ -1,9 +1,10 @@
 import { Injectable, HttpService, OnModuleInit } from '@nestjs/common';
 import { CronJob } from 'cron';
-import { from } from 'rxjs';
+import { from, of, Observable } from 'rxjs';
 import { switchMap, map, retry, mergeMap } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { stringify } from 'querystring';
+import { AxiosResponse } from 'axios';
 
 import { ClientTokenManagerService } from '../../aggregates/client-token-manager/client-token-manager.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
@@ -14,7 +15,6 @@ import {
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
-  NONE_PYTHON_STRING,
   APP_WWW_FORM_URLENCODED,
   CONTENT_TYPE,
   HUNDRED_NUMBERSTRING,
@@ -33,7 +33,6 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    let iterationCount = 0;
     let tokenCache: TokenCache;
     const job = new CronJob(FRAPPE_TOKEN_CLEANUP_CRON_STRING, async () => {
       from(this.settings.find())
@@ -54,28 +53,9 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
                         settings,
                         tokenCache,
                         nowInServerTimeZone,
-                        iterationCount,
                       );
                     }),
-                    mergeMap(resTokens => {
-                      if (
-                        resTokens.data.data.length > 0 &&
-                        resTokens.data.data.length <
-                          Number(HUNDRED_NUMBERSTRING)
-                      ) {
-                        return from(resTokens.data.data);
-                      }
-
-                      iterationCount++;
-                      return this.getFrappeTokens(
-                        settings,
-                        tokenCache,
-                        nowInServerTimeZone,
-                        iterationCount,
-                      ).pipe(
-                        switchMap(moreTokens => from(moreTokens.data.data)),
-                      );
-                    }),
+                    mergeMap(moreTokens => from(moreTokens.data.data)),
                     mergeMap(({ access_token }) => {
                       return this.revokeToken(settings, access_token);
                     }),
@@ -105,8 +85,8 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
     settings: ServerSettings,
     token: TokenCache,
     nowInServerTimeZone: string,
-    iterationCount: number,
-  ) {
+    iterationCount: number = 0,
+  ): Observable<AxiosResponse> {
     const headers = {
       [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
     };
@@ -118,13 +98,29 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
         ['expiration_time', '<', nowInServerTimeZone],
         ['status', '!=', 'Revoked'],
       ]),
-      limit_page_length: NONE_PYTHON_STRING,
+      limit_page_length: HUNDRED_NUMBERSTRING,
       limit_start: Number(HUNDRED_NUMBERSTRING) * iterationCount,
     };
 
-    return this.http.get(settings.authServerURL + OAUTH_BEARER_TOKEN_ENDPOINT, {
-      headers,
-      params,
-    });
+    return this.http
+      .get(settings.authServerURL + OAUTH_BEARER_TOKEN_ENDPOINT, {
+        headers,
+        params,
+      })
+      .pipe(
+        switchMap(resTokens => {
+          if (resTokens.data.data.length === Number(HUNDRED_NUMBERSTRING)) {
+            iterationCount++;
+            return this.getFrappeTokens(
+              settings,
+              token,
+              nowInServerTimeZone,
+              iterationCount,
+            );
+          }
+
+          return of(resTokens);
+        }),
+      );
   }
 }
