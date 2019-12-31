@@ -19,6 +19,9 @@
               <ion-text color="tertiary">
                 {{ snakeToTitleCase(model) }}
               </ion-text>
+              <ion-button style="padding-left:10%"(click)="changeRoute('bulk-serial')">
+                Bluk Serial
+              </ion-button>
             </ion-card-title>
           </ion-card-header>
           <div class="loading-shade" *ngIf="dataSource.loading$ | async">

@@ -4,6 +4,7 @@ import { WarrantyDataSource } from './warranty-datasource';
 import { WarrantyService } from './warranty.service';
 import { SERIAL_NO } from '../../constants/storage';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-warranty',
@@ -22,6 +23,7 @@ export class WarrantyPage implements OnInit {
   constructor(
     private warrantyService: WarrantyService,
     private location: Location,
+    private readonly router: Router,
   ) {
     this.model = SERIAL_NO;
   }
@@ -60,5 +62,9 @@ export class WarrantyPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  changeRoute(route: string) {
+    this.router.navigateByUrl(route);
   }
 }
