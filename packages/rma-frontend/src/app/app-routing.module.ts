@@ -21,6 +21,11 @@ const routes: Routes = [
     loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
   },
   {
+    path: 'bulk-serial',
+    loadChildren:
+      './warranty-ui/bulk-serial/bulk-serial.module#BulkSerialPageModule',
+  },
+  {
     path: 'sales',
     loadChildren: './sales-ui/sales/sales.module#SalesPageModule',
   },
@@ -44,6 +49,11 @@ const routes: Routes = [
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
+  {
+    path: 'bulk-serial',
+    loadChildren:
+      './warranty-ui/bulk-serial/bulk-serial.module#BulkSerialPageModule',
+  },
 ];
 
 @NgModule({

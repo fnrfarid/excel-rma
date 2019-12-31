@@ -6,7 +6,6 @@ import { WarrantyService } from './warranty/warranty.service';
 
 @NgModule({
   declarations: [],
-
   imports: [CommonModule, AddSalesInvoicePageModule, MaterialModule],
   exports: [AddSalesInvoicePageModule, AddSalesInvoicePageModule],
   providers: [WarrantyService],

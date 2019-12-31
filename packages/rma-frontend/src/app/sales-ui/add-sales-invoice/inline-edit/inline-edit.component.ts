@@ -71,7 +71,6 @@ export class InlineEditComponent {
 
   onSubmit() {
     if (this.popover) {
-      // console.log(this.itemFormControl.value);
       if (this.column === 'item') {
         const selectedItem = this._filter(this.itemFormControl.value);
         this.popover.close(selectedItem[0]);
