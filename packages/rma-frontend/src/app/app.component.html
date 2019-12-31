@@ -18,6 +18,7 @@
               routerLink="/"
               (click)="login()"
               class="clickable"
+              lines="none"
             >
               <ion-icon slot="start" name="log-in"></ion-icon>
               <ion-label>Login</ion-label>
@@ -26,6 +27,7 @@
               routerDirection="'root'"
               *ngIf="loggedIn"
               routerLink="/home"
+              lines="none"
             >
               <ion-icon slot="start" name="home"></ion-icon>
               <ion-label>Home</ion-label>
@@ -34,6 +36,7 @@
               routerDirection="forward"
               *ngIf="loggedIn"
               routerLink="/sales"
+              lines="none"
             >
               <ion-icon slot="start" name="list-box"></ion-icon>
               <ion-label>Sales Invoice</ion-label>
@@ -42,6 +45,7 @@
               routerDirection="'root'"
               *ngIf="loggedIn"
               routerLink="/warranty"
+              lines="none"
             >
               <ion-icon slot="start" name="settings"></ion-icon>
               <ion-label>Warranty</ion-label>
@@ -52,6 +56,7 @@
               *ngIf="loggedIn"
               (click)="logout()"
               class="clickable"
+              lines="none"
             >
               <ion-icon slot="start" name="log-out"></ion-icon>
               <ion-label>Logout</ion-label>
