@@ -19,36 +19,6 @@ export class SalesService {
 
   constructor(private http: HttpClient) {
     this.salesInvoiceList = [];
-    // this.salesInvoiceList = [
-    //   {
-    //     uuid: '1',
-    //     company: 'Test Company',
-    //     customer: {
-    //       name: 'Hardik Bhanderi',
-    //       uuid: '2',
-    //       addressLine1: 'C-42 , Sheetal Complex,',
-    //       addressLine2: 'SV Road , Dahisar(E)',
-    //       city: 'Mumbai',
-    //       pinCode: '400068',
-    //     },
-    //     series: 'SINV-00001',
-    //     status: 'Draft',
-    //   },
-    //   {
-    //     uuid: '2',
-    //     company: 'CastleCraft',
-    //     customer: {
-    //       name: 'Prafful Suthar',
-    //       uuid: '1',
-    //       addressLine1: 'C-42 , Sheetal Complex,',
-    //       addressLine2: 'SV Road , Dahisar(E)',
-    //       city: 'Mumbai',
-    //       pinCode: '400068',
-    //     },
-    //     series: 'SINV-00002',
-    //     status: 'Paid',
-    //   },
-    // ];
 
     this.itemList = [
       {
