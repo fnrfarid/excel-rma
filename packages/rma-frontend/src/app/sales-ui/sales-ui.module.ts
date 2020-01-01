@@ -4,7 +4,7 @@ import { SalesPageModule } from './sales/sales.module';
 import { AddSalesInvoicePageModule } from './add-sales-invoice/add-sales-invoice.module';
 import { SalesService } from './services/sales.service';
 import { MaterialModule } from '../material/material.module';
-// import { SatPopoverModule } from '@ncstate/sat-popover';
+import { ViewSalesInvoicePageModule } from './view-sales-invoice/view-sales-invoice.module';
 
 @NgModule({
   declarations: [],
@@ -14,9 +14,13 @@ import { MaterialModule } from '../material/material.module';
     SalesPageModule,
     AddSalesInvoicePageModule,
     MaterialModule,
-    // SatPopoverModule,
+    ViewSalesInvoicePageModule,
   ],
-  exports: [SalesPageModule, AddSalesInvoicePageModule],
+  exports: [
+    SalesPageModule,
+    AddSalesInvoicePageModule,
+    ViewSalesInvoicePageModule,
+  ],
   providers: [SalesService],
 })
 export class SalesUiModule {}
