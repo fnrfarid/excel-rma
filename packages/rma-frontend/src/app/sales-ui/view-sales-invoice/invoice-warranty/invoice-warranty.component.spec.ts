@@ -9,10 +9,9 @@ describe('InvoiceWarrantyComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InvoiceWarrantyComponent ],
+      declarations: [InvoiceWarrantyComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
-    .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {

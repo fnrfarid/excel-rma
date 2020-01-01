@@ -9,10 +9,9 @@ describe('ViewSalesInvoicePage', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ViewSalesInvoicePage ],
+      declarations: [ViewSalesInvoicePage],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
-    .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {
