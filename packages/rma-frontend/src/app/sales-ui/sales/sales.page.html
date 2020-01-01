@@ -84,7 +84,7 @@
                     Paid
                   </ion-text>
                   <ion-text *ngIf="!row.submitted" color="danger">
-                    Draft
+                    Submittedd
                   </ion-text>
                 </td>
               </ng-container>
@@ -107,7 +107,11 @@
                 mat-header-row
                 *matHeaderRowDef="displayedColumns; sticky: true"
               ></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: displayedColumns;"
+                [routerLink]="['/'+'view-sales-invoice',row.uuid]"
+              ></tr>
             </table>
 
             <mat-card-actions>
