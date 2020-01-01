@@ -47,13 +47,18 @@ const routes: Routes = [
     path: 'warranty',
     loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
   },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: '**', redirectTo: 'home' },
   {
     path: 'bulk-serial',
     loadChildren:
       './warranty-ui/bulk-serial/bulk-serial.module#BulkSerialPageModule',
   },
+  {
+    path: 'view-sales-invoice/:invoiceUuid',
+    loadChildren:
+      './sales-ui/view-sales-invoice/view-sales-invoice.module#ViewSalesInvoicePageModule',
+  },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' },
 ];
 
 @NgModule({

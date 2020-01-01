@@ -24,7 +24,7 @@
           <ion-card-content>
             <ion-grid class="ion-no-padding">
               <ion-row>
-                <ion-col size="5">
+                <ion-col>
                   <ion-item>
                     <ion-label position="floating">Naming Series</ion-label>
                     <ion-select
@@ -41,7 +41,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col offset="2" size="5">
+                <ion-col>
                   <ion-item>
                     <ion-label position="floating">Company</ion-label>
                     <ion-select
@@ -60,7 +60,7 @@
                 </ion-col>
               </ion-row>
               <ion-row class="align">
-                <ion-col size="5">
+                <ion-col>
                   <ion-item>
                     <ion-label position="floating">Customer Name</ion-label>
                     <ion-select
@@ -76,7 +76,7 @@
                     </ion-select>
                   </ion-item>
                 </ion-col>
-                <ion-col offset="2" size="5">
+                <ion-col>
                   <ion-item>
                     <ion-label position="floating">Posting Date</ion-label>
                     <ion-datetime display-format="DD.MM.YYYY"></ion-datetime>
@@ -84,7 +84,7 @@
                 </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label position="floating">Remaining Balance</ion-label>
                     <ion-input
@@ -94,7 +94,7 @@
                     ></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col offset="2" size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label position="floating">Sales Person</ion-label>
                     <ion-input
@@ -106,7 +106,7 @@
                 </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label position="floating">Branch</ion-label>
                     <ion-input
@@ -116,7 +116,7 @@
                     ></ion-input>
                   </ion-item>
                 </ion-col>
-                <ion-col offset="2" size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label position="floating">Warehouse</ion-label>
                     <ion-input
@@ -128,13 +128,13 @@
                 </ion-col>
               </ion-row>
               <ion-row class="align">
-                <ion-col size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label>Campaign Invoice</ion-label>
                     <ion-checkbox slot="start"></ion-checkbox>
                   </ion-item>
                 </ion-col>
-                <ion-col offset="2" size="5">
+                <ion-col>
                   <ion-item>
                     <ion-label position="floating">Item Barcode</ion-label>
                     <ion-input
@@ -163,7 +163,7 @@
           <ion-card-content *ngIf="customer.name !== '' ">
             <ion-grid class="ion-no-padding">
               <ion-row>
-                <ion-col size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label position="stacked">Customer address</ion-label>
                     {{customer.addressLine1}}
@@ -173,7 +173,7 @@
                     {{customer.city}} - {{customer.pinCode}}
                   </ion-item>
                 </ion-col>
-                <ion-col offset="2" size="5">
+                <ion-col>
                   <ion-item lines="none">
                     <ion-label position="stacked">Contact Person</ion-label>
                     {{customer.name}}

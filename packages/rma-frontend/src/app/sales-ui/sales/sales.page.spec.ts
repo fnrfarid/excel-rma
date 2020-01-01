@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { SalesService } from '../services/sales.service';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SalesPage', () => {
   let component: SalesPage;
@@ -16,7 +17,12 @@ describe('SalesPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SalesPage],
-      imports: [MaterialModule, FormsModule, NoopAnimationsModule],
+      imports: [
+        MaterialModule,
+        FormsModule,
+        NoopAnimationsModule,
+        RouterTestingModule.withRoutes([]),
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {

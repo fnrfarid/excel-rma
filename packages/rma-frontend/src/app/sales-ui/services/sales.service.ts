@@ -8,7 +8,7 @@ import {
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
 } from '../../constants/storage';
-import { LIST_SALES_INVOICE_ENDPOINT } from 'src/app/constants/url-strings';
+import { LIST_SALES_INVOICE_ENDPOINT } from '../../constants/url-strings';
 
 @Injectable({
   providedIn: 'root',

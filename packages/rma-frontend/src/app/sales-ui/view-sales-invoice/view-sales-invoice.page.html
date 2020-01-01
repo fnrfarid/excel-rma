@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Sales Invoice
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-card>
+    <ion-card-header class="ion-no-padding">
+      <ion-segment [(ngModel)]="selectedSegment" scrollable="true">
+        <ion-segment-button value="details">
+          <ion-label>Details</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="serial">
+          <ion-label>Serials</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="accounts">
+          <ion-label>Accounts</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="sales-return">
+          <ion-label>Sales Return</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="warranty">
+          <ion-label>Warranty</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="credit-notes">
+          <ion-label>Credit Notes</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-header>
+    <ion-card-content [ngSwitch]="selectedSegment">
+      <sales-invoice-details *ngSwitchCase="'details'"> </sales-invoice-details>
+      <sales-invoice-serials *ngSwitchCase="'serial'"> </sales-invoice-serials>
+      <sales-invoice-accounts
+        *ngSwitchCase="'accounts'"
+      ></sales-invoice-accounts>
+      <sales-invoice-return
+        *ngSwitchCase="'sales-return'"
+      ></sales-invoice-return>
+      <sales-invoice-warranty
+        *ngSwitchCase="'warranty'"
+      ></sales-invoice-warranty>
+      <sales-invoice-credit-notes *ngSwitchCase="'credit-notes'">
+      </sales-invoice-credit-notes>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

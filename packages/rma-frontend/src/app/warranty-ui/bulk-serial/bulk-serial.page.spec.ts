@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { BulkSerialPage } from './bulk-serial.page';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../material/material.module';
 import { RouterTestingModule } from '@angular/router/testing';
 
 describe('BulkSerialPage', () => {
