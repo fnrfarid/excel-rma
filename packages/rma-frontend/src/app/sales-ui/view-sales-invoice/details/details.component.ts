@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { DetailsDataSource } from './details-datasource';
+import { SalesService } from '../../services/sales.service';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -6,7 +8,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./details.component.scss'],
 })
 export class DetailsComponent implements OnInit {
-  constructor() {}
+  displayedColumns = ['item', 'quantity', 'rate', 'total'];
 
-  ngOnInit() {}
+  dataSource: DetailsDataSource;
+
+  constructor(private salesService: SalesService) {}
+
+  ngOnInit() {
+    this.dataSource = new DetailsDataSource(this.salesService);
+    this.dataSource.loadItems();
+  }
 }
