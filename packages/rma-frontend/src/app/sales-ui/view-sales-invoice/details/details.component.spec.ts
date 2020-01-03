@@ -2,6 +2,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DetailsComponent } from './details.component';
+import { MaterialModule } from '../../../material/material.module';
+import { SalesService } from '../../services/sales.service';
+import { of } from 'rxjs';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -11,6 +14,15 @@ describe('DetailsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DetailsComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [MaterialModule],
+      providers: [
+        {
+          provide: SalesService,
+          useValue: {
+            getItemList: () => of({}),
+          },
+        },
+      ],
     }).compileComponents();
   }));
 

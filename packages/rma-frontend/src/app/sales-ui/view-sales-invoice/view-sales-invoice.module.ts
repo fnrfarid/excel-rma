@@ -12,6 +12,7 @@ import { CreditNotesComponent } from './credit-notes/credit-notes.component';
 import { InvoiceWarrantyComponent } from './invoice-warranty/invoice-warranty.component';
 import { SalesReturnComponent } from './sales-return/sales-return.component';
 import { SerialsComponent } from './serials/serials.component';
+import { MaterialModule } from '../../material/material.module';
 
 const routes: Routes = [
   {
@@ -25,6 +26,7 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
+    MaterialModule,
     RouterModule.forChild(routes),
   ],
   declarations: [
