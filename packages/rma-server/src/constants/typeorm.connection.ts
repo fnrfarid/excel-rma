@@ -19,6 +19,7 @@ import { Item } from '../item/entity/item/item.entity';
 import { Supplier } from '../supplier/entity/supplier/supplier.entity';
 import { SerialNo } from '../serial-no/entity/serial-no/serial-no.entity';
 import { SalesInvoice } from '../sales-invoice/entity/sales-invoice/sales-invoice.entity';
+import { WarrantyClaim } from '../warranty-claim/entity/warranty-claim/warranty-claim.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -43,6 +44,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       Supplier,
       SerialNo,
       SalesInvoice,
+      WarrantyClaim,
     ],
     useNewUrlParser: true,
     w: 'majority',
@@ -63,7 +65,7 @@ export function connectTypeORMTokenCache(
     type: 'mongodb',
     logging: false,
     synchronize: true,
-    entities: [TokenCache],
+    entities: [TokenCache, WarrantyClaim],
     useNewUrlParser: true,
     w: 'majority',
     useUnifiedTopology: true,
