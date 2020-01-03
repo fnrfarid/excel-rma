@@ -1,5 +1,167 @@
 <ion-card>
   <ion-card-content>
-    Awesome content
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Customer Name</ion-label>
+            <ion-input
+              readonly="true"
+              placeholder="Castlecraft"
+              type="string"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Invoice No</ion-label>
+            <ion-input
+              placeholder="INV-0001"
+              readonly="true"
+              type="string"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Address</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              placeholder="Mumbai , India"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Posting Date</ion-label>
+            <ion-datetime
+              readonly
+              placeholder="03.01.2020"
+              display-format="DD.MM.YYYY"
+            ></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Balance</ion-label>
+            <ion-input
+              readonly="true"
+              type="number"
+              placeholder="200000"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Warehouse</ion-label>
+            <ion-input
+              readonly="true"
+              type="text"
+              placeholder="Dhaka Warehouse"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label>Package Invoice</ion-label>
+            <ion-checkbox slot="start"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Items
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-item lines="none">
+      <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+        <ng-container matColumnDef="item">
+          <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container *ngIf="row.name">
+              {{ row.name }}
+            </ng-container>
+            <span class="add-comment" *ngIf="!row.name">
+              Add an item
+            </span>
+            <!-- <sat-popover
+              #p
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updateItem(row, $event)"
+            >
+              <inline-edit [value]="row.name" column="item"></inline-edit>
+            </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="quantity">
+          <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.quantity }}
+            </ng-container>
+            <!--
+            <sat-popover
+              #p
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updateQuantity(row, $event)"
+            >
+              <inline-edit
+                [value]="row.quantity"
+                column="quantity"
+              ></inline-edit>
+            </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="rate">
+          <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.rate }}
+            </ng-container>
+            <!-- <sat-popover
+              #p
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updateRate(row, $event)"
+            >
+              <inline-edit [value]="row.rate" column="rate"></inline-edit>
+            </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="total">
+          <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{
+            row.rate * row.quantity
+          }}</mat-cell>
+        </ng-container>
+        <mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </ion-item>
   </ion-card-content>
 </ion-card>
