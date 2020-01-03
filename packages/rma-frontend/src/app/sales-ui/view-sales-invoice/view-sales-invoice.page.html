@@ -9,41 +9,60 @@
 <ion-content class="page-background">
   <ion-card>
     <ion-card-header class="ion-no-padding">
-      <ion-segment [(ngModel)]="selectedSegment" scrollable="true">
-        <ion-segment-button value="details">
+      <ion-segment
+        [(ngModel)]="selectedSegment"
+        scrollable="true"
+        (ionChange)="segmentChanged($event)"
+      >
+        <ion-segment-button value="0">
           <ion-label>Details</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="serial">
+        <ion-segment-button value="1">
           <ion-label>Serials</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="accounts">
+        <ion-segment-button value="2">
           <ion-label>Accounts</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="sales-return">
+        <ion-segment-button value="3">
           <ion-label>Sales Return</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="warranty">
+        <ion-segment-button value="4">
           <ion-label>Warranty</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="credit-notes">
+        <ion-segment-button value="5">
           <ion-label>Credit Notes</ion-label>
         </ion-segment-button>
       </ion-segment>
     </ion-card-header>
-    <ion-card-content [ngSwitch]="selectedSegment">
-      <sales-invoice-details *ngSwitchCase="'details'"> </sales-invoice-details>
-      <sales-invoice-serials *ngSwitchCase="'serial'"> </sales-invoice-serials>
-      <sales-invoice-accounts
-        *ngSwitchCase="'accounts'"
-      ></sales-invoice-accounts>
-      <sales-invoice-return
-        *ngSwitchCase="'sales-return'"
-      ></sales-invoice-return>
-      <sales-invoice-warranty
-        *ngSwitchCase="'warranty'"
-      ></sales-invoice-warranty>
-      <sales-invoice-credit-notes *ngSwitchCase="'credit-notes'">
-      </sales-invoice-credit-notes>
-    </ion-card-content>
   </ion-card>
+
+  <ion-slides
+    #slides
+    mode="md"
+    pager="false"
+    [options]="sliderOptions"
+    (ionSlideDidChange)="slideChanged(slides)"
+    (ionSlidesDidLoad)="slideChanged(slides)"
+  >
+    <ion-slide>
+      <sales-invoice-details class="width"> </sales-invoice-details>
+    </ion-slide>
+    <ion-slide>
+      <sales-invoice-serials class="width"> </sales-invoice-serials>
+    </ion-slide>
+    <ion-slide>
+      <sales-invoice-accounts class="width"></sales-invoice-accounts>
+    </ion-slide>
+    <ion-slide>
+      <sales-invoice-return class="width"></sales-invoice-return>
+    </ion-slide>
+    <ion-slide>
+      <sales-invoice-warranty class="width"></sales-invoice-warranty>
+    </ion-slide>
+    <ion-slide>
+      <sales-invoice-credit-notes class="width"> </sales-invoice-credit-notes>
+    </ion-slide>
+  </ion-slides>
+
+  <!-- <div [ngSwitch]="selectedSegment"></div> -->
 </ion-content>
