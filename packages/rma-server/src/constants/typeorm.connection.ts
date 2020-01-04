@@ -65,7 +65,7 @@ export function connectTypeORMTokenCache(
     type: 'mongodb',
     logging: false,
     synchronize: true,
-    entities: [TokenCache, WarrantyClaim],
+    entities: [TokenCache],
     useNewUrlParser: true,
     w: 'majority',
     useUnifiedTopology: true,
