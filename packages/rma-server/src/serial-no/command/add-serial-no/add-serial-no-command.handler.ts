@@ -11,7 +11,7 @@ export class AddSerialNoHandler implements ICommandHandler<AddSerialNoCommand> {
   async execute(command: AddSerialNoCommand) {
     const { serialNoPayload, clientHttpRequest } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await aggregate.addSerialNo(serialNoPayload, clientHttpRequest);
+    await aggregate.addSerialNo(serialNoPayload, clientHttpRequest).toPromise();
     aggregate.commit();
   }
 }

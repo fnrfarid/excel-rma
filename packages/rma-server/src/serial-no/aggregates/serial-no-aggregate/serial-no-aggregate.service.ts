@@ -15,7 +15,7 @@ import { SerialNo } from '../../entity/serial-no/serial-no.entity';
 import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { throwError, of } from 'rxjs';
 import {
   AUTHORIZATION,
   CONTENT_TYPE,
@@ -24,6 +24,7 @@ import {
 } from '../../../constants/app-strings';
 import { BEARER_HEADER_VALUE_PREFIX } from '../../../constants/app-strings';
 import { FRAPPE_API_SERIAL_NO_ENDPOINT } from '../../../constants/routes';
+import { SerialNoPoliciesService } from '../../policies/serial-no-policies/serial-no-policies.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -31,17 +32,27 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly serialNoService: SerialNoService,
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
+    private readonly serialNoPolicyService: SerialNoPoliciesService,
   ) {
     super();
   }
 
   addSerialNo(serialNoPayload: SerialNoDto, clientHttpRequest) {
-    const serialNo = new SerialNo();
-    Object.assign(serialNo, serialNoPayload);
-    serialNo.uuid = uuidv4();
-    serialNo.isSynced = false;
-    this.syncNewSerialNo(serialNo, clientHttpRequest);
-    this.apply(new SerialNoAddedEvent(serialNo, clientHttpRequest));
+    return this.serialNoPolicyService.validateSerial(serialNoPayload).pipe(
+      switchMap(validSerial => {
+        return this.serialNoPolicyService.validateItem(serialNoPayload).pipe(
+          switchMap(validItems => {
+            const serialNo = new SerialNo();
+            Object.assign(serialNo, serialNoPayload);
+            serialNo.uuid = uuidv4();
+            serialNo.isSynced = false;
+            this.syncNewSerialNo(serialNo, clientHttpRequest);
+            this.apply(new SerialNoAddedEvent(serialNo, clientHttpRequest));
+            return of({});
+          }),
+        );
+      }),
+    );
   }
 
   async retrieveSerialNo(uuid: string, req) {

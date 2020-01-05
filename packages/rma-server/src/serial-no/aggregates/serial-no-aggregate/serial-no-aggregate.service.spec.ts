@@ -3,6 +3,7 @@ import { SerialNoAggregateService } from './serial-no-aggregate.service';
 import { SerialNoService } from '../../entity/serial-no/serial-no.service';
 import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { SerialNoPoliciesService } from '../../policies/serial-no-policies/serial-no-policies.service';
 describe('SerialNoAggregateService', () => {
   let service: SerialNoAggregateService;
 
@@ -20,6 +21,10 @@ describe('SerialNoAggregateService', () => {
         },
         {
           provide: SettingsService,
+          useValue: {},
+        },
+        {
+          provide: SerialNoPoliciesService,
           useValue: {},
         },
       ],

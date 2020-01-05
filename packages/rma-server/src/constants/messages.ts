@@ -11,3 +11,5 @@ export const SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED =
 export const DELIVERY_NOTE_ALREADY_SUBMITTED =
   'Provided delivery note is already submitted';
 export const DELIVERY_NOTE_IN_QUEUE = 'Provided delivery note is in queue';
+export const SERIAL_NO_ALREADY_EXIST = 'Serial Number already exist';
+export const ITEM_NOT_FOUND = 'Item not found';
