@@ -1,4 +1,11 @@
-import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
+import {
+  Column,
+  ObjectIdColumn,
+  BaseEntity,
+  ObjectID,
+  Entity,
+  Index,
+} from 'typeorm';
 
 export class Barcodes {
   name: string;
@@ -49,6 +56,7 @@ export class Item extends BaseEntity {
   docstatus: number;
 
   @Column()
+  @Index({ unique: true })
   item_code: string;
 
   @Column()

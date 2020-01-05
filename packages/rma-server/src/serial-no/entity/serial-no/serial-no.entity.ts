@@ -1,4 +1,11 @@
-import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
+import {
+  Column,
+  ObjectIdColumn,
+  BaseEntity,
+  ObjectID,
+  Entity,
+  Index,
+} from 'typeorm';
 
 @Entity()
 export class SerialNo extends BaseEntity {
@@ -30,6 +37,7 @@ export class SerialNo extends BaseEntity {
   docstatus: number;
 
   @Column()
+  @Index({ unique: true })
   serial_no: string;
 
   @Column()
