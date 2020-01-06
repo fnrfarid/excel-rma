@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalesReturnComponent } from './sales-return.component';
+import { MaterialModule } from '../../../material/material.module';
 
 describe('SalesReturnComponent', () => {
   let component: SalesReturnComponent;
@@ -10,6 +11,7 @@ describe('SalesReturnComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SalesReturnComponent],
+      imports: [MaterialModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));
