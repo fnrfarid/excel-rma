@@ -1,3 +1,78 @@
-<p>
-  accounts works!
-</p>
+<ion-card>
+  <ion-card-content class="ion-no-padding">
+    <ion-item lines="none">
+      <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+        <ng-container matColumnDef="voucher-no">
+          <mat-header-cell *matHeaderCellDef>Voucher No</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container *ngIf="row.voucherNo">
+              {{ row.voucherNo }}
+            </ng-container>
+            <span class="add-comment" *ngIf="!row.voucherNo">
+              Add an item
+            </span>
+            <!-- <sat-popover
+              #p
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updateItem(row, $event)"
+            >
+              <inline-edit [value]="row.name" column="item"></inline-edit>
+            </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="voucher-type">
+          <mat-header-cell *matHeaderCellDef>Voucher Type</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.voucherType }}
+            </ng-container>
+            <!--
+            <sat-popover
+              #p
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updateQuantity(row, $event)"
+            >
+              <inline-edit
+                [value]="row.quantity"
+                column="quantity"
+              ></inline-edit>
+            </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="amount">
+          <mat-header-cell *matHeaderCellDef>Amount</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.amount }}</mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="dated">
+          <mat-header-cell *matHeaderCellDef>Dated</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.dated }}
+            </ng-container>
+            <!-- <sat-popover
+                      #p
+                      hasBackdrop
+                      xAlign="start"
+                      yAlign="start"
+                      (closed)="updateRate(row, $event)"
+                    >
+                      <inline-edit [value]="row.rate" column="rate"></inline-edit>
+                    </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="remark">
+          <mat-header-cell *matHeaderCellDef>Remarks</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.remark }}</mat-cell>
+        </ng-container>
+        <mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </ion-item>
+  </ion-card-content>
+</ion-card>
