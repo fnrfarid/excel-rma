@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AccountsDataSource } from './accounts-datasource';
 
 @Component({
   selector: 'sales-invoice-accounts',
@@ -6,7 +7,20 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./accounts.component.scss'],
 })
 export class AccountsComponent implements OnInit {
+  displayedColumns = [
+    'voucher-no',
+    'voucher-type',
+    'amount',
+    'dated',
+    'remark',
+  ];
+
+  dataSource: AccountsDataSource;
+
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.dataSource = new AccountsDataSource();
+    this.dataSource.loadItems();
+  }
 }

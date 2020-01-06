@@ -81,10 +81,10 @@
                 <th mat-header-cell *matHeaderCellDef>Status</th>
                 <td mat-cell *matCellDef="let row">
                   <ion-text color="success" *ngIf="row.submitted">
-                    Paid
+                    Submitted
                   </ion-text>
                   <ion-text *ngIf="!row.submitted" color="danger">
-                    Submittedd
+                    Draft
                   </ion-text>
                 </td>
               </ng-container>

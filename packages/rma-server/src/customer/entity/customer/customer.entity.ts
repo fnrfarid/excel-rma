@@ -1,4 +1,11 @@
-import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
+import {
+  Column,
+  ObjectIdColumn,
+  BaseEntity,
+  ObjectID,
+  Entity,
+  Index,
+} from 'typeorm';
 
 export class CustomerCreditLimit {
   credit_limit: number;
@@ -14,6 +21,7 @@ export class Customer extends BaseEntity {
   uuid: string;
 
   @Column()
+  @Index({ unique: true })
   name: string;
 
   @Column()

@@ -1,4 +1,11 @@
-import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
+import {
+  Column,
+  ObjectIdColumn,
+  BaseEntity,
+  ObjectID,
+  Entity,
+  Index,
+} from 'typeorm';
 
 @Entity()
 export class Supplier extends BaseEntity {
@@ -9,6 +16,7 @@ export class Supplier extends BaseEntity {
   uuid: string;
 
   @Column()
+  @Index({ unique: true })
   name: string;
 
   @Column()

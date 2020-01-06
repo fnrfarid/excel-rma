@@ -1,12 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SerialNoPoliciesService } from './serial-no-policies.service';
+import { SerialNoService } from '../../entity/serial-no/serial-no.service';
+import { ItemService } from '../../../item/entity/item/item.service';
 
 describe('SerialNoPoliciesService', () => {
   let service: SerialNoPoliciesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SerialNoPoliciesService],
+      providers: [
+        SerialNoPoliciesService,
+        {
+          provide: SerialNoService,
+          useValue: {},
+        },
+        {
+          provide: ItemService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     service = module.get<SerialNoPoliciesService>(SerialNoPoliciesService);

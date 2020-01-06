@@ -20,6 +20,7 @@ import { ItemModule } from './item/item.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { SerialNoModule } from './serial-no/serial-no.module';
 import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
+import { WarrantyClaimModule } from './warranty-claim/warranty-claim.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
     SalesInvoiceModule,
     ItemModule,
     SerialNoModule,
+    WarrantyClaimModule,
   ],
   controllers: [AppController],
   providers: [AppService],
