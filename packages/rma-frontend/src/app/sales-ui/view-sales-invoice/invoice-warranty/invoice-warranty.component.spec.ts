@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { InvoiceWarrantyComponent } from './invoice-warranty.component';
+import { MaterialModule } from '../../../material/material.module';
 
 describe('InvoiceWarrantyComponent', () => {
   let component: InvoiceWarrantyComponent;
@@ -10,6 +11,7 @@ describe('InvoiceWarrantyComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InvoiceWarrantyComponent],
+      imports: [MaterialModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));
