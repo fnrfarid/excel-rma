@@ -42,10 +42,10 @@ export class SerialNoController {
     return this.commandBus.execute(new RemoveSerialNoCommand(uuid));
   }
 
-  @Get('v1/get/:uuid')
+  @Get('v1/get/:serial_no')
   @UseGuards(TokenGuard)
-  async getSerialNo(@Param('uuid') uuid, @Req() req) {
-    return await this.queryBus.execute(new RetrieveSerialNoQuery(uuid, req));
+  async getSerialNo(@Param('serial_no') serial_no) {
+    return await this.queryBus.execute(new RetrieveSerialNoQuery(serial_no));
   }
 
   @Get('v1/list')
