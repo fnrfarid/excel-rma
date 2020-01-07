@@ -17,22 +17,12 @@
       </ion-avatar>
     </ion-item>
     <ion-card-header>
-      <ion-card-subtitle>Expires In {{ expires }}</ion-card-subtitle>
-      <ion-card-title>AccessToken: {{ accessToken }}</ion-card-title>
+      <ion-card-subtitle>{{ email }}</ion-card-subtitle>
+      <ion-card-title>Welcome {{ fullName }}!</ion-card-title>
     </ion-card-header>
   </ion-card>
 </ion-content>
 
-<ion-content *ngIf="loggedIn" class="card">
-  <ion-grid style="height: 30%">
-    <ion-row
-      class="ion-justify-content-center ion-align-items-center"
-      style="height: 100%"
-    >
-      <ion-icon name="log-in"></ion-icon>&nbsp;Awesome!! Welcome to Excelbd...
-    </ion-row>
-  </ion-grid>
-</ion-content>
 <ion-content *ngIf="!loggedIn" class="card">
   <ion-grid style="height: 100%">
     <ion-row
