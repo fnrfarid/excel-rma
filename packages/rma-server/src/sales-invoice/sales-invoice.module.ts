@@ -7,9 +7,10 @@ import { SalesInvoiceEventManager } from './event';
 import { SalesInvoiceController } from './controllers/sales-invoice/sales-invoice.controller';
 import { SalesInvoicePoliciesService } from './policies/sales-invoice-policies/sales-invoice-policies.service';
 import { SalesInvoiceEntitiesModule } from './entity/entity.module';
+import { CustomerModule } from '../customer/customer.module';
 
 @Module({
-  imports: [SalesInvoiceEntitiesModule, CqrsModule, HttpModule],
+  imports: [SalesInvoiceEntitiesModule, CqrsModule, HttpModule, CustomerModule],
   controllers: [SalesInvoiceController],
   providers: [
     ...SalesInvoiceAggregatesManager,

@@ -14,15 +14,11 @@ import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.se
 import { SalesInvoiceRemovedEvent } from '../../event/sales-invoice-removed/sales-invoice-removed.event';
 import { SalesInvoiceUpdatedEvent } from '../../event/sales-invoice-updated/sales-invoice-updated.event';
 import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-update-dto';
-import {
-  SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED,
-  DELIVERY_NOTE_ALREADY_SUBMITTED,
-  DELIVERY_NOTE_IN_QUEUE,
-} from '../../../constants/messages';
+import { SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { throwError, of } from 'rxjs';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
@@ -32,6 +28,7 @@ import {
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
 import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
+import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -39,6 +36,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly settingsService: SettingsService,
     private readonly http: HttpService,
+    private readonly validateSalesInvoicePolicy: SalesInvoicePoliciesService,
   ) {
     super();
   }
@@ -83,19 +81,41 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     this.apply(new SalesInvoiceUpdatedEvent(updatePayload));
   }
 
-  async submitSalesInvoice(uuid, clientHttpRequest: any) {
-    const provider = await this.salesInvoiceService.findOne({ uuid });
-    if (!provider) {
-      throw new NotFoundException();
-    }
-    if (provider.submitted === true) {
-      throw new BadRequestException(DELIVERY_NOTE_ALREADY_SUBMITTED);
-    }
-    if (provider.inQueue === true) {
-      throw new BadRequestException(DELIVERY_NOTE_IN_QUEUE);
-    }
-    this.apply(new SalesInvoiceSubmittedEvent(provider));
-    this.syncSubmittedSalesInvoice(provider, clientHttpRequest);
+  submitSalesInvoice(
+    salesInvoicePayload: SalesInvoiceUpdateDto,
+    clientHttpRequest: any,
+  ) {
+    return this.validateSalesInvoicePolicy
+      .validateSalesInvoice(salesInvoicePayload)
+      .pipe(
+        switchMap(() => {
+          return this.validateSalesInvoicePolicy
+            .validateCustomer(salesInvoicePayload)
+            .pipe(
+              switchMap(() => {
+                return this.validateSalesInvoicePolicy
+                  .validateSubmittedState(salesInvoicePayload)
+                  .pipe(
+                    switchMap(() => {
+                      return this.validateSalesInvoicePolicy.validateQueueState(
+                        salesInvoicePayload,
+                      );
+                    }),
+                  )
+                  .pipe(
+                    switchMap(salesInvoice => {
+                      this.apply(new SalesInvoiceSubmittedEvent(salesInvoice));
+                      this.syncSubmittedSalesInvoice(
+                        salesInvoice,
+                        clientHttpRequest,
+                      );
+                      return of({});
+                    }),
+                  );
+              }),
+            );
+        }),
+      );
   }
 
   syncSubmittedSalesInvoice(

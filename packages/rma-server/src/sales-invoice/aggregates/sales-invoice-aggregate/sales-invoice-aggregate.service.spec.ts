@@ -3,6 +3,7 @@ import { SalesInvoiceAggregateService } from './sales-invoice-aggregate.service'
 import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
+import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 
 describe('SalesInvoiceAggregateService', () => {
   let service: SalesInvoiceAggregateService;
@@ -21,6 +22,10 @@ describe('SalesInvoiceAggregateService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: SalesInvoicePoliciesService,
           useValue: {},
         },
       ],
