@@ -2,6 +2,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { SerialNo } from './serial-no.entity';
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class SerialNoService {
@@ -58,5 +60,13 @@ export class SerialNoService {
 
   async updateOne(query, options?) {
     return await this.serialNoRepository.updateOne(query, options);
+  }
+
+  asyncAggregate(query) {
+    return of(this.serialNoRepository.aggregate(query)).pipe(
+      switchMap((aggregateData: any) => {
+        return aggregateData.toArray();
+      }),
+    );
   }
 }
