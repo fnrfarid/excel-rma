@@ -55,9 +55,9 @@ export class SalesInvoiceController {
   @Post('v1/submit')
   @UseGuards(TokenGuard)
   @UsePipes()
-  submitSalesInvoice(@Body() updatePayload: { uuid: string }, @Req() req) {
+  submitSalesInvoice(@Body() updatePayload: SalesInvoiceUpdateDto, @Req() req) {
     return this.commandBus.execute(
-      new SubmitSalesInvoiceCommand(updatePayload.uuid, req),
+      new SubmitSalesInvoiceCommand(updatePayload, req),
     );
   }
 

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-bulk-serial',
@@ -25,6 +26,7 @@ export class BulkSerialPage implements OnInit {
   constructor(
     private readonly snackbar: MatSnackBar,
     private readonly router: Router,
+    private readonly location: Location,
   ) {
     this.date = new Date().toDateString();
   }
@@ -87,5 +89,9 @@ export class BulkSerialPage implements OnInit {
     }
     this.snackbar.open('Warranty Claims Created', 'Close', { duration: 2500 });
     this.router.navigateByUrl('warranty');
+  }
+
+  navigateBack() {
+    this.location.back();
   }
 }

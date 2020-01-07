@@ -16,6 +16,7 @@ import {
 } from './constants/storage';
 import { AppService } from './app.service';
 import { interval, Subscription } from 'rxjs';
+import { LoginService } from './api/login/login.service';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +32,7 @@ export class AppComponent implements OnInit {
     private readonly splashScreen: SplashScreen,
     private readonly statusBar: StatusBar,
     private readonly appService: AppService,
+    private readonly loginService: LoginService,
   ) {
     this.initializeApp();
   }
@@ -86,6 +88,7 @@ export class AppComponent implements OnInit {
   logout() {
     this.loggedIn = false;
     localStorage.clear();
+    this.loginService.logout();
   }
 
   setupImplicitFlow(): void {
