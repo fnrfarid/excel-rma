@@ -5,6 +5,8 @@ import { DetailsComponent } from './details.component';
 import { MaterialModule } from '../../../material/material.module';
 import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -14,7 +16,12 @@ describe('DetailsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DetailsComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      imports: [MaterialModule],
+      imports: [
+        MaterialModule,
+        BrowserAnimationsModule,
+        RouterTestingModule.withRoutes([]),
+        BrowserAnimationsModule,
+      ],
       providers: [
         {
           provide: SalesService,
