@@ -1,8 +1,8 @@
 <ion-card>
-  <ion-card-content>
+  <ion-card-content class="ion-no-padding">
     <ion-grid class="ion-no-padding">
       <ion-row>
-        <ion-col>
+        <ion-col size="5">
           <ion-item lines="none">
             <ion-label position="floating">Company</ion-label>
             <ion-select
@@ -19,7 +19,7 @@
             </ion-select>
           </ion-item>
         </ion-col>
-        <ion-col>
+        <ion-col offset="2" size="5">
           <ion-item lines="none">
             <ion-label position="floating">Supplier</ion-label>
             <ion-select
@@ -40,7 +40,7 @@
         </ion-col>
       </ion-row>
       <ion-row class="align">
-        <ion-col class="ion-text-left">
+        <ion-col size="5" class="ion-text-left">
           <input
             type="file"
             id="txtFileUpload"
@@ -48,7 +48,7 @@
             accept=".csv"
           />
         </ion-col>
-        <ion-col>
+        <ion-col offset="2" size="5">
           <ion-item>
             <ion-label position="floating">Date</ion-label>
             <ion-input
@@ -69,7 +69,7 @@
       <ion-col class="ion-text-left">
         <ion-card-title>
           <ion-text color="tertiary">
-            Items
+            Claims
           </ion-text>
         </ion-card-title>
       </ion-col>

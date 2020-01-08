@@ -1,9 +1,9 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { WarrantyService } from '../warranty/warranty.service';
+import { WarrantyService } from '../warranty.service';
 
-export interface WarrantyClaimListingData {
+export interface WarrantyClaimsListingData {
   claim: string;
   company: string;
   supplier: string;
@@ -12,18 +12,18 @@ export interface WarrantyClaimListingData {
 }
 
 export interface ListResponse {
-  docs: WarrantyClaimListingData[];
+  docs: WarrantyClaimsListingData[];
   length: number;
   offset: number;
 }
-export class WarrantyClaimDataSource extends DataSource<
-  WarrantyClaimListingData
+export class WarrantyClaimsDataSource extends DataSource<
+  WarrantyClaimsListingData
 > {
-  data: WarrantyClaimListingData[];
+  data: WarrantyClaimsListingData[];
   length: number;
   offset: number;
 
-  itemSubject = new BehaviorSubject<WarrantyClaimListingData[]>([]);
+  itemSubject = new BehaviorSubject<WarrantyClaimsListingData[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
 
   loading$ = this.loadingSubject.asObservable();
@@ -34,7 +34,7 @@ export class WarrantyClaimDataSource extends DataSource<
 
   connect(
     collectionViewer: CollectionViewer,
-  ): Observable<WarrantyClaimListingData[]> {
+  ): Observable<WarrantyClaimsListingData[]> {
     return this.itemSubject.asObservable();
   }
 

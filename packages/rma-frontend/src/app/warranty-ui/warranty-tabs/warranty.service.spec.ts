@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+
 import { WarrantyService } from './warranty.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpErrorHandler } from '../../common/interfaces/services/http-error-handler/http-error-handler.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('WarrantyService', () => {
   beforeEach(() =>

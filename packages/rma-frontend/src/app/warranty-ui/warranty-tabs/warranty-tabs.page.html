@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Warranty</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-card>
+    <ion-card-header class="ion-no-padding">
+      <ion-segment
+        [(ngModel)]="selectedSegment"
+        scrollable="true"
+        (ionChange)="segmentChanged($event)"
+      >
+        <ion-segment-button value="0">
+          <ion-label>Serial No</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="1">
+          <ion-label>Assign Claims</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="2">
+          <ion-label>Warranty Claims</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-slides
+    #slides
+    mode="md"
+    pager="false"
+    [options]="sliderOptions"
+    (ionSlideDidChange)="slideChanged(slides)"
+    (ionSlidesDidLoad)="slideChanged(slides)"
+  >
+    <ion-slide>
+      <warranty-serial-number class="width"> </warranty-serial-number>
+    </ion-slide>
+    <ion-slide>
+      <warranty-assign-claims class="width"> </warranty-assign-claims>
+    </ion-slide>
+    <ion-slide>
+      <warranty-claims class="width"></warranty-claims>
+    </ion-slide>
+  </ion-slides>
+
+  <!-- <div [ngSwitch]="selectedSegment"></div> -->
+</ion-content>

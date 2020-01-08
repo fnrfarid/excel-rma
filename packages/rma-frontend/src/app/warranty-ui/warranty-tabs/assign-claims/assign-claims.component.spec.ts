@@ -1,27 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { BulkSerialPage } from './bulk-serial.page';
-import { MatSnackBar } from '@angular/material';
-import { Router } from '@angular/router';
-import { MaterialModule } from '../../material/material.module';
-import { RouterTestingModule } from '@angular/router/testing';
 
-describe('BulkSerialPage', () => {
-  let component: BulkSerialPage;
-  let fixture: ComponentFixture<BulkSerialPage>;
+import { AssignClaimsComponent } from './assign-claims.component';
+import { MaterialModule } from '../../../material/material.module';
+import { MatSnackBar } from '@angular/material';
+
+describe('AssignClaimsComponent', () => {
+  let component: AssignClaimsComponent;
+  let fixture: ComponentFixture<AssignClaimsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [BulkSerialPage],
+      declarations: [AssignClaimsComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      imports: [RouterTestingModule, MaterialModule],
+      imports: [MaterialModule],
       providers: [
         {
           provide: MatSnackBar,
-          useValue: {},
-        },
-        {
-          provide: Router,
           useValue: {},
         },
       ],
@@ -29,7 +24,7 @@ describe('BulkSerialPage', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BulkSerialPage);
+    fixture = TestBed.createComponent(AssignClaimsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
