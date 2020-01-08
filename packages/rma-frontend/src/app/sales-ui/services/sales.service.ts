@@ -8,7 +8,10 @@ import {
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
 } from '../../constants/storage';
-import { LIST_SALES_INVOICE_ENDPOINT } from '../../constants/url-strings';
+import {
+  LIST_SALES_INVOICE_ENDPOINT,
+  SALES_INVOICE_GET_ONE_ENDPOINT,
+} from '../../constants/url-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -72,18 +75,10 @@ export class SalesService {
     });
   }
 
-  getSalesInvoice(series: string) {
-    const foundInvoice = {} as SalesInvoice;
-    foundInvoice.company = '';
-    foundInvoice.customer = '';
-    // foundInvoice.series = '';
-    // foundInvoice.status = '';
-
-    this.salesInvoiceList.forEach(invoice => {
-      // if (invoice.series === series) foundInvoice = invoice;
+  getSalesInvoice(uuid: string) {
+    return this.http.get(`${SALES_INVOICE_GET_ONE_ENDPOINT}${uuid}`, {
+      headers: this.getAuthorizationHeaders(),
     });
-
-    return of(foundInvoice);
   }
 
   getItemList() {
