@@ -1,11 +1,11 @@
-::-ms-browse {
+::-webkit-file-upload-button {
   background: #633ce0;
   color: #ffffff;
   border: 1px solid #633ce0;
   padding: 10px;
   border-radius: 15px;
 }
-::-webkit-file-upload-button {
+::-ms-browse {
   background: #633ce0;
   color: #ffffff;
   border: 1px solid #633ce0;
@@ -22,14 +22,14 @@ table {
   width: 100%;
 }
 
-td {
-  text-align: left;
-}
-
 tr.mat-footer-row {
   font-weight: bold;
 }
 
 .mat-table-sticky {
   border-top: 1px solid #e0e0e0;
+}
+
+td {
+  text-align: left;
 }

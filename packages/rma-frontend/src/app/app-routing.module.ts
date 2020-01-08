@@ -17,20 +17,6 @@ const routes: Routes = [
     loadChildren: './callback/callback.module#CallbackPageModule',
   },
   {
-    path: 'warranty',
-    loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
-  },
-  {
-    path: 'warranty-claim',
-    loadChildren:
-      './warranty-ui/warranty-claim/warranty-claim.module#WarrantyClaimPageModule',
-  },
-  {
-    path: 'bulk-serial',
-    loadChildren:
-      './warranty-ui/bulk-serial/bulk-serial.module#BulkSerialPageModule',
-  },
-  {
     path: 'sales',
     loadChildren: './sales-ui/sales/sales.module#SalesPageModule',
   },
@@ -52,6 +38,11 @@ const routes: Routes = [
     path: 'view-sales-invoice/:invoiceUuid',
     loadChildren:
       './sales-ui/view-sales-invoice/view-sales-invoice.module#ViewSalesInvoicePageModule',
+  },
+  {
+    path: 'warranty',
+    loadChildren:
+      './warranty-ui/warranty-tabs/warranty-tabs.module#WarrantyTabsPageModule',
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },

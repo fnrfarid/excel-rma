@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { Router } from '@angular/router';
-import { Location } from '@angular/common';
 
 @Component({
-  selector: 'app-bulk-serial',
-  templateUrl: './bulk-serial.page.html',
-  styleUrls: ['./bulk-serial.page.scss'],
+  selector: 'warranty-assign-claims',
+  templateUrl: './assign-claims.component.html',
+  styleUrls: ['./assign-claims.component.scss'],
 })
-export class BulkSerialPage implements OnInit {
+export class AssignClaimsComponent implements OnInit {
   date;
   csvFile: any;
   displayedColumns: string[] = [
@@ -23,15 +21,11 @@ export class BulkSerialPage implements OnInit {
   company;
   supplier;
 
-  constructor(
-    private readonly snackbar: MatSnackBar,
-    private readonly router: Router,
-    private readonly location: Location,
-  ) {
+  constructor(private readonly snackbar: MatSnackBar) {}
+
+  ngOnInit() {
     this.date = new Date().toDateString();
   }
-
-  ngOnInit() {}
 
   fileChangedEvent($event): void {
     const reader = new FileReader();
@@ -88,10 +82,5 @@ export class BulkSerialPage implements OnInit {
       return;
     }
     this.snackbar.open('Warranty Claims Created', 'Close', { duration: 2500 });
-    this.router.navigateByUrl('warranty');
-  }
-
-  navigateBack() {
-    this.location.back();
   }
 }
