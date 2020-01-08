@@ -4,21 +4,23 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Customer Name</ion-label>
+            <ion-label position="floating">Company</ion-label>
             <ion-input
               readonly="true"
               placeholder="Castlecraft"
               type="string"
+              value="{{salesInvoiceDetails?.company ? salesInvoiceDetails.company : ''}}"
             ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Invoice No</ion-label>
+            <ion-label position="floating">Customer</ion-label>
             <ion-input
-              placeholder="INV-0001"
+              placeholder="Company"
               readonly="true"
               type="string"
+              value="{{salesInvoiceDetails?.customer ? salesInvoiceDetails.customer  : ''}}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -27,10 +29,14 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Address</ion-label>
+            <!-- <textarea name="" id="" cols="30" rows="3" disabled>
+              {{salesInvoiceDetails?.address_display ? salesInvoiceDetails.address_display : ''}}
+            </textarea> -->
             <ion-input
               readonly="true"
               type="string"
-              placeholder="Mumbai , India"
+              value="{{salesInvoiceDetails?.address_display ? salesInvoiceDetails.address_display : ''}}"
+              placeholder="Address"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -39,8 +45,9 @@
             <ion-label position="floating">Posting Date</ion-label>
             <ion-datetime
               readonly
-              placeholder="03.01.2020"
-              display-format="DD.MM.YYYY"
+              placeholder="Posting Date"
+              display-format="YYYY.DD.MM"
+              value="{{salesInvoiceDetails?.posting_date ? salesInvoiceDetails.posting_date : ''}}"
             ></ion-datetime>
           </ion-item>
         </ion-col>
@@ -48,21 +55,23 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Balance</ion-label>
-            <ion-input
-              readonly="true"
-              type="number"
-              placeholder="200000"
-            ></ion-input>
+            <ion-label position="floating">Due Date</ion-label>
+            <ion-datetime
+              readonly
+              placeholder="Due Date"
+              value="{{salesInvoiceDetails?.due_date ? salesInvoiceDetails.due_date : ''}}"
+              display-format="YYYY.DD.MM"
+            ></ion-datetime>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Warehouse</ion-label>
+            <ion-label position="floating">Contact</ion-label>
             <ion-input
               readonly="true"
               type="text"
-              placeholder="Dhaka Warehouse"
+              value="{{salesInvoiceDetails?.contact_display ? salesInvoiceDetails.contact_display : ''}}"
+              placeholder="Contact"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -72,6 +81,18 @@
           <ion-item lines="none">
             <ion-label>Package Invoice</ion-label>
             <ion-checkbox slot="start"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Status</ion-label>
+            <ion-input
+            readonly="true"
+            type="text"
+            value="{{salesInvoiceDetails?.submitted ? 'Submitted' : 'Draft'}}"
+            placeholder="Contact"
+            [ngStyle]="{'color':salesInvoiceDetails?.submitted === true ? 'green' : 'red' }"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -93,11 +114,11 @@
   <ion-card-content>
     <ion-item lines="none">
       <mat-table #table [dataSource]="dataSource" style="width: 100%;">
-        <ng-container matColumnDef="item">
+        <ng-container matColumnDef="item_code">
           <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
           <mat-cell *matCellDef="let row">
             <ng-container *ngIf="row.name">
-              {{ row.name }}
+              {{ row.item_code }}
             </ng-container>
             <span class="add-comment" *ngIf="!row.name">
               Add an item
@@ -113,11 +134,32 @@
             </sat-popover> -->
           </mat-cell>
         </ng-container>
-        <ng-container matColumnDef="quantity">
+        <ng-container matColumnDef="item_name">
+          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.item_name }}
+            </ng-container>
+            <!--
+          <sat-popover
+            #p
+            hasBackdrop
+            xAlign="start"
+            yAlign="start"
+            (closed)="updateQuantity(row, $event)"
+          >
+            <inline-edit
+              [value]="row.quantity"
+              column="quantity"
+            ></inline-edit>
+          </sat-popover> -->
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="qty">
           <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
           <mat-cell *matCellDef="let row">
             <ng-container>
-              {{ row.quantity }}
+              {{ row.qty }}
             </ng-container>
             <!--
             <sat-popover
@@ -151,10 +193,10 @@
             </sat-popover> -->
           </mat-cell>
         </ng-container>
-        <ng-container matColumnDef="total">
+        <ng-container matColumnDef="amount">
           <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
           <mat-cell *matCellDef="let row">{{
-            row.rate * row.quantity
+            row.rate * row.qty
           }}</mat-cell>
         </ng-container>
         <mat-header-row
