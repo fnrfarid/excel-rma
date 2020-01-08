@@ -39,14 +39,11 @@ const routes: Routes = [
     loadChildren:
       './sales-ui/view-sales-invoice/view-sales-invoice.module#ViewSalesInvoicePageModule',
   },
-<<<<<<< HEAD
   {
     path: 'warranty',
     loadChildren:
       './warranty-ui/warranty-tabs/warranty-tabs.module#WarrantyTabsPageModule',
   },
-=======
->>>>>>> 02ab80961505a1c5afea79359716ed30f68dfadb
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
