@@ -25,6 +25,11 @@ import {
 import { BEARER_HEADER_VALUE_PREFIX } from '../../../constants/app-strings';
 import { FRAPPE_API_SERIAL_NO_ENDPOINT } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../policies/serial-no-policies/serial-no-policies.service';
+import {
+  SUPPLIER_PROJECT_QUERY,
+  CUSTOMER_PROJECT_QUERY,
+  ITEM_PROJECT_QUERY,
+} from '../../../constants/query';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -55,10 +60,64 @@ export class SerialNoAggregateService extends AggregateRoot {
     );
   }
 
-  async retrieveSerialNo(uuid: string, req) {
-    const serialNo = await this.serialNoService.findOne({ uuid });
-    if (!serialNo) throw new NotFoundException();
-    return serialNo;
+  async retrieveSerialNo(serial_no: string) {
+    return this.serialNoService
+      .asyncAggregate([
+        { $match: { serial_no } },
+        {
+          $lookup: {
+            from: 'item',
+            localField: 'item_code',
+            foreignField: 'item_code',
+            as: 'item',
+          },
+        },
+        {
+          $lookup: {
+            from: 'supplier',
+            localField: 'supplier',
+            foreignField: 'name',
+            as: 'supplier',
+          },
+        },
+        {
+          $lookup: {
+            from: 'customer',
+            localField: 'customer',
+            foreignField: 'name',
+            as: 'customer',
+          },
+        },
+        {
+          $unwind: this.unwindQuery('$item'),
+        },
+        {
+          $unwind: this.unwindQuery('$supplier'),
+        },
+        {
+          $unwind: this.unwindQuery('$customer'),
+        },
+        {
+          $project: {
+            uuid: 1,
+            name: 1,
+            isSynced: 1,
+            serial_no: 1,
+            item_code: 1,
+            supplier: SUPPLIER_PROJECT_QUERY,
+            customer: CUSTOMER_PROJECT_QUERY,
+            item: ITEM_PROJECT_QUERY,
+          },
+        },
+      ])
+      .pipe(
+        switchMap((serial: any[]) => {
+          if (!serial || !serial.length) {
+            return throwError(new NotFoundException());
+          }
+          return of(serial);
+        }),
+      );
   }
 
   async getSerialNoList(offset, limit, sort, search, clientHttpRequest) {
@@ -130,5 +189,12 @@ export class SerialNoAggregateService extends AggregateRoot {
         },
         error: err => {},
       });
+  }
+
+  unwindQuery(key) {
+    return {
+      path: key,
+      preserveNullAndEmptyArrays: true,
+    };
   }
 }

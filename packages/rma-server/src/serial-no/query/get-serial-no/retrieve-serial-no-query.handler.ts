@@ -8,7 +8,7 @@ export class RetrieveSerialNoHandler
   constructor(private readonly manager: SerialNoAggregateService) {}
 
   async execute(query: RetrieveSerialNoQuery) {
-    const { req, uuid } = query;
-    return this.manager.retrieveSerialNo(uuid, req);
+    const { serial_no } = query;
+    return this.manager.retrieveSerialNo(serial_no);
   }
 }

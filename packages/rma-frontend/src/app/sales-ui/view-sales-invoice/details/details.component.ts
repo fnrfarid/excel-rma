@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { DetailsDataSource } from './details-datasource';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { SalesService } from '../../services/sales.service';
+import { MatSnackBar } from '@angular/material';
+import { CLOSE } from '../../../constants/aap-string';
+import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -8,14 +12,65 @@ import { SalesService } from '../../services/sales.service';
   styleUrls: ['./details.component.scss'],
 })
 export class DetailsComponent implements OnInit {
-  displayedColumns = ['item', 'quantity', 'rate', 'total'];
+  displayedColumns = ['item_code', 'item_name', 'qty', 'rate', 'amount'];
+  salesInvoiceDetails: SalesInvoiceDetails;
+  dataSource: SalesInvoiceItem[];
+  uuid;
 
-  dataSource: DetailsDataSource;
-
-  constructor(private salesService: SalesService) {}
+  constructor(
+    private readonly router: Router,
+    private readonly salesService: SalesService,
+    private readonly snackBar: MatSnackBar,
+  ) {}
 
   ngOnInit() {
-    this.dataSource = new DetailsDataSource(this.salesService);
-    this.dataSource.loadItems();
+    this.router.events
+      .pipe(filter(route => route instanceof NavigationEnd))
+      .subscribe((route: NavigationEnd) => {
+        this.uuid = route.url.split('/')[2];
+        route.url.split('/').length >= 3
+          ? this.getSalesInvoice(route.url.split('/')[2])
+          : null;
+      });
   }
+
+  getSalesInvoice(uuid: string) {
+    this.salesService.getSalesInvoice(uuid).subscribe({
+      next: (success: any) => {
+        this.salesInvoiceDetails = success;
+        this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
+          .address_display
+          ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
+          : undefined;
+        this.dataSource = success.items;
+      },
+      error: err => {
+        this.snackBar.open(
+          err.error.message
+            ? err.error.message
+            : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
+          CLOSE,
+          { duration: 2500 },
+        );
+      },
+    });
+  }
+}
+
+export class SalesInvoiceDetails {
+  customer: string;
+  company: string;
+  posting_date: string;
+  due_date: string;
+  address_display: string;
+  contact_display: string;
+  submitted: string;
+}
+
+export class SalesInvoiceItem {
+  item_code: string;
+  item_name: string;
+  qty: number;
+  rate: number;
+  amount: number;
 }
