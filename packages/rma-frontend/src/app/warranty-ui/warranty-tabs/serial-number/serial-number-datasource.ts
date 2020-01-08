@@ -1,7 +1,7 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-import { WarrantyService } from './warranty.service';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { WarrantyService } from '../warranty.service';
 
 export interface ListingData {
   uuid: string;
@@ -13,7 +13,7 @@ export interface ListResponse {
   length: number;
   offset: number;
 }
-export class WarrantyDataSource extends DataSource<ListingData> {
+export class SerialNumberDataSource extends DataSource<ListingData> {
   data: ListingData[];
   length: number;
   offset: number;

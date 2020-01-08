@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   HandleError,
   HttpErrorHandler,
 } from '../../common/interfaces/services/http-error-handler/http-error-handler.service';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
+  ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
-  ACCESS_TOKEN,
 } from '../../constants/storage';
 
 @Injectable({
