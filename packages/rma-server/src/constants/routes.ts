@@ -24,3 +24,4 @@ export const SERIAL_NO_ON_UPDATE_ENDPOINT = '/api/serial_no/webhook/v1/update';
 export const OAUTH_BEARER_TOKEN_ENDPOINT =
   '/api/resource/OAuth%20Bearer%20Token';
 export const GET_TIME_ZONE_ENDPOINT = '/api/method/frappe.client.get_time_zone';
+export const LIST_DELIVERY_NOTE_ENDPOINT = '/api/resource/Delivery%20Note';
