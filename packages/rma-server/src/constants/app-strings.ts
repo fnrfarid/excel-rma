@@ -47,3 +47,12 @@ export const ITEM_METADATA_FILTER_FIELDS = [
 ];
 export const NONE_PYTHON_STRING = 'None';
 export const HUNDRED_NUMBERSTRING = '100';
+export const DELIVERY_NOTE_LIST_FIELD = [
+  'name',
+  'title',
+  'status',
+  'posting_date',
+  'total',
+  'owner',
+  'modified_by',
+];

@@ -21,10 +21,12 @@ import { SupplierModule } from './supplier/supplier.module';
 import { SerialNoModule } from './serial-no/serial-no.module';
 import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
 import { WarrantyClaimModule } from './warranty-claim/warranty-claim.module';
+import { DeliveryNoteModule } from './delivery-note/delivery-note-invoice.module';
 
 @Module({
   imports: [
     HttpModule,
+    DeliveryNoteModule,
     TypeOrmModule.forRootAsync({
       name: TOKEN_CACHE_CONNECTION,
       imports: [ConfigModule],
