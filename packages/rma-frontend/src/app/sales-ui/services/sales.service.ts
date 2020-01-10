@@ -106,4 +106,15 @@ export class SalesService {
     )}`;
     return headers;
   }
+
+  getDeliveryNoteList(pageNumber?, pageSize?) {
+    const url = LIST_SALES_INVOICE_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString());
+    return this.http.get(url, {
+      params,
+      headers: this.getAuthorizationHeaders(),
+    });
+  }
 }
