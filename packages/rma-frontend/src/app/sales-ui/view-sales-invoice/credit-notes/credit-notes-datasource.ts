@@ -1,5 +1,8 @@
 import { DataSource } from '@angular/cdk/table';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, Observable } from 'rxjs';
+import { WarrantyService } from 'src/app/warranty-ui/warranty-tabs/warranty.service';
+import { CollectionViewer } from '@angular/cdk/collections';
+import { map, catchError, finalize } from 'rxjs/operators';
 
 export interface CreditNote {
   voucherNo: string;
@@ -13,47 +16,42 @@ export interface CreditNote {
 }
 
 export class CreditNotesDataSource extends DataSource<CreditNote> {
-  itemSubject = new BehaviorSubject<CreditNote[]>([]);
+  data: CreditNote[];
+  length: number;
+  offset: number;
 
-  constructor() {
+  itemSubject = new BehaviorSubject<CreditNote[]>([]);
+  loadingSubject = new BehaviorSubject<boolean>(false);
+
+  loading$ = this.loadingSubject.asObservable();
+
+  constructor(private model: string, private listingService: WarrantyService) {
     super();
   }
 
-  connect() {
+  connect(collectionViewer: CollectionViewer): Observable<CreditNote[]> {
     return this.itemSubject.asObservable();
   }
-  disconnect() {
+
+  disconnect(collectionViewer: CollectionViewer): void {
     this.itemSubject.complete();
+    this.loadingSubject.complete();
   }
 
-  loadItems() {
-    this.getCreditNoteList().subscribe(creditNote =>
-      this.itemSubject.next(creditNote),
-    );
-  }
-
-  data() {
-    return this.itemSubject.value;
-  }
-
-  update(data) {
-    this.itemSubject.next(data);
-  }
-
-  getCreditNoteList() {
-    const warrantyList: Array<CreditNote> = [
-      {
-        voucherNo: 'CN-1234',
-        invoiceNo: 'INV#123',
-        brand: 'TP-LINK',
-        date: '02.01.2020',
-        amount: 2000,
-        remarks: 'Campaign Offer',
-        createdBy: 'Prafful',
-        submittedBy: 'Hardik',
-      },
-    ];
-
-    return of(warrantyList);
+  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+    this.loadingSubject.next(true);
+    this.listingService
+      .findModels(this.model, filter, sortOrder, pageIndex, pageSize)
+      .pipe(
+        map((items: CreditNote[]) => {
+          this.data = items;
+          this.offset = (pageIndex + 1) * pageSize;
+          this.length = items.length;
+          return items;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe(items => this.itemSubject.next(items));
   }
 }

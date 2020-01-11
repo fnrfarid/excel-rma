@@ -15,3 +15,9 @@ export class Item {
   quantity: number;
   rate: number;
 }
+
+export class APIResponse {
+  docs: any[];
+  length: number;
+  offset: number;
+}

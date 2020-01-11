@@ -22,6 +22,7 @@ import { SerialNoModule } from './serial-no/serial-no.module';
 import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
 import { WarrantyClaimModule } from './warranty-claim/warranty-claim.module';
 import { DeliveryNoteModule } from './delivery-note/delivery-note-invoice.module';
+import { CreditNoteModule } from './credit-note/credit-note-invoice.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { DeliveryNoteModule } from './delivery-note/delivery-note-invoice.module
     DirectModule,
     CustomerModule,
     SupplierModule,
+    CreditNoteModule,
     SalesInvoiceModule,
     ItemModule,
     SerialNoModule,
