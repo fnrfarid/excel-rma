@@ -1,6 +1,6 @@
 import { Component, Input, Optional, Host } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { filter, startWith, map } from 'rxjs/operators';
+import { filter, switchMap, startWith } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { SalesService } from '../../services/sales.service';
@@ -31,7 +31,7 @@ export class InlineEditComponent {
 
   itemFormControl = new FormControl();
   itemList: Array<Item>;
-  filteredItemList: Observable<Item[]>;
+  filteredItemList: Observable<any[]>;
   /** Form model for the input. */
   comment = '';
   quantity: number = null;
@@ -49,31 +49,29 @@ export class InlineEditComponent {
         .pipe(filter(val => val == null))
         .subscribe(() => (this.comment = this.value || null));
     }
-    this.salesService.getItemList().subscribe({
-      next: response => {
-        this.itemList = [];
-        this.itemList = response;
-      },
-    });
+    this.getItemList();
+  }
+
+  getItemList() {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value)),
+      switchMap(value => {
+        return this.salesService.getItemList(value);
+      }),
     );
   }
 
-  private _filter(value: string): Item[] {
-    const filterValue = value.toLowerCase();
-
-    return this.itemList.filter(
-      option => option.name.toLowerCase().indexOf(filterValue) === 0,
-    );
+  getOptionText(option) {
+    return option.item_name;
   }
 
   onSubmit() {
     if (this.popover) {
       if (this.column === 'item') {
-        const selectedItem = this._filter(this.itemFormControl.value);
-        this.popover.close(selectedItem[0]);
+        const selectedItem = {} as Item;
+        selectedItem.itemCode = this.itemFormControl.value.item_code;
+        selectedItem.name = this.itemFormControl.value.item_name;
+        this.popover.close(selectedItem);
       } else if (this.column === 'quantity') this.popover.close(this.quantity);
       else this.popover.close(this.rate);
     }

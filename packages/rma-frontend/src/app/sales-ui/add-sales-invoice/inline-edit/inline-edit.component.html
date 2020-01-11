@@ -8,12 +8,16 @@
       [formControl]="itemFormControl"
       [matAutocomplete]="auto"
     />
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+    <mat-autocomplete
+      autoActiveFirstOption
+      #auto="matAutocomplete"
+      [displayWith]="getOptionText"
+    >
       <mat-option
         *ngFor="let option of filteredItemList | async"
-        [value]="option.name"
+        [value]="option"
       >
-        {{ option.name }}
+        {{ option.item_name }} ( {{ option.item_code }} )
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
