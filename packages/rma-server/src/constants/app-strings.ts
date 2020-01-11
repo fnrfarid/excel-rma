@@ -56,3 +56,16 @@ export const DELIVERY_NOTE_LIST_FIELD = [
   'owner',
   'modified_by',
 ];
+export const CREDIT_NOTE_LIST_FIELD = [
+  'name',
+  'owner',
+  'modified_by',
+  'title',
+  'customer_name',
+  'company',
+  'posting_date',
+  'due_date',
+  'return_against',
+  'contact_email',
+  'total',
+];
