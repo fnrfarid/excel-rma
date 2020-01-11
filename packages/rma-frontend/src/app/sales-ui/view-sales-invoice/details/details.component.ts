@@ -28,9 +28,11 @@ export class DetailsComponent implements OnInit {
       .pipe(filter(route => route instanceof NavigationEnd))
       .subscribe((route: NavigationEnd) => {
         this.uuid = route.url.split('/')[2];
-        route.url.split('/').length >= 3
-          ? this.getSalesInvoice(route.url.split('/')[2])
-          : null;
+        if (route.url.split('/')[1] === 'view-sales-invoice') {
+          route.url.split('/').length >= 3
+            ? this.getSalesInvoice(route.url.split('/')[2])
+            : null;
+        }
       });
   }
 
