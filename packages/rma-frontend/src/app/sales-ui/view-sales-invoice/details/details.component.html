@@ -9,7 +9,9 @@
               readonly="true"
               placeholder="Castlecraft"
               type="string"
-              value="{{salesInvoiceDetails?.company ? salesInvoiceDetails.company : ''}}"
+              value="{{
+                salesInvoiceDetails?.company ? salesInvoiceDetails.company : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -20,7 +22,11 @@
               placeholder="Company"
               readonly="true"
               type="string"
-              value="{{salesInvoiceDetails?.customer ? salesInvoiceDetails.customer  : ''}}"
+              value="{{
+                salesInvoiceDetails?.customer
+                  ? salesInvoiceDetails.customer
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -35,7 +41,11 @@
             <ion-input
               readonly="true"
               type="string"
-              value="{{salesInvoiceDetails?.address_display ? salesInvoiceDetails.address_display : ''}}"
+              value="{{
+                salesInvoiceDetails?.address_display
+                  ? salesInvoiceDetails.address_display
+                  : ''
+              }}"
               placeholder="Address"
             ></ion-input>
           </ion-item>
@@ -47,7 +57,11 @@
               readonly
               placeholder="Posting Date"
               display-format="YYYY.DD.MM"
-              value="{{salesInvoiceDetails?.posting_date ? salesInvoiceDetails.posting_date : ''}}"
+              value="{{
+                salesInvoiceDetails?.posting_date
+                  ? salesInvoiceDetails.posting_date
+                  : ''
+              }}"
             ></ion-datetime>
           </ion-item>
         </ion-col>
@@ -59,7 +73,11 @@
             <ion-datetime
               readonly
               placeholder="Due Date"
-              value="{{salesInvoiceDetails?.due_date ? salesInvoiceDetails.due_date : ''}}"
+              value="{{
+                salesInvoiceDetails?.due_date
+                  ? salesInvoiceDetails.due_date
+                  : ''
+              }}"
               display-format="YYYY.DD.MM"
             ></ion-datetime>
           </ion-item>
@@ -70,7 +88,11 @@
             <ion-input
               readonly="true"
               type="text"
-              value="{{salesInvoiceDetails?.contact_display ? salesInvoiceDetails.contact_display : ''}}"
+              value="{{
+                salesInvoiceDetails?.contact_display
+                  ? salesInvoiceDetails.contact_display
+                  : ''
+              }}"
               placeholder="Contact"
             ></ion-input>
           </ion-item>
@@ -87,11 +109,15 @@
           <ion-item lines="none">
             <ion-label position="floating">Status</ion-label>
             <ion-input
-            readonly="true"
-            type="text"
-            value="{{salesInvoiceDetails?.submitted ? 'Submitted' : 'Draft'}}"
-            placeholder="Contact"
-            [ngStyle]="{'color':salesInvoiceDetails?.submitted === true ? 'green' : 'red' }"
+              readonly="true"
+              type="text"
+              value="{{
+                salesInvoiceDetails?.submitted ? 'Submitted' : 'Draft'
+              }}"
+              placeholder="Contact"
+              [ngStyle]="{
+                color: salesInvoiceDetails?.submitted === true ? 'green' : 'red'
+              }"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -111,19 +137,18 @@
       </ion-col>
     </ion-row>
   </ion-card-header>
-  <ion-card-content>
-    <ion-item lines="none">
-      <mat-table #table [dataSource]="dataSource" style="width: 100%;">
-        <ng-container matColumnDef="item_code">
-          <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container *ngIf="row.name">
-              {{ row.item_code }}
-            </ng-container>
-            <span class="add-comment" *ngIf="!row.name">
-              Add an item
-            </span>
-            <!-- <sat-popover
+  <ion-card-content class="ion-no-padding">
+    <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+      <ng-container matColumnDef="item_code">
+        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container *ngIf="row.name">
+            {{ row.item_code }}
+          </ng-container>
+          <span class="add-comment" *ngIf="!row.name">
+            Add an item
+          </span>
+          <!-- <sat-popover
               #p
               hasBackdrop
               xAlign="start"
@@ -132,15 +157,15 @@
             >
               <inline-edit [value]="row.name" column="item"></inline-edit>
             </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="item_name">
-          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container>
-              {{ row.item_name }}
-            </ng-container>
-            <!--
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="item_name">
+        <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_name }}
+          </ng-container>
+          <!--
           <sat-popover
             #p
             hasBackdrop
@@ -153,15 +178,15 @@
               column="quantity"
             ></inline-edit>
           </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="qty">
-          <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container>
-              {{ row.qty }}
-            </ng-container>
-            <!--
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="qty">
+        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.qty }}
+          </ng-container>
+          <!--
             <sat-popover
               #p
               hasBackdrop
@@ -174,15 +199,15 @@
                 column="quantity"
               ></inline-edit>
             </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="rate">
-          <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container>
-              {{ row.rate }}
-            </ng-container>
-            <!-- <sat-popover
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="rate">
+        <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.rate }}
+          </ng-container>
+          <!-- <sat-popover
               #p
               hasBackdrop
               xAlign="start"
@@ -191,19 +216,16 @@
             >
               <inline-edit [value]="row.rate" column="rate"></inline-edit>
             </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="amount">
-          <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{
-            row.rate * row.qty
-          }}</mat-cell>
-        </ng-container>
-        <mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-      </mat-table>
-    </ion-item>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="amount">
+        <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+        <mat-cell *matCellDef="let row">{{ row.rate * row.qty }}</mat-cell>
+      </ng-container>
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
   </ion-card-content>
 </ion-card>

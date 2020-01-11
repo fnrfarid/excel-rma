@@ -10,11 +10,17 @@
 </ion-header>
 
 <ion-content class="page-background">
-  <ion-fab class="ion-margin-end" vertical="top" color="light" horizontal="end">
-    <ion-fab-button>
-      <ion-icon name="arrow-dropdown"></ion-icon>
+  <ion-fab
+    class="ion-margin-end"
+    slot="fixed"
+    vertical="top"
+    color="light"
+    horizontal="end"
+  >
+    <ion-fab-button class="fab-position">
+      SAVE
     </ion-fab-button>
-    <ion-fab-list side="start">
+    <ion-fab-list side="start" class="fab-position">
       <ion-button color="medium">DRAFT</ion-button>
       <ion-button color="light">DELIVERY NOTE</ion-button>
       <ion-button color="primary">SALES INVOICE</ion-button>
@@ -284,7 +290,6 @@
                 Address
               </ion-text>
             </ion-card-title>
-            <!-- <button mat-raised-button color="primary">Primary</button> -->
           </ion-card-header>
           <ion-card-content *ngIf="customer.name !== '' ">
             <ion-grid class="ion-no-padding">
