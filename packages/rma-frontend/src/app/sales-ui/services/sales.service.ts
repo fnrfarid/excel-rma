@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
+import {
+  SalesInvoice,
+  Item,
+  APIResponse,
+} from '../../common/interfaces/sales.interface';
 import { of } from 'rxjs';
 // import { Customer } from '../../common/interfaces/customer.interface';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -11,7 +15,9 @@ import {
 import {
   LIST_SALES_INVOICE_ENDPOINT,
   SALES_INVOICE_GET_ONE_ENDPOINT,
+  LIST_ITEMS_ENDPOINT,
 } from '../../constants/url-strings';
+import { switchMap, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -81,8 +87,27 @@ export class SalesService {
     });
   }
 
-  getItemList() {
-    return of(this.itemList);
+  getItemList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+    const url = LIST_ITEMS_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.http
+      .get<APIResponse>(url, {
+        params,
+        headers: this.getAuthorizationHeaders(),
+      })
+      .pipe(
+        switchMap(response => {
+          return of(response.docs);
+        }),
+        catchError(err => {
+          return of(this.itemList);
+        }),
+      );
   }
 
   getItem(uuid: string) {

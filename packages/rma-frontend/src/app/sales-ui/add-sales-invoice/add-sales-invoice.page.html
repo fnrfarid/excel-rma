@@ -153,42 +153,6 @@
       <ion-col class="ion-no-padding">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>
-              <ion-text color="tertiary">
-                Address
-              </ion-text>
-            </ion-card-title>
-            <!-- <button mat-raised-button color="primary">Primary</button> -->
-          </ion-card-header>
-          <ion-card-content *ngIf="customer.name !== '' ">
-            <ion-grid class="ion-no-padding">
-              <ion-row>
-                <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="stacked">Customer address</ion-label>
-                    {{customer.addressLine1}}
-                    <br />
-                    {{customer.addressLine2}}
-                    <br />
-                    {{customer.city}} - {{customer.pinCode}}
-                  </ion-item>
-                </ion-col>
-                <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="stacked">Contact Person</ion-label>
-                    {{customer.name}}
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-    <ion-row class="ion-no-padding">
-      <ion-col class="ion-no-padding">
-        <ion-card>
-          <ion-card-header>
             <ion-row class="align">
               <ion-col>
                 <ion-card-title>
@@ -297,6 +261,42 @@
                 ></mat-row>
               </mat-table>
             </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-no-padding">
+      <ion-col class="ion-no-padding">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-text color="tertiary">
+                Address
+              </ion-text>
+            </ion-card-title>
+            <!-- <button mat-raised-button color="primary">Primary</button> -->
+          </ion-card-header>
+          <ion-card-content *ngIf="customer.name !== '' ">
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col>
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Customer address</ion-label>
+                    {{customer.addressLine1}}
+                    <br />
+                    {{customer.addressLine2}}
+                    <br />
+                    {{customer.city}} - {{customer.pinCode}}
+                  </ion-item>
+                </ion-col>
+                <ion-col>
+                  <ion-item lines="none">
+                    <ion-label position="stacked">Contact Person</ion-label>
+                    {{customer.name}}
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
           </ion-card-content>
         </ion-card>
       </ion-col>

@@ -80,7 +80,7 @@ export class AddSalesInvoicePage implements OnInit {
     const copy = this.dataSource.data().slice();
     row.name = item.name;
     row.quantity = 1;
-    row.rate = item.rate;
+    row.rate = 0;
     this.dataSource.update(copy);
   }
 
