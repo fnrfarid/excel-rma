@@ -69,3 +69,16 @@ export const CREDIT_NOTE_LIST_FIELD = [
   'contact_email',
   'total',
 ];
+export const RETURN_VOUCHER_LIST_FIELD = [
+  'name',
+  'owner',
+  'modified_by',
+  'payment_type',
+  'posting_date',
+  'company',
+  'mode_of_payment',
+  'party_type',
+  'party',
+  'party_balance',
+  'paid_amount',
+];

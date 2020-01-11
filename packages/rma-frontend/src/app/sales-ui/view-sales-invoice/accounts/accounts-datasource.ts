@@ -1,58 +1,60 @@
 import { DataSource } from '@angular/cdk/table';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, Observable } from 'rxjs';
+import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
+import { CollectionViewer } from '@angular/cdk/collections';
+import { map, catchError, finalize } from 'rxjs/operators';
 
 export interface Account {
-  voucherNo: string;
-  voucherType: string;
-  amount: number;
-  dated: string;
-  remark: string;
+  name: string;
+  owner: string;
+  modified_by: string;
+  payment_type: string;
+  posting_date: string;
+  company: string;
+  mode_of_payment: string;
+  party_type: string;
+  party: string;
+  party_balance: string;
+  paid_amount: string;
 }
 
 export class AccountsDataSource extends DataSource<Account> {
-  itemSubject = new BehaviorSubject<Account[]>([]);
+  data: Account[];
+  length: number;
+  offset: number;
 
-  constructor() {
+  itemSubject = new BehaviorSubject<Account[]>([]);
+  loadingSubject = new BehaviorSubject<boolean>(false);
+
+  loading$ = this.loadingSubject.asObservable();
+
+  constructor(private model: string, private listingService: WarrantyService) {
     super();
   }
 
-  connect() {
+  connect(collectionViewer: CollectionViewer): Observable<Account[]> {
     return this.itemSubject.asObservable();
   }
-  disconnect() {
+
+  disconnect(collectionViewer: CollectionViewer): void {
     this.itemSubject.complete();
+    this.loadingSubject.complete();
   }
 
-  loadItems() {
-    this.getAccountList().subscribe(account => this.itemSubject.next(account));
-  }
-
-  data() {
-    return this.itemSubject.value;
-  }
-
-  update(data) {
-    this.itemSubject.next(data);
-  }
-
-  getAccountList() {
-    const accountList: Array<Account> = [
-      {
-        voucherNo: 'RV-0001',
-        voucherType: 'Cash',
-        dated: '04.01.2020',
-        amount: 500000,
-        remark: '',
-      },
-      {
-        voucherNo: 'RV-0002',
-        voucherType: 'Cheque',
-        dated: '05.01.2020',
-        amount: 550000,
-        remark: 'For the project',
-      },
-    ];
-
-    return of(accountList);
+  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+    this.loadingSubject.next(true);
+    this.listingService
+      .findModels(this.model, filter, sortOrder, pageIndex, pageSize)
+      .pipe(
+        map((items: Account[]) => {
+          this.data = items;
+          this.offset = (pageIndex + 1) * pageSize;
+          this.length = items.length;
+          return items;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe(items => this.itemSubject.next(items));
   }
 }
