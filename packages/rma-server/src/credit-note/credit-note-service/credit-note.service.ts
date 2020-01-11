@@ -2,6 +2,7 @@ import {
   Injectable,
   NotImplementedException,
   HttpService,
+  BadRequestException,
 } from '@nestjs/common';
 import { SettingsService } from '../../system-settings/aggregates/settings/settings.service';
 import { switchMap, catchError } from 'rxjs/operators';
@@ -46,7 +47,7 @@ export class CreditNoteService {
           );
       }),
       catchError(error => {
-        return throwError(error);
+        return throwError(new BadRequestException(error));
       }),
     );
   }

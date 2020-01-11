@@ -1,78 +1,100 @@
 <ion-card>
-  <ion-card-content class="ion-no-padding">
-    <ion-item lines="none">
-      <mat-table #table [dataSource]="dataSource" style="width: 100%;">
-        <ng-container matColumnDef="voucher-no">
-          <mat-header-cell *matHeaderCellDef>Voucher No</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container *ngIf="row.voucherNo">
-              {{ row.voucherNo }}
-            </ng-container>
-            <span class="add-comment" *ngIf="!row.voucherNo">
-              Add an item
-            </span>
-            <!-- <sat-popover
-              #p
-              hasBackdrop
-              xAlign="start"
-              yAlign="start"
-              (closed)="updateItem(row, $event)"
-            >
-              <inline-edit [value]="row.name" column="item"></inline-edit>
-            </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="voucher-type">
-          <mat-header-cell *matHeaderCellDef>Voucher Type</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container>
-              {{ row.voucherType }}
-            </ng-container>
-            <!--
-            <sat-popover
-              #p
-              hasBackdrop
-              xAlign="start"
-              yAlign="start"
-              (closed)="updateQuantity(row, $event)"
-            >
-              <inline-edit
-                [value]="row.quantity"
-                column="quantity"
-              ></inline-edit>
-            </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="amount">
-          <mat-header-cell *matHeaderCellDef>Amount</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ row.amount }}</mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="dated">
-          <mat-header-cell *matHeaderCellDef>Dated</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container>
-              {{ row.dated }}
-            </ng-container>
-            <!-- <sat-popover
-                      #p
-                      hasBackdrop
-                      xAlign="start"
-                      yAlign="start"
-                      (closed)="updateRate(row, $event)"
-                    >
-                      <inline-edit [value]="row.rate" column="rate"></inline-edit>
-                    </sat-popover> -->
-          </mat-cell>
-        </ng-container>
-        <ng-container matColumnDef="remark">
-          <mat-header-cell *matHeaderCellDef>Remarks</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ row.remark }}</mat-cell>
-        </ng-container>
-        <mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-      </mat-table>
-    </ion-item>
+  <ion-card-content class="table-container ion-no-padding">
+    <div class="loading-shade" *ngIf="dataSource.loading$ | async">
+      <mat-progress-bar *ngIf="dataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+    </div>
+
+    <table mat-table class="full-width-table" [dataSource]="dataSource" matSort style="width: 100%;">
+
+      <!-- CN Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>RV name</th>
+        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+      </ng-container>
+
+      <!-- Posting Date Column -->
+      <ng-container matColumnDef="posting_date">
+        <th mat-header-cell *matHeaderCellDef>Posting Date</th>
+        <td mat-cell *matCellDef="let row">{{ row.posting_date }}</td>
+      </ng-container>
+      
+      <!-- Paid Amount Column -->
+      <ng-container matColumnDef="paid_amount">
+        <th mat-header-cell *matHeaderCellDef>Paid Amount</th>
+        <td mat-cell *matCellDef="let row">{{ row.paid_amount }}</td>
+      </ng-container>
+
+      <!-- Payment Type Column -->
+      <ng-container matColumnDef="payment_type">
+        <th mat-header-cell *matHeaderCellDef>Payment Type</th>
+        <td 
+        mat-cell
+        *matCellDef="let row"
+        >{{ row.payment_type }}</td>
+      </ng-container>
+
+      <!-- Created By Column -->
+      <ng-container matColumnDef="owner">
+        <th mat-header-cell *matHeaderCellDef>Created By</th>
+        <td mat-cell *matCellDef="let row">{{ row.owner }}</td>
+      </ng-container>
+
+      <!-- Modified By Column -->
+      <ng-container matColumnDef="modified_by">
+        <th mat-header-cell *matHeaderCellDef>Modified By</th>
+        <td mat-cell *matCellDef="let row">{{ row.modified_by }}</td>
+      </ng-container>
+
+      <!-- Company Name Column -->
+      <ng-container matColumnDef="company">
+        <th mat-header-cell *matHeaderCellDef>Company Name</th>
+        <td 
+        mat-cell
+        *matCellDef="let row"
+        >{{ row.company }}</td>
+      </ng-container>
+
+      <!-- Mode Of Payment Name Column -->
+      <ng-container matColumnDef="mode_of_payment">
+        <th mat-header-cell *matHeaderCellDef>Mode of Pay</th>
+        <td 
+        mat-cell
+        *matCellDef="let row"
+        >{{ row.mode_of_payment }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="party_type">
+        <th mat-header-cell *matHeaderCellDef>Party type</th>
+        <td 
+        mat-cell
+        *matCellDef="let row"
+        >{{ row.party_type }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="party">
+        <th mat-header-cell *matHeaderCellDef>Party Type</th>
+        <td 
+        mat-cell
+        *matCellDef="let row"
+        >{{ row.party }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="party_balance">
+        <th mat-header-cell *matHeaderCellDef>Party Balance</th>
+        <td 
+        mat-cell
+        *matCellDef="let row"
+        >{{ row.party_balance }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <mat-card-actions>
+      <mat-paginator #paginator class="mat-paginator-sticky" (page)="getUpdate($event)"
+        [pageIndex]="paginator.pageIndex" [length]="dataSource.length" [pageSizeOptions]="[10, 50, 100, 500]">
+      </mat-paginator>
+    </mat-card-actions>
   </ion-card-content>
 </ion-card>

@@ -1,6 +1,6 @@
 import { DataSource } from '@angular/cdk/table';
 import { BehaviorSubject, of, Observable } from 'rxjs';
-import { WarrantyService } from 'src/app/warranty-ui/warranty-tabs/warranty.service';
+import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { map, catchError, finalize } from 'rxjs/operators';
 
