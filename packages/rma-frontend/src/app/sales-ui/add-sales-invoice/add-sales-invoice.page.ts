@@ -18,6 +18,7 @@ export class AddSalesInvoicePage implements OnInit {
   dataSource: ItemsDataSource;
   customer: Customer;
   series: string;
+  selectedPostingDate: any;
   displayedColumns = ['item', 'quantity', 'rate', 'total'];
   constructor(
     private readonly route: ActivatedRoute,
@@ -104,5 +105,15 @@ export class AddSalesInvoicePage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  datePicked($event) {
+    const date = new Date($event.detail.value);
+    this.selectedPostingDate = [
+      date.getFullYear(),
+      date.getMonth() + 1,
+      // +1 as index of months start's from 0
+      date.getDate(),
+    ].join('-');
   }
 }
