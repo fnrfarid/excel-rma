@@ -9,6 +9,9 @@ import {
   Param,
   Get,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
@@ -19,6 +22,10 @@ import { UpdateWarrantyClaimCommand } from '../../command/update-warranty-claim/
 import { RetrieveWarrantyClaimQuery } from '../../query/get-warranty-claim/retrieve-warranty-claim.query';
 import { RetrieveWarrantyClaimListQuery } from '../../query/list-warranty-claim/retrieve-warranty-claim-list.query';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { APPLICATION_JSON_CONTENT_TYPE } from '../../../constants/app-strings';
+import { FILE_NOT_FOUND, INVALID_FILE } from '../../../constants/app-strings';
+import { CreateBulkClaimsCommand } from '../../command/create-bulk-claims/create-bulk-claims.command';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
@@ -30,9 +37,9 @@ export class WarrantyClaimController {
   @Post('v1/create')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  create(@Body() warrantyclaimPayload: WarrantyClaimDto, @Req() req) {
+  create(@Body() warrantyClaimPayload: WarrantyClaimDto, @Req() req) {
     return this.commandBus.execute(
-      new AddWarrantyClaimCommand(warrantyclaimPayload, req),
+      new AddWarrantyClaimCommand(warrantyClaimPayload, req),
     );
   }
 
@@ -80,5 +87,16 @@ export class WarrantyClaimController {
     return this.commandBus.execute(
       new UpdateWarrantyClaimCommand(updatePayload),
     );
+  }
+
+  @Post('v1/create_bulk_claims')
+  @UseGuards(TokenGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  createBulkClaims(@UploadedFile('file') file, @Req() req) {
+    if (!file) throw new BadRequestException(FILE_NOT_FOUND);
+    if (file.mimetype !== APPLICATION_JSON_CONTENT_TYPE) {
+      throw new BadRequestException(INVALID_FILE);
+    }
+    return this.commandBus.execute(new CreateBulkClaimsCommand(file, req));
   }
 }

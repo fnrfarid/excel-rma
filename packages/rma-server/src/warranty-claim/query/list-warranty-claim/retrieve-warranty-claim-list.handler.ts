@@ -8,7 +8,7 @@ export class RetrieveWarrantyClaimListQueryHandler
   constructor(private readonly manager: WarrantyClaimAggregateService) {}
   async execute(query: RetrieveWarrantyClaimListQuery) {
     const { offset, limit, search, sort, clientHttpRequest } = query;
-    return await this.manager.getWarrantyCaimList(
+    return await this.manager.getWarrantyClaimList(
       Number(offset),
       Number(limit),
       search,
