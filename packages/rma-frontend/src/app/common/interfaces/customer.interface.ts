@@ -5,4 +5,5 @@ export interface Customer {
   addressLine2: string;
   city: string;
   pinCode: string;
+  email: string;
 }
