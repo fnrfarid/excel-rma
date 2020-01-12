@@ -66,7 +66,19 @@ export class SalesInvoiceDetails {
   due_date: string;
   address_display: string;
   contact_display: string;
-  submitted: string;
+  submitted?: string;
+  email?: string;
+  posting_time?: string;
+  set_posting_time?: number;
+  contact_person?: string;
+  territory?: string;
+  update_stock?: number;
+  total_qty?: number;
+  base_total?: number;
+  base_net_total?: number;
+  total?: number;
+  net_total?: number;
+  pos_total_qty?: number;
 }
 
 export class SalesInvoiceItem {

@@ -21,7 +21,7 @@
       SAVE
     </ion-fab-button>
     <ion-fab-list side="start" class="fab-position">
-      <ion-button color="medium">DRAFT</ion-button>
+      <ion-button color="medium" (click)="submitDraft()">DRAFT</ion-button>
       <ion-button color="light">DELIVERY NOTE</ion-button>
       <ion-button color="primary">SALES INVOICE</ion-button>
     </ion-fab-list>
@@ -95,7 +95,10 @@
                 <ion-col>
                   <ion-item>
                     <ion-label position="floating">Posting Date</ion-label>
-                    <ion-datetime display-format="DD.MM.YYYY" (ionChange)="datePicked($event)" ></ion-datetime>
+                    <ion-datetime
+                      display-format="DD.MM.YYYY"
+                      (ionChange)="datePicked($event)"
+                    ></ion-datetime>
                   </ion-item>
                 </ion-col>
               </ion-row>
@@ -194,10 +197,10 @@
                     [satPopoverAnchor]="p"
                     (click)="p.open()"
                   >
-                    <ng-container *ngIf="row.name">
-                      {{row.name}}
+                    <ng-container *ngIf="row.item_name">
+                      {{row.item_name}}
                     </ng-container>
-                    <span class="add-comment" *ngIf="!row.name">
+                    <span class="add-comment" *ngIf="!row.item_name">
                       Add an item
                     </span>
                     <sat-popover
@@ -208,7 +211,7 @@
                       (closed)="updateItem(row, $event)"
                     >
                       <inline-edit
-                        [value]="row.name"
+                        [value]="row.item_name"
                         column="item"
                       ></inline-edit>
                     </sat-popover>
@@ -222,7 +225,7 @@
                     (click)="p.open()"
                   >
                     <ng-container>
-                      {{row.quantity}}
+                      {{row.qty}}
                     </ng-container>
 
                     <sat-popover
@@ -233,7 +236,7 @@
                       (closed)="updateQuantity(row, $event)"
                     >
                       <inline-edit
-                        [value]="row.quantity"
+                        [value]="row.qty"
                         column="quantity"
                       ></inline-edit>
                     </sat-popover>
@@ -266,7 +269,7 @@
                 <ng-container matColumnDef="total">
                   <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
                   <mat-cell *matCellDef="let row"
-                    >{{row.rate * row.quantity}}</mat-cell
+                    >{{row.rate * row.qty}}</mat-cell
                   >
                 </ng-container>
                 <mat-header-row

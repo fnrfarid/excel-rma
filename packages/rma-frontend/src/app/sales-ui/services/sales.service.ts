@@ -16,8 +16,10 @@ import {
   LIST_SALES_INVOICE_ENDPOINT,
   SALES_INVOICE_GET_ONE_ENDPOINT,
   LIST_ITEMS_ENDPOINT,
+  CREATE_SALES_INVOICE_ENDPOINT,
 } from '../../constants/url-strings';
 import { switchMap, catchError } from 'rxjs/operators';
+import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 
 @Injectable({
   providedIn: 'root',
@@ -31,33 +33,33 @@ export class SalesService {
 
     this.itemList = [
       {
-        itemCode: '1',
-        name: 'TP Link Router',
-        quantity: 10,
+        item_code: '1',
+        item_name: 'TP Link Router',
+        qty: 10,
         rate: 2000,
       },
       {
-        itemCode: '2',
-        name: 'LG Modem',
-        quantity: 15,
+        item_code: '2',
+        item_name: 'LG Modem',
+        qty: 15,
         rate: 1500,
       },
       {
-        itemCode: '3',
-        name: 'Intel NIC',
-        quantity: 5,
+        item_code: '3',
+        item_name: 'Intel NIC',
+        qty: 5,
         rate: 4000,
       },
       {
-        itemCode: '4',
-        name: 'Network switch',
-        quantity: 3,
+        item_code: '4',
+        item_name: 'Network switch',
+        qty: 3,
         rate: 10000,
       },
       {
-        itemCode: '5',
-        name: 'Line Driver',
-        quantity: 2,
+        item_code: '5',
+        item_name: 'Line Driver',
+        qty: 2,
         rate: 17000,
       },
     ];
@@ -112,13 +114,13 @@ export class SalesService {
 
   getItem(uuid: string) {
     let foundItem = {} as Item;
-    foundItem.itemCode = '';
-    foundItem.name = '';
-    foundItem.quantity = null;
+    foundItem.item_code = '';
+    foundItem.item_name = '';
+    foundItem.qty = null;
     foundItem.rate = null;
 
     this.itemList.forEach(item => {
-      if (item.itemCode === uuid) foundItem = item;
+      if (item.item_code === uuid) foundItem = item;
     });
 
     return of(foundItem);
@@ -139,6 +141,37 @@ export class SalesService {
       .set('offset', (pageNumber * pageSize).toString());
     return this.http.get(url, {
       params,
+      headers: this.getAuthorizationHeaders(),
+    });
+  }
+
+  createSalesInvoice(salesDetails: SalesInvoiceDetails, itemList: Item[]) {
+    const url = CREATE_SALES_INVOICE_ENDPOINT;
+
+    const body = {
+      title: salesDetails.customer,
+      customer: salesDetails.customer,
+      company: salesDetails.company,
+      posting_date: salesDetails.posting_date,
+      posting_time: salesDetails.posting_time,
+      set_posting_time: salesDetails.set_posting_time,
+      due_date: salesDetails.due_date,
+      address_display: salesDetails.address_display,
+      contact_person: salesDetails.contact_display,
+      contact_display: salesDetails.contact_display,
+      contact_email: salesDetails.email,
+      territory: salesDetails.territory,
+      update_stock: salesDetails.update_stock,
+      total_qty: salesDetails.total_qty,
+      base_total: salesDetails.base_total,
+      base_net_total: salesDetails.base_net_total,
+      total: salesDetails.total,
+      net_total: salesDetails.net_total,
+      pos_total_qty: salesDetails.pos_total_qty,
+      items: itemList,
+    };
+
+    return this.http.post(url, body, {
       headers: this.getAuthorizationHeaders(),
     });
   }
