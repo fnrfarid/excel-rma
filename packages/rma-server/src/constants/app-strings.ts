@@ -82,3 +82,8 @@ export const RETURN_VOUCHER_LIST_FIELD = [
   'party_balance',
   'paid_amount',
 ];
+export const INVALID_FILE =
+  'Provided file is invalid please provide a JSON file with type claims : claim[]';
+export const FILE_NOT_FOUND =
+  'File is missing, please provide your claims file';
+export const DRAFT_STATUS = 'Draft';

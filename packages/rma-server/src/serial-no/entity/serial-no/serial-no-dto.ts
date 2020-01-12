@@ -16,4 +16,8 @@ export class SerialNoDto {
   @IsNotEmpty()
   @IsString()
   company: string;
+
+  @IsNotEmpty()
+  @IsString()
+  supplier: string;
 }

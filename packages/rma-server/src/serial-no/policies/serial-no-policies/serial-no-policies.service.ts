@@ -10,14 +10,17 @@ import { switchMap } from 'rxjs/operators';
 import {
   SERIAL_NO_ALREADY_EXIST,
   ITEM_NOT_FOUND,
+  SUPPLIER_NOT_FOUND,
 } from '../../../constants/messages';
 import { ItemService } from '../../../item/entity/item/item.service';
+import { SupplierService } from '../../../supplier/entity/supplier/supplier.service';
 
 @Injectable()
 export class SerialNoPoliciesService {
   constructor(
     private readonly serialNoService: SerialNoService,
     private readonly itemService: ItemService,
+    private readonly supplierService: SupplierService,
   ) {}
 
   validateSerial(serialProvider: SerialNoDto) {
@@ -42,6 +45,19 @@ export class SerialNoPoliciesService {
           return of(true);
         }
         return throwError(new NotFoundException(ITEM_NOT_FOUND));
+      }),
+    );
+  }
+
+  validateSupplier(serialProvider: SerialNoDto) {
+    return from(
+      this.supplierService.findOne({ name: serialProvider.supplier }),
+    ).pipe(
+      switchMap(supplier => {
+        if (supplier) {
+          return of(true);
+        }
+        return throwError(new NotFoundException(SUPPLIER_NOT_FOUND));
       }),
     );
   }

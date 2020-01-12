@@ -14,7 +14,7 @@ import { SerialNoUpdatedEvent } from '../../event/serial-no-updated/serial-no-up
 import { SerialNo } from '../../entity/serial-no/serial-no.entity';
 import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, retry } from 'rxjs/operators';
 import { throwError, of } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -43,6 +43,15 @@ export class SerialNoAggregateService extends AggregateRoot {
   }
 
   addSerialNo(serialNoPayload: SerialNoDto, clientHttpRequest) {
+    return this.validateNewSerialNo(serialNoPayload, clientHttpRequest).pipe(
+      switchMap(serialNo => {
+        this.apply(new SerialNoAddedEvent(serialNo, clientHttpRequest));
+        return of({});
+      }),
+    );
+  }
+
+  validateNewSerialNo(serialNoPayload: SerialNoDto, clientHttpRequest) {
     return this.serialNoPolicyService.validateSerial(serialNoPayload).pipe(
       switchMap(validSerial => {
         return this.serialNoPolicyService.validateItem(serialNoPayload).pipe(
@@ -52,8 +61,7 @@ export class SerialNoAggregateService extends AggregateRoot {
             serialNo.uuid = uuidv4();
             serialNo.isSynced = false;
             this.syncNewSerialNo(serialNo, clientHttpRequest);
-            this.apply(new SerialNoAddedEvent(serialNo, clientHttpRequest));
-            return of({});
+            return of(serialNo);
           }),
         );
       }),
@@ -172,6 +180,7 @@ export class SerialNoAggregateService extends AggregateRoot {
             },
           );
         }),
+        retry(3),
       )
       .subscribe({
         next: response => {

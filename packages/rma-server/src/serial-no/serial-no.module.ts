@@ -9,9 +9,16 @@ import { SerialNoController } from './controllers/serial-no/serial-no.controller
 import { SerialNoPoliciesService } from './policies/serial-no-policies/serial-no-policies.service';
 import { SerialNoWebhookController } from './controllers/serial-no-webhook/serial-no-webhook.controller';
 import { ItemEntitiesModule } from '../item/entity/item-entity.module';
+import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
 
 @Module({
-  imports: [SerialNoEntitiesModule, CqrsModule, HttpModule, ItemEntitiesModule],
+  imports: [
+    SerialNoEntitiesModule,
+    CqrsModule,
+    HttpModule,
+    ItemEntitiesModule,
+    SupplierEntitiesModule,
+  ],
   controllers: [SerialNoController, SerialNoWebhookController],
   providers: [
     ...SerialNoAggregatesManager,
