@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material';
 import { CLOSE } from '../../../constants/aap-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -21,6 +22,8 @@ export class DetailsComponent implements OnInit {
     private readonly router: Router,
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
+    private readonly route: ActivatedRoute,
+    private location: Location,
   ) {}
 
   ngOnInit() {
@@ -56,6 +59,16 @@ export class DetailsComponent implements OnInit {
         );
       },
     });
+  }
+
+  submitSalesInvoice() {
+    this.salesService
+      .submitSalesInvoice(this.route.snapshot.params.invoiceUuid)
+      .subscribe({
+        next: success => {
+          this.location.back();
+        },
+      });
   }
 }
 
