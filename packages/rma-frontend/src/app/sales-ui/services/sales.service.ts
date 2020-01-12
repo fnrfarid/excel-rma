@@ -157,7 +157,7 @@ export class SalesService {
       set_posting_time: salesDetails.set_posting_time,
       due_date: salesDetails.due_date,
       address_display: salesDetails.address_display,
-      contact_person: salesDetails.contact_display,
+      contact_person: salesDetails.contact_person,
       contact_display: salesDetails.contact_display,
       contact_email: salesDetails.email,
       territory: salesDetails.territory,
