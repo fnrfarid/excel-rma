@@ -42,12 +42,21 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   addSalesInvoice(salesInvoicePayload: SalesInvoiceDto, clientHttpRequest) {
-    const salesInvoice = new SalesInvoice();
-    Object.assign(salesInvoice, salesInvoicePayload);
-    salesInvoice.uuid = uuidv4();
-    salesInvoice.isSynced = false;
-    salesInvoice.inQueue = false;
-    this.apply(new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest));
+    return this.validateSalesInvoicePolicy
+      .validateCustomer(salesInvoicePayload)
+      .pipe(
+        switchMap(() => {
+          const salesInvoice = new SalesInvoice();
+          Object.assign(salesInvoice, salesInvoicePayload);
+          salesInvoice.uuid = uuidv4();
+          salesInvoice.isSynced = false;
+          salesInvoice.inQueue = false;
+          this.apply(
+            new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest),
+          );
+          return of({});
+        }),
+      );
   }
 
   async retrieveSalesInvoice(uuid: string, req) {
@@ -81,41 +90,36 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     this.apply(new SalesInvoiceUpdatedEvent(updatePayload));
   }
 
-  submitSalesInvoice(
-    salesInvoicePayload: SalesInvoiceUpdateDto,
-    clientHttpRequest: any,
-  ) {
-    return this.validateSalesInvoicePolicy
-      .validateSalesInvoice(salesInvoicePayload)
-      .pipe(
-        switchMap(() => {
-          return this.validateSalesInvoicePolicy
-            .validateCustomer(salesInvoicePayload)
-            .pipe(
-              switchMap(() => {
-                return this.validateSalesInvoicePolicy
-                  .validateSubmittedState(salesInvoicePayload)
-                  .pipe(
-                    switchMap(() => {
-                      return this.validateSalesInvoicePolicy.validateQueueState(
-                        salesInvoicePayload,
-                      );
-                    }),
-                  )
-                  .pipe(
-                    switchMap(salesInvoice => {
-                      this.apply(new SalesInvoiceSubmittedEvent(salesInvoice));
-                      this.syncSubmittedSalesInvoice(
-                        salesInvoice,
-                        clientHttpRequest,
-                      );
-                      return of({});
-                    }),
-                  );
-              }),
-            );
-        }),
-      );
+  submitSalesInvoice(uuid: string, clientHttpRequest: any) {
+    return this.validateSalesInvoicePolicy.validateSalesInvoice(uuid).pipe(
+      switchMap(salesInvoice => {
+        return this.validateSalesInvoicePolicy
+          .validateCustomer(salesInvoice)
+          .pipe(
+            switchMap(() => {
+              return this.validateSalesInvoicePolicy
+                .validateSubmittedState(salesInvoice)
+                .pipe(
+                  switchMap(() => {
+                    return this.validateSalesInvoicePolicy.validateQueueState(
+                      salesInvoice,
+                    );
+                  }),
+                )
+                .pipe(
+                  switchMap(isValid => {
+                    this.apply(new SalesInvoiceSubmittedEvent(salesInvoice));
+                    this.syncSubmittedSalesInvoice(
+                      salesInvoice,
+                      clientHttpRequest,
+                    );
+                    return of({});
+                  }),
+                );
+            }),
+          );
+      }),
+    );
   }
 
   syncSubmittedSalesInvoice(
@@ -177,34 +181,24 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
 
   mapSalesInvoice(salesInvoice: SalesInvoice) {
     return {
-      title: salesInvoice.title,
+      // title: salesInvoice.title ,
       docstatus: 1,
       customer: salesInvoice.customer,
       company: salesInvoice.company,
       posting_date: salesInvoice.posting_date,
       set_posting_time: salesInvoice.set_posting_time,
       due_date: salesInvoice.due_date,
-      address_display: salesInvoice.address_display,
-      contact_person: salesInvoice.contact_person,
-      contact_display: salesInvoice.contact_display,
       contact_email: salesInvoice.contact_email,
       territory: salesInvoice.territory,
-      update_stock: salesInvoice.update_stock,
       total_qty: salesInvoice.total_qty,
-      base_total: salesInvoice.base_total,
-      base_net_total: salesInvoice.base_net_total,
+      update_stock: salesInvoice.update_stock,
       total: salesInvoice.total,
-      net_total: salesInvoice.net_total,
-      pos_total_qty: salesInvoice.pos_total_qty,
       items: salesInvoice.items.filter(each => {
         delete each.owner;
         return each;
       }),
-      pricing_rules: salesInvoice.pricing_rules,
-      packed_items: salesInvoice.packed_items,
       timesheets: salesInvoice.timesheets,
       taxes: salesInvoice.taxes,
-      advances: salesInvoice.advances,
       payment_schedule: salesInvoice.payment_schedule,
       payments: salesInvoice.payments,
       sales_team: salesInvoice.sales_team,

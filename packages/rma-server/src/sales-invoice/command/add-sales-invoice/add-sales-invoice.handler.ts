@@ -12,7 +12,9 @@ export class AddSalesInvoiceHandler
   async execute(command: AddSalesInvoiceCommand) {
     const { salesInvoicePayload, clientHttpRequest } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await aggregate.addSalesInvoice(salesInvoicePayload, clientHttpRequest);
+    await aggregate
+      .addSalesInvoice(salesInvoicePayload, clientHttpRequest)
+      .toPromise();
     aggregate.commit();
   }
 }

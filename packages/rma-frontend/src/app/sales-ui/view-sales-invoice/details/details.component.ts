@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material';
 import { CLOSE } from '../../../constants/aap-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
+import { Item } from '../../../common/interfaces/sales.interface';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -76,11 +77,13 @@ export class SalesInvoiceDetails {
   customer: string;
   company: string;
   posting_date: string;
+  customer_email: string;
   due_date: string;
   address_display: string;
   contact_display: string;
   submitted?: string;
   email?: string;
+  contact_email: string;
   posting_time?: string;
   set_posting_time?: number;
   contact_person?: string;
@@ -91,6 +94,7 @@ export class SalesInvoiceDetails {
   base_net_total?: number;
   total?: number;
   net_total?: number;
+  items?: Item[];
   pos_total_qty?: number;
 }
 
