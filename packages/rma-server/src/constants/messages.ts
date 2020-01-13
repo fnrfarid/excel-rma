@@ -13,7 +13,8 @@ export const DELIVERY_NOTE_ALREADY_SUBMITTED =
 export const DELIVERY_NOTE_IN_QUEUE = 'Provided delivery note is in queue';
 export const SERIAL_NO_ALREADY_EXIST = 'Serial Number already exist';
 export const ITEM_NOT_FOUND = 'Item not found';
-export const CUSTOMER_NOT_FOUND = 'Customer not found';
+export const CUSTOMER_AND_CONTACT_INVALID =
+  'Provided Customer or contact email invalid';
 export const SALES_INVOICE_NOT_FOUND = 'Sales Invoice not found';
 export const SUPPLIER_NOT_FOUND = 'Supplier not found';
 export const INVALID_WARRANTY_CLAIM_AT_POSITION =

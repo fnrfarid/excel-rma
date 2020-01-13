@@ -4,7 +4,7 @@ import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
   SALES_INVOICE_NOT_FOUND,
-  CUSTOMER_NOT_FOUND,
+  CUSTOMER_AND_CONTACT_INVALID,
   DELIVERY_NOTE_ALREADY_SUBMITTED,
   DELIVERY_NOTE_IN_QUEUE,
 } from '../../../constants/messages';
@@ -27,13 +27,21 @@ export class SalesInvoicePoliciesService {
       }),
     );
   }
-  validateCustomer(salesInvoicePayload: { customer: string }) {
+  validateCustomer(salesInvoicePayload: {
+    customer: string;
+    contact_email: string;
+  }) {
     return from(
-      this.customerService.findOne({ name: salesInvoicePayload.customer }),
+      this.customerService.findOne({
+        name: salesInvoicePayload.customer,
+        owner: salesInvoicePayload.contact_email,
+      }),
     ).pipe(
       switchMap(customer => {
         if (!customer) {
-          return throwError(new BadRequestException(CUSTOMER_NOT_FOUND));
+          return throwError(
+            new BadRequestException(CUSTOMER_AND_CONTACT_INVALID),
+          );
         }
         return of(true);
       }),
