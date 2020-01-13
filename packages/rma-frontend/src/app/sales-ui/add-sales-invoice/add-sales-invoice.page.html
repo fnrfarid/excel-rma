@@ -69,7 +69,7 @@
                         >Test Company</ion-select-option
                       >
                       <ion-select-option value="Siddhi Company"
-                        >Siddhi Company</ion-select-option
+                        >Excel Technologies Ltd</ion-select-option
                       >
                     </ion-select>
                   </ion-item>
@@ -97,34 +97,33 @@
                     <ion-label position="floating">Posting Date</ion-label>
                     <ion-datetime
                       display-format="DD.MM.YYYY"
-                      (ionChange)="datePicked($event)"
+                      (ionChange)="postingDate($event)"
                     ></ion-datetime>
                   </ion-item>
                 </ion-col>
               </ion-row>
               <ion-row>
                 <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="floating">Remaining Balance</ion-label>
-                    <ion-input
-                      readonly="true"
-                      placeholder="20000"
-                      type="number"
-                    ></ion-input>
+                  <ion-item>
+                    <ion-label position="floating">Due Date</ion-label>
+                    <ion-datetime
+                      display-format="DD.MM.YYYY"
+                      (ionChange)="dueDate($event)"
+                    ></ion-datetime>
                   </ion-item>
                 </ion-col>
                 <ion-col>
-                  <ion-item lines="none">
+                  <!-- <ion-item lines="none">
                     <ion-label position="floating">Sales Person</ion-label>
                     <ion-input
                       readonly="true"
                       placeholder="David"
                       type="string"
                     ></ion-input>
-                  </ion-item>
+                  </ion-item> -->
                 </ion-col>
               </ion-row>
-              <ion-row>
+              <!-- <ion-row>
                 <ion-col>
                   <ion-item lines="none">
                     <ion-label position="floating">Branch</ion-label>
@@ -145,7 +144,7 @@
                     ></ion-input>
                   </ion-item>
                 </ion-col>
-              </ion-row>
+              </ion-row> -->
               <ion-row class="align">
                 <ion-col>
                   <ion-item lines="none">
@@ -154,13 +153,13 @@
                   </ion-item>
                 </ion-col>
                 <ion-col>
-                  <ion-item>
+                  <!-- <ion-item>
                     <ion-label position="floating">Item Barcode</ion-label>
                     <ion-input
                       placeholder="Enter Barcode"
                       type="string"
                     ></ion-input>
-                  </ion-item>
+                  </ion-item> -->
                 </ion-col>
               </ion-row>
             </ion-grid>

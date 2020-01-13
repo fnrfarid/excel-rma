@@ -146,33 +146,9 @@ export class SalesService {
     });
   }
 
-  createSalesInvoice(salesDetails: SalesInvoiceDetails, itemList: Item[]) {
+  createSalesInvoice(salesDetails: SalesInvoiceDetails) {
     const url = CREATE_SALES_INVOICE_ENDPOINT;
-
-    const body = {
-      title: salesDetails.customer,
-      customer: salesDetails.customer,
-      company: salesDetails.company,
-      posting_date: salesDetails.posting_date,
-      posting_time: salesDetails.posting_time,
-      set_posting_time: salesDetails.set_posting_time,
-      due_date: salesDetails.due_date,
-      address_display: salesDetails.address_display,
-      contact_person: salesDetails.contact_person,
-      contact_display: salesDetails.contact_display,
-      contact_email: salesDetails.email,
-      territory: salesDetails.territory,
-      update_stock: salesDetails.update_stock,
-      total_qty: salesDetails.total_qty,
-      base_total: salesDetails.base_total,
-      base_net_total: salesDetails.base_net_total,
-      total: salesDetails.total,
-      net_total: salesDetails.net_total,
-      pos_total_qty: salesDetails.pos_total_qty,
-      items: itemList,
-    };
-
-    return this.http.post(url, body, {
+    return this.http.post(url, salesDetails, {
       headers: this.getAuthorizationHeaders(),
     });
   }
