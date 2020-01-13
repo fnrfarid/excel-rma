@@ -10,10 +10,13 @@ export class SalesInvoice {
 }
 
 export class Item {
-  itemCode: string;
-  name: string;
-  quantity: number;
+  name?: string;
+  owner?: string;
+  item_code: string;
+  item_name: string;
+  qty: number;
   rate: number;
+  amount?: number;
 }
 
 export class APIResponse {

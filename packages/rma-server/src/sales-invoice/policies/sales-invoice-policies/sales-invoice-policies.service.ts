@@ -8,7 +8,6 @@ import {
   DELIVERY_NOTE_ALREADY_SUBMITTED,
   DELIVERY_NOTE_IN_QUEUE,
 } from '../../../constants/messages';
-import { SalesInvoiceUpdateDto } from '../../../sales-invoice/entity/sales-invoice/sales-invoice-update-dto';
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 
 @Injectable()
@@ -18,19 +17,17 @@ export class SalesInvoicePoliciesService {
     private readonly customerService: CustomerService,
   ) {}
 
-  validateSalesInvoice(salesInvoicePayload: SalesInvoiceUpdateDto) {
-    return from(
-      this.salesInvoiceService.findOne({ uuid: salesInvoicePayload.uuid }),
-    ).pipe(
+  validateSalesInvoice(uuid: string) {
+    return from(this.salesInvoiceService.findOne({ uuid })).pipe(
       switchMap(salesInvoice => {
         if (!salesInvoice) {
           return throwError(new BadRequestException(SALES_INVOICE_NOT_FOUND));
         }
-        return of(true);
+        return of(salesInvoice);
       }),
     );
   }
-  validateCustomer(salesInvoicePayload: SalesInvoiceUpdateDto) {
+  validateCustomer(salesInvoicePayload: { customer: string }) {
     return from(
       this.customerService.findOne({ name: salesInvoicePayload.customer }),
     ).pipe(
@@ -42,7 +39,7 @@ export class SalesInvoicePoliciesService {
       }),
     );
   }
-  validateSubmittedState(salesInvoicePayload: SalesInvoiceUpdateDto) {
+  validateSubmittedState(salesInvoicePayload: { uuid: string }) {
     return from(
       this.salesInvoiceService.findOne({ uuid: salesInvoicePayload.uuid }),
     ).pipe(
@@ -56,7 +53,7 @@ export class SalesInvoicePoliciesService {
       }),
     );
   }
-  validateQueueState(salesInvoicePayload: SalesInvoiceUpdateDto) {
+  validateQueueState(salesInvoicePayload: { uuid: string }) {
     return from(
       this.salesInvoiceService.findOne({ uuid: salesInvoicePayload.uuid }),
     ).pipe(

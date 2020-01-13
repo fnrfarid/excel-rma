@@ -69,8 +69,10 @@ export class InlineEditComponent {
     if (this.popover) {
       if (this.column === 'item') {
         const selectedItem = {} as Item;
-        selectedItem.itemCode = this.itemFormControl.value.item_code;
-        selectedItem.name = this.itemFormControl.value.item_name;
+        selectedItem.item_code = this.itemFormControl.value.item_code;
+        selectedItem.item_name = this.itemFormControl.value.item_name;
+        selectedItem.name = this.itemFormControl.value.name;
+        selectedItem.owner = this.itemFormControl.value.owner;
         this.popover.close(selectedItem);
       } else if (this.column === 'quantity') this.popover.close(this.quantity);
       else this.popover.close(this.rate);

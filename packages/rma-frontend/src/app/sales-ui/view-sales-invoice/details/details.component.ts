@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material';
 import { CLOSE } from '../../../constants/aap-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
+import { Location } from '@angular/common';
+import { Item } from '../../../common/interfaces/sales.interface';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -21,6 +23,8 @@ export class DetailsComponent implements OnInit {
     private readonly router: Router,
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
+    private readonly route: ActivatedRoute,
+    private location: Location,
   ) {}
 
   ngOnInit() {
@@ -57,16 +61,41 @@ export class DetailsComponent implements OnInit {
       },
     });
   }
+
+  submitSalesInvoice() {
+    this.salesService
+      .submitSalesInvoice(this.route.snapshot.params.invoiceUuid)
+      .subscribe({
+        next: success => {
+          this.location.back();
+        },
+      });
+  }
 }
 
 export class SalesInvoiceDetails {
   customer: string;
   company: string;
   posting_date: string;
+  customer_email: string;
   due_date: string;
   address_display: string;
   contact_display: string;
-  submitted: string;
+  submitted?: string;
+  email?: string;
+  contact_email: string;
+  posting_time?: string;
+  set_posting_time?: number;
+  contact_person?: string;
+  territory?: string;
+  update_stock?: number;
+  total_qty?: number;
+  base_total?: number;
+  base_net_total?: number;
+  total?: number;
+  net_total?: number;
+  items?: Item[];
+  pos_total_qty?: number;
 }
 
 export class SalesInvoiceItem {

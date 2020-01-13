@@ -10,10 +10,6 @@ import { Type } from 'class-transformer';
 export class SalesInvoiceDto {
   @IsNotEmpty()
   @IsString()
-  title: string;
-
-  @IsNotEmpty()
-  @IsString()
   customer: string;
 
   @IsNotEmpty()
@@ -29,24 +25,8 @@ export class SalesInvoiceDto {
   posting_time: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  set_posting_time: number;
-
-  @IsNotEmpty()
   @IsString()
   due_date: string;
-
-  @IsNotEmpty()
-  @IsString()
-  address_display: string;
-
-  @IsNotEmpty()
-  @IsString()
-  contact_person: string;
-
-  @IsNotEmpty()
-  @IsString()
-  contact_display: string;
 
   @IsNotEmpty()
   @IsString()
@@ -66,28 +46,44 @@ export class SalesInvoiceDto {
 
   @IsNotEmpty()
   @IsNumber()
-  base_total: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  base_net_total: number;
-
-  @IsNotEmpty()
-  @IsNumber()
   total: number;
 
   @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => ItemDto)
+  items: ItemDto[];
+
+  @IsOptional()
+  @IsNumber()
+  set_posting_time: number;
+
+  @IsOptional()
+  @IsString()
+  address_display: string;
+
+  @IsOptional()
+  @IsString()
+  contact_person: string;
+
+  @IsOptional()
+  @IsString()
+  contact_display: string;
+
+  @IsOptional()
+  @IsNumber()
+  base_total: number;
+
+  @IsOptional()
+  @IsNumber()
+  base_net_total: number;
+
+  @IsOptional()
   @IsNumber()
   net_total: number;
 
   @IsOptional()
   @IsNumber()
   pos_total_qty: number;
-
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => ItemDto)
-  items: ItemDto[];
 
   @IsOptional()
   pricing_rules: any[];
@@ -147,7 +143,7 @@ export class TaxDto {
 }
 
 export class ItemDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name: string;
 

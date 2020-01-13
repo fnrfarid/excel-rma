@@ -23,6 +23,7 @@ import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
 import { WarrantyClaimModule } from './warranty-claim/warranty-claim.module';
 import { DeliveryNoteModule } from './delivery-note/delivery-note-invoice.module';
 import { CreditNoteModule } from './credit-note/credit-note-invoice.module';
+import { ReturnVoucherModule } from './return-voucher/return-voucher-invoice.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { CreditNoteModule } from './credit-note/credit-note-invoice.module';
     SystemSettingsModule,
     DirectModule,
     CustomerModule,
+    ReturnVoucherModule,
     SupplierModule,
     CreditNoteModule,
     SalesInvoiceModule,

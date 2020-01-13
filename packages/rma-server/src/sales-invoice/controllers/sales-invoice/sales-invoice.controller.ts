@@ -52,13 +52,11 @@ export class SalesInvoiceController {
     );
   }
 
-  @Post('v1/submit')
+  @Post('v1/submit/:uuid')
   @UseGuards(TokenGuard)
   @UsePipes()
-  submitSalesInvoice(@Body() updatePayload: SalesInvoiceUpdateDto, @Req() req) {
-    return this.commandBus.execute(
-      new SubmitSalesInvoiceCommand(updatePayload, req),
-    );
+  submitSalesInvoice(@Param('uuid') uuid: string, @Req() req) {
+    return this.commandBus.execute(new SubmitSalesInvoiceCommand(uuid, req));
   }
 
   @Get('v1/get/:uuid')

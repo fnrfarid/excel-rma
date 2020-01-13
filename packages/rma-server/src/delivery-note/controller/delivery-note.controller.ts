@@ -8,7 +8,7 @@ export class DeliveryNoteController {
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  getSupplier(
+  getDeliveryNote(
     @Req() req,
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,

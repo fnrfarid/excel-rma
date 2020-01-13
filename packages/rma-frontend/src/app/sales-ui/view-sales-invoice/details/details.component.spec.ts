@@ -7,6 +7,7 @@ import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Location } from '@angular/common';
 
 describe('DetailsComponent', () => {
   let component: DetailsComponent;
@@ -27,7 +28,12 @@ describe('DetailsComponent', () => {
           provide: SalesService,
           useValue: {
             getItemList: () => of({}),
+            submitSalesInvoice: (...args) => of({}),
           },
+        },
+        {
+          provide: Location,
+          useValue: {},
         },
       ],
     }).compileComponents();
