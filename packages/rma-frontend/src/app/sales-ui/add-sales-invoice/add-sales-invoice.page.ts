@@ -131,10 +131,10 @@ export class AddSalesInvoicePage implements OnInit {
       if (item.item_name !== '') {
         item.amount = item.qty * item.rate;
         salesInvoiceDetails.total_qty += item.qty;
+        salesInvoiceDetails.total += item.amount;
         // salesInvoiceDetails.pos_total_qty += item.qty;
         // salesInvoiceDetails.base_total += item.amount;
         // salesInvoiceDetails.base_net_total += item.amount;
-        // salesInvoiceDetails.total += item.amount;
         // salesInvoiceDetails.net_total += item.amount;
         return item;
       }

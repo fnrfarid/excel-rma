@@ -17,14 +17,9 @@
     color="light"
     horizontal="end"
   >
-    <ion-fab-button class="fab-position">
+    <ion-fab-button class="fab-position" (click)="submitDraft()">
       SAVE
     </ion-fab-button>
-    <ion-fab-list side="start" class="fab-position">
-      <ion-button color="medium" (click)="submitDraft()">DRAFT</ion-button>
-      <ion-button color="light">DELIVERY NOTE</ion-button>
-      <ion-button color="primary">SALES INVOICE</ion-button>
-    </ion-fab-list>
   </ion-fab>
   <ion-grid class="ion-no-padding">
     <ion-row class="ion-no-padding">
