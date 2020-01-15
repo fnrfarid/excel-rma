@@ -6,6 +6,8 @@ import {
   Body,
   Post,
   UseGuards,
+  Req,
+  Param,
 } from '@nestjs/common';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -51,5 +53,24 @@ export class SettingsController {
   @UseGuards(TokenGuard, RoleGuard)
   setupWebhooks() {
     return this.settingsService.setupWebhooks();
+  }
+
+  @Post('v1/setup_company/:company_name')
+  @UseGuards(TokenGuard)
+  setupDefaultCompany(@Param('company_name') companyName, @Req() req) {
+    return this.settingsService.setDefaultCompany(companyName, req);
+  }
+
+  @Post('v1/update_company/:company_name')
+  @Roles(SYSTEM_MANAGER)
+  @UseGuards(TokenGuard, RoleGuard)
+  updateDefaultCompany(@Param('company_name') companyName, @Req() req) {
+    return this.settingsService.updateDefaultCompany(companyName, req);
+  }
+
+  @Get('v1/profile')
+  @UseGuards(TokenGuard)
+  async getUserProfile(@Req() req) {
+    return await this.settingsService.getUserProfile(req);
   }
 }

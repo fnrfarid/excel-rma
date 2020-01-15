@@ -3,9 +3,10 @@ import {
   NotImplementedException,
   HttpService,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import { Observable, from, forkJoin, throwError } from 'rxjs';
+import { Observable, from, forkJoin, throwError, of } from 'rxjs';
 import { switchMap, catchError, map } from 'rxjs/operators';
 import { randomBytes } from 'crypto';
 import { ServerSettingsService } from '../../entities/server-settings/server-settings.service';
@@ -18,7 +19,11 @@ import {
   APPLICATION_JSON_CONTENT_TYPE,
 } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
-import { PLEASE_RUN_SETUP } from '../../../constants/messages';
+import {
+  PLEASE_RUN_SETUP,
+  COMPANY_NOT_FOUND_ON_FRAPPE,
+  DEFAULT_COMPANY_ALREADY_EXISTS,
+} from '../../../constants/messages';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import {
   getBearerTokenOnTrashWebhookData,
@@ -49,7 +54,9 @@ import {
   TOKEN_DELETE_ENDPOINT,
   SERIAL_NO_AFTER_INSERT_ENDPOINT,
   SERIAL_NO_ON_UPDATE_ENDPOINT,
+  FRAPPE_API_COMPANY_ENDPOINT,
 } from '../../../constants/routes';
+import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 
 @Injectable()
 export class SettingsService extends AggregateRoot {
@@ -57,6 +64,7 @@ export class SettingsService extends AggregateRoot {
     private readonly serverSettingsService: ServerSettingsService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly http: HttpService,
+    private readonly tokenService: TokenCacheService,
   ) {
     super();
   }
@@ -250,5 +258,59 @@ export class SettingsService extends AggregateRoot {
         return throwError(new InternalServerErrorException(error));
       }),
     );
+  }
+
+  async getUserProfile(req) {
+    return await this.tokenService.findOne({
+      accessToken: req.token.accessToken,
+    });
+  }
+
+  setDefaultCompany(companyName: string, req) {
+    return this.find().pipe(
+      switchMap(settings => {
+        if (settings.defaultCompany) {
+          return throwError(
+            new BadRequestException(DEFAULT_COMPANY_ALREADY_EXISTS),
+          );
+        }
+        return this.assignCompany(settings, companyName, req);
+      }),
+    );
+  }
+
+  updateDefaultCompany(companyName: string, req) {
+    return this.find().pipe(
+      switchMap(settings => {
+        return this.assignCompany(settings, companyName, req);
+      }),
+    );
+  }
+
+  assignCompany(settings: ServerSettings, companyName: string, req) {
+    return this.http
+      .get(
+        settings.authServerURL +
+          FRAPPE_API_COMPANY_ENDPOINT +
+          `/${companyName}`,
+        { headers: this.getAuthorizationHeaders(req.token) },
+      )
+      .pipe(
+        switchMap(company => {
+          this.serverSettingsService
+            .updateOne(
+              { uuid: settings.uuid },
+              { $set: { defaultCompany: companyName } },
+            )
+            .then(success => {})
+            .catch(error => {});
+          return of();
+        }),
+        catchError(err => {
+          return throwError(
+            new BadRequestException(COMPANY_NOT_FOUND_ON_FRAPPE),
+          );
+        }),
+      );
   }
 }
