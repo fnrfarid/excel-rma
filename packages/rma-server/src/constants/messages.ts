@@ -19,3 +19,6 @@ export const SALES_INVOICE_NOT_FOUND = 'Sales Invoice not found';
 export const SUPPLIER_NOT_FOUND = 'Supplier not found';
 export const INVALID_WARRANTY_CLAIM_AT_POSITION =
   'Invalid Warranty Claim at position ';
+export const COMPANY_NOT_FOUND_ON_FRAPPE =
+  'Provided company not found, please make sure that the provided company exist on frappe';
+export const DEFAULT_COMPANY_ALREADY_EXISTS = 'Default company already exists';
