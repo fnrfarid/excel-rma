@@ -42,6 +42,7 @@ export class SetupService {
       info.serviceAccountUser = undefined;
       info.serviceAccountSecret = undefined;
       info.webhookApiKey = undefined;
+      info.clientTokenUuid = undefined;
     }
     return info;
   }

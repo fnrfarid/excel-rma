@@ -95,10 +95,11 @@ export class AppComponent implements OnInit {
     this.appService.getMessage().subscribe({
       next: response => {
         if (
-          response &&
-          !response.frontendClientId &&
-          !response.appURL &&
-          !response.authorizationURL
+          !response ||
+          (response &&
+            !response.frontendClientId &&
+            !response.appURL &&
+            !response.authorizationURL)
         ) {
           return;
         }
@@ -148,7 +149,7 @@ export class AppComponent implements OnInit {
     if (now > expiry - TWENTY_MINUTES_IN_SECONDS) {
       this.appService.getMessage().subscribe({
         next: response => {
-          if (response.message) return;
+          if (!response) return;
           const frappe_auth_config = {
             client_id: response.frontendClientId,
             redirect_uri: response.appURL + SILENT_REFRESH_ENDPOINT,

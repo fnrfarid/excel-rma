@@ -64,6 +64,9 @@ export class ServerSettings extends BaseEntity {
   @Column()
   backendCallbackURLs: string[];
 
+  @Column()
+  defaultCompany: string;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();
