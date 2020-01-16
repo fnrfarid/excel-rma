@@ -34,6 +34,9 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     this.setUserSession();
+  }
+
+  ngAfterViewInit() {
     this.loadProfile();
   }
 
