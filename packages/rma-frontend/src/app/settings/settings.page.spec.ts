@@ -2,22 +2,22 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 
-import { ViewSalesInvoicePage } from './view-sales-invoice.page';
+import { SettingsPage } from './settings.page';
 
-describe('ViewSalesInvoicePage', () => {
-  let component: ViewSalesInvoicePage;
-  let fixture: ComponentFixture<ViewSalesInvoicePage>;
+describe('SettingsPage', () => {
+  let component: SettingsPage;
+  let fixture: ComponentFixture<SettingsPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ViewSalesInvoicePage],
+      declarations: [SettingsPage],
       providers: [{ provide: Location, useValue: {} }],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ViewSalesInvoicePage);
+    fixture = TestBed.createComponent(SettingsPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

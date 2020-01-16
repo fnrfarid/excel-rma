@@ -8,6 +8,11 @@ const routes: Routes = [
       import('./home/home.module').then(m => m.HomePageModule),
   },
   {
+    path: 'settings',
+    loadChildren: () =>
+      import('./settings/settings.module').then(m => m.SettingsPageModule),
+  },
+  {
     path: 'callback',
     loadChildren: () =>
       import('./callback/callback.module').then(m => m.CallbackPageModule),
@@ -46,6 +51,10 @@ const routes: Routes = [
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
+  {
+    path: 'settings',
+    loadChildren: './settings/settings.module#SettingsPageModule',
+  },
 ];
 
 @NgModule({

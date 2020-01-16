@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonSlides } from '@ionic/angular';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-view-sales-invoice',
@@ -15,7 +16,7 @@ export class ViewSalesInvoicePage implements OnInit {
     speed: 400,
   };
 
-  constructor() {}
+  constructor(private readonly location: Location) {}
 
   ngOnInit() {
     this.selectedSegment = 0;
@@ -30,5 +31,9 @@ export class ViewSalesInvoicePage implements OnInit {
     slides.getActiveIndex().then(index => {
       this.selectedSegment = index;
     });
+  }
+
+  navigateBack() {
+    this.location.back();
   }
 }
