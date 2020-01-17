@@ -313,4 +313,22 @@ export class SettingsService extends AggregateRoot {
         }),
       );
   }
+
+  relayListCompanies(query) {
+    return this.clientToken.getClientToken().pipe(
+      switchMap(token => {
+        return from(this.serverSettingsService.find()).pipe(
+          switchMap(settings => {
+            const url = settings.authServerURL + FRAPPE_API_COMPANY_ENDPOINT;
+            return this.http
+              .get(url, {
+                headers: this.getAuthorizationHeaders(token),
+                params: query,
+              })
+              .pipe(map(res => res.data));
+          }),
+        );
+      }),
+    );
+  }
 }
