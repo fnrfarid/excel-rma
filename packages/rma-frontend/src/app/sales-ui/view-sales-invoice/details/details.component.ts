@@ -3,7 +3,7 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material';
-import { CLOSE } from '../../../constants/aap-string';
+import { CLOSE } from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
