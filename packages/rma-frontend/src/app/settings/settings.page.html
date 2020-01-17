@@ -9,6 +9,108 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content class="page-background">
+  <ion-grid class="ion-no-padding">
+    <ion-row class="ion-no-padding">
+      <ion-col class="ion-no-padding">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-text>
+                RMA Server Settings
+              </ion-text>
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <form [formGroup]="companySettingsForm">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  required
+                  placeholder="Default Company"
+                  aria-label="Default Company"
+                  [matAutocomplete]="auto"
+                  formControlName="defaultCompany">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let company of companies | async" [value]="company.name">
+                    <span>{{company.name}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Authorization Server URL"
+                  type="text"
+                  formControlName="authServerURL"
+                  readonly>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="App URL"
+                  type="text"
+                  formControlName="appURL"
+                  readonly>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Frontend Client ID"
+                  type="text"
+                  formControlName="frontendClientId"
+                  required>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Backend Client ID"
+                  type="text"
+                  formControlName="backendClientId"
+                  required>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Service Account"
+                  type="text"
+                  formControlName="serviceAccountUser"
+                  required>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  required
+                  formControlName="serviceAccountSecret"
+                  matInput type="password" placeholder="Service Account Secret"
+                  [type]="hideSASecret ? 'password' : 'text'">
+                <mat-icon matSuffix (click)="hideSASecret = !hideSASecret">
+                  {{hideSASecret ? 'visibility' : 'visibility_off'}}
+                </mat-icon>
+              </mat-form-field>
+            </form>
+            <div class="ion-padding">
+              <ion-button color="light" (click)="updateSettings()">Update</ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-text>
+                ERPNext Settings
+              </ion-text>
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="ion-padding">
+              <ion-button color="dark">Setup Webhooks</ion-button>
+            </div>
+            <div class="ion-padding">
+              <ion-button color="dark">Reset Webhook Key</ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

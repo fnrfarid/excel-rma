@@ -8,6 +8,7 @@ import {
   UseGuards,
   Req,
   Param,
+  Query,
 } from '@nestjs/common';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -72,5 +73,12 @@ export class SettingsController {
   @UseGuards(TokenGuard)
   async getUserProfile(@Req() req) {
     return await this.settingsService.getUserProfile(req);
+  }
+
+  @Get('v1/relay_list_companies')
+  @Roles(SYSTEM_MANAGER)
+  @UseGuards(TokenGuard, RoleGuard)
+  relayListCompanies(@Query() query) {
+    return this.settingsService.relayListCompanies(query);
   }
 }
