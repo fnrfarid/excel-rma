@@ -1,5 +1,5 @@
 import { Controller, Get, UseGuards, Req, Query } from '@nestjs/common';
-import { DeliveryNoteService } from '../delivery-note-service/delivery-note.service';
+import { DeliveryNoteService } from '../entity/delivery-note-service/delivery-note.service';
 import { TokenGuard } from '../../auth/guards/token.guard';
 
 @Controller('delivery_note')

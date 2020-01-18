@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeliveryNoteService } from './delivery-note.service';
-import { SettingsService } from '../../system-settings/aggregates/settings/settings.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
 
 describe('DeliveryNoteService', () => {

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeliveryNoteController } from './delivery-note.controller';
-import { DeliveryNoteService } from '../delivery-note-service/delivery-note.service';
+import { DeliveryNoteService } from '../entity/delivery-note-service/delivery-note.service';
 import { TokenGuard } from '../../auth/guards/token.guard';
 
 describe('DeliveryNote Controller', () => {
