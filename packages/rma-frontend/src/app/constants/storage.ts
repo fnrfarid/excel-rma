@@ -30,3 +30,4 @@ export const SERIAL_NO = 'serial_no';
 export const AUTHORIZATION = 'Authorization';
 export const WARRANTY_CLAIM = 'warranty-claim';
 export const BEARER_TOKEN_PREFIX = 'Bearer ';
+export const DEFAULT_COMPANY = 'defaultCompany';
