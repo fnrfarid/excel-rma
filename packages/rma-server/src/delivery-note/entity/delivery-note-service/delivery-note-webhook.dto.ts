@@ -1,4 +1,4 @@
-export interface DeliveryNoteWebhookInterface {
+export class DeliveryNoteWebhookDto {
   name: string;
   modified_by: string;
   docstatus: 0;
@@ -20,13 +20,13 @@ export interface DeliveryNoteWebhookInterface {
   base_grand_total: number;
   customer_group: string;
   territory: string;
-  items: DeliveryItemsInterface[];
-  pricing_rules: DeliverPricingRulesInterface[];
-  packed_items: DeliveryPackedItemsInterface[];
-  taxes: DeliveryTaxesInterface[];
-  sales_team: DeliverySalesTeamInterface[];
+  items: DeliveryItemsDto[];
+  pricing_rules: DeliverPricingRulesDto[];
+  packed_items: DeliveryPackedItemsDto[];
+  taxes: DeliveryTaxesDto[];
+  sales_team: DeliverySalesTeamDto[];
 }
-export interface DeliveryItemsInterface {
+export class DeliveryItemsDto {
   name: string;
   item_code: string;
   item_name: string;
@@ -43,7 +43,7 @@ export interface DeliveryItemsInterface {
   rate: number;
   amount: number;
 }
-export interface DeliveryTaxesInterface {
+export class DeliveryTaxesDto {
   name: string;
   docstatus: number;
   charge_type: string;
@@ -54,6 +54,6 @@ export interface DeliveryTaxesInterface {
   tax_amount: number;
   total: number;
 }
-export interface DeliverPricingRulesInterface {}
-export interface DeliveryPackedItemsInterface {}
-export interface DeliverySalesTeamInterface {}
+export class DeliverPricingRulesDto {}
+export class DeliveryPackedItemsDto {}
+export class DeliverySalesTeamDto {}

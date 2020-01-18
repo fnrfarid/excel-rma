@@ -72,21 +72,21 @@ export class DeliveryNote extends BaseEntity {
   territory: string;
 
   @Column()
-  items: DeliveryItemsInterface[];
+  items: DeliveryItems[];
 
   @Column()
-  pricing_rules: DeliverPricingRulesInterface[];
+  pricing_rules: DeliverPricingRules[];
 
   @Column()
-  packed_items: DeliveryPackedItemsInterface[];
+  packed_items: DeliveryPackedItems[];
 
   @Column()
-  taxes: DeliveryTaxesInterface[];
+  taxes: DeliveryTaxes[];
 
   @Column()
-  sales_team: DeliverySalesTeamInterface[];
+  sales_team: DeliverySalesTeam[];
 }
-export class DeliveryItemsInterface {
+export class DeliveryItems {
   name: string;
   item_code: string;
   item_name: string;
@@ -103,7 +103,7 @@ export class DeliveryItemsInterface {
   rate: number;
   amount: number;
 }
-export class DeliveryTaxesInterface {
+export class DeliveryTaxes {
   name: string;
   docstatus: number;
   charge_type: string;
@@ -114,6 +114,6 @@ export class DeliveryTaxesInterface {
   tax_amount: number;
   total: number;
 }
-export class DeliverPricingRulesInterface {}
-export class DeliveryPackedItemsInterface {}
-export class DeliverySalesTeamInterface {}
+export class DeliverPricingRules {}
+export class DeliveryPackedItems {}
+export class DeliverySalesTeam {}
