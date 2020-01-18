@@ -16,6 +16,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpErrorHandler } from './common/interfaces/services/http-error-handler/http-error-handler.service';
 import { MessageService } from './common/interfaces/services/message/message.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SystemManagerGuard } from './common/guards/system-manager.guard';
 
 @NgModule({
   declarations: [AppComponent],
@@ -37,6 +38,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MessageService,
     HttpErrorHandler,
     SplashScreen,
+    SystemManagerGuard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],

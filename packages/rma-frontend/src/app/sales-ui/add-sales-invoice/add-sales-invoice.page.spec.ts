@@ -6,8 +6,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material/material.module';
 import { Location } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SalesInvoice } from 'src/app/common/interfaces/sales.interface';
+import { SalesInvoice } from '../../common/interfaces/sales.interface';
 import { of } from 'rxjs';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('AddSalesInvoicePage', () => {
   let component: AddSalesInvoicePage;
@@ -17,7 +19,14 @@ describe('AddSalesInvoicePage', () => {
     TestBed.configureTestingModule({
       declarations: [AddSalesInvoicePage],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      imports: [RouterTestingModule, HttpClientTestingModule, MaterialModule],
+      imports: [
+        RouterTestingModule,
+        HttpClientTestingModule,
+        MaterialModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+      ],
       providers: [
         {
           provide: Location,

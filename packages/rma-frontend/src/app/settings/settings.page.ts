@@ -90,6 +90,7 @@ export class SettingsPage implements OnInit {
             .create({
               message: UPDATE_SUCCESSFUL,
               duration: SHORT_DURATION,
+              showCloseButton: true,
             })
             .then(toast => toast.present());
         },
@@ -98,6 +99,7 @@ export class SettingsPage implements OnInit {
             .create({
               message: UPDATE_ERROR,
               duration: SHORT_DURATION,
+              showCloseButton: true,
             })
             .then(toast => toast.present());
         },

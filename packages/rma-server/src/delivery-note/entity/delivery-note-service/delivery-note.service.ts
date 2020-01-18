@@ -4,16 +4,16 @@ import {
   HttpService,
   BadRequestException,
 } from '@nestjs/common';
-import { SettingsService } from '../../system-settings/aggregates/settings/settings.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap, catchError } from 'rxjs/operators';
 import { throwError, of } from 'rxjs';
-import { PLEASE_RUN_SETUP } from '../../constants/messages';
+import { PLEASE_RUN_SETUP } from '../../../constants/messages';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
   DELIVERY_NOTE_LIST_FIELD,
-} from '../../constants/app-strings';
-import { LIST_DELIVERY_NOTE_ENDPOINT } from '../../constants/routes';
+} from '../../../constants/app-strings';
+import { LIST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class DeliveryNoteService {
