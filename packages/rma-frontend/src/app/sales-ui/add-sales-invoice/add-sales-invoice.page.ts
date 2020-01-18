@@ -6,6 +6,10 @@ import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
 import { Location } from '@angular/common';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
+import { DEFAULT_COMPANY } from 'src/app/constants/storage';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -17,11 +21,14 @@ export class AddSalesInvoicePage implements OnInit {
   calledFrom: string;
   customerList: Array<Customer>;
   dataSource: ItemsDataSource;
-  customer: Customer;
+  // customer: Customer;
   series: string;
-  selectedPostingDate: string;
-  selectedDueDate: string;
+  postingDate: string;
+  dueDate: string;
   displayedColumns = ['item', 'quantity', 'rate', 'total'];
+  customerFormControl = new FormControl();
+  filteredCustomerList: Observable<any[]>;
+  companyFormControl = new FormControl();
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
@@ -53,18 +60,25 @@ export class AddSalesInvoicePage implements OnInit {
     this.calledFrom = this.route.snapshot.params.calledFrom;
     this.salesInvoice = {} as SalesInvoice;
 
-    this.salesInvoice.company = '';
+    // this.salesInvoice.company = '';
 
-    this.customer = {} as Customer;
-    this.customer.addressLine1 = '';
-    this.customer.addressLine2 = '';
-    this.customer.city = '';
-    this.customer.name = '';
-    this.customer.pinCode = '';
-    this.customer.uuid = '';
+    // this.customer = {} as Customer;
+    // this.customer.addressLine1 = '';
+    // this.customer.addressLine2 = '';
+    // this.customer.city = '';
+    // this.customer.name = '';
+    // this.customer.pinCode = '';
+    // this.customer.uuid = '';
     this.series = '';
     this.dataSource = new ItemsDataSource();
     this.dataSource.loadItems();
+    this.filteredCustomerList = this.customerFormControl.valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getCustomerList(value);
+      }),
+    );
+    this.companyFormControl.setValue(localStorage.getItem(DEFAULT_COMPANY));
   }
 
   addItem() {
@@ -116,17 +130,17 @@ export class AddSalesInvoicePage implements OnInit {
 
   submitDraft() {
     const salesInvoiceDetails = {} as SalesInvoiceDetails;
-    salesInvoiceDetails.customer = this.customer.name;
-    salesInvoiceDetails.company = this.salesInvoice.company;
-    salesInvoiceDetails.posting_date = this.selectedPostingDate;
+    salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
+    salesInvoiceDetails.company = this.companyFormControl.value;
+    salesInvoiceDetails.posting_date = this.postingDate;
     salesInvoiceDetails.posting_time = this.getFrappeTime();
     salesInvoiceDetails.set_posting_time = 1;
-    salesInvoiceDetails.due_date = this.selectedDueDate;
+    salesInvoiceDetails.due_date = this.dueDate;
     salesInvoiceDetails.territory = 'All Territories';
     salesInvoiceDetails.update_stock = 0;
     salesInvoiceDetails.total_qty = 0;
     salesInvoiceDetails.total = 0;
-    salesInvoiceDetails.contact_email = this.customer.email;
+    salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
     const itemList = this.dataSource.data().filter(item => {
       if (item.item_name !== '') {
         item.amount = item.qty * item.rate;
@@ -155,12 +169,12 @@ export class AddSalesInvoicePage implements OnInit {
     });
   }
 
-  postingDate($event) {
-    this.selectedPostingDate = this.getParsedDate($event.detail.value);
+  selectedPostingDate($event) {
+    this.postingDate = this.getParsedDate($event.value);
   }
 
-  dueDate($event) {
-    this.selectedDueDate = this.getParsedDate($event.detail.value);
+  selectedDueDate($event) {
+    this.dueDate = this.getParsedDate($event.value);
   }
 
   getFrappeTime() {
@@ -176,5 +190,9 @@ export class AddSalesInvoicePage implements OnInit {
       // +1 as index of months start's from 0
       date.getDate(),
     ].join('-');
+  }
+
+  getOptionText(option) {
+    if (option) return option.customer_name;
   }
 }

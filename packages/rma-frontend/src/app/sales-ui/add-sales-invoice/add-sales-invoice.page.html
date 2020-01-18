@@ -34,45 +34,60 @@
           </ion-card-header>
           <ion-card-content>
             <ion-grid class="ion-no-padding">
-              <ion-row>
+              <ion-row class="align">
                 <ion-col>
-                  <ion-item>
+                  <!-- <ion-item lines="none">
                     <ion-label position="floating">Naming Series</ion-label>
-                    <ion-select
-                      interface="popover"
-                      placeholder="Select Series"
-                      [(ngModel)]="series"
-                    >
-                      <ion-select-option value="sinv"
-                        >SINV-####</ion-select-option
-                      >
-                      <ion-select-option value="sinvret"
-                        >SINV-RET-####</ion-select-option
-                      >
-                    </ion-select>
-                  </ion-item>
+                    <ion-input
+                      readonly="true"
+                      type="string"
+                      value="SINV-####"
+                    ></ion-input>
+                  </ion-item> -->
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      placeholder="Naming Series"
+                      readonly
+                      value="SINV-####"
+                    />
+                  </mat-form-field>
                 </ion-col>
                 <ion-col>
-                  <ion-item>
-                    <ion-label position="floating">Company</ion-label>
-                    <ion-select
-                      interface="popover"
-                      placeholder="Select Company"
-                      [(ngModel)]="salesInvoice.company"
-                    >
-                      <ion-select-option value="Test Company"
-                        >Test Company</ion-select-option
-                      >
-                      <ion-select-option value="Siddhi Company"
-                        >Excel Technologies Ltd</ion-select-option
-                      >
-                    </ion-select>
-                  </ion-item>
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      placeholder="Company"
+                      readonly
+                      [formControl]="companyFormControl"
+                    />
+                  </mat-form-field>
                 </ion-col>
               </ion-row>
               <ion-row class="align">
                 <ion-col>
-                  <ion-item>
+                  <mat-form-field class="example-full-width">
+                    <input
+                      type="text"
+                      placeholder="Select Customer"
+                      matInput
+                      [formControl]="customerFormControl"
+                      [matAutocomplete]="auto"
+                    />
+                    <mat-autocomplete
+                      autoActiveFirstOption
+                      #auto="matAutocomplete"
+                      [displayWith]="getOptionText"
+                    >
+                      <mat-option
+                        *ngFor="let option of filteredCustomerList | async"
+                        [value]="option"
+                      >
+                        {{ option.customer_name }}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                  <!-- <ion-item>
                     <ion-label position="floating">Customer Name</ion-label>
                     <ion-select
                       interface="popover"
@@ -85,61 +100,35 @@
                         >{{customer.name}}</ion-select-option
                       >
                     </ion-select>
-                  </ion-item>
+                  </ion-item> -->
                 </ion-col>
                 <ion-col>
-                  <ion-item>
+                  <!-- <ion-item>
                     <ion-label position="floating">Posting Date</ion-label>
                     <ion-datetime
                       display-format="DD.MM.YYYY"
                       (ionChange)="postingDate($event)"
                     ></ion-datetime>
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-              <ion-row>
-                <ion-col>
-                  <ion-item>
-                    <ion-label position="floating">Due Date</ion-label>
-                    <ion-datetime
-                      display-format="DD.MM.YYYY"
-                      (ionChange)="dueDate($event)"
-                    ></ion-datetime>
-                  </ion-item>
-                </ion-col>
-                <ion-col>
-                  <!-- <ion-item lines="none">
-                    <ion-label position="floating">Sales Person</ion-label>
-                    <ion-input
-                      readonly="true"
-                      placeholder="David"
-                      type="string"
-                    ></ion-input>
                   </ion-item> -->
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      [matDatepicker]="postingDate"
+                      placeholder="Posting Date"
+                      readonly
+                      (dateChange)="selectedPostingDate($event)"
+                    />
+                    <mat-datepicker-toggle
+                      matSuffix
+                      [for]="postingDate"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker
+                      #postingDate
+                      disabled="false"
+                    ></mat-datepicker>
+                  </mat-form-field>
                 </ion-col>
               </ion-row>
-              <!-- <ion-row>
-                <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="floating">Branch</ion-label>
-                    <ion-input
-                      readonly="true"
-                      placeholder="Saki Naka"
-                      type="string"
-                    ></ion-input>
-                  </ion-item>
-                </ion-col>
-                <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="floating">Warehouse</ion-label>
-                    <ion-input
-                      readonly="true"
-                      placeholder="Warehouse 1"
-                      type="string"
-                    ></ion-input>
-                  </ion-item>
-                </ion-col>
-              </ion-row> -->
               <ion-row class="align">
                 <ion-col>
                   <ion-item lines="none">
@@ -148,13 +137,20 @@
                   </ion-item>
                 </ion-col>
                 <ion-col>
-                  <!-- <ion-item>
-                    <ion-label position="floating">Item Barcode</ion-label>
-                    <ion-input
-                      placeholder="Enter Barcode"
-                      type="string"
-                    ></ion-input>
-                  </ion-item> -->
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      [matDatepicker]="dueDate"
+                      placeholder="Due Date"
+                      readonly
+                      (dateChange)="selectedDueDate($event)"
+                    />
+                    <mat-datepicker-toggle
+                      matSuffix
+                      [for]="dueDate"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #dueDate disabled="false"></mat-datepicker>
+                  </mat-form-field>
                 </ion-col>
               </ion-row>
             </ion-grid>
@@ -288,7 +284,7 @@
               </ion-text>
             </ion-card-title>
           </ion-card-header>
-          <ion-card-content *ngIf="customer.name !== '' ">
+          <!-- <ion-card-content *ngIf="customer.name !== '' ">
             <ion-grid class="ion-no-padding">
               <ion-row>
                 <ion-col>
@@ -309,7 +305,7 @@
                 </ion-col>
               </ion-row>
             </ion-grid>
-          </ion-card-content>
+          </ion-card-content> -->
         </ion-card>
       </ion-col>
     </ion-row>
