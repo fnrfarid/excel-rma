@@ -30,6 +30,8 @@ import {
   CUSTOMER_PROJECT_QUERY,
   ITEM_PROJECT_QUERY,
 } from '../../../constants/query';
+import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
+import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-policies/assign-serial-no-policies.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -38,6 +40,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
     private readonly serialNoPolicyService: SerialNoPoliciesService,
+    private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
   ) {
     super();
   }
@@ -205,5 +208,14 @@ export class SerialNoAggregateService extends AggregateRoot {
       path: key,
       preserveNullAndEmptyArrays: true,
     };
+  }
+
+  assignSerial(assignPayload: AssignSerialDto) {
+    return this.assignSerialNoPolicyService.validateSerial(assignPayload).pipe(
+      switchMap(isValid => {
+        // fire observable to create delivery note.
+        return of({});
+      }),
+    );
   }
 }

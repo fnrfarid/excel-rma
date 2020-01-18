@@ -25,7 +25,7 @@ export class SerialNoWebhookAggregateService extends AggregateRoot {
           Object.assign(provider, serialNoPayload);
           return this.serialNoService.create(provider);
         }
-        return;
+        return this.serialNoUpdated(serialNoPayload);
       }),
     );
   }

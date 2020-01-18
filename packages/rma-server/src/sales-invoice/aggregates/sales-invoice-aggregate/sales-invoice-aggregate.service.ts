@@ -17,7 +17,7 @@ import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-
 import { SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 import { throwError, of } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -157,12 +157,20 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           );
         }),
       )
+      .pipe(map(data => data.data.data))
       .subscribe({
         next: success => {
           this.salesInvoiceService
             .updateOne(
               { uuid: salesInvoice.uuid },
-              { $set: { inQueue: false, isSynced: true, submitted: true } },
+              {
+                $set: {
+                  inQueue: false,
+                  isSynced: true,
+                  submitted: true,
+                  name: success.name,
+                },
+              },
             )
             .then(updated => {})
             .catch(error => {});
