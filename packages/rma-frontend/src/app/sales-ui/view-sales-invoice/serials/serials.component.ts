@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { DEFAULT_COMPANY } from '../../../constants/storage';
+import { SalesService } from '../../services/sales.service';
+import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
+import { CLOSE } from '../../../constants/app-string';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -8,7 +13,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./serials.component.scss'],
 })
 export class SerialsComponent implements OnInit {
-  date;
   csvFile: any;
   displayedColumns: string[] = [
     'position',
@@ -19,16 +23,57 @@ export class SerialsComponent implements OnInit {
     'claimsReceivedDate',
   ];
   dataSource = [];
-  company;
-  supplier;
-
+  date = new FormControl(new Date());
+  claimsReceivedDate: string;
   constructor(
     private readonly snackbar: MatSnackBar,
-    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly salesService: SalesService,
   ) {}
 
   ngOnInit() {
-    this.date = new Date().toDateString();
+    // this.claimsDateFormControl = new FormControl(new Date().toString());
+    this.claimsReceivedDate = this.getParsedDate(this.date.value);
+
+    this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
+  }
+
+  getSalesInvoice(uuid: string) {
+    this.salesService.getSalesInvoice(uuid).subscribe({
+      next: (success: any) => {
+        // this.salesInvoiceDetails = success;
+        // this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
+        //   .address_display
+        //   ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
+        //   : undefined;
+        // this.dataSource = success.items;
+        let i = 0;
+        const itemList = [];
+        for (const item of success.items) {
+          for (let j = 0; j < item.qty; j++) {
+            itemList.push({
+              position: i,
+              serial: '',
+              item: item.item_name,
+              company: localStorage.getItem(DEFAULT_COMPANY),
+              claimsReceivedDate: this.claimsReceivedDate,
+            });
+            i++;
+          }
+        }
+
+        this.dataSource = itemList;
+      },
+      error: err => {
+        this.snackbar.open(
+          err.error.message
+            ? err.error.message
+            : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
+          CLOSE,
+          { duration: 2500 },
+        );
+      },
+    });
   }
 
   fileChangedEvent($event): void {
@@ -38,6 +83,23 @@ export class SerialsComponent implements OnInit {
       this.csvFile = file.target.result;
       this.populateTable();
     };
+  }
+
+  claimsDate($event) {
+    this.claimsReceivedDate = this.getParsedDate($event.value);
+    this.dataSource.forEach((item, index) => {
+      this.dataSource[index].claimsReceivedDate = this.claimsReceivedDate;
+    });
+  }
+
+  getParsedDate(value) {
+    const date = new Date(value);
+    return [
+      date.getFullYear(),
+      date.getMonth() + 1,
+      // +1 as index of months start's from 0
+      date.getDate(),
+    ].join('-');
   }
 
   populateTable() {
@@ -50,9 +112,9 @@ export class SerialsComponent implements OnInit {
         position: i,
         serial: element.serial,
         item: element.model,
-        company: this.company,
-        supplier: this.supplier,
-        claimsReceivedDate: this.date,
+        company: localStorage.getItem(DEFAULT_COMPANY),
+        // supplier: this.supplier,
+        claimsReceivedDate: this.claimsReceivedDate,
       });
       i++;
     });
@@ -76,16 +138,5 @@ export class SerialsComponent implements OnInit {
       result.push(obj);
     }
     return result;
-  }
-
-  createWarrantyClaims() {
-    if (!this.supplier || !this.company) {
-      this.snackbar.open('Please select a supplier and company', 'Close', {
-        duration: 2500,
-      });
-      return;
-    }
-    this.snackbar.open('Warranty Claims Created', 'Close', { duration: 2500 });
-    this.router.navigateByUrl('warranty');
   }
 }

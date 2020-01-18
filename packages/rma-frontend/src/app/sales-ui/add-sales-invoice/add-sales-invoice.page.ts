@@ -9,7 +9,7 @@ import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.compo
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, switchMap } from 'rxjs/operators';
-import { DEFAULT_COMPANY } from 'src/app/constants/storage';
+import { DEFAULT_COMPANY } from '../../constants/storage';
 
 @Component({
   selector: 'app-add-sales-invoice',

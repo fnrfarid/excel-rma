@@ -1,44 +1,6 @@
 <ion-card>
   <ion-card-content>
     <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Company</ion-label>
-            <ion-select
-              interface="popover"
-              placeholder="Select Series"
-              [(ngModel)]="company"
-              #C
-              (ionChange)="populateTable()"
-            >
-              <ion-select-option value="ExcelBd">ExcelBd</ion-select-option>
-              <ion-select-option value="Castlecraft"
-                >Castlecraft</ion-select-option
-              >
-            </ion-select>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Supplier</ion-label>
-            <ion-select
-              interface="popover"
-              placeholder="Select Series"
-              [(ngModel)]="supplier"
-              #C
-              (ionChange)="populateTable()"
-            >
-              <ion-select-option value="Dhaka central dealer"
-                >Dhaka central dealer</ion-select-option
-              >
-              <ion-select-option value="ExcelBd seller"
-                >ExcelBd seller</ion-select-option
-              >
-            </ion-select>
-          </ion-item>
-        </ion-col>
-      </ion-row>
       <ion-row class="align">
         <ion-col class="ion-text-left">
           <input
@@ -49,21 +11,31 @@
           />
         </ion-col>
         <ion-col>
-          <ion-item>
-            <ion-label position="floating">Date</ion-label>
-            <ion-input
-              placeholder="Please select date"
-              type="string"
-              [(ngModel)]="date"
-            ></ion-input>
-          </ion-item>
+          <mat-form-field class="example-full-width transform">
+            <input
+              matInput
+              [matDatepicker]="claimsReceivedDate"
+              [formControl]="date"
+              placeholder="Serial Assigned Date"
+              readonly
+              (dateChange)="claimsDate($event)"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="claimsReceivedDate"
+            ></mat-datepicker-toggle>
+            <mat-datepicker
+              #claimsReceivedDate
+              disabled="false"
+            ></mat-datepicker>
+          </mat-form-field>
         </ion-col>
       </ion-row>
     </ion-grid>
   </ion-card-content>
 </ion-card>
 
-<ion-card *ngIf="csvFile">
+<ion-card>
   <ion-card-header>
     <ion-row class="align">
       <ion-col class="ion-text-left">
@@ -74,12 +46,8 @@
         </ion-card-title>
       </ion-col>
       <ion-col class="ion-text-right" size="auto">
-        <ion-button
-          color="tertiary"
-          fill="outline"
-          (click)="createWarrantyClaims()"
-        >
-          Create Warranty Claim's
+        <ion-button color="tertiary" fill="outline">
+          Add Serial
         </ion-button>
       </ion-col>
     </ion-row>
@@ -114,7 +82,7 @@
       </ng-container>
 
       <ng-container matColumnDef="claimsReceivedDate">
-        <th mat-header-cell *matHeaderCellDef>Claim Received Date</th>
+        <th mat-header-cell *matHeaderCellDef>Serial Assigned Date</th>
         <td mat-cell *matCellDef="let element">
           {{ element.claimsReceivedDate }}
         </td>
