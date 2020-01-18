@@ -69,4 +69,8 @@ export class SerialNoService {
       }),
     );
   }
+
+  async count(query) {
+    return await this.serialNoRepository.count(query);
+  }
 }

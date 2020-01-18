@@ -19,6 +19,8 @@ import { RetrieveSerialNoQuery } from '../../query/get-serial-no/retrieve-serial
 import { RetrieveSerialNoListQuery } from '../../query/list-serial-no/retrieve-serial-no-list.query';
 import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
 import { SerialNoDto } from '../../entity/serial-no/serial-no-dto';
+import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
+import { AssignSerialNoCommand } from '../../command/assign-serial-no/assign-serial-no.command';
 
 @Controller('serial_no')
 export class SerialNoController {
@@ -76,5 +78,14 @@ export class SerialNoController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   updateSerialNo(@Body() updatePayload: UpdateSerialNoDto) {
     return this.commandBus.execute(new UpdateSerialNoCommand(updatePayload));
+  }
+
+  @Post('v1/assign')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  assignSerialNo(@Body() assignSerialPayload: AssignSerialDto) {
+    return this.commandBus.execute(
+      new AssignSerialNoCommand(assignSerialPayload),
+    );
   }
 }

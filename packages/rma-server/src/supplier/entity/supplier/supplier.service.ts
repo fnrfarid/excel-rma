@@ -59,4 +59,8 @@ export class SupplierService {
   async updateOne(query, options?) {
     return await this.supplierRepository.updateOne(query, options);
   }
+
+  async count(query) {
+    await this.supplierRepository.count(query);
+  }
 }

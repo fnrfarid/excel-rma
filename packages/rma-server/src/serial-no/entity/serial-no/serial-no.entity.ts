@@ -92,6 +92,9 @@ export class SerialNo extends BaseEntity {
   serial_no_details: string;
 
   @Column()
+  deliveryNote: string;
+
+  @Column()
   company: string;
 
   @Column()
