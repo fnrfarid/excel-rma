@@ -8,3 +8,4 @@ export const RELAY_LIST_COMPANIES_ENDPOINT =
   '/api/settings/v1/relay_list_companies';
 export const GET_SETTINGS_ENDPOINT = '/api/settings/v1/get';
 export const UPDATE_SETTINGS_ENDPOINT = '/api/settings/v1/update';
+export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';

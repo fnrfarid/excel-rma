@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { SystemManagerGuard } from './common/guards/system-manager.guard';
 
 const routes: Routes = [
   {
@@ -11,6 +12,7 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () =>
       import('./settings/settings.module').then(m => m.SettingsPageModule),
+    canActivate: [SystemManagerGuard],
   },
   {
     path: 'callback',
@@ -51,10 +53,6 @@ const routes: Routes = [
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
-  {
-    path: 'settings',
-    loadChildren: './settings/settings.module#SettingsPageModule',
-  },
 ];
 
 @NgModule({
