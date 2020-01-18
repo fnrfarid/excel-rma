@@ -13,6 +13,7 @@ import {
   LOGGED_IN,
   CALLBACK_ENDPOINT,
   SILENT_REFRESH_ENDPOINT,
+  DEFAULT_COMPANY,
 } from './constants/storage';
 
 @Injectable()
@@ -38,6 +39,7 @@ export class AppService {
     localStorage.setItem(APP_URL, response.appURL);
     localStorage.setItem(AUTH_SERVER_URL, response.authServerURL);
     localStorage.setItem(LOGGED_IN, 'false');
+    localStorage.setItem(DEFAULT_COMPANY, response.defaultCompany);
     JSON.parse(localStorage.getItem(IN_LOGIN))
       ? null
       : localStorage.removeItem(IN_LOGIN);

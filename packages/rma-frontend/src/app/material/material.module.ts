@@ -20,6 +20,8 @@ import {
   MatExpansionModule,
   MatAutocompleteModule,
   MatOptionModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
 } from '@angular/material';
 import { SatPopoverModule } from '@ncstate/sat-popover';
 
@@ -47,6 +49,8 @@ import { SatPopoverModule } from '@ncstate/sat-popover';
     MatExpansionModule,
     MatAutocompleteModule,
     MatOptionModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   exports: [
     MatTableModule,
@@ -69,6 +73,8 @@ import { SatPopoverModule } from '@ncstate/sat-popover';
     MatExpansionModule,
     MatAutocompleteModule,
     MatOptionModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
 })
 export class MaterialModule {}
