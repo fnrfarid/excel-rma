@@ -13,6 +13,7 @@ import { InvoiceWarrantyComponent } from './invoice-warranty/invoice-warranty.co
 import { SalesReturnComponent } from './sales-return/sales-return.component';
 import { SerialsComponent } from './serials/serials.component';
 import { MaterialModule } from '../../material/material.module';
+import { EditTableComponent } from './edit-table/edit-table.component';
 
 const routes: Routes = [
   {
@@ -38,6 +39,7 @@ const routes: Routes = [
     InvoiceWarrantyComponent,
     SalesReturnComponent,
     SerialsComponent,
+    EditTableComponent,
   ],
 })
 export class ViewSalesInvoicePageModule {}
