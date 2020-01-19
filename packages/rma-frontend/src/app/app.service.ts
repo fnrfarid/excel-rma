@@ -14,7 +14,11 @@ import {
   CALLBACK_ENDPOINT,
   SILENT_REFRESH_ENDPOINT,
   DEFAULT_COMPANY,
+  AUTHORIZATION,
+  BEARER_TOKEN_PREFIX,
+  ACCESS_TOKEN,
 } from './constants/storage';
+import { GET_USER_PROFILE_ROLES } from './constants/url-strings';
 
 @Injectable()
 export class AppService {
@@ -60,5 +64,14 @@ export class AppService {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+  }
+
+  checkUserProfile() {
+    return this.http.get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
+      headers: {
+        [AUTHORIZATION]:
+          BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
+      },
+    });
   }
 }

@@ -1,48 +1,42 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SerialsComponent } from './serials.component';
-import { MatSnackBar } from '@angular/material';
-import { RouterTestingModule } from '@angular/router/testing';
+import { EditTableComponent } from './edit-table.component';
 import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('SerialsComponent', () => {
-  let component: SerialsComponent;
-  let fixture: ComponentFixture<SerialsComponent>;
+describe('EditTableComponent', () => {
+  let component: EditTableComponent;
+  let fixture: ComponentFixture<EditTableComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SerialsComponent],
+      declarations: [EditTableComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         MaterialModule,
+        HttpClientTestingModule,
         FormsModule,
         ReactiveFormsModule,
         BrowserAnimationsModule,
-        RouterTestingModule.withRoutes([]),
       ],
       providers: [
         {
-          provide: MatSnackBar,
-          useValue: {},
-        },
-        {
           provide: SalesService,
           useValue: {
-            getSalesInvoice: (...args) => of({ items: [] }),
-            getWarehouseList: (...args) => of([{}]),
+            getSerialList: (...args) => of([{}]),
           },
         },
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SerialsComponent);
+    fixture = TestBed.createComponent(EditTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

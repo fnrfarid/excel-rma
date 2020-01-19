@@ -35,8 +35,13 @@ tr.mat-footer-row {
 }
 .example-full-width {
   width: 100%;
+  color: black;
 }
 
 .transform {
   transform: translateY(10px);
+}
+
+.add-comment {
+  opacity: 0.4;
 }

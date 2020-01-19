@@ -17,6 +17,7 @@ import {
 import { AppService } from './app.service';
 import { interval, Subscription } from 'rxjs';
 import { LoginService } from './api/login/login.service';
+import { SYSTEM_MANAGER } from './constants/app-string';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit {
   loggedIn: boolean;
   hideAuthButtons: boolean = false;
   subscription: Subscription;
+  showSettings: boolean = false;
 
   constructor(
     private readonly platform: Platform,
@@ -62,6 +64,19 @@ export class AppComponent implements OnInit {
   setUserSession() {
     if (localStorage.getItem(ACCESS_TOKEN) || location.hash) {
       this.loggedIn = true;
+
+      this.appService.checkUserProfile().subscribe({
+        next: res => {
+          if (
+            res &&
+            res.roles.length > 0 &&
+            res.roles.includes(SYSTEM_MANAGER)
+          ) {
+            this.showSettings = true;
+          }
+        },
+        error: error => (this.showSettings = false),
+      });
     } else {
       this.loggedIn = false;
       this.setupImplicitFlow();

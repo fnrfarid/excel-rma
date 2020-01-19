@@ -62,11 +62,23 @@ export class SerialNoService {
     return await this.serialNoRepository.updateOne(query, options);
   }
 
+  async update(query, options?) {
+    return await this.serialNoRepository.update(query, options);
+  }
+
+  async updateMany(query, options?) {
+    return await this.serialNoRepository.updateMany(query, options);
+  }
+
   asyncAggregate(query) {
     return of(this.serialNoRepository.aggregate(query)).pipe(
       switchMap((aggregateData: any) => {
         return aggregateData.toArray();
       }),
     );
+  }
+
+  async count(query) {
+    return await this.serialNoRepository.count(query);
   }
 }

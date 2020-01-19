@@ -9,6 +9,9 @@ export class SalesInvoice extends BaseEntity {
   uuid: string;
 
   @Column()
+  name: string;
+
+  @Column()
   title: string;
 
   @Column()
@@ -67,6 +70,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   items: Item[];
+
+  @Column()
+  delivery_note_items: any[] = [];
 
   @Column()
   pricing_rules: [];

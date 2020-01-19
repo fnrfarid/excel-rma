@@ -59,4 +59,8 @@ export class ItemService {
   async updateOne(query, options?) {
     return await this.itemRepository.updateOne(query, options);
   }
+
+  async count(query) {
+    return await this.itemRepository.count(query);
+  }
 }

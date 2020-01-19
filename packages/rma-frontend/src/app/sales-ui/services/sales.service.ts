@@ -3,6 +3,7 @@ import {
   SalesInvoice,
   Item,
   APIResponse,
+  SerialAssign,
 } from '../../common/interfaces/sales.interface';
 import { of } from 'rxjs';
 // import { Customer } from '../../common/interfaces/customer.interface';
@@ -19,6 +20,9 @@ import {
   CREATE_SALES_INVOICE_ENDPOINT,
   SUBMIT_SALES_INVOICE_ENDPOINT,
   LIST_CUSTOMER_ENDPOINT,
+  LIST_WAREHOUSE_ENDPOINT,
+  LIST_SERIAL_ENDPOINT,
+  ASSIGN_SERIAL_ENDPOINT,
 } from '../../constants/url-strings';
 import { switchMap, catchError } from 'rxjs/operators';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
@@ -87,6 +91,14 @@ export class SalesService {
 
   getSalesInvoice(uuid: string) {
     return this.http.get(`${SALES_INVOICE_GET_ONE_ENDPOINT}${uuid}`, {
+      headers: this.getAuthorizationHeaders(),
+    });
+  }
+
+  assignSerials(assignSerial: SerialAssign) {
+    const url = ASSIGN_SERIAL_ENDPOINT;
+
+    return this.http.post(url, assignSerial, {
       headers: this.getAuthorizationHeaders(),
     });
   }
@@ -186,6 +198,46 @@ export class SalesService {
       .pipe(
         switchMap(response => {
           return of(response.docs);
+        }),
+      );
+  }
+
+  getSerialList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+    const url = LIST_SERIAL_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.http
+      .get<APIResponse>(url, {
+        params,
+        headers: this.getAuthorizationHeaders(),
+      })
+      .pipe(
+        switchMap(response => {
+          return of(response.docs);
+        }),
+      );
+  }
+
+  getWarehouseList(value: string) {
+    const url = LIST_WAREHOUSE_ENDPOINT;
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: `[["name","like","%${value}%"]]`,
+      },
+    });
+    return this.http
+      .get<any>(url, {
+        params,
+        headers: this.getAuthorizationHeaders(),
+      })
+      .pipe(
+        switchMap(response => {
+          return of(response.data);
         }),
       );
   }

@@ -1,0 +1,30 @@
+<form (ngSubmit)="onSubmit()">
+  <div class="mat-subheading-2" class="ion-text-capitalize">Select Serial</div>
+  <mat-form-field>
+    <input
+      type="text"
+      placeholder="Select Serial"
+      matInput
+      [formControl]="itemFormControl"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete
+      autoActiveFirstOption
+      #auto="matAutocomplete"
+      [displayWith]="getOptionText"
+    >
+      <mat-option
+        *ngFor="let option of filteredItemList | async"
+        [value]="option"
+      >
+        {{ option.serial_no }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <div class="actions">
+    <button mat-button type="button" color="primary" (click)="onCancel()">
+      CANCEL
+    </button>
+    <button mat-button type="submit" color="primary">SAVE</button>
+  </div>
+</form>
