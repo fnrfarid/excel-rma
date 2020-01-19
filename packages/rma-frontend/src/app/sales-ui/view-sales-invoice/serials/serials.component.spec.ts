@@ -33,6 +33,7 @@ describe('SerialsComponent', () => {
           provide: SalesService,
           useValue: {
             getSalesInvoice: (...args) => of({ items: [] }),
+            getWarehouseList: (...args) => of([{}]),
           },
         },
       ],

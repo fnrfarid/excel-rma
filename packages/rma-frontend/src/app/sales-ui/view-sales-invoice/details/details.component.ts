@@ -96,6 +96,7 @@ export class SalesInvoiceDetails {
   net_total?: number;
   items?: Item[];
   pos_total_qty?: number;
+  name?: string;
 }
 
 export class SalesInvoiceItem {
