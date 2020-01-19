@@ -31,6 +31,31 @@
           </mat-form-field>
         </ion-col>
       </ion-row>
+      <ion-row>
+        <ion-col size-md="6">
+          <mat-form-field class="example-full-width">
+            <input
+              type="text"
+              placeholder="Select Warehouse"
+              matInput
+              [formControl]="warehouseFormControl"
+              [matAutocomplete]="auto"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto="matAutocomplete"
+              [displayWith]="getOptionText"
+            >
+              <mat-option
+                *ngFor="let option of filteredWarehouseList | async"
+                [value]="option.name"
+              >
+                {{ option.name }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </ion-col>
+      </ion-row>
     </ion-grid>
   </ion-card-content>
 </ion-card>
@@ -46,8 +71,12 @@
         </ion-card-title>
       </ion-col>
       <ion-col class="ion-text-right" size="auto">
-        <ion-button color="tertiary" fill="outline">
-          Add Serial
+        <ion-button
+          color="tertiary"
+          fill="outline"
+          (click)="submitDeliveryNote()"
+        >
+          Submit
         </ion-button>
       </ion-col>
     </ion-row>
