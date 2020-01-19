@@ -63,7 +63,28 @@
 
       <ng-container matColumnDef="serial">
         <th mat-header-cell *matHeaderCellDef>Serial No</th>
-        <td mat-cell *matCellDef="let element">{{ element.serial }}</td>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          [satPopoverAnchor]="p"
+          (click)="p.open()"
+        >
+          <ng-container *ngIf="element.serial_no">
+            {{ element.serial_no }}
+          </ng-container>
+          <span class="add-comment" *ngIf="!element.serial_no">
+            Assign Serial
+          </span>
+          <sat-popover
+            #p
+            hasBackdrop
+            xAlign="start"
+            yAlign="start"
+            (closed)="updateSerial(element, $event)"
+          >
+            <edit-table [value]="element.serial_no"> </edit-table>
+          </sat-popover>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="item">

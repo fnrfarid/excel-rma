@@ -53,7 +53,7 @@ export class SerialsComponent implements OnInit {
           for (let j = 0; j < item.qty; j++) {
             itemList.push({
               position: i,
-              serial: '',
+              serial_no: '',
               item: item.item_name,
               company: localStorage.getItem(DEFAULT_COMPANY),
               claimsReceivedDate: this.claimsReceivedDate,
@@ -74,6 +74,12 @@ export class SerialsComponent implements OnInit {
         );
       },
     });
+  }
+
+  updateSerial(element, serial) {
+    const index = this.dataSource.indexOf(element);
+    this.dataSource[index].serial_no = serial.serial_no;
+    this.dataSource[index].supplier = serial.supplier;
   }
 
   fileChangedEvent($event): void {
