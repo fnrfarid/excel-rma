@@ -87,3 +87,5 @@ export const INVALID_FILE =
 export const FILE_NOT_FOUND =
   'File is missing, please provide your claims file';
 export const DRAFT_STATUS = 'Draft';
+export const SALES_USER = 'Sales User';
+export const SALES_MANAGER = 'Sales Manager';
