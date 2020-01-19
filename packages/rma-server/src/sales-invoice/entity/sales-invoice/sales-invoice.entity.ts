@@ -72,6 +72,9 @@ export class SalesInvoice extends BaseEntity {
   items: Item[];
 
   @Column()
+  delivery_note_items: any[] = [];
+
+  @Column()
   pricing_rules: [];
 
   @Column()

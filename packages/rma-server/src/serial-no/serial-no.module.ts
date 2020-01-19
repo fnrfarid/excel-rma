@@ -12,6 +12,7 @@ import { ItemEntitiesModule } from '../item/entity/item-entity.module';
 import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
 import { AssignSerialNoPoliciesService } from './policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.module';
+import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.modul
     ItemEntitiesModule,
     SupplierEntitiesModule,
     SalesInvoiceEntitiesModule,
+    DeliveryNoteModule,
   ],
   controllers: [SerialNoController, SerialNoWebhookController],
   providers: [

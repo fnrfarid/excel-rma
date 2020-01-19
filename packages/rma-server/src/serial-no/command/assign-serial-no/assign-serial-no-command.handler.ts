@@ -11,9 +11,11 @@ export class AssignSerialNoHandler
   ) {}
 
   async execute(command: AssignSerialNoCommand) {
-    const { assignPayload } = command;
+    const { assignPayload, clientHttpRequest } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await this.manager.assignSerial(assignPayload).toPromise();
+    await this.manager
+      .assignSerial(assignPayload, clientHttpRequest)
+      .toPromise();
     aggregate.commit();
   }
 }
