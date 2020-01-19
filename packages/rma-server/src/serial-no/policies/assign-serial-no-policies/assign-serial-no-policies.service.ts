@@ -45,7 +45,7 @@ export class AssignSerialNoPoliciesService {
 
             serialProvider.items.forEach(element => {
               serial_no.add(element.serial_no);
-              item.add({ item_code: element.item_code });
+              item.add(element.item_code);
             });
             const item_array: any[] = Array.from(item);
             const serial_no_array: any[] = Array.from(serial_no);
@@ -92,8 +92,8 @@ export class AssignSerialNoPoliciesService {
     );
   }
 
-  validateItem(item: any[]) {
-    return from(this.itemService.count({ $or: item })).pipe(
+  validateItem(item: string[]) {
+    return from(this.itemService.count({ item_code: { $in: item } })).pipe(
       switchMap((itemCount: any) => {
         if (itemCount !== item.length) {
           return throwError(
