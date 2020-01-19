@@ -32,6 +32,7 @@ import {
 } from '../../../constants/query';
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-policies/assign-serial-no-policies.service';
+import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -41,6 +42,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly settingsService: SettingsService,
     private readonly serialNoPolicyService: SerialNoPoliciesService,
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
+    private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
   ) {
     super();
   }
@@ -210,10 +212,13 @@ export class SerialNoAggregateService extends AggregateRoot {
     };
   }
 
-  assignSerial(assignPayload: AssignSerialDto) {
+  assignSerial(assignPayload: AssignSerialDto, clientHttpRequest) {
     return this.assignSerialNoPolicyService.validateSerial(assignPayload).pipe(
       switchMap(isValid => {
-        // fire observable to create delivery note.
+        this.deliveryNoteAggregateService.createDeliveryNote(
+          assignPayload,
+          clientHttpRequest,
+        );
         return of({});
       }),
     );

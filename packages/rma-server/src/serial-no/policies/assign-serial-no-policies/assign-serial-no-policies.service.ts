@@ -10,7 +10,6 @@ import {
   PLEASE_SETUP_DEFAULT_COMPANY,
   INVALID_COMPANY,
   SALES_INVOICE_NOT_FOUND,
-  THERE_SHOULD_BE_ONLY_ONE_DEFAULT_COMPANY,
   ALL_SERIAL_NO_SHOULD_BE_UNIQUE,
   SERIAL_NO_NOT_FOUND,
   INVALID_ITEM,
@@ -42,15 +41,10 @@ export class AssignSerialNoPoliciesService {
         }
         return this.settingsService.find().pipe(
           switchMap(settings => {
-            const [serial_no, company, item] = [
-              new Set(),
-              new Set(),
-              new Set(),
-            ];
+            const [serial_no, item] = [new Set(), new Set()];
 
-            serialProvider.serials.forEach(element => {
+            serialProvider.items.forEach(element => {
               serial_no.add(element.serial_no);
-              company.add(element.company);
               item.add({ item_code: element.item_code });
             });
             const item_array: any[] = Array.from(item);
@@ -62,22 +56,14 @@ export class AssignSerialNoPoliciesService {
               );
             }
 
-            if (serialProvider.serials.length !== serial_no_array.length) {
+            if (serialProvider.items.length !== serial_no_array.length) {
               return throwError(
                 new BadRequestException(ALL_SERIAL_NO_SHOULD_BE_UNIQUE),
               );
             }
 
-            if (!company.has(settings.defaultCompany)) {
+            if (serialProvider.company !== settings.defaultCompany) {
               return throwError(new BadRequestException(INVALID_COMPANY));
-            }
-
-            if (Array.from(company).length > 1) {
-              return throwError(
-                new BadRequestException(
-                  THERE_SHOULD_BE_ONLY_ONE_DEFAULT_COMPANY,
-                ),
-              );
             }
 
             return from(

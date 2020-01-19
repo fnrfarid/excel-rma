@@ -83,9 +83,12 @@ export class SerialNoController {
   @Post('v1/assign')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  assignSerialNo(@Body() assignSerialPayload: AssignSerialDto) {
+  assignSerialNo(
+    @Body() assignSerialPayload: AssignSerialDto,
+    @Req() clientHttpRequest,
+  ) {
     return this.commandBus.execute(
-      new AssignSerialNoCommand(assignSerialPayload),
+      new AssignSerialNoCommand(assignSerialPayload, clientHttpRequest),
     );
   }
 }
