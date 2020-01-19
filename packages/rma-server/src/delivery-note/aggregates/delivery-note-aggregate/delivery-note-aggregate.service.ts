@@ -124,7 +124,7 @@ export class DeliveryNoteAggregateService {
               serial_no: item.serial_no,
               expense_account: item.expense_account,
               cost_center: item.cost_center,
-              delivery_note: response.items,
+              delivery_note: response.name,
             });
             return;
           });
