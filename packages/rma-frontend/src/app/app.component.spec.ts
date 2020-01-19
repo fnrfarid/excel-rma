@@ -31,6 +31,7 @@ describe('AppComponent', () => {
           useValue: {
             getMessage: (...args) => of({}),
             setInfoLocalStorage: (...args) => null,
+            checkUserProfile: () => of({ roles: [] }),
           },
         },
         {
