@@ -1,60 +1,49 @@
-import {
-  Injectable,
-  NotImplementedException,
-  HttpService,
-  BadRequestException,
-} from '@nestjs/common';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, catchError } from 'rxjs/operators';
-import { throwError, of } from 'rxjs';
-import { PLEASE_RUN_SETUP } from '../../../constants/messages';
-import {
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
-  DELIVERY_NOTE_LIST_FIELD,
-} from '../../../constants/app-strings';
-import { LIST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeliveryNote } from './delivery-note.entity';
+import { MongoRepository } from 'typeorm';
+import { DEFAULT } from '../../../constants/typeorm.connection';
 
 @Injectable()
 export class DeliveryNoteService {
   constructor(
-    private readonly settingsService: SettingsService,
-    private readonly http: HttpService,
+    @InjectRepository(DeliveryNote, DEFAULT)
+    private readonly deliveryNoteRepo: MongoRepository<DeliveryNote>,
   ) {}
 
-  listDeliveryNote(offset, limit, req) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        if (!settings.authServerURL) {
-          return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
-        }
-        const headers = this.getAuthorizationHeaders(req.token);
-        const params = {
-          filters: JSON.stringify([['is_return', '=', '1']]),
-          fields: JSON.stringify(DELIVERY_NOTE_LIST_FIELD),
-          limit_page_length: Number(limit),
-          limit_start: Number(offset),
-        };
-        return this.http
-          .get(settings.authServerURL + LIST_DELIVERY_NOTE_ENDPOINT, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.data.data);
-            }),
-          );
-      }),
-      catchError(error => {
-        return throwError(new BadRequestException(error));
-      }),
-    );
+  async save(params) {
+    return await this.deliveryNoteRepo.save(params);
   }
 
-  getAuthorizationHeaders(token) {
-    return {
-      [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-    };
+  async find(): Promise<DeliveryNote[]> {
+    return await this.deliveryNoteRepo.find();
+  }
+
+  async findOne(params) {
+    return await this.deliveryNoteRepo.findOne(params);
+  }
+
+  async update(query, params) {
+    return await this.deliveryNoteRepo.update(query, params);
+  }
+
+  async updateMany(query, params) {
+    return await this.deliveryNoteRepo.updateMany(query, params);
+  }
+
+  async updateOne(query, params) {
+    return await this.deliveryNoteRepo.updateOne(query, params);
+  }
+
+  async count() {
+    return await this.deliveryNoteRepo.count();
+  }
+
+  async paginate(skip: number, take: number) {
+    return await this.deliveryNoteRepo.find({ skip, take });
+  }
+
+  async deleteMany(params) {
+    return await this.deliveryNoteRepo.deleteMany(params);
   }
 }

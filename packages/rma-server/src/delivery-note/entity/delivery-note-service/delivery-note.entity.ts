@@ -1,8 +1,8 @@
-import { Entity, Column, ObjectID, BaseEntity } from 'typeorm';
+import { Entity, Column, ObjectID, BaseEntity, ObjectIdColumn } from 'typeorm';
 
 @Entity()
 export class DeliveryNote extends BaseEntity {
-  @Column()
+  @ObjectIdColumn()
   _id: ObjectID;
 
   @Column()
@@ -86,7 +86,8 @@ export class DeliveryNote extends BaseEntity {
   @Column()
   sales_team: DeliverySalesTeam[];
 }
-export class DeliveryItems {
+
+export interface DeliveryItems {
   name: string;
   item_code: string;
   item_name: string;
@@ -103,7 +104,8 @@ export class DeliveryItems {
   rate: number;
   amount: number;
 }
-export class DeliveryTaxes {
+
+export interface DeliveryTaxes {
   name: string;
   docstatus: number;
   charge_type: string;
@@ -114,6 +116,9 @@ export class DeliveryTaxes {
   tax_amount: number;
   total: number;
 }
-export class DeliverPricingRules {}
-export class DeliveryPackedItems {}
-export class DeliverySalesTeam {}
+
+export interface DeliverPricingRules {}
+
+export interface DeliveryPackedItems {}
+
+export interface DeliverySalesTeam {}

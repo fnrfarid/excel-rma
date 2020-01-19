@@ -28,3 +28,4 @@ export const LIST_DELIVERY_NOTE_ENDPOINT = '/api/resource/Delivery%20Note';
 export const LIST_CREDIT_NOTE_ENDPOINT = '/api/resource/Sales%20Invoice';
 export const LIST_RETURN_VOUCHER_ENDPOINT = '/api/resource/Payment%20Entry';
 export const FRAPPE_API_COMPANY_ENDPOINT = '/api/resource/Company';
+export const ERPNEXT_API_WAREHOUSE_ENDPOINT = '/api/resource/Warehouse';
