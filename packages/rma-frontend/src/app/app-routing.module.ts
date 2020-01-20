@@ -33,6 +33,11 @@ const routes: Routes = [
       './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
   },
   {
+    path: 'add-sales-invoice/:calledFrom/:invoiceUuid',
+    loadChildren:
+      './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
+  },
+  {
     path: 'add-purchase-invoice',
     loadChildren:
       './purchase-ui/add-purchase-invoice/add-purchase-invoice.module#AddPurchaseInvoicePageModule',

@@ -18,6 +18,7 @@ import { AppService } from './app.service';
 import { interval, Subscription } from 'rxjs';
 import { LoginService } from './api/login/login.service';
 import { SYSTEM_MANAGER } from './constants/app-string';
+import { SettingsService } from './settings/settings.service';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +36,7 @@ export class AppComponent implements OnInit {
     private readonly statusBar: StatusBar,
     private readonly appService: AppService,
     private readonly loginService: LoginService,
+    private readonly settingService: SettingsService,
   ) {
     this.initializeApp();
   }
@@ -65,7 +67,7 @@ export class AppComponent implements OnInit {
     if (localStorage.getItem(ACCESS_TOKEN) || location.hash) {
       this.loggedIn = true;
 
-      this.appService.checkUserProfile().subscribe({
+      this.settingService.checkUserProfile().subscribe({
         next: res => {
           if (
             res &&
