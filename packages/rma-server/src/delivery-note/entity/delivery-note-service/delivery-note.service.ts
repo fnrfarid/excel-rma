@@ -8,9 +8,7 @@ export class DeliveryNoteService {
   constructor(
     @InjectRepository(DeliveryNote)
     private readonly deliveryNoteRepository: MongoRepository<DeliveryNote>,
-
-  ) { }
-
+  ) {}
 
   async create(deliveryNotePayload: DeliveryNote) {
     const deliveryNote = new DeliveryNote();
@@ -80,6 +78,5 @@ export class DeliveryNoteService {
 
   async paginate(skip: number, take: number) {
     return await this.deliveryNoteRepository.find({ skip, take });
-
   }
 }

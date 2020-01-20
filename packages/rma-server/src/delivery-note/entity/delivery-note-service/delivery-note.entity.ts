@@ -117,6 +117,6 @@ export class DeliveryNoteTaxes {
   tax_amount: number;
   total: number;
 }
-export class DeliveryNotePricingRules { }
-export class DeliveryNotePackedItems { }
-export class DeliveryNoteSalesTeam { }
+export class DeliveryNotePricingRules {}
+export class DeliveryNotePackedItems {}
+export class DeliveryNoteSalesTeam {}

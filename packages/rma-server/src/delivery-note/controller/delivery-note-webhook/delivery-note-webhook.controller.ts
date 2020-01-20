@@ -14,7 +14,7 @@ import { DeliveryNoteWebhookAggregateService } from '../../../delivery-note/aggr
 export class DeliveryNoteWebhookController {
   constructor(
     private readonly deliveryNoteAggregateService: DeliveryNoteWebhookAggregateService,
-  ) { }
+  ) {}
 
   @Post('webhook/v1/create')
   @UsePipes(new ValidationPipe({ whitelist: true }))
@@ -29,8 +29,6 @@ export class DeliveryNoteWebhookController {
   @UseGuards(FrappeWebhookGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   updatedDeliveryNote(@Body() deliveryNotePayload: DeliveryNoteWebhookDto) {
-    console.log("hahha");
-
     return 'update coming soon';
   }
 
@@ -38,8 +36,6 @@ export class DeliveryNoteWebhookController {
   @UseGuards(FrappeWebhookGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   deletedDeliveryNote(@Body() deliveryNotePayload: DeliveryNoteWebhookDto) {
-    console.log(deliveryNotePayload)
-    return "coming soon"
+    return 'coming soon';
   }
-
 }

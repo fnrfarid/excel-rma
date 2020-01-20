@@ -2,5 +2,6 @@ import { DeliveryNoteWebhookAggregateService } from './delivery-note-webhook-agg
 import { DeliveryNoteAggregateService } from './delivery-note-aggregate/delivery-note-aggregate.service';
 
 export const DeliveryNoteAggregatesManager = [
-  DeliveryNoteWebhookAggregateService, DeliveryNoteAggregateService
+  DeliveryNoteWebhookAggregateService,
+  DeliveryNoteAggregateService,
 ];

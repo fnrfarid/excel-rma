@@ -11,4 +11,4 @@ import { DeliveryNoteWebhookController } from './controller/delivery-note-webhoo
   providers: [...DeliveryNoteAggregatesManager],
   exports: [DeliveryNoteEntitiesModule, ...DeliveryNoteAggregatesManager],
 })
-export class DeliveryNoteModule { }
+export class DeliveryNoteModule {}

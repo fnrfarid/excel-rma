@@ -10,7 +10,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import {
   ERPNEXT_API_WAREHOUSE_ENDPOINT,
-  DELIVERY_NOTE_API_ENDPOINT,
+  LIST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
 import { PLEASE_RUN_SETUP } from '../../../constants/messages';
 import {
@@ -51,7 +51,7 @@ export class DeliveryNoteAggregateService {
           limit_start: Number(offset),
         };
         return this.http
-          .get(settings.authServerURL + DELIVERY_NOTE_API_ENDPOINT, {
+          .get(settings.authServerURL + LIST_DELIVERY_NOTE_ENDPOINT, {
             params,
             headers,
           })
@@ -101,7 +101,7 @@ export class DeliveryNoteAggregateService {
           }
           const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
           return this.http.post(
-            settings.authServerURL + DELIVERY_NOTE_API_ENDPOINT,
+            settings.authServerURL + LIST_DELIVERY_NOTE_ENDPOINT,
             deliveryNoteBody,
             { headers: this.getAuthorizationHeaders(clientHttpRequest.token) },
           );
