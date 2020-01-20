@@ -19,7 +19,9 @@ export class ItemsDataSource extends DataSource<Item> {
     this.itemSubject.complete();
   }
 
-  loadItems() {}
+  loadItems(items) {
+    this.itemSubject.next(items);
+  }
 
   data() {
     return this.itemSubject.value;

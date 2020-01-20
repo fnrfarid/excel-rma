@@ -5,7 +5,8 @@
         <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Add Sales Invoice</ion-title>
+    <ion-title *ngIf="calledFrom === 'add'">Add Sales Invoice</ion-title>
+    <ion-title *ngIf="calledFrom === 'edit'">Update Sales Invoice</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -17,8 +18,19 @@
     color="light"
     horizontal="end"
   >
-    <ion-fab-button class="fab-position" (click)="submitDraft()">
+    <ion-fab-button
+      *ngIf="calledFrom === 'add'"
+      class="fab-position"
+      (click)="submitDraft()"
+    >
       <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button
+      *ngIf="calledFrom === 'edit'"
+      class="fab-position"
+      (click)="updateSalesInvoice()"
+    >
+      <ion-icon name="create"></ion-icon>
     </ion-fab-button>
   </ion-fab>
   <ion-grid class="ion-no-padding">
@@ -77,11 +89,10 @@
                     <mat-autocomplete
                       autoActiveFirstOption
                       #auto="matAutocomplete"
-                      [displayWith]="getOptionText"
                     >
                       <mat-option
                         *ngFor="let option of filteredCustomerList | async"
-                        [value]="option"
+                        [value]="option.customer_name"
                       >
                         {{ option.customer_name }}
                       </mat-option>
@@ -116,6 +127,7 @@
                       [matDatepicker]="postingDate"
                       placeholder="Posting Date"
                       readonly
+                      [formControl]="postingDateFormControl"
                       (dateChange)="selectedPostingDate($event)"
                     />
                     <mat-datepicker-toggle
@@ -143,6 +155,7 @@
                       [matDatepicker]="dueDate"
                       placeholder="Due Date"
                       readonly
+                      [formControl]="dueDateFormControl"
                       (dateChange)="selectedDueDate($event)"
                     />
                     <mat-datepicker-toggle
