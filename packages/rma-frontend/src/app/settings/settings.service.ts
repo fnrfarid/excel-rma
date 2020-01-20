@@ -5,6 +5,7 @@ import {
   RELAY_LIST_COMPANIES_ENDPOINT,
   GET_SETTINGS_ENDPOINT,
   UPDATE_SETTINGS_ENDPOINT,
+  GET_USER_PROFILE_ROLES,
 } from '../constants/url-strings';
 import {
   AUTHORIZATION,
@@ -40,6 +41,15 @@ export class SettingsService {
 
   getSettings() {
     return this.http.get<any>(GET_SETTINGS_ENDPOINT, {
+      headers: {
+        [AUTHORIZATION]:
+          BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
+      },
+    });
+  }
+
+  checkUserProfile() {
+    return this.http.get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
       headers: {
         [AUTHORIZATION]:
           BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
