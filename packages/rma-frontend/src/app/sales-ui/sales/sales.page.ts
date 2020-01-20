@@ -4,6 +4,13 @@ import { SalesInvoice } from '../../common/interfaces/sales.interface';
 import { Location } from '@angular/common';
 import { MatPaginator, MatSort } from '@angular/material';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
+import { SettingsService } from '../../settings/settings.service';
+import { SYSTEM_MANAGER } from '../../constants/app-string';
+import { Router } from '@angular/router';
+import {
+  VIEW_SALES_INVOICE_PAGE_URL,
+  ADD_SALES_INVOICE_PAGE_URL,
+} from '../../constants/url-strings';
 
 @Component({
   selector: 'app-sales',
@@ -18,7 +25,12 @@ export class SalesPage implements OnInit {
   dataSource: SalesInvoiceDataSource;
   displayedColumns = ['customer', 'status', 'total'];
   search: string = '';
-  constructor(private salesService: SalesService, private location: Location) {}
+  constructor(
+    private readonly salesService: SalesService,
+    private location: Location,
+    private readonly settingService: SettingsService,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit() {
     this.dataSource = new SalesInvoiceDataSource(this.salesService);
@@ -41,6 +53,21 @@ export class SalesPage implements OnInit {
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );
+  }
+
+  navigateBasedOnRoles(uuid: string) {
+    this.settingService.checkUserProfile().subscribe({
+      next: res => {
+        let navUrl: string;
+        if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
+          navUrl = `${VIEW_SALES_INVOICE_PAGE_URL}/${uuid}`;
+          this.router.navigateByUrl(navUrl);
+        } else {
+          navUrl = `${ADD_SALES_INVOICE_PAGE_URL}/edit/${uuid}`;
+          this.router.navigateByUrl(navUrl);
+        }
+      },
+    });
   }
 
   navigateBack() {

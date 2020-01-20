@@ -9,6 +9,8 @@ import { SalesService } from '../services/sales.service';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SettingsService } from 'src/app/settings/settings.service';
 
 describe('SalesPage', () => {
   let component: SalesPage;
@@ -19,6 +21,7 @@ describe('SalesPage', () => {
       declarations: [SalesPage],
       imports: [
         MaterialModule,
+        HttpClientTestingModule,
         FormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
@@ -33,6 +36,12 @@ describe('SalesPage', () => {
           provide: SalesService,
           useValue: {
             getSalesInvoiceList: (...args) => of({}),
+          },
+        },
+        {
+          provide: SettingsService,
+          useValue: {
+            checkUserProfile: () => of([]),
           },
         },
       ],
