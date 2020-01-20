@@ -18,6 +18,7 @@ import { DEFAULT_COMPANY } from '../../constants/storage';
 })
 export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
+  invoiceUuid: string;
   calledFrom: string;
   customerList: Array<Customer>;
   dataSource: ItemsDataSource;
@@ -29,6 +30,8 @@ export class AddSalesInvoicePage implements OnInit {
   customerFormControl = new FormControl();
   filteredCustomerList: Observable<any[]>;
   companyFormControl = new FormControl();
+  postingDateFormControl = new FormControl();
+  dueDateFormControl = new FormControl();
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
@@ -57,9 +60,23 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   ngOnInit() {
-    this.calledFrom = this.route.snapshot.params.calledFrom;
+    this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
+    this.series = '';
 
+    this.calledFrom = this.route.snapshot.params.calledFrom;
+    if (this.calledFrom === 'edit') {
+      this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
+      this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
+        next: (res: SalesInvoiceDetails) => {
+          this.companyFormControl.setValue(res.company);
+          this.customerFormControl.setValue(res.customer);
+          this.postingDateFormControl.setValue(new Date(res.posting_date));
+          this.dueDateFormControl.setValue(new Date(res.due_date));
+          this.dataSource.loadItems(res.items);
+        },
+      });
+    }
     // this.salesInvoice.company = '';
 
     // this.customer = {} as Customer;
@@ -69,9 +86,6 @@ export class AddSalesInvoicePage implements OnInit {
     // this.customer.name = '';
     // this.customer.pinCode = '';
     // this.customer.uuid = '';
-    this.series = '';
-    this.dataSource = new ItemsDataSource();
-    this.dataSource.loadItems();
     this.filteredCustomerList = this.customerFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
@@ -130,7 +144,7 @@ export class AddSalesInvoicePage implements OnInit {
 
   submitDraft() {
     const salesInvoiceDetails = {} as SalesInvoiceDetails;
-    salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
+    salesInvoiceDetails.customer = this.customerFormControl.value;
     salesInvoiceDetails.company = this.companyFormControl.value;
     salesInvoiceDetails.posting_date = this.postingDate;
     salesInvoiceDetails.posting_time = this.getFrappeTime();
@@ -169,6 +183,8 @@ export class AddSalesInvoicePage implements OnInit {
     });
   }
 
+  updateSalesInvoice() {}
+
   selectedPostingDate($event) {
     this.postingDate = this.getParsedDate($event.value);
   }
@@ -190,9 +206,5 @@ export class AddSalesInvoicePage implements OnInit {
       // +1 as index of months start's from 0
       date.getDate(),
     ].join('-');
-  }
-
-  getOptionText(option) {
-    if (option) return option.customer_name;
   }
 }
