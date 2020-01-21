@@ -1,13 +1,13 @@
 import { Controller, Get, UseGuards, Req, Query } from '@nestjs/common';
-import { TokenGuard } from '../../auth/guards/token.guard';
-import { Roles } from '../../auth/decorators/roles.decorator';
+import { TokenGuard } from '../../../auth/guards/token.guard';
+import { Roles } from '../../../auth/decorators/roles.decorator';
 import {
   SYSTEM_MANAGER,
   SALES_USER,
   SALES_MANAGER,
-} from '../../constants/app-strings';
-import { RoleGuard } from '../../auth/guards/role.guard';
-import { DeliveryNoteAggregateService } from '../aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
+} from '../../../constants/app-strings';
+import { RoleGuard } from '../../../auth/guards/role.guard';
+import { DeliveryNoteAggregateService } from '../../aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 
 @Controller('delivery_note')
 export class DeliveryNoteController {
