@@ -1218,3 +1218,390 @@ export function getSerialNoAfterInsertWebhookData(
     ],
   };
 }
+
+export function deliveryNoteNoAfterInsertWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Delivery Note',
+    webhook_docevent: 'after_insert',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      {
+        fieldname: 'name',
+        key: 'name',
+      },
+      {
+        fieldname: 'modified_by',
+        key: 'modified_by',
+      },
+      {
+        fieldname: 'docstatus',
+        key: 'docstatus',
+      },
+      {
+        fieldname: 'title',
+        key: 'title',
+      },
+      {
+        fieldname: 'naming_series',
+        key: 'naming_series',
+      },
+      {
+        fieldname: 'customer',
+        key: 'customer',
+      },
+      {
+        fieldname: 'customer_name',
+        key: 'customer_name',
+      },
+      {
+        fieldname: 'company',
+        key: 'company',
+      },
+      {
+        fieldname: 'posting_date',
+        key: 'posting_date',
+      },
+      {
+        fieldname: 'posting_time',
+        key: 'posting_time',
+      },
+      {
+        fieldname: 'is_return',
+        key: 'is_return',
+      },
+      {
+        fieldname: 'currency',
+        key: 'currency',
+      },
+      {
+        fieldname: 'conversion_rate',
+        key: 'conversion_rate',
+      },
+      {
+        fieldname: 'total_qty',
+        key: 'total_qty',
+      },
+      {
+        fieldname: 'base_total',
+        key: 'base_total',
+      },
+      {
+        fieldname: 'base_net_total',
+        key: 'base_net_total',
+      },
+      {
+        fieldname: 'total',
+        key: 'total',
+      },
+      {
+        fieldname: 'net_total',
+        key: 'net_total',
+      },
+      {
+        fieldname: 'base_grand_total',
+        key: 'base_grand_total',
+      },
+      {
+        fieldname: 'customer_group',
+        key: 'customer_group',
+      },
+      {
+        fieldname: 'territory',
+        key: 'territory',
+      },
+      {
+        fieldname: 'items',
+        key: 'items',
+      },
+      {
+        fieldname: 'pricing_rules',
+        key: 'pricing_rules',
+      },
+      {
+        fieldname: 'packed_items',
+        key: 'packed_items',
+      },
+      {
+        fieldname: 'taxes',
+        key: 'taxes',
+      },
+      {
+        fieldname: 'sales_team',
+        key: 'sales_team',
+      },
+    ],
+  };
+}
+
+export function deliveryNoteOnUpdateWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Delivery Note',
+    webhook_docevent: 'on_update',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      {
+        fieldname: 'name',
+        key: 'name',
+      },
+      {
+        fieldname: 'modified_by',
+        key: 'modified_by',
+      },
+      {
+        fieldname: 'docstatus',
+        key: 'docstatus',
+      },
+      {
+        fieldname: 'title',
+        key: 'title',
+      },
+      {
+        fieldname: 'naming_series',
+        key: 'naming_series',
+      },
+      {
+        fieldname: 'customer',
+        key: 'customer',
+      },
+      {
+        fieldname: 'customer_name',
+        key: 'customer_name',
+      },
+      {
+        fieldname: 'company',
+        key: 'company',
+      },
+      {
+        fieldname: 'posting_date',
+        key: 'posting_date',
+      },
+      {
+        fieldname: 'posting_time',
+        key: 'posting_time',
+      },
+      {
+        fieldname: 'is_return',
+        key: 'is_return',
+      },
+      {
+        fieldname: 'currency',
+        key: 'currency',
+      },
+      {
+        fieldname: 'conversion_rate',
+        key: 'conversion_rate',
+      },
+      {
+        fieldname: 'total_qty',
+        key: 'total_qty',
+      },
+      {
+        fieldname: 'base_total',
+        key: 'base_total',
+      },
+      {
+        fieldname: 'base_net_total',
+        key: 'base_net_total',
+      },
+      {
+        fieldname: 'total',
+        key: 'total',
+      },
+      {
+        fieldname: 'net_total',
+        key: 'net_total',
+      },
+      {
+        fieldname: 'base_grand_total',
+        key: 'base_grand_total',
+      },
+      {
+        fieldname: 'customer_group',
+        key: 'customer_group',
+      },
+      {
+        fieldname: 'territory',
+        key: 'territory',
+      },
+      {
+        fieldname: 'items',
+        key: 'items',
+      },
+      {
+        fieldname: 'pricing_rules',
+        key: 'pricing_rules',
+      },
+      {
+        fieldname: 'packed_items',
+        key: 'packed_items',
+      },
+      {
+        fieldname: 'taxes',
+        key: 'taxes',
+      },
+      {
+        fieldname: 'sales_team',
+        key: 'sales_team',
+      },
+    ],
+  };
+}
+
+export function deliveryNoteOnTrashWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Delivery Note',
+    webhook_docevent: 'on_trash',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      {
+        fieldname: 'name',
+        key: 'name',
+      },
+      {
+        fieldname: 'modified_by',
+        key: 'modified_by',
+      },
+      {
+        fieldname: 'docstatus',
+        key: 'docstatus',
+      },
+      {
+        fieldname: 'title',
+        key: 'title',
+      },
+      {
+        fieldname: 'naming_series',
+        key: 'naming_series',
+      },
+      {
+        fieldname: 'customer',
+        key: 'customer',
+      },
+      {
+        fieldname: 'customer_name',
+        key: 'customer_name',
+      },
+      {
+        fieldname: 'company',
+        key: 'company',
+      },
+      {
+        fieldname: 'posting_date',
+        key: 'posting_date',
+      },
+      {
+        fieldname: 'posting_time',
+        key: 'posting_time',
+      },
+      {
+        fieldname: 'is_return',
+        key: 'is_return',
+      },
+      {
+        fieldname: 'currency',
+        key: 'currency',
+      },
+      {
+        fieldname: 'conversion_rate',
+        key: 'conversion_rate',
+      },
+      {
+        fieldname: 'total_qty',
+        key: 'total_qty',
+      },
+      {
+        fieldname: 'base_total',
+        key: 'base_total',
+      },
+      {
+        fieldname: 'base_net_total',
+        key: 'base_net_total',
+      },
+      {
+        fieldname: 'total',
+        key: 'total',
+      },
+      {
+        fieldname: 'net_total',
+        key: 'net_total',
+      },
+      {
+        fieldname: 'base_grand_total',
+        key: 'base_grand_total',
+      },
+      {
+        fieldname: 'customer_group',
+        key: 'customer_group',
+      },
+      {
+        fieldname: 'territory',
+        key: 'territory',
+      },
+      {
+        fieldname: 'items',
+        key: 'items',
+      },
+      {
+        fieldname: 'pricing_rules',
+        key: 'pricing_rules',
+      },
+      {
+        fieldname: 'packed_items',
+        key: 'packed_items',
+      },
+      {
+        fieldname: 'taxes',
+        key: 'taxes',
+      },
+      {
+        fieldname: 'sales_team',
+        key: 'sales_team',
+      },
+    ],
+  };
+}

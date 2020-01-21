@@ -32,3 +32,4 @@ export const SERIAL_NO_NOT_FOUND = 'Serial no not found';
 export const INVALID_ITEM = 'Provided data has invalid item';
 export const INVALID_ITEM_CODE_OR_SUPPLIER =
   'item_code and supplier not found.';
+export const DELIVERY_NOTE_ALREADY_EXISTS = 'Delivery note already exist';

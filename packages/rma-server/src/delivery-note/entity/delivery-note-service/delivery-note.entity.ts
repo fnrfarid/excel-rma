@@ -9,13 +9,16 @@ export class DeliveryNote extends BaseEntity {
   uuid: string;
 
   @Column()
+  isSynced: boolean;
+
+  @Column()
   name: string;
 
   @Column()
   modified_by: string;
 
   @Column()
-  docstatus: 0;
+  docstatus: number;
 
   @Column()
   title: string;
@@ -72,22 +75,21 @@ export class DeliveryNote extends BaseEntity {
   territory: string;
 
   @Column()
-  items: DeliveryItems[];
+  items: DeliveryNoteItems[];
 
   @Column()
-  pricing_rules: DeliverPricingRules[];
+  pricing_rules: DeliveryNotePricingRules[];
 
   @Column()
-  packed_items: DeliveryPackedItems[];
+  packed_items: DeliveryNotePackedItems[];
 
   @Column()
-  taxes: DeliveryTaxes[];
+  taxes: DeliveryNoteTaxes[];
 
   @Column()
-  sales_team: DeliverySalesTeam[];
+  sales_team: DeliveryNoteSalesTeam[];
 }
-
-export interface DeliveryItems {
+export class DeliveryNoteItems {
   name: string;
   item_code: string;
   item_name: string;
@@ -104,8 +106,7 @@ export interface DeliveryItems {
   rate: number;
   amount: number;
 }
-
-export interface DeliveryTaxes {
+export class DeliveryNoteTaxes {
   name: string;
   docstatus: number;
   charge_type: string;
@@ -116,9 +117,6 @@ export interface DeliveryTaxes {
   tax_amount: number;
   total: number;
 }
-
-export interface DeliverPricingRules {}
-
-export interface DeliveryPackedItems {}
-
-export interface DeliverySalesTeam {}
+export class DeliveryNotePricingRules {}
+export class DeliveryNotePackedItems {}
+export class DeliveryNoteSalesTeam {}
