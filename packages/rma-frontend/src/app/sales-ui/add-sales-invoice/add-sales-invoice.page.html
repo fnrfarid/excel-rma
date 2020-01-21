@@ -198,6 +198,8 @@
                   <mat-cell
                     *matCellDef="let row"
                     [satPopoverAnchor]="p"
+                    tabindex="0"
+                    (keyup.enter)="p.open()"
                     (click)="p.open()"
                   >
                     <ng-container *ngIf="row.item_name">
