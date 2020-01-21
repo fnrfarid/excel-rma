@@ -14,3 +14,5 @@ export const LIST_WAREHOUSE_ENDPOINT =
   'api/delivery_note/v1/relay_list_warehouses';
 export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';
 export const ASSIGN_SERIAL_ENDPOINT = '/api/serial_no/v1/assign';
+export const VIEW_SALES_INVOICE_PAGE_URL = 'view-sales-invoice';
+export const ADD_SALES_INVOICE_PAGE_URL = 'add-sales-invoice';
