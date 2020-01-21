@@ -25,6 +25,7 @@ import { DeliveryNoteEntitiesModule } from './delivery-note/entity/delivery-note
 import { CreditNoteModule } from './credit-note/credit-note-invoice.module';
 import { ReturnVoucherModule } from './return-voucher/return-voucher-invoice.module';
 import { DeliveryNoteModule } from './delivery-note/delivery-note.module';
+import { CommandModule } from './command/command.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { DeliveryNoteModule } from './delivery-note/delivery-note.module';
     SerialNoModule,
     WarrantyClaimModule,
     DeliveryNoteModule,
+    CommandModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -27,7 +27,7 @@
     "@nestjs/cqrs": "^6.1.0",
     "@nestjs/microservices": "^6.10.8",
     "@nestjs/platform-express": "^6.10.8",
-    "@nestjs/swagger": "^4.0.9",
+    "@nestjs/swagger": "^4.1.15",
     "@nestjs/terminus": "^6.5.3",
     "@nestjs/typeorm": "^6.2.0",
     "class-transformer": "^0.2.3",

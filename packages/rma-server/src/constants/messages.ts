@@ -33,3 +33,5 @@ export const INVALID_ITEM = 'Provided data has invalid item';
 export const INVALID_ITEM_CODE_OR_SUPPLIER =
   'item_code and supplier not found.';
 export const DELIVERY_NOTE_ALREADY_EXISTS = 'Delivery note already exist';
+export const INVALID_HTTP_METHOD = 'Invalid HTTP Request Method';
+export const INVALID_REQUEST = 'Invalid Request';
