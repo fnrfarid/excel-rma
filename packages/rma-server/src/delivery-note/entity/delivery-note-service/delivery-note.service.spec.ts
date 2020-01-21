@@ -10,7 +10,10 @@ describe('DeliveryNoteService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DeliveryNoteService,
-        { provide: getRepositoryToken(DeliveryNote), useValue: {} },
+        {
+          provide: getRepositoryToken(DeliveryNote),
+          useValue: {},
+        },
       ],
     }).compile();
 
