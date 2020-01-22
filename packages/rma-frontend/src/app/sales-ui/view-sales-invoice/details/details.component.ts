@@ -74,6 +74,7 @@ export class DetailsComponent implements OnInit {
 }
 
 export class SalesInvoiceDetails {
+  uuid?: string;
   customer: string;
   company: string;
   posting_date: string;

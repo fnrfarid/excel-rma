@@ -63,14 +63,17 @@ export class AddSalesInvoicePage implements OnInit {
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
-
+    this.postingDateFormControl.setValue(new Date());
     this.calledFrom = this.route.snapshot.params.calledFrom;
     if (this.calledFrom === 'edit') {
       this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
       this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
         next: (res: SalesInvoiceDetails) => {
           this.companyFormControl.setValue(res.company);
-          this.customerFormControl.setValue(res.customer);
+          this.customerFormControl.setValue({
+            customer_name: res.customer,
+            owner: res.contact_email,
+          });
           this.postingDateFormControl.setValue(new Date(res.posting_date));
           this.dueDateFormControl.setValue(new Date(res.due_date));
           this.dataSource.loadItems(res.items);
@@ -144,7 +147,7 @@ export class AddSalesInvoicePage implements OnInit {
 
   submitDraft() {
     const salesInvoiceDetails = {} as SalesInvoiceDetails;
-    salesInvoiceDetails.customer = this.customerFormControl.value;
+    salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
     salesInvoiceDetails.company = this.companyFormControl.value;
     salesInvoiceDetails.posting_date = this.postingDate;
     salesInvoiceDetails.posting_time = this.getFrappeTime();
@@ -183,7 +186,43 @@ export class AddSalesInvoicePage implements OnInit {
     });
   }
 
-  updateSalesInvoice() {}
+  updateSalesInvoice() {
+    const salesInvoiceDetails = {} as SalesInvoiceDetails;
+    salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
+    salesInvoiceDetails.company = this.companyFormControl.value;
+    salesInvoiceDetails.posting_date = this.getParsedDate(
+      this.postingDateFormControl.value,
+    );
+    salesInvoiceDetails.posting_time = this.getFrappeTime();
+    salesInvoiceDetails.set_posting_time = 1;
+    salesInvoiceDetails.due_date = this.getParsedDate(
+      this.dueDateFormControl.value,
+    );
+    salesInvoiceDetails.territory = 'All Territories';
+    salesInvoiceDetails.update_stock = 0;
+    salesInvoiceDetails.total_qty = 0;
+    salesInvoiceDetails.total = 0;
+    salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
+    const itemList = this.dataSource.data().filter(item => {
+      if (item.item_name !== '') {
+        item.amount = item.qty * item.rate;
+        salesInvoiceDetails.total_qty += item.qty;
+        salesInvoiceDetails.total += item.amount;
+        // salesInvoiceDetails.pos_total_qty += item.qty;
+        // salesInvoiceDetails.base_total += item.amount;
+        // salesInvoiceDetails.base_net_total += item.amount;
+        // salesInvoiceDetails.net_total += item.amount;
+        return item;
+      }
+    });
+    salesInvoiceDetails.items = itemList;
+    salesInvoiceDetails.uuid = this.invoiceUuid;
+    this.salesService.updateSalesInvoice(salesInvoiceDetails).subscribe({
+      next: res => {
+        this.location.back();
+      },
+    });
+  }
 
   selectedPostingDate($event) {
     this.postingDate = this.getParsedDate($event.value);
@@ -206,5 +245,9 @@ export class AddSalesInvoicePage implements OnInit {
       // +1 as index of months start's from 0
       date.getDate(),
     ].join('-');
+  }
+
+  getOptionText(option) {
+    if (option) return option.customer_name;
   }
 }
