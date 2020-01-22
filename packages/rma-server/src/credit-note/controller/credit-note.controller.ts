@@ -12,7 +12,13 @@ export class CreditNoteController {
     @Req() req,
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
+    @Query('sales_invoice') sales_invoice,
   ) {
-    return this.creditNoteService.listCreditNote(offset, limit, req);
+    return this.creditNoteService.listCreditNote(
+      offset,
+      limit,
+      req,
+      sales_invoice,
+    );
   }
 }

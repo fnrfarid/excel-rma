@@ -34,3 +34,29 @@ export const ITEM_PROJECT_QUERY = {
   taxes: 1,
   uoms: 1,
 };
+export const DELIVERY_NOTE_IS_RETURN_FILTER_QUERY = [
+  'Delivery Note',
+  'is_return',
+  '=',
+  '1',
+];
+export const DELIVERY_NOTE_FILTER_BY_SALES_INVOICE_QUERY = [
+  'Delivery Note Item',
+  'against_sales_invoice',
+  '=',
+];
+export const CREDIT_NOTE_IS_RETURN_QUERY = ['is_return', '=', '1'];
+export const CREDIT_NOTE_FILTER_BY_SALES_INVOICE_QUERY = [
+  'return_against',
+  '=',
+];
+export const RETURN_VOUCHER_PAYMENT_TYPE_FILTER_QUERY = [
+  'payment_type',
+  '=',
+  'receive',
+];
+export const RETURN_VOUCHER_FILTER_BY_SALES_INVOICE_QUERY = [
+  'Payment Entry Reference',
+  'reference_name',
+  '=',
+];
