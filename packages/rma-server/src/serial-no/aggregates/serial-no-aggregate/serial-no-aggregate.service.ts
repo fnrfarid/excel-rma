@@ -215,11 +215,10 @@ export class SerialNoAggregateService extends AggregateRoot {
   assignSerial(assignPayload: AssignSerialDto, clientHttpRequest) {
     return this.assignSerialNoPolicyService.validateSerial(assignPayload).pipe(
       switchMap(isValid => {
-        this.deliveryNoteAggregateService.createDeliveryNote(
+        return this.deliveryNoteAggregateService.createDeliveryNote(
           assignPayload,
           clientHttpRequest,
         );
-        return of({});
       }),
     );
   }
