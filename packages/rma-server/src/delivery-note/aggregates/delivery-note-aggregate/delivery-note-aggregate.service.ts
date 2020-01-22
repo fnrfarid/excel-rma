@@ -13,7 +13,10 @@ import {
   LIST_DELIVERY_NOTE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
-import { PLEASE_RUN_SETUP } from '../../../constants/messages';
+import {
+  PLEASE_RUN_SETUP,
+  SALES_INVOICE_MANDATORY,
+} from '../../../constants/messages';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
@@ -27,6 +30,10 @@ import {
 import { DeliveryNoteResponseInterface } from '../../entity/delivery-note-service/delivery-note-response-interface';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
+import {
+  DELIVERY_NOTE_IS_RETURN_FILTER_QUERY,
+  DELIVERY_NOTE_FILTER_BY_SALES_INVOICE_QUERY,
+} from '../../../constants/query';
 
 @Injectable()
 export class DeliveryNoteAggregateService {
@@ -38,15 +45,22 @@ export class DeliveryNoteAggregateService {
     private readonly salesInvoiceService: SalesInvoiceService,
   ) {}
 
-  listDeliveryNote(offset, limit, req) {
+  listDeliveryNote(offset, limit, req, sales_invoice) {
+    if (!sales_invoice) {
+      return throwError(new BadRequestException(SALES_INVOICE_MANDATORY));
+    }
     return this.settingsService.find().pipe(
       switchMap(settings => {
         if (!settings.authServerURL) {
           return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
         }
         const headers = this.getAuthorizationHeaders(req.token);
+
         const params = {
-          filters: JSON.stringify([['is_return', '=', '1']]),
+          filters: JSON.stringify([
+            DELIVERY_NOTE_IS_RETURN_FILTER_QUERY,
+            [...DELIVERY_NOTE_FILTER_BY_SALES_INVOICE_QUERY, sales_invoice],
+          ]),
           fields: JSON.stringify(DELIVERY_NOTE_LIST_FIELD),
           limit_page_length: Number(limit),
           limit_start: Number(offset),

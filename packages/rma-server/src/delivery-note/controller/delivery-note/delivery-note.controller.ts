@@ -21,8 +21,14 @@ export class DeliveryNoteController {
     @Req() req,
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
+    @Query('sales_invoice') sales_invoice: string,
   ) {
-    return this.deliveryNoteAggregate.listDeliveryNote(offset, limit, req);
+    return this.deliveryNoteAggregate.listDeliveryNote(
+      offset,
+      limit,
+      req,
+      sales_invoice,
+    );
   }
 
   @Get('v1/relay_list_warehouses')
