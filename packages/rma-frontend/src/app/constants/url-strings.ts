@@ -19,3 +19,5 @@ export const VIEW_SALES_INVOICE_PAGE_URL = 'view-sales-invoice';
 export const ADD_SALES_INVOICE_PAGE_URL = 'add-sales-invoice';
 export const RELAY_LIST_PRICELIST_ENDPOINT =
   '/api/command/user/api/resource/Price%20List';
+export const RELAY_GET_ITEMPRICE_ENDPOINT =
+  '/api/command/user/api/resource/Item Price';

@@ -112,7 +112,8 @@ export class AddSalesInvoicePage implements OnInit {
     row.name = item.name;
     row.owner = item.owner;
     row.qty = 1;
-    row.rate = 0;
+    row.rate = item.rate;
+    this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(copy);
   }
 

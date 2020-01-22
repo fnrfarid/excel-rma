@@ -18,7 +18,7 @@ export class InlineEditComponent {
     return this._value;
   }
   set value(x) {
-    this.itemFormControl.setValue(x);
+    this.itemFormControl.setValue({ item_name: x });
     this.quantity = x;
     this.rate = x;
     this._value = x;
@@ -68,12 +68,19 @@ export class InlineEditComponent {
   onSubmit() {
     if (this.popover) {
       if (this.column === 'item') {
-        const selectedItem = {} as Item;
-        selectedItem.item_code = this.itemFormControl.value.item_code;
-        selectedItem.item_name = this.itemFormControl.value.item_name;
-        selectedItem.name = this.itemFormControl.value.name;
-        selectedItem.owner = this.itemFormControl.value.owner;
-        this.popover.close(selectedItem);
+        this.salesService
+          .getItemPrice(this.itemFormControl.value.item_code)
+          .subscribe({
+            next: res => {
+              const selectedItem = {} as Item;
+              selectedItem.item_code = this.itemFormControl.value.item_code;
+              selectedItem.item_name = this.itemFormControl.value.item_name;
+              selectedItem.name = this.itemFormControl.value.name;
+              selectedItem.owner = this.itemFormControl.value.owner;
+              selectedItem.rate = res[0].price_list_rate;
+              this.popover.close(selectedItem);
+            },
+          });
       } else if (this.column === 'quantity') this.popover.close(this.quantity);
       else this.popover.close(this.rate);
     }
