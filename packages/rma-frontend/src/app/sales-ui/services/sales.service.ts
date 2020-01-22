@@ -23,6 +23,7 @@ import {
   LIST_WAREHOUSE_ENDPOINT,
   LIST_SERIAL_ENDPOINT,
   ASSIGN_SERIAL_ENDPOINT,
+  UPDATE_SALES_INVOICE_ENDPOINT,
 } from '../../constants/url-strings';
 import { switchMap, catchError } from 'rxjs/operators';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
@@ -161,6 +162,13 @@ export class SalesService {
 
   createSalesInvoice(salesDetails: SalesInvoiceDetails) {
     const url = CREATE_SALES_INVOICE_ENDPOINT;
+    return this.http.post(url, salesDetails, {
+      headers: this.getAuthorizationHeaders(),
+    });
+  }
+
+  updateSalesInvoice(salesDetails: SalesInvoiceDetails) {
+    const url = UPDATE_SALES_INVOICE_ENDPOINT;
     return this.http.post(url, salesDetails, {
       headers: this.getAuthorizationHeaders(),
     });
