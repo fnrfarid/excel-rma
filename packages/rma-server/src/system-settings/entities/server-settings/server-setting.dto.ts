@@ -93,4 +93,20 @@ export class ServerSettingsDto {
     required: true,
   })
   webhookApiKey: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Default Company for app from ERPNext',
+    type: 'string',
+    required: true,
+  })
+  defaultCompany: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Selling Price List from ERPNext',
+    type: 'string',
+    required: true,
+  })
+  sellingPriceList: string;
 }

@@ -6,6 +6,7 @@ import {
   GET_SETTINGS_ENDPOINT,
   UPDATE_SETTINGS_ENDPOINT,
   GET_USER_PROFILE_ROLES,
+  RELAY_LIST_PRICELIST_ENDPOINT,
 } from '../constants/url-strings';
 import {
   AUTHORIZATION,
@@ -29,6 +30,26 @@ export class SettingsService {
       });
       return this.http
         .get<{ data: unknown[] }>(RELAY_LIST_COMPANIES_ENDPOINT, {
+          headers: {
+            [AUTHORIZATION]:
+              BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
+          },
+          params,
+        })
+        .pipe(map(res => res.data));
+    });
+  }
+
+  relaySellingPriceListsOperation() {
+    return switchMap(value => {
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["name","like","%${value}%"],["selling","=",1]]`,
+        },
+      });
+      return this.http
+        .get<{ data: unknown[] }>(RELAY_LIST_PRICELIST_ENDPOINT, {
           headers: {
             [AUTHORIZATION]:
               BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
@@ -65,6 +86,7 @@ export class SettingsService {
     backendClientId: string,
     serviceAccountUser: string,
     serviceAccountSecret: string,
+    sellingPriceList: string,
   ) {
     return this.http.post<any>(
       UPDATE_SETTINGS_ENDPOINT,
@@ -76,6 +98,7 @@ export class SettingsService {
         backendClientId,
         serviceAccountUser,
         serviceAccountSecret,
+        sellingPriceList,
       },
       {
         headers: {

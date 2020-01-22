@@ -17,3 +17,5 @@ export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';
 export const ASSIGN_SERIAL_ENDPOINT = '/api/serial_no/v1/assign';
 export const VIEW_SALES_INVOICE_PAGE_URL = 'view-sales-invoice';
 export const ADD_SALES_INVOICE_PAGE_URL = 'add-sales-invoice';
+export const RELAY_LIST_PRICELIST_ENDPOINT =
+  '/api/command/user/api/resource/Price%20List';

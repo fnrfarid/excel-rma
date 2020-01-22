@@ -40,6 +40,20 @@
               <mat-form-field class="mat-input-wrapper">
                 <input
                   matInput
+                  required
+                  placeholder="Selling Price List"
+                  aria-label="Selling Price List"
+                  [matAutocomplete]="auto"
+                  formControlName="sellingPriceList">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let priceList of sellingPriceLists | async" [value]="priceList.name">
+                    <span>{{priceList.name}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
                   placeholder="Authorization Server URL"
                   type="text"
                   formControlName="authServerURL"

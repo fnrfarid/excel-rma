@@ -67,6 +67,9 @@ export class ServerSettings extends BaseEntity {
   @Column()
   defaultCompany: string;
 
+  @Column()
+  sellingPriceList: string;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();
