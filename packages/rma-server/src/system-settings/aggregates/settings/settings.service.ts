@@ -39,6 +39,9 @@ import {
   getItemOnTrashWebhookData,
   getSerialNoAfterInsertWebhookData,
   getSerialNoUpdateWebhookData,
+  deliveryNoteOnUpdateWebhookData,
+  deliveryNoteOnTrashWebhookData,
+  deliveryNoteNoAfterInsertWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
@@ -55,6 +58,7 @@ import {
   SERIAL_NO_AFTER_INSERT_ENDPOINT,
   SERIAL_NO_ON_UPDATE_ENDPOINT,
   FRAPPE_API_COMPANY_ENDPOINT,
+  LIST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 
@@ -247,6 +251,39 @@ export class SettingsService extends AggregateRoot {
               serverSettings.authServerURL + '/api/resource/Webhook',
               getSerialNoUpdateWebhookData(
                 serverSettings.appURL + SERIAL_NO_ON_UPDATE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              deliveryNoteOnUpdateWebhookData(
+                serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              deliveryNoteOnTrashWebhookData(
+                serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              deliveryNoteNoAfterInsertWebhookData(
+                serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },

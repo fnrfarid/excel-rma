@@ -3,6 +3,7 @@ import {
   IsString,
   ValidateNested,
   IsNumber,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -40,7 +41,7 @@ export class AssignSerialDto {
   company: string;
 
   @IsNotEmpty()
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => DeliveryNoteItemDto)
   items: DeliveryNoteItemDto[];
 }
@@ -63,6 +64,6 @@ export class DeliveryNoteItemDto {
   amount: number;
 
   @IsNotEmpty()
-  @IsString()
-  serial_no: string;
+  @IsArray()
+  serial_no: string[];
 }

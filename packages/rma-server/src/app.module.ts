@@ -21,14 +21,16 @@ import { SupplierModule } from './supplier/supplier.module';
 import { SerialNoModule } from './serial-no/serial-no.module';
 import { SalesInvoiceModule } from './sales-invoice/sales-invoice.module';
 import { WarrantyClaimModule } from './warranty-claim/warranty-claim.module';
-import { DeliveryNoteModule } from './delivery-note/delivery-note.module';
+import { DeliveryNoteEntitiesModule } from './delivery-note/entity/delivery-note-entity.module';
 import { CreditNoteModule } from './credit-note/credit-note-invoice.module';
 import { ReturnVoucherModule } from './return-voucher/return-voucher-invoice.module';
+import { DeliveryNoteModule } from './delivery-note/delivery-note.module';
+import { CommandModule } from './command/command.module';
 
 @Module({
   imports: [
     HttpModule,
-    DeliveryNoteModule,
+    DeliveryNoteEntitiesModule,
     TypeOrmModule.forRootAsync({
       name: TOKEN_CACHE_CONNECTION,
       imports: [ConfigModule],
@@ -54,6 +56,8 @@ import { ReturnVoucherModule } from './return-voucher/return-voucher-invoice.mod
     ItemModule,
     SerialNoModule,
     WarrantyClaimModule,
+    DeliveryNoteModule,
+    CommandModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { DeliveryNoteController } from './delivery-note.controller';
-import { TokenGuard } from '../../auth/guards/token.guard';
-import { DeliveryNoteAggregateService } from '../aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
-import { RoleGuard } from '../../auth/guards/role.guard';
-import { SettingsService } from '../../system-settings/aggregates/settings/settings.service';
-import { ClientTokenManagerService } from '../../auth/aggregates/client-token-manager/client-token-manager.service';
-import { TokenCacheService } from '../../auth/entities/token-cache/token-cache.service';
-import { ConnectService } from '../../auth/aggregates/connect/connect.service';
+import { TokenGuard } from '../../../auth/guards/token.guard';
+import { DeliveryNoteAggregateService } from '../../aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
+import { RoleGuard } from '../../../auth/guards/role.guard';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
+import { ConnectService } from '../../../auth/aggregates/connect/connect.service';
 
 describe('DeliveryNote Controller', () => {
   let controller: DeliveryNoteController;

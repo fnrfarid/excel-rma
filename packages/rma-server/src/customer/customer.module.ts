@@ -8,10 +8,15 @@ import { CustomerEventManager } from './event';
 import { CustomerController } from './controllers/customer/customer.controller';
 import { CustomerPoliciesService } from './policies/customer-policies/customer-policies.service';
 import { CustomerWebhookController } from './controllers/customer-webhook/customer-webhook.controller';
+import { TerritoryController } from './controllers/territory/territory.controller';
 
 @Module({
   imports: [CustomerEntitiesModule, CqrsModule, HttpModule],
-  controllers: [CustomerController, CustomerWebhookController],
+  controllers: [
+    CustomerController,
+    CustomerWebhookController,
+    TerritoryController,
+  ],
   providers: [
     ...CustomerAggregatesManager,
     ...CustomerQueryManager,

@@ -2,48 +2,81 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryNote } from './delivery-note.entity';
 import { MongoRepository } from 'typeorm';
-import { DEFAULT } from '../../../constants/typeorm.connection';
 
 @Injectable()
 export class DeliveryNoteService {
   constructor(
-    @InjectRepository(DeliveryNote, DEFAULT)
-    private readonly deliveryNoteRepo: MongoRepository<DeliveryNote>,
+    @InjectRepository(DeliveryNote)
+    private readonly deliveryNoteRepository: MongoRepository<DeliveryNote>,
   ) {}
 
-  async save(params) {
-    return await this.deliveryNoteRepo.save(params);
+  async create(deliveryNotePayload: DeliveryNote) {
+    const deliveryNote = new DeliveryNote();
+    Object.assign(deliveryNote, deliveryNotePayload);
+    return await this.deliveryNoteRepository.insertOne(deliveryNote);
   }
 
-  async find(): Promise<DeliveryNote[]> {
-    return await this.deliveryNoteRepo.find();
+  async find(query?) {
+    return await this.deliveryNoteRepository.find(query);
   }
 
-  async findOne(params) {
-    return await this.deliveryNoteRepo.findOne(params);
+  async findOne(param, options?) {
+    return await this.deliveryNoteRepository.findOne(param, options);
   }
 
-  async update(query, params) {
-    return await this.deliveryNoteRepo.update(query, params);
+  async list(skip, take, search, sort) {
+    const nameExp = new RegExp(search, 'i');
+    const columns = this.deliveryNoteRepository.manager.connection
+      .getMetadata(DeliveryNote)
+      .ownColumns.map(column => column.propertyName);
+
+    const $or = columns.map(field => {
+      const filter = {};
+      filter[field] = nameExp;
+      return filter;
+    });
+    const $and: any[] = [{ $or }];
+
+    const where: { $and: any } = { $and };
+
+    const results = await this.deliveryNoteRepository.find({
+      skip,
+      take,
+      where,
+    });
+
+    return {
+      docs: results || [],
+      length: await this.deliveryNoteRepository.count(where),
+      offset: skip,
+    };
   }
 
-  async updateMany(query, params) {
-    return await this.deliveryNoteRepo.updateMany(query, params);
-  }
-
-  async updateOne(query, params) {
-    return await this.deliveryNoteRepo.updateOne(query, params);
-  }
-
-  async count() {
-    return await this.deliveryNoteRepo.count();
-  }
-
-  async paginate(skip: number, take: number) {
-    return await this.deliveryNoteRepo.find({ skip, take });
+  async deleteOne(query, options?) {
+    return await this.deliveryNoteRepository.deleteOne(query, options);
   }
 
   async deleteMany(params) {
-    return await this.deliveryNoteRepo.deleteMany(params);
+    return await this.deliveryNoteRepository.deleteMany(params);
+  }
+
+  async updateOne(query, options?) {
+    return await this.deliveryNoteRepository.updateOne(query, options);
+  }
+
+  async update(query, params) {
+    return await this.deliveryNoteRepository.update(query, params);
+  }
+
+  async updateMany(query, params) {
+    return await this.deliveryNoteRepository.updateMany(query, params);
+  }
+
+  async count() {
+    return await this.deliveryNoteRepository.count();
+  }
+
+  async paginate(skip: number, take: number) {
+    return await this.deliveryNoteRepository.find({ skip, take });
   }
 }

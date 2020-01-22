@@ -27,6 +27,7 @@ export class SettingsPage implements OnInit {
     backendClientId: new FormControl(),
     serviceAccountUser: new FormControl(),
     serviceAccountSecret: new FormControl(),
+    sellingPriceList: new FormControl(),
   });
 
   companies: Observable<unknown[]> = this.companySettingsForm
@@ -35,6 +36,14 @@ export class SettingsPage implements OnInit {
       debounceTime(500),
       startWith(''),
       this.service.relayCompaniesOperation(),
+    );
+
+  sellingPriceLists: Observable<unknown[]> = this.companySettingsForm
+    .get('sellingPriceList')
+    .valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relaySellingPriceListsOperation(),
     );
 
   constructor(
@@ -65,6 +74,9 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm
           .get('serviceAccountSecret')
           .setValue(res.serviceAccountSecret);
+        this.companySettingsForm
+          .get('sellingPriceList')
+          .setValue(res.sellingPriceList);
       },
     });
   }
@@ -83,6 +95,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('backendClientId').value,
         this.companySettingsForm.get('serviceAccountUser').value,
         this.companySettingsForm.get('serviceAccountSecret').value,
+        this.companySettingsForm.get('sellingPriceList').value,
       )
       .subscribe({
         next: success => {

@@ -12,7 +12,13 @@ export class ReturnVoucherController {
     @Req() req,
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
+    @Query('sales_invoice') sales_invoice,
   ) {
-    return this.returnVoucherService.listReturnVoucher(offset, limit, req);
+    return this.returnVoucherService.listReturnVoucher(
+      offset,
+      limit,
+      req,
+      sales_invoice,
+    );
   }
 }

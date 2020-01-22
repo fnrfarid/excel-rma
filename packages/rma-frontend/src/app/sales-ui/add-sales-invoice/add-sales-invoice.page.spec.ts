@@ -36,6 +36,7 @@ describe('AddSalesInvoicePage', () => {
           provide: SalesInvoice,
           useValue: {
             createSalesInvoice: (...args) => of({}),
+            getSalesInvoice: (...args) => of({}),
           },
         },
       ],

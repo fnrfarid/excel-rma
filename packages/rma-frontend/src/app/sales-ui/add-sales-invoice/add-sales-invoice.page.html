@@ -89,10 +89,11 @@
                     <mat-autocomplete
                       autoActiveFirstOption
                       #auto="matAutocomplete"
+                      [displayWith]="getOptionText"
                     >
                       <mat-option
                         *ngFor="let option of filteredCustomerList | async"
-                        [value]="option.customer_name"
+                        [value]="option"
                       >
                         {{ option.customer_name }}
                       </mat-option>
@@ -198,6 +199,8 @@
                   <mat-cell
                     *matCellDef="let row"
                     [satPopoverAnchor]="p"
+                    tabindex="0"
+                    (keyup.enter)="p.open()"
                     (click)="p.open()"
                   >
                     <ng-container *ngIf="row.item_name">
@@ -219,12 +222,15 @@
                       ></inline-edit>
                     </sat-popover>
                   </mat-cell>
+                  <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
                 </ng-container>
                 <ng-container matColumnDef="quantity">
                   <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
                   <mat-cell
                     *matCellDef="let row"
                     [satPopoverAnchor]="p"
+                    tabindex="0"
+                    (keyup.enter)="p.open()"
                     (click)="p.open()"
                   >
                     <ng-container>
@@ -244,12 +250,15 @@
                       ></inline-edit>
                     </sat-popover>
                   </mat-cell>
+                  <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
                 </ng-container>
                 <ng-container matColumnDef="rate">
                   <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
                   <mat-cell
                     *matCellDef="let row"
                     [satPopoverAnchor]="p"
+                    tabindex="0"
+                    (keyup.enter)="p.open()"
                     (click)="p.open()"
                   >
                     <ng-container>
@@ -268,12 +277,14 @@
                       ></inline-edit>
                     </sat-popover>
                   </mat-cell>
+                  <mat-footer-cell *matFooterCellDef>Total </mat-footer-cell>
                 </ng-container>
                 <ng-container matColumnDef="total">
                   <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
                   <mat-cell *matCellDef="let row"
                     >{{row.rate * row.qty}}</mat-cell
                   >
+                  <mat-footer-cell *matFooterCellDef>{{total}}</mat-footer-cell>
                 </ng-container>
                 <mat-header-row
                   *matHeaderRowDef="displayedColumns; sticky: true"
@@ -281,6 +292,10 @@
                 <mat-row
                   *matRowDef="let row; columns: displayedColumns;"
                 ></mat-row>
+                <mat-footer-row
+                  class="footer"
+                  *matFooterRowDef="displayedColumns; sticky: true"
+                ></mat-footer-row>
               </mat-table>
             </ion-item>
           </ion-card-content>

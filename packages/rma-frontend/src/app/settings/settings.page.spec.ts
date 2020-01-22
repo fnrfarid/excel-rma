@@ -30,6 +30,8 @@ describe('SettingsPage', () => {
           provide: SettingsService,
           useValue: {
             relayCompaniesOperation: (...args) => switchMap(res => empty()),
+            relaySellingPriceListsOperation: (...args) =>
+              switchMap(res => empty()),
             getSettings: (...args) => empty(),
           },
         },
