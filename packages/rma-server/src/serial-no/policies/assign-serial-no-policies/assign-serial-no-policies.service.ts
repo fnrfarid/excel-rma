@@ -10,7 +10,7 @@ import {
   PLEASE_SETUP_DEFAULT_COMPANY,
   INVALID_COMPANY,
   SALES_INVOICE_NOT_FOUND,
-  ALL_SERIAL_NO_SHOULD_BE_UNIQUE,
+  SERIAL_SHOULD_BE_EQUAL_TO_QUANTITY,
   SERIAL_NO_NOT_FOUND,
   INVALID_ITEM,
   INVALID_ITEM_CODE_OR_SUPPLIER,
@@ -42,11 +42,16 @@ export class AssignSerialNoPoliciesService {
         return this.settingsService.find().pipe(
           switchMap(settings => {
             const [serial_no, item] = [new Set(), new Set()];
+            let total_qty = 0;
 
             serialProvider.items.forEach(element => {
-              serial_no.add(element.serial_no);
               item.add(element.item_code);
+              total_qty += element.qty;
+              element.serial_no.forEach(serial => {
+                serial_no.add(serial);
+              });
             });
+
             const item_array: any[] = Array.from(item);
             const serial_no_array: any[] = Array.from(serial_no);
 
@@ -56,9 +61,15 @@ export class AssignSerialNoPoliciesService {
               );
             }
 
-            if (serialProvider.items.length !== serial_no_array.length) {
+            if (total_qty !== serial_no_array.length) {
               return throwError(
-                new BadRequestException(ALL_SERIAL_NO_SHOULD_BE_UNIQUE),
+                new BadRequestException(
+                  this.getMessage(
+                    SERIAL_SHOULD_BE_EQUAL_TO_QUANTITY,
+                    total_qty,
+                    serial_no_array.length,
+                  ),
+                ),
               );
             }
 

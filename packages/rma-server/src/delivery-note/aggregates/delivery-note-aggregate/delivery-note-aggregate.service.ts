@@ -11,6 +11,7 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import {
   ERPNEXT_API_WAREHOUSE_ENDPOINT,
   LIST_DELIVERY_NOTE_ENDPOINT,
+  POST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
 import { PLEASE_RUN_SETUP } from '../../../constants/messages';
 import {
@@ -101,15 +102,15 @@ export class DeliveryNoteAggregateService {
           }
           const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
           return this.http.post(
-            settings.authServerURL + LIST_DELIVERY_NOTE_ENDPOINT,
+            settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
             deliveryNoteBody,
             { headers: this.getAuthorizationHeaders(clientHttpRequest.token) },
           );
         }),
       )
       .pipe(map(data => data.data.data))
-      .subscribe({
-        next: (response: DeliveryNoteResponseInterface) => {
+      .pipe(
+        switchMap((response: DeliveryNoteResponseInterface) => {
           const serials = [];
           const items = [];
           response.items.filter(item => {
@@ -142,11 +143,14 @@ export class DeliveryNoteAggregateService {
             )
             .then(success => {})
             .catch(error => {});
-        },
-        error: err => {
-          err;
-        },
-      });
+          return of({});
+        }),
+        catchError(err => {
+          return throwError(
+            new BadRequestException(err.response ? err.response.data.exc : err),
+          );
+        }),
+      );
   }
 
   mapCreateDeliveryNote(
@@ -179,6 +183,7 @@ export class DeliveryNoteAggregateService {
   ) {
     items.filter(element => {
       element.against_sales_invoice = assignPayload.sales_invoice_name;
+      element.serial_no = element.serial_no.join('\n');
     });
     return items;
   }

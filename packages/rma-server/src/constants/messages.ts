@@ -26,8 +26,8 @@ export const PLEASE_SETUP_DEFAULT_COMPANY = 'Please set default company';
 export const INVALID_COMPANY = 'Provided Company is invalid';
 export const THERE_SHOULD_BE_ONLY_ONE_DEFAULT_COMPANY =
   'There should be just 1 default company';
-export const ALL_SERIAL_NO_SHOULD_BE_UNIQUE =
-  'Found duplicate serial no,expected unique.';
+export const SERIAL_SHOULD_BE_EQUAL_TO_QUANTITY =
+  'Quantity and provided serial_no should be equal';
 export const SERIAL_NO_NOT_FOUND = 'Serial no not found';
 export const INVALID_ITEM = 'Provided data has invalid item';
 export const INVALID_ITEM_CODE_OR_SUPPLIER =

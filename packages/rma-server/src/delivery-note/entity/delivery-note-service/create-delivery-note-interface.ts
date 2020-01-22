@@ -21,6 +21,6 @@ export interface CreateDeliveryNoteItemInterface {
   rate?: number;
   amount?: number;
   against_sales_invoice?: string;
-  serial_no?: string;
+  serial_no?: any;
   // "12348\n12349\n12350"
 }
