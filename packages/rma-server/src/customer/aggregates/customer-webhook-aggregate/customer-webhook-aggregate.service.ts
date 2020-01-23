@@ -32,7 +32,7 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
 
   customerCreated(customerWebhookPayload: CustomerWebhookInterface) {
     return from(
-      this.customerService.findOne({ owner: customerWebhookPayload.owner }),
+      this.customerService.findOne({ name: customerWebhookPayload.name }),
     ).pipe(
       switchMap(customer => {
         if (customer) {
@@ -117,12 +117,12 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
   }
 
   customerDeleted(customer: CustomerWebhookInterface) {
-    return from(this.customerService.deleteOne({ owner: customer.owner }));
+    return from(this.customerService.deleteOne({ name: customer.name }));
   }
 
   customerUpdated(customerPayload: CustomerWebhookInterface) {
     return from(
-      this.customerService.findOne({ owner: customerPayload.owner }),
+      this.customerService.findOne({ name: customerPayload.name }),
     ).pipe(
       switchMap(customer => {
         if (!customer) {
