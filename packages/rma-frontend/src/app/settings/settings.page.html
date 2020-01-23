@@ -107,6 +107,48 @@
             </div>
           </ion-card-content>
         </ion-card>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              Territory for Warehouse
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="ion-padding">
+              <mat-form-field class="mat-input-wrapper">
+                <input matInput placeholder="Search" [(ngModel)]="search" (keyup.enter)="setFilter()">
+                <button mat-button matSuffix (click)="setFilter()">
+                  <mat-icon>search</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <table mat-table class="mat-input-wrapper" [dataSource]="territoryDataSource" matSort aria-label="Elements">
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header (click)="setFilter()">Name</th>
+                <td mat-cell *matCellDef="let row">
+                  <a [routerLink]="['/' + 'territory', row.uuid]">{{row.name}}</a>
+                </td>
+              </ng-container>
+
+              <!-- Warehouse Column -->
+              <ng-container matColumnDef="warehouse">
+                <th mat-header-cell *matHeaderCellDef>Warehouse</th>
+                <td mat-cell *matCellDef="let row">{{row.warehouse}}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-paginator #paginator
+              class="mat-paginator-sticky"
+              (page)="getUpdate($event)"
+              [pageIndex]="paginator.pageIndex"
+              [length]="territoryDataSource.length"
+              [pageSizeOptions]="[10, 50, 100, 500]">
+            </mat-paginator>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>
