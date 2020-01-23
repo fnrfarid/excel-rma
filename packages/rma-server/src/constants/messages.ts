@@ -28,10 +28,14 @@ export const THERE_SHOULD_BE_ONLY_ONE_DEFAULT_COMPANY =
   'There should be just 1 default company';
 export const SERIAL_SHOULD_BE_EQUAL_TO_QUANTITY =
   'Quantity and provided serial_no should be equal';
+export const ITEMS_SHOULD_BE_EQUAL_TO_QUANTITY =
+  'Quantity and provided Item should be equal';
+export const ITEMS_SHOULD_BE_UNIQUE =
+  'Item should be unique, found duplicate entries';
 export const SERIAL_NO_NOT_FOUND = 'Serial no not found';
 export const INVALID_ITEM = 'Provided data has invalid item';
-export const INVALID_ITEM_CODE_OR_SUPPLIER =
-  'item_code and supplier not found.';
+export const INVALID_ITEM_TOTAL = 'Provided data has invalid total';
+export const INVALID_ITEM_CODE = 'item not found';
 export const DELIVERY_NOTE_ALREADY_EXISTS = 'Delivery note already exist';
 export const INVALID_HTTP_METHOD = 'Invalid HTTP Request Method';
 export const INVALID_REQUEST = 'Invalid Request';
