@@ -7,6 +7,7 @@ import {
   UPDATE_SETTINGS_ENDPOINT,
   GET_USER_PROFILE_ROLES,
   RELAY_LIST_PRICELIST_ENDPOINT,
+  LIST_TERRITORIES_ENDPOINT,
 } from '../constants/url-strings';
 import {
   AUTHORIZATION,
@@ -107,5 +108,26 @@ export class SettingsService {
         },
       },
     );
+  }
+
+  findTerritories(
+    filter: string,
+    sortOrder: string,
+    pageIndex: number,
+    pageSize: number,
+  ) {
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageIndex * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.http.get(LIST_TERRITORIES_ENDPOINT, {
+      headers: {
+        [AUTHORIZATION]:
+          BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
+      },
+      params,
+    });
   }
 }

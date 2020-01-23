@@ -50,7 +50,12 @@ export class TerritoryAggregateService {
   }
 
   async getTerritoryList(offset, limit, search, sort) {
-    return await this.territory.list(offset, limit, search, sort);
+    return await this.territory.list(
+      Number(offset),
+      Number(limit),
+      search,
+      sort,
+    );
   }
 
   async removeTerritory(uuid: string) {
