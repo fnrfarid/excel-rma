@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
-import { Customer } from '../../common/interfaces/customer.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
 import { Location } from '@angular/common';
@@ -10,6 +9,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, switchMap } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
+import { DRAFT } from '../../constants/app-string';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -20,9 +20,7 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
-  customerList: Array<Customer>;
   dataSource: ItemsDataSource;
-  // customer: Customer;
   series: string;
   total: number = 0;
   postingDate: string;
@@ -37,28 +35,7 @@ export class AddSalesInvoicePage implements OnInit {
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
     private location: Location,
-  ) {
-    this.customerList = [
-      {
-        name: 'Prafful suthar',
-        uuid: '2',
-        addressLine1: 'C-42 , Sheetal Complex,',
-        addressLine2: 'SV Road , Dahisar(E)',
-        city: 'Mumbai',
-        pinCode: '400068',
-        email: 'prafful@castlecraft.in',
-      },
-      {
-        name: 'prafful 2',
-        uuid: '1',
-        addressLine1: 'C-42 , Sheetal Complex,',
-        addressLine2: 'SV Road , Dahisar(E)',
-        city: 'Mumbai',
-        pinCode: '400068',
-        email: 'prafful@mntechnique.com',
-      },
-    ];
-  }
+  ) {}
 
   ngOnInit() {
     this.dataSource = new ItemsDataSource();
@@ -152,15 +129,20 @@ export class AddSalesInvoicePage implements OnInit {
     const salesInvoiceDetails = {} as SalesInvoiceDetails;
     salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
     salesInvoiceDetails.company = this.companyFormControl.value;
-    salesInvoiceDetails.posting_date = this.postingDate;
+    salesInvoiceDetails.posting_date = this.getParsedDate(
+      this.postingDateFormControl.value,
+    );
     salesInvoiceDetails.posting_time = this.getFrappeTime();
     salesInvoiceDetails.set_posting_time = 1;
-    salesInvoiceDetails.due_date = this.dueDate;
+    salesInvoiceDetails.due_date = this.getParsedDate(
+      this.dueDateFormControl.value,
+    );
     salesInvoiceDetails.territory = 'All Territories';
     salesInvoiceDetails.update_stock = 0;
     salesInvoiceDetails.total_qty = 0;
     salesInvoiceDetails.total = 0;
     salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
+    salesInvoiceDetails.status = DRAFT;
     const itemList = this.dataSource.data().filter(item => {
       if (item.item_name !== '') {
         item.amount = item.qty * item.rate;
@@ -196,6 +178,7 @@ export class AddSalesInvoicePage implements OnInit {
     salesInvoiceDetails.total_qty = 0;
     salesInvoiceDetails.total = 0;
     salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
+    salesInvoiceDetails.status = DRAFT;
     const itemList = this.dataSource.data().filter(item => {
       if (item.item_name !== '') {
         item.amount = item.qty * item.rate;
