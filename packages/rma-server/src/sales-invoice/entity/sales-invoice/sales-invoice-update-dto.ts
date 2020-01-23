@@ -4,8 +4,10 @@ import {
   IsOptional,
   IsNumber,
   ValidateNested,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { SALES_INVOICE_STATUS_ENUM } from '../../../constants/app-strings';
 
 export class SalesInvoiceUpdateDto {
   @IsNotEmpty()
@@ -31,6 +33,11 @@ export class SalesInvoiceUpdateDto {
   @IsOptional()
   @IsString()
   posting_time: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsEnum(SALES_INVOICE_STATUS_ENUM)
+  status: string;
 
   @IsOptional()
   @IsNumber()
