@@ -7,6 +7,7 @@ export interface ListingData {
   uuid: string;
   customer: string;
   submitted: boolean;
+  status: string;
   total: number;
 }
 

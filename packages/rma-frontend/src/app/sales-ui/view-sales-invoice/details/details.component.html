@@ -1,14 +1,25 @@
 <ion-card>
   <ion-card-content>
     <ion-fab
-      *ngIf="!salesInvoiceDetails?.submitted"
+      *ngIf="
+        !salesInvoiceDetails?.submitted &&
+        salesInvoiceDetails?.status !== 'Rejected'
+      "
       vertical="top"
       horizontal="end"
       slot="fixed"
     >
-      <ion-fab-button (click)="submitSalesInvoice()">
+      <ion-fab-button>
         <ion-icon name="lock"></ion-icon>
       </ion-fab-button>
+      <ion-fab-list side="start">
+        <ion-button color="danger" (click)="rejectSalesInvoice()">
+          Reject
+        </ion-button>
+        <ion-button (click)="submitSalesInvoice()">
+          Submit
+        </ion-button>
+      </ion-fab-list>
     </ion-fab>
     <ion-grid class="ion-no-padding">
       <ion-row>
@@ -121,9 +132,7 @@
             <ion-input
               readonly="true"
               type="text"
-              value="{{
-                salesInvoiceDetails?.submitted ? 'To Deliver' : 'Draft'
-              }}"
+              value="{{ salesInvoiceDetails?.status }}"
               placeholder="Contact"
               [ngStyle]="{
                 color: salesInvoiceDetails?.submitted === true ? 'green' : 'red'
