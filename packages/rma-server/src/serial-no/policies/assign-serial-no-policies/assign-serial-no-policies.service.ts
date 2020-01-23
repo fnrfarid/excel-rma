@@ -13,7 +13,7 @@ import {
   SERIAL_SHOULD_BE_EQUAL_TO_QUANTITY,
   SERIAL_NO_NOT_FOUND,
   INVALID_ITEM,
-  INVALID_ITEM_CODE_OR_SUPPLIER,
+  INVALID_ITEM_CODE,
 } from '../../../constants/messages';
 import { ItemService } from '../../../item/entity/item/item.service';
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
@@ -109,7 +109,11 @@ export class AssignSerialNoPoliciesService {
         if (itemCount !== item.length) {
           return throwError(
             new BadRequestException(
-              `${INVALID_ITEM}, ${INVALID_ITEM_CODE_OR_SUPPLIER}`,
+              this.getMessage(
+                `${INVALID_ITEM}, ${INVALID_ITEM_CODE}`,
+                item.length,
+                itemCount,
+              ),
             ),
           );
         }

@@ -33,6 +33,10 @@ import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
     SerialNoPoliciesService,
     AssignSerialNoPoliciesService,
   ],
-  exports: [SerialNoEntitiesModule, ...SerialNoAggregatesManager],
+  exports: [
+    SerialNoEntitiesModule,
+    ...SerialNoAggregatesManager,
+    AssignSerialNoPoliciesService,
+  ],
 })
 export class SerialNoModule {}
