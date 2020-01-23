@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { SettingsService } from './settings.service';
 import { startWith, debounceTime } from 'rxjs/operators';
-import { ToastController } from '@ionic/angular';
+import { ToastController, PopoverController } from '@ionic/angular';
 import {
   SHORT_DURATION,
   UPDATE_SUCCESSFUL,
   UPDATE_ERROR,
 } from '../constants/app-string';
+import { MatPaginator, MatSort } from '@angular/material';
+import { TerritoryDataSource } from './territory-datasource';
+import { MapTerritoryComponent } from './map-territory/map-territory.component';
 
 @Component({
   selector: 'app-settings',
@@ -46,10 +49,18 @@ export class SettingsPage implements OnInit {
       this.service.relaySellingPriceListsOperation(),
     );
 
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  territoryDataSource: TerritoryDataSource;
+
+  displayedColumns = ['name', 'warehouse'];
+  search: string = '';
+
   constructor(
     private readonly location: Location,
     private readonly service: SettingsService,
     private readonly toastController: ToastController,
+    private readonly popoverController: PopoverController,
   ) {}
 
   ngOnInit() {
@@ -79,6 +90,9 @@ export class SettingsPage implements OnInit {
           .setValue(res.sellingPriceList);
       },
     });
+
+    this.territoryDataSource = new TerritoryDataSource(this.service);
+    this.territoryDataSource.loadItems();
   }
 
   navigateBack() {
@@ -117,5 +131,34 @@ export class SettingsPage implements OnInit {
             .then(toast => toast.present());
         },
       });
+  }
+
+  getUpdate(event) {
+    this.territoryDataSource.loadItems(
+      this.search,
+      this.sort.direction,
+      event.pageIndex,
+      event.pageSize,
+    );
+  }
+
+  setFilter() {
+    this.territoryDataSource.loadItems(
+      this.search,
+      this.sort.direction,
+      this.paginator.pageIndex,
+      this.paginator.pageSize,
+    );
+  }
+
+  async mapTerritory(uuid?: string, territory?: string, warehouse?: string) {
+    const popover = await this.popoverController.create({
+      component: MapTerritoryComponent,
+      componentProps: { uuid, territory, warehouse },
+    });
+    popover.onDidDismiss().then(() => {
+      this.territoryDataSource.loadItems();
+    });
+    return await popover.present();
   }
 }

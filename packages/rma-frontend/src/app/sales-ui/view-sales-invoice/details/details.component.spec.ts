@@ -29,6 +29,7 @@ describe('DetailsComponent', () => {
           useValue: {
             getItemList: () => of({}),
             submitSalesInvoice: (...args) => of({}),
+            getSalesInvoice: (...args) => of({}),
           },
         },
         {

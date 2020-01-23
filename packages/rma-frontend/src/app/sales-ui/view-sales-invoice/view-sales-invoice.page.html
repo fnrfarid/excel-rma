@@ -14,11 +14,7 @@
 <ion-content class="page-background">
   <ion-card>
     <ion-card-header class="ion-no-padding">
-      <ion-segment
-        [(ngModel)]="selectedSegment"
-        scrollable="true"
-        (ionChange)="segmentChanged($event)"
-      >
+      <ion-segment [(ngModel)]="selectedSegment" scrollable="true">
         <ion-segment-button value="0">
           <ion-label>Details</ion-label>
         </ion-segment-button>
@@ -41,33 +37,24 @@
     </ion-card-header>
   </ion-card>
 
-  <ion-slides
-    #slides
-    mode="md"
-    pager="false"
-    [options]="sliderOptions"
-    (ionSlideDidChange)="slideChanged(slides)"
-    (ionSlidesDidLoad)="slideChanged(slides)"
-  >
-    <ion-slide>
-      <sales-invoice-details class="width"> </sales-invoice-details>
-    </ion-slide>
-    <ion-slide>
-      <sales-invoice-serials class="width"> </sales-invoice-serials>
-    </ion-slide>
-    <ion-slide>
-      <sales-invoice-accounts class="width"></sales-invoice-accounts>
-    </ion-slide>
-    <ion-slide>
-      <sales-invoice-return class="width"></sales-invoice-return>
-    </ion-slide>
-    <ion-slide>
-      <sales-invoice-warranty class="width"></sales-invoice-warranty>
-    </ion-slide>
-    <ion-slide>
-      <sales-invoice-credit-notes class="width"> </sales-invoice-credit-notes>
-    </ion-slide>
-  </ion-slides>
-
-  <!-- <div [ngSwitch]="selectedSegment"></div> -->
+  <div [ngSwitch]="selectedSegment">
+    <sales-invoice-details class="width" *ngSwitchCase="0">
+    </sales-invoice-details>
+    <sales-invoice-serials class="width" *ngSwitchCase="1">
+    </sales-invoice-serials>
+    <sales-invoice-accounts
+      class="width"
+      *ngSwitchCase="2"
+    ></sales-invoice-accounts>
+    <sales-invoice-return
+      class="width"
+      *ngSwitchCase="3"
+    ></sales-invoice-return>
+    <sales-invoice-warranty
+      class="width"
+      *ngSwitchCase="4"
+    ></sales-invoice-warranty>
+    <sales-invoice-credit-notes class="width" *ngSwitchCase="5">
+    </sales-invoice-credit-notes>
+  </div>
 </ion-content>

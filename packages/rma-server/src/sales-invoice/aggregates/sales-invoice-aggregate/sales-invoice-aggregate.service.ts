@@ -46,6 +46,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       .validateCustomer(salesInvoicePayload)
       .pipe(
         switchMap(() => {
+          return this.validateSalesInvoicePolicy.validateItems(
+            salesInvoicePayload.items,
+          );
+        }),
+        switchMap(() => {
           const salesInvoice = new SalesInvoice();
           Object.assign(salesInvoice, salesInvoicePayload);
           salesInvoice.uuid = uuidv4();

@@ -1,22 +1,19 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { SalesService } from '../services/sales.service';
+import { SettingsService } from './settings.service';
 
 export interface ListingData {
-  uuid: string;
-  customer: string;
-  submitted: boolean;
-  status: string;
-  total: number;
+  name: string;
+  warehouse: string;
 }
 
-export interface ListResponse {
+export interface TerritoryListResponse {
   docs: ListingData[];
   length: number;
   offset: number;
 }
-export class SalesInvoiceDataSource extends DataSource<ListingData> {
+export class TerritoryDataSource extends DataSource<ListingData> {
   data: ListingData[];
   length: number;
   offset: number;
@@ -26,7 +23,7 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
 
   loading$ = this.loadingSubject.asObservable();
 
-  constructor(private salesService: SalesService) {
+  constructor(private settings: SettingsService) {
     super();
   }
 
@@ -41,10 +38,10 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
 
   loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
     this.loadingSubject.next(true);
-    this.salesService
-      .getSalesInvoiceList(filter, sortOrder, pageIndex, pageSize)
+    this.settings
+      .findTerritories(filter, sortOrder, pageIndex, pageSize)
       .pipe(
-        map((res: ListResponse) => {
+        map((res: TerritoryListResponse) => {
           this.data = res.docs;
           this.offset = res.offset;
           this.length = res.length;

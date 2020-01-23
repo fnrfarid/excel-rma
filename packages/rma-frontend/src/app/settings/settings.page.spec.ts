@@ -1,7 +1,8 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { Location } from '@angular/common';
-import { ToastController } from '@ionic/angular';
+import { ToastController, PopoverController } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { empty } from 'rxjs';
@@ -22,6 +23,7 @@ describe('SettingsPage', () => {
         ReactiveFormsModule,
         MaterialModule,
         BrowserAnimationsModule,
+        RouterTestingModule,
       ],
       declarations: [SettingsPage],
       providers: [
@@ -33,9 +35,11 @@ describe('SettingsPage', () => {
             relaySellingPriceListsOperation: (...args) =>
               switchMap(res => empty()),
             getSettings: (...args) => empty(),
+            findTerritories: (...args) => empty(),
           },
         },
         { provide: ToastController, useValue: {} },
+        { provide: PopoverController, useValue: {} },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();

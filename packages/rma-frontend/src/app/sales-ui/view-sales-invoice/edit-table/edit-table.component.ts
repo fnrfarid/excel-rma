@@ -17,7 +17,7 @@ export class EditTableComponent implements OnInit {
   }
   set value(x) {
     this._value = x;
-    this.itemFormControl.setValue(x);
+    this.itemFormControl.setValue({ serial_no: x });
   }
 
   private _value = '';

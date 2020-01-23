@@ -86,7 +86,7 @@
                   }"
                     *ngIf="row.submitted"
                   >
-                    To Deliver
+                    {{row.status}}
                   </ion-text>
                   <ion-text
                     *ngIf="!row.submitted"
@@ -94,7 +94,7 @@
                     color: 'red'
                   }"
                   >
-                    Draft
+                    {{row.status}}
                   </ion-text>
                 </td>
               </ng-container>

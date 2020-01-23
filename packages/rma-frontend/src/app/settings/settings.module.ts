@@ -7,6 +7,9 @@ import { IonicModule } from '@ionic/angular';
 
 import { SettingsPage } from './settings.page';
 import { MaterialModule } from '../material/material.module';
+import { MapTerritoryComponent } from './map-territory/map-territory.component';
+import { SettingsService } from './settings.service';
+import { MapTerritoryService } from './map-territory/map-territory.service';
 
 const routes: Routes = [
   {
@@ -24,6 +27,8 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MaterialModule,
   ],
-  declarations: [SettingsPage],
+  entryComponents: [MapTerritoryComponent],
+  declarations: [SettingsPage, MapTerritoryComponent],
+  providers: [SettingsService, MapTerritoryService],
 })
 export class SettingsPageModule {}

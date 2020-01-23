@@ -21,3 +21,9 @@ export const RELAY_LIST_PRICELIST_ENDPOINT =
   '/api/command/user/api/resource/Price%20List';
 export const RELAY_GET_ITEMPRICE_ENDPOINT =
   '/api/command/user/api/resource/Item Price';
+export const LIST_TERRITORIES_ENDPOINT = '/api/territory/v1/list';
+export const RELAY_LIST_TERRITORIES_ENDPOINT =
+  '/api/command/user/api/resource/Territory';
+export const CREATE_TERRITORY_ENDPOINT = '/api/territory/v1/create';
+export const UPDATE_TERRITORY_ENDPOINT = '/api/territory/v1/update';
+export const DELETE_TERRITORY_ENDPOINT = '/api/territory/v1/remove';
