@@ -270,4 +270,10 @@ export class SalesService {
         }),
       );
   }
+
+  validateItemList(itemCodeList: string[]) {
+    const filteredList = [...new Set(itemCodeList)];
+    if (filteredList.length === itemCodeList.length) return true;
+    return false;
+  }
 }
