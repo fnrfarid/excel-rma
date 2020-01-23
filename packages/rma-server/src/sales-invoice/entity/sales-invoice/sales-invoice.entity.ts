@@ -99,6 +99,9 @@ export class SalesInvoice extends BaseEntity {
   sales_team: [];
 
   @Column()
+  status: string;
+
+  @Column()
   submitted: boolean;
 
   @Column()

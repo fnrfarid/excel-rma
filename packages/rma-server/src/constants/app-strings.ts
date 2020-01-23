@@ -89,3 +89,4 @@ export const FILE_NOT_FOUND =
 export const DRAFT_STATUS = 'Draft';
 export const SALES_USER = 'Sales User';
 export const SALES_MANAGER = 'Sales Manager';
+export const SALES_INVOICE_STATUS_ENUM = ['Draft', 'Rejected', 'Submitted'];
