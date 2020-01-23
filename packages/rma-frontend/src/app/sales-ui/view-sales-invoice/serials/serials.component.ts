@@ -99,7 +99,7 @@ export class SerialsComponent implements OnInit {
   }
 
   updateSerial(element, serial) {
-    if (serial) {
+    if (serial.supplier) {
       const index = this.dataSource.indexOf(element);
       this.dataSource[index].serial_no = serial.serial_no;
       this.dataSource[index].supplier = serial.supplier;

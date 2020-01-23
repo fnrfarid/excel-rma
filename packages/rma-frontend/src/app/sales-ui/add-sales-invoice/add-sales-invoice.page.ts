@@ -27,7 +27,7 @@ export class AddSalesInvoicePage implements OnInit {
   total: number = 0;
   postingDate: string;
   dueDate: string;
-  displayedColumns = ['item', 'quantity', 'rate', 'total'];
+  displayedColumns = ['item', 'quantity', 'rate', 'total', 'delete'];
   customerFormControl = new FormControl();
   filteredCustomerList: Observable<any[]>;
   companyFormControl = new FormControl();
@@ -136,6 +136,12 @@ export class AddSalesInvoicePage implements OnInit {
     this.calculateTotal(this.dataSource.data().slice());
 
     this.dataSource.update(copy);
+  }
+
+  deleteRow(i: number) {
+    this.dataSource.data().splice(i, 1);
+    this.calculateTotal(this.dataSource.data().slice());
+    this.dataSource.update(this.dataSource.data());
   }
 
   navigateBack() {
