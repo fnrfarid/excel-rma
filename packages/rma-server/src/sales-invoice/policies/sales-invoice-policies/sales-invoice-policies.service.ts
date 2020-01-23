@@ -5,7 +5,7 @@ import { switchMap } from 'rxjs/operators';
 import {
   SALES_INVOICE_NOT_FOUND,
   CUSTOMER_AND_CONTACT_INVALID,
-  DELIVERY_NOTE_ALREADY_SUBMITTED,
+  SALES_INVOICE_CANNOT_BE_SUBMITTED,
   DELIVERY_NOTE_IN_QUEUE,
   ITEMS_SHOULD_BE_UNIQUE,
   INVALID_ITEM_TOTAL,
@@ -13,6 +13,7 @@ import {
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { ItemDto } from '../../entity/sales-invoice/sales-invoice-dto';
 import { AssignSerialNoPoliciesService } from '../../../serial-no/policies/assign-serial-no-policies/assign-serial-no-policies.service';
+import { DRAFT_STATUS } from '../../../constants/app-strings';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -89,10 +90,12 @@ export class SalesInvoicePoliciesService {
     return from(
       this.salesInvoiceService.findOne({ uuid: salesInvoicePayload.uuid }),
     ).pipe(
-      switchMap(submittedState => {
-        if (submittedState.submitted) {
+      switchMap(salesInvoice => {
+        if (salesInvoice.status !== DRAFT_STATUS) {
           return throwError(
-            new BadRequestException(DELIVERY_NOTE_ALREADY_SUBMITTED),
+            new BadRequestException(
+              salesInvoice.status + SALES_INVOICE_CANNOT_BE_SUBMITTED,
+            ),
           );
         }
         return of(true);
