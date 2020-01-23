@@ -6,8 +6,10 @@ export const SERVICE_ALREADY_REGISTERED = 'Service already registered';
 export const INVALID_CODE = 'Invalid Code';
 export const INVALID_STATE = 'Invalid State';
 export const INVALID_FRAPPE_TOKEN = 'Invalid Frappe Token';
-export const SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED =
-  'submitted Sales Invoice cannot be updated';
+export const SALES_INVOICE_CANNOT_BE_UPDATED =
+  ' Sales Invoice cannot be updated';
+export const SALES_INVOICE_CANNOT_BE_SUBMITTED =
+  ' Sales Invoice cannot be submitted';
 export const DELIVERY_NOTE_ALREADY_SUBMITTED =
   'Provided delivery note is already submitted';
 export const DELIVERY_NOTE_IN_QUEUE = 'Provided delivery note is in queue';
