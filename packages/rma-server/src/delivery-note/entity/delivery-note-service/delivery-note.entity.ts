@@ -12,6 +12,9 @@ export class DeliveryNote extends BaseEntity {
   isSynced: boolean;
 
   @Column()
+  inQueue: boolean;
+
+  @Column()
   name: string;
 
   @Column()
@@ -27,6 +30,9 @@ export class DeliveryNote extends BaseEntity {
   naming_series: string;
 
   @Column()
+  issue_credit_note: boolean;
+
+  @Column()
   customer: string;
 
   @Column()
@@ -39,10 +45,13 @@ export class DeliveryNote extends BaseEntity {
   posting_date: string;
 
   @Column()
+  contact_email: string;
+
+  @Column()
   posting_time: string;
 
   @Column()
-  is_return: number;
+  is_return: boolean;
 
   @Column()
   currency: string;
@@ -73,6 +82,9 @@ export class DeliveryNote extends BaseEntity {
 
   @Column()
   territory: string;
+
+  @Column()
+  set_warehouse: string;
 
   @Column()
   items: DeliveryNoteItems[];

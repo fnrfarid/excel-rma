@@ -20,6 +20,8 @@ import { UpdateSalesInvoiceCommand } from '../../command/update-sales-invoice/up
 import { RetrieveSalesInvoiceListQuery } from '../../query/list-sales-invoice/retrieve-sales-invoice-list.query';
 import { RetrieveSalesInvoiceQuery } from '../../query/get-sales-invoice/retrieve-sales-invoice.query';
 import { SubmitSalesInvoiceCommand } from '../../command/submit-sales-invoice/submit-sales-invoice.command';
+import { CreateSalesReturnCommand } from '../../command/create-sales-return/create-sales-return.command';
+import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
 
 @Controller('sales_invoice')
 export class SalesInvoiceController {
@@ -80,6 +82,15 @@ export class SalesInvoiceController {
     }
     return await this.queryBus.execute(
       new RetrieveSalesInvoiceListQuery(offset, limit, search, sort),
+    );
+  }
+
+  @Post('v1/create_return')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  createReturn(@Body() createReturnPayload: CreateSalesReturnDto, @Req() req) {
+    return this.commandBus.execute(
+      new CreateSalesReturnCommand(createReturnPayload, req),
     );
   }
 }

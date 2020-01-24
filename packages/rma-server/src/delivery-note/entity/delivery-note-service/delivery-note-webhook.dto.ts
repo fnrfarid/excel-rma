@@ -16,6 +16,10 @@ export class DeliveryNoteWebhookDto {
   @IsOptional()
   modified_by: string;
 
+  @IsString()
+  @IsOptional()
+  contact_email: string;
+
   @IsNumber()
   @IsOptional()
   docstatus: number;
@@ -38,6 +42,10 @@ export class DeliveryNoteWebhookDto {
 
   @IsString()
   @IsOptional()
+  set_warehouse: string;
+
+  @IsString()
+  @IsOptional()
   company: string;
 
   @IsString()
@@ -50,7 +58,7 @@ export class DeliveryNoteWebhookDto {
 
   @IsNumber()
   @IsOptional()
-  is_return: number;
+  is_return: boolean;
 
   @IsString()
   @IsOptional()

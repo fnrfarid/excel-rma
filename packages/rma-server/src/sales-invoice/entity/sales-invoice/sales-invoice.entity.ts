@@ -12,6 +12,12 @@ export class SalesInvoice extends BaseEntity {
   name: string;
 
   @Column()
+  is_return: boolean;
+
+  @Column()
+  issue_credit_note: boolean;
+
+  @Column()
   title: string;
 
   @Column()

@@ -8,9 +8,16 @@ import { SalesInvoiceController } from './controllers/sales-invoice/sales-invoic
 import { SalesInvoicePoliciesService } from './policies/sales-invoice-policies/sales-invoice-policies.service';
 import { SalesInvoiceEntitiesModule } from './entity/entity.module';
 import { CustomerModule } from '../customer/customer.module';
+import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 
 @Module({
-  imports: [SalesInvoiceEntitiesModule, CqrsModule, HttpModule, CustomerModule],
+  imports: [
+    SalesInvoiceEntitiesModule,
+    CqrsModule,
+    HttpModule,
+    CustomerModule,
+    DeliveryNoteModule,
+  ],
   controllers: [SalesInvoiceController],
   providers: [
     ...SalesInvoiceAggregatesManager,
