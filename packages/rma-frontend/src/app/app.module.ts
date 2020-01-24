@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import * as localforage from 'localforage';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -17,6 +18,9 @@ import { HttpErrorHandler } from './common/interfaces/services/http-error-handle
 import { MessageService } from './common/interfaces/services/message/message.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SystemManagerGuard } from './common/guards/system-manager.guard';
+import { LoginService } from './api/login/login.service';
+import { StorageService, STORAGE_TOKEN } from './api/storage/storage.service';
+import { SERVICE_NAME } from './constants/storage';
 
 @NgModule({
   declarations: [AppComponent],
@@ -40,6 +44,15 @@ import { SystemManagerGuard } from './common/guards/system-manager.guard';
     SplashScreen,
     SystemManagerGuard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    LoginService,
+    {
+      provide: STORAGE_TOKEN,
+      useFactory: () => {
+        localforage.config({ name: SERVICE_NAME });
+        return localforage;
+      },
+    },
+    StorageService,
   ],
   bootstrap: [AppComponent],
 })

@@ -4,6 +4,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { AppService } from './app.service';
+import { STORAGE_TOKEN } from './api/storage/storage.service';
 
 describe('AppService', () => {
   let injector: TestBed;
@@ -13,7 +14,7 @@ describe('AppService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AppService],
+      providers: [AppService, { provide: STORAGE_TOKEN, useValue: {} }],
     });
 
     injector = getTestBed();

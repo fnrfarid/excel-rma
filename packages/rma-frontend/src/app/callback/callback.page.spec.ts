@@ -4,6 +4,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CallbackPage } from './callback.page';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { STORAGE_TOKEN } from '../api/storage/storage.service';
 
 @Component({
   template: '',
@@ -16,6 +17,7 @@ describe('CallbackPage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [CallbackPage, MockComponent],
+      providers: [{ provide: STORAGE_TOKEN, useValue: {} }],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         RouterTestingModule.withRoutes([

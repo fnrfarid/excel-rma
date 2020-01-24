@@ -1,7 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { interval, Subscription } from 'rxjs';
 import {
   TOKEN,
   ACCESS_TOKEN,
@@ -15,7 +13,6 @@ import {
   TWENTY_MINUTES_IN_SECONDS,
 } from './constants/storage';
 import { AppService } from './app.service';
-import { interval, Subscription } from 'rxjs';
 import { LoginService } from './api/login/login.service';
 import { SYSTEM_MANAGER } from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
@@ -31,71 +28,78 @@ export class AppComponent implements OnInit {
   showSettings: boolean = false;
 
   constructor(
-    private readonly platform: Platform,
-    private readonly splashScreen: SplashScreen,
-    private readonly statusBar: StatusBar,
     private readonly appService: AppService,
     private readonly loginService: LoginService,
     private readonly settingService: SettingsService,
-  ) {
-    this.initializeApp();
-  }
+  ) {}
 
   @HostListener('window:message', ['$event'])
   onMessage(event) {
     if (event && event.data && typeof event.data === 'string') {
       const hash = event.data.replace('#', '');
       const query = new URLSearchParams(hash);
-      localStorage.setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN));
+      this.appService
+        .getStorage()
+        .setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN))
+        .then(saved => {});
       const now = Math.floor(Date.now() / 1000);
-      localStorage.setItem(
-        ACCESS_TOKEN_EXPIRY,
-        (now + Number(query.get(EXPIRES_IN))).toString(),
-      );
+      this.appService
+        .getStorage()
+        .setItem(
+          ACCESS_TOKEN_EXPIRY,
+          (now + Number(query.get(EXPIRES_IN))).toString(),
+        )
+        .then(saved => {});
     }
   }
 
   ngOnInit() {
+    this.setUserSession();
     this.setupSilentRefresh();
-    const localToken = localStorage.getItem(ACCESS_TOKEN);
-    if (localToken) {
-      this.silentRefresh();
-    }
+    this.silentRefresh();
+    this.appService
+      .getStorage()
+      .getItem(ACCESS_TOKEN)
+      .then(localToken => {
+        if (localToken) {
+          this.checkRoles(localToken as string);
+        }
+      });
   }
 
   setUserSession() {
-    if (localStorage.getItem(ACCESS_TOKEN) || location.hash) {
-      this.loggedIn = true;
-
-      this.settingService.checkUserProfile().subscribe({
-        next: res => {
-          if (
-            res &&
-            res.roles.length > 0 &&
-            res.roles.includes(SYSTEM_MANAGER)
-          ) {
-            this.showSettings = true;
+    this.appService
+      .getStorage()
+      .getItem(ACCESS_TOKEN)
+      .then(token => {
+        if (token || location.hash.includes('access_token')) {
+          const hash = (location.hash as string).replace('#', '');
+          const query = new URLSearchParams(hash);
+          this.loggedIn = true;
+          if (!token) {
+            this.checkRoles(query.get(ACCESS_TOKEN));
           }
-        },
-        error: error => (this.showSettings = false),
+        } else {
+          this.loggedIn = false;
+          this.setupImplicitFlow();
+        }
       });
-    } else {
-      this.loggedIn = false;
-      this.setupImplicitFlow();
-    }
+  }
+
+  checkRoles(token: string) {
+    this.settingService.checkUserProfile(token).subscribe({
+      next: res => {
+        if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
+          this.showSettings = true;
+        }
+      },
+      error: error => (this.showSettings = false),
+    });
   }
 
   setupSilentRefresh() {
     const source = interval(TEN_MINUTES_IN_MS);
     this.subscription = source.subscribe(val => this.silentRefresh());
-  }
-
-  initializeApp() {
-    this.platform.ready().then(() => {
-      this.statusBar.styleLightContent();
-      this.splashScreen.hide();
-    });
-    this.setUserSession();
   }
 
   login() {
@@ -104,8 +108,10 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.loggedIn = false;
-    localStorage.clear();
-    this.loginService.logout();
+    this.appService
+      .getStorage()
+      .clear()
+      .then(() => this.loginService.logout());
   }
 
   setupImplicitFlow(): void {
@@ -136,16 +142,20 @@ export class AppComponent implements OnInit {
   }
 
   initiateLogin(authorizationUrl: string, frappe_auth_config) {
-    window.location.href = this.getEncodedFrappeLoginUrl(
-      authorizationUrl,
-      frappe_auth_config,
-    );
-    return;
+    const state = this.appService.generateRandomString(32);
+    this.appService
+      .getStorage()
+      .setItem(STATE, state)
+      .then(savedState => {
+        window.location.href = this.getEncodedFrappeLoginUrl(
+          authorizationUrl,
+          frappe_auth_config,
+          savedState,
+        );
+      });
   }
 
-  getEncodedFrappeLoginUrl(authorizationUrl, frappe_auth_config) {
-    const state = this.appService.generateRandomString(32);
-    localStorage.setItem(STATE, state);
+  getEncodedFrappeLoginUrl(authorizationUrl, frappe_auth_config, state) {
     authorizationUrl += `?client_id=${frappe_auth_config.client_id}`;
     authorizationUrl += `&scope=${encodeURIComponent(
       frappe_auth_config.scope,
@@ -160,53 +170,69 @@ export class AppComponent implements OnInit {
 
   silentRefresh() {
     const now = Math.floor(Date.now() / 1000);
-    const expiry = localStorage.getItem(ACCESS_TOKEN_EXPIRY)
-      ? Number(localStorage.getItem(ACCESS_TOKEN_EXPIRY))
-      : now;
-    if (now > expiry - TWENTY_MINUTES_IN_SECONDS) {
-      this.appService.getMessage().subscribe({
-        next: response => {
-          if (!response) return;
-          const frappe_auth_config = {
-            client_id: response.frontendClientId,
-            redirect_uri: response.appURL + SILENT_REFRESH_ENDPOINT,
-            response_type: TOKEN,
-            scope: SCOPES_OPENID_ALL,
-          };
-          const url = this.getEncodedFrappeLoginUrl(
-            response.authorizationURL,
-            frappe_auth_config,
-          );
+    this.appService
+      .getStorage()
+      .getItem(ACCESS_TOKEN_EXPIRY)
+      .then(token => {
+        const expiry = token
+          ? Number(this.appService.getStorage().getItem(ACCESS_TOKEN_EXPIRY))
+          : now;
+        if (now > expiry - TWENTY_MINUTES_IN_SECONDS) {
+          this.appService.getMessage().subscribe({
+            next: response => {
+              if (!response) return;
+              const frappe_auth_config = {
+                client_id: response.frontendClientId,
+                redirect_uri: response.appURL + SILENT_REFRESH_ENDPOINT,
+                response_type: TOKEN,
+                scope: SCOPES_OPENID_ALL,
+              };
 
-          const existingIframe = document.getElementsByClassName(
-            'silent-iframe',
-          );
+              const state = this.appService.generateRandomString(32);
+              this.appService
+                .getStorage()
+                .setItem(STATE, state)
+                .then(savedState => {
+                  const url = this.getEncodedFrappeLoginUrl(
+                    response.authorizationURL,
+                    frappe_auth_config,
+                    savedState,
+                  );
 
-          if (!existingIframe.length) {
-            const iframe = document.createElement('iframe');
-            iframe.onload = () => {
-              try {
-                (iframe.contentWindow || iframe.contentDocument).location.href;
-              } catch (err) {
-                localStorage.clear();
-                this.initiateLogin(response.authorizationURL, {
-                  ...frappe_auth_config,
-                  ...{ redirect_uri: response.appURL + CALLBACK_ENDPOINT },
+                  const existingIframe = document.getElementsByClassName(
+                    'silent-iframe',
+                  );
+
+                  if (!existingIframe.length) {
+                    const iframe = document.createElement('iframe');
+                    iframe.onload = () => {
+                      try {
+                        (iframe.contentWindow || iframe.contentDocument)
+                          .location.href;
+                      } catch (err) {
+                        this.appService.getStorage().clear();
+                        this.initiateLogin(response.authorizationURL, {
+                          ...frappe_auth_config,
+                          ...{
+                            redirect_uri: response.appURL + CALLBACK_ENDPOINT,
+                          },
+                        });
+                      }
+                    };
+                    iframe.className = 'silent-iframe';
+                    iframe.setAttribute('src', url);
+
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                  } else {
+                    existingIframe[0].setAttribute('src', url);
+                  }
                 });
-              }
-            };
-            iframe.className = 'silent-iframe';
-            iframe.setAttribute('src', url);
-
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-          } else {
-            existingIframe[0].setAttribute('src', url);
-          }
-        },
-        error: error => {},
+            },
+            error: error => {},
+          });
+        }
       });
-    }
   }
 
   ngOnDestroy() {
