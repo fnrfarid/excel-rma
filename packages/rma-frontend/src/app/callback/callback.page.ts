@@ -44,9 +44,7 @@ export class CallbackPage implements OnInit {
             .then(() => this.storage.setItem(LOGGED_IN, true))
             .then(() => this.router.navigateByUrl(home));
         } else {
-          this.storage.clear().then(cleared => {
-            this.router.navigateByUrl(home);
-          });
+          this.router.navigateByUrl(home);
         }
       });
     });

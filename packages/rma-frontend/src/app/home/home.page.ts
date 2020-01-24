@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
@@ -20,7 +22,6 @@ export class HomePage implements OnInit {
   loggedIn: boolean;
   picture: string;
   state: string;
-  accessToken: string;
   email: string;
   fullName: string;
 
@@ -28,17 +29,21 @@ export class HomePage implements OnInit {
     private readonly http: HttpClient,
     private readonly login: LoginService,
     private readonly storage: StorageService,
+    private readonly router: Router,
   ) {}
 
   ngOnInit() {
-    this.loggedIn = this.storage.getItem(ACCESS_TOKEN) ? true : false;
-    this.storage.getItem(ACCESS_TOKEN).then(token => {
-      this.loggedIn = token ? true : false;
-      this.accessToken = token as string;
-      this.loadProfile();
-    });
-
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map(event => {
+          this.loadProfile();
+          return event;
+        }),
+      )
+      .subscribe({ next: res => {}, error: err => {} });
     this.setUserSession();
+    this.loadProfile();
   }
 
   setUserSession() {
@@ -53,20 +58,25 @@ export class HomePage implements OnInit {
   }
 
   loadProfile() {
-    const headers = {
-      [AUTHORIZATION]: BEARER_TOKEN_PREFIX + this.accessToken,
-    };
+    this.storage.getItem(ACCESS_TOKEN).then(token => {
+      this.loggedIn = token ? true : false;
+      if (this.loggedIn) {
+        const headers = {
+          [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+        };
 
-    this.http
-      .get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
-        headers,
-      })
-      .subscribe({
-        error: error => {},
-        next: profile => {
-          this.email = profile.email;
-          this.fullName = profile.name;
-        },
-      });
+        this.http
+          .get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
+            headers,
+          })
+          .subscribe({
+            error: error => {},
+            next: profile => {
+              this.email = profile.email;
+              this.fullName = profile.name;
+            },
+          });
+      }
+    });
   }
 }
