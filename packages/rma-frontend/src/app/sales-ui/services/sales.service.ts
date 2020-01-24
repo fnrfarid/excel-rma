@@ -26,6 +26,7 @@ import {
   ASSIGN_SERIAL_ENDPOINT,
   UPDATE_SALES_INVOICE_ENDPOINT,
   RELAY_GET_ITEMPRICE_ENDPOINT,
+  GET_SERIAL_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -222,6 +223,15 @@ export class SalesService {
               return of(response.docs);
             }),
           );
+      }),
+    );
+  }
+
+  getSerial(serial_no) {
+    const url = `${GET_SERIAL_ENDPOINT}/${serial_no}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any[]>(url, { headers });
       }),
     );
   }

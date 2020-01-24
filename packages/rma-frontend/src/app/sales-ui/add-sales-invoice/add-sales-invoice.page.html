@@ -185,7 +185,12 @@
                 </ion-card-title>
               </ion-col>
               <ion-col class="ion-text-right" size="auto">
-                <ion-button color="tertiary" fill="outline" (ctrlI)="addItem()" (click)="addItem()">
+                <ion-button
+                  color="tertiary"
+                  fill="outline"
+                  (ctrlI)="addItem()"
+                  (click)="addItem()"
+                >
                   Add
                 </ion-button>
               </ion-col>
@@ -293,6 +298,7 @@
                       (click)="deleteRow(i)"
                       fill="clear"
                       class="ion-no-padding"
+                      color="danger"
                     >
                       <ion-icon slot="icon-only" name="trash"></ion-icon>
                     </ion-button>

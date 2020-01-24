@@ -11,6 +11,7 @@ export const GET_SETTINGS_ENDPOINT = '/api/settings/v1/get';
 export const UPDATE_SETTINGS_ENDPOINT = '/api/settings/v1/update';
 export const LIST_CUSTOMER_ENDPOINT = 'api/customer/v1/list';
 export const LIST_SERIAL_ENDPOINT = 'api/serial_no/v1/list';
+export const GET_SERIAL_ENDPOINT = 'api/serial_no/v1/get';
 export const LIST_WAREHOUSE_ENDPOINT =
   'api/delivery_note/v1/relay_list_warehouses';
 export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';
