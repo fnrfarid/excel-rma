@@ -28,6 +28,7 @@ export class SerialsComponent implements OnInit {
     'company',
     'supplier',
     'claimsReceivedDate',
+    'clear',
   ];
   dataSource = [];
   date = new FormControl(new Date());
@@ -112,12 +113,29 @@ export class SerialsComponent implements OnInit {
       });
   }
 
-  updateSerial(element, serial) {
-    if (serial.supplier) {
+  updateSerial(element, serial_no) {
+    if (serial_no) {
       const index = this.dataSource.indexOf(element);
-      this.dataSource[index].serial_no = serial.serial_no;
-      this.dataSource[index].supplier = serial.supplier;
+      this.dataSource[index].serial_no = serial_no;
+      this.salesService.getSerial(serial_no).subscribe({
+        next: res => {
+          this.dataSource[index].supplier = res[0].supplier.supplier_name;
+        },
+        error: err => {
+          this.dataSource[index].serial_no = '';
+          this.snackbar.open('Invalid Serial No ', CLOSE, {
+            duration: 2500,
+          });
+        },
+      });
+      // this.dataSource[index].supplier = serial.supplier;
     }
+  }
+
+  clearRow(element) {
+    const index = this.dataSource.indexOf(element);
+    this.dataSource[index].serial_no = '';
+    this.dataSource[index].supplier = '';
   }
 
   submitDeliveryNote() {
