@@ -52,12 +52,6 @@ export class AppService {
       );
   }
 
-  login(url, body) {
-    return this.http.post(url, body, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
-  }
-
   generateRandomString(length: number) {
     let result = '';
     const characters =

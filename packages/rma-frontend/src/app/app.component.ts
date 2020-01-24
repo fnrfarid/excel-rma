@@ -41,7 +41,7 @@ export class AppComponent implements OnInit {
       this.appService
         .getStorage()
         .setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN))
-        .then(saved => {});
+        .then(token => this.checkRoles(token));
       const now = Math.floor(Date.now() / 1000);
       this.appService
         .getStorage()
@@ -56,12 +56,12 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.setUserSession();
     this.setupSilentRefresh();
-    this.silentRefresh();
     this.appService
       .getStorage()
       .getItem(ACCESS_TOKEN)
       .then(localToken => {
         if (localToken) {
+          this.silentRefresh();
           this.checkRoles(localToken as string);
         }
       });
@@ -173,10 +173,8 @@ export class AppComponent implements OnInit {
     this.appService
       .getStorage()
       .getItem(ACCESS_TOKEN_EXPIRY)
-      .then(token => {
-        const expiry = token
-          ? Number(this.appService.getStorage().getItem(ACCESS_TOKEN_EXPIRY))
-          : now;
+      .then(tokenExpiry => {
+        const expiry = tokenExpiry ? Number(tokenExpiry) : now;
         if (now > expiry - TWENTY_MINUTES_IN_SECONDS) {
           this.appService.getMessage().subscribe({
             next: response => {
