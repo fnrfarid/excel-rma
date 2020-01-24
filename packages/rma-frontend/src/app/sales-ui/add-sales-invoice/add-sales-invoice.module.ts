@@ -2,12 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
-
 import { IonicModule } from '@ionic/angular';
-
 import { AddSalesInvoicePage } from './add-sales-invoice.page';
 import { MaterialModule } from '../../material/material.module';
 import { InlineEditComponent } from './inline-edit/inline-edit.component';
+import { KeyDownDetectorDirective } from './on-key-down-directive';
 
 const routes: Routes = [
   {
@@ -25,7 +24,11 @@ const routes: Routes = [
     MaterialModule,
     ReactiveFormsModule,
   ],
-  declarations: [AddSalesInvoicePage, InlineEditComponent],
-  exports: [InlineEditComponent],
+  declarations: [
+    AddSalesInvoicePage,
+    InlineEditComponent,
+    KeyDownDetectorDirective,
+  ],
+  exports: [InlineEditComponent, KeyDownDetectorDirective],
 })
 export class AddSalesInvoicePageModule {}

@@ -82,20 +82,19 @@
     </ion-row>
   </ion-card-header>
   <ion-card-content class="ion-no-padding">
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
       <ng-container matColumnDef="position">
-        <th mat-header-cell *matHeaderCellDef>Claim No.</th>
-        <td mat-cell *matCellDef="let element">
-          Claim-000{{ element.position }}
-        </td>
+        <mat-header-cell *matHeaderCellDef>No.</mat-header-cell>
+        <mat-cell *matCellDef="let element">000{{ element.position }}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="serial">
-        <th mat-header-cell *matHeaderCellDef>Serial No</th>
-        <td
-          mat-cell
+        <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
+        <mat-cell
           *matCellDef="let element"
           [satPopoverAnchor]="p"
+          tabindex="0"
+          (keyup.enter)="p.open()"
           (click)="p.open()"
         >
           <ng-container *ngIf="element.serial_no">
@@ -113,33 +112,50 @@
           >
             <edit-table [value]="element.serial_no"> </edit-table>
           </sat-popover>
-        </td>
+        </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="item">
-        <th mat-header-cell *matHeaderCellDef>Item</th>
-        <td mat-cell *matCellDef="let element">{{ element.item }}</td>
+        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.item }}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="company">
-        <th mat-header-cell *matHeaderCellDef>Company</th>
-        <td mat-cell *matCellDef="let element">{{ element.company }}</td>
+        <mat-header-cell *matHeaderCellDef>Company</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.company }}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="supplier">
-        <th mat-header-cell *matHeaderCellDef>Supplier</th>
-        <td mat-cell *matCellDef="let element">{{ element.supplier }}</td>
+        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.supplier }}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="claimsReceivedDate">
-        <th mat-header-cell *matHeaderCellDef>Serial Assigned Date</th>
-        <td mat-cell *matCellDef="let element">
+        <mat-header-cell *matHeaderCellDef
+          >Serial Assigned Date</mat-header-cell
+        >
+        <mat-cell *matCellDef="let element">
           {{ element.claimsReceivedDate }}
-        </td>
+        </mat-cell>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
+      <ng-container matColumnDef="clear">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <ion-button
+            (click)="clearRow(element)"
+            color="danger"
+            color="danger"
+            fill="clear"
+          >
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
   </ion-card-content>
 </ion-card>

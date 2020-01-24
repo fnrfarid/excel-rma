@@ -14,16 +14,17 @@ import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.se
 import { SalesInvoiceRemovedEvent } from '../../event/sales-invoice-removed/sales-invoice-removed.event';
 import { SalesInvoiceUpdatedEvent } from '../../event/sales-invoice-updated/sales-invoice-updated.event';
 import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-update-dto';
-import { SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
+import { SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, catchError } from 'rxjs/operators';
 import { throwError, of, from } from 'rxjs';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
   CONTENT_TYPE,
   APPLICATION_JSON_CONTENT_TYPE,
+  DRAFT_STATUS,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -57,6 +58,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     return this.validateSalesInvoicePolicy
       .validateCustomer(salesInvoicePayload)
       .pipe(
+        switchMap(() => {
+          return this.validateSalesInvoicePolicy.validateItems(
+            salesInvoicePayload.items,
+          );
+        }),
         switchMap(() => {
           const salesInvoice = new SalesInvoice();
           Object.assign(salesInvoice, salesInvoicePayload);
@@ -96,8 +102,10 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     if (!provider) {
       throw new NotFoundException();
     }
-    if (provider.submitted === true) {
-      throw new BadRequestException(SUBMITTED_SALES_INVOICE_CANNOT_BE_UPDATED);
+    if (provider.status !== DRAFT_STATUS) {
+      throw new BadRequestException(
+        provider.status + SALES_INVOICE_CANNOT_BE_UPDATED,
+      );
     }
     this.apply(new SalesInvoiceUpdatedEvent(updatePayload));
   }
@@ -120,12 +128,22 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                 )
                 .pipe(
                   switchMap(isValid => {
-                    this.apply(new SalesInvoiceSubmittedEvent(salesInvoice));
-                    this.syncSubmittedSalesInvoice(
-                      salesInvoice,
-                      clientHttpRequest,
+                    return from(
+                      this.salesInvoiceService.updateOne(
+                        { uuid: salesInvoice.uuid },
+                        { $set: { inQueue: true } },
+                      ),
+                    ).pipe(
+                      switchMap(() => {
+                        this.apply(
+                          new SalesInvoiceSubmittedEvent(salesInvoice),
+                        );
+                        return this.syncSubmittedSalesInvoice(
+                          salesInvoice,
+                          clientHttpRequest,
+                        );
+                      }),
                     );
-                    return of({});
                   }),
                 );
             }),
@@ -170,24 +188,23 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         }),
       )
       .pipe(map(data => data.data.data))
-      .subscribe({
-        next: success => {
-          this.salesInvoiceService
-            .updateOne(
+      .pipe(
+        switchMap(success => {
+          return from(
+            this.salesInvoiceService.updateOne(
               { uuid: salesInvoice.uuid },
               {
                 $set: {
-                  inQueue: false,
                   isSynced: true,
                   submitted: true,
+                  inQueue: false,
                   name: success.name,
                 },
               },
-            )
-            .then(updated => {})
-            .catch(error => {});
-        },
-        error: err => {
+            ),
+          );
+        }),
+        catchError(err => {
           this.salesInvoiceService
             .updateOne(
               { uuid: salesInvoice.uuid },
@@ -195,8 +212,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             )
             .then(updated => {})
             .catch(error => {});
-        },
-      });
+          return throwError(
+            new BadRequestException(err.response ? err.response.data.exc : err),
+          );
+        }),
+      );
   }
 
   mapSalesInvoice(salesInvoice: SalesInvoice) {

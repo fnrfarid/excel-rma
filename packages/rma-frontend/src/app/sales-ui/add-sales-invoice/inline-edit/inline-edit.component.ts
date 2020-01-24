@@ -77,7 +77,7 @@ export class InlineEditComponent {
               selectedItem.item_name = this.itemFormControl.value.item_name;
               selectedItem.name = this.itemFormControl.value.name;
               selectedItem.owner = this.itemFormControl.value.owner;
-              selectedItem.rate = res[0].price_list_rate;
+              selectedItem.rate = res.length === 0 ? 0 : res[0].price_list_rate;
               this.popover.close(selectedItem);
             },
           });

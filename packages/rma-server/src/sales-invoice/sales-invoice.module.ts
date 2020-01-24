@@ -9,6 +9,7 @@ import { SalesInvoicePoliciesService } from './policies/sales-invoice-policies/s
 import { SalesInvoiceEntitiesModule } from './entity/entity.module';
 import { CustomerModule } from '../customer/customer.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
+import { SerialNoModule } from '../serial-no/serial-no.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
     HttpModule,
     CustomerModule,
     DeliveryNoteModule,
+    SerialNoModule,
   ],
   controllers: [SalesInvoiceController],
   providers: [

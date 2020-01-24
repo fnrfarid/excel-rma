@@ -10,6 +10,7 @@ import { SalesInvoice } from '../../common/interfaces/sales.interface';
 import { of } from 'rxjs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { STORAGE_TOKEN } from '../../api/storage/storage.service';
 
 describe('AddSalesInvoicePage', () => {
   let component: AddSalesInvoicePage;
@@ -39,6 +40,7 @@ describe('AddSalesInvoicePage', () => {
             getSalesInvoice: (...args) => of({}),
           },
         },
+        { provide: STORAGE_TOKEN, useValue: {} },
       ],
     }).compileComponents();
   }));

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material';
-import { CLOSE } from '../../../constants/app-string';
+import { CLOSE, REJECTED } from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
@@ -20,7 +19,6 @@ export class DetailsComponent implements OnInit {
   uuid;
 
   constructor(
-    private readonly router: Router,
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
@@ -28,16 +26,7 @@ export class DetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.router.events
-      .pipe(filter(route => route instanceof NavigationEnd))
-      .subscribe((route: NavigationEnd) => {
-        this.uuid = route.url.split('/')[2];
-        if (route.url.split('/')[1] === 'view-sales-invoice') {
-          route.url.split('/').length >= 3
-            ? this.getSalesInvoice(route.url.split('/')[2])
-            : null;
-        }
-      });
+    this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
   }
 
   getSalesInvoice(uuid: string) {
@@ -71,6 +60,17 @@ export class DetailsComponent implements OnInit {
         },
       });
   }
+
+  rejectSalesInvoice() {
+    const payload = {} as SalesInvoiceDetails;
+    payload.uuid = this.route.snapshot.params.invoiceUuid;
+    payload.status = REJECTED;
+    this.salesService.updateSalesInvoice(payload).subscribe({
+      next: success => {
+        this.location.back();
+      },
+    });
+  }
 }
 
 export class SalesInvoiceDetails {
@@ -82,6 +82,7 @@ export class SalesInvoiceDetails {
   due_date: string;
   address_display: string;
   contact_display: string;
+  status: string;
   submitted?: string;
   email?: string;
   contact_email: string;
