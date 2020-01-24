@@ -45,3 +45,22 @@ tr.mat-footer-row {
 .add-comment {
   opacity: 0.4;
 }
+
+.mat-column-clear {
+  flex: 0 0 5%;
+}
+
+mat-header-cell {
+  display: flex;
+  justify-content: center;
+}
+
+mat-header-row {
+  display: flex;
+  justify-content: center;
+}
+
+mat-cell {
+  display: flex;
+  justify-content: center;
+}

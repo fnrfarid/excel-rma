@@ -8,6 +8,7 @@ import {
   LOGGED_IN,
   SCOPE,
 } from '../constants/storage';
+import { StorageService } from '../api/storage/storage.service';
 
 @Component({
   selector: 'app-callback',
@@ -15,28 +16,37 @@ import {
   styleUrls: ['./callback.page.scss'],
 })
 export class CallbackPage implements OnInit {
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private storage: StorageService,
+  ) {}
 
   ngOnInit() {
     const home = 'home';
     this.route.fragment.subscribe((fragment: string) => {
-      const state = localStorage.getItem(STATE);
-      localStorage.removeItem(STATE);
-
       const query = new URLSearchParams(fragment);
       const respState = query.get(STATE);
-      if (state === respState) {
-        localStorage.setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN));
-        const now = Math.floor(Date.now() / 1000);
-        localStorage.setItem(
-          ACCESS_TOKEN_EXPIRY,
-          (now + Number(query.get(EXPIRES_IN))).toString(),
-        );
-        localStorage.setItem(SCOPE, query.get(SCOPE));
-        localStorage.setItem(LOGGED_IN, 'true');
-        this.router.navigateByUrl(home);
-        return;
-      }
+
+      this.storage.getItem(STATE).then(state => {
+        this.storage.removeItem(STATE).then();
+        if (state === respState) {
+          const now = Math.floor(Date.now() / 1000);
+          this.storage
+            .setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN))
+            .then(() =>
+              this.storage.setItem(
+                ACCESS_TOKEN_EXPIRY,
+                (now + Number(query.get(EXPIRES_IN))).toString(),
+              ),
+            )
+            .then(() => this.storage.setItem(SCOPE, query.get(SCOPE)))
+            .then(() => this.storage.setItem(LOGGED_IN, true))
+            .then(() => this.router.navigateByUrl(home));
+        } else {
+          this.router.navigateByUrl(home);
+        }
+      });
     });
   }
 }

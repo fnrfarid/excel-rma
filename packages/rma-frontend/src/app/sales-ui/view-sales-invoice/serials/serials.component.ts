@@ -9,8 +9,8 @@ import {
 } from '../../../constants/messages';
 import { CLOSE } from '../../../constants/app-string';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { startWith, switchMap, mergeMap, map } from 'rxjs/operators';
 import { SalesInvoiceDetails } from '../details/details.component';
 import { SerialAssign } from '../../../common/interfaces/sales.interface';
 
@@ -28,6 +28,7 @@ export class SerialsComponent implements OnInit {
     'company',
     'supplier',
     'claimsReceivedDate',
+    'clear',
   ];
   dataSource = [];
   date = new FormControl(new Date());
@@ -55,55 +56,86 @@ export class SerialsComponent implements OnInit {
   }
 
   getSalesInvoice(uuid: string) {
-    this.salesService.getSalesInvoice(uuid).subscribe({
-      next: (success: any) => {
-        // this.salesInvoiceDetails = success;
-        // this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
-        //   .address_display
-        //   ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
-        //   : undefined;
-        // this.dataSource = success.items;
-        this.salesInvoiceDetails = success;
+    from(this.salesService.getStore().getItem(DEFAULT_COMPANY))
+      .pipe(
+        switchMap(company => {
+          let i = 0;
+          return this.salesService.getSalesInvoice(uuid).pipe(
+            switchMap(success => {
+              this.salesInvoiceDetails = success as SalesInvoiceDetails;
+              return from(this.salesInvoiceDetails.items);
+            }),
+            map(item => {
+              i++;
+              return item;
+            }),
+            mergeMap(item => {
+              const itemList = [];
+              for (let j = 0; j < item.qty; j++) {
+                itemList.push({
+                  position: i,
+                  serial_no: '',
+                  item: item.item_name,
+                  company,
+                  claimsReceivedDate: this.claimsReceivedDate,
+                  rate: item.rate,
+                  qty: 1,
+                  amount: item.rate,
+                  item_code: item.item_code,
+                });
+                i++;
+              }
+              return of(itemList);
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        next: itemList => {
+          // this.salesInvoiceDetails = success;
+          // this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
+          //   .address_display
+          //   ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
+          //   : undefined;
+          // this.dataSource = success.items;
 
-        let i = 0;
-        const itemList = [];
-        for (const item of success.items) {
-          for (let j = 0; j < item.qty; j++) {
-            itemList.push({
-              position: i,
-              serial_no: '',
-              item: item.item_name,
-              company: localStorage.getItem(DEFAULT_COMPANY),
-              claimsReceivedDate: this.claimsReceivedDate,
-              rate: item.rate,
-              qty: 1,
-              amount: item.rate,
-              item_code: item.item_code,
-            });
-            i++;
-          }
-        }
-
-        this.dataSource = itemList;
-      },
-      error: err => {
-        this.snackbar.open(
-          err.error.message
-            ? err.error.message
-            : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
-          CLOSE,
-          { duration: 2500 },
-        );
-      },
-    });
+          this.dataSource = itemList;
+        },
+        error: err => {
+          this.snackbar.open(
+            err.error.message
+              ? err.error.message
+              : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
+            CLOSE,
+            { duration: 2500 },
+          );
+        },
+      });
   }
 
-  updateSerial(element, serial) {
-    if (serial.supplier) {
+  updateSerial(element, serial_no) {
+    if (serial_no) {
       const index = this.dataSource.indexOf(element);
-      this.dataSource[index].serial_no = serial.serial_no;
-      this.dataSource[index].supplier = serial.supplier;
+      this.dataSource[index].serial_no = serial_no;
+      this.salesService.getSerial(serial_no).subscribe({
+        next: res => {
+          this.dataSource[index].supplier = res[0].supplier.supplier_name;
+        },
+        error: err => {
+          this.dataSource[index].serial_no = '';
+          this.snackbar.open('Invalid Serial No ', CLOSE, {
+            duration: 2500,
+          });
+        },
+      });
+      // this.dataSource[index].supplier = serial.supplier;
     }
+  }
+
+  clearRow(element) {
+    const index = this.dataSource.indexOf(element);
+    this.dataSource[index].serial_no = '';
+    this.dataSource[index].supplier = '';
   }
 
   submitDeliveryNote() {

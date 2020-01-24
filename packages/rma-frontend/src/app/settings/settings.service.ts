@@ -14,12 +14,17 @@ import {
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
 } from '../constants/storage';
+import { from } from 'rxjs';
+import { StorageService } from '../api/storage/storage.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsService {
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly storage: StorageService,
+  ) {}
 
   relayCompaniesOperation() {
     return switchMap(value => {
@@ -29,15 +34,16 @@ export class SettingsService {
           filters: `[["name","like","%${value}%"]]`,
         },
       });
-      return this.http
-        .get<{ data: unknown[] }>(RELAY_LIST_COMPANIES_ENDPOINT, {
-          headers: {
-            [AUTHORIZATION]:
-              BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-          },
-          params,
-        })
-        .pipe(map(res => res.data));
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_LIST_COMPANIES_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
     });
   }
 
@@ -49,34 +55,44 @@ export class SettingsService {
           filters: `[["name","like","%${value}%"],["selling","=",1]]`,
         },
       });
-      return this.http
-        .get<{ data: unknown[] }>(RELAY_LIST_PRICELIST_ENDPOINT, {
-          headers: {
-            [AUTHORIZATION]:
-              BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-          },
-          params,
-        })
-        .pipe(map(res => res.data));
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_LIST_PRICELIST_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
     });
   }
 
   getSettings() {
-    return this.http.get<any>(GET_SETTINGS_ENDPOINT, {
-      headers: {
-        [AUTHORIZATION]:
-          BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-      },
-    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(GET_SETTINGS_ENDPOINT, {
+          headers,
+        });
+      }),
+    );
   }
 
-  checkUserProfile() {
-    return this.http.get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
-      headers: {
-        [AUTHORIZATION]:
-          BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-      },
-    });
+  checkUserProfile(accessToken?: string) {
+    if (accessToken) {
+      return this.http.get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
+        headers: {
+          [AUTHORIZATION]: BEARER_TOKEN_PREFIX + accessToken,
+        },
+      });
+    }
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
+          headers,
+        });
+      }),
+    );
   }
 
   updateSettings(
@@ -89,24 +105,23 @@ export class SettingsService {
     serviceAccountSecret: string,
     sellingPriceList: string,
   ) {
-    return this.http.post<any>(
-      UPDATE_SETTINGS_ENDPOINT,
-      {
-        authServerURL,
-        appURL,
-        defaultCompany,
-        frontendClientId,
-        backendClientId,
-        serviceAccountUser,
-        serviceAccountSecret,
-        sellingPriceList,
-      },
-      {
-        headers: {
-          [AUTHORIZATION]:
-            BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-        },
-      },
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<any>(
+          UPDATE_SETTINGS_ENDPOINT,
+          {
+            authServerURL,
+            appURL,
+            defaultCompany,
+            frontendClientId,
+            backendClientId,
+            serviceAccountUser,
+            serviceAccountSecret,
+            sellingPriceList,
+          },
+          { headers },
+        );
+      }),
     );
   }
 
@@ -121,13 +136,23 @@ export class SettingsService {
       .set('offset', (pageIndex * pageSize).toString())
       .set('search', filter)
       .set('sort', sortOrder);
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(LIST_TERRITORIES_ENDPOINT, {
+          headers,
+          params,
+        });
+      }),
+    );
+  }
 
-    return this.http.get(LIST_TERRITORIES_ENDPOINT, {
-      headers: {
-        [AUTHORIZATION]:
-          BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-      },
-      params,
-    });
+  getHeaders() {
+    return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
+      map(token => {
+        return {
+          [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+        };
+      }),
+    );
   }
 }

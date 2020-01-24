@@ -67,7 +67,12 @@ export class AddSalesInvoicePage implements OnInit {
         return this.salesService.getCustomerList(value);
       }),
     );
-    this.companyFormControl.setValue(localStorage.getItem(DEFAULT_COMPANY));
+    this.salesService
+      .getStore()
+      .getItem(DEFAULT_COMPANY)
+      .then(company => {
+        this.companyFormControl.setValue(company);
+      });
   }
 
   addItem() {

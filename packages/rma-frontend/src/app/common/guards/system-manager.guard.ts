@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, from } from 'rxjs';
 import { GET_USER_PROFILE_ROLES } from '../../constants/url-strings';
 import { SYSTEM_MANAGER } from '../../constants/app-string';
 import {
@@ -10,6 +10,7 @@ import {
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
 } from '../../constants/storage';
+import { StorageService } from '../../api/storage/storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,29 +18,31 @@ import {
 export class SystemManagerGuard implements CanActivate {
   constructor(
     private readonly http: HttpClient,
-    private readonly router: Router,
+    private readonly storage: StorageService,
   ) {}
 
   canActivate() {
-    this.router.navigate;
-    return this.http
-      .get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
-        headers: {
-          [AUTHORIZATION]:
-            BEARER_TOKEN_PREFIX + localStorage.getItem(ACCESS_TOKEN),
-        },
-      })
-      .pipe(
-        switchMap(res => {
-          if (
-            res &&
-            res.roles.length > 0 &&
-            res.roles.includes(SYSTEM_MANAGER)
-          ) {
-            return of(true);
-          }
-          return of(false);
-        }),
-      );
+    return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
+      switchMap(token => {
+        return this.http
+          .get<{ roles: string[] }>(GET_USER_PROFILE_ROLES, {
+            headers: {
+              [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+            },
+          })
+          .pipe(
+            switchMap(res => {
+              if (
+                res &&
+                res.roles.length > 0 &&
+                res.roles.includes(SYSTEM_MANAGER)
+              ) {
+                return of(true);
+              }
+              return of(false);
+            }),
+          );
+      }),
+    );
   }
 }
