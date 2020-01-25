@@ -16,7 +16,7 @@ export class DetailsComponent implements OnInit {
   displayedColumns = ['item_code', 'item_name', 'qty', 'rate', 'amount'];
   salesInvoiceDetails: SalesInvoiceDetails;
   dataSource: SalesInvoiceItem[];
-  uuid;
+  invoiceUuid: string;
 
   constructor(
     private readonly salesService: SalesService,
@@ -26,7 +26,8 @@ export class DetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
+    this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
+    this.getSalesInvoice(this.invoiceUuid);
   }
 
   getSalesInvoice(uuid: string) {
