@@ -42,5 +42,5 @@ export interface SerialNo {
   qty: number;
   rate: number;
   amount: number;
-  serial_no: string;
+  serial_no: string[];
 }
