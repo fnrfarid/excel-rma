@@ -9,13 +9,17 @@ import {
 @Pipe({
   name: 'curFormat',
 })
-export class CurFormatPipe implements PipeTransform {
+export class CurrencyFormatPipe implements PipeTransform {
   constructor(
     private readonly storage: StorageService,
     private readonly currencyPipe: CurrencyPipe,
   ) {}
   async transform(value) {
     const currency = await this.storage.getItem(DEFAULT_CURRENCY_KEY);
-    return this.currencyPipe.transform(value, currency || DEFAULT_CURRENCY);
+    return this.currencyPipe.transform(
+      value,
+      currency || DEFAULT_CURRENCY,
+      'symbol-narrow',
+    );
   }
 }
