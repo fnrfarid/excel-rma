@@ -6,7 +6,7 @@ import { MatPaginator, MatSort } from '@angular/material';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
 import { SettingsService } from '../../settings/settings.service';
 import { SYSTEM_MANAGER } from '../../constants/app-string';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 import {
   VIEW_SALES_INVOICE_PAGE_URL,
   ADD_SALES_INVOICE_PAGE_URL,
@@ -55,15 +55,20 @@ export class SalesPage implements OnInit {
     );
   }
 
-  navigateBasedOnRoles(uuid: string) {
+  navigateBasedOnRoles(row) {
     this.settingService.checkUserProfile().subscribe({
       next: res => {
         let navUrl: string;
         if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
-          navUrl = `${VIEW_SALES_INVOICE_PAGE_URL}/${uuid}`;
-          this.router.navigateByUrl(navUrl);
+          const navExtras: NavigationExtras = {
+            state: {
+              sales_invoice_name: row.name,
+            },
+          };
+          navUrl = `${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`;
+          this.router.navigateByUrl(navUrl, navExtras);
         } else {
-          navUrl = `${ADD_SALES_INVOICE_PAGE_URL}/edit/${uuid}`;
+          navUrl = `${ADD_SALES_INVOICE_PAGE_URL}/edit/${row.uuid}`;
           this.router.navigateByUrl(navUrl);
         }
       },

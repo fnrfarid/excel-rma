@@ -18,19 +18,19 @@
         <ion-segment-button value="0">
           <ion-label>Details</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="1">
+        <ion-segment-button value="1" *ngIf="sales_invoice_name">
           <ion-label>Serials</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="2">
+        <ion-segment-button value="2" *ngIf="sales_invoice_name">
           <ion-label>Accounts</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="3">
+        <ion-segment-button value="3" *ngIf="sales_invoice_name">
           <ion-label>Sales Return</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="4">
+        <ion-segment-button value="4" *ngIf="sales_invoice_name">
           <ion-label>Warranty</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="5">
+        <ion-segment-button value="5" *ngIf="sales_invoice_name">
           <ion-label>Credit Notes</ion-label>
         </ion-segment-button>
       </ion-segment>
