@@ -65,6 +65,7 @@ export class AppComponent implements OnInit {
           this.checkRoles(localToken as string);
         }
       });
+    this.appService.getGlobalDefault();
   }
 
   setUserSession() {

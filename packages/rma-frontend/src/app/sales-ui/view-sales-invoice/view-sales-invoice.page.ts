@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-view-sales-invoice',
@@ -8,11 +9,12 @@ import { Location } from '@angular/common';
 })
 export class ViewSalesInvoicePage implements OnInit {
   selectedSegment: any;
-
-  constructor(private readonly location: Location) {}
+  sales_invoice_name: string;
+  constructor(private readonly location: Location, private router: Router) {}
 
   ngOnInit() {
     this.selectedSegment = 0;
+    this.sales_invoice_name = this.router.getCurrentNavigation().extras.state.sales_invoice_name;
   }
 
   navigateBack() {

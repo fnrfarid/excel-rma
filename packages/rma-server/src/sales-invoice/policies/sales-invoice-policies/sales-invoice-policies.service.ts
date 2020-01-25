@@ -11,6 +11,7 @@ import {
   INVALID_ITEM_TOTAL,
 } from '../../../constants/messages';
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
+import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
 import { ItemDto } from '../../entity/sales-invoice/sales-invoice-dto';
 import { AssignSerialNoPoliciesService } from '../../../serial-no/policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { DRAFT_STATUS } from '../../../constants/app-strings';
@@ -113,5 +114,32 @@ export class SalesInvoicePoliciesService {
         return of(queueState);
       }),
     );
+  }
+
+  validateSalesReturn(createReturnPayload: CreateSalesReturnDto) {
+    const test = createReturnPayload.items;
+    const data = new Set();
+    test.forEach(element => {
+      data.add(element.against_sales_invoice);
+    });
+    const salesInvoiceName: any[] = Array.from(data);
+    if (salesInvoiceName.length === 1) {
+      return from(
+        this.salesInvoiceService.findOne({ name: salesInvoiceName }),
+      ).pipe(
+        switchMap(salesInvoice => {
+          return salesInvoiceName;
+        }),
+      );
+    }
+    return throwError(
+      new BadRequestException(
+        this.getMessage(SALES_INVOICE_NOT_FOUND, 1, salesInvoiceName.length),
+      ),
+    );
+  }
+
+  getMessage(notFoundMessage, expected, found) {
+    return `${notFoundMessage}, expected ${expected || 0} found ${found || 0}`;
   }
 }

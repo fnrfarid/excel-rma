@@ -9,7 +9,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, switchMap } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
-import { DRAFT } from '../../constants/app-string';
+import { DRAFT, CLOSE } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material';
 
 @Component({
@@ -69,9 +69,9 @@ export class AddSalesInvoicePage implements OnInit {
     );
     this.salesService
       .getStore()
-      .getItem(DEFAULT_COMPANY)
-      .then(company => {
-        this.companyFormControl.setValue(company);
+      .getItems([DEFAULT_COMPANY])
+      .then(items => {
+        this.companyFormControl.setValue(items[DEFAULT_COMPANY]);
       });
   }
 
@@ -170,7 +170,7 @@ export class AddSalesInvoicePage implements OnInit {
         error: err => {},
       });
     } else {
-      this.snackbar.open('Error : Duplicate Items added.', 'Close', {
+      this.snackbar.open('Error : Duplicate Items added.', CLOSE, {
         duration: 2500,
       });
     }

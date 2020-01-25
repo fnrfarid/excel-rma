@@ -16,6 +16,12 @@
         <ion-button color="danger" (click)="rejectSalesInvoice()">
           Reject
         </ion-button>
+        <ion-button
+          color="warning"
+          [routerLink]="['/add-sales-invoice', 'edit', invoiceUuid]"
+        >
+          Edit
+        </ion-button>
         <ion-button (click)="submitSalesInvoice()">
           Submit
         </ion-button>
@@ -133,7 +139,7 @@
               readonly="true"
               type="text"
               value="{{ salesInvoiceDetails?.status }}"
-              placeholder="Contact"
+              placeholder="Status"
               [ngStyle]="{
                 color: salesInvoiceDetails?.submitted === true ? 'green' : 'red'
               }"
@@ -224,7 +230,7 @@
         <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.rate }}
+            {{ row.rate | curFormat | async }}
           </ng-container>
           <!-- <sat-popover
               #p
@@ -239,7 +245,9 @@
       </ng-container>
       <ng-container matColumnDef="amount">
         <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
-        <mat-cell *matCellDef="let row">{{ row.rate * row.qty }}</mat-cell>
+        <mat-cell *matCellDef="let row">{{
+          row.rate * row.qty | curFormat | async
+        }}</mat-cell>
       </ng-container>
       <mat-header-row
         *matHeaderRowDef="displayedColumns; sticky: true"

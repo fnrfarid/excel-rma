@@ -21,6 +21,8 @@ import { SystemManagerGuard } from './common/guards/system-manager.guard';
 import { LoginService } from './api/login/login.service';
 import { StorageService, STORAGE_TOKEN } from './api/storage/storage.service';
 import { SERVICE_NAME } from './constants/storage';
+import { AppCommonModule } from './common/app-common.module';
+import { TimeService } from './api/time/time.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -35,11 +37,13 @@ import { SERVICE_NAME } from './constants/storage';
     SalesUiModule,
     PurchaseUiModule,
     BrowserAnimationsModule,
+    AppCommonModule,
   ],
   providers: [
     AppService,
     StatusBar,
     MessageService,
+    TimeService,
     HttpErrorHandler,
     SplashScreen,
     SystemManagerGuard,

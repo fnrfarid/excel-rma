@@ -10,7 +10,7 @@ export class DeliveryNoteService {
     private readonly deliveryNoteRepository: MongoRepository<DeliveryNote>,
   ) {}
 
-  async create(deliveryNotePayload: DeliveryNote) {
+  async create(deliveryNotePayload) {
     const deliveryNote = new DeliveryNote();
     Object.assign(deliveryNote, deliveryNotePayload);
     return await this.deliveryNoteRepository.insertOne(deliveryNote);

@@ -1,11 +1,14 @@
 export interface CreateDeliveryNoteInterface {
-  docstatus?: 1;
+  docstatus?: number;
   customer?: string;
   company?: string;
   posting_date?: string;
   posting_time?: string;
-  is_return?: number;
+  is_return?: boolean;
+  issue_credit_note?: boolean;
+  return_against?: string;
   set_warehouse?: string;
+  contact_email?: string;
   total_qty?: number;
   total?: number;
   items?: CreateDeliveryNoteItemInterface[];

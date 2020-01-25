@@ -174,7 +174,7 @@ export class DeliveryNoteAggregateService {
     deliveryNoteBody.docstatus = 1;
     deliveryNoteBody.posting_date = assignPayload.posting_date;
     deliveryNoteBody.posting_time = assignPayload.posting_time;
-    deliveryNoteBody.is_return = 0;
+    deliveryNoteBody.is_return = false;
     deliveryNoteBody.set_warehouse = assignPayload.set_warehouse;
     deliveryNoteBody.customer = assignPayload.customer;
     deliveryNoteBody.company = assignPayload.company;

@@ -7,6 +7,7 @@ import { AddSalesInvoicePage } from './add-sales-invoice.page';
 import { MaterialModule } from '../../material/material.module';
 import { InlineEditComponent } from './inline-edit/inline-edit.component';
 import { KeyDownDetectorDirective } from './on-key-down-directive';
+import { AppCommonModule } from '../../common/app-common.module';
 
 const routes: Routes = [
   {
@@ -19,6 +20,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
+    AppCommonModule,
     IonicModule,
     RouterModule.forChild(routes),
     MaterialModule,

@@ -12,7 +12,11 @@ import { FormControl } from '@angular/forms';
 import { Observable, from, of } from 'rxjs';
 import { startWith, switchMap, mergeMap, map } from 'rxjs/operators';
 import { SalesInvoiceDetails } from '../details/details.component';
-import { SerialAssign } from '../../../common/interfaces/sales.interface';
+import {
+  SerialAssign,
+  SerialNo,
+} from '../../../common/interfaces/sales.interface';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -41,6 +45,7 @@ export class SerialsComponent implements OnInit {
     private readonly snackbar: MatSnackBar,
     private readonly route: ActivatedRoute,
     private readonly salesService: SalesService,
+    private readonly location: Location,
   ) {}
 
   ngOnInit() {
@@ -119,16 +124,28 @@ export class SerialsComponent implements OnInit {
       this.dataSource[index].serial_no = serial_no;
       this.salesService.getSerial(serial_no).subscribe({
         next: res => {
-          this.dataSource[index].supplier = res[0].supplier.supplier_name;
+          if (res[0].item_code === element.item_code)
+            this.dataSource[index].supplier = res[0].supplier.supplier_name;
+          else {
+            this.snackbar.open(
+              'Serial Number is not assignable on current Item.',
+              CLOSE,
+              {
+                duration: 2500,
+              },
+            );
+            this.dataSource[index].serial_no = '';
+            this.dataSource[index].supplier = '';
+          }
         },
         error: err => {
           this.dataSource[index].serial_no = '';
+          this.dataSource[index].supplier = '';
           this.snackbar.open('Invalid Serial No ', CLOSE, {
             duration: 2500,
           });
         },
       });
-      // this.dataSource[index].supplier = serial.supplier;
     }
   }
 
@@ -149,25 +166,73 @@ export class SerialsComponent implements OnInit {
     assignSerial.total = 0;
     assignSerial.total_qty = 0;
     assignSerial.items = [];
-    for (const item of this.dataSource) {
-      assignSerial.total += item.amount;
-      assignSerial.total_qty += item.qty;
-      const serialItem = {} as SerialItem;
-      serialItem.item_code = item.item_code;
-      serialItem.qty = item.qty;
-      serialItem.rate = item.rate;
-      serialItem.amount = item.amount;
-      serialItem.serial_no = item.serial_no;
-      assignSerial.items.push(serialItem);
-    }
 
-    this.salesService.assignSerials(assignSerial).subscribe({
-      next: success => {
-        this.snackbar.open(SERIAL_ASSIGNED, CLOSE, {
-          duration: 2500,
-        });
-      },
+    const filteredItemCodeList = [
+      ...new Set(this.dataSource.map(item => item.item_code)),
+    ];
+
+    filteredItemCodeList.forEach(item_code => {
+      const serialItem = {} as SerialItem;
+      serialItem.serial_no = [];
+      serialItem.qty = 0;
+      serialItem.amount = 0;
+      serialItem.rate = 0;
+      serialItem.item_code = item_code;
+      this.dataSource.forEach(item => {
+        if (item_code === item.item_code && item.serial_no !== '') {
+          serialItem.qty += 1;
+          serialItem.amount += item.rate;
+          serialItem.serial_no.push(item.serial_no);
+          serialItem.rate = item.rate;
+        }
+      });
+      assignSerial.total += serialItem.amount;
+      assignSerial.total_qty += serialItem.qty;
+      assignSerial.items.push(serialItem);
     });
+
+    if (this.validateSerials(assignSerial.items)) {
+      this.salesService.assignSerials(assignSerial).subscribe({
+        next: success => {
+          this.snackbar.open(SERIAL_ASSIGNED, CLOSE, {
+            duration: 2500,
+          });
+          this.location.back();
+        },
+        error: err => {
+          if (err.status === 406) {
+            const errMessage = err.error.message.split('\\n');
+            this.snackbar.open(
+              errMessage[errMessage.length - 2].split(':')[1],
+              CLOSE,
+              {
+                duration: 2500,
+              },
+            );
+            return;
+          }
+          this.snackbar.open(err.error.message, CLOSE, {
+            duration: 2500,
+          });
+        },
+      });
+    } else {
+      this.snackbar.open('Error : Duplicate Serial number assigned.', CLOSE, {
+        duration: 2500,
+      });
+    }
+  }
+
+  validateSerials(itemList: SerialNo[]) {
+    const serials = [];
+    itemList.forEach(item => {
+      item.serial_no.forEach(serial => {
+        serials.push(serial);
+      });
+    });
+    const filteredSerials = [...new Set(serials)];
+    if (filteredSerials.length === serials.length) return true;
+    return false;
   }
 
   fileChangedEvent($event): void {
@@ -240,5 +305,5 @@ export interface SerialItem {
   qty: number;
   rate: number;
   amount: number;
-  serial_no: string;
+  serial_no: string[];
 }
