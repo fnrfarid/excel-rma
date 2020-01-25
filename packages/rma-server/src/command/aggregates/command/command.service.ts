@@ -5,61 +5,62 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { throwError } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
 import {
   INVALID_HTTP_METHOD,
   INVALID_REQUEST,
 } from '../../../constants/messages';
-import {
-  ACCEPT,
-  CONTENT_TYPE,
-  APPLICATION_JSON_CONTENT_TYPE,
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
-} from '../../../constants/app-strings';
-import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
-import { switchMap, map, catchError } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpRequestMethod } from '../../../constants/http-method.enum';
+import {
+  AUTHORIZATION,
+  CONTENT_TYPE,
+  ACCEPT,
+} from '../../../constants/app-strings';
 
 @Injectable()
 export class CommandService {
   constructor(
     private readonly http: HttpService,
-    private readonly clientToken: ClientTokenManagerService,
     private readonly settings: SettingsService,
   ) {}
 
   makeRequest(
     method: HttpRequestMethod,
     requestUrl: string[],
-    accessToken: string,
     params: unknown,
     data: unknown,
-    clientToken: boolean = false,
+    headers: unknown,
   ) {
-    if (clientToken && accessToken && !requestUrl.length) {
+    if (!requestUrl) {
       return throwError(new BadRequestException(INVALID_REQUEST));
     }
+
+    const relayHeaders = {};
+
+    if (headers[AUTHORIZATION]) {
+      relayHeaders[AUTHORIZATION] = headers[AUTHORIZATION];
+    }
+
+    if (headers[CONTENT_TYPE]) {
+      relayHeaders[CONTENT_TYPE] = headers[CONTENT_TYPE];
+    }
+
+    if (headers[ACCEPT]) {
+      relayHeaders[ACCEPT] = headers[ACCEPT];
+    }
+
     return this.settings.find().pipe(
       switchMap(settings => {
         const url = settings.authServerURL + '/' + requestUrl[0];
-        if (clientToken) {
-          return this.clientToken.getClientToken().pipe(
-            switchMap(token => {
-              return this.relayCommand(
-                method,
-                url,
-                token.accessToken,
-                params,
-                data,
-              );
-            }),
-          );
-        }
-        return this.relayCommand(method, url, accessToken, params, data);
+        return this.relayCommand(method, url, params, data, relayHeaders);
       }),
       catchError(error => {
-        return throwError(new InternalServerErrorException(error));
+        let message = error.message;
+        if (error.response && error.response.data) {
+          message = error.response.data;
+        }
+        return throwError(new InternalServerErrorException(message));
       }),
     );
   }
@@ -67,16 +68,10 @@ export class CommandService {
   relayCommand(
     method: HttpRequestMethod,
     url: string,
-    accessToken: string,
     params: unknown,
     data: unknown,
+    headers: unknown,
   ) {
-    const headers = {
-      [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
-      [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
-      [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + accessToken,
-    };
-
     switch (method) {
       case HttpRequestMethod.GET:
         return this.http

@@ -31,3 +31,7 @@ export const WARRANTY_CLAIM = 'warranty-claim';
 export const BEARER_TOKEN_PREFIX = 'Bearer ';
 export const DEFAULT_COMPANY = 'defaultCompany';
 export const SERVICE_NAME = 'excel-rma';
+export const DEFAULT_CURRENCY = 'BDT';
+export const DEFAULT_CURRENCY_KEY = 'defaultCurrency';
+export const COUNTRY = 'country';
+export const TIME_ZONE = 'time_zone';
