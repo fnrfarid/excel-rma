@@ -22,6 +22,7 @@ import { LoginService } from './api/login/login.service';
 import { StorageService, STORAGE_TOKEN } from './api/storage/storage.service';
 import { SERVICE_NAME } from './constants/storage';
 import { AppCommonModule } from './common/app-common.module';
+import { TimeService } from './api/time/time.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -42,6 +43,7 @@ import { AppCommonModule } from './common/app-common.module';
     AppService,
     StatusBar,
     MessageService,
+    TimeService,
     HttpErrorHandler,
     SplashScreen,
     SystemManagerGuard,
