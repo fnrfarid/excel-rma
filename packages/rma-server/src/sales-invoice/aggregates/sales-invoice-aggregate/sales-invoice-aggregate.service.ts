@@ -28,8 +28,19 @@ import {
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
-import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
+import {
+  FRAPPE_API_SALES_INVOICE_ENDPOINT,
+  POST_DELIVERY_NOTE_ENDPOINT,
+} from '../../../constants/routes';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
+import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
+import { DeliveryNote } from '../../../delivery-note/entity/delivery-note-service/delivery-note.entity';
+import {
+  CreateDeliveryNoteInterface,
+  CreateDeliveryNoteItemInterface,
+} from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
+import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-note-service/delivery-note-webhook.dto';
+import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -38,6 +49,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly settingsService: SettingsService,
     private readonly http: HttpService,
     private readonly validateSalesInvoicePolicy: SalesInvoicePoliciesService,
+    private readonly deliveryNoteService: DeliveryNoteService,
   ) {
     super();
   }
@@ -231,5 +243,96 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       payments: salesInvoice.payments,
       sales_team: salesInvoice.sales_team,
     };
+  }
+
+  createSalesReturn(
+    createReturnPayload: CreateSalesReturnDto,
+    clientHttpRequest,
+  ) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        if (!settings) {
+          return throwError(new NotImplementedException());
+        }
+        return from(
+          this.validateSalesInvoicePolicy.validateSalesReturn(
+            createReturnPayload,
+          ),
+        ).pipe(
+          switchMap(salesReturn => {
+            const deliveryNote = new DeliveryNote();
+            Object.assign(deliveryNote, createReturnPayload);
+            this.http
+              .post(
+                settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
+                deliveryNote,
+                {
+                  headers: {
+                    [AUTHORIZATION]:
+                      BEARER_HEADER_VALUE_PREFIX +
+                      clientHttpRequest.token.accessToken,
+                    [CONTENT_TYPE]: APP_WWW_FORM_URLENCODED,
+                    [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
+                  },
+                },
+              )
+              .pipe(map(data => data.data.data))
+              .subscribe({
+                next: response => {
+                  const deliveryNoteData = new DeliveryNote();
+                  deliveryNoteData.uuid = uuidv4();
+                  deliveryNoteData.isSynced = false;
+                  deliveryNoteData.inQueue = false;
+                  deliveryNoteData.is_return = true;
+                  deliveryNoteData.issue_credit_note = true;
+                  const delivery = this.mapCreateDeliveryNote(response);
+                  Object.assign(deliveryNoteData, delivery);
+                  this.deliveryNoteService.create(deliveryNoteData);
+                },
+                error: err => {},
+              });
+            return of({});
+          }),
+        );
+      }),
+    );
+  }
+
+  mapCreateDeliveryNote(
+    assignPayload: DeliveryNoteWebhookDto,
+  ): CreateDeliveryNoteInterface {
+    const deliveryNoteBody: CreateDeliveryNoteInterface = {};
+    deliveryNoteBody.docstatus = 1;
+    deliveryNoteBody.posting_date = assignPayload.posting_date;
+    deliveryNoteBody.posting_time = assignPayload.posting_time;
+    deliveryNoteBody.is_return = true;
+    deliveryNoteBody.issue_credit_note = true;
+    deliveryNoteBody.contact_email = assignPayload.contact_email;
+    deliveryNoteBody.set_warehouse = assignPayload.set_warehouse;
+    deliveryNoteBody.customer = assignPayload.customer;
+    deliveryNoteBody.company = assignPayload.company;
+    deliveryNoteBody.total_qty = assignPayload.total_qty;
+    deliveryNoteBody.total = assignPayload.total;
+    deliveryNoteBody.items = this.mapSerialsFromItem(assignPayload.items);
+    // deliveryNoteBody.pricing_rules = []
+    // deliveryNoteBody.packed_items = []
+    // deliveryNoteBody.taxes = []
+    // deliveryNoteBody.sales_team = []
+    return deliveryNoteBody;
+  }
+
+  mapSerialsFromItem(items: CreateDeliveryNoteItemInterface[]) {
+    const itemData = [];
+    items.forEach(eachItemData => {
+      itemData.push({
+        item_code: eachItemData.item_code,
+        qty: eachItemData.qty,
+        rate: eachItemData.rate,
+        serial_no: eachItemData.serial_no,
+        against_sales_invoice: eachItemData.against_sales_invoice,
+        amount: eachItemData.amount,
+      });
+    });
+    return itemData;
   }
 }
