@@ -31,3 +31,7 @@ export const FRAPPE_API_COMPANY_ENDPOINT = '/api/resource/Company';
 export const ERPNEXT_API_WAREHOUSE_ENDPOINT = '/api/resource/Warehouse';
 export const POST_DELIVERY_NOTE_ENDPOINT = '/api/resource/Delivery%20Note';
 export const API_RESOURCE_TERRITORY = '/api/resource/Territory';
+export const FRAPPE_API_GET_GLOBAL_DEFAULTS =
+  '/api/resource/Global Defaults/Global Defaults';
+export const FRAPPE_API_GET_SYSTEM_SETTINGS =
+  '/api/resource/System Settings/System Settings';

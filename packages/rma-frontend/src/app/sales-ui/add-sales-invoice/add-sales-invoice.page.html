@@ -290,9 +290,9 @@
                 <ng-container matColumnDef="total">
                   <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
                   <mat-cell *matCellDef="let row"
-                    >{{row.rate * row.qty}}</mat-cell
+                    >{{row.rate * row.qty | curFormat | async}}</mat-cell
                   >
-                  <mat-footer-cell *matFooterCellDef>{{total}}</mat-footer-cell>
+                  <mat-footer-cell *matFooterCellDef>{{total | curFormat | async }}</mat-footer-cell>
                 </ng-container>
                 <ng-container matColumnDef="delete">
                   <mat-header-cell *matHeaderCellDef></mat-header-cell>

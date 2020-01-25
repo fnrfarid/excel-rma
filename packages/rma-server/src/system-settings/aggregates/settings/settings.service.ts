@@ -59,8 +59,14 @@ import {
   SERIAL_NO_ON_UPDATE_ENDPOINT,
   FRAPPE_API_COMPANY_ENDPOINT,
   LIST_DELIVERY_NOTE_ENDPOINT,
+  FRAPPE_API_GET_GLOBAL_DEFAULTS,
+  FRAPPE_API_GET_SYSTEM_SETTINGS,
 } from '../../../constants/routes';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
+import {
+  FrappeGlobalDefaultsInterface,
+  FrappeSystemSettingsInterface,
+} from '../../../system-settings/entities/server-settings/server-defaults-interface';
 
 @Injectable()
 export class SettingsService extends AggregateRoot {
@@ -363,6 +369,47 @@ export class SettingsService extends AggregateRoot {
                 params: query,
               })
               .pipe(map(res => res.data));
+          }),
+        );
+      }),
+    );
+  }
+
+  relayListDefaults() {
+    return this.find().pipe(
+      switchMap(settings => {
+        if (!settings.authServerURL) {
+          return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
+        }
+        return this.clientToken.getClientToken().pipe(
+          switchMap(token => {
+            return this.http
+              .get(settings.authServerURL + FRAPPE_API_GET_GLOBAL_DEFAULTS, {
+                headers: this.getAuthorizationHeaders(token),
+              })
+              .pipe(
+                map(data => data.data.data),
+                switchMap((globalDefaults: FrappeGlobalDefaultsInterface) => {
+                  return this.http
+                    .get(
+                      settings.authServerURL + FRAPPE_API_GET_SYSTEM_SETTINGS,
+                      { headers: this.getAuthorizationHeaders(token) },
+                    )
+                    .pipe(
+                      map(data => data.data.data),
+                      switchMap(
+                        (systemSettings: FrappeSystemSettingsInterface) => {
+                          return of({
+                            default_company: globalDefaults.default_company,
+                            country: globalDefaults.country,
+                            default_currency: globalDefaults.default_currency,
+                            time_zone: systemSettings.time_zone,
+                          });
+                        },
+                      ),
+                    );
+                }),
+              );
           }),
         );
       }),

@@ -13,8 +13,12 @@ import {
   CALLBACK_ENDPOINT,
   SILENT_REFRESH_ENDPOINT,
   DEFAULT_COMPANY,
+  DEFAULT_CURRENCY_KEY,
+  COUNTRY,
+  TIME_ZONE,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
+import { GET_GLOBAL_DEFAULTS_ENDPOINT } from './constants/url-strings';
 
 @Injectable()
 export class AppService {
@@ -65,5 +69,22 @@ export class AppService {
 
   getStorage() {
     return this.storage;
+  }
+
+  getGlobalDefault() {
+    return this.http.get(GET_GLOBAL_DEFAULTS_ENDPOINT).subscribe({
+      next: (success: {
+        default_currency: string;
+        country: string;
+        time_zone: string;
+      }) => {
+        this.storage
+          .setItem(DEFAULT_CURRENCY_KEY, success.default_currency)
+          .then(() => this.storage.setItem(COUNTRY, success.country))
+          .then(() => this.storage.setItem(TIME_ZONE, success.time_zone))
+          .then(() => {});
+      },
+      error: err => {},
+    });
   }
 }

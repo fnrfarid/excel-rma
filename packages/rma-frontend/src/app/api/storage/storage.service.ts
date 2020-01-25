@@ -22,4 +22,14 @@ export class StorageService {
   async clear() {
     return await this.storage.clear();
   }
+
+  async getItems(keys: string[]) {
+    const data = {};
+    for (const key in keys) {
+      if (key) {
+        data[keys[key]] = await this.getItem(keys[key]);
+      }
+    }
+    return data;
+  }
 }
