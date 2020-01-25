@@ -81,4 +81,9 @@ export class SettingsController {
   relayListCompanies(@Query() query) {
     return this.settingsService.relayListCompanies(query);
   }
+
+  @Get('v1/relay_get_defaults')
+  relayGetDefaults() {
+    return this.settingsService.relayListDefaults();
+  }
 }

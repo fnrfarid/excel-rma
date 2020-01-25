@@ -28,3 +28,5 @@ export const RELAY_LIST_TERRITORIES_ENDPOINT =
 export const CREATE_TERRITORY_ENDPOINT = '/api/territory/v1/create';
 export const UPDATE_TERRITORY_ENDPOINT = '/api/territory/v1/update';
 export const DELETE_TERRITORY_ENDPOINT = '/api/territory/v1/remove';
+export const GET_GLOBAL_DEFAULTS_ENDPOINT =
+  '/api/settings/v1/relay_get_defaults';

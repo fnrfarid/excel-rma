@@ -14,6 +14,7 @@ import { SalesReturnComponent } from './sales-return/sales-return.component';
 import { SerialsComponent } from './serials/serials.component';
 import { MaterialModule } from '../../material/material.module';
 import { EditTableComponent } from './edit-table/edit-table.component';
+import { AppCommonModule } from '../../common/app-common.module';
 
 const routes: Routes = [
   {
@@ -29,6 +30,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     IonicModule,
     MaterialModule,
+    AppCommonModule,
     RouterModule.forChild(routes),
   ],
   declarations: [
