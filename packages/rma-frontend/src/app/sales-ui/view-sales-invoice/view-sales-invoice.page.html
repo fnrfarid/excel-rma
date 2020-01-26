@@ -43,6 +43,7 @@
     <sales-invoice-serials class="width" *ngSwitchCase="1">
     </sales-invoice-serials>
     <sales-invoice-accounts
+      [sales_invoice]="sales_invoice_name"
       class="width"
       *ngSwitchCase="2"
     ></sales-invoice-accounts>
@@ -54,7 +55,11 @@
       class="width"
       *ngSwitchCase="4"
     ></sales-invoice-warranty>
-    <sales-invoice-credit-notes class="width" *ngSwitchCase="5">
+    <sales-invoice-credit-notes
+      [sales_invoice]="sales_invoice_name"
+      class="width"
+      *ngSwitchCase="5"
+    >
     </sales-invoice-credit-notes>
   </div>
 </ion-content>

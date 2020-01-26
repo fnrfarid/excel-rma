@@ -30,3 +30,6 @@ export const UPDATE_TERRITORY_ENDPOINT = '/api/territory/v1/update';
 export const DELETE_TERRITORY_ENDPOINT = '/api/territory/v1/remove';
 export const GET_GLOBAL_DEFAULTS_ENDPOINT =
   '/api/settings/v1/relay_get_defaults';
+export const LIST_RETURN_VOUCHER_ENDPOINT = 'api/return_voucher/v1/list';
+export const LIST_CREDIT_NOTE_ENDPOINT = 'api/credit_note/v1/list';
+export const LIST_DELIVERY_NOTE_ENDPOINT = 'api/delivery_note/v1/list';

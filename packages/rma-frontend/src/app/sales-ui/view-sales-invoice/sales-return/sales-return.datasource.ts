@@ -1,7 +1,7 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
+import { SalesReturnService } from './sales-return.service';
 
 export interface ListingData {
   name: string;
@@ -23,7 +23,7 @@ export class SalesReturnDataSource extends DataSource<ListingData> {
 
   loading$ = this.loadingSubject.asObservable();
 
-  constructor(private model: string, private listingService: WarrantyService) {
+  constructor(private salesReturnService: SalesReturnService) {
     super();
   }
 
@@ -36,10 +36,22 @@ export class SalesReturnDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+  loadItems(
+    sales_invoice: string,
+    filter = '',
+    sortOrder = 'asc',
+    pageIndex = 0,
+    pageSize = 10,
+  ) {
     this.loadingSubject.next(true);
-    this.listingService
-      .findModels(this.model, filter, sortOrder, pageIndex, pageSize)
+    this.salesReturnService
+      .getReturnVoucherList(
+        sales_invoice,
+        filter,
+        sortOrder,
+        pageIndex,
+        pageSize,
+      )
       .pipe(
         map((items: ListingData[]) => {
           this.data = items;
