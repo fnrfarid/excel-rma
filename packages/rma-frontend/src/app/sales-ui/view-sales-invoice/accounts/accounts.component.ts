@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AccountsDataSource } from './accounts-datasource';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
 import { MatPaginator, MatSort } from '@angular/material';
+import { AccountsService } from './accounts.service';
 
 @Component({
   selector: 'sales-invoice-accounts',
@@ -11,6 +11,9 @@ import { MatPaginator, MatSort } from '@angular/material';
 export class AccountsComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+
+  @Input()
+  sales_invoice: string;
   displayedColumns = [
     'name',
     'posting_date',
@@ -24,20 +27,19 @@ export class AccountsComponent implements OnInit {
     'owner',
     'modified_by',
   ];
-  model: string;
   search: string = '';
   dataSource: AccountsDataSource;
 
-  constructor(private readonly warrantyService: WarrantyService) {}
+  constructor(private readonly accountsService: AccountsService) {}
 
   ngOnInit() {
-    this.model = 'return_voucher';
-    this.dataSource = new AccountsDataSource(this.model, this.warrantyService);
-    this.dataSource.loadItems();
+    this.dataSource = new AccountsDataSource(this.accountsService);
+    this.dataSource.loadItems(this.sales_invoice);
   }
 
   getUpdate(event) {
     this.dataSource.loadItems(
+      this.sales_invoice,
       this.search,
       this.sort.direction,
       event.pageIndex,
@@ -47,6 +49,7 @@ export class AccountsComponent implements OnInit {
 
   setFilter() {
     this.dataSource.loadItems(
+      this.sales_invoice,
       this.search,
       this.sort.direction,
       this.paginator.pageIndex,

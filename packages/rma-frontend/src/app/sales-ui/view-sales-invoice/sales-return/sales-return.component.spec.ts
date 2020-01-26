@@ -3,10 +3,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SalesReturnComponent } from './sales-return.component';
 import { MaterialModule } from '../../../material/material.module';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
+import { SalesReturnService } from './sales-return.service';
 
 describe('SalesReturnComponent', () => {
   let component: SalesReturnComponent;
@@ -19,9 +19,9 @@ describe('SalesReturnComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
-          provide: WarrantyService,
+          provide: SalesReturnService,
           useValue: {
-            findModels: (...args) => of({}),
+            getReturnVoucherList: (...args) => of([{}]),
           },
         },
       ],
