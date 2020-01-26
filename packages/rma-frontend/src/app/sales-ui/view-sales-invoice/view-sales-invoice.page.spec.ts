@@ -3,7 +3,9 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 
 import { ViewSalesInvoicePage } from './view-sales-invoice.page';
-import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { SalesService } from '../services/sales.service';
+import { of } from 'rxjs';
 
 describe('ViewSalesInvoicePage', () => {
   let component: ViewSalesInvoicePage;
@@ -12,16 +14,19 @@ describe('ViewSalesInvoicePage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ViewSalesInvoicePage],
+      imports: [RouterTestingModule],
       providers: [
         {
           provide: Location,
           useValue: {},
         },
         {
-          provide: Router,
+          provide: SalesService,
           useValue: {
-            getCurrentNavigation: () => ({
-              extras: { state: { sales_invoice_name: 'SINV-00420' } },
+            getSalesInvoice: (...args) => of({}),
+            getStore: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
             }),
           },
         },

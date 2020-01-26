@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { SalesReturnDataSource } from './sales-return.datasource';
 import { MatPaginator, MatSort } from '@angular/material';
+import { SalesReturnService } from './sales-return.service';
 
 @Component({
   selector: 'sales-invoice-return',
@@ -11,6 +11,9 @@ import { MatPaginator, MatSort } from '@angular/material';
 export class SalesReturnComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+
+  @Input()
+  sales_invoice: string;
 
   dataSource: SalesReturnDataSource;
   displayedColumns = [
@@ -22,22 +25,18 @@ export class SalesReturnComponent implements OnInit {
     'owner',
     'modified_by',
   ];
-  model: string;
   search: string = '';
 
-  constructor(private readonly warrantyService: WarrantyService) {}
+  constructor(private readonly salesReturnService: SalesReturnService) {}
 
   ngOnInit() {
-    this.model = 'delivery_note';
-    this.dataSource = new SalesReturnDataSource(
-      this.model,
-      this.warrantyService,
-    );
-    this.dataSource.loadItems();
+    this.dataSource = new SalesReturnDataSource(this.salesReturnService);
+    this.dataSource.loadItems(this.sales_invoice);
   }
 
   getUpdate(event) {
     this.dataSource.loadItems(
+      this.sales_invoice,
       this.search,
       this.sort.direction,
       event.pageIndex,
@@ -47,6 +46,7 @@ export class SalesReturnComponent implements OnInit {
 
   setFilter() {
     this.dataSource.loadItems(
+      this.sales_invoice,
       this.search,
       this.sort.direction,
       this.paginator.pageIndex,
