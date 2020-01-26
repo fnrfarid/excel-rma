@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { SalesPage } from './sales.page';
 import { MaterialModule } from '../../material/material.module';
+import { AppCommonModule } from '../../common/app-common.module';
 
 const routes: Routes = [
   {
@@ -23,6 +24,7 @@ const routes: Routes = [
     MaterialModule,
     ReactiveFormsModule,
     RouterModule.forChild(routes),
+    AppCommonModule,
   ],
   declarations: [SalesPage],
 })
