@@ -6,11 +6,12 @@ import { MatPaginator, MatSort } from '@angular/material';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
 import { SettingsService } from '../../settings/settings.service';
 import { SYSTEM_MANAGER } from '../../constants/app-string';
-import { Router, NavigationExtras } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import {
   VIEW_SALES_INVOICE_PAGE_URL,
   ADD_SALES_INVOICE_PAGE_URL,
 } from '../../constants/url-strings';
+import { map, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sales',
@@ -34,7 +35,15 @@ export class SalesPage implements OnInit {
 
   ngOnInit() {
     this.dataSource = new SalesInvoiceDataSource(this.salesService);
-    this.dataSource.loadItems();
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map(event => {
+          this.dataSource.loadItems();
+          return event;
+        }),
+      )
+      .subscribe({ next: res => {}, error: err => {} });
   }
 
   getUpdate(event) {
@@ -60,13 +69,8 @@ export class SalesPage implements OnInit {
       next: res => {
         let navUrl: string;
         if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
-          const navExtras: NavigationExtras = {
-            state: {
-              sales_invoice_name: row.name,
-            },
-          };
           navUrl = `${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`;
-          this.router.navigateByUrl(navUrl, navExtras);
+          this.router.navigateByUrl(navUrl);
         } else {
           navUrl = `${ADD_SALES_INVOICE_PAGE_URL}/edit/${row.uuid}`;
           this.router.navigateByUrl(navUrl);
