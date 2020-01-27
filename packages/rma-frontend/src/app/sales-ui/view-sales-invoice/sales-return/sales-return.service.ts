@@ -5,7 +5,7 @@ import {
   BEARER_TOKEN_PREFIX,
   AUTHORIZATION,
   ACCESS_TOKEN,
-} from 'src/app/constants/storage';
+} from '../../../constants/storage';
 import { map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { LIST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/url-strings';

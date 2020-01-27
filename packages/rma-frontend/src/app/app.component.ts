@@ -209,13 +209,18 @@ export class AppComponent implements OnInit {
                         (iframe.contentWindow || iframe.contentDocument)
                           .location.href;
                       } catch (err) {
-                        this.appService.getStorage().clear();
-                        this.initiateLogin(response.authorizationURL, {
-                          ...frappe_auth_config,
-                          ...{
-                            redirect_uri: response.appURL + CALLBACK_ENDPOINT,
-                          },
-                        });
+                        this.appService
+                          .getStorage()
+                          .clear()
+                          .then(() =>
+                            this.initiateLogin(response.authorizationURL, {
+                              ...frappe_auth_config,
+                              ...{
+                                redirect_uri:
+                                  response.appURL + CALLBACK_ENDPOINT,
+                              },
+                            }),
+                          );
                       }
                     };
                     iframe.className = 'silent-iframe';

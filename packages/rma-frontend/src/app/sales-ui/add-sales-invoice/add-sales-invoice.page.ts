@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
@@ -7,7 +7,7 @@ import { Location } from '@angular/common';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+import { startWith, switchMap, filter } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
 import { DRAFT, CLOSE } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material';
@@ -37,6 +37,7 @@ export class AddSalesInvoicePage implements OnInit {
     private salesService: SalesService,
     private readonly snackbar: MatSnackBar,
     private location: Location,
+    private readonly router: Router,
   ) {}
 
   ngOnInit() {
@@ -67,11 +68,22 @@ export class AddSalesInvoicePage implements OnInit {
         return this.salesService.getCustomerList(value);
       }),
     );
-    this.salesService
-      .getStore()
-      .getItems([DEFAULT_COMPANY])
-      .then(items => {
-        this.companyFormControl.setValue(items[DEFAULT_COMPANY]);
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe({
+        next: event => {
+          this.salesService
+            .getStore()
+            .getItems([DEFAULT_COMPANY])
+            .then(items => {
+              if (items[DEFAULT_COMPANY]) {
+                this.companyFormControl.setValue(items[DEFAULT_COMPANY]);
+              } else {
+                this.getApiInfo();
+              }
+            });
+        },
+        error: error => {},
       });
   }
 
@@ -252,5 +264,14 @@ export class AddSalesInvoicePage implements OnInit {
 
   getOptionText(option) {
     if (option) return option.customer_name;
+  }
+
+  getApiInfo() {
+    this.salesService.getApiInfo().subscribe({
+      next: res => {
+        this.companyFormControl.setValue(res.defaultCompany);
+      },
+      error: error => {},
+    });
   }
 }

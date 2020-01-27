@@ -6,7 +6,7 @@ import { CLOSE, REJECTED } from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
-import { AUTH_SERVER_URL } from 'src/app/constants/storage';
+import { AUTH_SERVER_URL } from '../../../constants/storage';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -45,7 +45,15 @@ export class DetailsComponent implements OnInit {
           .getStore()
           .getItem(AUTH_SERVER_URL)
           .then(auth_url => {
-            this.viewSalesInvoiceUrl = `${auth_url}/desk#Form/Sales Invoice/${success.name}`;
+            if (auth_url) {
+              this.viewSalesInvoiceUrl = `${auth_url}/desk#Form/Sales Invoice/${success.name}`;
+            } else {
+              this.salesService.getApiInfo().subscribe({
+                next: res => {
+                  this.viewSalesInvoiceUrl = `${res.authServerURL}/desk#Form/Sales Invoice/${success.name}`;
+                },
+              });
+            }
           });
       },
       error: err => {
