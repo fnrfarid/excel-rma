@@ -156,15 +156,15 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
               { serial_no: { $in: serials } },
               { $set: { delivery_note: response.name } },
             )
-            .then(success => { })
-            .catch(error => { });
+            .then(success => {})
+            .catch(error => {});
           this.salesInvoiceService
             .updateMany(
               { name: assignPayload.sales_invoice_name },
               { $push: { delivery_note_items: { $each: items } } },
             )
-            .then(success => { })
-            .catch(error => { });
+            .then(success => {})
+            .catch(error => {});
           return of({});
         }),
         catchError(err => {
@@ -210,8 +210,8 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     return items;
   }
 
-  getDeliveryNote(uuid: string) {
-    return this.deliveryNoteService.findOne({ uuid });
+  async getDeliveryNote(uuid: string) {
+    return await this.deliveryNoteService.findOne({ uuid });
   }
 
   async updateDeliveryNote(payload: UpdateDeliveryNoteDto) {

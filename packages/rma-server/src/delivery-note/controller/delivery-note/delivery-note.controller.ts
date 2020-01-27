@@ -29,7 +29,7 @@ export class DeliveryNoteController {
     private readonly deliveryNoteAggregate: DeliveryNoteAggregateService,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
-  ) { }
+  ) {}
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
