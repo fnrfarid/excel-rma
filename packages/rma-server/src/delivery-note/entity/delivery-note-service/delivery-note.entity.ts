@@ -116,6 +116,7 @@ export class DeliveryNoteItems {
   price_list_rate: number;
   base_price_list_rate: number;
   rate: number;
+  serial_no: string;
   amount: number;
 }
 export class DeliveryNoteTaxes {
