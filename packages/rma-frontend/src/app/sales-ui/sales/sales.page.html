@@ -84,12 +84,12 @@
                     [ngStyle]="{
                     color: 'green'
                   }"
-                    *ngIf="row.submitted"
+                    *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' "
                   >
                     {{row.status}}
                   </ion-text>
                   <ion-text
-                    *ngIf="!row.submitted"
+                    *ngIf="row.status === 'Draft' || row.status === 'Rejected' "
                     [ngStyle]="{
                     color: 'red'
                   }"
