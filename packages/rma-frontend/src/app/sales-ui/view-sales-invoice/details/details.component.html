@@ -31,19 +31,6 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Company</ion-label>
-            <ion-input
-              readonly="true"
-              placeholder="Castlecraft"
-              type="string"
-              value="{{
-                salesInvoiceDetails?.company ? salesInvoiceDetails.company : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
             <ion-label position="floating">Customer</ion-label>
             <ion-input
               placeholder="Company"
@@ -57,14 +44,33 @@
             ></ion-input>
           </ion-item>
         </ion-col>
+        <ion-col *ngIf="salesInvoiceDetails?.name">
+          <ion-item lines="none" [href]="viewSalesInvoiceUrl" target="_blank">
+            <ion-label position="floating">Sales Invoice Number</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              value="{{
+                salesInvoiceDetails?.name ? salesInvoiceDetails.name : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col *ngIf="!salesInvoiceDetails?.name">
+          <ion-item lines="none">
+            <ion-label position="floating">Sales Invoice Number</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              placeholder="Submit Invoice to See SI Number"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
       </ion-row>
       <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Address</ion-label>
-            <!-- <textarea name="" id="" cols="30" rows="3" disabled>
-              {{salesInvoiceDetails?.address_display ? salesInvoiceDetails.address_display : ''}}
-            </textarea> -->
             <ion-input
               readonly="true"
               type="string"
@@ -173,15 +179,6 @@
           <span class="add-comment" *ngIf="!row.name">
             Add an item
           </span>
-          <!-- <sat-popover
-              #p
-              hasBackdrop
-              xAlign="start"
-              yAlign="start"
-              (closed)="updateItem(row, $event)"
-            >
-              <inline-edit [value]="row.name" column="item"></inline-edit>
-            </sat-popover> -->
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="item_name">
@@ -190,19 +187,6 @@
           <ng-container>
             {{ row.item_name }}
           </ng-container>
-          <!--
-          <sat-popover
-            #p
-            hasBackdrop
-            xAlign="start"
-            yAlign="start"
-            (closed)="updateQuantity(row, $event)"
-          >
-            <inline-edit
-              [value]="row.quantity"
-              column="quantity"
-            ></inline-edit>
-          </sat-popover> -->
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="qty">
@@ -211,19 +195,6 @@
           <ng-container>
             {{ row.qty }}
           </ng-container>
-          <!--
-            <sat-popover
-              #p
-              hasBackdrop
-              xAlign="start"
-              yAlign="start"
-              (closed)="updateQuantity(row, $event)"
-            >
-              <inline-edit
-                [value]="row.quantity"
-                column="quantity"
-              ></inline-edit>
-            </sat-popover> -->
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="rate">
@@ -232,15 +203,6 @@
           <ng-container>
             {{ row.rate | curFormat | async }}
           </ng-container>
-          <!-- <sat-popover
-              #p
-              hasBackdrop
-              xAlign="start"
-              yAlign="start"
-              (closed)="updateRate(row, $event)"
-            >
-              <inline-edit [value]="row.rate" column="rate"></inline-edit>
-            </sat-popover> -->
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="amount">
