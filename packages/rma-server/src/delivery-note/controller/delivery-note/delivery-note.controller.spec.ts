@@ -9,6 +9,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { ConnectService } from '../../../auth/aggregates/connect/connect.service';
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
 
 describe('DeliveryNote Controller', () => {
   let controller: DeliveryNoteController;
@@ -27,6 +28,8 @@ describe('DeliveryNote Controller', () => {
         { provide: HttpService, useValue: {} },
         { provide: ConnectService, useValue: {} },
         { provide: Reflector, useValue: {} },
+        { provide: QueryBus, useValue: {} },
+        { provide: CommandBus, useValue: {} },
       ],
     })
       .overrideGuard(TokenGuard)
