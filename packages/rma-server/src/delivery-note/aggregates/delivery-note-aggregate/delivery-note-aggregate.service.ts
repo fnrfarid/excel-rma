@@ -16,6 +16,7 @@ import {
 import {
   PLEASE_RUN_SETUP,
   SALES_INVOICE_MANDATORY,
+  NO_DELIVERY_NOTE_FOUND,
 } from '../../../constants/messages';
 import {
   AUTHORIZATION,
@@ -30,20 +31,27 @@ import {
 import { DeliveryNoteResponseInterface } from '../../entity/delivery-note-service/delivery-note-response-interface';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { DeliveryNoteService } from '../../entity/delivery-note-service/delivery-note.service';
+import { UpdateDeliveryNoteDto } from '../../entity/delivery-note-service/update-delivery-note.dto';
+import { DeliveryNoteUpdatedEvent } from '../../events/delivery-note-updated/delivery-note-updated.event';
 import {
   DELIVERY_NOTE_IS_RETURN_FILTER_QUERY,
   DELIVERY_NOTE_FILTER_BY_SALES_INVOICE_QUERY,
 } from '../../../constants/query';
 
 @Injectable()
-export class DeliveryNoteAggregateService {
+export class DeliveryNoteAggregateService extends AggregateRoot {
   constructor(
     private readonly settingsService: SettingsService,
     private readonly http: HttpService,
     private readonly serialNoService: SerialNoService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly salesInvoiceService: SalesInvoiceService,
-  ) {}
+    private readonly deliveryNoteService: DeliveryNoteService,
+  ) {
+    super();
+  }
 
   listDeliveryNote(offset, limit, req, sales_invoice) {
     if (!sales_invoice) {
@@ -200,5 +208,19 @@ export class DeliveryNoteAggregateService {
       element.serial_no = element.serial_no.join('\n');
     });
     return items;
+  }
+
+  async getDeliveryNote(uuid: string) {
+    return await this.deliveryNoteService.findOne({ uuid });
+  }
+
+  async updateDeliveryNote(payload: UpdateDeliveryNoteDto) {
+    const foundDeliveryNote = await this.deliveryNoteService.findOne({
+      uuid: payload.uuid,
+    });
+    if (!foundDeliveryNote) {
+      throw new BadRequestException(NO_DELIVERY_NOTE_FOUND);
+    }
+    this.apply(new DeliveryNoteUpdatedEvent(payload));
   }
 }
