@@ -5,8 +5,8 @@ import { AccountsComponent } from './accounts.component';
 import { MaterialModule } from '../../../material/material.module';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
 import { of } from 'rxjs';
+import { AccountsService } from './accounts.service';
 
 describe('AccountsComponent', () => {
   let component: AccountsComponent;
@@ -19,9 +19,9 @@ describe('AccountsComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
-          provide: WarrantyService,
+          provide: AccountsService,
           useValue: {
-            findModels: (...args) => of({}),
+            getReturnVoucherList: (...args) => of([{}]),
           },
         },
       ],

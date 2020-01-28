@@ -3,10 +3,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CreditNotesComponent } from './credit-notes.component';
 import { MaterialModule } from '../../../material/material.module';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
 import { of } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
+import { CreditNoteService } from './credit-note.service';
 
 describe('CreditNotesComponent', () => {
   let component: CreditNotesComponent;
@@ -19,9 +19,9 @@ describe('CreditNotesComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
-          provide: WarrantyService,
+          provide: CreditNoteService,
           useValue: {
-            findModels: (...args) => of({}),
+            getCreditNoteList: (...args) => of([{}]),
           },
         },
       ],

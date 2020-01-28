@@ -84,12 +84,12 @@
                     [ngStyle]="{
                     color: 'green'
                   }"
-                    *ngIf="row.submitted"
+                    *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' "
                   >
                     {{row.status}}
                   </ion-text>
                   <ion-text
-                    *ngIf="!row.submitted"
+                    *ngIf="row.status === 'Draft' || row.status === 'Rejected' "
                     [ngStyle]="{
                     color: 'red'
                   }"
@@ -109,7 +109,7 @@
                   Total
                 </th>
                 <td mat-cell *matCellDef="let row">
-                  ₹ {{row.total}}
+                  {{row.total | curFormat | async }}
                 </td>
               </ng-container>
 
@@ -120,7 +120,7 @@
               <tr
                 mat-row
                 *matRowDef="let row; columns: displayedColumns;"
-                (click)="navigateBasedOnRoles(row.uuid)"
+                (click)="navigateBasedOnRoles(row)"
               ></tr>
             </table>
 

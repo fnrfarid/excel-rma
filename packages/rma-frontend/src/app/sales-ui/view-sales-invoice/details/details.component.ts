@@ -6,6 +6,7 @@ import { CLOSE, REJECTED } from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
+import { AUTH_SERVER_URL } from '../../../constants/storage';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -16,7 +17,8 @@ export class DetailsComponent implements OnInit {
   displayedColumns = ['item_code', 'item_name', 'qty', 'rate', 'amount'];
   salesInvoiceDetails: SalesInvoiceDetails;
   dataSource: SalesInvoiceItem[];
-  uuid;
+  invoiceUuid: string;
+  viewSalesInvoiceUrl: string;
 
   constructor(
     private readonly salesService: SalesService,
@@ -26,7 +28,8 @@ export class DetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
+    this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
+    this.getSalesInvoice(this.invoiceUuid);
   }
 
   getSalesInvoice(uuid: string) {
@@ -38,6 +41,20 @@ export class DetailsComponent implements OnInit {
           ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
           : undefined;
         this.dataSource = success.items;
+        this.salesService
+          .getStore()
+          .getItem(AUTH_SERVER_URL)
+          .then(auth_url => {
+            if (auth_url) {
+              this.viewSalesInvoiceUrl = `${auth_url}/desk#Form/Sales Invoice/${success.name}`;
+            } else {
+              this.salesService.getApiInfo().subscribe({
+                next: res => {
+                  this.viewSalesInvoiceUrl = `${res.authServerURL}/desk#Form/Sales Invoice/${success.name}`;
+                },
+              });
+            }
+          });
       },
       error: err => {
         this.snackBar.open(

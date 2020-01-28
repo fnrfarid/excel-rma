@@ -42,5 +42,6 @@ export const DELIVERY_NOTE_ALREADY_EXISTS = 'Delivery note already exist';
 export const INVALID_HTTP_METHOD = 'Invalid HTTP Request Method';
 export const INVALID_REQUEST = 'Invalid Request';
 export const SALES_INVOICE_MANDATORY = 'Sales invoice url query is mandatory.';
+export const NO_DELIVERY_NOTE_FOUND = 'Invalid Request, No Delivery Note Found';
 export const SALES_INVOICE_INVALID = 'Sales invoice is invalid';
 export const PURCHASE_INVOICE_ALREADY_EXIST = 'Purchase invoice already exist';

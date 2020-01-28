@@ -1,8 +1,8 @@
 import { DataSource } from '@angular/cdk/table';
 import { BehaviorSubject, of, Observable } from 'rxjs';
-import { WarrantyService } from '../../../warranty-ui/warranty-tabs/warranty.service';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { map, catchError, finalize } from 'rxjs/operators';
+import { CreditNoteService } from './credit-note.service';
 
 export interface CreditNote {
   voucherNo: string;
@@ -25,7 +25,7 @@ export class CreditNotesDataSource extends DataSource<CreditNote> {
 
   loading$ = this.loadingSubject.asObservable();
 
-  constructor(private model: string, private listingService: WarrantyService) {
+  constructor(private creditNoteService: CreditNoteService) {
     super();
   }
 
@@ -38,10 +38,16 @@ export class CreditNotesDataSource extends DataSource<CreditNote> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+  loadItems(
+    sales_invoice: string,
+    filter = '',
+    sortOrder = 'asc',
+    pageIndex = 0,
+    pageSize = 10,
+  ) {
     this.loadingSubject.next(true);
-    this.listingService
-      .findModels(this.model, filter, sortOrder, pageIndex, pageSize)
+    this.creditNoteService
+      .getCreditNoteList(sales_invoice, filter, sortOrder, pageIndex, pageSize)
       .pipe(
         map((items: CreditNote[]) => {
           this.data = items;

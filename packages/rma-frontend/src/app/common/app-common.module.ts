@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CurFormatPipe } from './pipes/currency.pipe';
+import { CurrencyFormatPipe } from './pipes/currency-format.pipe';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
 @NgModule({
   imports: [CommonModule],
-  declarations: [CurFormatPipe],
+  declarations: [CurrencyFormatPipe],
   providers: [CurrencyPipe],
-  exports: [CurFormatPipe],
+  exports: [CurrencyFormatPipe],
 })
 export class AppCommonModule {}
