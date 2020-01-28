@@ -26,6 +26,7 @@ import { CreditNoteModule } from './credit-note/credit-note-invoice.module';
 import { ReturnVoucherModule } from './return-voucher/return-voucher-invoice.module';
 import { DeliveryNoteModule } from './delivery-note/delivery-note.module';
 import { CommandModule } from './command/command.module';
+import { PurchaseInvoiceModule } from './purchase-invoice/purchase-invoice.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CommandModule } from './command/command.module';
     DirectModule,
     CustomerModule,
     ReturnVoucherModule,
+    PurchaseInvoiceModule,
     SupplierModule,
     CreditNoteModule,
     SalesInvoiceModule,
