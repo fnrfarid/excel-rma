@@ -22,6 +22,7 @@ import { SalesInvoice } from '../sales-invoice/entity/sales-invoice/sales-invoic
 import { WarrantyClaim } from '../warranty-claim/entity/warranty-claim/warranty-claim.entity';
 import { DeliveryNote } from '../delivery-note/entity/delivery-note-service/delivery-note.entity';
 import { Territory } from '../customer/entity/territory/territory.entity';
+import { PurchaseInvoice } from '../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -49,6 +50,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       WarrantyClaim,
       DeliveryNote,
       Territory,
+      PurchaseInvoice,
     ],
     useNewUrlParser: true,
     w: 'majority',
