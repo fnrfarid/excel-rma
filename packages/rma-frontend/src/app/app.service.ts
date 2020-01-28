@@ -18,11 +18,14 @@ import {
   TIME_ZONE,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
-import { GET_GLOBAL_DEFAULTS_ENDPOINT } from './constants/url-strings';
+import {
+  GET_GLOBAL_DEFAULTS_ENDPOINT,
+  API_INFO_ENDPOINT,
+} from './constants/url-strings';
 
 @Injectable()
 export class AppService {
-  messageUrl = '/api/info'; // URL to web api
+  messageUrl = API_INFO_ENDPOINT; // URL to web api
 
   constructor(
     private readonly http: HttpClient,

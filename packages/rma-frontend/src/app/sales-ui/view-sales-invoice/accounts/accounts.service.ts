@@ -8,7 +8,7 @@ import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
-} from 'src/app/constants/storage';
+} from '../../../constants/storage';
 
 @Injectable({
   providedIn: 'root',

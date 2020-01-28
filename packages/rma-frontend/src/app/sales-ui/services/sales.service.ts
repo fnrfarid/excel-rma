@@ -27,6 +27,7 @@ import {
   UPDATE_SALES_INVOICE_ENDPOINT,
   RELAY_GET_ITEMPRICE_ENDPOINT,
   GET_SERIAL_ENDPOINT,
+  API_INFO_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -304,5 +305,9 @@ export class SalesService {
 
   getStore() {
     return this.storage;
+  }
+
+  getApiInfo() {
+    return this.http.get<any>(API_INFO_ENDPOINT);
   }
 }
