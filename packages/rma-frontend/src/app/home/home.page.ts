@@ -1,17 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
   LOGGED_IN,
+  AUTH_SERVER_URL,
 } from '../constants/storage';
-import { HttpClient } from '@angular/common/http';
 import { DIRECT_PROFILE_ENDPOINT } from '../constants/url-strings';
 import { IDTokenClaims } from '../common/interfaces/id-token-claims.interfaces';
 import { LoginService } from '../api/login/login.service';
 import { StorageService } from '../api/storage/storage.service';
+import { AppService } from '../app.service';
 
 @Component({
   selector: 'app-home',
@@ -30,6 +32,7 @@ export class HomePage implements OnInit {
     private readonly login: LoginService,
     private readonly storage: StorageService,
     private readonly router: Router,
+    private readonly appService: AppService,
   ) {}
 
   ngOnInit() {
@@ -41,7 +44,19 @@ export class HomePage implements OnInit {
           return event;
         }),
       )
-      .subscribe({ next: res => {}, error: err => {} });
+      .subscribe({
+        next: res => {
+          this.storage.getItem(AUTH_SERVER_URL).then(url => {
+            if (!url) {
+              this.appService.getMessage().subscribe({
+                next: success => this.appService.setInfoLocalStorage(success),
+                error: error => {},
+              });
+            }
+          });
+        },
+        error: err => {},
+      });
     this.setUserSession();
     this.loadProfile();
   }
