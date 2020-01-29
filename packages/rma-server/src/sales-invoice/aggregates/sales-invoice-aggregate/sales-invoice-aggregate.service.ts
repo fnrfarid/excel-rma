@@ -208,7 +208,14 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           this.salesInvoiceService
             .updateOne(
               { uuid: salesInvoice.uuid },
-              { $set: { inQueue: false, isSynced: false, submitted: false } },
+              {
+                $set: {
+                  inQueue: false,
+                  isSynced: false,
+                  submitted: false,
+                  status: DRAFT_STATUS,
+                },
+              },
             )
             .then(updated => {})
             .catch(error => {});

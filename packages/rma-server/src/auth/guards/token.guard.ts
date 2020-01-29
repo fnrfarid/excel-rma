@@ -147,6 +147,7 @@ export class TokenGuard implements CanActivate {
       .catch(err => {});
     req[TOKEN] = token;
     this.connectService.getUserRoles({ user: token.email });
+    this.connectService.getUserTerritory({ user: token.email });
     return of(true);
   }
 
