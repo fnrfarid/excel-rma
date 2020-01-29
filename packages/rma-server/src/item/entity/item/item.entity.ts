@@ -121,4 +121,7 @@ export class Item extends BaseEntity {
 
   @Column()
   isSynced: boolean;
+
+  @Column()
+  minimumPrice: number;
 }

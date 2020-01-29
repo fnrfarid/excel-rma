@@ -24,7 +24,7 @@ export class ItemService {
     return await this.itemRepository.findOne(param, options);
   }
 
-  async list(skip, take, search, sort) {
+  async list(skip, take, search, order) {
     const nameExp = new RegExp(search, 'i');
     const columns = this.itemRepository.manager.connection
       .getMetadata(Item)
@@ -43,6 +43,7 @@ export class ItemService {
       skip,
       take,
       where,
+      order,
     });
 
     return {

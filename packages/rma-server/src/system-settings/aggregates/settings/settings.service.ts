@@ -42,6 +42,7 @@ import {
   deliveryNoteOnUpdateWebhookData,
   deliveryNoteOnTrashWebhookData,
   deliveryNoteNoAfterInsertWebhookData,
+  purchaseInvoiceOnSubmitWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
@@ -290,6 +291,19 @@ export class SettingsService extends AggregateRoot {
               serverSettings.authServerURL + '/api/resource/Webhook',
               deliveryNoteNoAfterInsertWebhookData(
                 serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          // purchase invoice webhook
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              purchaseInvoiceOnSubmitWebhookData(
+                serverSettings.appURL,
                 serverSettings.webhookApiKey,
               ),
               { headers },

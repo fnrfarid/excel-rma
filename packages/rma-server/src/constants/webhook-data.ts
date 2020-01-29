@@ -1605,3 +1605,152 @@ export function deliveryNoteOnTrashWebhookData(
     ],
   };
 }
+
+export function purchaseInvoiceOnSubmitWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Purchase Invoice',
+    webhook_docevent: 'on_submit',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      {
+        fieldname: 'name',
+        key: 'name',
+      },
+      {
+        fieldname: 'docstatus',
+        key: 'docstatus',
+      },
+      {
+        fieldname: 'title',
+        key: 'title',
+      },
+      {
+        fieldname: 'naming_series',
+        key: 'naming_series',
+      },
+      {
+        fieldname: 'supplier',
+        key: 'supplier',
+      },
+      {
+        fieldname: 'supplier_name',
+        key: 'supplier_name',
+      },
+      {
+        fieldname: 'due_date',
+        key: 'due_date',
+      },
+      {
+        fieldname: 'is_paid',
+        key: 'is_paid',
+      },
+      {
+        fieldname: 'is_return',
+        key: 'is_return',
+      },
+      {
+        fieldname: 'company',
+        key: 'company',
+      },
+      {
+        fieldname: 'posting_date',
+        key: 'posting_date',
+      },
+      {
+        fieldname: 'posting_time',
+        key: 'posting_time',
+      },
+      {
+        fieldname: 'supplier_address',
+        key: 'supplier_address',
+      },
+      {
+        fieldname: 'address_display',
+        key: 'address_display',
+      },
+      {
+        fieldname: 'buying_price_list',
+        key: 'buying_price_list',
+      },
+      {
+        fieldname: 'update_stock',
+        key: 'update_stock',
+      },
+      {
+        fieldname: 'total_qty',
+        key: 'total_qty',
+      },
+      {
+        fieldname: 'base_total',
+        key: 'base_total',
+      },
+      {
+        fieldname: 'total',
+        key: 'total',
+      },
+      {
+        fieldname: 'in_words',
+        key: 'in_words',
+      },
+      {
+        fieldname: 'total_advance',
+        key: 'total_advance',
+      },
+      {
+        fieldname: 'outstanding_amount',
+        key: 'outstanding_amount',
+      },
+      {
+        fieldname: 'paid_amount',
+        key: 'paid_amount',
+      },
+      {
+        fieldname: 'credit_to',
+        key: 'credit_to',
+      },
+      {
+        fieldname: 'against_expense_account',
+        key: 'against_expense_account',
+      },
+      {
+        fieldname: 'items',
+        key: 'items',
+      },
+      {
+        fieldname: 'pricing_rules',
+        key: 'pricing_rules',
+      },
+      {
+        fieldname: 'supplied_items',
+        key: 'supplied_items',
+      },
+      {
+        fieldname: 'taxes',
+        key: 'taxes',
+      },
+      {
+        fieldname: 'advances',
+        key: 'advances',
+      },
+      {
+        fieldname: 'payment_schedule',
+        key: 'payment_schedule',
+      },
+    ],
+  };
+}

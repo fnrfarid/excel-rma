@@ -30,9 +30,13 @@
                   placeholder="Default Company"
                   aria-label="Default Company"
                   [matAutocomplete]="autoCompany"
-                  formControlName="defaultCompany">
+                  formControlName="defaultCompany"
+                />
                 <mat-autocomplete #autoCompany="matAutocomplete">
-                  <mat-option *ngFor="let company of companies | async" [value]="company.name">
+                  <mat-option
+                    *ngFor="let company of companies | async"
+                    [value]="company.name"
+                  >
                     <span>{{company.name}}</span>
                   </mat-option>
                 </mat-autocomplete>
@@ -44,9 +48,13 @@
                   placeholder="Selling Price List"
                   aria-label="Selling Price List"
                   [matAutocomplete]="autoSellingPriceList"
-                  formControlName="sellingPriceList">
+                  formControlName="sellingPriceList"
+                />
                 <mat-autocomplete #autoSellingPriceList="matAutocomplete">
-                  <mat-option *ngFor="let priceList of sellingPriceLists | async" [value]="priceList.name">
+                  <mat-option
+                    *ngFor="let priceList of sellingPriceLists | async"
+                    [value]="priceList.name"
+                  >
                     <span>{{priceList.name}}</span>
                   </mat-option>
                 </mat-autocomplete>
@@ -57,7 +65,8 @@
                   placeholder="Authorization Server URL"
                   type="text"
                   formControlName="authServerURL"
-                  readonly>
+                  readonly
+                />
               </mat-form-field>
               <mat-form-field class="mat-input-wrapper">
                 <input
@@ -65,7 +74,8 @@
                   placeholder="App URL"
                   type="text"
                   formControlName="appURL"
-                  readonly>
+                  readonly
+                />
               </mat-form-field>
               <mat-form-field class="mat-input-wrapper">
                 <input
@@ -73,7 +83,8 @@
                   placeholder="Frontend Client ID"
                   type="text"
                   formControlName="frontendClientId"
-                  required>
+                  required
+                />
               </mat-form-field>
               <mat-form-field class="mat-input-wrapper">
                 <input
@@ -81,7 +92,8 @@
                   placeholder="Backend Client ID"
                   type="text"
                   formControlName="backendClientId"
-                  required>
+                  required
+                />
               </mat-form-field>
               <mat-form-field class="mat-input-wrapper">
                 <input
@@ -89,22 +101,37 @@
                   placeholder="Service Account"
                   type="text"
                   formControlName="serviceAccountUser"
-                  required>
+                  required
+                />
               </mat-form-field>
               <mat-form-field class="mat-input-wrapper">
                 <input
                   required
                   formControlName="serviceAccountSecret"
-                  matInput type="password" placeholder="Service Account Secret"
-                  [type]="hideSASecret ? 'password' : 'text'">
+                  matInput
+                  type="password"
+                  placeholder="Service Account Secret"
+                  [type]="hideSASecret ? 'password' : 'text'"
+                />
                 <mat-icon matSuffix (click)="hideSASecret = !hideSASecret">
                   {{hideSASecret ? 'visibility' : 'visibility_off'}}
                 </mat-icon>
               </mat-form-field>
             </form>
-            <div class="ion-padding">
-              <ion-button color="light" (click)="updateSettings()">Update</ion-button>
-            </div>
+            <ion-grid class="ion-padding">
+              <ion-row>
+                <ion-col>
+                  <ion-button color="light" (click)="updateSettings()"
+                    >Update</ion-button
+                  >
+                </ion-col>
+                <ion-col class="ion-text-right">
+                  <ion-button color="light" routerLink="/settings/item-price">
+                    Set Item Price</ion-button
+                  >
+                </ion-col>
+              </ion-row>
+            </ion-grid>
           </ion-card-content>
         </ion-card>
         <ion-card>
@@ -112,9 +139,7 @@
             <ion-card-title>
               Territory for Warehouse
             </ion-card-title>
-            <ion-fab
-              vertical="top"
-              horizontal="end">
+            <ion-fab vertical="top" horizontal="end">
               <ion-fab-button color="light" (click)="mapTerritory()">
                 <ion-icon name="swap"></ion-icon>
               </ion-fab-button>
@@ -123,16 +148,34 @@
           <ion-card-content>
             <div class="ion-padding">
               <mat-form-field class="mat-input-wrapper">
-                <input matInput placeholder="Search" [(ngModel)]="search" (keyup.enter)="setFilter()">
+                <input
+                  matInput
+                  placeholder="Search"
+                  [(ngModel)]="search"
+                  (keyup.enter)="setFilter()"
+                />
                 <button mat-button matSuffix (click)="setFilter()">
                   <mat-icon>search</mat-icon>
                 </button>
               </mat-form-field>
             </div>
-            <table mat-table class="mat-input-wrapper" [dataSource]="territoryDataSource" matSort aria-label="Elements">
+            <table
+              mat-table
+              class="mat-input-wrapper"
+              [dataSource]="territoryDataSource"
+              matSort
+              aria-label="Elements"
+            >
               <!-- Name Column -->
               <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header (click)="setFilter()">Name</th>
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+                  mat-sort-header
+                  (click)="setFilter()"
+                >
+                  Name
+                </th>
                 <td mat-cell *matCellDef="let row">
                   {{row.name}}
                 </td>
@@ -144,18 +187,25 @@
                 <td mat-cell *matCellDef="let row">{{row.warehouse}}</td>
               </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr
+                mat-header-row
+                *matHeaderRowDef="displayedColumns; sticky: true"
+              ></tr>
               <tr
                 mat-row
                 (click)="mapTerritory(row.uuid, row.name, row.warehouse)"
-                *matRowDef="let row; columns: displayedColumns;"></tr>
+                *matRowDef="let row; columns: displayedColumns;"
+              ></tr>
             </table>
-            <mat-paginator #paginator
+
+            <mat-paginator
+              #paginator
               class="mat-paginator-sticky"
               (page)="getUpdate($event)"
               [pageIndex]="paginator.pageIndex"
               [length]="territoryDataSource.length"
-              [pageSizeOptions]="[10, 50, 100, 500]">
+              [pageSizeOptions]="[10, 50, 100, 500]"
+            >
             </mat-paginator>
           </ion-card-content>
         </ion-card>
