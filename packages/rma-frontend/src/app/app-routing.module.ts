@@ -56,6 +56,11 @@ const routes: Routes = [
     loadChildren:
       './warranty-ui/warranty-tabs/warranty-tabs.module#WarrantyTabsPageModule',
   },
+  {
+    path: 'settings/item-price',
+    loadChildren: './sales-ui/item-price/item-price.module#ItemPricePageModule',
+    canActivate: [SystemManagerGuard],
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
