@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ItemPriceService } from '../services/item-price.service';
 
 export interface ListingData {
+  uuid: string;
   name: string;
   minimumPrice: number;
 }
@@ -13,7 +14,7 @@ export interface ItemListResponse {
   length: number;
   offset: number;
 }
-export class ItemDataSource extends DataSource<ListingData> {
+export class ItemPriceDataSource extends DataSource<ListingData> {
   data: ListingData[];
   length: number;
   offset: number;
@@ -51,5 +52,13 @@ export class ItemDataSource extends DataSource<ListingData> {
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe(items => this.itemSubject.next(items));
+  }
+
+  getData() {
+    return this.itemSubject.value;
+  }
+
+  update(data) {
+    this.itemSubject.next(data);
   }
 }

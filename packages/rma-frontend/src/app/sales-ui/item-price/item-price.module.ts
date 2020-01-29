@@ -8,6 +8,7 @@ import { IonicModule } from '@ionic/angular';
 import { ItemPricePage } from './item-price.page';
 import { MaterialModule } from '../../material/material.module';
 import { AppCommonModule } from '../../common/app-common.module';
+import { EditPriceComponent } from './edit-price/edit-price.component';
 
 const routes: Routes = [
   {
@@ -25,6 +26,6 @@ const routes: Routes = [
     MaterialModule,
     AppCommonModule,
   ],
-  declarations: [ItemPricePage],
+  declarations: [ItemPricePage, EditPriceComponent],
 })
 export class ItemPricePageModule {}

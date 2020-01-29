@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -9,13 +9,18 @@ import { ItemPricePage } from './item-price.page';
 import { MaterialModule } from '../../material/material.module';
 import { ItemPriceService } from '../services/item-price.service';
 
+@Pipe({ name: 'curFormat' })
+class MockPipe implements PipeTransform {
+  transform(value: any, ...args: any[]) {}
+}
+
 describe('ItemPricePage', () => {
   let component: ItemPricePage;
   let fixture: ComponentFixture<ItemPricePage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ItemPricePage],
+      declarations: [ItemPricePage, MockPipe],
       imports: [
         MaterialModule,
         RouterTestingModule,

@@ -8,8 +8,11 @@ import {
   BEARER_TOKEN_PREFIX,
 } from '../../constants/storage';
 import { StorageService } from '../../api/storage/storage.service';
-import { API_ITEM_LIST } from '../../constants/url-strings';
-import { ItemListResponse } from '../item-price/item-datasource';
+import {
+  API_ITEM_LIST,
+  API_ITEM_SET_MIN_PRICE,
+} from '../../constants/url-strings';
+import { ItemListResponse } from '../item-price/item-price.datasource';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +42,20 @@ export class ItemPriceService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  setMinPrice(itemUuid: string, minimumPrice: number) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          API_ITEM_SET_MIN_PRICE + '/' + itemUuid,
+          { minimumPrice },
+          {
+            headers,
+          },
+        );
       }),
     );
   }

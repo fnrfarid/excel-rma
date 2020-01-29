@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatPaginator, MatSort } from '@angular/material';
 import { Router, NavigationEnd } from '@angular/router';
-import { ItemDataSource } from './item-datasource';
+import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
 import { filter, map } from 'rxjs/operators';
 
@@ -14,7 +14,7 @@ import { filter, map } from 'rxjs/operators';
 export class ItemPricePage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-  dataSource: ItemDataSource;
+  dataSource: ItemPriceDataSource;
   displayedColumns = ['item', 'price'];
   search: string = '';
 
@@ -25,7 +25,7 @@ export class ItemPricePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dataSource = new ItemDataSource(this.itemPriceService);
+    this.dataSource = new ItemPriceDataSource(this.itemPriceService);
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
@@ -48,5 +48,12 @@ export class ItemPricePage implements OnInit {
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );
+  }
+
+  updateMinPrice(row: ListingData, minPrice: number) {
+    this.itemPriceService.setMinPrice(row.uuid, minPrice).subscribe({
+      next: success => (row.minimumPrice = minPrice),
+      error: error => {},
+    });
   }
 }
