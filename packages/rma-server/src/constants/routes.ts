@@ -35,3 +35,5 @@ export const FRAPPE_API_GET_GLOBAL_DEFAULTS =
   '/api/resource/Global Defaults/Global Defaults';
 export const FRAPPE_API_GET_SYSTEM_SETTINGS =
   '/api/resource/System Settings/System Settings';
+export const FRAPPE_API_GET_USER_PERMISSION_ENDPOINT =
+  '/api/resource/User Permission';

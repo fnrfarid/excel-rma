@@ -13,7 +13,10 @@ import { switchMap, map, mergeMap } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { throwError, of } from 'rxjs';
 import { PLEASE_RUN_SETUP } from '../../../constants/messages';
-import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
+import {
+  FRAPPE_API_GET_USER_INFO_ENDPOINT,
+  FRAPPE_API_GET_USER_PERMISSION_ENDPOINT,
+} from '../../../constants/routes';
 import {
   FrappeUserInfoInterface,
   FrappeUserInfoRolesInterface,
@@ -22,6 +25,7 @@ import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
 } from '../../../constants/app-strings';
+import { HUNDRED_NUMBERSTRING } from '../../../constants/app-strings';
 
 @Injectable()
 export class ConnectService {
@@ -57,10 +61,11 @@ export class ConnectService {
       .then(success => {})
       .catch(error => {});
     this.getUserRoles(frappeBearerToken);
+    this.getUserTerritory(frappeBearerToken);
     return;
   }
 
-  getUserRoles(frappeToken: FrappeBearerTokenWebhookInterface) {
+  getUserRoles(frappeToken: { user: string }) {
     return this.settingService
       .find()
       .pipe(
@@ -107,6 +112,59 @@ export class ConnectService {
       });
   }
 
+  getUserTerritory(frappeToken: { user: string }) {
+    return this.settingService
+      .find()
+      .pipe(
+        switchMap(settings => {
+          if (!settings.authServerURL) {
+            return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
+          }
+          return this.clientTokenManager.getClientToken().pipe(
+            switchMap(token => {
+              const params = {
+                fields: JSON.stringify([
+                  ['allow', '=', 'Territory'],
+                  ['user', '=', frappeToken.user],
+                ]),
+                filters: JSON.stringify(['for_value']),
+                limit_page_length: HUNDRED_NUMBERSTRING,
+              };
+              return this.http
+                .get(
+                  settings.authServerURL +
+                    FRAPPE_API_GET_USER_PERMISSION_ENDPOINT,
+                  {
+                    headers: this.getAuthorizationHeaders(token.accessToken),
+                    params,
+                  },
+                )
+                .pipe(
+                  map(data => data.data.data),
+                  mergeMap((userTerritory: { for_value: string }[]) => {
+                    const territory = this.mapUserTerritory(userTerritory);
+                    this.tokenCacheService
+                      .updateMany(
+                        { email: frappeToken.user },
+                        {
+                          $set: { territory },
+                        },
+                      )
+                      .then(success => {})
+                      .catch(error => {});
+                    return of({});
+                  }),
+                );
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
+  }
+
   mapFrappeBearerToken(
     frappeBearerToken: FrappeBearerTokenWebhookInterface,
     tokenObject: TokenCache,
@@ -133,6 +191,14 @@ export class ConnectService {
       userRoles.push(eachRole.role);
     });
     return userRoles;
+  }
+
+  mapUserTerritory(territory: { for_value: string }[]) {
+    const userTerritory = [];
+    territory.filter(eachTerritory => {
+      userTerritory.push(eachTerritory.for_value);
+    });
+    return userTerritory;
   }
 
   tokenDeleted(accessToken: string) {
