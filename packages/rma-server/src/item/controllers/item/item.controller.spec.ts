@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ItemController } from './item.controller';
-import { QueryBus } from '@nestjs/cqrs';
+import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
+import { RoleGuard } from '../../../auth/guards/role.guard';
 
 describe('Item Controller', () => {
   let controller: ItemController;
@@ -10,13 +11,13 @@ describe('Item Controller', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ItemController],
       providers: [
-        {
-          provide: QueryBus,
-          useValue: {},
-        },
+        { provide: QueryBus, useValue: {} },
+        { provide: CommandBus, useValue: {} },
       ],
     })
       .overrideGuard(TokenGuard)
+      .useValue({})
+      .overrideGuard(RoleGuard)
       .useValue({})
       .compile();
 

@@ -15,6 +15,8 @@ export class ItemAggregateService extends AggregateRoot {
   }
 
   async getItemList(offset, limit, sort, search, clientHttpRequest) {
-    return this.itemService.list(offset, limit, search, sort);
+    let sortQuery = { name: 'ASC' };
+    if (sort) sortQuery = { name: sort.toUpperCase() };
+    return this.itemService.list(offset, limit, search, sortQuery);
   }
 }

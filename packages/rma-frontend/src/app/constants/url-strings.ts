@@ -34,3 +34,4 @@ export const LIST_RETURN_VOUCHER_ENDPOINT = 'api/return_voucher/v1/list';
 export const LIST_CREDIT_NOTE_ENDPOINT = 'api/credit_note/v1/list';
 export const LIST_DELIVERY_NOTE_ENDPOINT = 'api/delivery_note/v1/list';
 export const API_INFO_ENDPOINT = '/api/info';
+export const API_ITEM_LIST = '/api/item/v1/list';
