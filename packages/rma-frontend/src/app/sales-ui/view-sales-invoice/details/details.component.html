@@ -102,6 +102,16 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
+            <ion-label position="floating">Balance</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              placeholder="Balance"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
             <ion-label position="floating">Due Date</ion-label>
             <ion-datetime
               readonly
@@ -115,9 +125,18 @@
             ></ion-datetime>
           </ion-item>
         </ion-col>
+      </ion-row>
+      <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Contact</ion-label>
+            <ion-label position="floating">Branch</ion-label>
+            <ion-input readonly="true" type="text" placeholder="Branch">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Warehouse</ion-label>
             <ion-input
               readonly="true"
               type="text"
@@ -126,7 +145,7 @@
                   ? salesInvoiceDetails.contact_display
                   : ''
               }}"
-              placeholder="Contact"
+              placeholder="Warehouse"
             ></ion-input>
           </ion-item>
         </ion-col>
