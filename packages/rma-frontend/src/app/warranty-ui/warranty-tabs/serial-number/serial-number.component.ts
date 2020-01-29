@@ -17,11 +17,23 @@ export class SerialNumberComponent implements OnInit {
   displayedColumns = ['serial_no', 'uuid', 'item_code'];
   model: string;
   search: string = '';
+  selected_serial_no: any;
 
-  constructor(private warrantyService: WarrantyService) {}
+  constructor(private warrantyService: WarrantyService) {
+    this.selected_serial_no = {} as any;
+    this.selected_serial_no.customer_name = '';
+    this.selected_serial_no.item_name = '';
+    this.selected_serial_no.serial_no = '';
+    this.selected_serial_no.item_code = '';
+    this.selected_serial_no.uuid = '';
+    this.selected_serial_no.delivery_time = '';
+
+    this.selected_serial_no.creation = '';
+  }
 
   ngOnInit() {
     this.model = SERIAL_NO;
+
     this.dataSource = new SerialNumberDataSource(
       this.model,
       this.warrantyService,
@@ -41,9 +53,13 @@ export class SerialNumberComponent implements OnInit {
   setFilter() {
     this.dataSource.loadItems(
       this.search,
+
       this.sort.direction,
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );
+  }
+  selectedSerialNo(row: any) {
+    this.selected_serial_no = row;
   }
 }
