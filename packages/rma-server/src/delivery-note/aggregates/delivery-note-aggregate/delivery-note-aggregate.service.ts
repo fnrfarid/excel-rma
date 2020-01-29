@@ -16,6 +16,7 @@ import {
 import {
   PLEASE_RUN_SETUP,
   SALES_INVOICE_MANDATORY,
+  DELIVERY_NOTE_DOES_NOT_EXIST,
   NO_DELIVERY_NOTE_FOUND,
 } from '../../../constants/messages';
 import {
@@ -39,7 +40,11 @@ import {
   DELIVERY_NOTE_IS_RETURN_FILTER_QUERY,
   DELIVERY_NOTE_FILTER_BY_SALES_INVOICE_QUERY,
 } from '../../../constants/query';
-
+import { DeliveryNote } from '../../../delivery-note/entity/delivery-note-service/delivery-note.entity';
+import * as uuidv4 from 'uuid/v4';
+import { DeliveryNoteDeletedEvent } from '../../events/delivery-note-deleted/delivery-note-deleted-event';
+import { DeliveryNoteCreatedEvent } from '../../events/delivery-note-created/delivery-note-created-event';
+import { CreateDeliveryNoteDto } from '../../entity/delivery-note-service/create-delivery-note.dto';
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
   constructor(
@@ -208,6 +213,21 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
       element.serial_no = element.serial_no.join('\n');
     });
     return items;
+  }
+
+  addDeliveryNote(payload: CreateDeliveryNoteDto) {
+    const data = new DeliveryNote();
+    Object.assign(data, payload);
+    data.uuid = uuidv4();
+    this.apply(new DeliveryNoteCreatedEvent(data));
+  }
+
+  async deleteDeliveryNote(uuid: string) {
+    const foundDeliveryNote = await this.deliveryNoteService.findOne({ uuid });
+    if (!foundDeliveryNote) {
+      throw new BadRequestException(DELIVERY_NOTE_DOES_NOT_EXIST);
+    }
+    this.apply(new DeliveryNoteDeletedEvent(uuid));
   }
 
   async getDeliveryNote(uuid: string) {

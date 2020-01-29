@@ -19,10 +19,14 @@ import {
 } from '../../../constants/app-strings';
 import { RoleGuard } from '../../../auth/guards/role.guard';
 import { DeliveryNoteAggregateService } from '../../aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
+import { CreateDeliveryNoteCommand } from '../../command/create-delivery-note/create-delivery-note.command';
+import { DeleteDeliveryNoteCommand } from '../../command/delete-delivery-note/delete-delivery-note.command';
+
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { RetriveDeliveryNoteQuery } from '../../queries/retrive-delivery-note/retrive-delivery-note.query';
 import { UpdateDeliveryNoteDto } from '../../entity/delivery-note-service/update-delivery-note.dto';
 import { UpdateDeliveryNoteCommand } from '../../commands/update-note/update-delivery-note.command';
+import { CreateDeliveryNoteDto } from '../../entity/delivery-note-service/create-delivery-note.dto';
 @Controller('delivery_note')
 export class DeliveryNoteController {
   constructor(
@@ -53,14 +57,28 @@ export class DeliveryNoteController {
   relayListCompanies(@Query() query) {
     return this.deliveryNoteAggregate.relayListWarehouses(query);
   }
+
   @UseGuards(TokenGuard)
-  @Get('v1/get_delivery_note/:uuid')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @Post('v1/create')
+  createDeliveryNote(@Body() payload: CreateDeliveryNoteDto) {
+    return this.commandBus.execute(new CreateDeliveryNoteCommand(payload));
+  }
+
+  @UseGuards(TokenGuard)
+  @Post('v1/delete/:uuid')
+  deleteDeliveryNote(@Param('uuid') uuid: string) {
+    return this.commandBus.execute(new DeleteDeliveryNoteCommand(uuid));
+  }
+
+  @UseGuards(TokenGuard)
+  @Get('v1/get/:uuid')
   getNote(@Param('uuid') uuid: string) {
     return this.queryBus.execute(new RetriveDeliveryNoteQuery(uuid));
   }
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  @Post('v1/update_delivery_note')
+  @Post('v1/update')
   updateDeliveryNote(@Body() payload: UpdateDeliveryNoteDto) {
     return this.commandBus.execute(new UpdateDeliveryNoteCommand(payload));
   }
