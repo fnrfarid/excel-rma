@@ -37,3 +37,15 @@ export const FRAPPE_API_GET_SYSTEM_SETTINGS =
   '/api/resource/System Settings/System Settings';
 export const FRAPPE_API_GET_USER_PERMISSION_ENDPOINT =
   '/api/resource/User Permission';
+export const DELIVERY_NOTE_AFTER_INSERT_ENDPOINT =
+  '/api/delivery_note/webhook/v1/create';
+export const DELIVERY_NOTE_ON_UPDATE_ENDPOINT =
+  '/api/delivery_note/webhook/v1/update';
+export const DELIVERY_NOTE_ON_TRASH_ENDPOINT =
+  '/api/delivery_note/webhook/v1/delete';
+export const PURCHASE_INVOICE_ON_SUBMIT_ENDPOINT =
+  '/api/purchase_invoice/webhook/v1/create';
+export const SALES_INVOICE_ON_SUBMIT_ENDPOINT =
+  '/api/sales_invoice/webhook/v1/create';
+export const SALES_INVOICE_ON_CANCEL_ENDPOINT =
+  '/api/sales_invoice/webhook/v1/cancel';

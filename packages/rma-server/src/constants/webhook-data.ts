@@ -1754,3 +1754,178 @@ export function purchaseInvoiceOnSubmitWebhookData(
     ],
   };
 }
+
+export function salesInvoiceOnSubmitWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Sales Invoice',
+    webhook_docevent: 'on_submit',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      {
+        key: 'name',
+        fieldname: 'name',
+      },
+      {
+        key: 'is_return',
+        fieldname: 'is_return',
+      },
+      {
+        key: 'issue_credit_note',
+        fieldname: 'issue_credit_note',
+      },
+      {
+        key: 'title',
+        fieldname: 'title',
+      },
+      {
+        key: 'customer',
+        fieldname: 'customer',
+      },
+      {
+        key: 'company',
+        fieldname: 'company',
+      },
+      {
+        key: 'posting_date',
+        fieldname: 'posting_date',
+      },
+      {
+        key: 'posting_time',
+        fieldname: 'posting_time',
+      },
+      {
+        key: 'set_posting_time',
+        fieldname: 'set_posting_time',
+      },
+      {
+        key: 'due_date',
+        fieldname: 'due_date',
+      },
+      {
+        key: 'address_display',
+        fieldname: 'address_display',
+      },
+      {
+        key: 'contact_person',
+        fieldname: 'contact_person',
+      },
+      {
+        key: 'contact_display',
+        fieldname: 'contact_display',
+      },
+      {
+        key: 'contact_email',
+        fieldname: 'contact_email',
+      },
+      {
+        key: 'territory',
+        fieldname: 'territory',
+      },
+      {
+        key: 'update_stock',
+        fieldname: 'update_stock',
+      },
+      {
+        key: 'total_qty',
+        fieldname: 'total_qty',
+      },
+      {
+        key: 'base_total',
+        fieldname: 'base_total',
+      },
+      {
+        key: 'base_net_total',
+        fieldname: 'base_net_total',
+      },
+      {
+        key: 'total',
+        fieldname: 'total',
+      },
+      {
+        key: 'net_total',
+        fieldname: 'net_total',
+      },
+      {
+        key: 'pos_total_qty',
+        fieldname: 'pos_total_qty',
+      },
+      {
+        key: 'items',
+        fieldname: 'items',
+      },
+      {
+        key: 'pricing_rules',
+        fieldname: 'pricing_rules',
+      },
+      {
+        key: 'packed_items',
+        fieldname: 'packed_items',
+      },
+      {
+        key: 'timesheets',
+        fieldname: 'timesheets',
+      },
+      {
+        key: 'taxes',
+        fieldname: 'taxes',
+      },
+      {
+        key: 'advances',
+        fieldname: 'advances',
+      },
+      {
+        key: 'payment_schedule',
+        fieldname: 'payment_schedule',
+      },
+      {
+        key: 'payments',
+        fieldname: 'payments',
+      },
+      {
+        key: 'sales_team',
+        fieldname: 'sales_team',
+      },
+    ],
+  };
+}
+export function salesInvoiceOnCancelWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Sales Invoice',
+    webhook_docevent: 'on_cancel',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      {
+        key: 'name',
+        fieldname: 'name',
+      },
+    ],
+  };
+}
