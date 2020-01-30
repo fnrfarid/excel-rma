@@ -12,15 +12,11 @@
 <ion-content class="page-background">
   <ion-card>
     <ion-card-header>
-      <ion-row class="align">
-        <ion-col>
-          <ion-card-title>
-            <ion-text color="tertiary">
-              Items
-            </ion-text>
-          </ion-card-title>
-        </ion-col>
-      </ion-row>
+      <ion-card-title>
+        <ion-text color="tertiary">
+          Items
+        </ion-text>
+      </ion-card-title>
     </ion-card-header>
     <div class="loading-shade" *ngIf="dataSource.loading$ | async">
       <mat-progress-bar
