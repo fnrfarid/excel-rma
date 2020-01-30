@@ -99,7 +99,10 @@
         <mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"
         ></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row
+          *matRowDef="let row; columns: displayedColumns;"
+          [routerLink]="['/view-purchase-invoice',row.uuid]"
+        ></mat-row>
       </mat-table>
 
       <mat-card-actions>
