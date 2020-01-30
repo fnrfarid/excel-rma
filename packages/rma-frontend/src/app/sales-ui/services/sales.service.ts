@@ -29,6 +29,8 @@ import {
   GET_SERIAL_ENDPOINT,
   API_INFO_ENDPOINT,
   API_ITEM_GET_BY_CODE,
+  GET_USER_PROFILE_ROLES,
+  API_TERRITORY_GET_WAREHOUSES,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -250,13 +252,29 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http
-          .get<any>(url, {
-            params,
-            headers,
-          })
+          .get<{ territory: string[] }>(GET_USER_PROFILE_ROLES, { headers })
           .pipe(
-            switchMap(response => {
-              return of(response.data);
+            switchMap(profile => {
+              if (profile.territory.length > 0) {
+                const territories = profile.territory;
+                let httpParams = new HttpParams();
+                territories.forEach(territory => {
+                  httpParams = httpParams.append('territories[]', territory);
+                });
+
+                return this.http
+                  .get<{ warehouses: string[] }>(API_TERRITORY_GET_WAREHOUSES, {
+                    headers,
+                    params: httpParams,
+                  })
+                  .pipe(map(res => res.warehouses));
+              }
+              return this.http
+                .get<any>(url, {
+                  params,
+                  headers,
+                })
+                .pipe(map(res => res.data));
             }),
           );
       }),

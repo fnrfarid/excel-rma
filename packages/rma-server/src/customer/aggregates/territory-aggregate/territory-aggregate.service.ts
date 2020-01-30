@@ -5,8 +5,8 @@ import {
   InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
-import { switchMap, catchError } from 'rxjs/operators';
-import { throwError, from, of, Observable } from 'rxjs';
+import { switchMap, catchError, mergeMap, map, toArray } from 'rxjs/operators';
+import { throwError, from, of, Observable, empty } from 'rxjs';
 import * as uuidv4 from 'uuid/v4';
 import { TerritoryService } from '../../entity/territory/territory.service';
 import { Territory } from '../../entity/territory/territory.entity';
@@ -146,5 +146,34 @@ export class TerritoryAggregateService {
 
   findTerritoryByNameAndWarehouse(name: string, warehouse: string) {
     return from(this.territory.findOne({ name, warehouse }));
+  }
+
+  getWarehousesForTerritories(territories: string[]) {
+    if (!Array.isArray(territories)) {
+      return throwError(new BadRequestException());
+    }
+
+    return from(territories).pipe(
+      mergeMap(territory => {
+        if (!territory) {
+          return empty();
+        }
+        return from(this.territory.findOne({ name: territory }));
+      }),
+      map(territory => {
+        return territory && territory.warehouse;
+      }),
+      toArray(),
+      map(warehouses => ({
+        warehouses: warehouses.filter((value, index, self) => {
+          return self.indexOf(value) === index;
+        }),
+      })),
+      map(filtered => ({
+        warehouses: filtered.warehouses.map(warehouse => ({
+          name: warehouse,
+        })),
+      })),
+    );
   }
 }
