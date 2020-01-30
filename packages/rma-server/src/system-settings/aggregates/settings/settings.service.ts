@@ -43,9 +43,12 @@ import {
   deliveryNoteOnTrashWebhookData,
   deliveryNoteNoAfterInsertWebhookData,
   purchaseInvoiceOnSubmitWebhookData,
+  salesInvoiceOnCancelWebhookData,
+  salesInvoiceOnSubmitWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
+  PURCHASE_INVOICE_ON_SUBMIT_ENDPOINT,
   ITEM_ON_UPDATE_ENDPOINT,
   ITEM_ON_TRASH_ENDPOINT,
   CUSTOMER_AFTER_INSERT_ENDPOINT,
@@ -59,9 +62,13 @@ import {
   SERIAL_NO_AFTER_INSERT_ENDPOINT,
   SERIAL_NO_ON_UPDATE_ENDPOINT,
   FRAPPE_API_COMPANY_ENDPOINT,
-  LIST_DELIVERY_NOTE_ENDPOINT,
+  SALES_INVOICE_ON_SUBMIT_ENDPOINT,
   FRAPPE_API_GET_GLOBAL_DEFAULTS,
   FRAPPE_API_GET_SYSTEM_SETTINGS,
+  DELIVERY_NOTE_ON_UPDATE_ENDPOINT,
+  DELIVERY_NOTE_ON_TRASH_ENDPOINT,
+  DELIVERY_NOTE_AFTER_INSERT_ENDPOINT,
+  SALES_INVOICE_ON_CANCEL_ENDPOINT,
 } from '../../../constants/routes';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import {
@@ -268,7 +275,7 @@ export class SettingsService extends AggregateRoot {
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
               deliveryNoteOnUpdateWebhookData(
-                serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
+                serverSettings.appURL + DELIVERY_NOTE_ON_UPDATE_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },
@@ -279,7 +286,7 @@ export class SettingsService extends AggregateRoot {
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
               deliveryNoteOnTrashWebhookData(
-                serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
+                serverSettings.appURL + DELIVERY_NOTE_ON_TRASH_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },
@@ -290,7 +297,7 @@ export class SettingsService extends AggregateRoot {
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
               deliveryNoteNoAfterInsertWebhookData(
-                serverSettings.appURL + LIST_DELIVERY_NOTE_ENDPOINT,
+                serverSettings.appURL + DELIVERY_NOTE_AFTER_INSERT_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },
@@ -303,7 +310,31 @@ export class SettingsService extends AggregateRoot {
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
               purchaseInvoiceOnSubmitWebhookData(
-                serverSettings.appURL,
+                serverSettings.appURL + PURCHASE_INVOICE_ON_SUBMIT_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          // Sales invoice webhook
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              salesInvoiceOnCancelWebhookData(
+                serverSettings.appURL + SALES_INVOICE_ON_CANCEL_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              salesInvoiceOnSubmitWebhookData(
+                serverSettings.appURL + SALES_INVOICE_ON_SUBMIT_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseInvoiceWebhookController } from './purchase-invoice-webhook.controller';
 import { PurchaseInvoiceWebhookAggregateService } from '../../../purchase-invoice/aggregates/purchase-invoice-webhook-aggregate/purchase-invoice-webhook-aggregate.service';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 
 describe('PurchaseInvoiceWebhook Controller', () => {
   let controller: PurchaseInvoiceWebhookController;
@@ -13,13 +13,12 @@ describe('PurchaseInvoiceWebhook Controller', () => {
           provide: PurchaseInvoiceWebhookAggregateService,
           useValue: {},
         },
-        {
-          provide: SettingsService,
-          useValue: {},
-        },
       ],
       controllers: [PurchaseInvoiceWebhookController],
-    }).compile();
+    })
+      .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .compile();
 
     controller = module.get<PurchaseInvoiceWebhookController>(
       PurchaseInvoiceWebhookController,
