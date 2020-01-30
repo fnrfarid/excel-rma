@@ -1,9 +1,118 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>purchase</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Purchase</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="page-background">
+  <ion-card>
+    <ion-card-header>
+      <ion-row class="align">
+        <ion-col>
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Purchase Invoices
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+      </ion-row>
+    </ion-card-header>
+    <div class="loading-shade" *ngIf="dataSource.loading$ | async">
+      <mat-progress-bar
+        *ngIf="dataSource.loading$ | async"
+        mode="indeterminate"
+      ></mat-progress-bar>
+    </div>
+    <ion-card-content class="ion-no-padding">
+      <div class="search-models">
+        <mat-form-field class="full-width">
+          <input
+            matInput
+            placeholder="Search"
+            [(ngModel)]="search"
+            (keyup.enter)="setFilter()"
+          />
+          <button mat-button matSuffix (click)="setFilter()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <mat-table
+        class="full-width-table"
+        [dataSource]="dataSource"
+        matSort
+        style="width: 100%;"
+      >
+        <ng-container matColumnDef="supplier">
+          <mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header
+            (click)="setFilter()"
+          >
+            Title
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.supplier}}
+          </mat-cell>
+        </ng-container>
 
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ion-text
+              [ngStyle]="{
+              color: 'green'
+            }"
+              *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' "
+            >
+              {{row.status}}
+            </ion-text>
+            <ion-text
+              *ngIf="row.status === 'Draft' || row.status === 'Rejected' "
+              [ngStyle]="{
+              color: 'red'
+            }"
+            >
+              {{row.status}}
+            </ion-text>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="total">
+          <mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header
+            (click)="setFilter()"
+          >
+            Total
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.total | curFormat | async }}
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
+
+      <mat-card-actions>
+        <mat-paginator
+          #paginator
+          class="mat-paginator-sticky"
+          (page)="getUpdate($event)"
+          [pageIndex]="paginator.pageIndex"
+          [length]="dataSource.length"
+          [pageSizeOptions]="[10, 50, 100, 500]"
+        >
+        </mat-paginator>
+      </mat-card-actions>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

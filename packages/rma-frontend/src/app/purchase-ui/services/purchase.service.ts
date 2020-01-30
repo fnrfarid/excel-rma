@@ -1,8 +1,49 @@
 import { Injectable } from '@angular/core';
-
+import { HttpParams, HttpClient } from '@angular/common/http';
+import {
+  BEARER_TOKEN_PREFIX,
+  AUTHORIZATION,
+  ACCESS_TOKEN,
+} from '../../constants/storage';
+import { from } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { LIST_PURCHASE_INVOICE_ENDPOINT } from '../../constants/url-strings';
+import { StorageService } from '../../api/storage/storage.service';
 @Injectable({
   providedIn: 'root',
 })
 export class PurchaseService {
-  constructor() {}
+  constructor(private http: HttpClient, private storage: StorageService) {}
+
+  getPurchaseInvoiceList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_PURCHASE_INVOICE_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
+  getHeaders() {
+    return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
+      map(token => {
+        return {
+          [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+        };
+      }),
+    );
+  }
 }
