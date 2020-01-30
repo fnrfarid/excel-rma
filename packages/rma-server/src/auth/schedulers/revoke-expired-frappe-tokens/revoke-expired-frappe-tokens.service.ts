@@ -73,7 +73,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
     job.start();
   }
 
-  revokeToken(settings: ServerSettings, token: string) {
+  revokeToken(settings: ServerSettings, token: string): Observable<unknown> {
     return this.http.post(settings.revocationURL, stringify({ token }), {
       headers: {
         [CONTENT_TYPE]: APP_WWW_FORM_URLENCODED,
@@ -119,7 +119,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
             );
           }
 
-          return of(resTokens);
+          return of(resTokens as AxiosResponse);
         }),
       );
   }

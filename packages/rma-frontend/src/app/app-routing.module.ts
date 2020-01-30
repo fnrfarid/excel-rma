@@ -61,6 +61,13 @@ const routes: Routes = [
     loadChildren: './sales-ui/item-price/item-price.module#ItemPricePageModule',
     canActivate: [SystemManagerGuard],
   },
+  {
+    path: 'view-purchase-invoice/:invoiceUuid',
+    loadChildren: () =>
+      import(
+        './purchase-ui/view-purchase-invoice/view-purchase-invoice.module'
+      ).then(m => m.ViewPurchaseInvoicePageModule),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];

@@ -56,4 +56,13 @@ export class ItemPricePage implements OnInit {
       error: error => {},
     });
   }
+
+  getUpdate(event) {
+    this.dataSource.loadItems(
+      this.search,
+      this.sort.direction,
+      event.pageIndex,
+      event.pageSize,
+    );
+  }
 }
