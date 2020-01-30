@@ -26,4 +26,10 @@ export class ItemAggregateService extends AggregateRoot {
     item.minimumPrice = minimumPrice;
     this.apply(new MinimumItemPriceSetEvent(item));
   }
+
+  async retrieveItemByCode(code: string, req) {
+    const item = await this.itemService.findOne({ item_code: code });
+    if (!item) throw new NotFoundException();
+    return item;
+  }
 }

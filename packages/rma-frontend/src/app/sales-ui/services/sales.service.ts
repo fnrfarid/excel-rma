@@ -28,6 +28,7 @@ import {
   RELAY_GET_ITEMPRICE_ENDPOINT,
   GET_SERIAL_ENDPOINT,
   API_INFO_ENDPOINT,
+  API_ITEM_GET_BY_CODE,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -301,6 +302,16 @@ export class SalesService {
     const filteredList = [...new Set(itemCodeList)];
     if (filteredList.length === itemCodeList.length) return true;
     return false;
+  }
+
+  getItemFromRMAServer(code: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<Item>(API_ITEM_GET_BY_CODE + '/' + code, {
+          headers,
+        });
+      }),
+    );
   }
 
   getStore() {

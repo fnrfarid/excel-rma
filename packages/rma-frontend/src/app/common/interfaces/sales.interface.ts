@@ -10,6 +10,7 @@ export class SalesInvoice {
 }
 
 export class Item {
+  uuid?: string;
   name?: string;
   owner?: string;
   item_code: string;
@@ -17,6 +18,7 @@ export class Item {
   qty: number;
   rate: number;
   amount?: number;
+  minimumPrice?: number;
 }
 
 export class APIResponse {

@@ -16,6 +16,7 @@ import { Roles } from '../../../auth/decorators/roles.decorator';
 import { SYSTEM_MANAGER } from '../../../constants/app-strings';
 import { RoleGuard } from '../../../auth/guards/role.guard';
 import { SetMinimumItemPriceCommand } from '../../commands/set-minimum-item-price/set-minimum-item-price.command';
+import { RetrieveItemByCodeQuery } from '../../query/get-item-by-code/retrieve-item-by-code-.query';
 
 @Controller('item')
 export class ItemController {
@@ -28,6 +29,12 @@ export class ItemController {
   @UseGuards(TokenGuard)
   async getItem(@Param('uuid') uuid, @Req() req) {
     return await this.queryBus.execute(new RetrieveItemQuery(uuid, req));
+  }
+
+  @Get('v1/get_by_item_code/:code')
+  @UseGuards(TokenGuard)
+  async getItemByCode(@Param('code') code, @Req() req) {
+    return await this.queryBus.execute(new RetrieveItemByCodeQuery(code, req));
   }
 
   @Get('v1/list')
