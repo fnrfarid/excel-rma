@@ -222,4 +222,8 @@ export class SerialNoAggregateService extends AggregateRoot {
       }),
     );
   }
+
+  validateSerials(serials: string[]) {
+    return this.serialNoPolicyService.validateSerials(serials);
+  }
 }

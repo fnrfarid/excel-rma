@@ -18,9 +18,13 @@ import { UpdateSerialNoCommand } from '../../command/update-serial-no/update-ser
 import { RetrieveSerialNoQuery } from '../../query/get-serial-no/retrieve-serial-no.query';
 import { RetrieveSerialNoListQuery } from '../../query/list-serial-no/retrieve-serial-no-list.query';
 import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
-import { SerialNoDto } from '../../entity/serial-no/serial-no-dto';
+import {
+  SerialNoDto,
+  ValidateSerialsDto,
+} from '../../entity/serial-no/serial-no-dto';
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoCommand } from '../../command/assign-serial-no/assign-serial-no.command';
+import { ValidateSerialsQuery } from '../../query/validate-serial/validate-serial.query';
 
 @Controller('serial_no')
 export class SerialNoController {
@@ -89,6 +93,15 @@ export class SerialNoController {
   ) {
     return this.commandBus.execute(
       new AssignSerialNoCommand(assignSerialPayload, clientHttpRequest),
+    );
+  }
+
+  @Post('v1/validate')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  validateSerialNo(@Req() clientHttpRequest, @Body() body: ValidateSerialsDto) {
+    return this.queryBus.execute(
+      new ValidateSerialsQuery(body.serials, clientHttpRequest),
     );
   }
 }
