@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray } from 'class-validator';
 
 export class SerialNoDto {
   @IsNotEmpty()
@@ -20,4 +20,10 @@ export class SerialNoDto {
   @IsNotEmpty()
   @IsString()
   supplier: string;
+}
+
+export class ValidateSerialsDto {
+  @IsNotEmpty()
+  @IsArray()
+  serials: string[];
 }

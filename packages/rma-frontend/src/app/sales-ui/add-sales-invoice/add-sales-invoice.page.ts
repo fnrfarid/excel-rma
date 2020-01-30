@@ -103,12 +103,8 @@ export class AddSalesInvoicePage implements OnInit {
       return;
     }
     const copy = this.dataSource.data().slice();
-    row.item_code = item.item_code;
-    row.item_name = item.item_name;
-    row.name = item.name;
-    row.owner = item.owner;
+    Object.assign(row, item);
     row.qty = 1;
-    row.rate = item.rate;
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(copy);
   }
@@ -128,7 +124,11 @@ export class AddSalesInvoicePage implements OnInit {
       return;
     }
     const copy = this.dataSource.data().slice();
-    row.rate = rate;
+    if (row.minimumPrice && row.minimumPrice > rate) {
+      row.rate = row.minimumPrice;
+    } else {
+      row.rate = rate;
+    }
     this.calculateTotal(this.dataSource.data().slice());
 
     this.dataSource.update(copy);

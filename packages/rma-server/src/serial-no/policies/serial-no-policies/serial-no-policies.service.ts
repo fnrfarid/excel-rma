@@ -65,4 +65,27 @@ export class SerialNoPoliciesService {
   validateCompany(serialProvider: SerialNoDto) {
     // validate company
   }
+
+  validateSerials(serials: string[]) {
+    return this.serialNoService
+      .asyncAggregate([
+        { $match: { serial_no: { $in: serials } } },
+        {
+          $group: {
+            _id: 'validSerials',
+            foundSerials: { $push: '$serial_no' },
+          },
+        },
+        {
+          $project: {
+            notFoundSerials: { $setDifference: [serials, '$foundSerials'] },
+          },
+        },
+      ])
+      .pipe(
+        switchMap((data: { _id: string; notFoundSerials: string[] }[]) => {
+          return of({ notFoundSerials: data[0].notFoundSerials });
+        }),
+      );
+  }
 }

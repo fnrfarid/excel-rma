@@ -63,4 +63,10 @@ export class TerritoryController {
   updateTerritory(@Body() updatePayload: UpdateTerritoryDto) {
     return this.territory.updateTerritory(updatePayload);
   }
+
+  @Get('v1/get_warehouses_for_territories')
+  @UseGuards(TokenGuard)
+  getWarehousesForTerritories(@Query('territories') territories: string[]) {
+    return this.territory.getWarehousesForTerritories(territories);
+  }
 }
