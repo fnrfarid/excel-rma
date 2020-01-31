@@ -9,11 +9,15 @@ import { ViewPurchaseInvoicePageRoutingModule } from './view-purchase-invoice-ro
 import { ViewPurchaseInvoicePage } from './view-purchase-invoice.page';
 import { PurchaseAssignSerialsComponent } from './purchase-assign-serials/purchase-assign-serials.component';
 import { PurchaseDetailsComponent } from './purchase-details/purchase-details.component';
+import { MaterialModule } from 'src/app/material/material.module';
+import { AppCommonModule } from 'src/app/common/app-common.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    MaterialModule,
+    AppCommonModule,
     IonicModule,
     ViewPurchaseInvoicePageRoutingModule,
   ],

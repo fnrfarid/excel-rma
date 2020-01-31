@@ -1,5 +1,248 @@
-<ion-card>
+<!-- <ion-card>
   <ion-card-content>
     Details works
+  </ion-card-content>
+</ion-card> -->
+<!-- --------------------- -->
+<ion-card>
+  <ion-card-content>
+    <!-- <ion-fab
+      *ngIf="
+        !salesInvoiceDetails?.submitted &&
+        salesInvoiceDetails?.status !== 'Rejected'
+      "
+      vertical="top"
+      horizontal="end"
+      slot="fixed"
+    >
+      <ion-fab-button>
+        <ion-icon name="lock"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-list side="start">
+        <ion-button color="danger" (click)="rejectSalesInvoice()">
+          Reject
+        </ion-button>
+        <ion-button
+          color="warning"
+          [routerLink]="['/add-sales-invoice', 'edit', invoiceUuid]"
+        >
+          Edit
+        </ion-button>
+        <ion-button (click)="submitSalesInvoice()">
+          Submit
+        </ion-button>
+      </ion-fab-list>
+    </ion-fab> -->
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Customer</ion-label>
+            <ion-input
+              placeholder="Company"
+              readonly="true"
+              type="string"
+              value="{{
+                purchaseInvoiceDetails?.customer
+                  ? purchaseInvoiceDetails.customer
+                  : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col *ngIf="purchaseInvoiceDetails?.name">
+          <ion-item lines="none" [href]="viewSalesInvoiceUrl" target="_blank">
+            <ion-label position="floating">Sales Invoice Number</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              value="{{
+                purchaseInvoiceDetails?.name ? purchaseInvoiceDetails.name : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col *ngIf="!purchaseInvoiceDetails?.name">
+          <ion-item lines="none">
+            <ion-label position="floating">Sales Invoice Number</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              placeholder="Submit Invoice to See SI Number"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Address</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              value="{{
+                purchaseInvoiceDetails?.address_display
+                  ? purchaseInvoiceDetails.address_display
+                  : ''
+              }}"
+              placeholder="Address"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Posting Date</ion-label>
+            <ion-datetime
+              readonly
+              placeholder="Posting Date"
+              display-format="YYYY.DD.MM"
+              value="{{
+                purchaseInvoiceDetails?.posting_date
+                  ? purchaseInvoiceDetails.posting_date
+                  : ''
+              }}"
+            ></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Balance</ion-label>
+            <ion-input
+              readonly="true"
+              type="string"
+              placeholder="Balance"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Due Date</ion-label>
+            <ion-datetime
+              readonly
+              placeholder="Due Date"
+              value="{{
+                purchaseInvoiceDetails?.due_date
+                  ? purchaseInvoiceDetails.due_date
+                  : ''
+              }}"
+              display-format="YYYY.DD.MM"
+            ></ion-datetime>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Branch</ion-label>
+            <ion-input readonly="true" type="text" placeholder="Branch">
+            </ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Warehouse</ion-label>
+            <ion-input
+              readonly="true"
+              type="text"
+              value="{{
+                purchaseInvoiceDetails?.contact_display
+                  ? purchaseInvoiceDetails.contact_display
+                  : ''
+              }}"
+              placeholder="Warehouse"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label>Package Invoice</ion-label>
+            <ion-checkbox slot="start"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Status</ion-label>
+            <ion-input
+              readonly="true"
+              type="text"
+              value="{{ purchaseInvoiceDetails?.status }}"
+              placeholder="Status"
+              [ngStyle]="{
+                color:
+                  purchaseInvoiceDetails?.submitted === true ? 'green' : 'red'
+              }"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Items
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content class="ion-no-padding">
+    <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+      <!-- <mat-table #table style="width: 100%;"> -->
+      <ng-container matColumnDef="item_code">
+        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container *ngIf="row.name">
+            {{ row.item_code }}
+          </ng-container>
+
+          <span class="add-comment" *ngIf="!row.name">
+            Add an item
+          </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="item_name">
+        <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_name }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="qty">
+        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.qty }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="rate">
+        <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.rate | curFormat | async }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="amount">
+        <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ row.rate * row.qty | curFormat | async }}
+        </mat-cell>
+      </ng-container>
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
   </ion-card-content>
 </ion-card>
