@@ -35,3 +35,4 @@ export const DEFAULT_CURRENCY = 'BDT';
 export const DEFAULT_CURRENCY_KEY = 'defaultCurrency';
 export const COUNTRY = 'country';
 export const TIME_ZONE = 'time_zone';
+export const DEFAULT_SELLING_PRICE_LIST = 'default_selling_price_list';
