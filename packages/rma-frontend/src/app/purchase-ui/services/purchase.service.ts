@@ -7,7 +7,11 @@ import {
 } from '../../constants/storage';
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { LIST_PURCHASE_INVOICE_ENDPOINT } from '../../constants/url-strings';
+import {
+  LIST_PURCHASE_INVOICE_ENDPOINT,
+  PURCHASE_INVOICE_GET_ONE_ENDPOINT,
+  API_INFO_ENDPOINT,
+} from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
 @Injectable({
   providedIn: 'root',
@@ -37,6 +41,16 @@ export class PurchaseService {
     );
   }
 
+  getPurchaseInvoice(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(`${PURCHASE_INVOICE_GET_ONE_ENDPOINT}${uuid}`, {
+          headers,
+        });
+      }),
+    );
+  }
+
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {
@@ -45,5 +59,13 @@ export class PurchaseService {
         };
       }),
     );
+  }
+
+  getStore() {
+    return this.storage;
+  }
+
+  getApiInfo() {
+    return this.http.get<any>(API_INFO_ENDPOINT);
   }
 }

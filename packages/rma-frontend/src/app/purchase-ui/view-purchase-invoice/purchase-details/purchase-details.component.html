@@ -1,74 +1,33 @@
-<!-- <ion-card>
-  <ion-card-content>
-    Details works
-  </ion-card-content>
-</ion-card> -->
-<!-- --------------------- -->
 <ion-card>
   <ion-card-content>
-    <!-- <ion-fab
-      *ngIf="
-        !salesInvoiceDetails?.submitted &&
-        salesInvoiceDetails?.status !== 'Rejected'
-      "
-      vertical="top"
-      horizontal="end"
-      slot="fixed"
-    >
-      <ion-fab-button>
-        <ion-icon name="lock"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-list side="start">
-        <ion-button color="danger" (click)="rejectSalesInvoice()">
-          Reject
-        </ion-button>
-        <ion-button
-          color="warning"
-          [routerLink]="['/add-sales-invoice', 'edit', invoiceUuid]"
-        >
-          Edit
-        </ion-button>
-        <ion-button (click)="submitSalesInvoice()">
-          Submit
-        </ion-button>
-      </ion-fab-list>
-    </ion-fab> -->
     <ion-grid class="ion-no-padding">
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Customer</ion-label>
+            <ion-label position="floating">Supplier</ion-label>
             <ion-input
-              placeholder="Company"
+              placeholder="Supplier"
               readonly="true"
               type="string"
               value="{{
-                purchaseInvoiceDetails?.customer
-                  ? purchaseInvoiceDetails.customer
+                purchaseInvoiceDetails?.supplier
+                  ? purchaseInvoiceDetails.supplier
                   : ''
               }}"
             ></ion-input>
           </ion-item>
         </ion-col>
-        <ion-col *ngIf="purchaseInvoiceDetails?.name">
-          <ion-item lines="none" [href]="viewSalesInvoiceUrl" target="_blank">
-            <ion-label position="floating">Sales Invoice Number</ion-label>
+        <ion-col>
+          <ion-item
+            lines="none"
+            [href]="viewPurchaseInvoiceUrl"
+            target="_blank"
+          >
+            <ion-label position="floating">Purchase Invoice Number</ion-label>
             <ion-input
               readonly="true"
               type="string"
-              value="{{
-                purchaseInvoiceDetails?.name ? purchaseInvoiceDetails.name : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col *ngIf="!purchaseInvoiceDetails?.name">
-          <ion-item lines="none">
-            <ion-label position="floating">Sales Invoice Number</ion-label>
-            <ion-input
-              readonly="true"
-              type="string"
-              placeholder="Submit Invoice to See SI Number"
+              [value]="purchaseInvoiceDetails?.name"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -77,16 +36,15 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Address</ion-label>
-            <ion-input
+            <ion-textarea
               readonly="true"
-              type="string"
               value="{{
                 purchaseInvoiceDetails?.address_display
                   ? purchaseInvoiceDetails.address_display
                   : ''
               }}"
-              placeholder="Address"
-            ></ion-input>
+              rows="5"
+            ></ion-textarea>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -113,6 +71,13 @@
               readonly="true"
               type="string"
               placeholder="Balance"
+              value="{{
+                purchaseInvoiceDetails?.outstanding_amount
+                  ? (purchaseInvoiceDetails.outstanding_amount
+                    | curFormat
+                    | async)
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -196,7 +161,6 @@
   </ion-card-header>
   <ion-card-content class="ion-no-padding">
     <mat-table #table [dataSource]="dataSource" style="width: 100%;">
-      <!-- <mat-table #table style="width: 100%;"> -->
       <ng-container matColumnDef="item_code">
         <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
         <mat-cell *matCellDef="let row">
