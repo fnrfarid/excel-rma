@@ -48,14 +48,6 @@
             <ion-grid class="ion-no-padding">
               <ion-row class="align">
                 <ion-col>
-                  <!-- <ion-item lines="none">
-                    <ion-label position="floating">Naming Series</ion-label>
-                    <ion-input
-                      readonly="true"
-                      type="string"
-                      value="SINV-####"
-                    ></ion-input>
-                  </ion-item> -->
                   <mat-form-field class="example-full-width">
                     <input
                       matInput
@@ -99,29 +91,8 @@
                       </mat-option>
                     </mat-autocomplete>
                   </mat-form-field>
-                  <!-- <ion-item>
-                    <ion-label position="floating">Customer Name</ion-label>
-                    <ion-select
-                      interface="popover"
-                      placeholder="Select Customer"
-                      [(ngModel)]="customer"
-                    >
-                      <ion-select-option
-                        [value]="customer"
-                        *ngFor="let customer of customerList"
-                        >{{customer.name}}</ion-select-option
-                      >
-                    </ion-select>
-                  </ion-item> -->
                 </ion-col>
                 <ion-col>
-                  <!-- <ion-item>
-                    <ion-label position="floating">Posting Date</ion-label>
-                    <ion-datetime
-                      display-format="DD.MM.YYYY"
-                      (ionChange)="postingDate($event)"
-                    ></ion-datetime>
-                  </ion-item> -->
                   <mat-form-field class="example-full-width">
                     <input
                       matInput
@@ -227,6 +198,7 @@
                       <inline-edit
                         [value]="row.item_name"
                         column="item"
+                        [minimumPrice]="row.minimumPrice"
                       ></inline-edit>
                     </sat-popover>
                   </mat-cell>
@@ -255,6 +227,7 @@
                       <inline-edit
                         [value]="row.qty"
                         column="quantity"
+                        [minimumPrice]="row.minimumPrice"
                       ></inline-edit>
                     </sat-popover>
                   </mat-cell>
@@ -282,6 +255,7 @@
                       <inline-edit
                         [value]="row.rate"
                         column="rate"
+                        [minimumPrice]="row.minimumPrice"
                       ></inline-edit>
                     </sat-popover>
                   </mat-cell>
@@ -292,7 +266,9 @@
                   <mat-cell *matCellDef="let row"
                     >{{row.rate * row.qty | curFormat | async}}</mat-cell
                   >
-                  <mat-footer-cell *matFooterCellDef>{{total | curFormat | async }}</mat-footer-cell>
+                  <mat-footer-cell *matFooterCellDef
+                    >{{total | curFormat | async }}</mat-footer-cell
+                  >
                 </ng-container>
                 <ng-container matColumnDef="delete">
                   <mat-header-cell *matHeaderCellDef></mat-header-cell>
@@ -334,28 +310,6 @@
               </ion-text>
             </ion-card-title>
           </ion-card-header>
-          <!-- <ion-card-content *ngIf="customer.name !== '' ">
-            <ion-grid class="ion-no-padding">
-              <ion-row>
-                <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="stacked">Customer address</ion-label>
-                    {{customer.addressLine1}}
-                    <br />
-                    {{customer.addressLine2}}
-                    <br />
-                    {{customer.city}} - {{customer.pinCode}}
-                  </ion-item>
-                </ion-col>
-                <ion-col>
-                  <ion-item lines="none">
-                    <ion-label position="stacked">Contact Person</ion-label>
-                    {{customer.name}}
-                  </ion-item>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content> -->
         </ion-card>
       </ion-col>
     </ion-row>
