@@ -36,7 +36,6 @@ export class DetailsComponent implements OnInit {
     this.salesService.getSalesInvoice(uuid).subscribe({
       next: (success: any) => {
         this.salesInvoiceDetails = success;
-
         this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
           .address_display
           ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')

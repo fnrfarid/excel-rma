@@ -38,8 +38,12 @@
       type="number"
       maxLength="140"
       name="rate"
-      [(ngModel)]="rate"
+      [formControl]="rateFormControl"
     />
+
+    <mat-error *ngIf="rateFormControl.errors">
+      Rate should be greater than {{ minimumPrice }}
+    </mat-error>
   </mat-form-field>
 
   <div class="actions">

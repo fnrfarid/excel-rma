@@ -5,6 +5,7 @@ import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
 import { Location } from '@angular/common';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
+
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, switchMap, filter } from 'rxjs/operators';
@@ -26,12 +27,14 @@ export class AddSalesInvoicePage implements OnInit {
   total: number = 0;
   postingDate: string;
   dueDate: string;
+
   displayedColumns = ['item', 'quantity', 'rate', 'total', 'delete'];
   customerFormControl = new FormControl();
   filteredCustomerList: Observable<any[]>;
   companyFormControl = new FormControl();
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
+
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
@@ -94,6 +97,7 @@ export class AddSalesInvoicePage implements OnInit {
     item.qty = 0;
     item.rate = 0;
     item.item_code = '';
+    item.minimumPrice = 0;
     data.push(item);
     this.dataSource.update(data);
   }
@@ -105,6 +109,7 @@ export class AddSalesInvoicePage implements OnInit {
     const copy = this.dataSource.data().slice();
     Object.assign(row, item);
     row.qty = 1;
+    row.rate = item.rate;
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(copy);
   }
