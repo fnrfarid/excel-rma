@@ -5,6 +5,9 @@ import { PurchaseDetailsComponent } from './purchase-details.component';
 import { MaterialModule } from '../../../material/material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Pipe, PipeTransform } from '@angular/core';
+import { PurchaseService } from '../../services/purchase.service';
+import { of } from 'rxjs';
+import { RouterTestingModule } from '@angular/router/testing';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -20,7 +23,24 @@ describe('PurchaseDetailsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [PurchaseDetailsComponent, MockPipe],
-      imports: [IonicModule.forRoot(), MaterialModule, BrowserAnimationsModule],
+      imports: [
+        IonicModule.forRoot(),
+        MaterialModule,
+        BrowserAnimationsModule,
+        RouterTestingModule,
+      ],
+      providers: [
+        {
+          provide: PurchaseService,
+          useValue: {
+            getPurchaseInvoice: (...args) => of({}),
+            getStore: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
+            }),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PurchaseDetailsComponent);
