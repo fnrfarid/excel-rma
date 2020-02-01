@@ -105,8 +105,9 @@
             <ion-label position="floating">Balance</ion-label>
             <ion-input
               readonly="true"
-              type="string"
+              type="number"
               placeholder="Balance"
+              value="{{salesInvoiceDetails?.outstanding_amount }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -129,8 +130,16 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Branch</ion-label>
-            <ion-input readonly="true" type="text" placeholder="Branch">
+            <ion-label position="floating">Territory</ion-label>
+            <ion-input 
+            readonly="true"
+            type="text"
+            value="{{
+              salesInvoiceDetails?.territory
+                ? salesInvoiceDetails.territory
+                : ''
+            }}"
+            placeholder="Territory">
             </ion-input>
           </ion-item>
         </ion-col>
@@ -141,8 +150,8 @@
               readonly="true"
               type="text"
               value="{{
-                salesInvoiceDetails?.contact_display
-                  ? salesInvoiceDetails.contact_display
+                salesInvoiceDetails?.delivery_warehouse
+                  ? salesInvoiceDetails.delivery_warehouse
                   : ''
               }}"
               placeholder="Warehouse"

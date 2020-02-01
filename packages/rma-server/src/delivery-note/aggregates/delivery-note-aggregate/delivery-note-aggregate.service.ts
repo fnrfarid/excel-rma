@@ -122,6 +122,13 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           if (!settings) {
             return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
           }
+          this.salesInvoiceService
+            .updateOne(
+              { name: assignPayload.sales_invoice_name },
+              { $set: { delivery_warehouse: assignPayload.set_warehouse } },
+            )
+            .then(success => {})
+            .catch(error => {});
           const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
           return this.http.post(
             settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,

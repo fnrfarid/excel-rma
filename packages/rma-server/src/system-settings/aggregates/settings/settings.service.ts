@@ -92,8 +92,8 @@ export class SettingsService extends AggregateRoot {
     return from(settings);
   }
 
-  update(query, params) {
-    return from(this.serverSettingsService.update(query, params));
+  updateMany(query, params) {
+    return from(this.serverSettingsService.updateMany(query, params));
   }
 
   getAuthorizationHeaders(token: TokenCache) {

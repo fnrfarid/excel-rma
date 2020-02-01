@@ -88,6 +88,10 @@ export class SalesInvoiceWebhookDto {
 
   @IsNotEmpty()
   @IsNumber()
+  outstanding_amount: number;
+
+  @IsNotEmpty()
+  @IsNumber()
   pos_total_qty: number;
 
   @IsNotEmpty()
