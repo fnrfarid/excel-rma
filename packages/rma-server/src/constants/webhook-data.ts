@@ -1800,6 +1800,10 @@ export function salesInvoiceOnSubmitWebhookData(
         fieldname: 'company',
       },
       {
+        fieldname: 'outstanding_amount',
+        key: 'outstanding_amount',
+      },
+      {
         key: 'posting_date',
         fieldname: 'posting_date',
       },

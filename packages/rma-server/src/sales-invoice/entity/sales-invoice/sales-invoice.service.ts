@@ -58,10 +58,6 @@ export class SalesInvoiceService {
     return await this.salesInvoiceRepository.updateOne(query, param);
   }
 
-  async update(query, param) {
-    return await this.salesInvoiceRepository.update(query, param);
-  }
-
   async updateMany(query, options?) {
     return await this.salesInvoiceRepository.updateMany(query, options);
   }

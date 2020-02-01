@@ -37,7 +37,10 @@ export class SettingsController {
   async updateSettings(@Body() payload: ServerSettingsDto) {
     return from(this.settingsService.find()).pipe(
       switchMap(settings => {
-        return this.settingsService.update({ uuid: settings.uuid }, payload);
+        return this.settingsService.updateMany(
+          { uuid: settings.uuid },
+          payload,
+        );
       }),
     );
   }

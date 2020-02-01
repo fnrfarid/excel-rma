@@ -94,6 +94,7 @@ export class SalesInvoiceDetails {
   uuid?: string;
   customer: string;
   company: string;
+  outstanding_amount: number;
   posting_date: string;
   customer_email: string;
   due_date: string;

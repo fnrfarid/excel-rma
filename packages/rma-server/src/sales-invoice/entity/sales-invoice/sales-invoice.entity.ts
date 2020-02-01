@@ -12,6 +12,9 @@ export class SalesInvoice extends BaseEntity {
   name: string;
 
   @Column()
+  outstanding_amount: string;
+
+  @Column()
   is_return: boolean;
 
   @Column()
@@ -52,6 +55,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   territory: string;
+
+  @Column()
+  delivery_warehouse: string;
 
   @Column()
   update_stock: number;

@@ -23,10 +23,6 @@ export class FrappeTokenService {
     return await this.frappeTokenRepo.findOne(params);
   }
 
-  async update(query, params) {
-    return await this.frappeTokenRepo.update(query, params);
-  }
-
   async count() {
     return await this.frappeTokenRepo.count();
   }
