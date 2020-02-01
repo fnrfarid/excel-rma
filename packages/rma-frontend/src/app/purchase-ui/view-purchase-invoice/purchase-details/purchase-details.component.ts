@@ -4,8 +4,8 @@ import { MatSnackBar } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { Item } from '../../../common/interfaces/sales.interface';
-import { AUTH_SERVER_URL } from 'src/app/constants/storage';
-import { CLOSE } from 'src/app/constants/app-string';
+import { AUTH_SERVER_URL } from '../../../constants/storage';
+import { CLOSE } from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
 @Component({
   selector: 'purchase-details',
