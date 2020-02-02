@@ -9,6 +9,12 @@ import { startWith, switchMap } from 'rxjs/operators';
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { CLOSE } from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
+import {
+  PurchaseReceipt,
+  PurchaseReceiptItem,
+} from '../../../common/interfaces/purchase-receipt.interface';
+import { Location } from '@angular/common';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -27,7 +33,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   ];
   dataSource = [];
   date = new FormControl(new Date());
-  claimsReceivedDate: string;
+  purchaseReceiptDate: string;
   warehouseFormControl = new FormControl();
   filteredWarehouseList: Observable<any[]>;
   purchaseInvoiceDetails: PurchaseInvoiceDetails;
@@ -36,11 +42,13 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     private readonly snackbar: MatSnackBar,
     private readonly route: ActivatedRoute,
     private readonly purchaseService: PurchaseService,
-    private readonly salesService: SalesService, // private readonly location: Location,
+    private readonly location: Location,
+    private readonly salesService: SalesService,
+    private loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
-    this.claimsReceivedDate = this.getParsedDate(this.date.value);
+    this.purchaseReceiptDate = this.getParsedDate(this.date.value);
     this.getPuchaseInvoice(this.route.snapshot.params.invoiceUuid);
     this.purchaseInvoiceDetails = {} as PurchaseInvoiceDetails;
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
@@ -61,9 +69,9 @@ export class PurchaseAssignSerialsComponent implements OnInit {
             itemList.push({
               position: j + 1,
               serial_no: '',
-              item: item.item_name,
+              item_name: item.item_name,
               company: res.company,
-              claimsReceivedDate: this.claimsReceivedDate,
+              claimsReceivedDate: this.purchaseReceiptDate,
               rate: item.rate,
               qty: 1,
               amount: item.rate,
@@ -82,6 +90,66 @@ export class PurchaseAssignSerialsComponent implements OnInit {
           CLOSE,
           { duration: 2500 },
         );
+      },
+    });
+  }
+
+  async submitDeliveryNote() {
+    const loading = await this.loadingController.create({
+      message: 'Creating Serials',
+      spinner: 'bubbles',
+    });
+    await loading.present();
+
+    const purchaseReceipt = {} as PurchaseReceipt;
+    purchaseReceipt.company = this.purchaseInvoiceDetails.company;
+    purchaseReceipt.naming_series = this.purchaseInvoiceDetails.naming_series;
+    purchaseReceipt.posting_date = this.getParsedDate(this.date.value);
+    purchaseReceipt.posting_time = this.getFrappeTime();
+    purchaseReceipt.purchase_invoice_name = this.purchaseInvoiceDetails.name;
+    purchaseReceipt.supplier = this.purchaseInvoiceDetails.supplier;
+    purchaseReceipt.total = 0;
+    purchaseReceipt.total_qty = 0;
+    purchaseReceipt.items = [];
+
+    const filteredItemCodeList = [
+      ...new Set(this.dataSource.map(item => item.item_code)),
+    ];
+    filteredItemCodeList.forEach(item_code => {
+      const purchaseReceiptItem = {} as PurchaseReceiptItem;
+      purchaseReceiptItem.warehouse = this.warehouseFormControl.value;
+      purchaseReceiptItem.serial_no = [];
+      purchaseReceiptItem.qty = 0;
+      purchaseReceiptItem.amount = 0;
+      purchaseReceiptItem.rate = 0;
+      purchaseReceiptItem.item_code = item_code;
+      this.dataSource.forEach(item => {
+        if (item_code === item.item_code && item.serial_no !== '') {
+          purchaseReceiptItem.qty += 1;
+          purchaseReceiptItem.amount += item.rate;
+          purchaseReceiptItem.serial_no.push(item.serial_no);
+          purchaseReceiptItem.rate = item.rate;
+          purchaseReceiptItem.item_name = item.item_name;
+        }
+      });
+      purchaseReceipt.total += purchaseReceiptItem.amount;
+      purchaseReceipt.total_qty += purchaseReceiptItem.qty;
+      purchaseReceipt.items.push(purchaseReceiptItem);
+    });
+
+    this.purchaseService.createPurchaseReceipt(purchaseReceipt).subscribe({
+      next: success => {
+        loading.dismiss();
+        this.snackbar.open('Purchase Receipt created', CLOSE, {
+          duration: 2500,
+        });
+        this.location.back();
+      },
+      error: err => {
+        loading.dismiss();
+        this.snackbar.open('Something went wrong ', CLOSE, {
+          duration: 2500,
+        });
       },
     });
   }
@@ -108,10 +176,15 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.dataSource[index].supplier = '';
   }
 
-  claimsDate($event) {
-    this.claimsReceivedDate = this.getParsedDate($event.value);
+  getFrappeTime() {
+    const date = new Date();
+    return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
+  }
+
+  selectedPurchaseReceiptDate($event) {
+    this.purchaseReceiptDate = this.getParsedDate($event.value);
     this.dataSource.forEach((item, index) => {
-      this.dataSource[index].claimsReceivedDate = this.claimsReceivedDate;
+      this.dataSource[index].claimsReceivedDate = this.purchaseReceiptDate;
     });
   }
 

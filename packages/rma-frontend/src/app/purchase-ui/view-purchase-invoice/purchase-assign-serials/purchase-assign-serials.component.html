@@ -9,18 +9,18 @@
           <mat-form-field class="example-full-width transform">
             <input
               matInput
-              [matDatepicker]="claimsReceivedDate"
+              [matDatepicker]="purchaseReceiptDate"
               [formControl]="date"
-              placeholder="Serial Assigned Date"
+              placeholder="Date"
               readonly
-              (dateChange)="claimsDate($event)"
+              (dateChange)="selectedPurchaseReceiptDate($event)"
             />
             <mat-datepicker-toggle
               matSuffix
-              [for]="claimsReceivedDate"
+              [for]="purchaseReceiptDate"
             ></mat-datepicker-toggle>
             <mat-datepicker
-              #claimsReceivedDate
+              #purchaseReceiptDate
               disabled="false"
             ></mat-datepicker>
           </mat-form-field>
@@ -113,7 +113,7 @@
 
       <ng-container matColumnDef="item">
         <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.item }}</mat-cell>
+        <mat-cell *matCellDef="let element">{{ element.item_name }}</mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="company">

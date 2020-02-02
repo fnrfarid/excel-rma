@@ -11,6 +11,7 @@ export class PurchaseInvoice {
 export class PurchaseInvoiceDetails {
   uuid?: string;
   name?: string;
+  naming_series?: string;
   supplier: string;
   company: string;
   due_date: string;
