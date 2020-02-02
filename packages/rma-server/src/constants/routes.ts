@@ -51,3 +51,5 @@ export const SALES_INVOICE_ON_CANCEL_ENDPOINT =
   '/api/sales_invoice/webhook/v1/cancel';
 export const FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT =
   '/api/resource/Payment%20Terms%20Template/';
+export const FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT =
+  '/api/resource/Purchase%20Receipt';
