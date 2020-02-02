@@ -145,6 +145,14 @@ export class AddSalesInvoicePage implements OnInit {
     this.dataSource.update(this.dataSource.data());
   }
 
+  customerChanged(customer) {
+    if (customer.credit_days) {
+      const date = new Date();
+      date.setDate(date.getDate() + customer.credit_days);
+      this.dueDateFormControl.setValue(date);
+    } else this.dueDateFormControl.setValue('');
+  }
+
   navigateBack() {
     this.location.back();
   }

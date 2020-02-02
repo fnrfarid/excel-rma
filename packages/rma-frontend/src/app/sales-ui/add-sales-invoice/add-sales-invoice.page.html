@@ -82,6 +82,7 @@
                       autoActiveFirstOption
                       #auto="matAutocomplete"
                       [displayWith]="getOptionText"
+                      (optionSelected)="customerChanged($event.option.value)"
                     >
                       <mat-option
                         *ngFor="let option of filteredCustomerList | async"
