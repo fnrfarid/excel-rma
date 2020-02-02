@@ -90,6 +90,7 @@ export const DRAFT_STATUS = 'Draft';
 export const TO_DELIVER_STATUS = 'To Deliver';
 export const REJECTED_STATUS = 'Rejected';
 export const SUBMITTED_STATUS = 'Submitted';
+export const COMPLETED_STATUS = 'Completed';
 export const CANCELED_STATUS = 'Canceled';
 export const SALES_USER = 'Sales User';
 export const SALES_MANAGER = 'Sales Manager';
