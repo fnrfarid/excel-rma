@@ -43,6 +43,12 @@ export class Customer extends BaseEntity {
   customer_group: string;
 
   @Column()
+  payment_terms: string;
+
+  @Column()
+  credit_days: number;
+
+  @Column()
   territory: string;
 
   @Column()
