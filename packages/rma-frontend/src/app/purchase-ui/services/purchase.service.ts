@@ -11,8 +11,10 @@ import {
   LIST_PURCHASE_INVOICE_ENDPOINT,
   PURCHASE_INVOICE_GET_ONE_ENDPOINT,
   API_INFO_ENDPOINT,
+  CREATE_PURCHASE_RECEIPT_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
+import { PurchaseReceipt } from '../../common/interfaces/purchase-receipt.interface';
 @Injectable({
   providedIn: 'root',
 })
@@ -45,6 +47,17 @@ export class PurchaseService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get(`${PURCHASE_INVOICE_GET_ONE_ENDPOINT}${uuid}`, {
+          headers,
+        });
+      }),
+    );
+  }
+
+  createPurchaseReceipt(purchaseReceipt: PurchaseReceipt) {
+    const url = CREATE_PURCHASE_RECEIPT_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, purchaseReceipt, {
           headers,
         });
       }),

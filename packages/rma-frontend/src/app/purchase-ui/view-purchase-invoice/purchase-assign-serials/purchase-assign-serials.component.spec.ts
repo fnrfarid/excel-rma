@@ -11,6 +11,7 @@ import { SalesService } from '../../../sales-ui/services/sales.service';
 import { of } from 'rxjs';
 import { PurchaseService } from '../../services/purchase.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Location } from '@angular/common';
 
 describe('PurchaseAssignSerialsComponent', () => {
   let component: PurchaseAssignSerialsComponent;
@@ -47,6 +48,10 @@ describe('PurchaseAssignSerialsComponent', () => {
           useValue: {
             getPurchaseInvoice: (...args) => of({ items: [] }),
           },
+        },
+        {
+          provide: Location,
+          useValue: {},
         },
       ],
     }).compileComponents();

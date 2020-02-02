@@ -41,6 +41,8 @@ export const API_INFO_ENDPOINT = '/api/info';
 export const API_ITEM_LIST = '/api/item/v1/list';
 export const API_ITEM_SET_MIN_PRICE = '/api/item/v1/set_minimum_item_price';
 export const API_ITEM_GET_BY_CODE = '/api/item/v1/get_by_item_code';
-export const LIST_PURCHASE_INVOICE_ENDPOINT = 'api/purchase_invoice/v1/list';
+export const LIST_PURCHASE_INVOICE_ENDPOINT = '/api/purchase_invoice/v1/list';
 export const PURCHASE_INVOICE_GET_ONE_ENDPOINT =
   '/api/purchase_invoice/v1/get/';
+export const CREATE_PURCHASE_RECEIPT_ENDPOINT =
+  '/api/purchase_receipt/v1/create';
