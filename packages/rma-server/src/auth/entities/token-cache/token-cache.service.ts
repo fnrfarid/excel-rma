@@ -23,10 +23,6 @@ export class TokenCacheService {
     return await this.tokenCacheRepository.findOne(params);
   }
 
-  async update(query, params) {
-    return await this.tokenCacheRepository.update(query, params);
-  }
-
   async updateMany(query, params) {
     return await this.tokenCacheRepository.updateMany(query, params);
   }

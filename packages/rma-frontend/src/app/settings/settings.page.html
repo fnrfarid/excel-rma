@@ -118,20 +118,11 @@
                 </mat-icon>
               </mat-form-field>
             </form>
-            <ion-grid class="ion-padding">
-              <ion-row>
-                <ion-col>
-                  <ion-button color="light" (click)="updateSettings()"
-                    >Update</ion-button
-                  >
-                </ion-col>
-                <ion-col class="ion-text-right">
-                  <ion-button color="light" routerLink="/settings/item-price">
-                    Set Item Price</ion-button
-                  >
-                </ion-col>
-              </ion-row>
-            </ion-grid>
+            <div class="ion-padding">
+              <ion-button color="light" (click)="updateSettings()">
+                Update
+              </ion-button>
+            </div>
           </ion-card-content>
         </ion-card>
         <ion-card>

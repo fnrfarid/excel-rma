@@ -1,13 +1,12 @@
 import {
   Injectable,
-  BadRequestException,
   HttpService,
   NotImplementedException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import {
-  CustomerWebhookInterface,
-  CreditLimitsInterface,
+  CustomerWebhookDto,
+  PaymentTemplateTermsInterface,
 } from '../../entity/customer/customer-webhook-interface';
 import { CustomerService } from '../../entity/customer/customer.service';
 import { from, throwError, of } from 'rxjs';
@@ -17,7 +16,7 @@ import { Customer } from '../../entity/customer/customer.entity';
 import * as uuidv4 from 'uuid/v4';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { FRAPPE_API_GET_CUSTOMER_ENDPOINT } from '../../../constants/routes';
+import { FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class CustomerWebhookAggregateService extends AggregateRoot {
@@ -30,34 +29,37 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
     super();
   }
 
-  customerCreated(customerWebhookPayload: CustomerWebhookInterface) {
+  customerCreated(customerWebhookPayload: CustomerWebhookDto) {
     return from(
       this.customerService.findOne({ name: customerWebhookPayload.name }),
     ).pipe(
       switchMap(customer => {
         if (customer) {
-          return throwError(new BadRequestException(CUSTOMER_ALREADY_EXISTS));
+          return of({ message: CUSTOMER_ALREADY_EXISTS });
         }
         const provider = this.mapCustomer(customerWebhookPayload);
+        if (customerWebhookPayload.payment_terms) {
+          this.syncCustomerCreditDays(provider);
+        }
         this.customerService
           .create(provider)
           .then(success => {})
           .catch(error => {});
-        this.syncCustomerCredit(provider);
         return of({});
       }),
     );
   }
 
-  mapCustomer(customerPayload: CustomerWebhookInterface) {
+  mapCustomer(customerPayload: CustomerWebhookDto) {
     const customer = new Customer();
     Object.assign(customer, customerPayload);
+    customer.credit_limits ? null : (customer.credit_limits = []);
     customer.uuid = uuidv4();
-    customer.isSynced = false;
+    customer.isSynced = customerPayload.payment_terms ? true : false;
     return customer;
   }
 
-  syncCustomerCredit(customer: Customer) {
+  syncCustomerCreditDays(customer: Customer) {
     return this.settingsService
       .find()
       .pipe(
@@ -69,8 +71,8 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
             switchMap(token => {
               const url =
                 settings.authServerURL +
-                FRAPPE_API_GET_CUSTOMER_ENDPOINT +
-                customer.name;
+                FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT +
+                customer.payment_terms;
               return this.http
                 .get(url, {
                   headers: this.settingsService.getAuthorizationHeaders(token),
@@ -78,15 +80,18 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
                 .pipe(
                   map(data => data.data.data),
                   switchMap(
-                    (response: { credit_limits: CreditLimitsInterface[] }) => {
-                      const customerCredit = this.mapCustomerCredit(
-                        response.credit_limits,
+                    (response: {
+                      template_name: string;
+                      terms: PaymentTemplateTermsInterface[];
+                    }) => {
+                      const creditDays: number = this.mapCustomerCreditDays(
+                        response.terms,
                       );
                       return this.customerService.updateOne(
                         { uuid: customer.uuid },
                         {
                           $set: {
-                            credit_limits: customerCredit,
+                            credit_days: creditDays,
                             isSynced: true,
                           },
                         },
@@ -105,22 +110,22 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
       });
   }
 
-  mapCustomerCredit(customerCredit: CreditLimitsInterface[]) {
-    const sanitizedData = [];
-    customerCredit.forEach(eachCustomerCredit => {
-      sanitizedData.push({
-        credit_limit: eachCustomerCredit.credit_limit,
-        company: eachCustomerCredit.company,
-      });
-    });
-    return sanitizedData;
+  mapCustomerCreditDays(customerCredit: PaymentTemplateTermsInterface[]) {
+    let credit_days: number;
+    for (const eachCustomerCredit of customerCredit) {
+      if (eachCustomerCredit.invoice_portion === 100) {
+        credit_days = eachCustomerCredit.credit_days;
+        break;
+      }
+    }
+    return credit_days;
   }
 
-  customerDeleted(customer: CustomerWebhookInterface) {
+  customerDeleted(customer: CustomerWebhookDto) {
     return from(this.customerService.deleteOne({ name: customer.name }));
   }
 
-  customerUpdated(customerPayload: CustomerWebhookInterface) {
+  customerUpdated(customerPayload: CustomerWebhookDto) {
     return from(
       this.customerService.findOne({ name: customerPayload.name }),
     ).pipe(
@@ -132,12 +137,15 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
           });
           return of();
         }
-        customer.isSynced = true;
+        customerPayload.isSynced = true;
+        customer.payment_terms = customerPayload.payment_terms;
+        customerPayload.payment_terms
+          ? this.syncCustomerCreditDays(customer)
+          : (customerPayload.credit_days = null);
         this.customerService
           .updateOne({ uuid: customer.uuid }, { $set: customerPayload })
           .then(success => {})
           .catch(err => {});
-        this.syncCustomerCredit(customer);
         return of();
       }),
     );

@@ -1,7 +1,7 @@
 import { Component, Input, Optional, Host } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { filter, switchMap, startWith, map } from 'rxjs/operators';
-import { FormControl } from '@angular/forms';
+import { filter, switchMap, startWith } from 'rxjs/operators';
+import { FormControl, Validators } from '@angular/forms';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { SalesService } from '../../services/sales.service';
 import { Observable } from 'rxjs';
@@ -20,22 +20,26 @@ export class InlineEditComponent {
   set value(x) {
     this.itemFormControl.setValue({ item_name: x });
     this.quantity = x;
-    this.rate = x;
+    this.rateFormControl.setValue(x);
     this._value = x;
   }
 
   @Input()
   column: string;
 
+  @Input()
+  minimumPrice: number;
+
   private _value = '';
 
   itemFormControl = new FormControl();
+  rateFormControl = new FormControl('', [Validators.min(this.minimumPrice)]);
+
   itemList: Array<Item>;
   filteredItemList: Observable<any[]>;
   /** Form model for the input. */
   comment = '';
   quantity: number = null;
-  rate: number = null;
 
   constructor(
     @Optional() @Host() public popover: SatPopover,
@@ -43,7 +47,6 @@ export class InlineEditComponent {
   ) {}
 
   ngOnInit() {
-    // subscribe to cancellations and reset form value
     if (this.popover) {
       this.popover.closed
         .pipe(filter(val => val == null))
@@ -70,38 +73,27 @@ export class InlineEditComponent {
       if (this.column === 'item') {
         this.salesService
           .getItemPrice(this.itemFormControl.value.item_code)
-          .pipe(
-            switchMap(priceListArray => {
-              return this.salesService
-                .getItemFromRMAServer(this.itemFormControl.value.item_code)
-                .pipe(
-                  map(item => {
-                    return {
-                      priceListArray,
-                      item,
-                    };
-                  }),
-                );
-            }),
-          )
           .subscribe({
             next: res => {
               const selectedItem = {} as Item;
-              selectedItem.uuid = res.item.uuid;
-              selectedItem.minimumPrice = res.item.minimumPrice;
               selectedItem.item_code = this.itemFormControl.value.item_code;
               selectedItem.item_name = this.itemFormControl.value.item_name;
               selectedItem.name = this.itemFormControl.value.name;
               selectedItem.owner = this.itemFormControl.value.owner;
-              selectedItem.rate =
-                res.priceListArray.length === 0
-                  ? 0
-                  : res.priceListArray[0].price_list_rate;
+              selectedItem.rate = 0;
+              if (res.length > 0) {
+                selectedItem.minimumPrice = res[0].price_list_rate;
+                selectedItem.rate = res[0].price_list_rate;
+              }
               this.popover.close(selectedItem);
             },
           });
       } else if (this.column === 'quantity') this.popover.close(this.quantity);
-      else this.popover.close(this.rate);
+      else {
+        if (this.rateFormControl.value < this.minimumPrice) {
+          this.rateFormControl.setErrors({ min: false });
+        } else this.popover.close(this.rateFormControl.value);
+      }
     }
   }
 

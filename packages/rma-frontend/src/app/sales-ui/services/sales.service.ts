@@ -8,11 +8,11 @@ import {
   APIResponse,
   SerialAssign,
 } from '../../common/interfaces/sales.interface';
-// import { Customer } from '../../common/interfaces/customer.interface';
 import {
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
+  DEFAULT_SELLING_PRICE_LIST,
 } from '../../constants/storage';
 import {
   LIST_SALES_INVOICE_ENDPOINT,
@@ -30,10 +30,12 @@ import {
   API_INFO_ENDPOINT,
   API_ITEM_GET_BY_CODE,
   GET_USER_PROFILE_ROLES,
+  CREATE_SALES_RETURN_ENDPOINT,
   API_TERRITORY_GET_WAREHOUSES,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
+import { SalesReturn } from '../../common/interfaces/sales-return.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -152,6 +154,17 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, salesDetails, {
+          headers,
+        });
+      }),
+    );
+  }
+
+  createSalesReturn(salesReturn: SalesReturn) {
+    const url = CREATE_SALES_RETURN_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, salesReturn, {
           headers,
         });
       }),
@@ -283,25 +296,29 @@ export class SalesService {
 
   getItemPrice(item_code: string) {
     const url = RELAY_GET_ITEMPRICE_ENDPOINT;
-    const params = new HttpParams({
-      fromObject: {
-        fields: '["price_list_rate"]',
-        filters: `[["item_code","=","${item_code}"],["price_list","=","Standard Selling"]]`,
-      },
-    });
+    return from(this.storage.getItem(DEFAULT_SELLING_PRICE_LIST)).pipe(
+      switchMap(priceList => {
+        const params = new HttpParams({
+          fromObject: {
+            fields: '["price_list_rate"]',
+            filters: `[["item_code","=","${item_code}"],["price_list","=","${priceList}"]]`,
+          },
+        });
 
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http
-          .get<any>(url, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.data);
-            }),
-          );
+        return this.getHeaders().pipe(
+          switchMap(headers => {
+            return this.http
+              .get<{ data: { price_list_rate: number }[] }>(url, {
+                params,
+                headers,
+              })
+              .pipe(
+                switchMap(response => {
+                  return of(response.data);
+                }),
+              );
+          }),
+        );
       }),
     );
   }

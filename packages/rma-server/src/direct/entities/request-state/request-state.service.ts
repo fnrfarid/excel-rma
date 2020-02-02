@@ -23,10 +23,6 @@ export class RequestStateService {
     return await this.requestStateRepository.findOne(params);
   }
 
-  async update(query, params) {
-    return await this.requestStateRepository.update(query, params);
-  }
-
   async count() {
     return await this.requestStateRepository.count();
   }

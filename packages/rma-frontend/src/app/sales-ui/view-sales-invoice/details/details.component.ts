@@ -36,7 +36,6 @@ export class DetailsComponent implements OnInit {
     this.salesService.getSalesInvoice(uuid).subscribe({
       next: (success: any) => {
         this.salesInvoiceDetails = success;
-
         this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
           .address_display
           ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
@@ -95,6 +94,7 @@ export class SalesInvoiceDetails {
   uuid?: string;
   customer: string;
   company: string;
+  outstanding_amount: number;
   posting_date: string;
   customer_email: string;
   due_date: string;
@@ -117,6 +117,8 @@ export class SalesInvoiceDetails {
   items?: Item[];
   pos_total_qty?: number;
   name?: string;
+  delivery_note_items?: Item[];
+  delivery_warehouse?: string;
 }
 
 export class SalesInvoiceItem {

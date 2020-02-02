@@ -19,6 +19,10 @@ export class Item {
   rate: number;
   amount?: number;
   minimumPrice?: number;
+  description?: string;
+  serial_no?: string;
+  delivery_note?: string;
+  against_sales_invoice?: string;
 }
 
 export class APIResponse {

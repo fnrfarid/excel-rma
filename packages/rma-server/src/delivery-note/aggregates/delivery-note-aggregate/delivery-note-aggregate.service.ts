@@ -22,6 +22,7 @@ import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
   DELIVERY_NOTE_LIST_FIELD,
+  COMPLETED_STATUS,
 } from '../../../constants/app-strings';
 import { AssignSerialDto } from '../../../serial-no/entity/serial-no/assign-serial-dto';
 import {
@@ -122,6 +123,13 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           if (!settings) {
             return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
           }
+          this.salesInvoiceService
+            .updateOne(
+              { name: assignPayload.sales_invoice_name },
+              { $set: { delivery_warehouse: assignPayload.set_warehouse } },
+            )
+            .then(success => {})
+            .catch(error => {});
           const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
           return this.http.post(
             settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
@@ -161,7 +169,10 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           this.salesInvoiceService
             .updateMany(
               { name: assignPayload.sales_invoice_name },
-              { $push: { delivery_note_items: { $each: items } } },
+              {
+                $push: { delivery_note_items: { $each: items } },
+                $set: { status: COMPLETED_STATUS },
+              },
             )
             .then(success => {})
             .catch(error => {});

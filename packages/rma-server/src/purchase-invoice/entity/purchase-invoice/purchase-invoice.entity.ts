@@ -1,4 +1,11 @@
-import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
+import {
+  Column,
+  ObjectIdColumn,
+  BaseEntity,
+  ObjectID,
+  Entity,
+  Index,
+} from 'typeorm';
 
 @Entity()
 export class PurchaseInvoice extends BaseEntity {
@@ -39,6 +46,7 @@ export class PurchaseInvoice extends BaseEntity {
   paid_amount: number;
 
   @Column()
+  @Index({ unique: true })
   name: string;
 
   @Column()
@@ -112,6 +120,23 @@ export class PurchaseInvoice extends BaseEntity {
 
   @Column()
   isSynced: boolean;
+
+  @Column()
+  purchase_receipt_items: PurchaseInvoicePurchaseReceiptItem[];
+}
+
+export class PurchaseInvoicePurchaseReceiptItem {
+  purchase_receipt_name: string;
+  amount: number;
+  cost_center: string;
+  expense_account: string;
+  item_code: string;
+  item_name: string;
+  name: string;
+  qty: number;
+  rate: number;
+  serial_no: string[];
+  warehouse: string;
 }
 
 export class PurchaseInvoicePaymentSchedule {

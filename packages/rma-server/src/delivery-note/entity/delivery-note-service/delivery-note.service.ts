@@ -64,10 +64,6 @@ export class DeliveryNoteService {
     return await this.deliveryNoteRepository.updateOne(query, options);
   }
 
-  async update(query, params) {
-    return await this.deliveryNoteRepository.update(query, params);
-  }
-
   async updateMany(query, params) {
     return await this.deliveryNoteRepository.updateMany(query, params);
   }

@@ -1,5 +1,157 @@
 <ion-card>
   <ion-card-content>
-    Assign Serial works
+    <ion-grid class="ion-no-padding">
+      <ion-row class="align">
+        <ion-col class="ion-text-left">
+          <input type="file" id="txtFileUpload" accept=".csv" />
+        </ion-col>
+        <ion-col>
+          <mat-form-field class="example-full-width transform">
+            <input
+              matInput
+              [matDatepicker]="purchaseReceiptDate"
+              [formControl]="date"
+              placeholder="Date"
+              readonly
+              (dateChange)="selectedPurchaseReceiptDate($event)"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="purchaseReceiptDate"
+            ></mat-datepicker-toggle>
+            <mat-datepicker
+              #purchaseReceiptDate
+              disabled="false"
+            ></mat-datepicker>
+          </mat-form-field>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-md="6">
+          <mat-form-field class="example-full-width">
+            <input
+              type="text"
+              placeholder="Select Warehouse"
+              matInput
+              [formControl]="warehouseFormControl"
+              [matAutocomplete]="auto"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto="matAutocomplete"
+              [displayWith]="getOptionText"
+            >
+              <mat-option
+                *ngFor="let option of filteredWarehouseList | async"
+                [value]="option.name"
+              >
+                {{ option.name }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<ion-card>
+  <ion-card-header>
+    <ion-row class="align">
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Items
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+      <ion-col class="ion-text-right" size="auto">
+        <ion-button
+          color="tertiary"
+          fill="outline"
+          (click)="submitDeliveryNote()"
+        >
+          Submit
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content class="ion-no-padding">
+    <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <ng-container matColumnDef="position">
+        <mat-header-cell *matHeaderCellDef>No.</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.position }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="serial">
+        <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
+        <mat-cell
+          *matCellDef="let element"
+          [satPopoverAnchor]="p"
+          tabindex="0"
+          (keyup.enter)="p.open()"
+          (click)="p.open()"
+        >
+          <ng-container *ngIf="element.serial_no">
+            {{ element.serial_no }}
+          </ng-container>
+          <span class="add-comment" *ngIf="!element.serial_no">
+            Assign Serial
+          </span>
+          <sat-popover
+            #p
+            hasBackdrop
+            xAlign="start"
+            yAlign="start"
+            (closed)="updateSerial(element, $event)"
+          >
+            <edit-purchase-table [value]="element.serial_no">
+            </edit-purchase-table>
+          </sat-popover>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="item">
+        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.item_name }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="company">
+        <mat-header-cell *matHeaderCellDef>Company</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.company }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="supplier">
+        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.supplier }}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="claimsReceivedDate">
+        <mat-header-cell *matHeaderCellDef
+          >Serial Assigned Date</mat-header-cell
+        >
+        <mat-cell *matCellDef="let element">
+          {{ element.claimsReceivedDate }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="clear">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <ion-button
+            (click)="clearRow(element)"
+            color="danger"
+            color="danger"
+            fill="clear"
+          >
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
   </ion-card-content>
 </ion-card>

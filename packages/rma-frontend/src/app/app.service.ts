@@ -16,6 +16,7 @@ import {
   DEFAULT_CURRENCY_KEY,
   COUNTRY,
   TIME_ZONE,
+  DEFAULT_SELLING_PRICE_LIST,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -56,7 +57,14 @@ export class AppService {
       .then(() => this.storage.setItem(LOGGED_IN, false))
       .then(() =>
         this.storage.setItem(DEFAULT_COMPANY, response.defaultCompany),
-      );
+      )
+      .then(() =>
+        this.storage.setItem(
+          DEFAULT_SELLING_PRICE_LIST,
+          response.sellingPriceList,
+        ),
+      )
+      .then(saved => {});
   }
 
   generateRandomString(length: number) {

@@ -159,8 +159,8 @@ export class SerialsComponent implements OnInit {
     const assignSerial = {} as SerialAssign;
     assignSerial.company = this.salesInvoiceDetails.company;
     assignSerial.customer = this.salesInvoiceDetails.customer;
-    assignSerial.posting_date = this.salesInvoiceDetails.posting_date;
-    assignSerial.posting_time = this.salesInvoiceDetails.posting_time;
+    assignSerial.posting_date = this.getParsedDate(this.date.value);
+    assignSerial.posting_time = this.getFrappeTime();
     assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
     assignSerial.set_warehouse = this.warehouseFormControl.value;
     assignSerial.total = 0;
@@ -221,6 +221,11 @@ export class SerialsComponent implements OnInit {
         duration: 2500,
       });
     }
+  }
+
+  getFrappeTime() {
+    const date = new Date();
+    return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
   }
 
   validateSerials(itemList: SerialNo[]) {

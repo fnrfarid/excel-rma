@@ -41,7 +41,7 @@ export class AssignSerialDto {
   company: string;
 
   @IsNotEmpty()
-  @ValidateNested({ each: true })
+  @ValidateNested()
   @Type(() => DeliveryNoteItemDto)
   items: DeliveryNoteItemDto[];
 }

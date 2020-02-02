@@ -15,17 +15,29 @@ import { SalesInvoiceWebhookDto } from '../../entity/sales-invoice/sales-invoice
 export class SalesInvoiceWebhookAggregateService {
   constructor(private readonly salesInvoiceService: SalesInvoiceService) {}
 
-  salesInvoiceCreated(purchaseInvoicePayload: SalesInvoiceWebhookDto) {
+  salesInvoiceCreated(salesInvoicePayload: SalesInvoiceWebhookDto) {
     return from(
       this.salesInvoiceService.findOne({
-        name: purchaseInvoicePayload.name,
+        name: salesInvoicePayload.name,
       }),
     ).pipe(
-      switchMap(purchaseInvoice => {
-        if (purchaseInvoice) {
-          of({ message: PURCHASE_INVOICE_ALREADY_EXIST });
+      switchMap(salesInvoice => {
+        if (salesInvoice) {
+          this.salesInvoiceService
+            .updateOne(
+              { name: salesInvoicePayload.name },
+              {
+                $set: {
+                  outstanding_amount: salesInvoicePayload.outstanding_amount,
+                  address_display: salesInvoicePayload.address_display,
+                },
+              },
+            )
+            .then(success => {})
+            .catch(error => {});
+          return of({ message: PURCHASE_INVOICE_ALREADY_EXIST });
         }
-        const provider = this.mapPurchaseInvoice(purchaseInvoicePayload);
+        const provider = this.mapPurchaseInvoice(salesInvoicePayload);
 
         this.salesInvoiceService
           .create(provider)
@@ -36,9 +48,9 @@ export class SalesInvoiceWebhookAggregateService {
     );
   }
 
-  mapPurchaseInvoice(purchaseInvoicePayload: SalesInvoiceWebhookDto) {
+  mapPurchaseInvoice(salesInvoicePayload: SalesInvoiceWebhookDto) {
     const salesInvoice = new SalesInvoice();
-    Object.assign(salesInvoice, purchaseInvoicePayload);
+    Object.assign(salesInvoice, salesInvoicePayload);
     salesInvoice.uuid = uuidv4();
     salesInvoice.isSynced = true;
     salesInvoice.status = SUBMITTED_STATUS;

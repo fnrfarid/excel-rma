@@ -37,12 +37,12 @@ export class ServerSettingsService {
     return await this.idpSettingsRepository.findOne(params);
   }
 
-  async update(query, params) {
-    return await this.idpSettingsRepository.update(query, params);
-  }
-
   async updateOne(query, params) {
     return await this.idpSettingsRepository.updateOne(query, params);
+  }
+
+  async updateMany(query, params) {
+    return await this.idpSettingsRepository.updateMany(query, params);
   }
 
   async count() {

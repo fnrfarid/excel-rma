@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
@@ -9,18 +9,25 @@ import { ViewPurchaseInvoicePageRoutingModule } from './view-purchase-invoice-ro
 import { ViewPurchaseInvoicePage } from './view-purchase-invoice.page';
 import { PurchaseAssignSerialsComponent } from './purchase-assign-serials/purchase-assign-serials.component';
 import { PurchaseDetailsComponent } from './purchase-details/purchase-details.component';
+import { MaterialModule } from '../../material/material.module';
+import { AppCommonModule } from '../../common/app-common.module';
+import { EditPurchaseTableComponent } from './edit-purchase-table/edit-purchase-table.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    MaterialModule,
+    AppCommonModule,
     IonicModule,
+    ReactiveFormsModule,
     ViewPurchaseInvoicePageRoutingModule,
   ],
   declarations: [
     ViewPurchaseInvoicePage,
     PurchaseAssignSerialsComponent,
     PurchaseDetailsComponent,
+    EditPurchaseTableComponent,
   ],
 })
 export class ViewPurchaseInvoicePageModule {}

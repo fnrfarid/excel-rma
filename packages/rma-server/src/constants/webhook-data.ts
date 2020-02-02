@@ -412,6 +412,14 @@ export function getCustomerAfterInsertWebhookData(
         fieldname: 'customer_name',
         key: 'customer_name',
       },
+      {
+        fieldname: 'credit_limits',
+        key: 'credit_limits',
+      },
+      {
+        fieldname: 'payment_terms',
+        key: 'payment_terms',
+      },
     ],
   };
 }
@@ -463,6 +471,14 @@ export function getCustomerOnUpdateWebhookData(
       {
         fieldname: 'customer_name',
         key: 'customer_name',
+      },
+      {
+        fieldname: 'credit_limits',
+        key: 'credit_limits',
+      },
+      {
+        fieldname: 'payment_terms',
+        key: 'payment_terms',
       },
     ],
   };
@@ -1798,6 +1814,10 @@ export function salesInvoiceOnSubmitWebhookData(
       {
         key: 'company',
         fieldname: 'company',
+      },
+      {
+        fieldname: 'outstanding_amount',
+        key: 'outstanding_amount',
       },
       {
         key: 'posting_date',

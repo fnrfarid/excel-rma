@@ -45,3 +45,4 @@ export const SALES_INVOICE_MANDATORY = 'Sales invoice url query is mandatory.';
 export const NO_DELIVERY_NOTE_FOUND = 'Invalid Request, No Delivery Note Found';
 export const SALES_INVOICE_INVALID = 'Sales invoice is invalid';
 export const PURCHASE_INVOICE_ALREADY_EXIST = 'Purchase invoice already exist';
+export const PURCHASE_INVOICE_NOT_FOUND = 'Purchase invoice not found';
