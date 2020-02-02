@@ -3,9 +3,6 @@ import {
   Post,
   UseGuards,
   Req,
-  Param,
-  Get,
-  Query,
   UsePipes,
   ValidationPipe,
   Body,
@@ -28,26 +25,5 @@ export class PurchaseReceiptController {
       purchaseReceiptPayload,
       req,
     );
-  }
-
-  @Get('v1/get/:uuid')
-  @UseGuards(TokenGuard)
-  async getClient(@Param('uuid') uuid: string, @Req() req) {
-    return;
-  }
-
-  @Get('v1/list')
-  @UseGuards(TokenGuard)
-  getClientList(
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 10,
-    @Query('search') search = '',
-    @Query('sort') sort,
-    @Req() clientHttpRequest,
-  ) {
-    if (sort !== 'ASC') {
-      sort = 'DESC';
-    }
-    return;
   }
 }
