@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { SalesReturnDataSource } from './sales-return.datasource';
 import { MatPaginator, MatSort } from '@angular/material';
 import { SalesReturnService } from './sales-return.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'sales-invoice-return',
@@ -26,10 +27,14 @@ export class SalesReturnComponent implements OnInit {
     'modified_by',
   ];
   search: string = '';
-
-  constructor(private readonly salesReturnService: SalesReturnService) {}
+  invoiceUuid: string = '';
+  constructor(
+    private readonly salesReturnService: SalesReturnService,
+    private readonly route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
+    this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.dataSource = new SalesReturnDataSource(this.salesReturnService);
     this.dataSource.loadItems(this.sales_invoice);
   }

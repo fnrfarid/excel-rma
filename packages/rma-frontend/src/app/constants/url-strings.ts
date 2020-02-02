@@ -13,6 +13,8 @@ export const SALES_INVOICE_GET_ONE_ENDPOINT = '/api/sales_invoice/v1/get/';
 export const CREATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/create';
 export const UPDATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/update';
 export const SUBMIT_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/submit';
+export const CREATE_SALES_RETURN_ENDPOINT =
+  'api/sales_invoice/v1/create_return';
 export const GET_SETTINGS_ENDPOINT = '/api/settings/v1/get';
 export const UPDATE_SETTINGS_ENDPOINT = '/api/settings/v1/update';
 export const LIST_SERIAL_ENDPOINT = 'api/serial_no/v1/list';

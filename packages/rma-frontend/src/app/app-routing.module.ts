@@ -68,6 +68,13 @@ const routes: Routes = [
         './purchase-ui/view-purchase-invoice/view-purchase-invoice.module'
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
+  {
+    path: 'add-sales-return/:invoiceUuid',
+    loadChildren: () =>
+      import('./sales-ui/add-sales-return/add-sales-return.module').then(
+        m => m.AddSalesReturnPageModule,
+      ),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
