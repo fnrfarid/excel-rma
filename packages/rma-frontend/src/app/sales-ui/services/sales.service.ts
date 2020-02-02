@@ -30,10 +30,12 @@ import {
   API_INFO_ENDPOINT,
   API_ITEM_GET_BY_CODE,
   GET_USER_PROFILE_ROLES,
+  CREATE_SALES_RETURN_ENDPOINT,
   API_TERRITORY_GET_WAREHOUSES,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
+import { SalesReturn } from '../../common/interfaces/sales-return.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -152,6 +154,17 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, salesDetails, {
+          headers,
+        });
+      }),
+    );
+  }
+
+  createSalesReturn(salesReturn: SalesReturn) {
+    const url = CREATE_SALES_RETURN_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, salesReturn, {
           headers,
         });
       }),

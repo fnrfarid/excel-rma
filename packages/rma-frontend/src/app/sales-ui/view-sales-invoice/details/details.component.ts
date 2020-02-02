@@ -117,6 +117,8 @@ export class SalesInvoiceDetails {
   items?: Item[];
   pos_total_qty?: number;
   name?: string;
+  delivery_note_items?: Item[];
+  delivery_warehouse?: string;
 }
 
 export class SalesInvoiceItem {

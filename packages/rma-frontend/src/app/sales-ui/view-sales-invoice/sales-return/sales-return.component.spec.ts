@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { SalesReturnService } from './sales-return.service';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SalesReturnComponent', () => {
   let component: SalesReturnComponent;
@@ -15,7 +16,12 @@ describe('SalesReturnComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SalesReturnComponent],
-      imports: [MaterialModule, FormsModule, BrowserAnimationsModule],
+      imports: [
+        MaterialModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        RouterTestingModule,
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {

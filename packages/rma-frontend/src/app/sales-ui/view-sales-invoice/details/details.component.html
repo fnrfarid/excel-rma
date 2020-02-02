@@ -107,7 +107,7 @@
               readonly="true"
               type="number"
               placeholder="Balance"
-              value="{{salesInvoiceDetails?.outstanding_amount }}"
+              value="{{ salesInvoiceDetails?.outstanding_amount }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -131,15 +131,16 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Territory</ion-label>
-            <ion-input 
-            readonly="true"
-            type="text"
-            value="{{
-              salesInvoiceDetails?.territory
-                ? salesInvoiceDetails.territory
-                : ''
-            }}"
-            placeholder="Territory">
+            <ion-input
+              readonly="true"
+              type="text"
+              value="{{
+                salesInvoiceDetails?.territory
+                  ? salesInvoiceDetails.territory
+                  : ''
+              }}"
+              placeholder="Territory"
+            >
             </ion-input>
           </ion-item>
         </ion-col>
@@ -154,7 +155,7 @@
                   ? salesInvoiceDetails.delivery_warehouse
                   : ''
               }}"
-              placeholder="Warehouse"
+              placeholder="Please assign Serials to view Warehouse"
             ></ion-input>
           </ion-item>
         </ion-col>

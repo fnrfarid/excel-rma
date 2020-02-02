@@ -1,0 +1,188 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Add Sales Return</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-fab
+    class="ion-margin-end"
+    slot="fixed"
+    vertical="top"
+    color="light"
+    horizontal="end"
+  >
+    <ion-fab-button class="fab-position" (click)="submitSalesReturn()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-text color="tertiary">
+          Details
+        </ion-text>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid class="ion-no-padding">
+        <ion-row class="align">
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input matInput readonly value="RINV-####" />
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input
+                matInput
+                placeholder="Company"
+                readonly
+                [formControl]="companyFormControl"
+              />
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+        <ion-row class="align">
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input
+                matInput
+                type="text"
+                placeholder="Customer"
+                readonly
+                [formControl]="customerFormControl"
+              />
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input
+                matInput
+                [matDatepicker]="postingDate"
+                placeholder="Posting Date"
+                readonly
+                [formControl]="postingDateFormControl"
+                (dateChange)="selectedPostingDate($event)"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="postingDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #postingDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+        <ion-row class="align">
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input
+                matInput
+                placeholder="Branch"
+                readonly
+                [formControl]="branchFormControl"
+              />
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input
+                type="text"
+                placeholder="Select Warehouse"
+                matInput
+                [formControl]="warehouseFormControl"
+                [matAutocomplete]="auto"
+              />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #auto="matAutocomplete"
+                [displayWith]="getOptionText"
+              >
+                <mat-option
+                  *ngFor="let option of filteredWarehouseList | async"
+                  [value]="option.name"
+                >
+                  {{ option.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-text color="tertiary">
+          Items
+        </ion-text>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="ion-no-padding">
+      <ion-item lines="none">
+        <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+          <ng-container matColumnDef="item">
+            <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.item_name}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="quantity">
+            <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <!-- [satPopoverAnchor]="p"
+              tabindex="0"
+              (keyup.enter)="p.open()"
+              (click)="p.open()" -->
+              <ng-container>
+                {{row.qty}}
+              </ng-container>
+
+              <!-- <sat-popover
+                #p
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateQuantity(row, $event)"
+              >
+                <edit-sales-return-table></edit-sales-return-table>
+              </sat-popover> -->
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="rate">
+            <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.rate | curFormat | async}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>Total </mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="total">
+            <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
+            <mat-cell *matCellDef="let row"
+              >{{row.rate * row.qty | curFormat | async}}</mat-cell
+            >
+            <mat-footer-cell *matFooterCellDef
+              >{{total | curFormat | async }}</mat-footer-cell
+            >
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          <mat-footer-row
+            class="footer"
+            *matFooterRowDef="displayedColumns; sticky: true"
+          ></mat-footer-row>
+        </mat-table>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
