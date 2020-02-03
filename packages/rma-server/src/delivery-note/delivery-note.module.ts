@@ -6,6 +6,7 @@ import { DeliveryNoteController } from './controller/delivery-note/delivery-note
 import { DeliveryNoteWebhookController } from './controller/delivery-note-webhook/delivery-note-webhook.controller';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.module';
+import { DeliveryNoteCommandHandler } from './command';
 import { DeliveryNoteQueryManager } from './queries';
 import { DeliveryNoteCommandManager } from './commands';
 import { DeliveryNoteEventManager } from './events';
@@ -21,6 +22,7 @@ import { DeliveryNoteEventManager } from './events';
   controllers: [DeliveryNoteController, DeliveryNoteWebhookController],
   providers: [
     ...DeliveryNoteAggregatesManager,
+    ...DeliveryNoteCommandHandler,
     ...DeliveryNoteQueryManager,
     ...DeliveryNoteCommandManager,
     ...DeliveryNoteEventManager,
