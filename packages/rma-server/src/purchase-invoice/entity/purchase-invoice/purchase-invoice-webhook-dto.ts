@@ -12,7 +12,7 @@ export class PurchaseInvoiceWebhookDto {
   @IsNumber()
   docstatus: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   is_paid: number;
 
@@ -36,7 +36,7 @@ export class PurchaseInvoiceWebhookDto {
   @IsNumber()
   total: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   total_advance: number;
 
@@ -44,7 +44,7 @@ export class PurchaseInvoiceWebhookDto {
   @IsNumber()
   outstanding_amount: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   paid_amount: number;
 
@@ -60,7 +60,7 @@ export class PurchaseInvoiceWebhookDto {
   @IsString()
   supplier: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   supplier_name: string;
 
@@ -84,37 +84,37 @@ export class PurchaseInvoiceWebhookDto {
   @IsString()
   posting_time: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   supplier_address: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   address_display: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   buying_price_list: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   in_words: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   credit_to: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   against_expense_account: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   pricing_rules: any[];
 
-  @IsNotEmpty()
+  @IsOptional()
   supplied_items: any[];
 
-  @IsNotEmpty()
+  @IsOptional()
   taxes: any[];
 
   @IsNotEmpty()
@@ -168,7 +168,7 @@ export class PurchaseInvoiceAdvancesDto {
   @IsString()
   reference_name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   reference_row: string;
 
@@ -195,7 +195,7 @@ export class PurchaseInvoiceItemDto {
   item_name: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
   @IsString()
@@ -223,7 +223,7 @@ export class PurchaseInvoiceItemDto {
   cost_center: string;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   received_qty: number;
 
   @IsNumber()
@@ -231,7 +231,7 @@ export class PurchaseInvoiceItemDto {
   qty: number;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   rejected_qty: number;
 
   @IsNumber()
