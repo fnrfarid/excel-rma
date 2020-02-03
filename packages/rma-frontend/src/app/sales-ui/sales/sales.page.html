@@ -39,20 +39,53 @@
               mode="indeterminate"
             ></mat-progress-bar>
           </div>
-          <ion-card-content class="ion-no-padding">
-            <div class="search-models">
-              <mat-form-field class="full-width">
-                <input
-                  matInput
-                  placeholder="Search"
-                  [(ngModel)]="search"
-                  (keyup.enter)="setFilter()"
-                />
-                <button mat-button matSuffix (click)="setFilter()">
-                  <mat-icon>search</mat-icon>
-                </button>
-              </mat-form-field>
-            </div>
+          <ion-card-content class="ion-padding">
+            <ion-grid fixed>
+              <ion-row>
+                <ion-col size="6">
+                  <mat-form-field >
+                    <input
+                      matInput
+                      placeholder="Invoice Number"
+                      [(ngModel)]="name"
+                      (keyup.enter)="setFilter()"
+                    />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col size="6">
+                  <mat-form-field>
+                    <mat-label>Status</mat-label>
+                    <mat-select [(value)]="status" (selectionChange)="statusChange($event.value)">
+                      <mat-option *ngFor="let status of invoiceStatus" [value]="status">
+                        {{status}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col size="6">
+                  <mat-form-field >
+                    <input
+                      matInput
+                      placeholder="Customer"
+                      [(ngModel)]="customer"
+                      (keyup.enter)="setFilter()"
+                    />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col size="6">
+                  <mat-form-field >
+                    <input
+                      matInput
+                      placeholder="Branch"
+                      [(ngModel)]="branch"
+                      (keyup.enter)="setFilter()"
+                    />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+            </ion-grid>            
             <table
               mat-table
               class="full-width-table"
@@ -61,7 +94,7 @@
               aria-label="Elements"
               style="width: 100%;"
             >
-              <!-- serial_no Column -->
+              <!-- customer Column -->
               <ng-container matColumnDef="customer">
                 <th
                   mat-header-cell
@@ -69,14 +102,67 @@
                   mat-sort-header
                   (click)="setFilter()"
                 >
-                  Title
+                  Customer
                 </th>
                 <td mat-cell *matCellDef="let row">
                   {{row.customer}}
                 </td>
               </ng-container>
 
-              <!-- UUID Column -->
+
+          <!-- name Column -->
+              <ng-container matColumnDef="name">
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+               >
+                  Invoice No
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  {{row.name}}
+                </td>
+              </ng-container>
+
+          <!-- posting_date Column -->
+          <ng-container matColumnDef="posting_date">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+           >
+              Posting Date
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.posting_date}}
+            </td>
+          </ng-container>
+
+          <!-- territory Column -->
+          <ng-container matColumnDef="territory">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+           >
+              Branch
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.territory}}
+            </td>
+          </ng-container>
+
+          <!-- total_qty Column -->
+          <ng-container matColumnDef="total_qty">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+           >
+              Quantity
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.total_qty}}
+            </td>
+          </ng-container>
+
+              <!-- Status Column -->
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef>Status</th>
                 <td mat-cell *matCellDef="let row">

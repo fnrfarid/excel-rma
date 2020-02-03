@@ -22,18 +22,8 @@ export class SalesInvoiceService {
     return await this.salesInvoiceRepository.findOne(query, param);
   }
 
-  async list(skip, take, search, sort) {
-    const nameExp = new RegExp(search, 'i');
-    const columns = this.salesInvoiceRepository.manager.connection
-      .getMetadata(SalesInvoice)
-      .ownColumns.map(column => column.propertyName);
-
-    const $or = columns.map(field => {
-      const filter = {};
-      filter[field] = nameExp;
-      return filter;
-    });
-    const $and: any[] = [{ $or }];
+  async list(skip, take, sort, filter_query?) {
+    const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
 
     const where: { $and: any } = { $and };
 
@@ -60,5 +50,15 @@ export class SalesInvoiceService {
 
   async updateMany(query, options?) {
     return await this.salesInvoiceRepository.updateMany(query, options);
+  }
+
+  getFilterQuery(query) {
+    const keys = Object.keys(query);
+    keys.forEach(key => {
+      query[key]
+        ? (query[key] = new RegExp(query[key], 'i'))
+        : delete query[key];
+    });
+    return query;
   }
 }

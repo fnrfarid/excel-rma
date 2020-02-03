@@ -24,8 +24,26 @@ export class SalesPage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: SalesInvoiceDataSource;
-  displayedColumns = ['customer', 'status', 'total'];
-  search: string = '';
+  displayedColumns = [
+    'status',
+    'customer',
+    'total',
+    'name',
+    'posting_date',
+    'territory',
+    'total_qty',
+  ];
+  invoiceStatus: string[] = [
+    'Draft',
+    'Completed',
+    'To Deliver',
+    'Rejected',
+    'Submitted',
+  ];
+  customer: string = '';
+  status: string = 'To Deliver';
+  name: string = '';
+  branch: string = '';
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
@@ -47,20 +65,32 @@ export class SalesPage implements OnInit {
   }
 
   getUpdate(event) {
+    const query = {
+      customer: this.customer,
+      status: this.status,
+      name: this.name,
+      territory: this.branch,
+    };
     this.dataSource.loadItems(
-      this.search,
       this.sort.direction,
       event.pageIndex,
       event.pageSize,
+      query,
     );
   }
 
   setFilter() {
+    const query = {
+      customer: this.customer,
+      status: this.status,
+      name: this.name,
+      territory: this.branch,
+    };
     this.dataSource.loadItems(
-      this.search,
       this.sort.direction,
       this.paginator.pageIndex,
       this.paginator.pageSize,
+      query,
     );
   }
 
@@ -81,5 +111,10 @@ export class SalesPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  statusChange(status) {
+    this.status = status;
+    this.setFilter();
   }
 }

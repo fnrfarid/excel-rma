@@ -22,6 +22,7 @@ import { RetrieveSalesInvoiceQuery } from '../../query/get-sales-invoice/retriev
 import { SubmitSalesInvoiceCommand } from '../../command/submit-sales-invoice/submit-sales-invoice.command';
 import { CreateSalesReturnCommand } from '../../command/create-sales-return/create-sales-return.command';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
+import { SalesInvoiceListQueryDto } from '../../../constants/listing-dto/sales-invoice-list-query';
 
 @Controller('sales_invoice')
 export class SalesInvoiceController {
@@ -71,17 +72,17 @@ export class SalesInvoiceController {
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  async listSalesInvoice(
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 10,
-    @Query('search') search = '',
-    @Query('sort') sort,
-  ) {
-    if (sort !== 'ASC') {
-      sort = 'DESC';
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: true }))
+  async listSalesInvoice(@Query() query: SalesInvoiceListQueryDto) {
+    const { offset, limit, sort, filter_query } = query;
+    let filter;
+    try {
+      filter = JSON.parse(filter_query);
+    } catch {
+      filter;
     }
     return await this.queryBus.execute(
-      new RetrieveSalesInvoiceListQuery(offset, limit, search, sort),
+      new RetrieveSalesInvoiceListQuery(offset, limit, sort, filter),
     );
   }
 
