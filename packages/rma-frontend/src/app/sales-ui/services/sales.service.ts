@@ -50,18 +50,14 @@ export class SalesService {
     this.itemList = [];
   }
 
-  getSalesInvoiceList(
-    filter = '',
-    sortOrder = 'asc',
-    pageNumber = 0,
-    pageSize = 10,
-  ) {
+  getSalesInvoiceList(sortOrder = 'asc', pageNumber = 0, pageSize = 10, query) {
     const url = LIST_SALES_INVOICE_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
+      .set('sort', sortOrder)
+      .set('filter_query', JSON.stringify(query));
+
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get(url, {
