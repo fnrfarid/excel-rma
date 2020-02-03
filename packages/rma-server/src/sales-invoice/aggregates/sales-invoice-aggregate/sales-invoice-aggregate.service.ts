@@ -83,8 +83,8 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     return provider;
   }
 
-  async getSalesInvoiceList(offset, limit, search, sort) {
-    return this.salesInvoiceService.list(offset, limit, search, sort);
+  async getSalesInvoiceList(offset, limit, sort, filter_query?) {
+    return this.salesInvoiceService.list(offset, limit, sort, filter_query);
   }
 
   async remove(uuid: string) {

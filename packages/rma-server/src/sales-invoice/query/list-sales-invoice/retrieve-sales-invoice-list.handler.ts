@@ -8,13 +8,13 @@ export class RetrieveSalesInvoiceListHandler
   constructor(private readonly manager: SalesInvoiceAggregateService) {}
 
   async execute(query: RetrieveSalesInvoiceListQuery) {
-    const { offset, limit, search, sort } = query;
+    const { offset, limit, sort, filter_query } = query;
 
     return await this.manager.getSalesInvoiceList(
       Number(offset),
       Number(limit),
-      search,
       sort,
+      filter_query,
     );
   }
 }
