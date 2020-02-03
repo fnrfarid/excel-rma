@@ -39,9 +39,10 @@ export class SalesPage implements OnInit {
     'To Deliver',
     'Rejected',
     'Submitted',
+    'All',
   ];
   customer: string = '';
-  status: string = 'To Deliver';
+  status: string = 'All';
   name: string = '';
   branch: string = '';
   constructor(
@@ -114,7 +115,11 @@ export class SalesPage implements OnInit {
   }
 
   statusChange(status) {
-    this.status = status;
-    this.setFilter();
+    if (status === 'All') {
+      this.dataSource.loadItems();
+    } else {
+      this.status = status;
+      this.setFilter();
+    }
   }
 }

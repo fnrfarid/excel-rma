@@ -40,10 +40,10 @@
             ></mat-progress-bar>
           </div>
           <ion-card-content class="ion-padding">
-            <ion-grid fixed>
+            <ion-grid>
               <ion-row>
-                <ion-col size="6">
-                  <mat-form-field >
+                <ion-col>
+                  <mat-form-field class="full-width">
                     <input
                       matInput
                       placeholder="Invoice Number"
@@ -52,11 +52,17 @@
                     />
                   </mat-form-field>
                 </ion-col>
-                <ion-col size="6">
-                  <mat-form-field>
+                <ion-col>
+                  <mat-form-field class="full-width">
                     <mat-label>Status</mat-label>
-                    <mat-select [(value)]="status" (selectionChange)="statusChange($event.value)">
-                      <mat-option *ngFor="let status of invoiceStatus" [value]="status">
+                    <mat-select
+                      [(value)]="status"
+                      (selectionChange)="statusChange($event.value)"
+                    >
+                      <mat-option
+                        *ngFor="let status of invoiceStatus"
+                        [value]="status"
+                      >
                         {{status}}
                       </mat-option>
                     </mat-select>
@@ -64,8 +70,8 @@
                 </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col size="6">
-                  <mat-form-field >
+                <ion-col>
+                  <mat-form-field class="full-width">
                     <input
                       matInput
                       placeholder="Customer"
@@ -74,8 +80,8 @@
                     />
                   </mat-form-field>
                 </ion-col>
-                <ion-col size="6">
-                  <mat-form-field >
+                <ion-col>
+                  <mat-form-field class="full-width">
                     <input
                       matInput
                       placeholder="Branch"
@@ -85,7 +91,7 @@
                   </mat-form-field>
                 </ion-col>
               </ion-row>
-            </ion-grid>            
+            </ion-grid>
             <table
               mat-table
               class="full-width-table"
@@ -109,13 +115,9 @@
                 </td>
               </ng-container>
 
-
-          <!-- name Column -->
+              <!-- name Column -->
               <ng-container matColumnDef="name">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-               >
+                <th mat-header-cell *matHeaderCellDef>
                   Invoice No
                 </th>
                 <td mat-cell *matCellDef="let row">
@@ -123,44 +125,35 @@
                 </td>
               </ng-container>
 
-          <!-- posting_date Column -->
-          <ng-container matColumnDef="posting_date">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-           >
-              Posting Date
-            </th>
-            <td mat-cell *matCellDef="let row">
-              {{row.posting_date}}
-            </td>
-          </ng-container>
+              <!-- posting_date Column -->
+              <ng-container matColumnDef="posting_date">
+                <th mat-header-cell *matHeaderCellDef>
+                  Posting Date
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  {{row.posting_date}}
+                </td>
+              </ng-container>
 
-          <!-- territory Column -->
-          <ng-container matColumnDef="territory">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-           >
-              Branch
-            </th>
-            <td mat-cell *matCellDef="let row">
-              {{row.territory}}
-            </td>
-          </ng-container>
+              <!-- territory Column -->
+              <ng-container matColumnDef="territory">
+                <th mat-header-cell *matHeaderCellDef>
+                  Branch
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  {{row.territory}}
+                </td>
+              </ng-container>
 
-          <!-- total_qty Column -->
-          <ng-container matColumnDef="total_qty">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-           >
-              Quantity
-            </th>
-            <td mat-cell *matCellDef="let row">
-              {{row.total_qty}}
-            </td>
-          </ng-container>
+              <!-- total_qty Column -->
+              <ng-container matColumnDef="total_qty">
+                <th mat-header-cell *matHeaderCellDef>
+                  Quantity
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  {{row.total_qty}}
+                </td>
+              </ng-container>
 
               <!-- Status Column -->
               <ng-container matColumnDef="status">
