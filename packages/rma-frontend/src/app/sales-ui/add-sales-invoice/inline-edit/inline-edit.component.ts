@@ -1,6 +1,6 @@
 import { Component, Input, Optional, Host } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { filter, switchMap, startWith } from 'rxjs/operators';
+import { filter, switchMap, startWith, map } from 'rxjs/operators';
 import { FormControl, Validators } from '@angular/forms';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { SalesService } from '../../services/sales.service';
@@ -73,17 +73,32 @@ export class InlineEditComponent {
       if (this.column === 'item') {
         this.salesService
           .getItemPrice(this.itemFormControl.value.item_code)
+          .pipe(
+            switchMap(priceListArray => {
+              return this.salesService
+                .getItemFromRMAServer(this.itemFormControl.value.item_code)
+                .pipe(
+                  map(item => {
+                    return {
+                      priceListArray,
+                      item,
+                    };
+                  }),
+                );
+            }),
+          )
           .subscribe({
             next: res => {
               const selectedItem = {} as Item;
+              selectedItem.uuid = res.item.uuid;
+              selectedItem.minimumPrice = res.item.minimumPrice;
               selectedItem.item_code = this.itemFormControl.value.item_code;
               selectedItem.item_name = this.itemFormControl.value.item_name;
               selectedItem.name = this.itemFormControl.value.name;
               selectedItem.owner = this.itemFormControl.value.owner;
               selectedItem.rate = 0;
-              if (res.length > 0) {
-                selectedItem.minimumPrice = res[0].price_list_rate;
-                selectedItem.rate = res[0].price_list_rate;
+              if (res.priceListArray.length > 0) {
+                selectedItem.rate = res.priceListArray[0].price_list_rate;
               }
               this.popover.close(selectedItem);
             },
