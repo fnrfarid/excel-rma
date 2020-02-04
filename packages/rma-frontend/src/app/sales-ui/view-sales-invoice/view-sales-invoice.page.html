@@ -24,13 +24,19 @@
         <ion-segment-button value="2" *ngIf="sales_invoice_name">
           <ion-label>Accounts</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="3" *ngIf="sales_invoice_name">
+        <ion-segment-button
+          value="3"
+          *ngIf="sales_invoice_name && deliveryItemCount !== 0"
+        >
           <ion-label>Sales Return</ion-label>
         </ion-segment-button>
         <ion-segment-button value="4" *ngIf="sales_invoice_name">
           <ion-label>Warranty</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="5" *ngIf="sales_invoice_name">
+        <ion-segment-button
+          value="5"
+          *ngIf="sales_invoice_name && deliveryItemCount !== 0"
+        >
           <ion-label>Credit Notes</ion-label>
         </ion-segment-button>
       </ion-segment>
