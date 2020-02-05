@@ -6,7 +6,7 @@ import { SalesService } from '../services/sales.service';
 import { Location } from '@angular/common';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { startWith, switchMap, filter } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
@@ -29,11 +29,12 @@ export class AddSalesInvoicePage implements OnInit {
   dueDate: string;
 
   displayedColumns = ['item', 'quantity', 'rate', 'total', 'delete'];
-  customerFormControl = new FormControl();
+
   filteredCustomerList: Observable<any[]>;
-  companyFormControl = new FormControl();
-  postingDateFormControl = new FormControl();
-  dueDateFormControl = new FormControl();
+  companyFormControl = new FormControl('', [Validators.required]);
+  customerFormControl = new FormControl('', [Validators.required]);
+  postingDateFormControl = new FormControl('', [Validators.required]);
+  dueDateFormControl = new FormControl('', [Validators.required]);
 
   constructor(
     private readonly route: ActivatedRoute,

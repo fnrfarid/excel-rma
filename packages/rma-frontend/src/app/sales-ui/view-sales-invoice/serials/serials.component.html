@@ -28,6 +28,9 @@
               #claimsReceivedDate
               disabled="false"
             ></mat-datepicker>
+            <mat-error *ngIf="date.hasError('required')">
+              Date is <strong>required</strong>
+            </mat-error>
           </mat-form-field>
         </ion-col>
       </ion-row>
@@ -53,6 +56,9 @@
                 {{ option.name }}
               </mat-option>
             </mat-autocomplete>
+            <mat-error *ngIf="warehouseFormControl.hasError('required')">
+              warehouse is <strong>required</strong>
+            </mat-error>
           </mat-form-field>
         </ion-col>
       </ion-row>
