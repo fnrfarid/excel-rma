@@ -39,7 +39,10 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(sortOrder = 'asc', pageIndex = 0, pageSize = 10, query?) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
+    if (!sortOrder) {
+      sortOrder = { posting_date: 'desc' };
+    }
     this.loadingSubject.next(true);
     this.salesService
       .getSalesInvoiceList(sortOrder, pageIndex, pageSize, query)
@@ -50,7 +53,7 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
           this.length = res.length;
           return res.docs;
         }),
-        catchError(() => of([])),
+        catchError(error => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe(items => this.itemSubject.next(items));

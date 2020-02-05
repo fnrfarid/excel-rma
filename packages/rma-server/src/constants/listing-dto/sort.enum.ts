@@ -1,5 +1,3 @@
-export enum QuerySort {
-  ASC = 'asc',
-  DESC = 'desc',
-  EMPTY = '',
+export class QuerySort {
+  posting_date?: string;
 }

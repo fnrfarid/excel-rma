@@ -67,29 +67,37 @@ export class SalesPage implements OnInit {
   }
 
   getUpdate(event) {
-    const query = {
-      customer: this.customer,
-      status: this.status,
-      name: this.name,
-      territory: this.branch,
-    };
+    const query: any = {};
+    if (this.customer) query.customer = this.customer;
+    if (this.status) query.status = this.status;
+    if (this.name) query.name = this.name;
+    if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
-      this.sort.direction,
+      undefined,
       event.pageIndex,
       event.pageSize,
       query,
     );
   }
 
-  setFilter() {
-    const query = {
-      customer: this.customer,
-      status: this.status,
-      name: this.name,
-      territory: this.branch,
-    };
+  setFilter(event?) {
+    const query: any = {};
+    if (this.customer) query.customer = this.customer;
+    if (this.status) query.status = this.status;
+    if (this.name) query.name = this.name;
+    if (this.branch) query.territory = this.branch;
+
+    const sortQuery = {};
+    if (event) {
+      for (const key of Object.keys(event)) {
+        if (key === 'active') {
+          sortQuery[event[key]] = event.direction;
+        }
+      }
+    }
+
     this.dataSource.loadItems(
-      this.sort.direction,
+      sortQuery,
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,

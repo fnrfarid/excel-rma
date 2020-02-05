@@ -23,14 +23,29 @@ export class SalesInvoiceService {
   }
 
   async list(skip, take, sort, filter_query?) {
+    let sortQuery;
+
+    try {
+      sortQuery = JSON.parse(sort);
+    } catch (error) {
+      sortQuery = { posting_date: 'desc' };
+    }
+
+    for (const key of Object.keys(sortQuery)) {
+      sortQuery[key] = sortQuery[key].toUpperCase();
+      if (!sortQuery[key]) {
+        delete sortQuery[key];
+      }
+    }
+
     const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
 
     const where: { $and: any } = { $and };
-
     const results = await this.salesInvoiceRepository.find({
       skip,
       take,
       where,
+      order: sortQuery,
     });
 
     return {
@@ -55,9 +70,15 @@ export class SalesInvoiceService {
   getFilterQuery(query) {
     const keys = Object.keys(query);
     keys.forEach(key => {
-      query[key]
-        ? (query[key] = new RegExp(query[key], 'i'))
-        : delete query[key];
+      if (query[key]) {
+        if (key === 'status' && query[key] === 'All') {
+          delete query[key];
+        } else {
+          query[key] = new RegExp(query[key], 'i');
+        }
+      } else {
+        delete query[key];
+      }
     });
     return query;
   }
