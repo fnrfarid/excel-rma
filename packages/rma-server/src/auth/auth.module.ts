@@ -1,4 +1,4 @@
-import { Module, Global, HttpModule } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleGuard } from './guards/role.guard';
 import { TokenGuard } from './guards/token.guard';
@@ -11,10 +11,7 @@ import { AuthSchedulers } from './schedulers';
 
 @Global()
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([TokenCache], TOKEN_CACHE_CONNECTION),
-    HttpModule,
-  ],
+  imports: [TypeOrmModule.forFeature([TokenCache], TOKEN_CACHE_CONNECTION)],
   providers: [
     TokenCacheService,
     RoleGuard,

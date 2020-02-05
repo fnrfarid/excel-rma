@@ -1,8 +1,7 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { WarrantyClaimAggregatesManager } from './aggregates';
 import { WarrantyClaimEntitiesModule } from './entity/entity.module';
 import { WarrantyClaimQueryManager } from './query';
-import { CqrsModule } from '@nestjs/cqrs';
 import { WarrantyClaimCommandManager } from './command';
 import { WarrantyClaimEventManager } from './event';
 import { WarrantyClaimController } from './controllers/warranty-claim/warranty-claim.controller';
@@ -13,8 +12,6 @@ import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
 @Module({
   imports: [
     WarrantyClaimEntitiesModule,
-    CqrsModule,
-    HttpModule,
     SerialNoModule,
     SupplierEntitiesModule,
   ],
