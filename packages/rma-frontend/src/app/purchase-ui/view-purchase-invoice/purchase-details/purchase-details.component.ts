@@ -7,6 +7,7 @@ import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { CLOSE } from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
+
 @Component({
   selector: 'purchase-details',
   templateUrl: './purchase-details.component.html',

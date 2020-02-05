@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { PurchaseService } from '../../services/purchase.service';
@@ -22,6 +22,7 @@ import { LoadingController } from '@ionic/angular';
   styleUrls: ['./purchase-assign-serials.component.scss'],
 })
 export class PurchaseAssignSerialsComponent implements OnInit {
+  warehouseFormControl = new FormControl('', [Validators.required]);
   displayedColumns: string[] = [
     'position',
     'serial',
@@ -34,7 +35,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   dataSource = [];
   date = new FormControl(new Date());
   purchaseReceiptDate: string;
-  warehouseFormControl = new FormControl();
+
   filteredWarehouseList: Observable<any[]>;
   purchaseInvoiceDetails: PurchaseInvoiceDetails;
 
