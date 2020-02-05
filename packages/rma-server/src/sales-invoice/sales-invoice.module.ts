@@ -1,7 +1,6 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SalesInvoiceAggregatesManager } from './aggregates';
 import { SalesInvoiceQueryManager } from './query';
-import { CqrsModule } from '@nestjs/cqrs';
 import { SalesInvoiceCommandManager } from './command';
 import { SalesInvoiceEventManager } from './event';
 import { SalesInvoiceController } from './controllers/sales-invoice/sales-invoice.controller';
@@ -15,8 +14,6 @@ import { SalesInvoiceWebhookController } from './controllers/sales-invoice-webho
 @Module({
   imports: [
     SalesInvoiceEntitiesModule,
-    CqrsModule,
-    HttpModule,
     CustomerModule,
     DeliveryNoteModule,
     SerialNoModule,

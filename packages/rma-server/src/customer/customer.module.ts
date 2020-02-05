@@ -1,8 +1,7 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CustomerAggregatesManager } from './aggregates';
 import { CustomerEntitiesModule } from './entity/entity.module';
 import { CustomerQueryManager } from './query';
-import { CqrsModule } from '@nestjs/cqrs';
 import { CustomerCommandManager } from './command';
 import { CustomerEventManager } from './event';
 import { CustomerController } from './controllers/customer/customer.controller';
@@ -11,7 +10,7 @@ import { CustomerWebhookController } from './controllers/customer-webhook/custom
 import { TerritoryController } from './controllers/territory/territory.controller';
 
 @Module({
-  imports: [CustomerEntitiesModule, CqrsModule, HttpModule],
+  imports: [CustomerEntitiesModule],
   controllers: [
     CustomerController,
     CustomerWebhookController,

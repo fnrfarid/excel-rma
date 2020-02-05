@@ -1,5 +1,4 @@
-import { Module, Global, HttpModule } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
+import { Module, Global } from '@nestjs/common';
 import { SettingsController } from './controllers/settings/settings.controller';
 import { SetupController } from './controllers/setup/setup.controller';
 import { SetupService } from './controllers/setup/setup.service';
@@ -11,11 +10,7 @@ import { ServerSettingsService } from './entities/server-settings/server-setting
 
 @Global()
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ServerSettings], DEFAULT),
-    HttpModule,
-    CqrsModule,
-  ],
+  imports: [TypeOrmModule.forFeature([ServerSettings], DEFAULT)],
   providers: [SetupService, ServerSettingsService, ...SystemSettingsAggregates],
   controllers: [SettingsController, SetupController],
   exports: [SetupService, ServerSettingsService, ...SystemSettingsAggregates],

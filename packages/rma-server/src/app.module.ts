@@ -1,4 +1,4 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -28,11 +28,11 @@ import { DeliveryNoteModule } from './delivery-note/delivery-note.module';
 import { CommandModule } from './command/command.module';
 import { PurchaseInvoiceModule } from './purchase-invoice/purchase-invoice.module';
 import { PurchaseReceiptModule } from './purchase-receipt/purchase-receipt.module';
+import { CommonDepModule } from './common-dep/common-dep.module';
 
 @Module({
   imports: [
-    HttpModule,
-    DeliveryNoteEntitiesModule,
+    CommonDepModule,
     TypeOrmModule.forRootAsync({
       name: TOKEN_CACHE_CONNECTION,
       imports: [ConfigModule],
@@ -50,7 +50,9 @@ import { PurchaseReceiptModule } from './purchase-receipt/purchase-receipt.modul
     AuthModule,
     SystemSettingsModule,
     DirectModule,
+    CommandModule,
     CustomerModule,
+    DeliveryNoteEntitiesModule,
     ReturnVoucherModule,
     PurchaseReceiptModule,
     PurchaseInvoiceModule,
@@ -61,7 +63,6 @@ import { PurchaseReceiptModule } from './purchase-receipt/purchase-receipt.modul
     SerialNoModule,
     WarrantyClaimModule,
     DeliveryNoteModule,
-    CommandModule,
   ],
   controllers: [AppController],
   providers: [AppService],
