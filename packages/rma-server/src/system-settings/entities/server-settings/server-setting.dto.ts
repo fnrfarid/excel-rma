@@ -109,4 +109,12 @@ export class ServerSettingsDto {
     required: true,
   })
   sellingPriceList: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'ERPNext Server timezone',
+    type: 'string',
+    required: true,
+  })
+  timeZone: string;
 }

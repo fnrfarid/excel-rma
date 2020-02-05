@@ -31,6 +31,7 @@ export class SettingsPage implements OnInit {
     serviceAccountUser: new FormControl(),
     serviceAccountSecret: new FormControl(),
     sellingPriceList: new FormControl(),
+    timeZone: new FormControl(),
   });
 
   companies: Observable<unknown[]> = this.companySettingsForm
@@ -47,6 +48,14 @@ export class SettingsPage implements OnInit {
       debounceTime(500),
       startWith(''),
       this.service.relaySellingPriceListsOperation(),
+    );
+
+  timezones: Observable<unknown[]> = this.companySettingsForm
+    .get('timeZone')
+    .valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relayTimeZoneOperation(),
     );
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -88,6 +97,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm
           .get('sellingPriceList')
           .setValue(res.sellingPriceList);
+        this.companySettingsForm.get('timeZone').setValue(res.timeZone);
       },
     });
 

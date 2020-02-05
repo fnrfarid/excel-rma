@@ -45,6 +45,24 @@
                 <input
                   matInput
                   required
+                  placeholder="ERPNext Timezone"
+                  aria-label="ERPNext Timezone"
+                  [matAutocomplete]="autoTZ"
+                  formControlName="timeZone"
+                />
+                <mat-autocomplete #autoTZ="matAutocomplete">
+                  <mat-option
+                    *ngFor="let timezone of timezones | async"
+                    [value]="timezone"
+                  >
+                    <span>{{timezone}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  required
                   placeholder="Selling Price List"
                   aria-label="Selling Price List"
                   [matAutocomplete]="autoSellingPriceList"
