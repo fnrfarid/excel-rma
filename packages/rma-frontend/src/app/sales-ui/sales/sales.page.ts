@@ -25,13 +25,14 @@ export class SalesPage implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: SalesInvoiceDataSource;
   displayedColumns = [
+    'name',
     'status',
+    'posting_date',
     'customer',
     'total',
-    'name',
-    'posting_date',
     'territory',
-    'total_qty',
+    'created_by',
+    'delivered_by',
   ];
   invoiceStatus: string[] = [
     'Draft',

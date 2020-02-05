@@ -38,17 +38,19 @@ export class AppComponent implements OnInit {
     if (event && event.data && typeof event.data === 'string') {
       const hash = event.data.replace('#', '');
       const query = new URLSearchParams(hash);
-      this.appService
-        .getStorage()
-        .setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN))
-        .then(token => this.checkRoles(token));
       const now = Math.floor(Date.now() / 1000);
       this.appService
         .getStorage()
-        .setItem(
-          ACCESS_TOKEN_EXPIRY,
-          (now + Number(query.get(EXPIRES_IN))).toString(),
-        )
+        .setItem(ACCESS_TOKEN, query.get(ACCESS_TOKEN))
+        .then(token => this.checkRoles(token))
+        .then(() => {
+          return this.appService
+            .getStorage()
+            .setItem(
+              ACCESS_TOKEN_EXPIRY,
+              (now + Number(query.get(EXPIRES_IN))).toString(),
+            );
+        })
         .then(saved => {});
     }
   }

@@ -13,6 +13,7 @@ export class ViewSalesInvoicePage implements OnInit {
   selectedSegment: any;
   sales_invoice_name: string = '';
   invoiceUuid: string = '';
+  deliveryItemCount: number;
   constructor(
     private readonly location: Location,
     private route: ActivatedRoute,
@@ -21,9 +22,13 @@ export class ViewSalesInvoicePage implements OnInit {
 
   ngOnInit() {
     this.selectedSegment = 0;
+    this.deliveryItemCount = 0;
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
       next: (res: SalesInvoiceDetails) => {
+        this.deliveryItemCount = res.delivery_note_items
+          ? res.delivery_note_items.length
+          : 0;
         this.sales_invoice_name = res.name;
       },
     });
