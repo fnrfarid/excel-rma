@@ -48,7 +48,7 @@
                       matInput
                       placeholder="Invoice Number"
                       [(ngModel)]="name"
-                      (keyup.enter)="setFilter()"
+                      (keyup.enter)="setFilter(event)"
                     />
                   </mat-form-field>
                 </ion-col>
@@ -76,7 +76,7 @@
                       matInput
                       placeholder="Customer"
                       [(ngModel)]="customer"
-                      (keyup.enter)="setFilter()"
+                      (keyup.enter)="setFilter(event)"
                     />
                   </mat-form-field>
                 </ion-col>
@@ -86,7 +86,7 @@
                       matInput
                       placeholder="Branch"
                       [(ngModel)]="branch"
-                      (keyup.enter)="setFilter()"
+                      (keyup.enter)="setFilter(event)"
                     />
                   </mat-form-field>
                 </ion-col>
@@ -97,17 +97,13 @@
               class="full-width-table"
               [dataSource]="dataSource"
               matSort
+              (matSortChange)="setFilter($event)"
               aria-label="Elements"
               style="width: 100%;"
             >
               <!-- customer Column -->
               <ng-container matColumnDef="customer">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  (click)="setFilter()"
-                >
+                <th mat-header-cell *matHeaderCellDef>
                   Customer
                 </th>
                 <td mat-cell *matCellDef="let row">
@@ -140,7 +136,7 @@
               </ng-container>
               <!-- posting_date Column -->
               <ng-container matColumnDef="posting_date">
-                <th mat-header-cell *matHeaderCellDef>
+                <th mat-header-cell mat-sort-header="posting_date" *matHeaderCellDef>
                   Date
                 </th>
                 <td mat-cell *matCellDef="let row">
@@ -192,12 +188,7 @@
               </ng-container>
 
               <ng-container matColumnDef="total">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  (click)="setFilter()"
-                >
+                <th mat-header-cell *matHeaderCellDef>
                   Invoice Amount
                 </th>
                 <td mat-cell *matCellDef="let row">

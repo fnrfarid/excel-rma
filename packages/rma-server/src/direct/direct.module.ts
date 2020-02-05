@@ -1,4 +1,4 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DirectController } from './controllers/direct/direct.controller';
 import { DirectService } from './aggregates/direct/direct.service';
@@ -10,10 +10,7 @@ import { RequestStateService } from './entities/request-state/request-state.serv
 import { CleanExpiredTokenCacheService } from '../auth/schedulers/clean-expired-token-cache/clean-expired-token-cache.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([FrappeToken, RequestState], DEFAULT),
-    HttpModule,
-  ],
+  imports: [TypeOrmModule.forFeature([FrappeToken, RequestState], DEFAULT)],
   controllers: [DirectController],
   providers: [
     DirectService,

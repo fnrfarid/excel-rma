@@ -50,7 +50,16 @@ export class SalesService {
     this.itemList = [];
   }
 
-  getSalesInvoiceList(sortOrder = 'asc', pageNumber = 0, pageSize = 10, query) {
+  getSalesInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+    if (!sortOrder) sortOrder = { posting_date: 'desc' };
+    if (!query) query = {};
+
+    try {
+      sortOrder = JSON.stringify(sortOrder);
+    } catch (error) {
+      sortOrder = JSON.stringify({ posting_date: 'desc' });
+    }
+
     const url = LIST_SALES_INVOICE_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())

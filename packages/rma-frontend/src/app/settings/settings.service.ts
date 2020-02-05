@@ -8,6 +8,7 @@ import {
   GET_USER_PROFILE_ROLES,
   RELAY_LIST_PRICELIST_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
+  GET_TIME_ZONE,
 } from '../constants/url-strings';
 import {
   AUTHORIZATION,
@@ -28,6 +29,7 @@ export class SettingsService {
 
   relayCompaniesOperation() {
     return switchMap(value => {
+      if (!value) value = '';
       const params = new HttpParams({
         fromObject: {
           fields: '["*"]',
@@ -49,6 +51,7 @@ export class SettingsService {
 
   relaySellingPriceListsOperation() {
     return switchMap(value => {
+      if (!value) value = '';
       const params = new HttpParams({
         fromObject: {
           fields: '["*"]',
@@ -65,6 +68,14 @@ export class SettingsService {
             .pipe(map(res => res.data));
         }),
       );
+    });
+  }
+
+  relayTimeZoneOperation() {
+    return switchMap(value => {
+      return this.http
+        .get<{ message: { time_zone: string } }>(GET_TIME_ZONE)
+        .pipe(map(res => [res.message.time_zone]));
     });
   }
 

@@ -8,7 +8,7 @@ import {
   SERIAL_ASSIGNED,
 } from '../../../constants/messages';
 import { CLOSE } from '../../../constants/app-string';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Observable, from, of } from 'rxjs';
 import { startWith, switchMap, mergeMap, map } from 'rxjs/operators';
 import { SalesInvoiceDetails } from '../details/details.component';
@@ -37,7 +37,7 @@ export class SerialsComponent implements OnInit {
   dataSource = [];
   date = new FormControl(new Date());
   claimsReceivedDate: string;
-  warehouseFormControl = new FormControl();
+  warehouseFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
   salesInvoiceDetails: SalesInvoiceDetails;
 

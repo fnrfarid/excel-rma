@@ -1,8 +1,7 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SerialNoAggregatesManager } from './aggregates';
 import { SerialNoEntitiesModule } from './entity/entity.module';
 import { SerialNoQueryManager } from './query';
-import { CqrsModule } from '@nestjs/cqrs';
 import { SerialNoCommandManager } from './command';
 import { SerialNoEventManager } from './event';
 import { SerialNoController } from './controllers/serial-no/serial-no.controller';
@@ -17,8 +16,6 @@ import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 @Module({
   imports: [
     SerialNoEntitiesModule,
-    CqrsModule,
-    HttpModule,
     ItemEntitiesModule,
     SupplierEntitiesModule,
     SalesInvoiceEntitiesModule,

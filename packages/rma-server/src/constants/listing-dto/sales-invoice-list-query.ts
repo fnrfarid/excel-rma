@@ -1,5 +1,5 @@
-import { IsOptional, IsEnum } from 'class-validator';
-import { QuerySort } from './sort.enum';
+import { IsOptional } from 'class-validator';
+// import { QuerySort } from './sort.enum';
 
 export class SalesInvoiceListQueryDto {
   @IsOptional()
@@ -12,7 +12,7 @@ export class SalesInvoiceListQueryDto {
   search: string;
 
   @IsOptional()
-  @IsEnum(QuerySort)
+  // @IsInstance(QuerySort)
   sort: string;
 
   @IsOptional()

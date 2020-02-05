@@ -23,6 +23,9 @@
               #purchaseReceiptDate
               disabled="false"
             ></mat-datepicker>
+            <mat-error *ngIf="date.hasError('required')">
+              Date is <strong>required</strong>
+            </mat-error>
           </mat-form-field>
         </ion-col>
       </ion-row>
@@ -30,11 +33,12 @@
         <ion-col size-md="6">
           <mat-form-field class="example-full-width">
             <input
+              [formControl]="warehouseFormControl"
               type="text"
               placeholder="Select Warehouse"
               matInput
-              [formControl]="warehouseFormControl"
               [matAutocomplete]="auto"
+              required
             />
             <mat-autocomplete
               autoActiveFirstOption
@@ -48,6 +52,9 @@
                 {{ option.name }}
               </mat-option>
             </mat-autocomplete>
+            <mat-error *ngIf="warehouseFormControl.hasError('required')">
+              Warehouse is <strong>required</strong>
+            </mat-error>
           </mat-form-field>
         </ion-col>
       </ion-row>

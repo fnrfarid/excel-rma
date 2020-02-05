@@ -92,7 +92,12 @@ export class AppComponent implements OnInit {
   checkRoles(token: string) {
     this.settingService.checkUserProfile(token).subscribe({
       next: res => {
-        if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
+        if (
+          res &&
+          res.roles &&
+          res.roles.length > 0 &&
+          res.roles.includes(SYSTEM_MANAGER)
+        ) {
           this.showSettings = true;
         }
       },

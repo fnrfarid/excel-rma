@@ -65,6 +65,9 @@
                       readonly
                       [formControl]="companyFormControl"
                     />
+                    <mat-error *ngIf="companyFormControl.hasError('required')">
+                      Company is <strong>required</strong>
+                    </mat-error>
                   </mat-form-field>
                 </ion-col>
               </ion-row>
@@ -91,6 +94,9 @@
                         {{ option.customer_name }}
                       </mat-option>
                     </mat-autocomplete>
+                    <mat-error *ngIf="customerFormControl.hasError('required')">
+                      Customer is <strong>required</strong>
+                    </mat-error>
                   </mat-form-field>
                 </ion-col>
                 <ion-col>
@@ -111,6 +117,11 @@
                       #postingDate
                       disabled="false"
                     ></mat-datepicker>
+                    <mat-error
+                      *ngIf="postingDateFormControl.hasError('required')"
+                    >
+                      Posting Date is <strong>required</strong>
+                    </mat-error>
                   </mat-form-field>
                 </ion-col>
               </ion-row>
@@ -136,6 +147,9 @@
                       [for]="dueDate"
                     ></mat-datepicker-toggle>
                     <mat-datepicker #dueDate disabled="false"></mat-datepicker>
+                    <mat-error *ngIf="dueDateFormControl.hasError('required')">
+                      Due Date is <strong>required</strong>
+                    </mat-error>
                   </mat-form-field>
                 </ion-col>
               </ion-row>

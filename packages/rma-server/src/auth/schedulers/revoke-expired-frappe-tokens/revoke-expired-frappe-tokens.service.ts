@@ -1,17 +1,14 @@
 import { Injectable, HttpService, OnModuleInit } from '@nestjs/common';
 import { CronJob } from 'cron';
 import { from, of, Observable } from 'rxjs';
-import { switchMap, map, retry, mergeMap } from 'rxjs/operators';
+import { switchMap, retry, mergeMap } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
 
 import { ClientTokenManagerService } from '../../aggregates/client-token-manager/client-token-manager.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
-import {
-  OAUTH_BEARER_TOKEN_ENDPOINT,
-  GET_TIME_ZONE_ENDPOINT,
-} from '../../../constants/routes';
+import { OAUTH_BEARER_TOKEN_ENDPOINT } from '../../../constants/routes';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
@@ -38,30 +35,23 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
       from(this.settings.find())
         .pipe(
           switchMap(settings => {
-            return this.http
-              .get(settings.authServerURL + GET_TIME_ZONE_ENDPOINT)
-              .pipe(
-                map(resTZ => resTZ.data.message),
-                switchMap(({ time_zone }) => {
-                  const nowInServerTimeZone = new DateTime(time_zone).toFormat(
-                    'yyyy-MM-dd HH:mm:ss',
-                  );
-                  return this.clientToken.getClientToken().pipe(
-                    switchMap(token => {
-                      tokenCache = token;
-                      return this.getFrappeTokens(
-                        settings,
-                        tokenCache,
-                        nowInServerTimeZone,
-                      );
-                    }),
-                    mergeMap(moreTokens => from(moreTokens.data.data)),
-                    mergeMap(({ access_token }) => {
-                      return this.revokeToken(settings, access_token);
-                    }),
-                  );
-                }),
-              );
+            const nowInServerTimeZone = new DateTime(
+              settings.timeZone,
+            ).toFormat('yyyy-MM-dd HH:mm:ss');
+            return this.clientToken.getClientToken().pipe(
+              switchMap(token => {
+                tokenCache = token;
+                return this.getFrappeTokens(
+                  settings,
+                  tokenCache,
+                  nowInServerTimeZone,
+                );
+              }),
+              mergeMap(moreTokens => from(moreTokens.data.data)),
+              mergeMap(({ access_token }) => {
+                return this.revokeToken(settings, access_token);
+              }),
+            );
           }),
           retry(3),
         )

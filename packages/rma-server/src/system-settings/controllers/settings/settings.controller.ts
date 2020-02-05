@@ -34,12 +34,14 @@ export class SettingsController {
   @Roles(SYSTEM_MANAGER)
   @UseGuards(TokenGuard, RoleGuard)
   @UsePipes(new ValidationPipe({ forbidNonWhitelisted: true }))
-  async updateSettings(@Body() payload: ServerSettingsDto) {
+  updateSettings(@Body() payload: ServerSettingsDto) {
     return from(this.settingsService.find()).pipe(
       switchMap(settings => {
-        return this.settingsService.updateMany(
-          { uuid: settings.uuid },
-          payload,
+        return from(
+          this.settingsService.updateMany(
+            { uuid: settings.uuid },
+            { $set: payload },
+          ),
         );
       }),
     );
