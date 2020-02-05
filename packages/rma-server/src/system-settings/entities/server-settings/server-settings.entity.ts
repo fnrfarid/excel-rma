@@ -70,6 +70,9 @@ export class ServerSettings extends BaseEntity {
   @Column()
   sellingPriceList: string;
 
+  @Column()
+  timeZone: string;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { HttpService } from '@nestjs/common';
 import { SetupController } from './setup.controller';
 import { SetupService } from './setup.service';
 
@@ -9,10 +10,8 @@ describe('SetupController', () => {
     app = await Test.createTestingModule({
       controllers: [SetupController],
       providers: [
-        {
-          provide: SetupService,
-          useValue: {}, // mock
-        },
+        { provide: SetupService, useValue: {} },
+        { provide: HttpService, useValue: {} },
       ],
     }).compile();
   });
