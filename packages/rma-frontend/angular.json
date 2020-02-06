@@ -45,7 +45,8 @@
                 "input": "src/global.scss"
               }
             ],
-            "scripts": []
+            "scripts": [],
+            "aot": false
           },
           "configurations": {
             "production": {

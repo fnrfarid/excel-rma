@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+/* eslint-disable */
 import { PurchaseInvoiceWebhookController } from './purchase-invoice-webhook.controller';
 import { PurchaseInvoiceWebhookAggregateService } from '../../../purchase-invoice/aggregates/purchase-invoice-webhook-aggregate/purchase-invoice-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+/* eslint-enable */
 
 describe('PurchaseInvoiceWebhook Controller', () => {
   let controller: PurchaseInvoiceWebhookController;

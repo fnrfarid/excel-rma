@@ -27,6 +27,7 @@ export class AddSalesReturnPage implements OnInit {
   warehouseFormControl = new FormControl();
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
+  getOptionText = '';
   constructor(
     private readonly location: Location,
     private readonly route: ActivatedRoute,

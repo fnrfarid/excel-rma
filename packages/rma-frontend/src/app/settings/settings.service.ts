@@ -115,6 +115,7 @@ export class SettingsService {
     serviceAccountUser: string,
     serviceAccountSecret: string,
     sellingPriceList: string,
+    timeZone: string,
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -129,6 +130,7 @@ export class SettingsService {
             serviceAccountUser,
             serviceAccountSecret,
             sellingPriceList,
+            timeZone,
           },
           { headers },
         );

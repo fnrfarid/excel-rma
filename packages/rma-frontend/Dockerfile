@@ -4,7 +4,7 @@ COPY . /home/craft/rma-frontend
 WORKDIR /home/craft/
 RUN cd rma-frontend \
     && npm install \
-    && npm run build
+    && npm run build -- --prod
 
 FROM nginx:latest
 
