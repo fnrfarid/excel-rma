@@ -25,7 +25,7 @@ export class StorageService {
 
   async getItems(keys: string[]) {
     const data = {};
-    for (const key in keys) {
+    for (const key of keys) {
       if (key) {
         data[keys[key]] = await this.getItem(keys[key]);
       }

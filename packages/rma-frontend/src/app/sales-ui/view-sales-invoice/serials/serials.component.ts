@@ -40,6 +40,7 @@ export class SerialsComponent implements OnInit {
   warehouseFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
   salesInvoiceDetails: SalesInvoiceDetails;
+  getOptionText = '';
 
   constructor(
     private readonly snackbar: MatSnackBar,

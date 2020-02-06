@@ -8,7 +8,7 @@
     "start": "ng serve --host \"rma.localhost\" --port 4700 --proxy-config proxy.config.json",
     "build": "ng build",
     "test": "ng test",
-    "lint": "tslint -c tslint.json './src/**/*.ts' './e2e/**/*.ts'",
+    "lint": "eslint '{e2e,src}/**/*.ts'",
     "format": "prettier --write './**/*.ts' './**/*.spec.ts'",
     "format:check": "prettier -c './**/*.ts' './**/*.spec.ts'",
     "e2e": "ng e2e"
@@ -50,7 +50,12 @@
     "@types/jasmine": "^3.5.2",
     "@types/jasminewd2": "^2.0.8",
     "@types/node": "^13.5.2",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
     "codelyzer": "^5.2.1",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jsdoc": "^21.0.0",
+    "eslint-plugin-prefer-arrow": "^1.1.7",
     "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "^4.4.1",
@@ -61,7 +66,6 @@
     "prettier": "^1.19.1",
     "protractor": "^5.4.3",
     "ts-node": "^8.6.2",
-    "tslint": "^6.0.0",
     "typescript": "~3.4.3"
   },
   "description": "An Ionic project"

@@ -120,6 +120,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('serviceAccountUser').value,
         this.companySettingsForm.get('serviceAccountSecret').value,
         this.companySettingsForm.get('sellingPriceList').value,
+        this.companySettingsForm.get('timeZone').value,
       )
       .subscribe({
         next: success => {
