@@ -38,6 +38,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   filteredWarehouseList: Observable<any[]>;
   purchaseInvoiceDetails: PurchaseInvoiceDetails;
+  getOptionText = '';
 
   constructor(
     private readonly snackbar: MatSnackBar,

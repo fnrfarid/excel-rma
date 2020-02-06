@@ -23,6 +23,7 @@ import { StorageService, STORAGE_TOKEN } from './api/storage/storage.service';
 import { SERVICE_NAME } from './constants/storage';
 import { AppCommonModule } from './common/app-common.module';
 import { TimeService } from './api/time/time.service';
+import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,6 +39,7 @@ import { TimeService } from './api/time/time.service';
     PurchaseUiModule,
     BrowserAnimationsModule,
     AppCommonModule,
+    WarrantyUiModule,
   ],
   providers: [
     AppService,

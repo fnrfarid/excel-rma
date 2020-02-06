@@ -6,9 +6,11 @@ import {
   ValidationPipe,
   Body,
 } from '@nestjs/common';
+/* eslint-disable */
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-note-service/delivery-note-webhook.dto';
 import { DeliveryNoteWebhookAggregateService } from '../../../delivery-note/aggregates/delivery-note-webhook-aggregate/delivery-note-webhook-aggregate.service';
+/* eslint-enable */
 
 @Controller('delivery_note')
 export class DeliveryNoteWebhookController {

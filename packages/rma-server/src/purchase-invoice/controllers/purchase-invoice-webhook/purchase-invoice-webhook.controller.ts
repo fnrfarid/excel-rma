@@ -6,9 +6,11 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
+/* eslint-disable */
 import { PurchaseInvoiceWebhookDto } from '../../entity/purchase-invoice/purchase-invoice-webhook-dto';
 import { PurchaseInvoiceWebhookAggregateService } from '../../aggregates/purchase-invoice-webhook-aggregate/purchase-invoice-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+/* eslint-enable */
 
 @Controller('purchase_invoice')
 export class PurchaseInvoiceWebhookController {

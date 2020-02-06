@@ -77,7 +77,6 @@
         #paginator
         class="mat-paginator-sticky"
         (page)="getUpdate($event)"
-        [pageIndex]="paginator.pageIndex"
         [length]="dataSource.length"
         [pageSizeOptions]="[10, 50, 100, 500]"
       >
