@@ -17,6 +17,9 @@ import {
   COUNTRY,
   TIME_ZONE,
   DEFAULT_SELLING_PRICE_LIST,
+  STATE,
+  TOKEN,
+  SCOPES_OPENID_ALL,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -97,5 +100,58 @@ export class AppService {
       },
       error: err => {},
     });
+  }
+
+  setupImplicitFlow(): void {
+    this.getMessage().subscribe({
+      next: response => {
+        if (
+          !response ||
+          (response &&
+            !response.frontendClientId &&
+            !response.appURL &&
+            !response.authorizationURL)
+        ) {
+          return;
+        }
+
+        this.setInfoLocalStorage(response);
+        const frappe_auth_config = {
+          client_id: response.frontendClientId,
+          redirect_uri: response.appURL + CALLBACK_ENDPOINT,
+          response_type: TOKEN,
+          scope: SCOPES_OPENID_ALL,
+        };
+        this.initiateLogin(response.authorizationURL, frappe_auth_config);
+        return;
+      },
+      error: error => {},
+    });
+  }
+
+  initiateLogin(authorizationUrl: string, frappe_auth_config) {
+    const state = this.generateRandomString(32);
+    this.getStorage()
+      .setItem(STATE, state)
+      .then(savedState => {
+        window.location.href = this.getEncodedFrappeLoginUrl(
+          authorizationUrl,
+          frappe_auth_config,
+          savedState,
+        );
+      });
+  }
+
+  getEncodedFrappeLoginUrl(authorizationUrl, frappe_auth_config, state) {
+    authorizationUrl += `?client_id=${frappe_auth_config.client_id}`;
+    authorizationUrl += `&scope=${encodeURIComponent(
+      frappe_auth_config.scope,
+    )}`;
+    authorizationUrl += `&redirect_uri=${encodeURIComponent(
+      frappe_auth_config.redirect_uri,
+    )}`;
+    authorizationUrl += `&response_type=${frappe_auth_config.response_type}`;
+    authorizationUrl += `&state=${state}`;
+    return authorizationUrl;
   }
 }

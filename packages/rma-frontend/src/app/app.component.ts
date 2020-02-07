@@ -22,7 +22,7 @@ import { SettingsService } from './settings/settings.service';
   templateUrl: 'app.component.html',
 })
 export class AppComponent implements OnInit {
-  loggedIn: boolean;
+  loggedIn: boolean = false;
   hideAuthButtons: boolean = false;
   subscription: Subscription;
   showSettings: boolean = false;
@@ -81,10 +81,11 @@ export class AppComponent implements OnInit {
           this.loggedIn = true;
           if (!token) {
             this.checkRoles(query.get(ACCESS_TOKEN));
+          } else {
+            this.checkRoles(token);
           }
         } else {
           this.loggedIn = false;
-          this.setupImplicitFlow();
         }
       });
   }
@@ -111,7 +112,7 @@ export class AppComponent implements OnInit {
   }
 
   login() {
-    this.setupImplicitFlow();
+    this.appService.setupImplicitFlow();
   }
 
   logout() {
@@ -120,60 +121,6 @@ export class AppComponent implements OnInit {
       .getStorage()
       .clear()
       .then(() => this.loginService.logout());
-  }
-
-  setupImplicitFlow(): void {
-    this.appService.getMessage().subscribe({
-      next: response => {
-        if (
-          !response ||
-          (response &&
-            !response.frontendClientId &&
-            !response.appURL &&
-            !response.authorizationURL)
-        ) {
-          return;
-        }
-
-        this.appService.setInfoLocalStorage(response);
-        const frappe_auth_config = {
-          client_id: response.frontendClientId,
-          redirect_uri: response.appURL + CALLBACK_ENDPOINT,
-          response_type: TOKEN,
-          scope: SCOPES_OPENID_ALL,
-        };
-        this.initiateLogin(response.authorizationURL, frappe_auth_config);
-        return;
-      },
-      error: error => {},
-    });
-  }
-
-  initiateLogin(authorizationUrl: string, frappe_auth_config) {
-    const state = this.appService.generateRandomString(32);
-    this.appService
-      .getStorage()
-      .setItem(STATE, state)
-      .then(savedState => {
-        window.location.href = this.getEncodedFrappeLoginUrl(
-          authorizationUrl,
-          frappe_auth_config,
-          savedState,
-        );
-      });
-  }
-
-  getEncodedFrappeLoginUrl(authorizationUrl, frappe_auth_config, state) {
-    authorizationUrl += `?client_id=${frappe_auth_config.client_id}`;
-    authorizationUrl += `&scope=${encodeURIComponent(
-      frappe_auth_config.scope,
-    )}`;
-    authorizationUrl += `&redirect_uri=${encodeURIComponent(
-      frappe_auth_config.redirect_uri,
-    )}`;
-    authorizationUrl += `&response_type=${frappe_auth_config.response_type}`;
-    authorizationUrl += `&state=${state}`;
-    return authorizationUrl;
   }
 
   silentRefresh() {
@@ -199,7 +146,7 @@ export class AppComponent implements OnInit {
                 .getStorage()
                 .setItem(STATE, state)
                 .then(savedState => {
-                  const url = this.getEncodedFrappeLoginUrl(
+                  const url = this.appService.getEncodedFrappeLoginUrl(
                     response.authorizationURL,
                     frappe_auth_config,
                     savedState,
@@ -220,13 +167,16 @@ export class AppComponent implements OnInit {
                           .getStorage()
                           .clear()
                           .then(() =>
-                            this.initiateLogin(response.authorizationURL, {
-                              ...frappe_auth_config,
-                              ...{
-                                redirect_uri:
-                                  response.appURL + CALLBACK_ENDPOINT,
+                            this.appService.initiateLogin(
+                              response.authorizationURL,
+                              {
+                                ...frappe_auth_config,
+                                ...{
+                                  redirect_uri:
+                                    response.appURL + CALLBACK_ENDPOINT,
+                                },
                               },
-                            }),
+                            ),
                           );
                       }
                     };

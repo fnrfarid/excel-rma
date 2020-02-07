@@ -85,7 +85,7 @@ export class HomePage implements OnInit {
             headers,
           })
           .subscribe({
-            error: error => {},
+            error: error => this.appService.setupImplicitFlow(),
             next: profile => {
               this.email = profile.email;
               this.fullName = profile.name;
