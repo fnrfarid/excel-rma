@@ -10,223 +10,226 @@
 </ion-header>
 
 <ion-content class="page-background">
-  <ion-grid class="ion-no-padding">
-    <ion-row class="ion-no-padding">
-      <ion-col class="ion-no-padding">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>
-              <ion-text>
-                RMA Server Settings
-              </ion-text>
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <form [formGroup]="companySettingsForm">
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  required
-                  placeholder="Default Company"
-                  aria-label="Default Company"
-                  [matAutocomplete]="autoCompany"
-                  formControlName="defaultCompany"
-                />
-                <mat-autocomplete #autoCompany="matAutocomplete">
-                  <mat-option
-                    *ngFor="let company of companies | async"
-                    [value]="company.name"
-                  >
-                    <span>{{company.name}}</span>
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  required
-                  placeholder="ERPNext Timezone"
-                  aria-label="ERPNext Timezone"
-                  [matAutocomplete]="autoTZ"
-                  formControlName="timeZone"
-                />
-                <mat-autocomplete #autoTZ="matAutocomplete">
-                  <mat-option
-                    *ngFor="let timezone of timezones | async"
-                    [value]="timezone"
-                  >
-                    <span>{{timezone}}</span>
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  required
-                  placeholder="Selling Price List"
-                  aria-label="Selling Price List"
-                  [matAutocomplete]="autoSellingPriceList"
-                  formControlName="sellingPriceList"
-                />
-                <mat-autocomplete #autoSellingPriceList="matAutocomplete">
-                  <mat-option
-                    *ngFor="let priceList of sellingPriceLists | async"
-                    [value]="priceList.name"
-                  >
-                    <span>{{priceList.name}}</span>
-                  </mat-option>
-                </mat-autocomplete>
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  placeholder="Authorization Server URL"
-                  type="text"
-                  formControlName="authServerURL"
-                  readonly
-                />
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  placeholder="App URL"
-                  type="text"
-                  formControlName="appURL"
-                  readonly
-                />
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  placeholder="Frontend Client ID"
-                  type="text"
-                  formControlName="frontendClientId"
-                  required
-                />
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  placeholder="Backend Client ID"
-                  type="text"
-                  formControlName="backendClientId"
-                  required
-                />
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  placeholder="Service Account"
-                  type="text"
-                  formControlName="serviceAccountUser"
-                  required
-                />
-              </mat-form-field>
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  required
-                  formControlName="serviceAccountSecret"
-                  matInput
-                  type="password"
-                  placeholder="Service Account Secret"
-                  [type]="hideSASecret ? 'password' : 'text'"
-                />
-                <mat-icon matSuffix (click)="hideSASecret = !hideSASecret">
-                  {{hideSASecret ? 'visibility' : 'visibility_off'}}
-                </mat-icon>
-              </mat-form-field>
-            </form>
-            <ion-grid class="ion-padding">
-              <ion-row>
-                <ion-col>
-                  <ion-button color="light" (click)="updateSettings()">
-                    Update
-                  </ion-button>
-                </ion-col>
-                <ion-col class="ion-text-right">
-                  <ion-button color="light" routerLink="/settings/item-price">
-                    Set Item Price
-                  </ion-button>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content>
-        </ion-card>
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>
-              Territory for Warehouse
-            </ion-card-title>
-            <ion-fab vertical="top" horizontal="end">
-              <ion-fab-button color="light" (click)="mapTerritory()">
-                <ion-icon name="swap"></ion-icon>
-              </ion-fab-button>
-            </ion-fab>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="ion-padding">
-              <mat-form-field class="mat-input-wrapper">
-                <input
-                  matInput
-                  placeholder="Search"
-                  [(ngModel)]="search"
-                  (keyup.enter)="setFilter()"
-                />
-                <button mat-button matSuffix (click)="setFilter()">
-                  <mat-icon>search</mat-icon>
-                </button>
-              </mat-form-field>
-            </div>
-            <table
-              mat-table
-              class="mat-input-wrapper"
-              [dataSource]="territoryDataSource"
-              matSort
-              aria-label="Elements"
+  <ion-fab vertical="top" horizontal="end" slot="fixed">
+    <ion-fab-button>
+      <ion-icon name="settings"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="start">
+      <ion-button routerLink="/settings/item-price">
+        Item Price
+      </ion-button>
+      <ion-button routerLink="/settings/credit-limit">
+        Credit Limit
+      </ion-button>
+    </ion-fab-list>
+  </ion-fab>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-text>
+          RMA Server Settings
+        </ion-text>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="companySettingsForm">
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            required
+            placeholder="Default Company"
+            aria-label="Default Company"
+            [matAutocomplete]="autoCompany"
+            formControlName="defaultCompany"
+          />
+          <mat-autocomplete #autoCompany="matAutocomplete">
+            <mat-option
+              *ngFor="let company of companies | async"
+              [value]="company.name"
             >
-              <!-- Name Column -->
-              <ng-container matColumnDef="name">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  mat-sort-header
-                  (click)="setFilter()"
-                >
-                  Name
-                </th>
-                <td mat-cell *matCellDef="let row">
-                  {{row.name}}
-                </td>
-              </ng-container>
-
-              <!-- Warehouse Column -->
-              <ng-container matColumnDef="warehouse">
-                <th mat-header-cell *matHeaderCellDef>Warehouse</th>
-                <td mat-cell *matCellDef="let row">{{row.warehouse}}</td>
-              </ng-container>
-
-              <tr
-                mat-header-row
-                *matHeaderRowDef="displayedColumns; sticky: true"
-              ></tr>
-              <tr
-                mat-row
-                (click)="mapTerritory(row.uuid, row.name, row.warehouse)"
-                *matRowDef="let row; columns: displayedColumns;"
-              ></tr>
-            </table>
-
-            <mat-paginator
-              #paginator
-              class="mat-paginator-sticky"
-              (page)="getUpdate($event)"
-              [length]="territoryDataSource.length"
-              [pageSizeOptions]="[10, 50, 100, 500]"
+              <span>{{company.name}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            required
+            placeholder="ERPNext Timezone"
+            aria-label="ERPNext Timezone"
+            [matAutocomplete]="autoTZ"
+            formControlName="timeZone"
+          />
+          <mat-autocomplete #autoTZ="matAutocomplete">
+            <mat-option
+              *ngFor="let timezone of timezones | async"
+              [value]="timezone"
             >
-            </mat-paginator>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+              <span>{{timezone}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            required
+            placeholder="Selling Price List"
+            aria-label="Selling Price List"
+            [matAutocomplete]="autoSellingPriceList"
+            formControlName="sellingPriceList"
+          />
+          <mat-autocomplete #autoSellingPriceList="matAutocomplete">
+            <mat-option
+              *ngFor="let priceList of sellingPriceLists | async"
+              [value]="priceList.name"
+            >
+              <span>{{priceList.name}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Authorization Server URL"
+            type="text"
+            formControlName="authServerURL"
+            readonly
+          />
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="App URL"
+            type="text"
+            formControlName="appURL"
+            readonly
+          />
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Frontend Client ID"
+            type="text"
+            formControlName="frontendClientId"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Backend Client ID"
+            type="text"
+            formControlName="backendClientId"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Service Account"
+            type="text"
+            formControlName="serviceAccountUser"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            required
+            formControlName="serviceAccountSecret"
+            matInput
+            type="password"
+            placeholder="Service Account Secret"
+            [type]="hideSASecret ? 'password' : 'text'"
+          />
+          <mat-icon matSuffix (click)="hideSASecret = !hideSASecret">
+            {{hideSASecret ? 'visibility' : 'visibility_off'}}
+          </mat-icon>
+        </mat-form-field>
+      </form>
+      <ion-grid class="ion-padding">
+        <ion-row>
+          <ion-col>
+            <ion-button color="light" (click)="updateSettings()">
+              Update
+            </ion-button>
+          </ion-col>
+          <ion-col class="ion-text-right"> </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        Territory for Warehouse
+      </ion-card-title>
+      <ion-fab vertical="top" horizontal="end">
+        <ion-fab-button color="light" (click)="mapTerritory()">
+          <ion-icon name="swap"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="ion-padding">
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Search"
+            [(ngModel)]="search"
+            (keyup.enter)="setFilter()"
+          />
+          <button mat-button matSuffix (click)="setFilter()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <table
+        mat-table
+        class="mat-input-wrapper"
+        [dataSource]="territoryDataSource"
+        matSort
+        aria-label="Elements"
+      >
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header
+            (click)="setFilter()"
+          >
+            Name
+          </th>
+          <td mat-cell *matCellDef="let row">
+            {{row.name}}
+          </td>
+        </ng-container>
+
+        <!-- Warehouse Column -->
+        <ng-container matColumnDef="warehouse">
+          <th mat-header-cell *matHeaderCellDef>Warehouse</th>
+          <td mat-cell *matCellDef="let row">{{row.warehouse}}</td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></tr>
+        <tr
+          mat-row
+          (click)="mapTerritory(row.uuid, row.name, row.warehouse)"
+          *matRowDef="let row; columns: displayedColumns;"
+        ></tr>
+      </table>
+
+      <mat-paginator
+        #paginator
+        class="mat-paginator-sticky"
+        (page)="getUpdate($event)"
+        [length]="territoryDataSource.length"
+        [pageSizeOptions]="[10, 50, 100, 500]"
+      >
+      </mat-paginator>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

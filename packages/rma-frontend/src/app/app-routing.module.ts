@@ -75,6 +75,14 @@ const routes: Routes = [
         m => m.AddSalesReturnPageModule,
       ),
   },
+  {
+    path: 'settings/credit-limit',
+    loadChildren: () =>
+      import('./credit-limit/credit-limit.module').then(
+        m => m.CreditLimitPageModule,
+      ),
+    canActivate: [SystemManagerGuard],
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
