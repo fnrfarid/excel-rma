@@ -23,6 +23,7 @@ export class Item {
   serial_no?: string;
   delivery_note?: string;
   against_sales_invoice?: string;
+  stock?: any;
 }
 
 export class APIResponse {

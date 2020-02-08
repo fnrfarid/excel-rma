@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { STORAGE_TOKEN } from '../../api/storage/storage.service';
 import { SalesService } from '../services/sales.service';
+import { ItemPriceService } from '../services/item-price.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -45,6 +46,17 @@ describe('AddSalesInvoicePage', () => {
             createSalesInvoice: (...args) => of({}),
             getSalesInvoice: (...args) => of({}),
             getCustomerList: (...args) => of([]),
+            getWarehouseList: (...args) => of([]),
+            getStore: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
+            }),
+          },
+        },
+        {
+          provide: ItemPriceService,
+          useValue: {
+            getStockBalance: (...args) => of({}),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

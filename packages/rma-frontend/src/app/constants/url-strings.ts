@@ -26,6 +26,8 @@ export const RELAY_LIST_PRICELIST_ENDPOINT =
   '/api/command/user/api/resource/Price%20List';
 export const RELAY_GET_ITEMPRICE_ENDPOINT =
   '/api/command/user/api/resource/Item Price';
+export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
+  '/api/command/user/api/method/erpnext.stock.utils.get_stock_balance';
 export const RELAY_LIST_TERRITORIES_ENDPOINT =
   '/api/command/user/api/resource/Territory';
 export const LIST_TERRITORIES_ENDPOINT = '/api/territory/v1/list';
