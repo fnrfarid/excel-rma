@@ -12,6 +12,7 @@ import { startWith, switchMap, filter } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
 import { DRAFT, CLOSE } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material';
+import { ItemPriceService } from '../services/item-price.service';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -28,8 +29,9 @@ export class AddSalesInvoicePage implements OnInit {
   postingDate: string;
   dueDate: string;
 
-  displayedColumns = ['item', 'quantity', 'rate', 'total', 'delete'];
-
+  displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
+  warehouseFormControl = new FormControl('');
+  filteredWarehouseList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
   companyFormControl = new FormControl('', [Validators.required]);
   customerFormControl = new FormControl('', [Validators.required]);
@@ -39,6 +41,7 @@ export class AddSalesInvoicePage implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
+    private itemPriceService: ItemPriceService,
     private readonly snackbar: MatSnackBar,
     private location: Location,
     private readonly router: Router,
@@ -72,6 +75,14 @@ export class AddSalesInvoicePage implements OnInit {
         return this.salesService.getCustomerList(value);
       }),
     );
+
+    this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getWarehouseList(value);
+      }),
+    );
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe({
@@ -99,8 +110,40 @@ export class AddSalesInvoicePage implements OnInit {
     item.rate = 0;
     item.item_code = '';
     item.minimumPrice = 0;
+    item.stock = this.warehouseFormControl.value ? 'Select an Item' : '';
     data.push(item);
     this.dataSource.update(data);
+  }
+
+  updateStockBalance(warehouse) {
+    const data = this.dataSource.data();
+    if (warehouse) {
+      data.forEach((item, index) => {
+        if (item.name) {
+          this.getWarehouseStock(item.item_code).subscribe({
+            next: res => {
+              data[index].stock = res.message;
+              this.dataSource.update(data);
+            },
+          });
+        } else {
+          data[index].stock = 'Select an Item';
+          this.dataSource.update(data);
+        }
+      });
+    } else {
+      data.forEach((item, index) => {
+        data[index].stock = 'Please select a Warehouse';
+        this.dataSource.update(data);
+      });
+    }
+  }
+
+  getWarehouseStock(item_code: string) {
+    return this.itemPriceService.getStockBalance(
+      item_code,
+      this.warehouseFormControl.value,
+    );
   }
 
   updateItem(row: Item, item: Item) {
@@ -109,10 +152,23 @@ export class AddSalesInvoicePage implements OnInit {
     }
     const copy = this.dataSource.data().slice();
     Object.assign(row, item);
-    row.qty = 1;
-    row.rate = item.rate;
-    this.calculateTotal(this.dataSource.data().slice());
-    this.dataSource.update(copy);
+    if (this.warehouseFormControl.value) {
+      this.getWarehouseStock(item.item_code).subscribe({
+        next: res => {
+          row.qty = 1;
+          row.rate = item.rate;
+          row.stock = res.message;
+          this.calculateTotal(this.dataSource.data().slice());
+          this.dataSource.update(copy);
+        },
+      });
+    } else {
+      row.qty = 1;
+      row.rate = item.rate;
+      row.stock = 'Please Select a Warehouse';
+      this.calculateTotal(this.dataSource.data().slice());
+      this.dataSource.update(copy);
+    }
   }
 
   updateQuantity(row: Item, quantity: number) {
