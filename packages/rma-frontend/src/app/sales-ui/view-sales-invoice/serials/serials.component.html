@@ -66,102 +66,159 @@
   </ion-card-content>
 </ion-card>
 
+<!-- Serial Range Card -->
 <ion-card>
-  <ion-card-header>
-    <ion-row class="align">
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Items
+  <ion-card-content>
+    <ion-card-title>Serial Range</ion-card-title>
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col size="6">
+          <mat-form-field>
+          <input matInput placeholder="Prefix" (input)="onPrefixChange($event.target.value)" type="text" name="Prefix" [(ngModel)]="rangePickerState.prefix" />
+          </mat-form-field>
+        </ion-col>
+        <ion-col size="6">
+          <mat-form-field>
+            <input matInput placeholder="From Range" (input)="onFromRange($event.target.value)" type="string" name="From Range" [(ngModel)]="rangePickerState.fromRange" />
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="From Range" (input)="onToRange($event.target.value)" type="string" name="To Range" [(ngModel)]="rangePickerState.toRange" />
+          </mat-form-field>
+          <ion-text color="primary">
+            <h3>Total : {{rangePickerState.serials.length}}</h3>
           </ion-text>
-        </ion-card-title>
-      </ion-col>
-      <ion-col class="ion-text-right" size="auto">
-        <ion-button
-          color="tertiary"
-          fill="outline"
-          (click)="submitDeliveryNote()"
-        >
-          Submit
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-card-header>
-  <ion-card-content class="ion-no-padding">
-    <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-      <ng-container matColumnDef="position">
-        <mat-header-cell *matHeaderCellDef>No.</mat-header-cell>
-        <mat-cell *matCellDef="let element">000{{ element.position }}</mat-cell>
-      </ng-container>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
 
-      <ng-container matColumnDef="serial">
-        <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
-        <mat-cell
-          *matCellDef="let element"
-          [satPopoverAnchor]="p"
-          tabindex="0"
-          (keyup.enter)="p.open()"
-          (click)="p.open()"
-        >
-          <ng-container *ngIf="element.serial_no">
-            {{ element.serial_no }}
+<ion-card>
+  <ion-card-content>
+    <ion-card-title>Products</ion-card-title>
+        <mat-table #table [dataSource]="itemDataSource" style="width: 100%;">
+
+          <ng-container matColumnDef="item_code">
+            <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <ng-container>
+                {{ row.item_code }}
+              </ng-container>
+            </mat-cell>
           </ng-container>
-          <span class="add-comment" *ngIf="!element.serial_no">
-            Assign Serial
-          </span>
-          <sat-popover
-            #p
-            hasBackdrop
-            xAlign="start"
-            yAlign="start"
-            (closed)="updateSerial(element, $event)"
-          >
-            <edit-table [value]="element.serial_no"> </edit-table>
-          </sat-popover>
+
+          <ng-container matColumnDef="item_name">
+            <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <ng-container>
+                {{ row.item_name }}
+              </ng-container>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="qty">
+            <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <ng-container>
+                {{ row.qty }}
+              </ng-container>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="assigned">
+            <mat-header-cell *matHeaderCellDef>Assigned</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <ng-container>
+                {{ row.assigned || 0 }}
+              </ng-container>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="remaining">
+            <mat-header-cell *matHeaderCellDef>Remaining</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ row.remaining || 0 }}
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="add_serial">
+            <mat-header-cell *matHeaderCellDef>Add Serials</mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <ion-button [disabled]="row.remaining === 0" fill="outline" (click)="assignSerial(row)">
+                <ion-icon name="Add"></ion-icon>
+              </ion-button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="itemDisplayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row *matRowDef="let row; columns: itemDisplayedColumns;"></mat-row>
+        </mat-table>
+  </ion-card-content>
+</ion-card>
+
+<ion-card>
+  <ion-card-content >
+    <ion-card-title>Serials</ion-card-title>
+    <mat-table #table [dataSource]="serialDataSource" style="width: 100%;">
+
+      <ng-container matColumnDef="item_code">
+        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_code }}
+          </ng-container>
         </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="item">
-        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.item }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="company">
-        <mat-header-cell *matHeaderCellDef>Company</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.company }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="supplier">
-        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.supplier }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="claimsReceivedDate">
-        <mat-header-cell *matHeaderCellDef
-          >Serial Assigned Date</mat-header-cell
-        >
-        <mat-cell *matCellDef="let element">
-          {{ element.claimsReceivedDate }}
+      <ng-container matColumnDef="item_name">
+        <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_name }}
+          </ng-container>
         </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="clear">
-        <mat-header-cell *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <ion-button
-            (click)="clearRow(element)"
-            color="danger"
-            color="danger"
-            fill="clear"
-          >
-            <ion-icon slot="icon-only" name="close"></ion-icon>
+      <ng-container matColumnDef="qty">
+        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.qty }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="rate">
+        <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.rate }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="serial_no">
+        <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ getSerialsInputValue(row) }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <mat-header-cell *matHeaderCellDef>Delete Serials</mat-header-cell>
+        <mat-cell *matCellDef="let row;let i = index;">
+          <ion-button color="danger" fill="clear" (click)="deleteRow(row,i)">
+            <ion-icon name="trash"></ion-icon>
           </ion-button>
         </mat-cell>
       </ng-container>
+
       <mat-header-row
-        *matHeaderRowDef="displayedColumns; sticky: true"
+        *matHeaderRowDef="serialDisplayedColumns; sticky: true"
       ></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      <mat-row *matRowDef="let row; columns: serialDisplayedColumns;let i = index"></mat-row>
     </mat-table>
   </ion-card-content>
 </ion-card>

@@ -1,22 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
-import { ActivatedRoute } from '@angular/router';
-import { DEFAULT_COMPANY } from '../../../constants/storage';
+import { Component, OnInit, Inject } from '@angular/core';
 import { SalesService } from '../../services/sales.service';
-import {
-  ERROR_FETCHING_SALES_INVOICE,
-  SERIAL_ASSIGNED,
-} from '../../../constants/messages';
-import { CLOSE } from '../../../constants/app-string';
 import { FormControl, Validators } from '@angular/forms';
-import { Observable, from, of } from 'rxjs';
-import { startWith, switchMap, mergeMap, map } from 'rxjs/operators';
-import { SalesInvoiceDetails } from '../details/details.component';
+import { Observable } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
 import {
-  SerialAssign,
-  SerialNo,
-} from '../../../common/interfaces/sales.interface';
-import { Location } from '@angular/common';
+  MatSnackBar,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+} from '@angular/material';
+import { CLOSE } from '../../../constants/app-string';
+import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
+import { SalesInvoiceDetails } from '../details/details.component';
+import { ActivatedRoute } from '@angular/router';
+import * as _ from 'lodash';
+import { SerialDataSource, ItemDataSource } from './serials-datasource';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -25,33 +23,49 @@ import { Location } from '@angular/common';
 })
 export class SerialsComponent implements OnInit {
   csvFile: any;
-  displayedColumns: string[] = [
-    'position',
-    'serial',
-    'item',
-    'company',
-    'supplier',
-    'claimsReceivedDate',
-    'clear',
-  ];
-  dataSource = [];
   date = new FormControl(new Date());
   claimsReceivedDate: string;
   warehouseFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
-  salesInvoiceDetails: SalesInvoiceDetails;
   getOptionText = '';
+  salesInvoiceDetails: SalesInvoiceDetails;
+
+  rangePickerState = {
+    prefix: '',
+    fromRange: 0,
+    toRange: 0,
+    serials: [],
+  };
+
+  itemDisplayedColumns = [
+    'item_code',
+    'item_name',
+    'qty',
+    'assigned',
+    'remaining',
+    'add_serial',
+  ];
+  itemDataSource: ItemDataSource;
+  serialDisplayedColumns = [
+    'item_code',
+    'item_name',
+    'qty',
+    'rate',
+    'serial_no',
+    'delete',
+  ];
+  serialDataSource: SerialDataSource;
 
   constructor(
-    private readonly snackbar: MatSnackBar,
-    private readonly route: ActivatedRoute,
     private readonly salesService: SalesService,
-    private readonly location: Location,
+    private readonly snackBar: MatSnackBar,
+    private readonly route: ActivatedRoute,
+    public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
-    // this.claimsDateFormControl = new FormControl(new Date().toString());
-    this.claimsReceivedDate = this.getParsedDate(this.date.value);
+    this.serialDataSource = new SerialDataSource();
+    this.itemDataSource = new ItemDataSource();
     this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -61,167 +75,159 @@ export class SerialsComponent implements OnInit {
     );
   }
 
-  getSalesInvoice(uuid: string) {
-    from(this.salesService.getStore().getItem(DEFAULT_COMPANY))
-      .pipe(
-        switchMap(company => {
-          let i = 0;
-          return this.salesService.getSalesInvoice(uuid).pipe(
-            switchMap(success => {
-              this.salesInvoiceDetails = success as SalesInvoiceDetails;
-              return from(this.salesInvoiceDetails.items);
-            }),
-            map(item => {
-              i++;
-              return item;
-            }),
-            mergeMap(item => {
-              const itemList = [];
-              for (let j = 0; j < item.qty; j++) {
-                itemList.push({
-                  position: i,
-                  serial_no: '',
-                  item: item.item_name,
-                  company,
-                  claimsReceivedDate: this.claimsReceivedDate,
-                  rate: item.rate,
-                  qty: 1,
-                  amount: item.rate,
-                  item_code: item.item_code,
-                });
-                i++;
-              }
-              return of(itemList);
-            }),
-          );
-        }),
-      )
-      .subscribe({
-        next: itemList => {
-          // this.salesInvoiceDetails = success;
-          // this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
-          //   .address_display
-          //   ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
-          //   : undefined;
-          // this.dataSource = success.items;
-
-          this.dataSource = itemList;
-        },
-        error: err => {
-          this.snackbar.open(
-            err.error.message
-              ? err.error.message
-              : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
-            CLOSE,
-            { duration: 2500 },
-          );
-        },
-      });
+  onFromRange(value) {
+    this.generateSerials(value);
   }
 
-  updateSerial(element, serial_no) {
-    if (serial_no) {
-      const index = this.dataSource.indexOf(element);
-      this.dataSource[index].serial_no = serial_no;
-      this.salesService.getSerial(serial_no).subscribe({
-        next: res => {
-          if (res[0].item_code === element.item_code)
-            this.dataSource[index].supplier = res[0].supplier.supplier_name;
-          else {
-            this.snackbar.open(
-              'Serial Number is not assignable on current Item.',
-              CLOSE,
-              {
-                duration: 2500,
-              },
-            );
-            this.dataSource[index].serial_no = '';
-            this.dataSource[index].supplier = '';
-          }
-        },
-        error: err => {
-          this.dataSource[index].serial_no = '';
-          this.dataSource[index].supplier = '';
-          this.snackbar.open('Invalid Serial No ', CLOSE, {
-            duration: 2500,
-          });
-        },
-      });
+  onToRange(value) {
+    this.generateSerials(undefined, value);
+  }
+
+  onPrefixChange(value) {
+    this.generateSerials(undefined, undefined, value);
+  }
+
+  async generateSerials(fromRange?, toRange?, prefix?) {
+    this.rangePickerState.serials =
+      (await this.getSerialsFromRange(
+        fromRange || this.rangePickerState.fromRange || 0,
+        toRange || this.rangePickerState.toRange || 0,
+        prefix || this.rangePickerState.prefix,
+      )) || [];
+  }
+
+  getSerialsFromRange(start: number, end: number, prefix: string) {
+    const data: any[] = _.range(
+      start > end ? Number(start) + 1 : start,
+      end > start ? Number(end) + 1 : end,
+    );
+    const maxSerial = data[data.length - 1]
+      ? data[data.length - 1].toString().length
+      : 1;
+    for (let i = 0; i < data.length; i++) {
+      data[i] = `${prefix}${this.getPaddedNumber(data[i], maxSerial)}`;
     }
+    return data;
   }
 
-  clearRow(element) {
-    const index = this.dataSource.indexOf(element);
-    this.dataSource[index].serial_no = '';
-    this.dataSource[index].supplier = '';
+  getPaddedNumber(num, numberLength) {
+    return _.padStart(num, numberLength, '0');
   }
 
-  submitDeliveryNote() {
-    const assignSerial = {} as SerialAssign;
-    assignSerial.company = this.salesInvoiceDetails.company;
-    assignSerial.customer = this.salesInvoiceDetails.customer;
-    assignSerial.posting_date = this.getParsedDate(this.date.value);
-    assignSerial.posting_time = this.getFrappeTime();
-    assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
-    assignSerial.set_warehouse = this.warehouseFormControl.value;
-    assignSerial.total = 0;
-    assignSerial.total_qty = 0;
-    assignSerial.items = [];
+  getSalesInvoice(uuid: string) {
+    return this.salesService.getSalesInvoice(uuid).subscribe({
+      next: (itemList: { items: Item[] }) => {
+        this.itemDataSource.loadItems(
+          itemList.items.filter(item => {
+            item.assigned = 0;
+            item.remaining = item.qty;
+            return item;
+          }),
+        );
+      },
+      error: err => {
+        this.snackBar.open(
+          err.error.message
+            ? err.error.message
+            : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
+          CLOSE,
+          { duration: 2500 },
+        );
+      },
+    });
+  }
 
-    const filteredItemCodeList = [
-      ...new Set(this.dataSource.map(item => item.item_code)),
-    ];
-
-    filteredItemCodeList.forEach(item_code => {
-      const serialItem = {} as SerialItem;
-      serialItem.serial_no = [];
-      serialItem.qty = 0;
-      serialItem.amount = 0;
-      serialItem.rate = 0;
-      serialItem.item_code = item_code;
-      this.dataSource.forEach(item => {
-        if (item_code === item.item_code && item.serial_no !== '') {
-          serialItem.qty += 1;
-          serialItem.amount += item.rate;
-          serialItem.serial_no.push(item.serial_no);
-          serialItem.rate = item.rate;
-        }
+  async assignSerial(row) {
+    if (!this.rangePickerState.serials.length) {
+      const dialogRef = this.dialog.open(AssignSerialsDialog, {
+        width: '250px',
+        data: { serials: row.remaining || 0 },
       });
-      assignSerial.total += serialItem.amount;
-      assignSerial.total_qty += serialItem.qty;
-      assignSerial.items.push(serialItem);
+
+      const serials = await dialogRef.afterClosed().toPromise();
+      if (serials) {
+        this.addSingularSerials(row, serials);
+        this.resetRangeState();
+        this.updateProductState(row, serials);
+      }
+      return;
+    }
+    const data = this.serialDataSource.data();
+    data.push({
+      item_code: row.item_code,
+      item_name: row.item_name,
+      qty: this.rangePickerState.serials.length,
+      rate: row.rate,
+      amount: row.amount,
+      serial_no: this.rangePickerState.serials,
+    });
+    this.updateProductState(
+      row.item_code,
+      this.rangePickerState.serials.length,
+    );
+    this.serialDataSource.update(data);
+    this.resetRangeState();
+  }
+
+  addSingularSerials(row, serialCount) {
+    this.updateProductState(row.item_code, serialCount);
+    const serials = this.serialDataSource.data();
+    Array.from({ length: serialCount }, (x, i) => {
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: 1,
+        rate: row.rate,
+        amount: row.amount,
+        serial_no: [''],
+      });
+    });
+    this.serialDataSource.update(serials);
+  }
+
+  updateProductState(item_code, assigned) {
+    const itemState = this.itemDataSource.data();
+    itemState.filter(product => {
+      if (product.item_code === item_code) {
+        product.assigned = product.assigned + assigned;
+        product.remaining = product.qty - product.assigned;
+      }
+      return product;
+    });
+    this.itemDataSource.update(itemState);
+  }
+
+  deleteRow(row, i) {
+    let serialData = this.serialDataSource.data();
+    serialData.length === 1 ? (serialData = []) : serialData.splice(i, 1);
+
+    this.serialDataSource.update(serialData);
+    const itemData = this.itemDataSource.data();
+
+    itemData.filter(item => {
+      if (item.item_code === row.item_code) {
+        item.assigned = item.assigned - row.qty;
+        item.remaining = item.remaining + row.qty;
+      }
+      return item;
     });
 
-    if (this.validateSerials(assignSerial.items)) {
-      this.salesService.assignSerials(assignSerial).subscribe({
-        next: success => {
-          this.snackbar.open(SERIAL_ASSIGNED, CLOSE, {
-            duration: 2500,
-          });
-          this.location.back();
-        },
-        error: err => {
-          if (err.status === 406) {
-            const errMessage = err.error.message.split('\\n');
-            this.snackbar.open(
-              errMessage[errMessage.length - 2].split(':')[1],
-              CLOSE,
-              {
-                duration: 2500,
-              },
-            );
-            return;
-          }
-          this.snackbar.open(err.error.message, CLOSE, {
-            duration: 2500,
-          });
-        },
-      });
-    } else {
-      this.snackbar.open('Error : Duplicate Serial number assigned.', CLOSE, {
-        duration: 2500,
-      });
-    }
+    this.itemDataSource.update(itemData);
+  }
+
+  getSerialsInputValue(row) {
+    return row.serial_no.length === 1
+      ? row.serial_no[0]
+      : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
+  }
+
+  resetRangeState() {
+    this.rangePickerState = {
+      prefix: '',
+      fromRange: 0,
+      toRange: 0,
+      serials: [],
+    };
   }
 
   getFrappeTime() {
@@ -229,32 +235,12 @@ export class SerialsComponent implements OnInit {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
   }
 
-  validateSerials(itemList: SerialNo[]) {
-    const serials = [];
-    itemList.forEach(item => {
-      item.serial_no.forEach(serial => {
-        serials.push(serial);
-      });
-    });
-    const filteredSerials = [...new Set(serials)];
-    if (filteredSerials.length === serials.length) return true;
-    return false;
-  }
-
   fileChangedEvent($event): void {
     const reader = new FileReader();
     reader.readAsText($event.target.files[0]);
     reader.onload = (file: any) => {
       this.csvFile = file.target.result;
-      this.populateTable();
     };
-  }
-
-  claimsDate($event) {
-    this.claimsReceivedDate = this.getParsedDate($event.value);
-    this.dataSource.forEach((item, index) => {
-      this.dataSource[index].claimsReceivedDate = this.claimsReceivedDate;
-    });
   }
 
   getParsedDate(value) {
@@ -265,24 +251,6 @@ export class SerialsComponent implements OnInit {
       // +1 as index of months start's from 0
       date.getDate(),
     ].join('-');
-  }
-
-  populateTable() {
-    if (!this.csvFile) return;
-    this.dataSource = [];
-    const data = this.csvJSON();
-    let i = 0;
-    data.forEach((element: { model: string; serial: string }) => {
-      this.dataSource.push({
-        position: i,
-        serial: element.serial,
-        item: element.model,
-        company: localStorage.getItem(DEFAULT_COMPANY),
-        // supplier: this.supplier,
-        claimsReceivedDate: this.claimsReceivedDate,
-      });
-      i++;
-    });
   }
 
   csvJSON() {
@@ -308,8 +276,31 @@ export class SerialsComponent implements OnInit {
 
 export interface SerialItem {
   item_code: string;
+  item_name: string;
   qty: number;
   rate: number;
   amount: number;
   serial_no: string[];
+}
+
+export interface Item {
+  item_name: string;
+  item_code: string;
+  qty: number;
+  assigned: number;
+  remaining: number;
+}
+
+@Component({
+  selector: 'assign-serials-dialog',
+  templateUrl: 'assign-serials-dialog.html',
+})
+export class AssignSerialsDialog {
+  constructor(
+    public dialogRef: MatDialogRef<AssignSerialsDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {}
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
 }
