@@ -22,18 +22,23 @@ export class WarrantyClaimService {
     return await this.warrantyclaimRepository.findOne(param, options);
   }
 
-  async list(skip, take, search, sort) {
-    const nameExp = new RegExp(search, 'i');
-    const columns = this.warrantyclaimRepository.manager.connection
-      .getMetadata(WarrantyClaim)
-      .ownColumns.map(column => column.propertyName);
+  async list(skip, take, sort, filter_query?) {
+    let sortQuery;
 
-    const $or = columns.map(field => {
-      const filter = {};
-      filter[field] = nameExp;
-      return filter;
-    });
-    const $and: any[] = [{ $or }];
+    try {
+      sortQuery = JSON.parse(sort);
+    } catch (error) {
+      sortQuery = { posting_date: 'desc' };
+    }
+
+    for (const key of Object.keys(sortQuery)) {
+      sortQuery[key] = sortQuery[key].toUpperCase();
+      if (!sortQuery[key]) {
+        delete sortQuery[key];
+      }
+    }
+
+    const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
 
     const where: { $and: any } = { $and };
 
@@ -41,6 +46,7 @@ export class WarrantyClaimService {
       skip,
       take,
       where,
+      order: sortQuery,
     });
 
     return {
@@ -48,6 +54,22 @@ export class WarrantyClaimService {
       length: await this.warrantyclaimRepository.count(where),
       offset: skip,
     };
+  }
+
+  getFilterQuery(query) {
+    const keys = Object.keys(query);
+    keys.forEach(key => {
+      if (query[key]) {
+        if (key === 'status' && query[key] === 'All') {
+          delete query[key];
+        } else {
+          query[key] = new RegExp(query[key], 'i');
+        }
+      } else {
+        delete query[key];
+      }
+    });
+    return query;
   }
 
   async deleteOne(query, options?) {
