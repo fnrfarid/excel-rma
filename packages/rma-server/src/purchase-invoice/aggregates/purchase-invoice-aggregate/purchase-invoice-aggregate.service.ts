@@ -33,8 +33,13 @@ export class PurchaseInvoiceAggregateService extends AggregateRoot {
     return provider;
   }
 
-  async getPurchaseInvoiceList(offset, limit, sort, search, clientHttpRequest) {
-    return await this.purchaseInvoiceService.list(offset, limit, search, sort);
+  async getPurchaseInvoiceList(offset, limit, sort, filter_query?) {
+    return await this.purchaseInvoiceService.list(
+      offset,
+      limit,
+      sort,
+      filter_query,
+    );
   }
 
   async remove(uuid: string) {
