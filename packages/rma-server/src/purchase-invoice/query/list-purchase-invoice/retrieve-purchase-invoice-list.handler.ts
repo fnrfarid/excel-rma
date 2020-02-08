@@ -7,13 +7,12 @@ export class RetrievePurchaseInvoiceListQueryHandler
   implements IQueryHandler<RetrievePurchaseInvoiceListQuery> {
   constructor(private readonly manager: PurchaseInvoiceAggregateService) {}
   async execute(query: RetrievePurchaseInvoiceListQuery) {
-    const { offset, limit, search, sort, clientHttpRequest } = query;
+    const { offset, limit, sort, filter_query } = query;
     return await this.manager.getPurchaseInvoiceList(
       Number(offset),
       Number(limit),
-      search,
       sort,
-      clientHttpRequest,
+      filter_query,
     );
   }
 }
