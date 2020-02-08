@@ -26,6 +26,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { APPLICATION_JSON_CONTENT_TYPE } from '../../../constants/app-strings';
 import { FILE_NOT_FOUND, INVALID_FILE } from '../../../constants/app-strings';
 import { CreateBulkClaimsCommand } from '../../command/create-bulk-claims/create-bulk-claims.command';
+import { WarrantyClaimsListQueryDto } from '../../../constants/listing-dto/warranty-claims-list-query';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
@@ -59,24 +60,17 @@ export class WarrantyClaimController {
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  getClientList(
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 10,
-    @Query('search') search = '',
-    @Query('sort') sort,
-    @Req() clientHttpRequest,
-  ) {
-    if (sort !== 'ASC') {
-      sort = 'DESC';
+  @UsePipes(new ValidationPipe({ forbidNonWhitelisted: true }))
+  getWarrantyClaimsList(@Query() query: WarrantyClaimsListQueryDto) {
+    const { offset, limit, sort, filter_query } = query;
+    let filter;
+    try {
+      filter = JSON.parse(filter_query);
+    } catch {
+      filter;
     }
     return this.queryBus.execute(
-      new RetrieveWarrantyClaimListQuery(
-        offset,
-        limit,
-        sort,
-        search,
-        clientHttpRequest,
-      ),
+      new RetrieveWarrantyClaimListQuery(offset, limit, sort, filter),
     );
   }
 

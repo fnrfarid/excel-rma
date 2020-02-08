@@ -11,7 +11,10 @@ import { AccountsComponent } from './accounts/accounts.component';
 import { CreditNotesComponent } from './credit-notes/credit-notes.component';
 import { InvoiceWarrantyComponent } from './invoice-warranty/invoice-warranty.component';
 import { SalesReturnComponent } from './sales-return/sales-return.component';
-import { SerialsComponent } from './serials/serials.component';
+import {
+  SerialsComponent,
+  AssignSerialsDialog,
+} from './serials/serials.component';
 import { MaterialModule } from '../../material/material.module';
 import { EditTableComponent } from './edit-table/edit-table.component';
 import { AppCommonModule } from '../../common/app-common.module';
@@ -33,7 +36,9 @@ const routes: Routes = [
     AppCommonModule,
     RouterModule.forChild(routes),
   ],
+  entryComponents: [AssignSerialsDialog],
   declarations: [
+    AssignSerialsDialog,
     ViewSalesInvoicePage,
     DetailsComponent,
     AccountsComponent,

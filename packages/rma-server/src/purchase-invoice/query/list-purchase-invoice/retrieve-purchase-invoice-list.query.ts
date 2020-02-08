@@ -4,8 +4,7 @@ export class RetrievePurchaseInvoiceListQuery implements IQuery {
   constructor(
     public offset: number,
     public limit: number,
-    public search: string,
     public sort: string,
-    public clientHttpRequest: any,
+    public filter_query: any,
   ) {}
 }
