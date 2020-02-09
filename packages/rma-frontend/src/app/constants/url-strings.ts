@@ -50,3 +50,7 @@ export const CREATE_PURCHASE_RECEIPT_ENDPOINT =
   '/api/purchase_receipt/v1/create';
 export const GET_TIME_ZONE =
   '/api/command/user/api/method/frappe.client.get_time_zone';
+export const UPDATE_RMA_CUSTOMER_ENDPOINT = '/api/customer/v1/update';
+export const UPDATE_CUSTOMER_CREDIT_LIMIT_ENDPOINT =
+  '/api/command/user/api/resource/Customer%20Credit%20Limit';
+export const CUSTOMER_ENDPOINT = '/api/command/user/api/resource/Customer';

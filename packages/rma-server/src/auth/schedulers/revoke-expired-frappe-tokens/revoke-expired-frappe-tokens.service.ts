@@ -1,4 +1,4 @@
-import { Injectable, HttpService, OnModuleInit } from '@nestjs/common';
+import { Injectable, HttpService, OnModuleInit, Logger } from '@nestjs/common';
 import { CronJob } from 'cron';
 import { from, of, Observable } from 'rxjs';
 import { switchMap, retry, mergeMap } from 'rxjs/operators';
@@ -18,6 +18,10 @@ import {
 } from '../../../constants/app-strings';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { TokenCache } from '../../entities/token-cache/token-cache.entity';
+import {
+  REVOKE_FRAPPE_TOKEN_SUCCESS,
+  REVOKE_FRAPPE_TOKEN_ERROR,
+} from '../../../constants/messages';
 
 export const FRAPPE_TOKEN_CLEANUP_CRON_STRING = '0 */15 * * * *';
 
@@ -56,8 +60,12 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
           retry(3),
         )
         .subscribe({
-          next: success => {},
-          error: error => {},
+          next: success => {
+            Logger.log(REVOKE_FRAPPE_TOKEN_SUCCESS, this.constructor.name);
+          },
+          error: error => {
+            Logger.error(REVOKE_FRAPPE_TOKEN_ERROR, this.constructor.name);
+          },
         });
     });
     job.start();

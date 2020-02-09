@@ -1,11 +1,4 @@
-import {
-  Column,
-  ObjectIdColumn,
-  BaseEntity,
-  ObjectID,
-  Entity,
-  Index,
-} from 'typeorm';
+import { Column, ObjectIdColumn, ObjectID, Entity, Index } from 'typeorm';
 
 export class CustomerCreditLimit {
   credit_limit: number;
@@ -13,7 +6,7 @@ export class CustomerCreditLimit {
 }
 
 @Entity()
-export class Customer extends BaseEntity {
+export class Customer {
   @ObjectIdColumn()
   _id: ObjectID;
 
@@ -56,4 +49,10 @@ export class Customer extends BaseEntity {
 
   @Column()
   isSynced: boolean;
+
+  @Column()
+  baseCreditLimitAmount: number;
+
+  @Column()
+  tempCreditLimitPeriod: Date;
 }

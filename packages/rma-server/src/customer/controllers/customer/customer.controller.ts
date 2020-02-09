@@ -73,8 +73,10 @@ export class CustomerController {
 
   @Post('v1/update')
   @UseGuards(TokenGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateCustomer(@Body() updatePayload: UpdateCustomerDto) {
-    return this.commandBus.execute(new UpdateCustomerCommand(updatePayload));
+  @UsePipes(ValidationPipe)
+  async updateCustomer(@Body() updatePayload: UpdateCustomerDto) {
+    return await this.commandBus.execute(
+      new UpdateCustomerCommand(updatePayload),
+    );
   }
 }

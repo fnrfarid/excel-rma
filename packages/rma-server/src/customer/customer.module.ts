@@ -8,6 +8,7 @@ import { CustomerController } from './controllers/customer/customer.controller';
 import { CustomerPoliciesService } from './policies/customer-policies/customer-policies.service';
 import { CustomerWebhookController } from './controllers/customer-webhook/customer-webhook.controller';
 import { TerritoryController } from './controllers/territory/territory.controller';
+import { CustomerSchedulers } from './schedulers';
 
 @Module({
   imports: [CustomerEntitiesModule],
@@ -21,6 +22,7 @@ import { TerritoryController } from './controllers/territory/territory.controlle
     ...CustomerQueryManager,
     ...CustomerEventManager,
     ...CustomerCommandManager,
+    ...CustomerSchedulers,
     CustomerPoliciesService,
   ],
   exports: [CustomerEntitiesModule, ...CustomerAggregatesManager],

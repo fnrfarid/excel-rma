@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, delay, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { from } from 'rxjs';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
@@ -14,6 +15,7 @@ import { IDTokenClaims } from '../common/interfaces/id-token-claims.interfaces';
 import { LoginService } from '../api/login/login.service';
 import { StorageService } from '../api/storage/storage.service';
 import { AppService } from '../app.service';
+import { DURATION } from '../constants/app-string';
 
 @Component({
   selector: 'app-home',
@@ -26,6 +28,7 @@ export class HomePage implements OnInit {
   state: string;
   email: string;
   fullName: string;
+  spinner = true;
 
   constructor(
     private readonly http: HttpClient,
@@ -40,6 +43,7 @@ export class HomePage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map(event => {
+          this.spinner = true;
           this.loadProfile();
           return event;
         }),
@@ -73,25 +77,27 @@ export class HomePage implements OnInit {
   }
 
   loadProfile() {
-    this.storage.getItem(ACCESS_TOKEN).then(token => {
-      this.loggedIn = token ? true : false;
-      if (this.loggedIn) {
-        const headers = {
-          [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
-        };
+    from(this.storage.getItem(ACCESS_TOKEN))
+      .pipe(
+        delay(DURATION),
+        switchMap(token => {
+          this.loggedIn = token ? true : false;
+          const headers = {
+            [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+          };
 
-        this.http
-          .get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
+          return this.http.get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
             headers,
-          })
-          .subscribe({
-            error: error => this.appService.setupImplicitFlow(),
-            next: profile => {
-              this.email = profile.email;
-              this.fullName = profile.name;
-            },
           });
-      }
-    });
+        }),
+      )
+      .subscribe({
+        error: error => this.appService.setupImplicitFlow(),
+        next: profile => {
+          this.spinner = false;
+          this.email = profile.email;
+          this.fullName = profile.name;
+        },
+      });
   }
 }

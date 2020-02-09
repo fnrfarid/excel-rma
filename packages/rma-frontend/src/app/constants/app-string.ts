@@ -1,7 +1,11 @@
 export const CLOSE = 'Close';
 export const SHORT_DURATION = 5000;
+export const DURATION = 1000;
 export const UPDATE_SUCCESSFUL = 'Update Successful';
 export const UPDATE_ERROR = 'Update Error';
 export const SYSTEM_MANAGER = 'System Manager';
 export const DRAFT = 'Draft';
 export const REJECTED = 'Rejected';
+export const ACCEPT = 'Accept';
+export const CONTENT_TYPE = 'Content-Type';
+export const APPLICATION_JSON = 'application/json';
