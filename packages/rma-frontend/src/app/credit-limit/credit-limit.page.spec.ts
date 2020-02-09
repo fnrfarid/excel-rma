@@ -1,15 +1,23 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, PopoverController } from '@ionic/angular';
+import { RouterTestingModule } from '@angular/router/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
+import { Location } from '@angular/common';
+import { of } from 'rxjs';
 
 import { CreditLimitPage } from './credit-limit.page';
 import { MaterialModule } from '../material/material.module';
-import { RouterTestingModule } from '@angular/router/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SalesService } from '../sales-ui/services/sales.service';
-import { Location } from '@angular/common';
-import { of } from 'rxjs';
+import { StorageService } from '../api/storage/storage.service';
+
+@Pipe({ name: 'curFormat' })
+class MockPipe implements PipeTransform {
+  transform(value: string) {
+    return value;
+  }
+}
 
 describe('CreditLimitPage', () => {
   let component: CreditLimitPage;
@@ -17,7 +25,7 @@ describe('CreditLimitPage', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [CreditLimitPage],
+      declarations: [CreditLimitPage, MockPipe],
       imports: [
         IonicModule.forRoot(),
         MaterialModule,
@@ -39,6 +47,8 @@ describe('CreditLimitPage', () => {
           },
         },
         { provide: Location, useValue: {} },
+        { provide: StorageService, useValue: {} },
+        { provide: PopoverController, useValue: {} },
       ],
     }).compileComponents();
 

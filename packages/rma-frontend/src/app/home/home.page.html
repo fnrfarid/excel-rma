@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngIf="loggedIn">
+<ion-content *ngIf="loggedIn && !spinner">
   <ion-card class="welcome-card">
     <ion-item *ngIf="picture">
       <ion-avatar>
@@ -23,13 +23,24 @@
   </ion-card>
 </ion-content>
 
-<ion-content *ngIf="!loggedIn" class="card">
+<ion-content *ngIf="!loggedIn && !spinner" class="card">
   <ion-grid style="height: 100%">
     <ion-row
       class="ion-justify-content-center ion-align-items-center"
       style="height: 100%"
     >
       <ion-icon name="log-in"></ion-icon>&nbsp;Please Login to continue
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-content *ngIf="spinner">
+  <ion-grid style="height: 100%">
+    <ion-row
+      class="ion-justify-content-center ion-align-items-center"
+      style="height: 100%"
+    >
+      <ion-spinner></ion-spinner>
     </ion-row>
   </ion-grid>
 </ion-content>
