@@ -50,7 +50,7 @@ export class SerialsComponent implements OnInit {
     'item_code',
     'item_name',
     'qty',
-    'rate',
+    'warranty_date',
     'serial_no',
     'delete',
   ];
@@ -101,9 +101,10 @@ export class SerialsComponent implements OnInit {
       start > end ? Number(start) + 1 : start,
       end > start ? Number(end) + 1 : end,
     );
-    const maxSerial = data[data.length - 1]
-      ? data[data.length - 1].toString().length
-      : 1;
+    const maxSerial =
+      start.toString().length > end.toString().length
+        ? start.toString().length
+        : end.toString().length;
     for (let i = 0; i < data.length; i++) {
       data[i] = `${prefix}${this.getPaddedNumber(data[i], maxSerial)}`;
     }
@@ -137,21 +138,27 @@ export class SerialsComponent implements OnInit {
     });
   }
 
-  async assignSerial(row) {
-    if (!this.rangePickerState.serials.length) {
-      const dialogRef = this.dialog.open(AssignSerialsDialog, {
-        width: '250px',
-        data: { serials: row.remaining || 0 },
-      });
+  async assignSingularSerials(row: Item) {
+    const dialogRef =
+      row.remaining >= 30
+        ? this.dialog.open(AssignSerialsDialog, {
+            width: '250px',
+            data: { serials: row.remaining || 0 },
+          })
+        : null;
 
-      const serials = await dialogRef.afterClosed().toPromise();
-      if (serials) {
-        this.addSingularSerials(row, serials);
-        this.resetRangeState();
-        this.updateProductState(row, serials);
-      }
-      return;
+    const serials =
+      row.remaining >= 30
+        ? await dialogRef.afterClosed().toPromise()
+        : row.remaining;
+    if (serials) {
+      this.addSingularSerials(row, serials);
+      this.resetRangeState();
+      this.updateProductState(row, serials);
     }
+  }
+
+  assignRangeSerial(row: Item) {
     const data = this.serialDataSource.data();
     data.push({
       item_code: row.item_code,
@@ -167,6 +174,42 @@ export class SerialsComponent implements OnInit {
     );
     this.serialDataSource.update(data);
     this.resetRangeState();
+  }
+
+  assignSerial(itemRow: Item) {
+    if (!this.rangePickerState.serials.length) {
+      this.assignSingularSerials(itemRow);
+      return;
+    }
+    if (itemRow.remaining < this.rangePickerState.serials.length) {
+      this.snackBar.open(
+        `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
+        CLOSE,
+        { duration: 2500 },
+      );
+      return;
+    }
+    this.validateSerial(
+      { item_code: itemRow.item_code, serials: this.rangePickerState.serials },
+      itemRow,
+    );
+  }
+
+  validateSerial(item: { item_code: string; serials: string[] }, row: Item) {
+    this.salesService.validateSerials(item).subscribe({
+      next: (success: { notFoundSerials: string[] }) => {
+        success.notFoundSerials && success.notFoundSerials.length
+          ? this.snackBar.open(
+              `Invalid Serials ${success.notFoundSerials
+                .splice(0, 5)
+                .join(', ')}...`,
+              CLOSE,
+              { duration: 2500 },
+            )
+          : this.assignRangeSerial(row);
+      },
+      error: err => {},
+    });
   }
 
   addSingularSerials(row, serialCount) {
@@ -289,6 +332,8 @@ export interface Item {
   qty: number;
   assigned: number;
   remaining: number;
+  rate?: number;
+  amount?: number;
 }
 
 @Component({

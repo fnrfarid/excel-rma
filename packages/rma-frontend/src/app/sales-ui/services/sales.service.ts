@@ -50,6 +50,13 @@ export class SalesService {
     this.itemList = [];
   }
 
+  validateSerials(item: { item_code: string; serials: string[] }) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post('/api/serial_no/v1/validate', item, { headers });
+      }),
+    );
+  }
   getSalesInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
     if (!sortOrder) sortOrder = { posting_date: 'desc' };
     if (!query) query = {};

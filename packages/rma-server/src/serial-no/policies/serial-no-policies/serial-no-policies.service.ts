@@ -4,7 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SerialNoService } from '../../entity/serial-no/serial-no.service';
-import { SerialNoDto } from '../../entity/serial-no/serial-no-dto';
+import {
+  SerialNoDto,
+  ValidateSerialsDto,
+} from '../../entity/serial-no/serial-no-dto';
 import { from, of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
@@ -66,10 +69,15 @@ export class SerialNoPoliciesService {
     // validate company
   }
 
-  validateSerials(serials: string[]) {
+  validateSerials(payload: ValidateSerialsDto) {
     return this.serialNoService
       .asyncAggregate([
-        { $match: { serial_no: { $in: serials } } },
+        {
+          $match: {
+            serial_no: { $in: payload.serials },
+            item_code: payload.item_code,
+          },
+        },
         {
           $group: {
             _id: 'validSerials',
@@ -78,13 +86,19 @@ export class SerialNoPoliciesService {
         },
         {
           $project: {
-            notFoundSerials: { $setDifference: [serials, '$foundSerials'] },
+            notFoundSerials: {
+              $setDifference: [payload.serials, '$foundSerials'],
+            },
           },
         },
       ])
       .pipe(
         switchMap((data: { _id: string; notFoundSerials: string[] }[]) => {
-          return of({ notFoundSerials: data[0].notFoundSerials });
+          return of({
+            notFoundSerials: data[0]
+              ? data[0].notFoundSerials
+              : payload.serials,
+          });
         }),
       );
   }

@@ -190,19 +190,20 @@
         </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="rate">
-        <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
+      <ng-container matColumnDef="warranty_date">
+        <mat-header-cell *matHeaderCellDef>Warranty Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.rate }}
-          </ng-container>
+          <input matInput [(ngModel)]="row.warranty_date" [matDatepicker]="warranty_date" disabled>
+          <mat-datepicker-toggle matSuffix [for]="warranty_date"></mat-datepicker-toggle>
+          <mat-datepicker #warranty_date disabled="false"></mat-datepicker>
         </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="serial_no">
         <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          {{ getSerialsInputValue(row) }}
+          <input *ngIf="row.serial_no.length === 1 ? true : false"  [(ngModel)]="row.serial_no[0]" >
+          <p *ngIf="row.serial_no.length === 1 ? false : true" >{{ getSerialsInputValue(row) }}</p>
         </mat-cell>
       </ng-container>
 
