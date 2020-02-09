@@ -8,7 +8,10 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import * as uuidv4 from 'uuid/v4';
 import { SerialNoAddedEvent } from '../../event/serial-no-added/serial-no-added.event';
 import { SerialNoService } from '../../entity/serial-no/serial-no.service';
-import { SerialNoDto } from '../../entity/serial-no/serial-no-dto';
+import {
+  SerialNoDto,
+  ValidateSerialsDto,
+} from '../../entity/serial-no/serial-no-dto';
 import { SerialNoRemovedEvent } from '../../event/serial-no-removed/serial-no-removed.event';
 import { SerialNoUpdatedEvent } from '../../event/serial-no-updated/serial-no-updated.event';
 import { SerialNo } from '../../entity/serial-no/serial-no.entity';
@@ -223,7 +226,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     );
   }
 
-  validateSerials(serials: string[]) {
-    return this.serialNoPolicyService.validateSerials(serials);
+  validateSerials(payload: ValidateSerialsDto) {
+    return this.serialNoPolicyService.validateSerials(payload);
   }
 }

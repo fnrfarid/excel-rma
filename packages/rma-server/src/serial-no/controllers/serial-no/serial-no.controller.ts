@@ -101,7 +101,7 @@ export class SerialNoController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   validateSerialNo(@Req() clientHttpRequest, @Body() body: ValidateSerialsDto) {
     return this.queryBus.execute(
-      new ValidateSerialsQuery(body.serials, clientHttpRequest),
+      new ValidateSerialsQuery(body, clientHttpRequest),
     );
   }
 }
