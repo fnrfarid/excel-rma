@@ -47,3 +47,8 @@ export const NO_DELIVERY_NOTE_FOUND = 'Invalid Request, No Delivery Note Found';
 export const SALES_INVOICE_INVALID = 'Sales invoice is invalid';
 export const PURCHASE_INVOICE_ALREADY_EXIST = 'Purchase invoice already exist';
 export const PURCHASE_INVOICE_NOT_FOUND = 'Purchase invoice not found';
+export const REVOKE_FRAPPE_TOKEN_SUCCESS = 'Revoked expired frappe tokens';
+export const REVOKE_FRAPPE_TOKEN_ERROR =
+  'Unable to revoke expired Frappe tokens';
+export const RESET_CREDIT_LIMIT_SUCCESS = 'Credit Limit Reset';
+export const RESET_CREDIT_LIMIT_ERROR = 'Error during Credit Limit Reset';

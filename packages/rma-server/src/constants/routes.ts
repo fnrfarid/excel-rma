@@ -2,7 +2,7 @@ export const FRAPPE_API_GET_USER_INFO_ENDPOINT = '/api/resource/User/';
 export const CLIENT_CALLBACK_ENDPOINT = '/home/callback';
 export const FRAPPE_API_GET_OAUTH_BEARER_TOKEN_ENDPOINT =
   '/api/resource/OAuth%20Bearer%20Token/';
-export const FRAPPE_API_GET_CUSTOMER_ENDPOINT = '/api/resource/Customer/';
+export const FRAPPE_API_GET_CUSTOMER_ENDPOINT = '/api/resource/Customer';
 export const FRAPPE_API_GET_ITEM_ENDPOINT = '/api/resource/Item/';
 export const TOKEN_ADD_ENDPOINT = '/api/connect/v1/token_added';
 export const TOKEN_DELETE_ENDPOINT = '/api/connect/v1/token_delete';
@@ -53,3 +53,5 @@ export const FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT =
   '/api/resource/Payment%20Terms%20Template/';
 export const FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT =
   '/api/resource/Purchase%20Receipt';
+export const ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT =
+  '/api/resource/Customer%20Credit%20Limit';

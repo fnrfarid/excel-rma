@@ -14,7 +14,7 @@
     <ion-card-header>
       <ion-card-title>
         <ion-text color="tertiary">
-          Items
+          Customers
         </ion-text>
       </ion-card-title>
     </ion-card-header>
@@ -46,15 +46,15 @@
         aria-label="Elements"
         style="width: 100%;"
       >
-        <!-- Item -->
+        <!-- Customer -->
         <ng-container matColumnDef="customer">
           <th
             mat-header-cell
             *matHeaderCellDef
-            mat-sort-header
+            mat-sort-header="customer"
             (click)="setFilter()"
           >
-            Item
+            Customer
           </th>
           <td mat-cell *matCellDef="let row">
             {{row.name}}
@@ -62,31 +62,22 @@
         </ng-container>
 
         <ng-container matColumnDef="credit_limits">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            (click)="setFilter()"
-          >
-            Credit Limits
+          <th mat-header-cell *matHeaderCellDef>
+            ERPNext Credit Limits
           </th>
           <td mat-cell *matCellDef="let row">
             <ion-text *ngFor="let limit of row.credit_limits">
-              {{limit.company}} - {{limit.credit_limit}} <br />
+              {{limit.credit_limit | curFormat | async}}
             </ion-text>
           </td>
         </ng-container>
         <ng-container matColumnDef="extended_credit_limit">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header
-            (click)="setFilter()"
-          >
-            Extended Credit Limit
+          <th mat-header-cell *matHeaderCellDef>
+            Base Credit Limit
           </th>
           <td mat-cell *matCellDef="let row">
-            {{row.extended_credit_limit ? row.extended_credit_limit : ''}}
+            {{row.baseCreditLimitAmount ? (row.baseCreditLimitAmount | curFormat
+            | async) : ''}}
           </td>
         </ng-container>
         <!-- Price Column -->
@@ -94,7 +85,8 @@
           <th mat-header-cell *matHeaderCellDef>Expiry Date</th>
           <td class="ion-text-right" mat-cell *matCellDef="let row">
             <ion-text>
-              {{row.expiry_date ? row.expiry_date : ''}}
+              {{row.tempCreditLimitPeriod ? (row.tempCreditLimitPeriod |
+              date:'mediumDate') : ''}}
             </ion-text>
           </td>
         </ng-container>
@@ -103,7 +95,13 @@
           mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"
         ></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr
+          tabindex="0"
+          mat-row
+          (click)="updateCreditLimitDialog(row)"
+          (keyup.enter)="updateCreditLimitDialog(row)"
+          *matRowDef="let row; columns: displayedColumns;"
+        ></tr>
       </table>
 
       <mat-card-actions>
