@@ -154,6 +154,8 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
               item_code: item.item_code,
               item_name: item.item_name,
               description: item.description,
+              deliveredBy: clientHttpRequest.token.fullName,
+              deliveredByEmail: clientHttpRequest.token.email,
               qty: item.qty,
               rate: item.rate,
               amount: item.amount,

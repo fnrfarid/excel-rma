@@ -114,6 +114,12 @@ export class SalesInvoice extends BaseEntity {
   status: string;
 
   @Column()
+  createdBy: string;
+
+  @Column()
+  createdByEmail: string;
+
+  @Column()
   submitted: boolean;
 
   @Column()
