@@ -66,6 +66,8 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         switchMap(() => {
           const salesInvoice = new SalesInvoice();
           Object.assign(salesInvoice, salesInvoicePayload);
+          salesInvoice.createdByEmail = clientHttpRequest.token.email;
+          salesInvoice.createdBy = clientHttpRequest.token.fullName;
           salesInvoice.uuid = uuidv4();
           salesInvoice.isSynced = false;
           salesInvoice.inQueue = false;
@@ -296,6 +298,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   deliveryNoteData.isSynced = false;
                   deliveryNoteData.inQueue = false;
                   deliveryNoteData.is_return = true;
+                  deliveryNoteData.createdByEmail =
+                    clientHttpRequest.token.email;
+                  deliveryNoteData.createdBy = clientHttpRequest.token.fullName;
                   deliveryNoteData.issue_credit_note = true;
                   const delivery = this.mapCreateDeliveryNote(response);
                   Object.assign(deliveryNoteData, delivery);

@@ -45,6 +45,12 @@ export class DeliveryNote extends BaseEntity {
   posting_date: string;
 
   @Column()
+  createdBy: string;
+
+  @Column()
+  createdByEmail: string;
+
+  @Column()
   contact_email: string;
 
   @Column()
