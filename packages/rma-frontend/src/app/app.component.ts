@@ -70,7 +70,6 @@ export class AppComponent implements OnInit {
           if (token || location.hash.includes('access_token')) {
             const hash = (location.hash as string).replace('#', '');
             const query = new URLSearchParams(hash);
-            this.loggedIn = true;
             if (!token) {
               token = query.get(ACCESS_TOKEN);
               this.checkRoles(token);
@@ -78,18 +77,17 @@ export class AppComponent implements OnInit {
               this.checkRoles(token);
             }
           } else {
-            this.loggedIn = false;
+            this.checkRoles();
           }
         },
         error: error => {},
       });
-
-    Promise.resolve('').then(token => {});
   }
 
-  checkRoles(token: string) {
+  checkRoles(token?: string) {
     this.settingService.checkUserProfile(token).subscribe({
       next: res => {
+        this.loggedIn = true;
         if (
           res &&
           res.roles &&
