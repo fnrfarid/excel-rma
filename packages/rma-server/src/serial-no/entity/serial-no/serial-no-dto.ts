@@ -26,4 +26,8 @@ export class ValidateSerialsDto {
   @IsNotEmpty()
   @IsArray()
   serials: string[];
+
+  @IsNotEmpty()
+  @IsString()
+  item_code: string;
 }
