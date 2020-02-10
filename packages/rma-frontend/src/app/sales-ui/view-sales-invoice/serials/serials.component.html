@@ -91,20 +91,22 @@
             <input
               matInput
               placeholder="From Range"
-              (input)="onFromRange($event.target.value)"
-              type="string"
+              type="number"
               name="From Range"
               [(ngModel)]="rangePickerState.fromRange"
+              (ngModelChange)="this.fromRangeUpdate.next($event)"
+              required
             />
           </mat-form-field>
           <mat-form-field class="example-full-width">
             <input
+              type="number"
               matInput
               placeholder="To Range"
-              (input)="onToRange($event.target.value)"
               type="string"
               name="To Range"
               [(ngModel)]="rangePickerState.toRange"
+              (ngModelChange)="this.toRangeUpdate.next($event)"
             />
           </mat-form-field>
           <ion-text color="primary">
