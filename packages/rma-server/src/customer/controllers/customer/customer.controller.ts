@@ -54,12 +54,9 @@ export class CustomerController {
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
     @Query('search') search = '',
-    @Query('sort') sort,
+    @Query('sort') sort: string,
     @Req() clientHttpRequest,
   ) {
-    if (sort !== 'ASC') {
-      sort = 'DESC';
-    }
     return await this.queryBus.execute(
       new RetrieveCustomerListQuery(
         offset,

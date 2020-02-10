@@ -68,4 +68,13 @@ export class CreditLimitPage implements OnInit {
     });
     return await popover.present();
   }
+
+  setFilter() {
+    this.dataSource.loadItems(
+      this.search,
+      this.sort.direction,
+      this.paginator.pageIndex,
+      this.paginator.pageSize,
+    );
+  }
 }

@@ -8,7 +8,7 @@ import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.compo
 
 import { FormControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { startWith, switchMap, filter } from 'rxjs/operators';
+import { startWith, switchMap, filter, map } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
 import { DRAFT, CLOSE } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material';
@@ -72,7 +72,9 @@ export class AddSalesInvoicePage implements OnInit {
     this.filteredCustomerList = this.customerFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getCustomerList(value);
+        return this.salesService
+          .getCustomerList(value)
+          .pipe(map(res => res.docs));
       }),
     );
 

@@ -25,6 +25,7 @@ export class CustomerService {
   }
 
   async list(skip, take, search, sort) {
+    const sortQuery = { name: sort };
     const nameExp = new RegExp(search, 'i');
     const columns = this.customerRepository.manager.connection
       .getMetadata(Customer)
@@ -43,6 +44,7 @@ export class CustomerService {
       skip,
       take,
       where,
+      order: sortQuery,
     });
 
     return {
