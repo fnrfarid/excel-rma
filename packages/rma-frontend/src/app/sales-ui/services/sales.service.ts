@@ -218,16 +218,10 @@ export class SalesService {
 
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http
-          .get<APIResponse>(url, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.docs);
-            }),
-          );
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
       }),
     );
   }

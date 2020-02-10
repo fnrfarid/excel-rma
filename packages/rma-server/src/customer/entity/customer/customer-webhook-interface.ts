@@ -35,7 +35,7 @@ export class CustomerWebhookDto {
   customer_type: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   gst_category: string;
 
   @IsString()

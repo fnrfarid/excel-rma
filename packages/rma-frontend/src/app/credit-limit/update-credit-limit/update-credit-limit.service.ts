@@ -60,11 +60,21 @@ export class UpdateCreditLimitService {
 
               for (const limit of creditLimits) {
                 if (limit.company === company) {
-                  return this.http.put(
-                    UPDATE_CUSTOMER_CREDIT_LIMIT_ENDPOINT + '/' + limit.name,
-                    { credit_limit: creditLimit },
-                    { headers },
-                  );
+                  return this.http
+                    .put(
+                      UPDATE_CUSTOMER_CREDIT_LIMIT_ENDPOINT + '/' + limit.name,
+                      { credit_limit: creditLimit },
+                      { headers },
+                    )
+                    .pipe(
+                      switchMap(updated => {
+                        return this.http.put(
+                          CUSTOMER_ENDPOINT + '/' + erpnextCustomer.name,
+                          {},
+                          { headers },
+                        );
+                      }),
+                    );
                 }
               }
 
