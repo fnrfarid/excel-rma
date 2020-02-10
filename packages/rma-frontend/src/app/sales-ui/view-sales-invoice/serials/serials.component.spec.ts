@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
+import { Location } from '@angular/common';
 
 describe('SerialsComponent', () => {
   let component: SerialsComponent;
@@ -38,6 +39,10 @@ describe('SerialsComponent', () => {
               getItem: (...args) => Promise.resolve('ITEM'),
             }),
           },
+        },
+        {
+          provide: Location,
+          useValue: {},
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],

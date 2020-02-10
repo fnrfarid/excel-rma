@@ -33,9 +33,16 @@ tr.mat-footer-row {
 .mat-table-sticky {
   border-top: 1px solid #e0e0e0;
 }
+
 .example-full-width {
   width: 100%;
   color: black;
+}
+
+.fab-position {
+  position: absolute;
+  top: 25px;
+  right: 0;
 }
 
 .transform {

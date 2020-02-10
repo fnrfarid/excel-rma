@@ -24,6 +24,8 @@ export class Item {
   delivery_note?: string;
   against_sales_invoice?: string;
   stock?: any;
+  assigned?: number;
+  remaining?: number;
 }
 
 export class APIResponse {
