@@ -16,11 +16,19 @@ import {
   MatDialog,
 } from '@angular/material';
 import { CLOSE } from '../../../constants/app-string';
-import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
+import {
+  ERROR_FETCHING_SALES_INVOICE,
+  SERIAL_ASSIGNED,
+} from '../../../constants/messages';
 import { SalesInvoiceDetails } from '../details/details.component';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { SerialDataSource, ItemDataSource } from './serials-datasource';
+import {
+  SerialAssign,
+  SerialNo,
+} from 'src/app/common/interfaces/sales.interface';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -72,6 +80,7 @@ export class SerialsComponent implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
+    private location: Location,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -139,7 +148,8 @@ export class SerialsComponent implements OnInit {
 
   getSalesInvoice(uuid: string) {
     return this.salesService.getSalesInvoice(uuid).subscribe({
-      next: (itemList: { items: Item[] }) => {
+      next: (itemList: SalesInvoiceDetails) => {
+        this.salesInvoiceDetails = itemList as SalesInvoiceDetails;
         this.itemDataSource.loadItems(
           itemList.items.filter(item => {
             item.assigned = 0;
@@ -284,6 +294,86 @@ export class SerialsComponent implements OnInit {
     return row.serial_no.length === 1
       ? row.serial_no[0]
       : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
+  }
+
+  submitDeliveryNote() {
+    const assignSerial = {} as SerialAssign;
+    assignSerial.company = this.salesInvoiceDetails.company;
+    assignSerial.customer = this.salesInvoiceDetails.customer;
+    assignSerial.posting_date = this.getParsedDate(this.date.value);
+    assignSerial.posting_time = this.getFrappeTime();
+    assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
+    assignSerial.set_warehouse = this.warehouseFormControl.value;
+    assignSerial.total = 0;
+    assignSerial.total_qty = 0;
+    assignSerial.items = [];
+
+    const filteredItemCodeList = [
+      ...new Set(this.serialDataSource.data().map(item => item.item_code)),
+    ];
+
+    filteredItemCodeList.forEach(item_code => {
+      const serialItem = {} as SerialItem;
+      serialItem.serial_no = [];
+      serialItem.qty = 0;
+      serialItem.amount = 0;
+      serialItem.rate = 0;
+      serialItem.item_code = item_code;
+      this.serialDataSource.data().forEach(item => {
+        if (item_code === item.item_code && item.serial_no[0] !== '') {
+          serialItem.qty += 1;
+          serialItem.amount += item.rate;
+          serialItem.serial_no.push(item.serial_no[0]);
+          serialItem.rate = item.rate;
+        }
+      });
+      assignSerial.total += serialItem.amount;
+      assignSerial.total_qty += serialItem.qty;
+      assignSerial.items.push(serialItem);
+    });
+
+    if (this.validateSerials(assignSerial.items)) {
+      this.salesService.assignSerials(assignSerial).subscribe({
+        next: success => {
+          this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
+            duration: 2500,
+          });
+          this.location.back();
+        },
+        error: err => {
+          if (err.status === 406) {
+            const errMessage = err.error.message.split('\\n');
+            this.snackBar.open(
+              errMessage[errMessage.length - 2].split(':')[1],
+              CLOSE,
+              {
+                duration: 2500,
+              },
+            );
+            return;
+          }
+          this.snackBar.open(err.error.message, CLOSE, {
+            duration: 2500,
+          });
+        },
+      });
+    } else {
+      this.snackBar.open('Error : Duplicate Serial number assigned.', CLOSE, {
+        duration: 2500,
+      });
+    }
+  }
+
+  validateSerials(itemList: SerialNo[]) {
+    const serials = [];
+    itemList.forEach(item => {
+      item.serial_no.forEach(serial => {
+        serials.push(serial);
+      });
+    });
+    const filteredSerials = [...new Set(serials)];
+    if (filteredSerials.length === serials.length) return true;
+    return false;
   }
 
   resetRangeState() {
