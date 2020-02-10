@@ -11,6 +11,7 @@ import {
   TEN_MINUTES_IN_MS,
   SCOPES_OPENID_ALL,
   TWENTY_MINUTES_IN_SECONDS,
+  LOGGED_IN,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
@@ -51,7 +52,7 @@ export class AppComponent implements OnInit {
               (now + Number(query.get(EXPIRES_IN))).toString(),
             );
         })
-        .then(saved => {});
+        .then(saved => this.loginService.login());
     }
   }
 
@@ -62,6 +63,18 @@ export class AppComponent implements OnInit {
   }
 
   setUserSession() {
+    this.loginService.changes.subscribe({
+      next: event => {
+        if (event.key === LOGGED_IN && event.value === true) {
+          this.loggedIn = true;
+          this.checkRoles();
+        } else {
+          this.loggedIn = false;
+        }
+      },
+      error: error => {},
+    });
+
     if (location.hash.includes(ACCESS_TOKEN)) {
       const hash = (location.hash as string).replace('#', '');
       const query = new URLSearchParams(hash);
