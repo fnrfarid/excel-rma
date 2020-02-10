@@ -27,7 +27,7 @@ import { SerialDataSource, ItemDataSource } from './serials-datasource';
 import {
   SerialAssign,
   SerialNo,
-} from 'src/app/common/interfaces/sales.interface';
+} from '../../../common/interfaces/sales.interface';
 import { Location } from '@angular/common';
 
 @Component({

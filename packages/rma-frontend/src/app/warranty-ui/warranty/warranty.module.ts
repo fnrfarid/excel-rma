@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { WarrantyPageRoutingModule } from './warranty-routing.module';
 
 import { WarrantyPage } from './warranty.page';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../material/material.module';
 
 @NgModule({
   imports: [

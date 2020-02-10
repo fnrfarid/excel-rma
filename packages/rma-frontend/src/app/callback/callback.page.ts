@@ -9,6 +9,7 @@ import {
   SCOPE,
 } from '../constants/storage';
 import { StorageService } from '../api/storage/storage.service';
+import { LoginService } from '../api/login/login.service';
 
 @Component({
   selector: 'app-callback',
@@ -20,6 +21,7 @@ export class CallbackPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private storage: StorageService,
+    private login: LoginService,
   ) {}
 
   ngOnInit() {
@@ -42,6 +44,7 @@ export class CallbackPage implements OnInit {
             )
             .then(() => this.storage.setItem(SCOPE, query.get(SCOPE)))
             .then(() => this.storage.setItem(LOGGED_IN, true))
+            .then(() => this.login.login())
             .then(() => this.router.navigateByUrl(home));
         } else {
           this.router.navigateByUrl(home);
