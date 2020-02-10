@@ -1,8 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { SalesService } from '../../services/sales.service';
 import { FormControl, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+
+import { Observable, Subject } from 'rxjs';
+import {
+  startWith,
+  switchMap,
+  debounceTime,
+  distinctUntilChanged,
+} from 'rxjs/operators';
 import {
   MatSnackBar,
   MatDialogRef,
@@ -23,9 +29,12 @@ import { SerialDataSource, ItemDataSource } from './serials-datasource';
 })
 export class SerialsComponent implements OnInit {
   csvFile: any;
+  value: string;
   date = new FormControl(new Date());
   claimsReceivedDate: string;
+
   warehouseFormControl = new FormControl('', [Validators.required]);
+
   filteredWarehouseList: Observable<any[]>;
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
@@ -37,6 +46,8 @@ export class SerialsComponent implements OnInit {
     serials: [],
   };
 
+  fromRangeUpdate = new Subject<string>();
+  toRangeUpdate = new Subject<string>();
   itemDisplayedColumns = [
     'item_code',
     'item_name',
@@ -61,7 +72,10 @@ export class SerialsComponent implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
-  ) {}
+  ) {
+    this.onFromRange(this.value);
+    this.onToRange(this.value);
+  }
 
   ngOnInit() {
     this.serialDataSource = new SerialDataSource();
@@ -76,11 +90,19 @@ export class SerialsComponent implements OnInit {
   }
 
   onFromRange(value) {
-    this.generateSerials(value);
+    this.fromRangeUpdate
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(v => {
+        this.generateSerials(value);
+      });
   }
 
   onToRange(value) {
-    this.generateSerials(undefined, value);
+    this.toRangeUpdate
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(v => {
+        this.generateSerials(undefined, value);
+      });
   }
 
   onPrefixChange(value) {
