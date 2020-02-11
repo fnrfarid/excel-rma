@@ -32,6 +32,7 @@ export class SettingsPage implements OnInit {
     serviceAccountSecret: new FormControl(),
     sellingPriceList: new FormControl(),
     timeZone: new FormControl(),
+    validateStock: new FormControl(),
   });
 
   companies: Observable<unknown[]> = this.companySettingsForm
@@ -98,6 +99,9 @@ export class SettingsPage implements OnInit {
           .get('sellingPriceList')
           .setValue(res.sellingPriceList);
         this.companySettingsForm.get('timeZone').setValue(res.timeZone);
+        this.companySettingsForm
+          .get('validateStock')
+          .setValue(res.validateStock);
       },
     });
 
@@ -121,6 +125,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('serviceAccountSecret').value,
         this.companySettingsForm.get('sellingPriceList').value,
         this.companySettingsForm.get('timeZone').value,
+        this.companySettingsForm.get('validateStock').value,
       )
       .subscribe({
         next: success => {
