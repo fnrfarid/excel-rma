@@ -21,7 +21,7 @@ import {
   RESET_CREDIT_LIMIT_ERROR,
 } from '../../../constants/messages';
 
-export const RESET_CUSTOMER_CREDIT_LIMIT_CRON_STRING = '0 0 */6 * * *';
+export const RESET_CUSTOMER_CREDIT_LIMIT_CRON_STRING = '0 0 */1 * * *';
 
 @Injectable()
 export class ResetCreditLimitService implements OnModuleInit {
@@ -33,7 +33,7 @@ export class ResetCreditLimitService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    // Run every 6 hours
+    // Run every hour
     const job = new CronJob(
       RESET_CUSTOMER_CREDIT_LIMIT_CRON_STRING,
       async () => {
