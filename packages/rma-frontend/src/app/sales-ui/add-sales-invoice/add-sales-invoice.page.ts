@@ -7,12 +7,18 @@ import { Location } from '@angular/common';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 
 import { FormControl, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { startWith, switchMap, filter, map } from 'rxjs/operators';
+import { Observable, throwError, of, from } from 'rxjs';
+import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../constants/storage';
-import { DRAFT, CLOSE } from '../../constants/app-string';
+import {
+  DRAFT,
+  CLOSE,
+  DURATION,
+  UPDATE_ERROR,
+} from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material';
 import { ItemPriceService } from '../services/item-price.service';
+import { INSUFFICIENT_STOCK_BALANCE } from '../../constants/messages';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -247,15 +253,26 @@ export class AddSalesInvoicePage implements OnInit {
         }
       });
       salesInvoiceDetails.items = itemList;
-      this.salesService.createSalesInvoice(salesInvoiceDetails).subscribe({
-        next: success => {
-          this.location.back();
-        },
-        error: err => {},
-      });
+      this.validateStock(itemList)
+        .pipe(
+          switchMap(info => {
+            return this.salesService.createSalesInvoice(salesInvoiceDetails);
+          }),
+        )
+        .subscribe({
+          next: success => {
+            this.location.back();
+          },
+          error: ({ message }) => {
+            if (!message) message = UPDATE_ERROR;
+            this.snackbar.open(message, 'Close', {
+              duration: DURATION,
+            });
+          },
+        });
     } else {
       this.snackbar.open('Error : Duplicate Items added.', CLOSE, {
-        duration: 2500,
+        duration: DURATION,
       });
     }
   }
@@ -290,16 +307,29 @@ export class AddSalesInvoicePage implements OnInit {
           return item;
         }
       });
+
       salesInvoiceDetails.items = itemList;
       salesInvoiceDetails.uuid = this.invoiceUuid;
-      this.salesService.updateSalesInvoice(salesInvoiceDetails).subscribe({
-        next: res => {
-          this.location.back();
-        },
-      });
+      this.validateStock(itemList)
+        .pipe(
+          switchMap(info => {
+            return this.salesService.updateSalesInvoice(salesInvoiceDetails);
+          }),
+        )
+        .subscribe({
+          next: res => {
+            this.location.back();
+          },
+          error: ({ message }) => {
+            if (!message) message = UPDATE_ERROR;
+            this.snackbar.open(message, 'Close', {
+              duration: DURATION,
+            });
+          },
+        });
     } else {
       this.snackbar.open('Error : Duplicate Items added.', 'Close', {
-        duration: 2500,
+        duration: DURATION,
       });
     }
   }
@@ -345,5 +375,23 @@ export class AddSalesInvoicePage implements OnInit {
       },
       error: error => {},
     });
+  }
+
+  validateStock(itemList: Item[] = []) {
+    return this.salesService.getApiInfo().pipe(
+      switchMap(info => {
+        if (info.validateStock) {
+          return from(itemList).pipe(
+            mergeMap(item => {
+              if (item.qty > item.stock) {
+                return throwError({ message: INSUFFICIENT_STOCK_BALANCE });
+              }
+              return of(item);
+            }),
+          );
+        }
+        return of(info);
+      }),
+    );
   }
 }
