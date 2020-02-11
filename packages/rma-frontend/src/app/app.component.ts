@@ -1,6 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { interval, Subscription, from } from 'rxjs';
-import { delay, retry } from 'rxjs/operators';
+import { interval, Subscription } from 'rxjs';
 import {
   TOKEN,
   ACCESS_TOKEN,
@@ -12,10 +11,11 @@ import {
   TEN_MINUTES_IN_MS,
   SCOPES_OPENID_ALL,
   TWENTY_MINUTES_IN_SECONDS,
+  LOGGED_IN,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
-import { SYSTEM_MANAGER, DURATION } from './constants/app-string';
+import { SYSTEM_MANAGER } from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
 
 @Component({
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
               (now + Number(query.get(EXPIRES_IN))).toString(),
             );
         })
-        .then(saved => {});
+        .then(saved => this.loginService.login());
     }
   }
 
@@ -63,25 +63,26 @@ export class AppComponent implements OnInit {
   }
 
   setUserSession() {
-    from(this.appService.getStorage().getItem(ACCESS_TOKEN))
-      .pipe(delay(DURATION), retry(3))
-      .subscribe({
-        next: token => {
-          if (token || location.hash.includes('access_token')) {
-            const hash = (location.hash as string).replace('#', '');
-            const query = new URLSearchParams(hash);
-            if (!token) {
-              token = query.get(ACCESS_TOKEN);
-              this.checkRoles(token);
-            } else {
-              this.checkRoles(token);
-            }
-          } else {
-            this.checkRoles();
-          }
-        },
-        error: error => {},
-      });
+    this.loginService.changes.subscribe({
+      next: event => {
+        if (event.key === LOGGED_IN && event.value === true) {
+          this.loggedIn = true;
+          this.checkRoles();
+        } else {
+          this.loggedIn = false;
+        }
+      },
+      error: error => {},
+    });
+
+    if (location.hash.includes(ACCESS_TOKEN)) {
+      const hash = (location.hash as string).replace('#', '');
+      const query = new URLSearchParams(hash);
+      const token = query.get(ACCESS_TOKEN);
+      this.checkRoles(token);
+    } else {
+      this.checkRoles();
+    }
   }
 
   checkRoles(token?: string) {

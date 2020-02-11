@@ -46,8 +46,10 @@ export class CreditLimitDataSource extends DataSource<ListingData> {
       .getCustomerList(filter, sortOrder, pageIndex, pageSize)
       .pipe(
         map(res => {
-          this.data = res;
-          return res;
+          this.data = res.docs;
+          this.length = res.length;
+          this.offset = res.offset;
+          return res.docs;
         }),
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),

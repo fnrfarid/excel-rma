@@ -1,3 +1,8 @@
+<ion-fab vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
+  <ion-fab-button class="fab-position" (click)="submitDeliveryNote()">
+    <ion-icon name="lock"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 <ion-card>
   <ion-card-content>
     <ion-grid class="ion-no-padding">
@@ -91,20 +96,22 @@
             <input
               matInput
               placeholder="From Range"
-              (input)="onFromRange($event.target.value)"
-              type="string"
+              type="number"
               name="From Range"
               [(ngModel)]="rangePickerState.fromRange"
+              (ngModelChange)="this.fromRangeUpdate.next($event)"
+              required
             />
           </mat-form-field>
           <mat-form-field class="example-full-width">
             <input
+              type="number"
               matInput
               placeholder="To Range"
-              (input)="onToRange($event.target.value)"
               type="string"
               name="To Range"
               [(ngModel)]="rangePickerState.toRange"
+              (ngModelChange)="this.toRangeUpdate.next($event)"
             />
           </mat-form-field>
           <ion-text color="primary">

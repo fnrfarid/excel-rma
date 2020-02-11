@@ -13,7 +13,7 @@ export class RetrieveCustomerListHandler
       Number(offset),
       Number(limit),
       search,
-      sort,
+      sort.toUpperCase(),
       clientHttpRequest,
     );
   }

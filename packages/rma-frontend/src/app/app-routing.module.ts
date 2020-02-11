@@ -28,6 +28,10 @@ const routes: Routes = [
     loadChildren: './sales-ui/sales/sales.module#SalesPageModule',
   },
   {
+    path: 'warranty',
+    loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
+  },
+  {
     path: 'add-sales-invoice/:calledFrom',
     loadChildren:
       './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
@@ -51,8 +55,9 @@ const routes: Routes = [
     loadChildren:
       './sales-ui/view-sales-invoice/view-sales-invoice.module#ViewSalesInvoicePageModule',
   },
+
   {
-    path: 'warranty',
+    path: 'warranty-tabs/:calledFrom',
     loadChildren:
       './warranty-ui/warranty-tabs/warranty-tabs.module#WarrantyTabsPageModule',
   },
@@ -85,6 +90,13 @@ const routes: Routes = [
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
+  {
+    path: 'warranty',
+    loadChildren: () =>
+      import('./warranty-ui/warranty/warranty.module').then(
+        m => m.WarrantyPageModule,
+      ),
+  },
 ];
 
 @NgModule({

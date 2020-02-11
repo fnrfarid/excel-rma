@@ -28,6 +28,9 @@ export class CustomerAggregateService extends AggregateRoot {
   }
 
   async getCustomerList(offset, limit, search, sort, clientHttpRequest) {
+    if (sort !== 'ASC') {
+      sort = 'DESC';
+    }
     return await this.customerService.list(offset, limit, search, sort);
   }
 
