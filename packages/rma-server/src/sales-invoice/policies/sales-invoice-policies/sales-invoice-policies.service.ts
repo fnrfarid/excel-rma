@@ -125,10 +125,10 @@ export class SalesInvoicePoliciesService {
     const salesInvoiceName: any[] = Array.from(data);
     if (salesInvoiceName.length === 1) {
       return from(
-        this.salesInvoiceService.findOne({ name: salesInvoiceName }),
+        this.salesInvoiceService.findOne({ name: salesInvoiceName[0] }),
       ).pipe(
         switchMap(salesInvoice => {
-          return salesInvoiceName;
+          return of(salesInvoice);
         }),
       );
     }
