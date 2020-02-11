@@ -74,6 +74,7 @@ export class AddSalesReturnPage implements OnInit {
     salesReturn.items = this.dataSource.filter((item: Item) => {
       item.against_sales_invoice = this.salesInvoiceDetails.name;
       item.qty = 0 - item.qty;
+      item.rate = 0 - item.rate;
       item.amount = item.rate * item.qty;
       salesReturn.total += item.amount;
       salesReturn.total_qty += item.qty;
