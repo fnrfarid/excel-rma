@@ -1,9 +1,19 @@
+<ion-fab vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
+  <ion-fab-button class="fab-position" (click)="submitPurchaseReceipt()">
+    <ion-icon name="lock"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 <ion-card>
   <ion-card-content>
     <ion-grid class="ion-no-padding">
       <ion-row class="align">
         <ion-col class="ion-text-left">
-          <input type="file" id="txtFileUpload" accept=".csv" />
+          <input
+            type="file"
+            id="txtFileUpload"
+            (change)="fileChangedEvent($event)"
+            accept=".csv"
+          />
         </ion-col>
         <ion-col>
           <mat-form-field class="example-full-width transform">
@@ -62,6 +72,207 @@
   </ion-card-content>
 </ion-card>
 
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Serial Range</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              placeholder="Prefix"
+              (input)="onPrefixChange($event.target.value)"
+              type="text"
+              name="Prefix"
+              [(ngModel)]="rangePickerState.prefix"
+            />
+          </mat-form-field>
+        </ion-col>
+        <ion-col>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              placeholder="From Range"
+              type="number"
+              name="From Range"
+              [(ngModel)]="rangePickerState.fromRange"
+              (ngModelChange)="this.fromRangeUpdate.next($event)"
+              required
+            />
+          </mat-form-field>
+          <mat-form-field class="example-full-width">
+            <input
+              type="number"
+              matInput
+              placeholder="To Range"
+              type="string"
+              name="To Range"
+              [(ngModel)]="rangePickerState.toRange"
+              (ngModelChange)="this.toRangeUpdate.next($event)"
+            />
+          </mat-form-field>
+          <ion-text color="primary">
+            <h3>Total : {{ rangePickerState.serials.length }}</h3>
+          </ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<ion-card>
+  <ion-card-content>
+    <ion-card-title>Products</ion-card-title>
+    <mat-table #table [dataSource]="itemDataSource" style="width: 100%;">
+      <ng-container matColumnDef="item_code">
+        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_code }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="item_name">
+        <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_name }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="qty">
+        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.qty }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="assigned">
+        <mat-header-cell *matHeaderCellDef>Assigned</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.assigned || 0 }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="remaining">
+        <mat-header-cell *matHeaderCellDef>Remaining</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ row.remaining || 0 }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="add_serial">
+        <mat-header-cell *matHeaderCellDef>Add Serials</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ion-button
+            [disabled]="row.remaining === 0"
+            fill="outline"
+            (click)="assignSerial(row)"
+          >
+            <ion-icon name="Add"></ion-icon>
+          </ion-button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="itemDisplayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: itemDisplayedColumns"></mat-row>
+    </mat-table>
+  </ion-card-content>
+</ion-card>
+
+<ion-card>
+  <ion-card-content>
+    <ion-card-title>Serials</ion-card-title>
+    <mat-table #table [dataSource]="serialDataSource" style="width: 100%;">
+      <ng-container matColumnDef="item_code">
+        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_code }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="item_name">
+        <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_name }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="qty">
+        <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.qty }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- <ng-container matColumnDef="warranty_date">
+        <mat-header-cell *matHeaderCellDef>Warranty Date</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <input
+            class="example-full-width"
+            matInput
+            [(ngModel)]="row.warranty_date"
+            [matDatepicker]="warranty_date"
+            disabled
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="warranty_date"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #warranty_date disabled="false"></mat-datepicker>
+        </mat-cell>
+      </ng-container> -->
+
+      <ng-container matColumnDef="serial_no">
+        <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <input
+            *ngIf="row.serial_no.length === 1 ? true : false"
+            [(ngModel)]="row.serial_no[0]"
+          />
+          <p *ngIf="row.serial_no.length === 1 ? false : true">
+            {{ getSerialsInputValue(row) }}
+          </p>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <mat-header-cell *matHeaderCellDef>Delete Serials</mat-header-cell>
+        <mat-cell *matCellDef="let row; let i = index">
+          <ion-button color="danger" fill="clear" (click)="deleteRow(row, i)">
+            <ion-icon name="trash"></ion-icon>
+          </ion-button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="serialDisplayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="let row; columns: serialDisplayedColumns; let i = index"
+      ></mat-row>
+    </mat-table>
+  </ion-card-content>
+</ion-card>
+
+<!--
 <ion-card>
   <ion-card-header>
     <ion-row class="align">
@@ -161,4 +372,4 @@
       <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
     </mat-table>
   </ion-card-content>
-</ion-card>
+</ion-card> -->

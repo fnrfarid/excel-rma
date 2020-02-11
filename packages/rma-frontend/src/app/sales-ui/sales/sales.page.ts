@@ -59,7 +59,7 @@ export class SalesPage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map(event => {
-          this.dataSource.loadItems();
+          this.dataSource.loadItems(undefined);
           return event;
         }),
       )
