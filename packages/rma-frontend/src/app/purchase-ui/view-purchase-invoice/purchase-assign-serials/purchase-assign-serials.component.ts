@@ -25,8 +25,8 @@ import {
   SerialDataSource,
 } from '../../../sales-ui/view-sales-invoice/serials/serials-datasource';
 import * as _ from 'lodash';
-import { Item } from 'src/app/common/interfaces/sales.interface';
-import { AssignSerialsDialog } from 'src/app/sales-ui/view-sales-invoice/serials/serials.component';
+import { Item } from '../../../common/interfaces/sales.interface';
+import { AssignSerialsDialog } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
 
 @Component({
   selector: 'purchase-assign-serials',

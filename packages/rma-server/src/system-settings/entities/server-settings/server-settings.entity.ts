@@ -73,6 +73,9 @@ export class ServerSettings extends BaseEntity {
   @Column()
   timeZone: string;
 
+  @Column()
+  validateStock: boolean;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();
