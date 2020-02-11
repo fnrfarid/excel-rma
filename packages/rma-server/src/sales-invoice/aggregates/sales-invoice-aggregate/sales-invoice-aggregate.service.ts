@@ -31,6 +31,7 @@ import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
 import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
+  LIST_CREDIT_NOTE_ENDPOINT,
 } from '../../../constants/routes';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
@@ -196,7 +197,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       )
       .pipe(map(data => data.data.data))
       .pipe(
-        switchMap(success => {
+        switchMap(successResponse => {
           return from(
             this.salesInvoiceService.updateOne(
               { uuid: salesInvoice.uuid },
@@ -205,7 +206,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   isSynced: true,
                   submitted: true,
                   inQueue: false,
-                  name: success.name,
+                  name: successResponse.name,
                 },
               },
             ),
@@ -273,7 +274,13 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             createReturnPayload,
           ),
         ).pipe(
-          switchMap(salesReturn => {
+          switchMap((salesInvoice: SalesInvoice) => {
+            this.createCreditNote(
+              settings,
+              createReturnPayload,
+              clientHttpRequest,
+              salesInvoice,
+            );
             const deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
             this.http
@@ -313,6 +320,61 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         );
       }),
     );
+  }
+
+  createCreditNote(
+    settings,
+    assignPayload: CreateSalesReturnDto,
+    clientHttpRequest,
+    salesInvoice: SalesInvoice,
+  ) {
+    const body = this.mapCreditNote(assignPayload, salesInvoice);
+    return this.http
+      .post(settings.authServerURL + LIST_CREDIT_NOTE_ENDPOINT, body, {
+        headers: {
+          [AUTHORIZATION]:
+            BEARER_HEADER_VALUE_PREFIX + clientHttpRequest.token.accessToken,
+          [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
+          [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
+        },
+      })
+      .pipe(map(data => data.data.data))
+      .subscribe({
+        next: (success: { name: string }) => {
+          this.salesInvoiceService
+            .updateOne(
+              { name: salesInvoice.name },
+              { $set: { credit_note: success.name } },
+            )
+            .then(created => {})
+            .catch(error => {});
+        },
+        error: err => {},
+      });
+  }
+
+  mapCreditNote(
+    assignPayload: CreateSalesReturnDto,
+    salesInvoice: SalesInvoice,
+  ) {
+    // cleanup math calculations after DTO validations are added
+    return {
+      docstatus: 1,
+      customer: assignPayload.customer,
+      is_return: 1,
+      company: assignPayload.company,
+      posting_date: assignPayload.posting_date,
+      return_against: salesInvoice.name,
+      posting_time: assignPayload.posting_time,
+      items: assignPayload.items.map(item => {
+        return {
+          item_code: item.item_code,
+          qty: item.qty,
+          rate: item.rate,
+          amount: item.amount,
+        };
+      }),
+    };
   }
 
   mapCreateDeliveryNote(

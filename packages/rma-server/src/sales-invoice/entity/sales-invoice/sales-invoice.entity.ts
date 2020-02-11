@@ -123,6 +123,9 @@ export class SalesInvoice extends BaseEntity {
   submitted: boolean;
 
   @Column()
+  credit_note: string;
+
+  @Column()
   inQueue: boolean;
 
   @Column()
