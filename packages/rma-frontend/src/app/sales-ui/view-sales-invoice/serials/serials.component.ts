@@ -427,6 +427,8 @@ export class SerialsComponent implements OnInit {
     }
     return result;
   }
+
+  claimsDate(event) {}
 }
 
 export interface SerialItem {
