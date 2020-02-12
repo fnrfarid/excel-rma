@@ -32,12 +32,12 @@ const routes: Routes = [
     loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
   },
   {
-    path: 'add-sales-invoice/:calledFrom',
+    path: 'sales/add-sales-invoice/:calledFrom',
     loadChildren:
       './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
   },
   {
-    path: 'add-sales-invoice/:calledFrom/:invoiceUuid',
+    path: 'sales/add-sales-invoice/:calledFrom/:invoiceUuid',
     loadChildren:
       './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
   },
@@ -51,7 +51,7 @@ const routes: Routes = [
     loadChildren: './purchase-ui/purchase/purchase.module#PurchasePageModule',
   },
   {
-    path: 'view-sales-invoice/:invoiceUuid',
+    path: 'sales/view-sales-invoice/:invoiceUuid',
     loadChildren:
       './sales-ui/view-sales-invoice/view-sales-invoice.module#ViewSalesInvoicePageModule',
   },
@@ -67,14 +67,14 @@ const routes: Routes = [
     canActivate: [SystemManagerGuard],
   },
   {
-    path: 'view-purchase-invoice/:invoiceUuid',
+    path: 'purchase/view-purchase-invoice/:invoiceUuid',
     loadChildren: () =>
       import(
         './purchase-ui/view-purchase-invoice/view-purchase-invoice.module'
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
   {
-    path: 'add-sales-return/:invoiceUuid',
+    path: 'sales/add-sales-return/:invoiceUuid',
     loadChildren: () =>
       import('./sales-ui/add-sales-return/add-sales-return.module').then(
         m => m.AddSalesReturnPageModule,
