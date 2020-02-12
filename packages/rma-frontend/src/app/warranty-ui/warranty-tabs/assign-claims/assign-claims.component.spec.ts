@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AssignClaimsComponent } from './assign-claims.component';
 import { MaterialModule } from '../../../material/material.module';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 describe('AssignClaimsComponent', () => {
   let component: AssignClaimsComponent;

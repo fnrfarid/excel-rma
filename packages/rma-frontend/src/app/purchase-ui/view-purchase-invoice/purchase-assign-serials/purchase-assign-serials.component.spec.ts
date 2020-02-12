@@ -6,7 +6,7 @@ import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { of } from 'rxjs';
 import { PurchaseService } from '../../services/purchase.service';
