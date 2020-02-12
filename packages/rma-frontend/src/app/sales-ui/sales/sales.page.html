@@ -26,7 +26,7 @@
               <ion-col class="ion-text-right">
                 <ion-button
                   color="tertiary"
-                  [routerLink]="['/add-sales-invoice', 'add']"
+                  [routerLink]="['/sales/add-sales-invoice', 'add']"
                 >
                   Add
                 </ion-button>
@@ -135,7 +135,8 @@
                   Delivered By
                 </th>
                 <td mat-cell *matCellDef="let row">
-                  {{ (row.delivery_note_items.length === 0) ? '' :  row.delivery_note_items[0]?.deliveredByEmail }}
+                  {{ (row.delivery_note_items.length === 0) ? '' :
+                  row.delivery_note_items[0]?.deliveredByEmail }}
                 </td>
               </ng-container>
               <!-- posting_date Column -->
