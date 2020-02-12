@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PurchaseService } from '../services/purchase.service';
 import { PurchaseInvoiceDataSource } from './purchase-invoice-datasource';
-import { MatSort, MatPaginator } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 import { PurchaseInvoice } from '../../common/interfaces/purchase.interface';
 import { Location } from '@angular/common';
 

@@ -4,7 +4,8 @@ import { Observable, Subject } from 'rxjs';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { PurchaseService } from '../../services/purchase.service';
 import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar, MatDialog } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import {
   startWith,
   switchMap,

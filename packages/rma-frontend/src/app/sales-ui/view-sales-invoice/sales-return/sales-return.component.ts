@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { SalesReturnDataSource } from './sales-return.datasource';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { SalesReturnService } from './sales-return.service';
 import { ActivatedRoute } from '@angular/router';
 
