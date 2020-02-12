@@ -127,4 +127,6 @@ export class AddSalesReturnPage implements OnInit {
   navigateBack() {
     this.location.back();
   }
+
+  selectedPostingDate(event) {}
 }
