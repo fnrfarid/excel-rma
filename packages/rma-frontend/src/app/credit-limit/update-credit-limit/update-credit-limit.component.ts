@@ -3,7 +3,11 @@ import { NavParams, PopoverController, ToastController } from '@ionic/angular';
 import { FormGroup, FormControl } from '@angular/forms';
 
 import { UpdateCreditLimitService } from './update-credit-limit.service';
-import { UPDATE_ERROR, SHORT_DURATION } from '../../constants/app-string';
+import {
+  UPDATE_ERROR,
+  SHORT_DURATION,
+  CLOSE,
+} from '../../constants/app-string';
 
 @Component({
   selector: 'app-update-credit-limit',
@@ -68,7 +72,7 @@ export class UpdateCreditLimitComponent implements OnInit {
             .create({
               message: UPDATE_ERROR,
               duration: SHORT_DURATION,
-              showCloseButton: true,
+              buttons: [{ text: CLOSE }],
             })
             .then(toast => toast.present());
         },

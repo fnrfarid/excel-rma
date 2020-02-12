@@ -16,7 +16,7 @@ import {
   DURATION,
   UPDATE_ERROR,
 } from '../../constants/app-string';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ItemPriceService } from '../services/item-price.service';
 import { INSUFFICIENT_STOCK_BALANCE } from '../../constants/messages';
 

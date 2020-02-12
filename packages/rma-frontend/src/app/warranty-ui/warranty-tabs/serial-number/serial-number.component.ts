@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { SerialNumberDataSource } from './serial-number-datasource';
 import { WarrantyService } from '../warranty.service';
 import { SERIAL_NO } from '../../../constants/storage';

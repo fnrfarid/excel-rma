@@ -9,12 +9,12 @@ import {
   debounceTime,
   distinctUntilChanged,
 } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
-  MatSnackBar,
   MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialog,
-} from '@angular/material';
+} from '@angular/material/dialog';
 import { CLOSE } from '../../../constants/app-string';
 import {
   ERROR_FETCHING_SALES_INVOICE,
