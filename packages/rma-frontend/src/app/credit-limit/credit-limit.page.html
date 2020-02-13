@@ -108,7 +108,7 @@
         <mat-paginator
           #paginator
           class="mat-paginator-sticky"
-          (page)="getUpdate($event)"
+          (page)="setFilter($event)"
           [length]="dataSource.length"
           [pageSizeOptions]="[10, 50, 100, 500]"
         >

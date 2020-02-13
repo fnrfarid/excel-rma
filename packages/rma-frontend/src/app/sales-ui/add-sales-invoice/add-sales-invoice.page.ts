@@ -43,6 +43,7 @@ export class AddSalesInvoicePage implements OnInit {
   customerFormControl = new FormControl('', [Validators.required]);
   postingDateFormControl = new FormControl('', [Validators.required]);
   dueDateFormControl = new FormControl('', [Validators.required]);
+  campaignInvoiceFormControl = new FormControl('');
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -72,6 +73,7 @@ export class AddSalesInvoicePage implements OnInit {
           this.dueDateFormControl.setValue(new Date(res.due_date));
           this.dataSource.loadItems(res.items);
           this.calculateTotal(res.items);
+          this.campaignInvoiceFormControl.setValue(res.isCampaign);
         },
       });
     }
@@ -229,6 +231,7 @@ export class AddSalesInvoicePage implements OnInit {
     if (isValid) {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
       salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
+      salesInvoiceDetails.isCampaign = this.campaignInvoiceFormControl.value;
       salesInvoiceDetails.company = this.companyFormControl.value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
         this.postingDateFormControl.value,
@@ -284,6 +287,7 @@ export class AddSalesInvoicePage implements OnInit {
     if (isValid) {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
       salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
+      salesInvoiceDetails.isCampaign = this.campaignInvoiceFormControl.value;
       salesInvoiceDetails.company = this.companyFormControl.value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
         this.postingDateFormControl.value,

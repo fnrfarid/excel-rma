@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE, REJECTED } from '../../../constants/app-string';
@@ -7,6 +7,7 @@ import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -19,22 +20,34 @@ export class DetailsComponent implements OnInit {
   dataSource: SalesInvoiceItem[];
   invoiceUuid: string;
   viewSalesInvoiceUrl: string;
+  campaign: boolean;
 
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
     private location: Location,
+    private readonly router: Router,
   ) {}
 
   ngOnInit() {
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.getSalesInvoice(this.invoiceUuid);
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe({
+        next: event => {
+          if (this.invoiceUuid) {
+            this.getSalesInvoice(this.invoiceUuid);
+          }
+        },
+      });
   }
 
   getSalesInvoice(uuid: string) {
     this.salesService.getSalesInvoice(uuid).subscribe({
       next: (success: any) => {
+        this.campaign = success.isCampaign;
         this.salesInvoiceDetails = success;
         this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
           .address_display
@@ -119,6 +132,7 @@ export class SalesInvoiceDetails {
   name?: string;
   delivery_note_items?: Item[];
   delivery_warehouse?: string;
+  isCampaign?: boolean;
 }
 
 export class SalesInvoiceItem {
