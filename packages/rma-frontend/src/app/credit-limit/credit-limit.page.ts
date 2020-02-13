@@ -78,6 +78,4 @@ export class CreditLimitPage implements OnInit {
       this.paginator.pageSize,
     );
   }
-
-  getUpdate(event) {}
 }
