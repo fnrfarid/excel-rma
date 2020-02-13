@@ -32,6 +32,17 @@ export class WarrantyPage implements OnInit {
     'delivered_by',
     'invoice_no',
   ];
+  customer: string;
+  claimNo: string;
+  thirdParty: string;
+  product: string;
+  fromDate: string;
+  claimStatus: string;
+  claimType: string;
+  territory: string;
+  serial: string;
+  toDate: string;
+
   constructor(private location: Location) {}
 
   ngOnInit() {
@@ -52,6 +63,16 @@ export class WarrantyPage implements OnInit {
 
   setFilter(event?) {
     const query: any = {};
+    if (this.customer) query.customer = this.customer;
+    if (this.claimNo) query.claimNo = this.claimNo;
+    if (this.thirdParty) query.thirdParty = this.thirdParty;
+    if (this.product) query.product = this.product;
+    if (this.fromDate) query.fromDate = this.fromDate;
+    if (this.claimStatus) query.claimStatus = this.claimStatus;
+    if (this.claimType) query.claimType = this.claimType;
+    if (this.territory) query.territory = this.territory;
+    if (this.serial) query.serial = this.serial;
+    if (this.toDate) query.toDate = this.toDate;
 
     const sortQuery = {};
     if (event) {

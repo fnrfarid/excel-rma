@@ -118,11 +118,28 @@
           </ion-col>
         </ion-row>
         <ion-row class="align">
-          <ion-col>
-            <ion-item lines="none">
-              <ion-label>Campaign Invoice</ion-label>
-              <ion-checkbox slot="start"></ion-checkbox>
-            </ion-item>
+          <ion-col size-md="6">
+            <mat-form-field class="example-full-width">
+              <input
+                type="text"
+                placeholder="Select Warehouse"
+                matInput
+                [formControl]="warehouseFormControl"
+                [matAutocomplete]="warehouse"
+              />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #warehouse="matAutocomplete"
+                (optionSelected)="updateStockBalance($event.option.value)"
+              >
+                <mat-option
+                  *ngFor="let warehouse of filteredWarehouseList | async"
+                  [value]="warehouse.name"
+                >
+                  {{ warehouse.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
           </ion-col>
           <ion-col>
             <mat-form-field class="example-full-width">
@@ -146,27 +163,12 @@
           </ion-col>
         </ion-row>
         <ion-row>
-          <ion-col size-md="6">
-            <mat-form-field class="example-full-width">
-              <input
-                type="text"
-                placeholder="Select Warehouse"
-                matInput
-                [formControl]="warehouseFormControl"
-                [matAutocomplete]="warehouse"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #warehouse="matAutocomplete"
-                (optionSelected)="updateStockBalance($event.option.value)"
-              >
-                <mat-option
-                  *ngFor="let warehouse of filteredWarehouseList | async"
-                  [value]="warehouse.name"
-                >
-                  {{ warehouse.name }}
-                </mat-option>
-              </mat-autocomplete>
+          <ion-col>
+            <mat-form-field class="mat-input-wrapper" appearance="none">
+              <mat-checkbox matInput [formControl]="campaignInvoiceFormControl">
+                Campaign Invoice
+              </mat-checkbox>
+              <input matInput disabled />
             </mat-form-field>
           </ion-col>
         </ion-row>

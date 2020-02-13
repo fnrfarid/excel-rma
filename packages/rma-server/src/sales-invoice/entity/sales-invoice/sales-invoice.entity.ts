@@ -130,6 +130,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   isSynced: boolean;
+
+  @Column()
+  isCampaign: boolean;
 }
 
 export class Tax {

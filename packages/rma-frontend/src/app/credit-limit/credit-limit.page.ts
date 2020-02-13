@@ -70,7 +70,7 @@ export class CreditLimitPage implements OnInit {
     return await popover.present();
   }
 
-  setFilter() {
+  setFilter(event?) {
     this.dataSource.loadItems(
       this.search,
       this.sort.direction,

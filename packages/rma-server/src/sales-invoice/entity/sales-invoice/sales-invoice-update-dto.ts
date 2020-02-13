@@ -125,6 +125,9 @@ export class SalesInvoiceUpdateDto {
 
   @IsOptional()
   sales_team: any[];
+
+  @IsOptional()
+  isCampaign: boolean;
 }
 
 export class TaxDto {
