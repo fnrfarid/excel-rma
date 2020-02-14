@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { of, from } from 'rxjs';
 import * as CSVTOJSON from 'csvjson-csv2json';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../constants/app-string';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { switchMap, map } from 'rxjs/operators';
