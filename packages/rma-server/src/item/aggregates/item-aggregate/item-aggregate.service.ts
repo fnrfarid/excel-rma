@@ -32,4 +32,12 @@ export class ItemAggregateService extends AggregateRoot {
     if (!item) throw new NotFoundException();
     return item;
   }
+
+  async retrieveItemByNames(items_names: string[], req) {
+    const item = await this.itemService.find({
+      item_name: { $in: items_names },
+    });
+    if (!item) throw new NotFoundException();
+    return item;
+  }
 }

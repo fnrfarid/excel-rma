@@ -10,6 +10,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
 import { Location } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 
 describe('SerialsComponent', () => {
   let component: SerialsComponent;
@@ -23,6 +25,7 @@ describe('SerialsComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         BrowserAnimationsModule,
+        HttpClientTestingModule,
         RouterTestingModule.withRoutes([]),
       ],
       providers: [
@@ -42,6 +45,10 @@ describe('SerialsComponent', () => {
         },
         {
           provide: Location,
+          useValue: {},
+        },
+        {
+          provide: CsvJsonService,
           useValue: {},
         },
       ],
