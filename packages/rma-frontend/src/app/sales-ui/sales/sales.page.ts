@@ -2,7 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { SalesService } from '../services/sales.service';
 import { SalesInvoice } from '../../common/interfaces/sales.interface';
 import { Location } from '@angular/common';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
 import { SettingsService } from '../../settings/settings.service';
 import { SYSTEM_MANAGER } from '../../constants/app-string';
@@ -109,10 +110,10 @@ export class SalesPage implements OnInit {
       next: res => {
         let navUrl: string;
         if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
-          navUrl = `${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`;
+          navUrl = `/sales/${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`;
           this.router.navigateByUrl(navUrl);
         } else {
-          navUrl = `${ADD_SALES_INVOICE_PAGE_URL}/edit/${row.uuid}`;
+          navUrl = `/sales/${ADD_SALES_INVOICE_PAGE_URL}/edit/${row.uuid}`;
           this.router.navigateByUrl(navUrl);
         }
       },

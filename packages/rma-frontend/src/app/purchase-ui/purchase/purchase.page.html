@@ -101,7 +101,7 @@
         ></mat-header-row>
         <mat-row
           *matRowDef="let row; columns: displayedColumns;"
-          [routerLink]="['/view-purchase-invoice',row.uuid]"
+          [routerLink]="['/purchase/view-purchase-invoice',row.uuid]"
         ></mat-row>
       </mat-table>
 

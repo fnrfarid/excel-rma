@@ -14,6 +14,8 @@ export class ViewSalesInvoicePage implements OnInit {
   sales_invoice_name: string = '';
   invoiceUuid: string = '';
   deliveryItemCount: number;
+  isCampaign: boolean;
+
   constructor(
     private readonly location: Location,
     private route: ActivatedRoute,
@@ -26,6 +28,7 @@ export class ViewSalesInvoicePage implements OnInit {
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
       next: (res: SalesInvoiceDetails) => {
+        this.isCampaign = res.isCampaign;
         this.deliveryItemCount = res.delivery_note_items
           ? res.delivery_note_items.length
           : 0;

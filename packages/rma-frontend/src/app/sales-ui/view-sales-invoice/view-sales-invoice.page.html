@@ -14,7 +14,7 @@
 <ion-content class="page-background">
   <ion-card>
     <ion-card-header class="ion-no-padding">
-      <ion-segment [(ngModel)]="selectedSegment" scrollable="true">
+      <ion-segment [(ngModel)]="selectedSegment" scrollable="true" class="disable-scrollbars">
         <ion-segment-button value="0">
           <ion-label>Details</ion-label>
         </ion-segment-button>
@@ -26,7 +26,7 @@
         </ion-segment-button>
         <ion-segment-button
           value="3"
-          *ngIf="sales_invoice_name && deliveryItemCount !== 0"
+          *ngIf="sales_invoice_name && deliveryItemCount !== 0 && !isCampaign"
         >
           <ion-label>Sales Return</ion-label>
         </ion-segment-button>
@@ -35,7 +35,7 @@
         </ion-segment-button>
         <ion-segment-button
           value="5"
-          *ngIf="sales_invoice_name && deliveryItemCount !== 0"
+          *ngIf="sales_invoice_name && deliveryItemCount !== 0 && !isCampaign"
         >
           <ion-label>Credit Notes</ion-label>
         </ion-segment-button>

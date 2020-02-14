@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PurchaseService } from '../../services/purchase.service';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { Item } from '../../../common/interfaces/sales.interface';

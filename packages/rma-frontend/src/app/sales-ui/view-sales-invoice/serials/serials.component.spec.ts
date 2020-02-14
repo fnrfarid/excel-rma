@@ -2,7 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SerialsComponent } from './serials.component';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -11,7 +11,7 @@ import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
 import { Location } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { CsvJsonService } from 'src/app/api/csv-json/csv-json.service';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 
 describe('SerialsComponent', () => {
   let component: SerialsComponent;

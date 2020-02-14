@@ -10,19 +10,6 @@
 </ion-header>
 
 <ion-content class="page-background">
-  <ion-fab vertical="top" horizontal="end" slot="fixed">
-    <ion-fab-button color="light">
-      <ion-icon name="settings"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="start">
-      <ion-button color="light" routerLink="/settings/item-price">
-        Item Price
-      </ion-button>
-      <ion-button color="light" routerLink="/settings/credit-limit">
-        Credit Limit
-      </ion-button>
-    </ion-fab-list>
-  </ion-fab>
   <ion-card>
     <ion-card-header>
       <ion-card-title>
@@ -30,6 +17,19 @@
           RMA Server Settings
         </ion-text>
       </ion-card-title>
+      <ion-fab vertical="top" horizontal="end">
+        <ion-fab-button color="light">
+          <ion-icon name="settings"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-list side="start">
+          <ion-button color="light" routerLink="/settings/item-price">
+            Item Price
+          </ion-button>
+          <ion-button color="light" routerLink="/settings/credit-limit">
+            Credit Limit
+          </ion-button>
+        </ion-fab-list>
+      </ion-fab>
     </ion-card-header>
     <ion-card-content>
       <form [formGroup]="companySettingsForm">
@@ -95,6 +95,9 @@
             formControlName="authServerURL"
             readonly
           />
+          <mat-checkbox formControlName="validateStock" matSuffix
+            >Validate Stock</mat-checkbox
+          >
         </mat-form-field>
         <mat-form-field class="mat-input-wrapper">
           <input
@@ -165,7 +168,7 @@
       </ion-card-title>
       <ion-fab vertical="top" horizontal="end">
         <ion-fab-button color="light" (click)="mapTerritory()">
-          <ion-icon name="swap"></ion-icon>
+          <ion-icon name="swap-horizontal-outline"></ion-icon>
         </ion-fab-button>
       </ion-fab>
     </ion-card-header>

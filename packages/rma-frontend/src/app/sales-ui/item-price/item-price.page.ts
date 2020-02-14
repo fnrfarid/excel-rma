@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { Router, NavigationEnd } from '@angular/router';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';

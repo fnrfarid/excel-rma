@@ -10,7 +10,7 @@
       slot="fixed"
     >
       <ion-fab-button>
-        <ion-icon name="lock"></ion-icon>
+        <ion-icon name="lock-closed-outline"></ion-icon>
       </ion-fab-button>
       <ion-fab-list side="start">
         <ion-button color="danger" (click)="rejectSalesInvoice()">
@@ -18,7 +18,7 @@
         </ion-button>
         <ion-button
           color="warning"
-          [routerLink]="['/add-sales-invoice', 'edit', invoiceUuid]"
+          [routerLink]="['/sales/add-sales-invoice', 'edit', invoiceUuid]"
         >
           Edit
         </ion-button>
@@ -163,8 +163,8 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label>Package Invoice</ion-label>
-            <ion-checkbox slot="start"></ion-checkbox>
+            <ion-label>Campaign Invoice</ion-label>
+            <ion-checkbox slot="start" disabled [checked]="campaign"></ion-checkbox>
           </ion-item>
         </ion-col>
         <ion-col>

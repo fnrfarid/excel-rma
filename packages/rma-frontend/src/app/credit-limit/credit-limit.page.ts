@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { PopoverController } from '@ionic/angular';
 import { CreditLimitDataSource } from './credit-limit-datasource';
 import { SalesService } from '../sales-ui/services/sales.service';
@@ -69,7 +70,7 @@ export class CreditLimitPage implements OnInit {
     return await popover.present();
   }
 
-  setFilter() {
+  setFilter(event?) {
     this.dataSource.loadItems(
       this.search,
       this.sort.direction,

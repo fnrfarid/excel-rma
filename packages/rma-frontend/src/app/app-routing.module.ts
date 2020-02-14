@@ -8,6 +8,7 @@ const routes: Routes = [
     loadChildren: () =>
       import('./home/home.module').then(m => m.HomePageModule),
   },
+
   {
     path: 'settings',
     loadChildren: () =>
@@ -21,60 +22,81 @@ const routes: Routes = [
   },
   {
     path: 'callback',
-    loadChildren: './callback/callback.module#CallbackPageModule',
+    loadChildren: () =>
+      import('./callback/callback.module').then(m => m.CallbackPageModule),
   },
   {
     path: 'sales',
-    loadChildren: './sales-ui/sales/sales.module#SalesPageModule',
+    loadChildren: () =>
+      import('./sales-ui/sales/sales.module').then(m => m.SalesPageModule),
   },
   {
     path: 'warranty',
-    loadChildren: './warranty-ui/warranty/warranty.module#WarrantyPageModule',
+    loadChildren: () =>
+      import('./warranty-ui/warranty/warranty.module').then(
+        m => m.WarrantyPageModule,
+      ),
   },
   {
-    path: 'add-sales-invoice/:calledFrom',
-    loadChildren:
-      './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
+    path: 'sales/add-sales-invoice/:calledFrom',
+    loadChildren: () =>
+      import('./sales-ui/add-sales-invoice/add-sales-invoice.module').then(
+        m => m.AddSalesInvoicePageModule,
+      ),
   },
   {
-    path: 'add-sales-invoice/:calledFrom/:invoiceUuid',
-    loadChildren:
-      './sales-ui/add-sales-invoice/add-sales-invoice.module#AddSalesInvoicePageModule',
+    path: 'sales/add-sales-invoice/:calledFrom/:invoiceUuid',
+    loadChildren: () =>
+      import('./sales-ui/add-sales-invoice/add-sales-invoice.module').then(
+        m => m.AddSalesInvoicePageModule,
+      ),
   },
   {
     path: 'add-purchase-invoice',
-    loadChildren:
-      './purchase-ui/add-purchase-invoice/add-purchase-invoice.module#AddPurchaseInvoicePageModule',
+    loadChildren: () =>
+      import(
+        './purchase-ui/add-purchase-invoice/add-purchase-invoice.module'
+      ).then(m => m.AddPurchaseInvoicePageModule),
   },
   {
     path: 'purchase',
-    loadChildren: './purchase-ui/purchase/purchase.module#PurchasePageModule',
+    loadChildren: () =>
+      import('./purchase-ui/purchase/purchase.module').then(
+        m => m.PurchasePageModule,
+      ),
   },
   {
-    path: 'view-sales-invoice/:invoiceUuid',
-    loadChildren:
-      './sales-ui/view-sales-invoice/view-sales-invoice.module#ViewSalesInvoicePageModule',
+    path: 'sales/view-sales-invoice/:invoiceUuid',
+    loadChildren: () =>
+      import('./sales-ui/view-sales-invoice/view-sales-invoice.module').then(
+        m => m.ViewSalesInvoicePageModule,
+      ),
   },
 
   {
     path: 'warranty-tabs/:calledFrom',
-    loadChildren:
-      './warranty-ui/warranty-tabs/warranty-tabs.module#WarrantyTabsPageModule',
+    loadChildren: () =>
+      import('./warranty-ui/warranty-tabs/warranty-tabs.module').then(
+        m => m.WarrantyTabsPageModule,
+      ),
   },
   {
     path: 'settings/item-price',
-    loadChildren: './sales-ui/item-price/item-price.module#ItemPricePageModule',
+    loadChildren: () =>
+      import('./sales-ui/item-price/item-price.module').then(
+        m => m.ItemPricePageModule,
+      ),
     canActivate: [SystemManagerGuard],
   },
   {
-    path: 'view-purchase-invoice/:invoiceUuid',
+    path: 'purchase/view-purchase-invoice/:invoiceUuid',
     loadChildren: () =>
       import(
         './purchase-ui/view-purchase-invoice/view-purchase-invoice.module'
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
   {
-    path: 'add-sales-return/:invoiceUuid',
+    path: 'sales/add-sales-return/:invoiceUuid',
     loadChildren: () =>
       import('./sales-ui/add-sales-return/add-sales-return.module').then(
         m => m.AddSalesReturnPageModule,
@@ -88,15 +110,9 @@ const routes: Routes = [
       ),
     canActivate: [SystemManagerGuard],
   },
+
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
-  {
-    path: 'warranty',
-    loadChildren: () =>
-      import('./warranty-ui/warranty/warranty.module').then(
-        m => m.WarrantyPageModule,
-      ),
-  },
 ];
 
 @NgModule({

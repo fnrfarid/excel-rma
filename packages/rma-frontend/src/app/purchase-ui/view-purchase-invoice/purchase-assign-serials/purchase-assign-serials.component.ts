@@ -4,7 +4,8 @@ import { Observable, Subject } from 'rxjs';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { PurchaseService } from '../../services/purchase.service';
 import { ActivatedRoute } from '@angular/router';
-import { MatSnackBar, MatDialog } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import {
   startWith,
   switchMap,
@@ -25,8 +26,8 @@ import {
   SerialDataSource,
 } from '../../../sales-ui/view-sales-invoice/serials/serials-datasource';
 import * as _ from 'lodash';
-import { Item } from 'src/app/common/interfaces/sales.interface';
-import { AssignSerialsDialog } from 'src/app/sales-ui/view-sales-invoice/serials/serials.component';
+import { Item } from '../../../common/interfaces/sales.interface';
+import { AssignSerialsDialog } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
 
 @Component({
   selector: 'purchase-assign-serials',

@@ -5,16 +5,16 @@ import * as _ from 'lodash';
 import { of, from } from 'rxjs';
 import * as CSVTOJSON from 'csvjson-csv2json';
 import { MatSnackBar } from '@angular/material';
-import { CLOSE } from 'src/app/constants/app-string';
+import { CLOSE } from '../../constants/app-string';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { switchMap, map } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
-} from 'src/app/constants/storage';
+} from '../../constants/storage';
 import { StorageService } from '../storage/storage.service';
-import { CsvJsonObj } from 'src/app/sales-ui/view-sales-invoice/serials/serials.component';
+import { CsvJsonObj } from '../../sales-ui/view-sales-invoice/serials/serials.component';
 import { SalesService } from '../../sales-ui/services/sales.service';
 
 @Injectable({
