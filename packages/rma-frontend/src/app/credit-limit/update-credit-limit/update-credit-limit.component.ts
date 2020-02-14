@@ -68,9 +68,17 @@ export class UpdateCreditLimitComponent implements OnInit {
           this.popoverCtrl.dismiss().then(dismissed => {});
         },
         error: error => {
+          let frappeError = UPDATE_ERROR;
+
+          try {
+            frappeError = JSON.parse(error.error._server_messages);
+            frappeError = JSON.parse(frappeError);
+            frappeError = (frappeError as { message?: string }).message;
+          } catch {}
+
           this.toastCtrl
             .create({
-              message: UPDATE_ERROR,
+              message: frappeError,
               duration: SHORT_DURATION,
               buttons: [{ text: CLOSE }],
             })

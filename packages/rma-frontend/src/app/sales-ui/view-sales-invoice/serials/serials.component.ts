@@ -1,8 +1,14 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { SalesService } from '../../services/sales.service';
 import { FormControl, Validators } from '@angular/forms';
 
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import {
   startWith,
   switchMap,
@@ -29,6 +35,7 @@ import {
   SerialNo,
 } from '../../../common/interfaces/sales.interface';
 import { Location } from '@angular/common';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -36,7 +43,10 @@ import { Location } from '@angular/common';
   styleUrls: ['./serials.component.scss'],
 })
 export class SerialsComponent implements OnInit {
-  csvFile: any;
+  @ViewChild('csvFileInput', { static: false })
+  csvFileInput: ElementRef;
+
+  xlsxData: any;
   value: string;
   date = new FormControl(new Date());
   claimsReceivedDate: string;
@@ -81,6 +91,7 @@ export class SerialsComponent implements OnInit {
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
     private location: Location,
+    private readonly csvService: CsvJsonService,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -136,8 +147,8 @@ export class SerialsComponent implements OnInit {
       start.toString().length > end.toString().length
         ? start.toString().length
         : end.toString().length;
-    for (let i = 0; i < data.length; i++) {
-      data[i] = `${prefix}${this.getPaddedNumber(data[i], maxSerial)}`;
+    for (let value of data) {
+      value = `${prefix}${this.getPaddedNumber(value, maxSerial)}`;
     }
     return data;
   }
@@ -190,20 +201,17 @@ export class SerialsComponent implements OnInit {
     }
   }
 
-  assignRangeSerial(row: Item) {
+  assignRangeSerial(row: Item, serials: string[]) {
     const data = this.serialDataSource.data();
     data.push({
       item_code: row.item_code,
       item_name: row.item_name,
-      qty: this.rangePickerState.serials.length,
+      qty: serials.length,
       rate: row.rate,
       amount: row.amount,
-      serial_no: this.rangePickerState.serials,
+      serial_no: serials,
     });
-    this.updateProductState(
-      row.item_code,
-      this.rangePickerState.serials.length,
-    );
+    this.updateProductState(row.item_code, serials.length);
     this.serialDataSource.update(data);
     this.resetRangeState();
   }
@@ -238,7 +246,7 @@ export class SerialsComponent implements OnInit {
               CLOSE,
               { duration: 2500 },
             )
-          : this.assignRangeSerial(row);
+          : this.assignRangeSerial(row, this.rangePickerState.serials);
       },
       error: err => {},
     });
@@ -394,8 +402,96 @@ export class SerialsComponent implements OnInit {
     const reader = new FileReader();
     reader.readAsText($event.target.files[0]);
     reader.onload = (file: any) => {
-      this.csvFile = file.target.result;
+      const csvData = file.target.result;
+      const licenseHeaders = csvData
+        .split('\n')[0]
+        .replace(/"/g, '')
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+        .split(',');
+      // validate file headers
+      this.csvService.validateHeaders(licenseHeaders)
+        ? // if valid convert to json.
+          this.csvService
+            .csvToJSON(csvData)
+            .pipe(
+              switchMap(json => {
+                // club json data to item_name as unique { blue cotton candy : { serials : [1,2,3..]}, ...  }
+                const data = this.csvService.mapJson(json);
+                // name of all items [ "blue cotton candy" ...]
+                const item_names = [];
+                // obj map for item and number of serial present like - { blue cotton candy : 50  }
+                const itemObj: CsvJsonObj = {};
+
+                // get all item_name and validate from current remaining items and then the API
+                for (const key in data) {
+                  if (key) {
+                    item_names.push(key);
+                    itemObj[key] = {
+                      serial: data[key].serial_no.length,
+                      serial_no: data[key].serial_no,
+                    };
+                  }
+                }
+                // validate Json serials with remaining products to be assigned.
+                return this.validateJson(itemObj)
+                  ? // if valid ping backend to validate found serials
+                    this.csvService.validateSerials(item_names, itemObj).pipe(
+                      switchMap((response: boolean) => {
+                        if (response) {
+                          return of(itemObj);
+                        }
+                        this.csvFileInput.nativeElement.value = '';
+                        return of(false);
+                      }),
+                    )
+                  : of(false);
+              }),
+            )
+            .subscribe({
+              next: (response: CsvJsonObj | boolean) => {
+                response ? this.addSerialsFromCsvJson(response) : null;
+                // reset file input, restart the flow.
+                this.csvFileInput.nativeElement.value = '';
+              },
+              error: err => {
+                this.csvFileInput.nativeElement.value = '';
+              },
+            })
+        : (this.csvFileInput.nativeElement.value = '');
     };
+  }
+  addSerialsFromCsvJson(csvJsonObj: CsvJsonObj | any) {
+    const data = this.itemDataSource.data();
+    data.forEach(element => {
+      this.assignRangeSerial(element, csvJsonObj[element.item_name].serial_no);
+    });
+  }
+
+  getMessage(notFoundMessage, expected?, found?) {
+    return this.snackBar.open(
+      expected && found
+        ? `${notFoundMessage}, expected ${expected} found ${found}`
+        : `${notFoundMessage}`,
+      CLOSE,
+      { duration: 2500 },
+    );
+  }
+
+  validateJson(json: CsvJsonObj) {
+    let isValid = true;
+    const data = this.itemDataSource.data();
+    for (const value of data) {
+      if (json[value.item_name]) {
+        if (value.remaining !== json[value.item_name].serial) {
+          this.getMessage(`Item ${value.item_name} has
+          ${value.remaining} remaining, but provided
+          ${json[value.item_name].serial} serials.`);
+          isValid = false;
+          break;
+        }
+      }
+    }
+    return isValid;
   }
 
   getParsedDate(value) {
@@ -408,29 +504,15 @@ export class SerialsComponent implements OnInit {
     ].join('-');
   }
 
-  csvJSON() {
-    // don't try to optimize or work with this code this will fail to convert csv which have hidden characters such as ",; simply use
-    // csvjson-csv2json library run the snippet npm i csvjson-csv2json
-    // use it like CSVTOJSON.csv2json(YOUR_CSV_STRING, { parseNumbers: true });
-    const lines = this.csvFile.split('\n');
-    const result = [];
-    const headers = lines[0].split(',');
-
-    for (let i = 1; i < lines.length; i++) {
-      const obj = {};
-      const currentline = lines[i].split(',');
-
-      for (let j = 0; j < headers.length; j++) {
-        obj[headers[j]] = currentline[j];
-      }
-      result.push(obj);
-    }
-    return result;
-  }
-
   claimsDate(event) {}
 }
 
+export interface CsvJsonObj {
+  [key: string]: {
+    serial: number;
+    serial_no: string[];
+  };
+}
 export interface SerialItem {
   item_code: string;
   item_name: string;
