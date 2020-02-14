@@ -12,6 +12,8 @@ import {
   API_ITEM_LIST,
   API_ITEM_SET_MIN_PRICE,
   RELAY_GET_STOCK_BALANCE_ENDPOINT,
+  GET_BALANCE_ON_ENDPOINT,
+  RELAY_API_RES_COMPANY,
 } from '../../constants/url-strings';
 import { ItemListResponse } from '../item-price/item-price.datasource';
 
@@ -74,6 +76,38 @@ export class ItemPriceService {
           },
         );
       }),
+    );
+  }
+
+  getRemainingBalance(
+    account: string,
+    date: string,
+    party_type: string,
+    party: string,
+    company: string,
+    headers,
+  ) {
+    const params = new HttpParams()
+      .append('account', account)
+      .append('date', date)
+      .append('party_type', party_type)
+      .append('party', party)
+      .append('company', company)
+      .append('ignore_account_permission', 'true');
+
+    return this.http
+      .get<{ message: any }>(GET_BALANCE_ON_ENDPOINT, { params, headers })
+      .pipe(map(res => res.message));
+  }
+
+  getCompany(company: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(RELAY_API_RES_COMPANY + '/' + company, {
+          headers,
+        });
+      }),
+      map(res => res.data),
     );
   }
 

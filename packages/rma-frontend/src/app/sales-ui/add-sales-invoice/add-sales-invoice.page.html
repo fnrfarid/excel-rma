@@ -171,6 +171,17 @@
               <input matInput disabled />
             </mat-form-field>
           </ion-col>
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input
+                matInput
+                placeholder="Remaining Balance"
+                readonly
+                [value]="remainingBalanceFormControl.value | curFormat | async"
+                [formControl]="remainingBalanceFormControl"
+              />
+            </mat-form-field>
+          </ion-col>
         </ion-row>
       </ion-grid>
     </ion-card-content>

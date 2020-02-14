@@ -483,8 +483,8 @@ export class SerialsComponent implements OnInit {
     for (const value of data) {
       if (json[value.item_name]) {
         if (value.remaining !== json[value.item_name].serial) {
-          this.getMessage(`Item ${value.item_name} has 
-          ${value.remaining} remaining, but provided 
+          this.getMessage(`Item ${value.item_name} has
+          ${value.remaining} remaining, but provided
           ${json[value.item_name].serial} serials.`);
           isValid = false;
           break;
@@ -503,6 +503,8 @@ export class SerialsComponent implements OnInit {
       date.getDate(),
     ].join('-');
   }
+
+  claimsDate(event) {}
 }
 
 export interface CsvJsonObj {

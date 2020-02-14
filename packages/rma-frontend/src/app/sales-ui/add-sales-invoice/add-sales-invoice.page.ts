@@ -7,9 +7,14 @@ import { Location } from '@angular/common';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 
 import { FormControl, Validators } from '@angular/forms';
-import { Observable, throwError, of, from } from 'rxjs';
+import { Observable, throwError, of, from, forkJoin } from 'rxjs';
 import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
-import { DEFAULT_COMPANY } from '../../constants/storage';
+import {
+  DEFAULT_COMPANY,
+  ACCESS_TOKEN,
+  AUTHORIZATION,
+  BEARER_TOKEN_PREFIX,
+} from '../../constants/storage';
 import {
   DRAFT,
   CLOSE,
@@ -19,6 +24,7 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ItemPriceService } from '../services/item-price.service';
 import { INSUFFICIENT_STOCK_BALANCE } from '../../constants/messages';
+import { TimeService } from '../../api/time/time.service';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -44,6 +50,7 @@ export class AddSalesInvoicePage implements OnInit {
   postingDateFormControl = new FormControl('', [Validators.required]);
   dueDateFormControl = new FormControl('', [Validators.required]);
   campaignInvoiceFormControl = new FormControl('');
+  remainingBalanceFormControl = new FormControl('');
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -52,6 +59,7 @@ export class AddSalesInvoicePage implements OnInit {
     private readonly snackbar: MatSnackBar,
     private location: Location,
     private readonly router: Router,
+    private readonly time: TimeService,
   ) {}
 
   ngOnInit() {
@@ -69,6 +77,7 @@ export class AddSalesInvoicePage implements OnInit {
             customer_name: res.customer,
             owner: res.contact_email,
           });
+          this.getRemainingBalance();
           this.postingDateFormControl.setValue(new Date(res.posting_date));
           this.dueDateFormControl.setValue(new Date(res.due_date));
           this.dataSource.loadItems(res.items);
@@ -103,6 +112,7 @@ export class AddSalesInvoicePage implements OnInit {
             .then(items => {
               if (items[DEFAULT_COMPANY]) {
                 this.companyFormControl.setValue(items[DEFAULT_COMPANY]);
+                this.getRemainingBalance();
               } else {
                 this.getApiInfo();
               }
@@ -218,6 +228,8 @@ export class AddSalesInvoicePage implements OnInit {
       date.setDate(date.getDate() + customer.credit_days);
       this.dueDateFormControl.setValue(date);
     } else this.dueDateFormControl.setValue('');
+
+    this.getRemainingBalance();
   }
 
   navigateBack() {
@@ -397,5 +409,49 @@ export class AddSalesInvoicePage implements OnInit {
         return of(info);
       }),
     );
+  }
+
+  getRemainingBalance() {
+    forkJoin({
+      time: from(this.time.getDateTime(new Date())),
+      token: from(this.salesService.getStore().getItem(ACCESS_TOKEN)),
+      company: this.itemPriceService.getCompany(this.companyFormControl.value),
+    })
+      .pipe(
+        switchMap(({ token, time, company }) => {
+          const headers = {
+            [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+          };
+          return this.itemPriceService.getRemainingBalance(
+            'debtors - ' + company.abbr,
+            time,
+            'Customer',
+            this.customerFormControl.value.name,
+            company.name,
+            headers,
+          );
+        }),
+      )
+      .subscribe({
+        next: message => {
+          // credit limit defaults to twice the debtor
+          let creditLimit = message;
+          const creditLimits: {
+            company: string;
+            credit_limit: number;
+          }[] = this.customerFormControl.value.credit_limits;
+
+          const limits = creditLimits.filter(
+            limit => limit.company === this.companyFormControl.value,
+          );
+
+          if (limits.length) {
+            creditLimit = Number(limits[0].credit_limit) - Number(message);
+          }
+
+          this.remainingBalanceFormControl.setValue(creditLimit);
+        },
+        error: error => {},
+      });
   }
 }
