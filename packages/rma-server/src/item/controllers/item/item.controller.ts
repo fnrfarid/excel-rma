@@ -7,6 +7,7 @@ import {
   UseGuards,
   Post,
   Body,
+  BadRequestException,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { RetrieveItemQuery } from '../../query/get-item/retrieve-item.query';
@@ -17,6 +18,8 @@ import { SYSTEM_MANAGER } from '../../../constants/app-strings';
 import { RoleGuard } from '../../../auth/guards/role.guard';
 import { SetMinimumItemPriceCommand } from '../../commands/set-minimum-item-price/set-minimum-item-price.command';
 import { RetrieveItemByCodeQuery } from '../../query/get-item-by-code/retrieve-item-by-code-.query';
+import { RetrieveItemByNamesQuery } from '../../query/get-item-by-names/retrieve-item-by-names-.query';
+import { INVALID_ITEM_NAME_QUERY } from '../../../constants/messages';
 
 @Controller('item')
 export class ItemController {
@@ -35,6 +38,20 @@ export class ItemController {
   @UseGuards(TokenGuard)
   async getItemByCode(@Param('code') code, @Req() req) {
     return await this.queryBus.execute(new RetrieveItemByCodeQuery(code, req));
+  }
+
+  @Get('v1/get_by_names')
+  @UseGuards(TokenGuard)
+  async getItemByNames(@Query('item_names') item_names: string, @Req() req) {
+    let query = [];
+    try {
+      query = JSON.parse(item_names);
+    } catch {
+      throw new BadRequestException(INVALID_ITEM_NAME_QUERY);
+    }
+    return await this.queryBus.execute(
+      new RetrieveItemByNamesQuery(query, req),
+    );
   }
 
   @Get('v1/list')

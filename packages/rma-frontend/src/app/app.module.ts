@@ -2,12 +2,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import * as localforage from 'localforage';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppService } from './app.service';
@@ -24,6 +22,7 @@ import { SERVICE_NAME } from './constants/storage';
 import { AppCommonModule } from './common/app-common.module';
 import { TimeService } from './api/time/time.service';
 import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
+import { CsvJsonService } from './api/csv-json/csv-json.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -46,6 +45,7 @@ import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
     StatusBar,
     MessageService,
     TimeService,
+    CsvJsonService,
     HttpErrorHandler,
     SplashScreen,
     SystemManagerGuard,

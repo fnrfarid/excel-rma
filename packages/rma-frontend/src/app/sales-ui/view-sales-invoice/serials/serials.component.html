@@ -9,6 +9,7 @@
       <ion-row class="align">
         <ion-col class="ion-text-left">
           <input
+            #csvFileInput
             type="file"
             id="txtFileUpload"
             (change)="fileChangedEvent($event)"
@@ -242,8 +243,9 @@
 
       <ng-container matColumnDef="serial_no">
         <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
-        <mat-cell *matCellDef="let row">
+        <mat-cell appearance="outline" *matCellDef="let row">
           <input
+            matInput
             *ngIf="row.serial_no.length === 1 ? true : false"
             [(ngModel)]="row.serial_no[0]"
           />
