@@ -42,7 +42,14 @@ function checkConnection() {
 
 function configureServer() {
   if [ ! -f .env ]; then
-    dockerize -template docker/env.tmpl:.env
+    envsubst '${DB_HOST}
+      ${DB_NAME}
+      ${DB_USER}
+      ${DB_PASSWORD}
+      ${CACHE_DB_NAME}
+      ${CACHE_DB_PASSWORD}
+      ${CACHE_DB_USER}' \
+      < docker/env.tmpl > .env
   fi
 }
 export -f configureServer

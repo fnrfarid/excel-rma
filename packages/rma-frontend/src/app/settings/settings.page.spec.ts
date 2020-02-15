@@ -37,6 +37,8 @@ describe('SettingsPage', () => {
             getSettings: (...args) => empty(),
             findTerritories: (...args) => empty(),
             relayTimeZoneOperation: (...args) => switchMap(res => empty()),
+            relayAccountsOperation: (...args) => switchMap(res => empty()),
+            relayWarehousesOperation: (...args) => switchMap(res => empty()),
           },
         },
         { provide: ToastController, useValue: {} },

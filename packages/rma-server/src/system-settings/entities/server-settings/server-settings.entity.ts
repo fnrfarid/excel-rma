@@ -76,6 +76,12 @@ export class ServerSettings extends BaseEntity {
   @Column()
   validateStock: boolean;
 
+  @Column()
+  transferWarehouse: string;
+
+  @Column()
+  debtorAccount: string;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();
