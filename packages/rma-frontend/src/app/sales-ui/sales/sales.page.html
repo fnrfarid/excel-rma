@@ -186,7 +186,7 @@
                     {{row.status}}
                   </ion-text>
                   <ion-text
-                    *ngIf="row.status === 'Draft' || row.status === 'Rejected' "
+                    *ngIf="row.status === 'Draft' || row.status === 'Rejected' || row.status === 'Canceled' "
                     [ngStyle]="{
                     color: 'red'
                   }"

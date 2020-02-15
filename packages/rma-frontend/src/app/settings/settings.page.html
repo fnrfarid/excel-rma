@@ -90,6 +90,42 @@
         <mat-form-field class="mat-input-wrapper">
           <input
             matInput
+            required
+            placeholder="Debtor Account"
+            aria-label="Debtor Account"
+            [matAutocomplete]="autoDebtorAccount"
+            formControlName="debtorAccount"
+          />
+          <mat-autocomplete #autoDebtorAccount="matAutocomplete">
+            <mat-option
+              *ngFor="let account of accounts | async"
+              [value]="account.name"
+            >
+              <span>{{account.name}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            required
+            placeholder="Transfer Warehouse"
+            aria-label="Transfer Warehouse"
+            [matAutocomplete]="autoTransferWarehouse"
+            formControlName="transferWarehouse"
+          />
+          <mat-autocomplete #autoTransferWarehouse="matAutocomplete">
+            <mat-option
+              *ngFor="let warehouse of warehouses | async"
+              [value]="warehouse.name"
+            >
+              <span>{{warehouse.name}}</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
             placeholder="Authorization Server URL"
             type="text"
             formControlName="authServerURL"

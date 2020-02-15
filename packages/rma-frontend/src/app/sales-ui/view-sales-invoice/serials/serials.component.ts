@@ -113,7 +113,11 @@ export class SerialsComponent implements OnInit {
     this.fromRangeUpdate
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(v => {
-        this.generateSerials(value);
+        this.generateSerials(
+          value,
+          this.rangePickerState.toRange,
+          this.rangePickerState.prefix,
+        );
       });
   }
 
@@ -121,21 +125,29 @@ export class SerialsComponent implements OnInit {
     this.toRangeUpdate
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(v => {
-        this.generateSerials(undefined, value);
+        this.generateSerials(
+          this.rangePickerState.fromRange,
+          value,
+          this.rangePickerState.prefix,
+        );
       });
   }
 
   onPrefixChange(value) {
-    this.generateSerials(undefined, undefined, value);
+    this.generateSerials(
+      this.rangePickerState.fromRange,
+      this.rangePickerState.toRange,
+      value,
+    );
   }
 
-  async generateSerials(fromRange?, toRange?, prefix?) {
+  generateSerials(fromRange?, toRange?, prefix?) {
     this.rangePickerState.serials =
-      (await this.getSerialsFromRange(
+      this.getSerialsFromRange(
         fromRange || this.rangePickerState.fromRange || 0,
         toRange || this.rangePickerState.toRange || 0,
         prefix || this.rangePickerState.prefix,
-      )) || [];
+      ) || [];
   }
 
   getSerialsFromRange(start: number, end: number, prefix: string) {
@@ -147,8 +159,12 @@ export class SerialsComponent implements OnInit {
       start.toString().length > end.toString().length
         ? start.toString().length
         : end.toString().length;
-    for (let value of data) {
-      value = `${prefix}${this.getPaddedNumber(value, maxSerial)}`;
+    let i = 0;
+    for (const value of data) {
+      if (value) {
+        data[i] = `${prefix}${this.getPaddedNumber(value, maxSerial)}`;
+        i++;
+      }
     }
     return data;
   }

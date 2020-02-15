@@ -9,13 +9,16 @@ import {
   RELAY_LIST_PRICELIST_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
   GET_TIME_ZONE,
+  ERPNEXT_ACCOUNT_ENDPOINT,
+  ERPNEXT_WAREHOUSE_ENDPOINT,
 } from '../constants/url-strings';
 import {
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
+  DEFAULT_COMPANY,
 } from '../constants/storage';
-import { from } from 'rxjs';
+import { from, forkJoin } from 'rxjs';
 import { StorageService } from '../api/storage/storage.service';
 
 @Injectable({
@@ -117,6 +120,8 @@ export class SettingsService {
     sellingPriceList: string,
     timeZone: string,
     validateStock: boolean,
+    debtorAccount: string,
+    transferWarehouse: string,
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -133,6 +138,8 @@ export class SettingsService {
             sellingPriceList,
             timeZone,
             validateStock,
+            debtorAccount,
+            transferWarehouse,
           },
           { headers },
         );
@@ -159,6 +166,58 @@ export class SettingsService {
         });
       }),
     );
+  }
+
+  relayAccountsOperation() {
+    return switchMap(value => {
+      if (!value) value = '';
+      return forkJoin({
+        headers: this.getHeaders(),
+        company: from(this.storage.getItem(DEFAULT_COMPANY)),
+      }).pipe(
+        switchMap(({ headers, company }) => {
+          const params = new HttpParams({
+            fromObject: {
+              fields: '["*"]',
+              filters: `[["name","like","%${value}%"],["company","=","${company}"]]`,
+            },
+          });
+
+          return this.http
+            .get<{ data: unknown[] }>(ERPNEXT_ACCOUNT_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
+  }
+
+  relayWarehousesOperation() {
+    return switchMap(value => {
+      if (!value) value = '';
+      return forkJoin({
+        headers: this.getHeaders(),
+        company: from(this.storage.getItem(DEFAULT_COMPANY)),
+      }).pipe(
+        switchMap(({ headers, company }) => {
+          const params = new HttpParams({
+            fromObject: {
+              fields: '["*"]',
+              filters: `[["name","like","%${value}%"],["company","=","${company}"]]`,
+            },
+          });
+
+          return this.http
+            .get<{ data: unknown[] }>(ERPNEXT_WAREHOUSE_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getHeaders() {

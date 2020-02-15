@@ -57,3 +57,7 @@ export const CUSTOMER_ENDPOINT = '/api/command/user/api/resource/Customer';
 export const GET_BALANCE_ON_ENDPOINT =
   '/api/command/user/api/method/erpnext.accounts.utils.get_balance_on';
 export const RELAY_API_RES_COMPANY = '/api/command/user/api/resource/Company';
+export const ERPNEXT_ACCOUNT_ENDPOINT =
+  '/api/command/user/api/resource/Account';
+export const ERPNEXT_WAREHOUSE_ENDPOINT =
+  '/api/command/user/api/resource/Warehouse';
