@@ -126,7 +126,7 @@
                   Created By
                 </th>
                 <td mat-cell *matCellDef="let row">
-                  {{ row.createdByEmail }}
+                  {{ row.createdBy }}
                 </td>
               </ng-container>
 
@@ -136,7 +136,7 @@
                 </th>
                 <td mat-cell *matCellDef="let row">
                   {{ (row.delivery_note_items.length === 0) ? '' :
-                  row.delivery_note_items[0]?.deliveredByEmail }}
+                  row.delivery_note_items[0]?.deliveredBy }}
                 </td>
               </ng-container>
               <!-- posting_date Column -->
