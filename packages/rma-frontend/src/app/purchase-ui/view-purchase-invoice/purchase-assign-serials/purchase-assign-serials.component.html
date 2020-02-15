@@ -9,6 +9,7 @@
       <ion-row class="align">
         <ion-col class="ion-text-left">
           <input
+            #csvFileInput
             type="file"
             id="txtFileUpload"
             (change)="fileChangedEvent($event)"
@@ -222,24 +223,6 @@
         </mat-cell>
       </ng-container>
 
-      <!-- <ng-container matColumnDef="warranty_date">
-        <mat-header-cell *matHeaderCellDef>Warranty Date</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <input
-            class="example-full-width"
-            matInput
-            [(ngModel)]="row.warranty_date"
-            [matDatepicker]="warranty_date"
-            disabled
-          />
-          <mat-datepicker-toggle
-            matSuffix
-            [for]="warranty_date"
-          ></mat-datepicker-toggle>
-          <mat-datepicker #warranty_date disabled="false"></mat-datepicker>
-        </mat-cell>
-      </ng-container> -->
-
       <ng-container matColumnDef="serial_no">
         <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -271,105 +254,3 @@
     </mat-table>
   </ion-card-content>
 </ion-card>
-
-<!--
-<ion-card>
-  <ion-card-header>
-    <ion-row class="align">
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Items
-          </ion-text>
-        </ion-card-title>
-      </ion-col>
-      <ion-col class="ion-text-right" size="auto">
-        <ion-button
-          color="tertiary"
-          fill="outline"
-          (click)="submitDeliveryNote()"
-        >
-          Submit
-        </ion-button>
-      </ion-col>
-    </ion-row>
-  </ion-card-header>
-  <ion-card-content class="ion-no-padding">
-    <mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-      <ng-container matColumnDef="position">
-        <mat-header-cell *matHeaderCellDef>No.</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.position }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="serial">
-        <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
-        <mat-cell
-          *matCellDef="let element"
-          [satPopoverAnchor]="p"
-          tabindex="0"
-          (keyup.enter)="p.open()"
-          (click)="p.open()"
-        >
-          <ng-container *ngIf="element.serial_no">
-            {{ element.serial_no }}
-          </ng-container>
-          <span class="add-comment" *ngIf="!element.serial_no">
-            Assign Serial
-          </span>
-          <sat-popover
-            #p
-            hasBackdrop
-            xAlign="start"
-            yAlign="start"
-            (closed)="updateSerial(element, $event)"
-          >
-            <edit-purchase-table [value]="element.serial_no">
-            </edit-purchase-table>
-          </sat-popover>
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="item">
-        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.item_name }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="company">
-        <mat-header-cell *matHeaderCellDef>Company</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.company }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="supplier">
-        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.supplier }}</mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="claimsReceivedDate">
-        <mat-header-cell *matHeaderCellDef
-          >Serial Assigned Date</mat-header-cell
-        >
-        <mat-cell *matCellDef="let element">
-          {{ element.claimsReceivedDate }}
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="clear">
-        <mat-header-cell *matHeaderCellDef></mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <ion-button
-            (click)="clearRow(element)"
-            color="danger"
-            color="danger"
-            fill="clear"
-          >
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
-        </mat-cell>
-      </ng-container>
-      <mat-header-row
-        *matHeaderRowDef="displayedColumns; sticky: true"
-      ></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-    </mat-table>
-  </ion-card-content>
-</ion-card> -->

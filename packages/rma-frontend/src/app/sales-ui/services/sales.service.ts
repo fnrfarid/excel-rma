@@ -50,7 +50,11 @@ export class SalesService {
     this.itemList = [];
   }
 
-  validateSerials(item: { item_code: string; serials: string[] }) {
+  validateSerials(item: {
+    item_code: string;
+    serials: string[];
+    validateFor?: string;
+  }) {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post('/api/serial_no/v1/validate', item, { headers });

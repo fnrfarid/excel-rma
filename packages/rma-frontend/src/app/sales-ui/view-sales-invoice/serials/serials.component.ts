@@ -419,13 +419,13 @@ export class SerialsComponent implements OnInit {
     reader.readAsText($event.target.files[0]);
     reader.onload = (file: any) => {
       const csvData = file.target.result;
-      const licenseHeaders = csvData
+      const headers = csvData
         .split('\n')[0]
         .replace(/"/g, '')
         .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
         .split(',');
       // validate file headers
-      this.csvService.validateHeaders(licenseHeaders)
+      this.csvService.validateHeaders(headers)
         ? // if valid convert to json.
           this.csvService
             .csvToJSON(csvData)
