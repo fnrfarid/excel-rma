@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsArray } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, IsOptional } from 'class-validator';
 
 export class SerialNoDto {
   @IsNotEmpty()
@@ -30,4 +30,8 @@ export class ValidateSerialsDto {
   @IsNotEmpty()
   @IsString()
   item_code: string;
+
+  @IsOptional()
+  @IsString()
+  validateFor: string;
 }
