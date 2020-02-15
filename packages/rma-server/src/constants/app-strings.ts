@@ -100,3 +100,5 @@ export const SALES_INVOICE_STATUS_ENUM = [
   'Rejected',
   'Submitted',
 ];
+export const PURCHASE_RECEIPT = 'purchase_receipt';
+export const DELIVERY_NOTE = 'delivery_note';

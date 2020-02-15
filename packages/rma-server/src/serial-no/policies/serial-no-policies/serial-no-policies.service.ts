@@ -70,39 +70,76 @@ export class SerialNoPoliciesService {
   }
 
   validateSerials(payload: ValidateSerialsDto) {
-    return this.serialNoService
-      .asyncAggregate([
-        {
-          $match: {
-            serial_no: { $in: payload.serials },
-            $or: [
-              { item_code: payload.item_code },
-              { item_name: payload.item_code },
-            ],
+    return (payload.validateFor === 'purchase_receipt'
+      ? this.validateSerialsForPurchaseReceipt(payload)
+      : this.validateSerialsForDeliveryNote(payload)
+    ).pipe(
+      switchMap(
+        (
+          data: {
+            _id: string;
+            notFoundSerials: string[];
+            foundSerials: string[];
+          }[],
+        ) => {
+          if (payload.validateFor === 'purchase_receipt') {
+            return of({ notFoundSerials: data[0] ? data[0].foundSerials : [] });
+          } else {
+            return of({
+              notFoundSerials: data[0]
+                ? data[0].notFoundSerials
+                : payload.serials,
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  validateSerialsForDeliveryNote(payload: ValidateSerialsDto) {
+    return this.serialNoService.asyncAggregate([
+      {
+        $match: {
+          serial_no: { $in: payload.serials },
+          $or: [
+            { item_code: payload.item_code },
+            { item_name: payload.item_code },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: 'validSerials',
+          foundSerials: { $push: '$serial_no' },
+        },
+      },
+      {
+        $project: {
+          notFoundSerials: {
+            $setDifference: [payload.serials, '$foundSerials'],
           },
         },
-        {
-          $group: {
-            _id: 'validSerials',
-            foundSerials: { $push: '$serial_no' },
-          },
+      },
+    ]);
+  }
+
+  validateSerialsForPurchaseReceipt(payload: ValidateSerialsDto) {
+    return this.serialNoService.asyncAggregate([
+      {
+        $match: {
+          serial_no: { $in: payload.serials },
+          $or: [
+            { item_code: payload.item_code },
+            { item_name: payload.item_code },
+          ],
         },
-        {
-          $project: {
-            notFoundSerials: {
-              $setDifference: [payload.serials, '$foundSerials'],
-            },
-          },
+      },
+      {
+        $group: {
+          _id: 'validSerials',
+          foundSerials: { $push: '$serial_no' },
         },
-      ])
-      .pipe(
-        switchMap((data: { _id: string; notFoundSerials: string[] }[]) => {
-          return of({
-            notFoundSerials: data[0]
-              ? data[0].notFoundSerials
-              : payload.serials,
-          });
-        }),
-      );
+      },
+    ]);
   }
 }

@@ -25,6 +25,10 @@ import {
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoCommand } from '../../command/assign-serial-no/assign-serial-no.command';
 import { ValidateSerialsQuery } from '../../query/validate-serial/validate-serial.query';
+import {
+  DELIVERY_NOTE,
+  PURCHASE_RECEIPT,
+} from '../../../constants/app-strings';
 
 @Controller('serial_no')
 export class SerialNoController {
@@ -97,9 +101,11 @@ export class SerialNoController {
   }
 
   @Post('v1/validate')
-  @UseGuards(TokenGuard)
+  // @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   validateSerialNo(@Req() clientHttpRequest, @Body() body: ValidateSerialsDto) {
+    body.validateFor =
+      body.validateFor === PURCHASE_RECEIPT ? body.validateFor : DELIVERY_NOTE;
     return this.queryBus.execute(
       new ValidateSerialsQuery(body, clientHttpRequest),
     );
