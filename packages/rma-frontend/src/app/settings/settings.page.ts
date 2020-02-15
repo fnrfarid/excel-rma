@@ -35,6 +35,8 @@ export class SettingsPage implements OnInit {
     sellingPriceList: new FormControl(),
     timeZone: new FormControl(),
     validateStock: new FormControl(),
+    transferWarehouse: new FormControl(),
+    debtorAccount: new FormControl(),
   });
 
   companies: Observable<unknown[]> = this.companySettingsForm
@@ -59,6 +61,22 @@ export class SettingsPage implements OnInit {
       debounceTime(500),
       startWith(''),
       this.service.relayTimeZoneOperation(),
+    );
+
+  accounts: Observable<unknown[]> = this.companySettingsForm
+    .get('debtorAccount')
+    .valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relayAccountsOperation(),
+    );
+
+  warehouses: Observable<unknown[]> = this.companySettingsForm
+    .get('transferWarehouse')
+    .valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relayWarehousesOperation(),
     );
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -104,6 +122,12 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm
           .get('validateStock')
           .setValue(res.validateStock);
+        this.companySettingsForm
+          .get('debtorAccount')
+          .setValue(res.debtorAccount);
+        this.companySettingsForm
+          .get('transferWarehouse')
+          .setValue(res.transferWarehouse);
       },
     });
 
@@ -128,6 +152,8 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('sellingPriceList').value,
         this.companySettingsForm.get('timeZone').value,
         this.companySettingsForm.get('validateStock').value,
+        this.companySettingsForm.get('debtorAccount').value,
+        this.companySettingsForm.get('transferWarehouse').value,
       )
       .subscribe({
         next: success => {

@@ -11,6 +11,10 @@ stages:
 
 test_rma_frontend:
   stage: tests
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - packages/rma-frontend/node_modules/
   only:
     changes:
       - packages/rma-frontend/**/*
@@ -35,6 +39,10 @@ test_rma_frontend:
 
 test_rma_mobile:
   stage: tests
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - packages/rma-mobile/node_modules/
   only:
     changes:
       - packages/rma-mobile/**/*
@@ -60,6 +68,10 @@ test_rma_mobile:
 
 test_rma_server:
   stage: tests
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - packages/rma-server/node_modules/
   only:
     changes:
       - packages/rma-server/**/*
@@ -95,7 +107,7 @@ pack_rma_server:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
     - export VERSION=$(git tag --list "rma-server@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
-    - docker build -t rma-server packages/rma-server
+    - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-server packages/rma-server
     # - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION
     - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:latest
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server
@@ -113,7 +125,7 @@ pack_rma_frontend:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
     - export VERSION=$(git tag --list "rma-frontend@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
-    - docker build -t rma-frontend packages/rma-frontend
+    - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-frontend packages/rma-frontend
     # - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
     - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend

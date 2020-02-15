@@ -117,4 +117,18 @@ export class ServerSettingsDto {
     required: true,
   })
   timeZone: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'ERPNext transfer warehouse',
+    type: 'string',
+  })
+  transferWarehouse: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'ERPNext debtor account',
+    type: 'string',
+  })
+  debtorAccount: string;
 }

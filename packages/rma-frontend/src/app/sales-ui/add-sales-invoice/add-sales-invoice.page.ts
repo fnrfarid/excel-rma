@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
-import { ItemsDataSource } from './items-datasource';
-import { SalesService } from '../services/sales.service';
-import { Location } from '@angular/common';
-import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
-
 import { FormControl, Validators } from '@angular/forms';
 import { Observable, throwError, of, from, forkJoin } from 'rxjs';
 import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
+import { Location } from '@angular/common';
+
+import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
+import { ItemsDataSource } from './items-datasource';
+import { SalesService } from '../services/sales.service';
+import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import {
   DEFAULT_COMPANY,
   ACCESS_TOKEN,
@@ -20,6 +20,7 @@ import {
   CLOSE,
   DURATION,
   UPDATE_ERROR,
+  SHORT_DURATION,
 } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ItemPriceService } from '../services/item-price.service';
@@ -114,7 +115,12 @@ export class AddSalesInvoicePage implements OnInit {
                 this.companyFormControl.setValue(items[DEFAULT_COMPANY]);
                 this.getRemainingBalance();
               } else {
-                this.getApiInfo();
+                this.getApiInfo().subscribe({
+                  next: res => {
+                    this.companyFormControl.setValue(res.defaultCompany);
+                  },
+                  error: error => {},
+                });
               }
             });
         },
@@ -385,12 +391,7 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   getApiInfo() {
-    this.salesService.getApiInfo().subscribe({
-      next: res => {
-        this.companyFormControl.setValue(res.defaultCompany);
-      },
-      error: error => {},
-    });
+    return this.salesService.getApiInfo();
   }
 
   validateStock(itemList: Item[] = []) {
@@ -415,19 +416,22 @@ export class AddSalesInvoicePage implements OnInit {
     forkJoin({
       time: from(this.time.getDateTime(new Date())),
       token: from(this.salesService.getStore().getItem(ACCESS_TOKEN)),
-      company: this.itemPriceService.getCompany(this.companyFormControl.value),
+      debtorAccount: this.getApiInfo().pipe(map(res => res.debtorAccount)),
     })
       .pipe(
-        switchMap(({ token, time, company }) => {
+        switchMap(({ token, time, debtorAccount }) => {
+          if (!debtorAccount) {
+            return throwError({ debtorAccountNotFound: true });
+          }
           const headers = {
             [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
           };
           return this.itemPriceService.getRemainingBalance(
-            'debtors - ' + company.abbr,
+            debtorAccount,
             time,
             'Customer',
             this.customerFormControl.value.name,
-            company.name,
+            this.companyFormControl.value,
             headers,
           );
         }),
@@ -451,7 +455,17 @@ export class AddSalesInvoicePage implements OnInit {
 
           this.remainingBalanceFormControl.setValue(creditLimit);
         },
-        error: error => {},
+        error: error => {
+          let frappeError = error.message || UPDATE_ERROR;
+
+          try {
+            frappeError = JSON.parse(error.error._server_messages);
+            frappeError = JSON.parse(frappeError);
+            frappeError = (frappeError as { message?: string }).message;
+          } catch {}
+
+          this.snackbar.open(frappeError, CLOSE, { duration: SHORT_DURATION });
+        },
       });
   }
 }
