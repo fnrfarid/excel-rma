@@ -164,7 +164,11 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label>Campaign Invoice</ion-label>
-            <ion-checkbox slot="start" disabled [checked]="campaign"></ion-checkbox>
+            <ion-checkbox
+              slot="start"
+              disabled
+              [checked]="campaign"
+            ></ion-checkbox>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -176,7 +180,11 @@
               value="{{ salesInvoiceDetails?.status }}"
               placeholder="Status"
               [ngStyle]="{
-                color: salesInvoiceDetails?.submitted === true ? 'green' : 'red'
+                color:
+                  (salesInvoiceDetails?.status === 'To Deliver' ||
+                    salesInvoiceDetails?.status === 'Completed') === true
+                    ? 'green'
+                    : 'red'
               }"
             ></ion-input>
           </ion-item>
