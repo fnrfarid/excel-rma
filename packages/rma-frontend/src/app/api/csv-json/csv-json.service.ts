@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { of, from } from 'rxjs';
 import * as CSVTOJSON from 'csvjson-csv2json';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE } from '../../constants/app-string';
+import { CLOSE, DELIVERY_NOTE } from '../../constants/app-string';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { switchMap, map } from 'rxjs/operators';
 import {
@@ -62,7 +62,11 @@ export class CsvJsonService {
     return out;
   }
 
-  validateSerials(item_names: string[], itemObj: CsvJsonObj) {
+  validateSerials(
+    item_names: string[],
+    itemObj: CsvJsonObj,
+    validateFor?: string,
+  ) {
     const params = new HttpParams().set(
       'item_names',
       JSON.stringify(item_names),
@@ -74,7 +78,7 @@ export class CsvJsonService {
           .pipe(
             switchMap((response: any[]) => {
               if (response.length === item_names.length) {
-                return this.validateSerialsWithItem(itemObj).pipe(
+                return this.validateSerialsWithItem(itemObj, validateFor).pipe(
                   switchMap(isValid => {
                     if (isValid.length) {
                       this.snackBar.open(
@@ -111,12 +115,17 @@ export class CsvJsonService {
     );
   }
 
-  validateSerialsWithItem(itemObj: CsvJsonObj) {
+  validateSerialsWithItem(itemObj: CsvJsonObj, validateFor?: string) {
     const invalidSerials = [];
+    validateFor = validateFor ? validateFor : DELIVERY_NOTE;
     return from(Object.keys(itemObj)).pipe(
       switchMap(key => {
         return this.salesService
-          .validateSerials({ item_code: key, serials: itemObj[key].serial_no })
+          .validateSerials({
+            item_code: key,
+            serials: itemObj[key].serial_no,
+            validateFor,
+          })
           .pipe(
             switchMap((data: { notFoundSerials: string[] }) => {
               invalidSerials.push(...data.notFoundSerials);

@@ -12,6 +12,7 @@ import { of } from 'rxjs';
 import { PurchaseService } from '../../services/purchase.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Location } from '@angular/common';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 
 describe('PurchaseAssignSerialsComponent', () => {
   let component: PurchaseAssignSerialsComponent;
@@ -51,6 +52,10 @@ describe('PurchaseAssignSerialsComponent', () => {
         },
         {
           provide: Location,
+          useValue: {},
+        },
+        {
+          provide: CsvJsonService,
           useValue: {},
         },
       ],

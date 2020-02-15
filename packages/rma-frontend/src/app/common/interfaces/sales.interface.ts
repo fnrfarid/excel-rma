@@ -16,7 +16,7 @@ export class Item {
   item_code: string;
   item_name: string;
   qty: number;
-  rate: number;
+  rate?: number;
   amount?: number;
   minimumPrice?: number;
   description?: string;
