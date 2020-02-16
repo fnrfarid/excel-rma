@@ -23,6 +23,7 @@ import { WarrantyClaim } from '../warranty-claim/entity/warranty-claim/warranty-
 import { DeliveryNote } from '../delivery-note/entity/delivery-note-service/delivery-note.entity';
 import { Territory } from '../customer/entity/territory/territory.entity';
 import { PurchaseInvoice } from '../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
+import { ErrorLog } from '../error-log/error-log-service/error-log.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -51,6 +52,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       DeliveryNote,
       Territory,
       PurchaseInvoice,
+      ErrorLog,
     ],
     useNewUrlParser: true,
     w: 'majority',

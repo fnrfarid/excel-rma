@@ -42,6 +42,7 @@ import {
 } from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
 import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-note-service/delivery-note-webhook.dto';
 import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -51,6 +52,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly http: HttpService,
     private readonly validateSalesInvoicePolicy: SalesInvoicePoliciesService,
     private readonly deliveryNoteService: DeliveryNoteService,
+    private readonly errorLogService: ErrorLogService,
   ) {
     super();
   }
@@ -213,6 +215,12 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           );
         }),
         catchError(err => {
+          this.errorLogService.createErrorLog(
+            err,
+            'Sales Invoice',
+            'salesInvoice',
+            clientHttpRequest,
+          );
           this.salesInvoiceService
             .updateOne(
               { uuid: salesInvoice.uuid },
@@ -313,7 +321,14 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   Object.assign(deliveryNoteData, delivery);
                   this.deliveryNoteService.create(deliveryNoteData);
                 },
-                error: err => {},
+                error: err => {
+                  this.errorLogService.createErrorLog(
+                    err,
+                    'Delivery Note',
+                    'deliveryNote',
+                    clientHttpRequest,
+                  );
+                },
               });
             return of({});
           }),
@@ -349,7 +364,14 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             .then(created => {})
             .catch(error => {});
         },
-        error: err => {},
+        error: err => {
+          this.errorLogService.createErrorLog(
+            err,
+            'Credit Note',
+            'salesInvoice',
+            clientHttpRequest,
+          );
+        },
       });
   }
 

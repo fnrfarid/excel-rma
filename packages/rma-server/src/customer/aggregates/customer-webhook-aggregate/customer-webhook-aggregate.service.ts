@@ -17,6 +17,7 @@ import * as uuidv4 from 'uuid/v4';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT } from '../../../constants/routes';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 @Injectable()
 export class CustomerWebhookAggregateService extends AggregateRoot {
@@ -25,6 +26,7 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
     private readonly clientTokenManager: ClientTokenManagerService,
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
+    private readonly errorLogService: ErrorLogService,
   ) {
     super();
   }
@@ -106,7 +108,9 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
       )
       .subscribe({
         next: success => {},
-        error: err => {},
+        error: err => {
+          this.errorLogService.createErrorLog(err, 'Customer', 'webhook', {});
+        },
       });
   }
 

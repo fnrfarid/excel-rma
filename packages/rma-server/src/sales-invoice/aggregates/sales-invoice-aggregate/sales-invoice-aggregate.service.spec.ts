@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { SalesInvoiceAggregateService } from './sales-invoice-aggregate.service';
 import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
@@ -19,6 +20,10 @@ describe('SalesInvoiceAggregateService', () => {
         },
         {
           provide: SettingsService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {

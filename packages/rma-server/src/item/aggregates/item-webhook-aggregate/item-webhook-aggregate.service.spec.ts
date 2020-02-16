@@ -4,6 +4,7 @@ import { HttpService } from '@nestjs/common';
 import { ItemService } from '../../entity/item/item.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 describe('ItemWebhookAggregateService', () => {
   let service: ItemWebhookAggregateService;
@@ -14,6 +15,10 @@ describe('ItemWebhookAggregateService', () => {
         ItemWebhookAggregateService,
         {
           provide: ItemService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {

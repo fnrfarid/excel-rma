@@ -4,6 +4,7 @@ import { CustomerService } from '../../entity/customer/customer.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 describe('CustomerWebhookAggregateService', () => {
   let service: CustomerWebhookAggregateService;
@@ -14,6 +15,10 @@ describe('CustomerWebhookAggregateService', () => {
         CustomerWebhookAggregateService,
         {
           provide: CustomerService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {
