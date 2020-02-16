@@ -38,10 +38,10 @@ export class PurchaseInvoiceDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
     this.loadingSubject.next(true);
     this.purchaseService
-      .getPurchaseInvoiceList(filter, sortOrder, pageIndex, pageSize)
+      .getPurchaseInvoiceList(sortOrder, pageIndex, pageSize, query)
       .pipe(
         map((res: ListResponse) => {
           this.data = res.docs;

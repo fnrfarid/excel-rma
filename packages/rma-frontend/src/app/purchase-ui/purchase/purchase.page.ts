@@ -17,7 +17,21 @@ export class PurchasePage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: PurchaseInvoiceDataSource;
-  displayedColumns = ['supplier', 'status', 'total'];
+  displayedColumns = [
+    'purchase_invoice_number',
+    'status',
+    'date',
+    'supplier',
+    'total',
+    'branch',
+    'created_by',
+    'delivered_by',
+  ];
+  invoiceStatus: string[] = ['Completed', 'Rejected', 'Submitted', 'All'];
+  supplier: string = '';
+  status: string = 'All';
+  name: string = '';
+  branch: string = '';
   search: string = '';
   constructor(
     private location: Location,
@@ -30,21 +44,50 @@ export class PurchasePage implements OnInit {
   }
 
   getUpdate(event) {
+    const query: any = {};
+    if (this.supplier) query.supplier_name = this.supplier;
+    if (this.status) query.status = this.status;
+    if (this.name) query.name = this.name;
+    if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
-      this.search,
-      this.sort.direction,
+      undefined,
       event.pageIndex,
       event.pageSize,
+      query,
     );
   }
 
-  setFilter() {
+  setFilter(event?) {
+    const query: any = {};
+    if (this.supplier) query.supplier_name = this.supplier;
+    if (this.status) query.status = this.status;
+    if (this.name) query.name = this.name;
+    if (this.branch) query.territory = this.branch;
+
+    const sortQuery = {};
+    if (event) {
+      for (const key of Object.keys(event)) {
+        if (key === 'active') {
+          sortQuery[event[key]] = event.direction;
+        }
+      }
+    }
+
     this.dataSource.loadItems(
-      this.search,
-      this.sort.direction,
+      sortQuery,
       this.paginator.pageIndex,
       this.paginator.pageSize,
+      query,
     );
+  }
+
+  statusChange(status) {
+    if (status === 'All') {
+      this.dataSource.loadItems();
+    } else {
+      this.status = status;
+      this.setFilter();
+    }
   }
 
   navigateBack() {
