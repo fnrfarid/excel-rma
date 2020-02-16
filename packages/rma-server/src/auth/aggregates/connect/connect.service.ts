@@ -26,6 +26,7 @@ import {
   BEARER_HEADER_VALUE_PREFIX,
 } from '../../../constants/app-strings';
 import { HUNDRED_NUMBERSTRING } from '../../../constants/app-strings';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 @Injectable()
 export class ConnectService {
@@ -34,6 +35,7 @@ export class ConnectService {
     private readonly clientTokenManager: ClientTokenManagerService,
     private readonly http: HttpService,
     private readonly settingService: SettingsService,
+    private readonly errorLogService: ErrorLogService,
   ) {}
 
   async createFrappeBearerToken(
@@ -108,7 +110,9 @@ export class ConnectService {
       )
       .subscribe({
         next: success => {},
-        error: err => {},
+        error: err => {
+          this.errorLogService.createErrorLog(err, 'User', 'tokenCache', {});
+        },
       });
   }
 
@@ -161,7 +165,9 @@ export class ConnectService {
       )
       .subscribe({
         next: success => {},
-        error: err => {},
+        error: err => {
+          this.errorLogService.createErrorLog(err, 'User', 'tokenCache', {});
+        },
       });
   }
 

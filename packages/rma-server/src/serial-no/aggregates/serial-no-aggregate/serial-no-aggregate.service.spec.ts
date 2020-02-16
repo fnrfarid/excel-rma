@@ -6,6 +6,8 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { SerialNoPoliciesService } from '../../policies/serial-no-policies/serial-no-policies.service';
 import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+
 describe('SerialNoAggregateService', () => {
   let service: SerialNoAggregateService;
 
@@ -27,6 +29,10 @@ describe('SerialNoAggregateService', () => {
         },
         {
           provide: SerialNoPoliciesService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {

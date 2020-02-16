@@ -8,9 +8,13 @@ import { DEFAULT } from '../constants/typeorm.connection';
 import { RequestState } from './entities/request-state/request-state.entity';
 import { RequestStateService } from './entities/request-state/request-state.service';
 import { CleanExpiredTokenCacheService } from '../auth/schedulers/clean-expired-token-cache/clean-expired-token-cache.service';
+import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FrappeToken, RequestState], DEFAULT)],
+  imports: [
+    TypeOrmModule.forFeature([FrappeToken, RequestState], DEFAULT),
+    ErrorLogModule,
+  ],
   controllers: [DirectController],
   providers: [
     DirectService,

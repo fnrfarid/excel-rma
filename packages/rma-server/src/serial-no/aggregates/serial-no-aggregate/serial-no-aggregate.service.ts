@@ -36,6 +36,7 @@ import {
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -46,6 +47,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly serialNoPolicyService: SerialNoPoliciesService,
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
     private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
+    private readonly errorLogService: ErrorLogService,
   ) {
     super();
   }
@@ -204,7 +206,14 @@ export class SerialNoAggregateService extends AggregateRoot {
             .then(success => {})
             .catch(error => {});
         },
-        error: err => {},
+        error: err => {
+          this.errorLogService.createErrorLog(
+            err,
+            'Serial No',
+            'serialNo',
+            clientHttpRequest,
+          );
+        },
       });
   }
 

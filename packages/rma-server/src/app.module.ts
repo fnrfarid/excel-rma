@@ -29,6 +29,7 @@ import { CommandModule } from './command/command.module';
 import { PurchaseInvoiceModule } from './purchase-invoice/purchase-invoice.module';
 import { PurchaseReceiptModule } from './purchase-receipt/purchase-receipt.module';
 import { CommonDepModule } from './common-dep/common-dep.module';
+import { ErrorLogModule } from './error-log/error-logs-invoice.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { CommonDepModule } from './common-dep/common-dep.module';
     CustomerModule,
     DeliveryNoteEntitiesModule,
     ReturnVoucherModule,
+    ErrorLogModule,
     PurchaseReceiptModule,
     PurchaseInvoiceModule,
     SupplierModule,

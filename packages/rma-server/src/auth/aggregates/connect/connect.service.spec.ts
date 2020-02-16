@@ -4,6 +4,7 @@ import { TokenCacheService } from '../../entities/token-cache/token-cache.servic
 import { ClientTokenManagerService } from '../client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 describe('ConnectService', () => {
   let service: ConnectService;
@@ -18,6 +19,10 @@ describe('ConnectService', () => {
         },
         {
           provide: ClientTokenManagerService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {

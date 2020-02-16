@@ -9,9 +9,10 @@ import { CustomerPoliciesService } from './policies/customer-policies/customer-p
 import { CustomerWebhookController } from './controllers/customer-webhook/customer-webhook.controller';
 import { TerritoryController } from './controllers/territory/territory.controller';
 import { CustomerSchedulers } from './schedulers';
+import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Module({
-  imports: [CustomerEntitiesModule],
+  imports: [CustomerEntitiesModule, ErrorLogModule],
   controllers: [
     CustomerController,
     CustomerWebhookController,
