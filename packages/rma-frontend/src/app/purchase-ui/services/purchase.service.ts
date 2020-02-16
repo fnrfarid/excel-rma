@@ -21,18 +21,22 @@ import { PurchaseReceipt } from '../../common/interfaces/purchase-receipt.interf
 export class PurchaseService {
   constructor(private http: HttpClient, private storage: StorageService) {}
 
-  getPurchaseInvoiceList(
-    filter = '',
-    sortOrder = 'asc',
-    pageNumber = 0,
-    pageSize = 10,
-  ) {
+  getPurchaseInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+    if (!sortOrder) sortOrder = { posting_date: 'desc' };
+    if (!query) query = {};
+
+    try {
+      sortOrder = JSON.stringify(sortOrder);
+    } catch (error) {
+      sortOrder = JSON.stringify({ posting_date: 'desc' });
+    }
+
     const url = LIST_PURCHASE_INVOICE_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
+      .set('sort', sortOrder)
+      .set('filter_query', JSON.stringify(query));
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get(url, {
