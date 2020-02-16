@@ -63,9 +63,6 @@ export class ItemController {
     @Query('sort') sort,
     @Req() clientHttpRequest,
   ) {
-    if (!sort) {
-      sort = 'asc';
-    }
     return await this.queryBus.execute(
       new RetrieveItemListQuery(offset, limit, sort, search, clientHttpRequest),
     );

@@ -4,10 +4,12 @@ import { Location } from '@angular/common';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ItemPricePage } from './item-price.page';
 import { MaterialModule } from '../../material/material.module';
 import { ItemPriceService } from '../services/item-price.service';
+import { StorageService } from '../../api/storage/storage.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -27,11 +29,13 @@ describe('ItemPricePage', () => {
         FormsModule,
         ReactiveFormsModule,
         BrowserAnimationsModule,
+        HttpClientTestingModule,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: ItemPriceService, useValue: {} },
         { provide: Location, useValue: {} },
+        { provide: StorageService, useValue: {} },
       ],
     }).compileComponents();
   }));

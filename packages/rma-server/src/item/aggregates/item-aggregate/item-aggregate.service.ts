@@ -15,10 +15,8 @@ export class ItemAggregateService extends AggregateRoot {
     return item;
   }
 
-  async getItemList(offset, limit, sort, search, clientHttpRequest) {
-    let sortQuery = { name: 'ASC' };
-    if (sort) sortQuery = { name: sort.toUpperCase() };
-    return this.itemService.list(offset, limit, search, sortQuery);
+  async getItemList(offset, limit, sort, filterQuery, clientHttpRequest) {
+    return this.itemService.list(offset, limit, sort, filterQuery);
   }
 
   async setMinPrice(uuid: string, minimumPrice: number) {

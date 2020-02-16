@@ -24,18 +24,27 @@ export class ItemService {
     return await this.itemRepository.findOne(param, options);
   }
 
-  async list(skip, take, search, order) {
-    const nameExp = new RegExp(search, 'i');
-    const columns = this.itemRepository.manager.connection
-      .getMetadata(Item)
-      .ownColumns.map(column => column.propertyName);
+  async list(skip, take, sort, filterQuery?) {
+    let sortQuery;
+    try {
+      sortQuery = JSON.parse(sort);
+    } catch {
+      sortQuery = { name: 'asc' };
+    }
 
-    const $or = columns.map(field => {
-      const filter = {};
-      filter[field] = nameExp;
-      return filter;
-    });
-    const $and: any[] = [{ $or }];
+    try {
+      filterQuery = JSON.parse(filterQuery);
+    } catch {
+      filterQuery = {};
+    }
+    for (const key of Object.keys(sortQuery)) {
+      sortQuery[key] = sortQuery[key].toUpperCase();
+      if (!sortQuery[key]) {
+        delete sortQuery[key];
+      }
+    }
+
+    const $and: any[] = [filterQuery ? this.getFilterQuery(filterQuery) : {}];
 
     const where: { $and: any } = { $and };
 
@@ -43,7 +52,7 @@ export class ItemService {
       skip,
       take,
       where,
-      order,
+      order: sortQuery,
     });
 
     return {
@@ -63,5 +72,21 @@ export class ItemService {
 
   async count(query) {
     return await this.itemRepository.count(query);
+  }
+
+  getFilterQuery(query) {
+    const keys = Object.keys(query);
+    keys.forEach(key => {
+      if (query[key]) {
+        if (key === 'status' && query[key] === 'All') {
+          delete query[key];
+        } else {
+          query[key] = new RegExp(query[key], 'i');
+        }
+      } else {
+        delete query[key];
+      }
+    });
+    return query;
   }
 }
