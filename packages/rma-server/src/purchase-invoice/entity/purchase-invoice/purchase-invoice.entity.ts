@@ -137,6 +137,8 @@ export class PurchaseInvoicePurchaseReceiptItem {
   rate: number;
   serial_no: string[];
   warehouse: string;
+  deliveredBy: string;
+  deliveredByEmail: string;
 }
 
 export class PurchaseInvoicePaymentSchedule {

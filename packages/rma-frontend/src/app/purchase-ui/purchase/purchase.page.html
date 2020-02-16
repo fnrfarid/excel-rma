@@ -106,7 +106,7 @@
               [ngStyle]="{
               color: 'green'
             }"
-              *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' "
+              *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' || row.status === 'Completed'"
             >
               {{row.status}}
             </ion-text>
@@ -170,7 +170,10 @@
           <mat-header-cell *matHeaderCellDef>
             Delivered By
           </mat-header-cell>
-          <mat-cell *matCellDef="let row"> </mat-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.purchase_receipt_items ?
+            row?.purchase_receipt_items[0]?.deliveredBy : '' }}
+          </mat-cell>
         </ng-container>
 
         <mat-header-row
