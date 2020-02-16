@@ -27,6 +27,7 @@ import { ServerSettings } from '../../../system-settings/entities/server-setting
 import { FrappeToken } from '../../entities/frappe-token/frappe-token.entity';
 import { BearerToken } from './bearer-token.interface';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 @Injectable()
 export class DirectService {
@@ -37,6 +38,7 @@ export class DirectService {
     private readonly settingService: SettingsService,
     private readonly frappeTokenService: FrappeTokenService,
     private readonly http: HttpService,
+    private readonly errorLogService: ErrorLogService,
   ) {}
 
   connectClientForUser(redirect: string) {
@@ -189,7 +191,11 @@ export class DirectService {
       )
       .subscribe({
         next: success => {},
-        error: error => {},
+        error: error => {
+          this.errorLogService.createErrorLog(error, 'Customer', 'webhook', {
+            token: { accessToken },
+          });
+        },
       });
   }
 

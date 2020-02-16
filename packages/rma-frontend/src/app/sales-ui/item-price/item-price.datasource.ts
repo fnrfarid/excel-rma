@@ -4,9 +4,13 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ItemPriceService } from '../services/item-price.service';
 
 export interface ListingData {
-  uuid: string;
-  name: string;
-  minimumPrice: number;
+  uuid?: string;
+  name?: string;
+  minimumPrice?: number;
+  brand?: string;
+  item_name?: string;
+  price?: number;
+  selling_price?: number;
 }
 
 export interface ItemListResponse {
@@ -37,10 +41,27 @@ export class ItemPriceDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+  loadItems(
+    filter = {},
+    sortOrder: any = { name: 'asc' },
+    pageIndex = 0,
+    pageSize = 10,
+  ) {
     this.loadingSubject.next(true);
+    try {
+      filter = JSON.stringify(filter);
+    } catch {
+      filter = JSON.stringify({});
+    }
+
+    try {
+      sortOrder = JSON.stringify(sortOrder);
+    } catch {
+      sortOrder = JSON.stringify({ name: 'asc' });
+    }
+
     this.itemPriceService
-      .findItems(filter, sortOrder, pageIndex, pageSize)
+      .findItems(filter as string, sortOrder as string, pageIndex, pageSize)
       .pipe(
         map(res => {
           this.data = res.docs;

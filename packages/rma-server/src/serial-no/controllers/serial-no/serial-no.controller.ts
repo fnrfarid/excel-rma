@@ -101,7 +101,7 @@ export class SerialNoController {
   }
 
   @Post('v1/validate')
-  // @UseGuards(TokenGuard)
+  @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   validateSerialNo(@Req() clientHttpRequest, @Body() body: ValidateSerialsDto) {
     body.validateFor =

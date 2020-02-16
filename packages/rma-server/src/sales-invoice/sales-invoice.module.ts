@@ -10,6 +10,7 @@ import { CustomerModule } from '../customer/customer.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { SerialNoModule } from '../serial-no/serial-no.module';
 import { SalesInvoiceWebhookController } from './controllers/sales-invoice-webhook/sales-invoice-webhook.controller';
+import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SalesInvoiceWebhookController } from './controllers/sales-invoice-webho
     CustomerModule,
     DeliveryNoteModule,
     SerialNoModule,
+    ErrorLogModule,
   ],
   controllers: [SalesInvoiceController, SalesInvoiceWebhookController],
   providers: [

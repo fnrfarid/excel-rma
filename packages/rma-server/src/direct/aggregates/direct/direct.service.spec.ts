@@ -3,6 +3,7 @@ import { DirectService } from './direct.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { RequestStateService } from '../../entities/request-state/request-state.service';
 import { FrappeTokenService } from '../../entities/frappe-token/frappe-token.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { HttpModule } from '@nestjs/common';
 
 describe('DirectService', () => {
@@ -15,6 +16,10 @@ describe('DirectService', () => {
         DirectService,
         {
           provide: RequestStateService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {

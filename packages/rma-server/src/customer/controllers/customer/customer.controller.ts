@@ -19,6 +19,8 @@ import { RetrieveCustomerQuery } from '../../query/get-customer/retrieve-custome
 import { RetrieveCustomerListQuery } from '../../query/list-customer/retrieve-customer-list.query';
 import { CustomerDto } from '../../../customer/entity/customer/customer-dto';
 import { UpdateCustomerDto } from '../../entity/customer/update-customer-dto';
+import { UpdateCreditLimitDto } from '../../entity/customer/update-credit-limit.dto';
+import { UpdateCreditLimitCommand } from '../../command/update-credit-limit/update-credit-limit.command';
 
 @Controller('customer')
 export class CustomerController {
@@ -74,6 +76,18 @@ export class CustomerController {
   async updateCustomer(@Body() updatePayload: UpdateCustomerDto) {
     return await this.commandBus.execute(
       new UpdateCustomerCommand(updatePayload),
+    );
+  }
+
+  @Post('v1/update_credit_limit')
+  @UseGuards(TokenGuard)
+  @UsePipes(ValidationPipe)
+  async updateCreditLimit(
+    @Body() updatePayload: UpdateCreditLimitDto,
+    @Req() req,
+  ) {
+    return await this.commandBus.execute(
+      new UpdateCreditLimitCommand(updatePayload, req),
     );
   }
 }

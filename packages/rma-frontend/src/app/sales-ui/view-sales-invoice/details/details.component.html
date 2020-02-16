@@ -89,7 +89,7 @@
             <ion-datetime
               readonly
               placeholder="Posting Date"
-              display-format="YYYY.DD.MM"
+              display-format="DD-MM-YYYY"
               value="{{
                 salesInvoiceDetails?.posting_date
                   ? salesInvoiceDetails.posting_date
@@ -102,13 +102,12 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Balance</ion-label>
-            <ion-input
+            <ion-label position="floating">Remark</ion-label>
+            <ion-textarea
               readonly="true"
-              type="number"
-              placeholder="Balance"
-              value="{{ salesInvoiceDetails?.outstanding_amount }}"
-            ></ion-input>
+              placeholder="Remark"
+              rows="1"
+            ></ion-textarea>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -122,7 +121,7 @@
                   ? salesInvoiceDetails.due_date
                   : ''
               }}"
-              display-format="YYYY.DD.MM"
+              display-format="DD-MM-YYYY"
             ></ion-datetime>
           </ion-item>
         </ion-col>

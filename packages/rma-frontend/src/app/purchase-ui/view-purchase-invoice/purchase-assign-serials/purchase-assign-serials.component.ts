@@ -188,8 +188,15 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         this.location.back();
       },
       error: err => {
+        let frappeError = 'Purchase Receipt Creation failed';
+
+        try {
+          frappeError = JSON.parse(err.error._server_messages);
+          frappeError = JSON.parse(frappeError);
+          frappeError = (frappeError as { message?: string }).message;
+        } catch {}
         loading.dismiss();
-        this.snackBar.open('Something went wrong ', CLOSE, {
+        this.snackBar.open(frappeError, CLOSE, {
           duration: 2500,
         });
       },

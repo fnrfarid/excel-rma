@@ -1,16 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpService } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import * as uuidv4 from 'uuid/v4';
+import { forkJoin } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 import { CustomerAddedEvent } from '../../event/customer-added/customer-added.event';
 import { CustomerService } from '../../entity/customer/customer.service';
 import { CustomerDto } from '../../entity/customer/customer-dto';
 import { CustomerRemovedEvent } from '../../event/customer-removed/customer-removed.event';
 import { CustomerUpdatedEvent } from '../../event/customer-updated/customer-updated.event';
 import { Customer } from '../../entity/customer/customer.entity';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
+import {
+  AUTHORIZATION,
+  BEARER_HEADER_VALUE_PREFIX,
+} from '../../../constants/app-strings';
 
 @Injectable()
 export class CustomerAggregateService extends AggregateRoot {
-  constructor(private readonly customerService: CustomerService) {
+  constructor(
+    private readonly customerService: CustomerService,
+    private readonly http: HttpService,
+    private readonly clientToken: ClientTokenManagerService,
+    private readonly settings: SettingsService,
+  ) {
     super();
   }
 
@@ -42,7 +56,7 @@ export class CustomerAggregateService extends AggregateRoot {
     this.apply(new CustomerRemovedEvent(customerFound));
   }
 
-  async updateCustomer(updatePayload: Customer) {
+  async updateCustomer(updatePayload) {
     if (updatePayload.tempCreditLimitPeriod) {
       updatePayload.tempCreditLimitPeriod = new Date(
         updatePayload.tempCreditLimitPeriod,
@@ -58,5 +72,25 @@ export class CustomerAggregateService extends AggregateRoot {
     }
     const customerPayload = Object.assign(customer, updatePayload);
     this.apply(new CustomerUpdatedEvent(customerPayload));
+  }
+
+  getUserDetails(email: string) {
+    return forkJoin({
+      token: this.clientToken.getClientToken(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ token, settings }) => {
+        return this.http
+          .get(
+            settings.authServerURL + FRAPPE_API_GET_USER_INFO_ENDPOINT + email,
+            {
+              headers: {
+                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
+              },
+            },
+          )
+          .pipe(map(res => res.data.data));
+      }),
+    );
   }
 }

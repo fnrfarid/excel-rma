@@ -17,6 +17,7 @@ import {
   APP_WWW_FORM_URLENCODED,
   ACCEPT,
   APPLICATION_JSON_CONTENT_TYPE,
+  COMPLETED_STATUS,
 } from '../../../constants/app-strings';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseInvoicePurchaseReceiptItem } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
@@ -73,6 +74,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
                       this.linkPurchaseInvoice(
                         purchaseReceipt,
                         purchase_invoice_name,
+                        clientHttpRequest,
                       );
                       return of({});
                     },
@@ -94,14 +96,19 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
   linkPurchaseInvoice(
     purchaseReceipt: PurchaseReceiptResponseInterface,
     purchase_invoice_name: string,
+    clientHttpRequest,
   ) {
     const purchaseReceiptItems = this.mapPurchaseInvoiceMetaData(
       purchaseReceipt,
+      clientHttpRequest,
     );
     this.purchaseInvoiceService
       .updateOne(
         { name: purchase_invoice_name },
-        { $push: { purchase_receipt_items: { $each: purchaseReceiptItems } } },
+        {
+          $push: { purchase_receipt_items: { $each: purchaseReceiptItems } },
+          $set: { status: COMPLETED_STATUS },
+        },
       )
       .then(success => {})
       .catch(error => {});
@@ -110,6 +117,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
   mapPurchaseInvoiceMetaData(
     purchaseReceipt: PurchaseReceiptResponseInterface,
+    clientHttpRequest,
   ) {
     const purchaseReceiptItems = [];
     purchaseReceipt.items.forEach(item => {
@@ -125,6 +133,9 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       purchaseInvoiceReceiptItem.rate = item.rate;
       purchaseInvoiceReceiptItem.serial_no = item.serial_no.split('\n');
       purchaseInvoiceReceiptItem.warehouse = item.warehouse;
+      purchaseInvoiceReceiptItem.deliveredBy = clientHttpRequest.token.fullName;
+      purchaseInvoiceReceiptItem.deliveredByEmail =
+        clientHttpRequest.token.email;
       purchaseReceiptItems.push(purchaseInvoiceReceiptItem);
     });
     return purchaseReceiptItems;

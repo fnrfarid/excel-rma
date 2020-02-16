@@ -55,4 +55,13 @@ export class Customer {
 
   @Column()
   tempCreditLimitPeriod: Date;
+
+  @Column()
+  creditLimitSetBy: string;
+
+  @Column()
+  creditLimitSetByFullName: string;
+
+  @Column()
+  creditLimitUpdatedOn: Date;
 }
