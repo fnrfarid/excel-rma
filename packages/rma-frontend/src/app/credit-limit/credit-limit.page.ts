@@ -23,6 +23,8 @@ export class CreditLimitPage implements OnInit {
     'credit_limits',
     'extended_credit_limit',
     'expiry_date',
+    'set_by',
+    'set_on',
   ];
   search: string = '';
 

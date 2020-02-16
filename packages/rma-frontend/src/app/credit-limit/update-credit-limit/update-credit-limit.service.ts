@@ -9,7 +9,7 @@ import {
   DEFAULT_COMPANY,
 } from '../../constants/storage';
 import {
-  UPDATE_RMA_CUSTOMER_ENDPOINT,
+  UPDATE_CREDIT_LIMIT_RMA_CUSTOMER_ENDPOINT,
   UPDATE_CUSTOMER_CREDIT_LIMIT_ENDPOINT,
   CUSTOMER_ENDPOINT,
 } from '../../constants/url-strings';
@@ -97,7 +97,7 @@ export class UpdateCreditLimitService {
     expiryDate: string,
   ) {
     return this.http.post(
-      UPDATE_RMA_CUSTOMER_ENDPOINT,
+      UPDATE_CREDIT_LIMIT_RMA_CUSTOMER_ENDPOINT,
       {
         uuid,
         baseCreditLimitAmount: baseLimit,
