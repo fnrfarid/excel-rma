@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { Router, NavigationEnd } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
-import { filter, map } from 'rxjs/operators';
+import { SalesService } from '../services/sales.service';
 
 @Component({
   selector: 'app-item-price',
@@ -16,13 +17,16 @@ export class ItemPricePage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: ItemPriceDataSource;
-  displayedColumns = ['item', 'price'];
-  search: string = '';
+  displayedColumns = ['name', 'item_name', 'brand', 'selling_price', 'price'];
+  itemName: string = '';
+  brand: string = '';
+  itemGroup: string = '';
 
   constructor(
     private readonly location: Location,
     private readonly router: Router,
     private readonly itemPriceService: ItemPriceService,
+    private readonly salesService: SalesService,
   ) {}
 
   ngOnInit() {
@@ -42,10 +46,24 @@ export class ItemPricePage implements OnInit {
     this.location.back();
   }
 
-  setFilter() {
+  setFilter(event?: Sort) {
+    const query: any = {};
+    if (this.brand) query.brand = this.brand;
+    if (this.itemGroup) query.item_group = this.itemGroup;
+    if (this.itemName) query.item_name = this.itemName;
+
+    const sortQuery = {};
+    if (event) {
+      for (const key of Object.keys(event)) {
+        if (key === 'active') {
+          sortQuery[event[key]] = event.direction;
+        }
+      }
+    }
+
     this.dataSource.loadItems(
-      this.search,
-      this.sort.direction,
+      query,
+      sortQuery,
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );
@@ -60,10 +78,30 @@ export class ItemPricePage implements OnInit {
 
   getUpdate(event) {
     this.dataSource.loadItems(
-      this.search,
+      {
+        brand: this.brand,
+        item_group: this.itemGroup,
+        item_name: this.itemName,
+      },
       this.sort.direction,
       event.pageIndex,
       event.pageSize,
     );
+  }
+
+  loadPrice(row, index) {
+    const data = this.dataSource.getData();
+    if (data.length !== 1) {
+      data[index] = { ...row };
+      this.salesService
+        .getItemPrice(data[index].name)
+        .pipe(map(prices => (prices.length ? prices[0].price_list_rate : 0)))
+        .subscribe({
+          next: price => {
+            data[index].selling_price = price;
+          },
+        });
+    }
+    this.dataSource.update(data);
   }
 }
