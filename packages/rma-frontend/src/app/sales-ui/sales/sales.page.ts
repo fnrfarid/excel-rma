@@ -48,6 +48,7 @@ export class SalesPage implements OnInit {
   status: string = 'All';
   name: string = '';
   branch: string = '';
+  total: number = 0;
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
@@ -67,7 +68,20 @@ export class SalesPage implements OnInit {
           return event;
         }),
       )
-      .subscribe({ next: res => {}, error: err => {} });
+      .subscribe({
+        next: res => {
+          this.getTotal();
+        },
+        error: err => {},
+      });
+  }
+
+  getTotal() {
+    this.dataSource.total.subscribe({
+      next: total => {
+        this.total = total;
+      },
+    });
   }
 
   getUpdate(event) {
