@@ -29,4 +29,5 @@ export class PurchaseInvoiceDetails {
   net_total?: number;
   items?: Item[];
   contact_display?: string;
+  purchase_receipt_items: any[];
 }

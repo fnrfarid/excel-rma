@@ -35,74 +35,17 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Address</ion-label>
-            <ion-textarea
-              readonly="true"
-              value="{{
-                purchaseInvoiceDetails?.address_display
-                  ? purchaseInvoiceDetails.address_display
-                  : ''
-              }}"
-              rows="5"
-            ></ion-textarea>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
             <ion-label position="floating">Posting Date</ion-label>
             <ion-datetime
               readonly
               placeholder="Posting Date"
-              display-format="YYYY.DD.MM"
+              display-format="DD-MM-YYYY"
               value="{{
                 purchaseInvoiceDetails?.posting_date
                   ? purchaseInvoiceDetails.posting_date
                   : ''
               }}"
             ></ion-datetime>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Balance</ion-label>
-            <ion-input
-              readonly="true"
-              type="string"
-              placeholder="Balance"
-              value="{{
-                purchaseInvoiceDetails?.outstanding_amount
-                  ? (purchaseInvoiceDetails.outstanding_amount
-                    | curFormat
-                    | async)
-                  : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Due Date</ion-label>
-            <ion-datetime
-              readonly
-              placeholder="Due Date"
-              value="{{
-                purchaseInvoiceDetails?.due_date
-                  ? purchaseInvoiceDetails.due_date
-                  : ''
-              }}"
-              display-format="YYYY.DD.MM"
-            ></ion-datetime>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Branch</ion-label>
-            <ion-input readonly="true" type="text" placeholder="Branch">
-            </ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -112,9 +55,10 @@
               readonly="true"
               type="text"
               value="{{
-                purchaseInvoiceDetails?.contact_display
-                  ? purchaseInvoiceDetails.contact_display
-                  : ''
+                purchaseInvoiceDetails.purchase_receipt_items
+                  ? (purchaseInvoiceDetails?.purchase_receipt_items)[0]
+                      ?.warehouse
+                  : 'Please assign serial to see warehouse'
               }}"
               placeholder="Warehouse"
             ></ion-input>
@@ -122,13 +66,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label>Package Invoice</ion-label>
-            <ion-checkbox slot="start"></ion-checkbox>
-          </ion-item>
-        </ion-col>
-        <ion-col>
+        <ion-col size-md="6" offset-md="6">
           <ion-item lines="none">
             <ion-label position="floating">Status</ion-label>
             <ion-input
@@ -161,18 +99,16 @@
   </ion-card-header>
   <ion-card-content class="ion-no-padding">
     <mat-table #table [dataSource]="dataSource" style="width: 100%;">
-      <ng-container matColumnDef="item_code">
-        <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+      <ng-container matColumnDef="item_group">
+        <mat-header-cell *matHeaderCellDef>Item Group</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container *ngIf="row.name">
-            {{ row.item_code }}
+            {{ row.item_group }}
           </ng-container>
-
-          <span class="add-comment" *ngIf="!row.name">
-            Add an item
-          </span>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
       </ng-container>
+
       <ng-container matColumnDef="item_name">
         <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -180,7 +116,9 @@
             {{ row.item_name }}
           </ng-container>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef>Total :</mat-footer-cell>
       </ng-container>
+
       <ng-container matColumnDef="qty">
         <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -188,7 +126,9 @@
             {{ row.qty }}
           </ng-container>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef>{{ total_qty }}</mat-footer-cell>
       </ng-container>
+
       <ng-container matColumnDef="rate">
         <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -196,17 +136,27 @@
             {{ row.rate | curFormat | async }}
           </ng-container>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
       </ng-container>
+
       <ng-container matColumnDef="amount">
         <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
         <mat-cell *matCellDef="let row">
           {{ row.rate * row.qty | curFormat | async }}
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef>
+          {{ total | curFormat | async }}
+        </mat-footer-cell>
       </ng-container>
+
       <mat-header-row
         *matHeaderRowDef="displayedColumns; sticky: true"
       ></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      <mat-footer-row
+        class="footer"
+        *matFooterRowDef="displayedColumns; sticky: true"
+      ></mat-footer-row>
     </mat-table>
   </ion-card-content>
 </ion-card>

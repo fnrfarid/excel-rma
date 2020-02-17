@@ -14,11 +14,13 @@ import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
   styleUrls: ['./purchase-details.component.scss'],
 })
 export class PurchaseDetailsComponent implements OnInit {
-  displayedColumns = ['item_code', 'item_name', 'qty', 'rate', 'amount'];
+  displayedColumns = ['item_group', 'item_name', 'qty', 'rate', 'amount'];
   purchaseInvoiceDetails: PurchaseInvoiceDetails;
   dataSource: Item[];
   invoiceUuid: string;
   viewPurchaseInvoiceUrl: string;
+  total_qty: number;
+  total: number;
   constructor(
     private readonly purchaseService: PurchaseService,
     private readonly snackBar: MatSnackBar,
@@ -28,6 +30,8 @@ export class PurchaseDetailsComponent implements OnInit {
   ngOnInit() {
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.purchaseInvoiceDetails = {} as PurchaseInvoiceDetails;
+    this.total_qty = 0;
+    this.total = 0;
     this.getPurchaseInvoice(this.invoiceUuid);
   }
 
@@ -44,6 +48,7 @@ export class PurchaseDetailsComponent implements OnInit {
           ? this.purchaseInvoiceDetails.address_display.replace(/<br>/g, '\n')
           : undefined;
         this.dataSource = res.items;
+        this.calculateTotal(this.dataSource);
         this.purchaseService
           .getStore()
           .getItem(AUTH_SERVER_URL)
@@ -68,6 +73,15 @@ export class PurchaseDetailsComponent implements OnInit {
           { duration: 2500 },
         );
       },
+    });
+  }
+
+  calculateTotal(itemList: Item[]) {
+    this.total = 0;
+    this.total_qty = 0;
+    itemList.forEach(item => {
+      this.total += item.qty * item.rate;
+      this.total_qty += item.qty;
     });
   }
 }
