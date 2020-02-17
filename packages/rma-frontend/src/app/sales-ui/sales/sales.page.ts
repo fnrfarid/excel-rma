@@ -40,6 +40,7 @@ export class SalesPage implements OnInit {
     'Completed',
     'To Deliver',
     'Canceled',
+    'Rejected',
     'Submitted',
     'All',
   ];
