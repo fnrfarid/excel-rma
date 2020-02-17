@@ -1767,6 +1767,10 @@ export function purchaseInvoiceOnSubmitWebhookData(
         fieldname: 'payment_schedule',
         key: 'payment_schedule',
       },
+      {
+        fieldname: 'owner',
+        key: 'owner',
+      },
     ],
   };
 }
