@@ -52,6 +52,10 @@ export class PurchaseInvoiceWebhookDto {
   @IsString()
   name: string;
 
+  @IsOptional()
+  @IsString()
+  owner: string;
+
   @IsNotEmpty()
   @IsString()
   title: string;
