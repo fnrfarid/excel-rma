@@ -69,16 +69,6 @@
               />
             </mat-form-field>
           </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                placeholder="Branch"
-                [(ngModel)]="branch"
-                (keyup.enter)="setFilter()"
-              />
-            </mat-form-field>
-          </ion-col>
         </ion-row>
       </ion-grid>
       <mat-table
@@ -148,21 +138,12 @@
           </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="branch">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="territory">
-            Branch
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.territory}}
-          </mat-cell>
-        </ng-container>
-
         <ng-container matColumnDef="created_by">
           <mat-header-cell *matHeaderCellDef>
             Created By
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{ row.createdBy }}
+            {{ row.created_by }}
           </mat-cell>
         </ng-container>
 

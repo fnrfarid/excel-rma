@@ -23,7 +23,6 @@ export class PurchasePage implements OnInit {
     'date',
     'supplier',
     'total',
-    'branch',
     'created_by',
     'delivered_by',
   ];
@@ -31,7 +30,6 @@ export class PurchasePage implements OnInit {
   supplier: string = '';
   status: string = 'All';
   name: string = '';
-  branch: string = '';
   search: string = '';
   constructor(
     private location: Location,
@@ -48,7 +46,6 @@ export class PurchasePage implements OnInit {
     if (this.supplier) query.supplier_name = this.supplier;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
-    if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
       undefined,
       event.pageIndex,
@@ -62,7 +59,6 @@ export class PurchasePage implements OnInit {
     if (this.supplier) query.supplier_name = this.supplier;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
-    if (this.branch) query.territory = this.branch;
 
     const sortQuery = {};
     if (event) {
