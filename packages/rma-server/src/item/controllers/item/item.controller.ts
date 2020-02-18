@@ -20,6 +20,7 @@ import { SetMinimumItemPriceCommand } from '../../commands/set-minimum-item-pric
 import { RetrieveItemByCodeQuery } from '../../query/get-item-by-code/retrieve-item-by-code-.query';
 import { RetrieveItemByNamesQuery } from '../../query/get-item-by-names/retrieve-item-by-names-.query';
 import { INVALID_ITEM_NAME_QUERY } from '../../../constants/messages';
+import { SetPurchaseWarrantyDaysCommand } from '../../commands/set-purchase-warranty-days/set-purchase-warranty-days.command';
 
 @Controller('item')
 export class ItemController {
@@ -77,6 +78,15 @@ export class ItemController {
   ) {
     return await this.commandBus.execute(
       new SetMinimumItemPriceCommand(uuid, minimumPrice),
+    );
+  }
+
+  @Roles(SYSTEM_MANAGER)
+  @Post('v1/set_purchase_warranty_days/:uuid')
+  @UseGuards(TokenGuard, RoleGuard)
+  async setPurchaseWarrantyDays(@Param('uuid') uuid, @Body('days') days) {
+    return await this.commandBus.execute(
+      new SetPurchaseWarrantyDaysCommand(uuid, days),
     );
   }
 }

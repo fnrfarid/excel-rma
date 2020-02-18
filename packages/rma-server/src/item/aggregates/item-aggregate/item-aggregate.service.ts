@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { ItemService } from '../../entity/item/item.service';
 import { MinimumItemPriceSetEvent } from '../../events/minimum-item-price-set/minimum-item-price-set.event';
+import { PurchaseWarrantyDaysSetEvent } from '../../events/purchase-warranty-days-set/purchase-warranty-days-set.event';
 
 @Injectable()
 export class ItemAggregateService extends AggregateRoot {
@@ -23,6 +24,12 @@ export class ItemAggregateService extends AggregateRoot {
     const item = await this.itemService.findOne({ uuid });
     item.minimumPrice = minimumPrice;
     this.apply(new MinimumItemPriceSetEvent(item));
+  }
+
+  async setPurchaseWarrantyDays(uuid: string, purchaseWarrantyDays: number) {
+    const item = await this.itemService.findOne({ uuid });
+    item.purchaseWarrantyDays = purchaseWarrantyDays;
+    this.apply(new PurchaseWarrantyDaysSetEvent(item));
   }
 
   async retrieveItemByCode(code: string, req) {
