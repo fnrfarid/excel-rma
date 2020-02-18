@@ -353,7 +353,7 @@
         </ion-text>
       </ion-card-title>
     </ion-card-header>
-    <ion-card-content *ngIf="address.name">
+    <ion-card-content *ngIf="address.name && customerFormControl.value">
       <ion-grid class="ion-no-padding">
         <ion-row>
           <ion-col>
@@ -369,6 +369,11 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+    </ion-card-content>
+    <ion-card-content *ngIf="!address.name && customerFormControl.value ">
+      <ion-text class="example-full-width">
+        No address assigned to customer
+      </ion-text>
     </ion-card-content>
   </ion-card>
 </ion-content>
