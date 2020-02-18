@@ -4,9 +4,14 @@ import { PurchaseReceiptController } from './controllers/purchase-receipt/purcha
 import { PurchaseInvoiceEntitiesModule } from '../purchase-invoice/entity/entity.module';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { PurchaseReceiptPoliciesService } from './purchase-receipt-policies/purchase-receipt-policies.service';
+import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Module({
-  imports: [PurchaseInvoiceEntitiesModule, SerialNoEntitiesModule],
+  imports: [
+    PurchaseInvoiceEntitiesModule,
+    SerialNoEntitiesModule,
+    ErrorLogModule,
+  ],
   controllers: [PurchaseReceiptController],
   providers: [
     ...PurchaseInvoiceAggregatesManager,
