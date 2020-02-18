@@ -41,7 +41,7 @@ export class AddSalesInvoicePage implements OnInit {
   total: number = 0;
   postingDate: string;
   dueDate: string;
-
+  address = {} as any;
   displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
   warehouseFormControl = new FormControl('');
   filteredWarehouseList: Observable<any[]>;
@@ -235,6 +235,11 @@ export class AddSalesInvoicePage implements OnInit {
       this.dueDateFormControl.setValue(date);
     } else this.dueDateFormControl.setValue('');
 
+    this.salesService.getAddress(customer.name).subscribe({
+      next: res => {
+        this.address = res;
+      },
+    });
     this.getRemainingBalance();
   }
 
