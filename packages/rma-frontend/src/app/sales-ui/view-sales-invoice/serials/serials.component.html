@@ -84,18 +84,6 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              placeholder="Prefix"
-              (input)="onPrefixChange($event.target.value)"
-              type="text"
-              name="Prefix"
-              [(ngModel)]="rangePickerState.prefix"
-            />
-          </mat-form-field>
-        </ion-col>
-        <ion-col>
-          <mat-form-field class="example-full-width">
-            <input
-              matInput
               placeholder="From Range"
               type="text"
               name="From Range"
@@ -115,6 +103,8 @@
               (ngModelChange)="this.toRangeUpdate.next($event)"
             />
           </mat-form-field>
+        </ion-col>
+        <ion-col>
           <ion-text color="primary">
             <h3>Total : {{ rangePickerState.serials.length }}</h3>
           </ion-text>
