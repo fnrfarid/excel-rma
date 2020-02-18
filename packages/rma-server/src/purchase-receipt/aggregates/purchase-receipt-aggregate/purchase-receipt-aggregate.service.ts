@@ -23,6 +23,7 @@ import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-
 import { PurchaseInvoicePurchaseReceiptItem } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/purchase-receipt-policies.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -31,6 +32,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     private readonly settingsService: SettingsService,
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
     private readonly purchaseReceiptPolicyService: PurchaseReceiptPoliciesService,
+    private readonly errorLogService: ErrorLogService,
   ) {
     super();
   }
@@ -82,6 +84,12 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
                 );
             }),
             catchError(err => {
+              this.errorLogService.createErrorLog(
+                err,
+                'Purchase Receipt',
+                'Purchase Receipt',
+                clientHttpRequest,
+              );
               return throwError(
                 new BadRequestException(
                   err.response ? err.response.data.exc : err,
