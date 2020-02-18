@@ -65,9 +65,19 @@
               routerLinkActive="active"
             >
               <ion-icon slot="start" name="settings"></ion-icon>
+              <ion-icon
+                name="chevron-down-outline"
+                *ngIf="!isSettingMenuVisible"
+                slot="end"
+              ></ion-icon>
+              <ion-icon
+                name="chevron-up-outline"
+                *ngIf="isSettingMenuVisible"
+                slot="end"
+              ></ion-icon>
               <ion-label>Settings</ion-label>
             </ion-item>
-            <ion-list *ngIf="isSettingMenuVisible">
+            <ion-list *ngIf="isSettingMenuVisible" class="ion-margin-start">
               <ion-item
                 *ngIf="loggedIn && showSettings"
                 routerLink="/settings/item-price"
