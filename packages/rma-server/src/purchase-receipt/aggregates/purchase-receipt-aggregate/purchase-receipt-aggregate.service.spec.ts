@@ -4,6 +4,7 @@ import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/purchase-receipt-policies.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 describe('PurchaseInvoiceAggregateService', () => {
   let service: PurchaseReceiptAggregateService;
@@ -22,6 +23,10 @@ describe('PurchaseInvoiceAggregateService', () => {
         },
         {
           provide: PurchaseInvoiceService,
+          useValue: {},
+        },
+        {
+          provide: ErrorLogService,
           useValue: {},
         },
         {
