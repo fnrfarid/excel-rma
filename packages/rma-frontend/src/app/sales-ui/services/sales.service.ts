@@ -32,6 +32,8 @@ import {
   GET_USER_PROFILE_ROLES,
   CREATE_SALES_RETURN_ENDPOINT,
   API_TERRITORY_GET_WAREHOUSES,
+  RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
+  RELAY_GET_FULL_ADDRESS_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -298,6 +300,34 @@ export class SalesService {
                   headers,
                 })
                 .pipe(map(res => res.data));
+            }),
+          );
+      }),
+    );
+  }
+
+  getAddress(name: string) {
+    const getAddressNameURL = RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT;
+
+    const params = new HttpParams()
+      .set('doctype', 'Customer')
+      .set('name', name);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http
+          .get<any>(getAddressNameURL, { params, headers })
+          .pipe(
+            map(res => res.message),
+            switchMap(address => {
+              if (address) {
+                const getFullAddressURL =
+                  RELAY_GET_FULL_ADDRESS_ENDPOINT + address;
+                return this.http
+                  .get<any>(getFullAddressURL, { headers })
+                  .pipe(map(res => res.data));
+              }
+              return of({});
             }),
           );
       }),
