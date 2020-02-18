@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
   hideAuthButtons: boolean = false;
   subscription: Subscription;
   showSettings: boolean = false;
+  isSettingMenuVisible: boolean = false;
 
   constructor(
     private readonly appService: AppService,
