@@ -124,4 +124,7 @@ export class Item extends BaseEntity {
 
   @Column()
   minimumPrice: number;
+
+  @Column()
+  purchaseWarrantyDays: number;
 }
