@@ -59,8 +59,8 @@ export class SerialsComponent implements OnInit {
 
   rangePickerState = {
     prefix: '',
-    fromRange: 0,
-    toRange: 0,
+    fromRange: '',
+    toRange: '',
     serials: [],
   };
 
@@ -109,15 +109,34 @@ export class SerialsComponent implements OnInit {
     );
   }
 
+  getSerialPrefix(startSerial, endSerial) {
+    if (!startSerial || !endSerial) return { start: 0, end: 0, prefix: '' };
+    const max =
+      startSerial.length > endSerial.length
+        ? startSerial.length
+        : endSerial.length;
+    startSerial = startSerial.split('');
+    endSerial = endSerial.split('');
+    let prefix = '';
+    for (let i = 0; i < max; i++) {
+      if (startSerial[i] === endSerial[i]) {
+        prefix += startSerial[i];
+      } else {
+        break;
+      }
+    }
+    const start = startSerial
+      .splice(prefix.length, startSerial.length)
+      .join('');
+    const end = endSerial.splice(prefix.length, startSerial.length).join('');
+    return { start, end, prefix };
+  }
+
   onFromRange(value) {
     this.fromRangeUpdate
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(v => {
-        this.generateSerials(
-          value,
-          this.rangePickerState.toRange,
-          this.rangePickerState.prefix,
-        );
+        this.generateSerials(value, this.rangePickerState.toRange);
       });
   }
 
@@ -125,32 +144,30 @@ export class SerialsComponent implements OnInit {
     this.toRangeUpdate
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(v => {
-        this.generateSerials(
-          this.rangePickerState.fromRange,
-          value,
-          this.rangePickerState.prefix,
-        );
+        this.generateSerials(this.rangePickerState.fromRange, value);
       });
   }
 
-  onPrefixChange(value) {
-    this.generateSerials(
-      this.rangePickerState.fromRange,
-      this.rangePickerState.toRange,
-      value,
-    );
-  }
-
-  generateSerials(fromRange?, toRange?, prefix?) {
+  generateSerials(fromRange?, toRange?) {
     this.rangePickerState.serials =
       this.getSerialsFromRange(
         fromRange || this.rangePickerState.fromRange || 0,
         toRange || this.rangePickerState.toRange || 0,
-        prefix || this.rangePickerState.prefix,
       ) || [];
   }
 
-  getSerialsFromRange(start: number, end: number, prefix: string) {
+  isNumber(number) {
+    return !isNaN(parseFloat(number)) && isFinite(number);
+  }
+
+  getSerialsFromRange(startSerial: string, endSerial: string) {
+    const { start, end, prefix } = this.getSerialPrefix(startSerial, endSerial);
+    if (!this.isNumber(start) || !this.isNumber(end)) {
+      this.getMessage(
+        'Invalid serial range, end should be a number found character',
+      );
+      return [];
+    }
     const data: any[] = _.range(
       start > end ? Number(start) + 1 : start,
       end > start ? Number(end) + 1 : end,
@@ -403,8 +420,8 @@ export class SerialsComponent implements OnInit {
   resetRangeState() {
     this.rangePickerState = {
       prefix: '',
-      fromRange: 0,
-      toRange: 0,
+      fromRange: '',
+      toRange: '',
       serials: [],
     };
   }
@@ -489,7 +506,7 @@ export class SerialsComponent implements OnInit {
         ? `${notFoundMessage}, expected ${expected} found ${found}`
         : `${notFoundMessage}`,
       CLOSE,
-      { duration: 2500 },
+      { duration: 4500 },
     );
   }
 

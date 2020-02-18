@@ -33,7 +33,7 @@ describe('PurchaseDetailsComponent', () => {
         {
           provide: PurchaseService,
           useValue: {
-            getPurchaseInvoice: (...args) => of({}),
+            getPurchaseInvoice: (...args) => of({ items: [] }),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

@@ -1,17 +1,27 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
 import { PurchaseInvoiceWebhookDto } from '../../entity/purchase-invoice/purchase-invoice-webhook-dto';
 import { PurchaseInvoiceService } from '../../entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseInvoice } from '../../entity/purchase-invoice/purchase-invoice.entity';
-import { from, throwError, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { from, throwError, of, forkJoin } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 import * as uuidv4 from 'uuid/v4';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
-import { SUBMITTED_STATUS } from '../../../constants/app-strings';
+import {
+  SUBMITTED_STATUS,
+  AUTHORIZATION,
+  BEARER_HEADER_VALUE_PREFIX,
+} from '../../../constants/app-strings';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class PurchaseInvoiceWebhookAggregateService {
   constructor(
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
+    private readonly clientToken: ClientTokenManagerService,
+    private readonly settings: SettingsService,
+    private readonly http: HttpService,
   ) {}
 
   purchaseInvoiceCreated(purchaseInvoicePayload: PurchaseInvoiceWebhookDto) {
@@ -27,12 +37,16 @@ export class PurchaseInvoiceWebhookAggregateService {
           );
         }
         const provider = this.mapPurchaseInvoice(purchaseInvoicePayload);
-
-        this.purchaseInvoiceService
-          .create(provider)
-          .then(success => {})
-          .catch(error => {});
-        return of({});
+        return this.getUserDetails(purchaseInvoicePayload.owner).pipe(
+          switchMap(user => {
+            provider.created_by = user.full_name;
+            this.purchaseInvoiceService
+              .create(provider)
+              .then(success => {})
+              .catch(error => {});
+            return of({});
+          }),
+        );
       }),
     );
   }
@@ -46,5 +60,25 @@ export class PurchaseInvoiceWebhookAggregateService {
     purchaseInvoice.inQueue = false;
     purchaseInvoice.submitted = true;
     return purchaseInvoice;
+  }
+
+  getUserDetails(email: string) {
+    return forkJoin({
+      token: this.clientToken.getClientToken(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ token, settings }) => {
+        return this.http
+          .get(
+            settings.authServerURL + FRAPPE_API_GET_USER_INFO_ENDPOINT + email,
+            {
+              headers: {
+                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
+              },
+            },
+          )
+          .pipe(map(res => res.data.data));
+      }),
+    );
   }
 }
