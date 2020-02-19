@@ -13,7 +13,7 @@
     "start:debug": "nest start --debug --watch",
     "prestart:prod": "rimraf dist && npm run build",
     "start:prod": "node dist/main.js",
-    "lint": "eslint '{tests,src}/**/*.ts'",
+    "lint": "eslint '{test,src}/**/*.ts'",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
