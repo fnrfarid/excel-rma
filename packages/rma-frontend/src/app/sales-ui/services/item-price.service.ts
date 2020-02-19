@@ -79,7 +79,7 @@ export class ItemPriceService {
       }),
     );
   }
-  // created revant sir
+
   setPurchaseWarrantyDays(itemUuid: string, days: number) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -93,7 +93,7 @@ export class ItemPriceService {
       }),
     );
   }
-  // -------------
+
   getRemainingBalance(
     account: string,
     date: string,
