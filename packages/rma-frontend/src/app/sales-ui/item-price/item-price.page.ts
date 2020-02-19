@@ -17,11 +17,18 @@ export class ItemPricePage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: ItemPriceDataSource;
-  displayedColumns = ['name', 'item_name', 'brand', 'selling_price', 'price'];
+  displayedColumns = [
+    'name',
+    'item_name',
+    'brand',
+    'purchaseWarrantyDays',
+    'selling_price',
+    'price',
+  ];
   itemName: string = '';
   brand: string = '';
   itemGroup: string = '';
-
+  purchaseWarrantyDays: string = '';
   constructor(
     private readonly location: Location,
     private readonly router: Router,
@@ -67,6 +74,13 @@ export class ItemPricePage implements OnInit {
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );
+  }
+
+  updatePurchaseWarrantyDays(row: ListingData, days: number) {
+    this.itemPriceService.setPurchaseWarrantyDays(row.uuid, days).subscribe({
+      next: success => (row.purchaseWarrantyDays = days),
+      error: error => {},
+    });
   }
 
   updateMinPrice(row: ListingData, minPrice: number) {
