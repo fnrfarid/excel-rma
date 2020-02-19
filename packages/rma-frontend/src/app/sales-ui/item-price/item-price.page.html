@@ -108,7 +108,35 @@
             {{row.brand}}
           </td>
         </ng-container>
+        <!-- purchase Warranty Days Column -->
+        <ng-container matColumnDef="purchaseWarrantyDays">
+          <th mat-header-cell *matHeaderCellDef class="ion-text-right">
+            Purchase Warranty Days
+          </th>
 
+          <td
+            class="ion-text-right"
+            mat-cell
+            *matCellDef="let row"
+            [satPopoverAnchor]="d"
+            tabindex="0"
+            (keyup.enter)="d.open()"
+            (click)="d.open()"
+          >
+            <ion-text>
+              {{row.purchaseWarrantyDays}}
+            </ion-text>
+            <sat-popover
+              #d
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updatePurchaseWarrantyDays(row, $event)"
+            >
+              <edit-days [value]="row.purchaseWarrantyDays"></edit-days>
+            </sat-popover>
+          </td>
+        </ng-container>
         <!-- Price Column -->
         <ng-container matColumnDef="price">
           <th mat-header-cell *matHeaderCellDef class="ion-text-right">
