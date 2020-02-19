@@ -149,4 +149,8 @@ export class SalesPage implements OnInit {
       this.setFilter();
     }
   }
+
+  getDate(date: string) {
+    return new Date(date);
+  }
 }

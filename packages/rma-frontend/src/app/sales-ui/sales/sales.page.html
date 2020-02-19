@@ -145,7 +145,7 @@
             Date
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.posting_date}}
+            {{( getDate(row.posting_date) | date:'dd-MM-yyyy' )}}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
