@@ -13,7 +13,7 @@ export class EditDaysComponent implements OnInit {
     return this._value;
   }
   set value(val) {
-    this.frmCtrl.setValue({ minimumPrice: val });
+    this.frmCtrl.setValue({ purchaseWarrantyDays: val });
     this.days = val;
     this._value = val;
   }
@@ -21,9 +21,6 @@ export class EditDaysComponent implements OnInit {
   days: number = 0.0;
 
   frmCtrl = new FormControl();
-
-  @Input()
-  column: string;
 
   constructor(@Optional() @Host() public popover: SatPopover) {}
 
