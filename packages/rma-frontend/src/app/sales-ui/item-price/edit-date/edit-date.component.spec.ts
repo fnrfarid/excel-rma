@@ -1,13 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-// import { IonicModule } from '@ionic/angular';
-
 import { EditDateComponent } from './edit-date.component';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SatPopover } from '@ncstate/sat-popover';
-
-// import { SatPopover } from '@ncstate/sat-popover';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('EditDateComponent', () => {
