@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditDateComponent } from './edit-date.component';
+import { EditDaysComponent } from './edit-days.component';
 import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -7,12 +7,12 @@ import { SatPopover } from '@ncstate/sat-popover';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('EditDateComponent', () => {
-  let component: EditDateComponent;
-  let fixture: ComponentFixture<EditDateComponent>;
+  let component: EditDaysComponent;
+  let fixture: ComponentFixture<EditDaysComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [EditDateComponent],
+      declarations: [EditDaysComponent],
       // imports: [IonicModule.forRoot()]
       imports: [
         MaterialModule,
@@ -25,7 +25,7 @@ describe('EditDateComponent', () => {
     }).compileComponents();
   }));
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditDateComponent);
+    fixture = TestBed.createComponent(EditDaysComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

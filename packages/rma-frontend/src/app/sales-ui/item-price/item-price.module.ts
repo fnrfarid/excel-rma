@@ -9,7 +9,7 @@ import { ItemPricePage } from './item-price.page';
 import { MaterialModule } from '../../material/material.module';
 import { AppCommonModule } from '../../common/app-common.module';
 import { EditPriceComponent } from './edit-price/edit-price.component';
-import { EditDateComponent } from './edit-date/edit-date.component';
+import { EditDaysComponent } from './edit-days/edit-days.component';
 const routes: Routes = [
   {
     path: '',
@@ -26,6 +26,6 @@ const routes: Routes = [
     MaterialModule,
     AppCommonModule,
   ],
-  declarations: [ItemPricePage, EditPriceComponent, EditDateComponent],
+  declarations: [ItemPricePage, EditPriceComponent, EditDaysComponent],
 })
 export class ItemPricePageModule {}

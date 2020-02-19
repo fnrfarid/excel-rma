@@ -108,10 +108,10 @@
             {{row.brand}}
           </td>
         </ng-container>
-        <!-- purchase Warranty Dates Column -->
-        <ng-container matColumnDef="purchaseWarrantyDates">
+        <!-- purchase Warranty Days Column -->
+        <ng-container matColumnDef="purchaseWarrantyDays">
           <th mat-header-cell *matHeaderCellDef class="ion-text-right">
-            purchaseWarrantyDates
+            Purchase Warranty Days
           </th>
 
           <td
@@ -124,19 +124,16 @@
             (click)="d.open()"
           >
             <ion-text>
-              {{row.days }}
+              {{row.purchaseWarrantyDays}}
             </ion-text>
             <sat-popover
               #d
               hasBackdrop
               xAlign="start"
               yAlign="start"
-              (closed)="updatePurchaseWarrantyDates(row, $event)"
+              (closed)="updatePurchaseWarrantyDays(row, $event)"
             >
-              <edit-date
-                [value]="row.days"
-                column="purchaseWarrantyDates"
-              ></edit-date>
+              <edit-days [value]="row.purchaseWarrantyDays"></edit-days>
             </sat-popover>
           </td>
         </ng-container>

@@ -3,11 +3,11 @@ import { FormControl } from '@angular/forms';
 import { SatPopover } from '@ncstate/sat-popover';
 
 @Component({
-  selector: 'edit-date',
-  templateUrl: './edit-date.component.html',
-  styleUrls: ['./edit-date.component.scss'],
+  selector: 'edit-days',
+  templateUrl: './edit-days.component.html',
+  styleUrls: ['./edit-days.component.scss'],
 })
-export class EditDateComponent implements OnInit {
+export class EditDaysComponent implements OnInit {
   @Input()
   get value(): any {
     return this._value;

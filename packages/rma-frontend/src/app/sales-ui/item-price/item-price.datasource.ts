@@ -11,7 +11,7 @@ export interface ListingData {
   item_name?: string;
   price?: number;
   selling_price?: number;
-  days?: number;
+  purchaseWarrantyDays?: number;
 }
 
 export interface ItemListResponse {
