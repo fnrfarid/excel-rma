@@ -14,6 +14,7 @@ import {
   RELAY_GET_STOCK_BALANCE_ENDPOINT,
   GET_BALANCE_ON_ENDPOINT,
   RELAY_API_RES_COMPANY,
+  API_ITEM_SET_PURCHASE_WARRANTY_DAYS,
 } from '../../constants/url-strings';
 import { ItemListResponse } from '../item-price/item-price.datasource';
 
@@ -78,7 +79,21 @@ export class ItemPriceService {
       }),
     );
   }
-
+  // created revant sir
+  setPurchaseWarrantyDays(itemUuid: string, days: number) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          API_ITEM_SET_PURCHASE_WARRANTY_DAYS + '/' + itemUuid,
+          { days },
+          {
+            headers,
+          },
+        );
+      }),
+    );
+  }
+  // -------------
   getRemainingBalance(
     account: string,
     date: string,

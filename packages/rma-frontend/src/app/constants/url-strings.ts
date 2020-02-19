@@ -62,3 +62,5 @@ export const ERPNEXT_ACCOUNT_ENDPOINT =
   '/api/command/user/api/resource/Account';
 export const ERPNEXT_WAREHOUSE_ENDPOINT =
   '/api/command/user/api/resource/Warehouse';
+export const API_ITEM_SET_PURCHASE_WARRANTY_DAYS =
+  '/api/item/v1/set_purchase_warranty_days';
