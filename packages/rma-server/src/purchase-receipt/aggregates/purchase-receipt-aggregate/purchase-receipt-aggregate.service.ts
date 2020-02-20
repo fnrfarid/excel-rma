@@ -10,7 +10,15 @@ import {
   PurchaseReceiptItemDto,
 } from '../../entity/purchase-receipt-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map, catchError, bufferCount } from 'rxjs/operators';
+import {
+  switchMap,
+  map,
+  catchError,
+  bufferCount,
+  mergeMap,
+  retry,
+  delay,
+} from 'rxjs/operators';
 import { throwError, of, Observable, from } from 'rxjs';
 import {
   FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT,
@@ -27,6 +35,7 @@ import {
   COMPLETED_STATUS,
   PURCHASE_RECEIPT_BATCH_SIZE,
   SERIAL_NO_VALIDATION_BATCH_SIZE,
+  FRAPPE_INSERT_MANY_BATCH_COUNT,
 } from '../../../constants/app-strings';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseInvoicePurchaseReceiptItem } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
@@ -217,8 +226,8 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           data.doctype = 'Purchase Receipt';
           return data;
         }),
-        bufferCount(10),
-        switchMap(receipt => {
+        bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
+        mergeMap(receipt => {
           return this.http.post<any>(
             settings.authServerURL + FRAPPE_API_INSERT_MANY,
             { docs: JSON.stringify(receipt) },
@@ -229,6 +238,8 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
             },
           );
         }),
+        delay(300),
+        retry(8),
       )
       .subscribe({
         next: (success: { data: { message: string[] }; config: any }) => {

@@ -112,25 +112,32 @@ export class SerialsComponent implements OnInit {
 
   getSerialPrefix(startSerial, endSerial) {
     if (!startSerial || !endSerial) return { start: 0, end: 0, prefix: '' };
-    const max =
-      startSerial.length > endSerial.length
-        ? startSerial.length
-        : endSerial.length;
-    startSerial = startSerial.split('');
-    endSerial = endSerial.split('');
-    let prefix = '';
-    for (let i = 0; i < max; i++) {
-      if (startSerial[i] === endSerial[i]) {
-        prefix += startSerial[i];
-      } else {
-        break;
-      }
+    const serialStartNumber = startSerial.match(/\d+/g);
+    const serialEndNumber = endSerial.match(/\d+/g);
+    let start = Number(
+      serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
+    );
+    let end = Number(serialEndNumber[serialEndNumber.length - 1].match(/\d+/g));
+    const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
+      /\d+$/,
+      '',
+    );
+    if (start > end) {
+      const tmp = start;
+      start = end;
+      end = tmp;
     }
-    const start = startSerial
-      .splice(prefix.length, startSerial.length)
-      .join('');
-    const end = endSerial.splice(prefix.length, startSerial.length).join('');
     return { start, end, prefix };
+  }
+
+  getStringPrefix(arr1: string[]) {
+    const arr = arr1.concat().sort(),
+      a1 = arr[0],
+      a2 = arr[arr.length - 1],
+      L = a1.length;
+    let i = 0;
+    while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
+    return a1.substring(0, i);
   }
 
   onFromRange(value) {
