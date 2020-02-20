@@ -24,6 +24,7 @@ import { DeliveryNote } from '../delivery-note/entity/delivery-note-service/deli
 import { Territory } from '../customer/entity/territory/territory.entity';
 import { PurchaseInvoice } from '../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
 import { ErrorLog } from '../error-log/error-log-service/error-log.entity';
+import { PurchaseReceipt } from '../purchase-receipt/entity/purchase-receipt.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -52,6 +53,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       DeliveryNote,
       Territory,
       PurchaseInvoice,
+      PurchaseReceipt,
       ErrorLog,
     ],
     useNewUrlParser: true,

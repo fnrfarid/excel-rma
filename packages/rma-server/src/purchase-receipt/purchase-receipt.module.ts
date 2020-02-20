@@ -5,17 +5,22 @@ import { PurchaseInvoiceEntitiesModule } from '../purchase-invoice/entity/entity
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { PurchaseReceiptPoliciesService } from './purchase-receipt-policies/purchase-receipt-policies.service';
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PurchaseReceiptService } from './entity/purchase-receipt.service';
+import { PurchaseReceipt } from './entity/purchase-receipt.entity';
 
 @Module({
   imports: [
     PurchaseInvoiceEntitiesModule,
     SerialNoEntitiesModule,
     ErrorLogModule,
+    TypeOrmModule.forFeature([PurchaseReceipt]),
   ],
   controllers: [PurchaseReceiptController],
   providers: [
     ...PurchaseInvoiceAggregatesManager,
     PurchaseReceiptPoliciesService,
+    PurchaseReceiptService,
   ],
   exports: [],
 })

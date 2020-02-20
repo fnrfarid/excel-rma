@@ -5,6 +5,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/purchase-receipt-policies.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 
 describe('PurchaseInvoiceAggregateService', () => {
   let service: PurchaseReceiptAggregateService;
@@ -27,6 +28,10 @@ describe('PurchaseInvoiceAggregateService', () => {
         },
         {
           provide: ErrorLogService,
+          useValue: {},
+        },
+        {
+          provide: PurchaseReceiptService,
           useValue: {},
         },
         {

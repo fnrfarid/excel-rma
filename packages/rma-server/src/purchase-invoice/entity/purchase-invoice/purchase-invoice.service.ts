@@ -85,4 +85,8 @@ export class PurchaseInvoiceService {
   async updateOne(query, options?) {
     return await this.purchaseInvoiceRepository.updateOne(query, options);
   }
+
+  async insertMany(query, options?) {
+    return await this.purchaseInvoiceRepository.insertMany(query, options);
+  }
 }
