@@ -88,6 +88,24 @@
             </mat-form-field>
           </ion-col>
         </ion-row>
+        <ion-row>
+          <ion-col size="6">
+            <mat-form-field class="full-width">
+              <mat-label> Campaign Invoice</mat-label>
+              <mat-select
+                [(value)]="campaign"
+                (selectionChange)="statusOfCampaignChange($event.value)"
+              >
+                <mat-option
+                  *ngFor="let status of campaignStatus"
+                  [value]="status"
+                >
+                  {{status}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
       </ion-grid>
       <table
         mat-table

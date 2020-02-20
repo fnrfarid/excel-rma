@@ -55,3 +55,6 @@ export const FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT =
   '/api/resource/Purchase%20Receipt';
 export const ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT =
   '/api/resource/Customer%20Credit%20Limit';
+export const FRAPPE_API_GET_DOCTYPE_COUNT =
+  '/api/method/frappe.client.get_count';
+export const FRAPPE_API_INSERT_MANY = '/api/method/frappe.client.insert_many';

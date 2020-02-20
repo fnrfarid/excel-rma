@@ -70,9 +70,13 @@ export class SalesInvoiceService {
   getFilterQuery(query) {
     const keys = Object.keys(query);
     keys.forEach(key => {
-      if (query[key]) {
+      if (typeof query[key] !== 'undefined') {
         if (key === 'status' && query[key] === 'All') {
           delete query[key];
+        } else if (key === 'isCampaign' && query[key] === true) {
+          query[key] = true;
+        } else if (key === 'isCampaign' && query[key] === false) {
+          query[key] = false;
         } else {
           query[key] = new RegExp(query[key], 'i');
         }
