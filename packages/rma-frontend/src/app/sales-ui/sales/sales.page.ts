@@ -91,12 +91,11 @@ export class SalesPage implements OnInit {
     if (this.customer) query.customer = this.customer;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
-    if (this.campaign) {
-      if (this.campaign === 'Yes') {
-        query.isCampaign = true;
-      } else if (this.campaign === 'No') {
-        query.isCampaign = false;
-      }
+
+    if (this.campaign === 'Yes') {
+      query.isCampaign = true;
+    } else if (this.campaign === 'No') {
+      query.isCampaign = false;
     }
 
     if (this.branch) query.territory = this.branch;
@@ -114,12 +113,11 @@ export class SalesPage implements OnInit {
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.branch) query.territory = this.branch;
-    if (this.campaign) {
-      if (this.campaign === 'Yes') {
-        query.isCampaign = true;
-      } else if (this.campaign === 'No') {
-        query.isCampaign = false;
-      }
+
+    if (this.campaign === 'Yes') {
+      query.isCampaign = true;
+    } else if (this.campaign === 'No') {
+      query.isCampaign = false;
     }
 
     const sortQuery = {};
