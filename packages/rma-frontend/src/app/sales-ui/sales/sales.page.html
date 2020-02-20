@@ -96,7 +96,10 @@
                 [(value)]="campaign"
                 (selectionChange)="statusOfCampaignChange($event.value)"
               >
-                <mat-option *ngFor="let  of campaignStatus" [value]="status">
+                <mat-option
+                  *ngFor="let status of campaignStatus"
+                  [value]="status"
+                >
                   {{status}}
                 </mat-option>
               </mat-select>
