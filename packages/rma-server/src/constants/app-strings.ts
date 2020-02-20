@@ -104,3 +104,4 @@ export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
 export const PURCHASE_RECEIPT_BATCH_SIZE = 200;
 export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
+export const FRAPPE_INSERT_MANY_BATCH_COUNT = 5;
