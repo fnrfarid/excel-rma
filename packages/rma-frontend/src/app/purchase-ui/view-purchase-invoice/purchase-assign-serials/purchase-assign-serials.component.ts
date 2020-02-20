@@ -55,8 +55,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   rangePickerState = {
     prefix: '',
-    fromRange: 0,
-    toRange: 0,
+    fromRange: '',
+    toRange: '',
     serials: [],
   };
 
@@ -207,7 +207,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.fromRangeUpdate
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(v => {
-        this.generateSerials(value);
+        this.generateSerials(value, this.rangePickerState.toRange);
       });
   }
 
@@ -215,24 +215,34 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.toRangeUpdate
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(v => {
-        this.generateSerials(undefined, value);
+        this.generateSerials(this.rangePickerState.fromRange, value);
       });
   }
 
-  onPrefixChange(value) {
-    this.generateSerials(undefined, undefined, value);
-  }
+  // onPrefixChange(value) {
+  //   this.generateSerials(undefined, undefined, value);
+  // }
 
-  async generateSerials(fromRange?, toRange?, prefix?) {
+  async generateSerials(fromRange?, toRange?) {
     this.rangePickerState.serials =
-      (await this.getSerialsFromRange(
+      this.getSerialsFromRange(
         fromRange || this.rangePickerState.fromRange || 0,
         toRange || this.rangePickerState.toRange || 0,
-        prefix || this.rangePickerState.prefix,
-      )) || [];
+      ) || [];
   }
 
-  getSerialsFromRange(start: number, end: number, prefix: string) {
+  isNumber(number) {
+    return !isNaN(parseFloat(number)) && isFinite(number);
+  }
+
+  getSerialsFromRange(startSerial: string, endSerial: string) {
+    const { start, end, prefix } = this.getSerialPrefix(startSerial, endSerial);
+    if (!this.isNumber(start) || !this.isNumber(end)) {
+      this.getMessage(
+        'Invalid serial range, end should be a number found character',
+      );
+      return [];
+    }
     const data: any[] = _.range(
       start > end ? Number(start) + 1 : start,
       end > start ? Number(end) + 1 : end,
@@ -241,10 +251,37 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       start.toString().length > end.toString().length
         ? start.toString().length
         : end.toString().length;
-    for (let i = 0; i < data.length; i++) {
-      data[i] = `${prefix}${this.getPaddedNumber(data[i], maxSerial)}`;
+    let i = 0;
+    for (const value of data) {
+      if (value) {
+        data[i] = `${prefix}${this.getPaddedNumber(value, maxSerial)}`;
+        i++;
+      }
     }
     return data;
+  }
+
+  getSerialPrefix(startSerial, endSerial) {
+    if (!startSerial || !endSerial) return { start: 0, end: 0, prefix: '' };
+    const max =
+      startSerial.length > endSerial.length
+        ? startSerial.length
+        : endSerial.length;
+    startSerial = startSerial.split('');
+    endSerial = endSerial.split('');
+    let prefix = '';
+    for (let i = 0; i < max; i++) {
+      if (startSerial[i] === endSerial[i]) {
+        prefix += startSerial[i];
+      } else {
+        break;
+      }
+    }
+    const start = startSerial
+      .splice(prefix.length, startSerial.length)
+      .join('');
+    const end = endSerial.splice(prefix.length, startSerial.length).join('');
+    return { start, end, prefix };
   }
 
   getPaddedNumber(num, numberLength) {
@@ -386,8 +423,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   resetRangeState() {
     this.rangePickerState = {
       prefix: '',
-      fromRange: 0,
-      toRange: 0,
+      fromRange: '',
+      toRange: '',
       serials: [],
     };
   }
