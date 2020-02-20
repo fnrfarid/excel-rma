@@ -1,9 +1,15 @@
-<ion-fab vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
+<ion-fab
+  vertical="top"
+  horizontal="end"
+  slot="fixed"
+  class="ion-margin-end"
+  *ngIf="filteredItemList.length !== 0"
+>
   <ion-fab-button class="fab-position" (click)="submitDeliveryNote()">
     <ion-icon name="lock-closed"></ion-icon>
   </ion-fab-button>
 </ion-fab>
-<ion-card>
+<ion-card *ngIf="filteredItemList.length !== 0">
   <ion-card-content>
     <ion-grid class="ion-no-padding">
       <ion-row class="align">
@@ -73,7 +79,7 @@
 </ion-card>
 
 <!-- Serial Range Card -->
-<ion-card>
+<ion-card *ngIf="filteredItemList.length !== 0">
   <ion-card-header>
     <ion-card-title>Serial Range</ion-card-title>
   </ion-card-header>
@@ -114,9 +120,21 @@
   </ion-card-content>
 </ion-card>
 
-<ion-card>
-  <ion-card-content>
+<ion-grid class="ion-no-padding" *ngIf="filteredItemList.length === 0">
+  <ion-row>
+    <ion-col>
+      <ion-text class="ion-text-center" style="color: black;">
+        <h1>All items already delivered</h1>
+      </ion-text>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-card *ngIf="filteredItemList.length !== 0">
+  <ion-card-header>
     <ion-card-title>Products</ion-card-title>
+  </ion-card-header>
+  <ion-card-content class="ion-no-padding">
     <mat-table #table [dataSource]="itemDataSource" style="width: 100%;">
       <ng-container matColumnDef="item_code">
         <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
@@ -182,9 +200,11 @@
   </ion-card-content>
 </ion-card>
 
-<ion-card>
-  <ion-card-content>
+<ion-card *ngIf="filteredItemList.length !== 0">
+  <ion-card-header>
     <ion-card-title>Serials</ion-card-title>
+  </ion-card-header>
+  <ion-card-content class="ion-no-padding">
     <mat-table #table [dataSource]="serialDataSource" style="width: 100%;">
       <ng-container matColumnDef="item_code">
         <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
