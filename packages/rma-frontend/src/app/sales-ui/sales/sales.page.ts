@@ -44,11 +44,13 @@ export class SalesPage implements OnInit {
     'Submitted',
     'All',
   ];
+  campaignStatus: string[] = ['Yes', 'No', 'All'];
   customer: string = '';
   status: string = 'All';
   name: string = '';
   branch: string = '';
   total: number = 0;
+  campaign: string = 'All';
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
@@ -89,6 +91,13 @@ export class SalesPage implements OnInit {
     if (this.customer) query.customer = this.customer;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
+
+    if (this.campaign === 'Yes') {
+      query.isCampaign = true;
+    } else if (this.campaign === 'No') {
+      query.isCampaign = false;
+    }
+
     if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
       undefined,
@@ -104,6 +113,12 @@ export class SalesPage implements OnInit {
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.branch) query.territory = this.branch;
+
+    if (this.campaign === 'Yes') {
+      query.isCampaign = true;
+    } else if (this.campaign === 'No') {
+      query.isCampaign = false;
+    }
 
     const sortQuery = {};
     if (event) {
@@ -152,5 +167,14 @@ export class SalesPage implements OnInit {
 
   getDate(date: string) {
     return new Date(date);
+  }
+
+  statusOfCampaignChange(campaign) {
+    if (campaign === 'All') {
+      this.dataSource.loadItems();
+    } else {
+      this.campaign = campaign;
+      this.setFilter();
+    }
   }
 }
