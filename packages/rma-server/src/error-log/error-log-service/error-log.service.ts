@@ -96,15 +96,19 @@ export class ErrorLogService {
       errorLog.message = frappeError;
     } catch {}
     errorLog.uuid = uuidv4();
-    errorLog.docType = docType;
-    errorLog.url = error.config.url;
-    errorLog.body = error.config.data;
-    errorLog.method = error.config.method;
-    errorLog.token =
-      req.token && req.token.accessToken ? req.token.accessToken : '';
-    errorLog.user = req.token && req.token.fullName ? req.token.fullName : '';
-    errorLog.entity = entity;
-    errorLog.error = error.response ? error.response.data.exc : error;
+    try {
+      errorLog.docType = docType;
+      errorLog.url = error.config.url;
+      errorLog.body = error.config.data;
+      errorLog.method = error.config.method;
+      errorLog.token =
+        req.token && req.token.accessToken ? req.token.accessToken : '';
+      errorLog.user = req.token && req.token.fullName ? req.token.fullName : '';
+      errorLog.entity = entity;
+      errorLog.error = error.response ? error.response.data.exc : error;
+    } catch {
+      errorLog.error = error;
+    }
     this.create(errorLog)
       .then(success => {})
       .catch(err => {});

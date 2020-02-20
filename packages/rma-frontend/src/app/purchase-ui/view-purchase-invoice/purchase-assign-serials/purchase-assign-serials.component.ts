@@ -1,6 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { Observable, Subject, of } from 'rxjs';
+import { Observable, Subject, of, from } from 'rxjs';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { PurchaseService } from '../../services/purchase.service';
 import { ActivatedRoute } from '@angular/router';
@@ -11,6 +11,9 @@ import {
   switchMap,
   debounceTime,
   distinctUntilChanged,
+  map,
+  bufferCount,
+  delay,
 } from 'rxjs/operators';
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { CLOSE, PURCHASE_RECEIPT } from '../../../constants/app-string';
@@ -194,7 +197,9 @@ export class PurchaseAssignSerialsComponent implements OnInit {
           frappeError = JSON.parse(err.error._server_messages);
           frappeError = JSON.parse(frappeError);
           frappeError = (frappeError as { message?: string }).message;
-        } catch {}
+        } catch {
+          frappeError = err.error.message;
+        }
         loading.dismiss();
         this.snackBar.open(frappeError, CLOSE, {
           duration: 2500,
@@ -306,25 +311,45 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     );
   }
 
-  validateSerial(item: { item_code: string; serials: string[] }, row: Item) {
-    this.salesService.validateSerials(item).subscribe({
-      next: (success: { notFoundSerials: string[] }) => {
-        success.notFoundSerials &&
-        success.notFoundSerials.length === item.serials.length
-          ? this.assignRangeSerial(row, this.rangePickerState.serials)
-          : this.snackBar.open(
-              `Invalid Serials ${this.getInvalidSerials(
-                item.serials,
-                success.notFoundSerials,
-              )
-                .splice(0, 5)
-                .join(', ')}...`,
-              CLOSE,
-              { duration: 2500 },
-            );
-      },
-      error: err => {},
-    });
+  validateSerial(
+    item: { item_code: string; serials: string[]; validateFor?: string },
+    row: Item,
+  ) {
+    const notFoundSerials = [];
+    item.validateFor = 'purchase_receipt';
+    return from(item.serials)
+      .pipe(
+        map(serial => serial),
+        bufferCount(4000),
+        delay(200),
+        switchMap(serialsBatch => {
+          const data = item;
+          data.serials = serialsBatch;
+          return this.salesService.validateSerials(item).pipe(
+            switchMap((response: { notFoundSerials: string[] }) => {
+              notFoundSerials.push(...response.notFoundSerials);
+              return of({ notFoundSerials });
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        next: (success: { notFoundSerials: string[] }) => {
+          success.notFoundSerials && success.notFoundSerials.length === 0
+            ? this.assignRangeSerial(row, this.rangePickerState.serials)
+            : this.snackBar.open(
+                `Invalid Serials ${this.getInvalidSerials(
+                  item.serials,
+                  success.notFoundSerials,
+                )
+                  .splice(0, 5)
+                  .join(', ')}...`,
+                CLOSE,
+                { duration: 2500 },
+              );
+        },
+        error: err => {},
+      });
   }
 
   getInvalidSerials(arr1, arr2) {

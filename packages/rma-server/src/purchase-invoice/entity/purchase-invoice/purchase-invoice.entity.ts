@@ -125,6 +125,9 @@ export class PurchaseInvoice extends BaseEntity {
   isSynced: boolean;
 
   @Column()
+  purchase_receipt_names: string[];
+
+  @Column()
   purchase_receipt_items: PurchaseInvoicePurchaseReceiptItem[];
 }
 

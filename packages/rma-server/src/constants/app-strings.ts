@@ -102,3 +102,5 @@ export const SALES_INVOICE_STATUS_ENUM = [
 ];
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
+export const PURCHASE_RECEIPT_BATCH_SIZE = 200;
+export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
