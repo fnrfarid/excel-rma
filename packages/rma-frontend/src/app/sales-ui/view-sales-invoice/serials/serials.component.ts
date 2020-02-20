@@ -64,6 +64,7 @@ export class SerialsComponent implements OnInit {
     serials: [],
   };
 
+  filteredItemList = [];
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
   itemDisplayedColumns = [
@@ -190,12 +191,29 @@ export class SerialsComponent implements OnInit {
     return _.padStart(num, numberLength, '0');
   }
 
+  getFilteredItems(salesInvoice: SalesInvoiceDetails) {
+    const filteredItemList = [];
+    salesInvoice.items.forEach(item => {
+      salesInvoice.delivery_note_items.filter(deliveredItem => {
+        if (item.item_code === deliveredItem.item_code) {
+          item.qty -= deliveredItem.qty;
+          return deliveredItem;
+        }
+      });
+      if (item.qty !== 0) {
+        filteredItemList.push(item);
+      }
+    });
+    return filteredItemList;
+  }
+
   getSalesInvoice(uuid: string) {
     return this.salesService.getSalesInvoice(uuid).subscribe({
       next: (itemList: SalesInvoiceDetails) => {
         this.salesInvoiceDetails = itemList as SalesInvoiceDetails;
+        this.filteredItemList = this.getFilteredItems(itemList);
         this.itemDataSource.loadItems(
-          itemList.items.filter(item => {
+          this.filteredItemList.filter(item => {
             item.assigned = 0;
             item.remaining = item.qty;
             return item;
