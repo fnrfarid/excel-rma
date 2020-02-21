@@ -17,13 +17,11 @@ import {
   bufferCount,
   mergeMap,
   retry,
-  delay,
 } from 'rxjs/operators';
 import { throwError, of, Observable, from } from 'rxjs';
 import {
   FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT,
   FRAPPE_API_GET_DOCTYPE_COUNT,
-  FRAPPE_API_INSERT_MANY,
 } from '../../../constants/routes';
 import {
   AUTHORIZATION,
@@ -44,6 +42,7 @@ import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { PurchaseReceiptService } from '../../../purchase-receipt/entity/purchase-receipt.service';
+import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -218,13 +217,18 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     const purchaseReceipts = this.getMapPurchaseReceipts(body);
     from(purchaseReceipts)
       .pipe(
-        map(receipts => {
-          receipts.serial_no = receipts.serial_no.join('\n');
+        switchMap(receipts => {
+          try {
+            receipts.serial_no = receipts.serial_no.join('\n');
+          } catch {
+            receipts.serial_no = receipts.serial_no;
+          }
           const data: any = new PurchaseReceiptDto();
           Object.assign(data, body);
           data.items = [receipts];
           data.doctype = 'Purchase Receipt';
-          return data;
+          data.owner = clientHttpRequest.token.email;
+          return of(data);
         }),
         bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
         mergeMap(receipt => {
@@ -235,14 +239,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               headers: this.settingsService.getAuthorizationHeaders(
                 clientHttpRequest.token,
               ),
+              timeout: 10000000,
             },
           );
         }),
-        delay(300),
-        retry(8),
+        retry(3),
       )
       .subscribe({
         next: (success: { data: { message: string[] }; config: any }) => {
+          if (!success.data) return;
           this.purchaseInvoiceService
             .updateOne(
               { name: purchase_invoice_name },

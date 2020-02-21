@@ -89,25 +89,32 @@ export class ErrorLogService {
     let frappeError;
     const errorLog = new ErrorLog();
     errorLog.createdOn = new Date();
+    errorLog.error = error;
+    errorLog.uuid = uuidv4();
     try {
       frappeError = JSON.parse(error.response.data._server_messages);
       frappeError = JSON.parse(frappeError);
       frappeError = (frappeError as { message?: string }).message;
       errorLog.message = frappeError;
     } catch {}
-    errorLog.uuid = uuidv4();
     try {
-      errorLog.docType = docType;
-      errorLog.url = error.config.url;
-      errorLog.body = error.config.data;
-      errorLog.method = error.config.method;
+      errorLog.docType = docType || '';
+      errorLog.entity = entity || '';
+      errorLog.error =
+        error.response && error.response.data && error.response.data.exc
+          ? error.response.data.exc
+          : error;
+      errorLog.url = error.config.url || '';
+      errorLog.body = error.config.data || '';
+      errorLog.method = error.config.method || '';
       errorLog.token =
         req.token && req.token.accessToken ? req.token.accessToken : '';
       errorLog.user = req.token && req.token.fullName ? req.token.fullName : '';
-      errorLog.entity = entity;
-      errorLog.error = error.response ? error.response.data.exc : error;
     } catch {
-      errorLog.error = error;
+      errorLog.error =
+        error.response && error.response.data && error.response.data.exc
+          ? error.response.data.exc
+          : error;
     }
     this.create(errorLog)
       .then(success => {})
