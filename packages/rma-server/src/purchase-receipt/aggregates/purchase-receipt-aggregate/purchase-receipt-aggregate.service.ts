@@ -247,7 +247,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       )
       .subscribe({
         next: (success: { data: { message: string[] }; config: any }) => {
-          if (!success.data) return;
           this.purchaseInvoiceService
             .updateOne(
               { name: purchase_invoice_name },
@@ -294,22 +293,22 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         const quotient = Math.floor(item.qty / PURCHASE_RECEIPT_BATCH_SIZE);
         const remainder = item.qty % PURCHASE_RECEIPT_BATCH_SIZE;
         item.serial_no = item.serial_no.split('\n');
-        const offsetItem: PurchaseReceiptItemDto = item;
         if (remainder) {
+          const offsetItem = new PurchaseReceiptItemDto();
+          Object.assign(offsetItem, item);
+          const serialsNo = offsetItem.serial_no.splice(0, remainder);
           offsetItem.qty = remainder;
           offsetItem.amount = offsetItem.qty * offsetItem.rate;
-          offsetItem.serial_no = offsetItem.serial_no.splice(0, remainder);
-          body.items = [offsetItem];
-          purchaseReceipts.push(body);
+          offsetItem.serial_no = serialsNo;
+          purchaseReceipts.push(offsetItem);
         }
-        offsetItem.qty = 200;
-        offsetItem.amount = offsetItem.qty * offsetItem.rate;
-        offsetItem.serial_no = item.serial_no.splice(
-          remainder,
-          item.serial_no.length,
-        );
+        const quotientItem = new PurchaseReceiptItemDto();
+        Object.assign(quotientItem, item);
+        quotientItem.qty = 200;
+        quotientItem.amount = quotientItem.qty * quotientItem.rate;
+        quotientItem.serial_no = item.serial_no;
         purchaseReceipts.push(
-          ...this.generateBatchedReceipt(offsetItem, quotient),
+          ...this.generateBatchedReceipt(quotientItem, quotient),
         );
       } else {
         const data = new PurchaseReceiptDto();
