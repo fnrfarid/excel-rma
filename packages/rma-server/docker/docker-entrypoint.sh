@@ -30,14 +30,13 @@ function checkEnv() {
     exit 1
   fi
   if [[ -z "$NODE_ENV" ]]; then
-    echo "NODE_ENV is not set"
-    exit 1
+    export NODE_ENV=production
   fi
 }
 
 function checkConnection() {
-  # Wait for mongodb
-  dockerize -wait tcp://$DB_HOST:27017 -timeout 30s
+  echo "Connect MongoDB . . ."
+  timeout 10 bash -c 'until printf "" 2>>/dev/null >>/dev/tcp/$0/$1; do sleep 1; done' $DB_HOST 27017
 }
 
 function configureServer() {
@@ -48,7 +47,8 @@ function configureServer() {
       ${DB_PASSWORD}
       ${CACHE_DB_NAME}
       ${CACHE_DB_PASSWORD}
-      ${CACHE_DB_USER}' \
+      ${CACHE_DB_USER}
+      ${NODE_ENV}' \
       < docker/env.tmpl > .env
   fi
 }

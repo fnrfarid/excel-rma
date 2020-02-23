@@ -10,14 +10,18 @@ services:
 
   mongo:
     image: bitnami/mongodb:latest
-    restart: unless-stopped
+    restart: on-failure
     environment:
       - MONGODB_USERNAME=${DB_USER}
       - MONGODB_PASSWORD=${DB_PASSWORD}
       - MONGODB_DATABASE=${DB_NAME}
       - MONGODB_ROOT_PASSWORD=${MONGODB_ROOT_PASSWORD}
-    ports:
-      - "27017:27017"
+      - CACHE_DB=${CACHE_DB}
+      - CACHE_USER=${CACHE_USER}
+      - CACHE_DB_PASSWORD=${CACHE_DB_PASSWORD}
+      - SERVER_DB=${SERVER_DB}
+      - SERVER_USER=${SERVER_USER}
+      - SERVER_DB_PASSWORD=${SERVER_DB_PASSWORD}
     volumes:
       - mongo-vol:/bitnami
       - ./files/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d

@@ -2,18 +2,18 @@
 
 echo 'Creating application user(s) and db(s)'
 
-mongo rma-server \
+mongo $SERVER_DB \
         --host localhost \
         --port 27017 \
         -u $MONGODB_PRIMARY_ROOT_USER \
         -p $MONGODB_ROOT_PASSWORD \
         --authenticationDatabase admin \
-        --eval "db.createUser({user: 'rma-server', pwd: '$MONGODB_PASSWORD', roles:[{role:'dbOwner', db: 'rma-server'}]});"
+        --eval "db.createUser({user: '$SERVER_USER', pwd: '$SERVER_DB_PASSWORD', roles:[{role:'dbOwner', db: '$SERVER_DB'}]});"
 
-mongo cache-db \
+mongo $CACHE_DB \
         --host localhost \
         --port 27017 \
         -u $MONGODB_PRIMARY_ROOT_USER \
         -p $MONGODB_ROOT_PASSWORD \
         --authenticationDatabase admin \
-        --eval "db.createUser({user: 'cache-db', pwd: '$MONGODB_PASSWORD', roles:[{role:'dbOwner', db: 'cache-db'}]});"
+        --eval "db.createUser({user: '$CACHE_USER', pwd: '$CACHE_DB_PASSWORD', roles:[{role:'dbOwner', db: '$CACHE_DB'}]});"
