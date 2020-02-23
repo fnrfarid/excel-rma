@@ -6,6 +6,7 @@ import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchas
 import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/purchase-receipt-policies.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 describe('PurchaseInvoiceAggregateService', () => {
   let service: PurchaseReceiptAggregateService;
@@ -36,6 +37,10 @@ describe('PurchaseInvoiceAggregateService', () => {
         },
         {
           provide: PurchaseReceiptPoliciesService,
+          useValue: {},
+        },
+        {
+          provide: SerialNoService,
           useValue: {},
         },
       ],

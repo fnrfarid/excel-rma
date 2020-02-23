@@ -105,3 +105,6 @@ export const DELIVERY_NOTE = 'delivery_note';
 export const PURCHASE_RECEIPT_BATCH_SIZE = 200;
 export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
 export const FRAPPE_INSERT_MANY_BATCH_COUNT = 5;
+export const PURCHASE_RECEIPT_DOCTYPE_NAME = 'Purchase Receipt';
+export const SERIAL_NO_DOCTYPE_NAME = 'Serial No';
+export const MONGO_INSERT_MANY_BATCH_NUMBER = 100000;

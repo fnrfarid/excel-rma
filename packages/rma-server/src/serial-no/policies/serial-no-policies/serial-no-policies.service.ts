@@ -128,6 +128,7 @@ export class SerialNoPoliciesService {
       {
         $match: {
           serial_no: { $in: payload.serials },
+          warehouse: { $exists: false },
           $or: [
             { item_code: payload.item_code },
             { item_name: payload.item_code },

@@ -13,6 +13,8 @@ export interface PurchaseReceiptResponseInterface {
 export interface PurchaseReceiptResponseItemInterface {
   amount: number;
   cost_center: string;
+  purchase_document_type: string;
+  purchase_document_no: string;
   expense_account: string;
   item_code: string;
   item_name: string;
