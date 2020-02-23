@@ -836,139 +836,6 @@ export function getItemOnTrashWebhookData(
   };
 }
 
-export function getSerialNoOnTrashWebhookData(
-  webhookURL: string,
-  webhookApiKey: string,
-) {
-  return {
-    webhook_doctype: 'Serial No',
-    webhook_docevent: 'on_trash',
-    request_url: webhookURL,
-    request_structure: 'Form URL-Encoded',
-    webhook_headers: [
-      {
-        key: 'Content-Type',
-        value: 'application/json',
-      },
-      {
-        key: 'x-frappe-api-key',
-        value: webhookApiKey,
-      },
-    ],
-    webhook_data: [
-      {
-        fieldname: 'name',
-        key: 'name',
-      },
-      {
-        fieldname: 'owner',
-        key: 'owner',
-      },
-
-      {
-        fieldname: 'creation',
-        key: 'creation',
-      },
-      {
-        fieldname: 'modified',
-        key: 'modified',
-      },
-      {
-        fieldname: 'modified_by',
-        key: 'modified_by',
-      },
-      {
-        fieldname: 'idx',
-        key: 'idx',
-      },
-      {
-        fieldname: 'docstatus',
-        key: 'docstatus',
-      },
-      {
-        fieldname: 'serial_no',
-        key: 'serial_no',
-      },
-      {
-        fieldname: 'item_code',
-        key: 'item_code',
-      },
-      {
-        fieldname: 'item_name',
-        key: 'item_name',
-      },
-      {
-        fieldname: 'description',
-        key: 'description',
-      },
-      {
-        fieldname: 'item_group',
-        key: 'item_group',
-      },
-      {
-        fieldname: 'purchase_time',
-        key: 'purchase_time',
-      },
-      {
-        fieldname: 'purchase_rate',
-        key: 'purchase_rate',
-      },
-      {
-        fieldname: 'supplier',
-        key: 'supplier',
-      },
-      {
-        fieldname: 'supplier_name',
-        key: 'supplier_name',
-      },
-      {
-        fieldname: 'asset_status',
-        key: 'asset_status',
-      },
-      {
-        fieldname: 'delivery_time',
-        key: 'delivery_time',
-      },
-      {
-        fieldname: 'is_cancelled',
-        key: 'is_cancelled',
-      },
-      {
-        fieldname: 'customer',
-        key: 'customer',
-      },
-      {
-        fieldname: 'customer_name',
-        key: 'customer_name',
-      },
-      {
-        fieldname: 'warranty_expiry_date',
-        key: 'warranty_expiry_date',
-      },
-      {
-        fieldname: 'maintenance_status',
-        key: 'maintenance_status',
-      },
-      {
-        fieldname: 'warranty_period',
-        key: 'warranty_period',
-      },
-      {
-        fieldname: 'serial_no_details',
-        key: 'serial_no_details',
-      },
-      {
-        fieldname: 'company',
-        key: 'company',
-      },
-      {
-        fieldname: 'doctype',
-        key: 'doctype',
-      },
-    ],
-  };
-}
-
 export function getSerialNoUpdateWebhookData(
   webhookURL: string,
   webhookApiKey: string,
@@ -1089,6 +956,10 @@ export function getSerialNoUpdateWebhookData(
       {
         fieldname: 'serial_no_details',
         key: 'serial_no_details',
+      },
+      {
+        fieldname: 'warehouse',
+        key: 'warehouse',
       },
       {
         fieldname: 'company',
@@ -1226,6 +1097,10 @@ export function getSerialNoAfterInsertWebhookData(
       {
         fieldname: 'company',
         key: 'company',
+      },
+      {
+        fieldname: 'warehouse',
+        key: 'warehouse',
       },
       {
         fieldname: 'doctype',

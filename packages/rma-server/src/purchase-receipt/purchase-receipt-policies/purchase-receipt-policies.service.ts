@@ -18,7 +18,10 @@ export class PurchaseReceiptPoliciesService {
       switchMap(valid => {
         const serials = this.getSerials(purchaseReceiptPayload);
         return from(
-          this.serialNoService.find({ serial_no: { $in: serials } }),
+          this.serialNoService.find({
+            serial_no: { $in: serials },
+            warehouse: { $exists: true },
+          }),
         ).pipe(
           switchMap(foundSerials => {
             if (foundSerials && foundSerials.length) {
@@ -38,7 +41,9 @@ export class PurchaseReceiptPoliciesService {
     serial.forEach(element => {
       foundSerials.push(element.serial_no);
     });
-    return `Provided serials ${foundSerials.join(', ')} already exists.`;
+    return `From Provided serials ${
+      foundSerials.length
+    } already exist, found : ${foundSerials.splice(0, 5).join(', ')}..`;
   }
 
   getSerials(purchaseReceiptPayload: PurchaseReceiptDto) {

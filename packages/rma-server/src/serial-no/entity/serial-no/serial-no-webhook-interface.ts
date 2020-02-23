@@ -20,6 +20,7 @@ export interface SerialNoWebhookInterface {
   is_cancelled: string;
   customer: string;
   customer_name: string;
+  warehouse: string;
   warranty_expiry_date: string;
   maintenance_status: string;
   warranty_period: number;
