@@ -66,6 +66,10 @@ export class SerialNoService {
     return await this.serialNoRepository.updateMany(query, options);
   }
 
+  async insertMany(query, options?) {
+    return await this.serialNoRepository.insertMany(query, options);
+  }
+
   asyncAggregate(query) {
     return of(this.serialNoRepository.aggregate(query)).pipe(
       switchMap((aggregateData: any) => {

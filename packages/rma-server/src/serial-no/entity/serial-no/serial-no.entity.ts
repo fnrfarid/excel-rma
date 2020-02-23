@@ -89,6 +89,9 @@ export class SerialNo extends BaseEntity {
   warranty_period: number;
 
   @Column()
+  warehouse: string;
+
+  @Column()
   serial_no_details: string;
 
   @Column()

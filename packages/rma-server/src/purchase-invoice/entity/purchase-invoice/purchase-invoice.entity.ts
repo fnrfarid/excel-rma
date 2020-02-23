@@ -126,12 +126,11 @@ export class PurchaseInvoice extends BaseEntity {
 
   @Column()
   purchase_receipt_names: string[];
-
-  @Column()
-  purchase_receipt_items: PurchaseInvoicePurchaseReceiptItem[];
 }
 
-export class PurchaseInvoicePurchaseReceiptItem {
+export class PurchaseReceiptMetaData {
+  purchase_document_type: string;
+  purchase_document_no: string;
   purchase_receipt_name: string;
   amount: number;
   cost_center: string;
