@@ -13,6 +13,8 @@ export class CleanExpiredTokenCacheService implements OnModuleInit {
         exp: { $lte: Math.floor(new Date().valueOf() / 1000) },
       };
 
+      query.refreshToken = { $exists: false };
+
       await this.tokenCache.deleteMany(query);
     });
     job.start();

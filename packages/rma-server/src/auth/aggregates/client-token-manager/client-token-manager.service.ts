@@ -52,11 +52,11 @@ export class ClientTokenManagerService {
   getExistingToken(settings$: Observable<ServerSettings>) {
     return settings$.pipe(
       switchMap(settings => {
-        if (!settings.clientTokenUuid) {
+        if (settings && !settings.serviceAccountUser) {
           return of(null);
         }
         return from(
-          this.tokenCache.findOne({ uuid: settings.clientTokenUuid }),
+          this.tokenCache.findOne({ email: settings.serviceAccountUser }),
         );
       }),
     );
