@@ -168,6 +168,16 @@
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
+        <ng-container matColumnDef="remarks">
+          <mat-header-cell *matHeaderCellDef>
+            Remarks
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.remarks}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
         <!-- territory Column -->
         <ng-container matColumnDef="territory">
           <mat-header-cell *matHeaderCellDef mat-sort-header="territory">

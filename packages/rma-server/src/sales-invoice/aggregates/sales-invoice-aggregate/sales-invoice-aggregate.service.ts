@@ -80,7 +80,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               ).toJSDate();
               salesInvoice.isSynced = false;
               salesInvoice.inQueue = false;
-              salesInvoice.createdBy;
               this.apply(
                 new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest),
               );
@@ -274,6 +273,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       payment_schedule: salesInvoice.payment_schedule,
       payments: salesInvoice.payments,
       sales_team: salesInvoice.sales_team,
+      remarks: salesInvoice.remarks,
     };
   }
 

@@ -136,6 +136,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   isCampaign: boolean;
+
+  @Column()
+  remarks: string;
 }
 
 export class Tax {
