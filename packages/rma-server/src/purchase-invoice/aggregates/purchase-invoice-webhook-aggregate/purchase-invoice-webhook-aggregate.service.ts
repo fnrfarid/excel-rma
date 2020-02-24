@@ -14,7 +14,7 @@ import {
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
-
+import { DateTime } from 'luxon';
 @Injectable()
 export class PurchaseInvoiceWebhookAggregateService {
   constructor(
@@ -25,18 +25,22 @@ export class PurchaseInvoiceWebhookAggregateService {
   ) {}
 
   purchaseInvoiceCreated(purchaseInvoicePayload: PurchaseInvoiceWebhookDto) {
-    return from(
-      this.purchaseInvoiceService.findOne({
-        name: purchaseInvoicePayload.name,
-      }),
-    ).pipe(
-      switchMap(purchaseInvoice => {
+    return forkJoin({
+      purchaseInvoice: from(
+        this.purchaseInvoiceService.findOne({
+          name: purchaseInvoicePayload.name,
+        }),
+      ),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ purchaseInvoice, settings }) => {
         if (purchaseInvoice) {
           return throwError(
             new BadRequestException(PURCHASE_INVOICE_ALREADY_EXIST),
           );
         }
         const provider = this.mapPurchaseInvoice(purchaseInvoicePayload);
+        provider.created_on = new DateTime(settings.timeZone).toJSDate();
         return this.getUserDetails(purchaseInvoicePayload.owner).pipe(
           switchMap(user => {
             provider.created_by = user.full_name;
