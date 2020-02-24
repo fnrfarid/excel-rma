@@ -31,6 +31,7 @@ export class SalesPage implements OnInit {
     'posting_date',
     'customer',
     'total',
+    'remarks',
     'territory',
     'created_by',
     'delivered_by',
