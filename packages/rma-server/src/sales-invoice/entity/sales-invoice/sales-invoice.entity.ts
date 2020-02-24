@@ -9,6 +9,9 @@ export class SalesInvoice extends BaseEntity {
   uuid: string;
 
   @Column()
+  created_on: Date;
+
+  @Column()
   name: string;
 
   @Column()

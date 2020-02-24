@@ -41,7 +41,7 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
 
   loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
     if (!sortOrder) {
-      sortOrder = { posting_date: 'desc' };
+      sortOrder = { created_on: 'desc' };
     }
     this.loadingSubject.next(true);
     this.salesService
