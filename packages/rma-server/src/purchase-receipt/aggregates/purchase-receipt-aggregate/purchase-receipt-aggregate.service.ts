@@ -18,6 +18,7 @@ import {
   mergeMap,
   retry,
   concatMap,
+  toArray,
 } from 'rxjs/operators';
 import { throwError, of, Observable, from } from 'rxjs';
 import {
@@ -33,11 +34,11 @@ import {
   APPLICATION_JSON_CONTENT_TYPE,
   COMPLETED_STATUS,
   PURCHASE_RECEIPT_BATCH_SIZE,
-  SERIAL_NO_VALIDATION_BATCH_SIZE,
   FRAPPE_INSERT_MANY_BATCH_COUNT,
   PURCHASE_RECEIPT_DOCTYPE_NAME,
   SERIAL_NO_DOCTYPE_NAME,
   MONGO_INSERT_MANY_BATCH_NUMBER,
+  SERIAL_NO_VALIDATION_BATCH_SIZE,
 } from '../../../constants/app-strings';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
@@ -48,6 +49,7 @@ import { ServerSettings } from '../../../system-settings/entities/server-setting
 import { PurchaseReceiptService } from '../../../purchase-receipt/entity/purchase-receipt.service';
 import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { INVALID_FILE } from '../../../constants/app-strings';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -63,9 +65,10 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     super();
   }
 
-  addPurchaseInvoice(
+  addPurchaseReceipt(
     purchaseInvoicePayload: PurchaseReceiptDto,
     clientHttpRequest,
+    file?,
   ) {
     return this.purchaseReceiptPolicyService
       .validatePurchaseReceipt(purchaseInvoicePayload)
@@ -121,6 +124,21 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       );
   }
 
+  purchaseReceiptFromFile(file, req) {
+    return from(this.getJsonData(file)).pipe(
+      switchMap((data: PurchaseReceiptDto) => {
+        if (!data) {
+          return throwError(new BadRequestException(INVALID_FILE));
+        }
+        return this.addPurchaseReceipt(data, req);
+      }),
+    );
+  }
+
+  getJsonData(file) {
+    return of(JSON.parse(file.buffer));
+  }
+
   validateFrappeSerials(
     settings,
     body: PurchaseReceiptDto,
@@ -131,7 +149,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     },
     bulk?: boolean,
   ): Observable<boolean | number> {
-    bulk ? bulk : false;
+    bulk = bulk ? bulk : false;
     const { serials, createSerialsBatch } = serialsNo
       ? serialsNo
       : this.getMappedSerials(body);
@@ -497,17 +515,17 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     return from(serials).pipe(
       map(serial => serial),
       bufferCount(SERIAL_NO_VALIDATION_BATCH_SIZE),
-      concatMap(data => {
+      concatMap((data: string[]) => {
         return this.validateFrappeSerials(
           settings,
           purchaseReceipt,
           clientHttpRequest,
-          { serials, createSerialsBatch },
+          { serials: data, createSerialsBatch },
           true,
         ).pipe(
           switchMap(isValid => {
             return isValid === true
-              ? of({ serials, createSerialsBatch })
+              ? of(true)
               : throwError(
                   new BadRequestException(
                     `${isValid} number of serials already exists`,
@@ -515,6 +533,10 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
                 );
           }),
         );
+      }),
+      toArray(),
+      switchMap(isValid => {
+        return of({ serials, createSerialsBatch });
       }),
     );
   }
