@@ -12,9 +12,11 @@ import {
   PURCHASE_INVOICE_GET_ONE_ENDPOINT,
   API_INFO_ENDPOINT,
   CREATE_PURCHASE_RECEIPT_ENDPOINT,
+  CREATE_PURCHASE_RECEIPT_BULK_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
 import { PurchaseReceipt } from '../../common/interfaces/purchase-receipt.interface';
+import { JSON_BODY_MAX_SIZE } from '../../constants/app-string';
 @Injectable({
   providedIn: 'root',
 })
@@ -58,12 +60,27 @@ export class PurchaseService {
   }
 
   createPurchaseReceipt(purchaseReceipt: PurchaseReceipt) {
-    const url = CREATE_PURCHASE_RECEIPT_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(url, purchaseReceipt, {
-          headers,
+        if (JSON.stringify(purchaseReceipt).length < JSON_BODY_MAX_SIZE) {
+          return this.http.post(
+            CREATE_PURCHASE_RECEIPT_ENDPOINT,
+            purchaseReceipt,
+            {
+              headers,
+            },
+          );
+        }
+        const blob = new Blob([JSON.stringify(purchaseReceipt)], {
+          type: 'application/json',
         });
+        const uploadData = new FormData();
+        uploadData.append('file', blob, 'purchase_receipts');
+        return this.http.post(
+          CREATE_PURCHASE_RECEIPT_BULK_ENDPOINT,
+          uploadData,
+          { headers },
+        );
       }),
     );
   }

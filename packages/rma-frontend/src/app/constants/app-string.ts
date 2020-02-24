@@ -11,3 +11,4 @@ export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
+export const JSON_BODY_MAX_SIZE = 8000;
