@@ -28,7 +28,7 @@ export class SalesInvoiceService {
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
-      sortQuery = { posting_date: 'desc' };
+      sortQuery = { created_on: 'desc' };
     }
 
     for (const key of Object.keys(sortQuery)) {
