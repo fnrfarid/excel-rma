@@ -82,9 +82,11 @@ export class ErrorLogService {
 
   createErrorLog(
     error,
-    docType,
-    entity,
-    req: { token?: { accessToken?: string; fullName?: string } },
+    docType = '',
+    entity = '',
+    req?: {
+      token?: { accessToken?: string; fullName?: string; email?: string };
+    },
   ) {
     let frappeError;
     const errorLog = new ErrorLog();
@@ -98,8 +100,8 @@ export class ErrorLogService {
       errorLog.message = frappeError;
     } catch {}
     try {
-      errorLog.docType = docType || '';
-      errorLog.entity = entity || '';
+      errorLog.docType = docType;
+      errorLog.entity = entity;
       errorLog.error =
         error.response && error.response.data && error.response.data.exc
           ? error.response.data.exc
@@ -108,7 +110,7 @@ export class ErrorLogService {
       errorLog.body = error.config.data || '';
       errorLog.method = error.config.method || '';
       errorLog.token =
-        req.token && req.token.accessToken ? req.token.accessToken : '';
+        req && req.token && req.token.accessToken ? req.token.accessToken : '';
       errorLog.user = req.token && req.token.fullName ? req.token.fullName : '';
     } catch {
       errorLog.error =

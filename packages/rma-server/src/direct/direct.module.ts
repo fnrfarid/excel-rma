@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DirectController } from './controllers/direct/direct.controller';
 import { DirectService } from './aggregates/direct/direct.service';
-import { FrappeToken } from './entities/frappe-token/frappe-token.entity';
-import { FrappeTokenService } from './entities/frappe-token/frappe-token.service';
 import { DEFAULT } from '../constants/typeorm.connection';
 import { RequestState } from './entities/request-state/request-state.entity';
 import { RequestStateService } from './entities/request-state/request-state.service';
@@ -11,22 +9,13 @@ import { CleanExpiredTokenCacheService } from '../auth/schedulers/clean-expired-
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([FrappeToken, RequestState], DEFAULT),
-    ErrorLogModule,
-  ],
+  imports: [TypeOrmModule.forFeature([RequestState], DEFAULT), ErrorLogModule],
   controllers: [DirectController],
   providers: [
     DirectService,
-    FrappeTokenService,
     RequestStateService,
     CleanExpiredTokenCacheService,
   ],
-  exports: [
-    DirectService,
-    FrappeTokenService,
-    RequestStateService,
-    CleanExpiredTokenCacheService,
-  ],
+  exports: [DirectService, RequestStateService, CleanExpiredTokenCacheService],
 })
 export class DirectModule {}

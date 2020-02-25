@@ -78,9 +78,6 @@ export class ClientTokenManagerService {
         return this.http.post(settings.tokenURL, stringify(body), { headers });
       }),
       map(this.payloadMapper),
-      switchMap(token => {
-        return this.saveNewToken(settings$, token);
-      }),
     );
   }
 
@@ -156,28 +153,11 @@ export class ClientTokenManagerService {
     saveToken.exp = tokenPayload.exp;
     saveToken.scope = tokenPayload.scope;
 
-    return from(this.tokenCache.save(saveToken)).pipe(
-      switchMap(token => {
-        return settings$.pipe(
-          switchMap(settings => {
-            settings.clientTokenUuid = token.uuid;
-            settings
-              .save()
-              .then(success => {})
-              .catch(error => {});
-            return of(token);
-          }),
-        );
-      }),
-    );
+    return from(this.tokenCache.save(saveToken));
   }
 
   deleteInvalidToken(token: TokenCache) {
     return from(this.settings.find()).pipe(
-      switchMap(settings => {
-        settings.clientTokenUuid = undefined;
-        return from(settings.save());
-      }),
       switchMap(settingsUpdated => {
         return from(this.tokenCache.deleteMany({ uuid: token.uuid }));
       }),
