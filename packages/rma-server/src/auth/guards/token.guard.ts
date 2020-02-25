@@ -52,7 +52,7 @@ export class TokenGuard implements CanActivate {
             if (Math.floor(new Date().getTime() / 1000) < cachedToken.exp) {
               req[TOKEN] = cachedToken;
               return of(true);
-            } else {
+            } else if (!cachedToken.refreshToken) {
               from(
                 this.tokenCacheService.deleteMany({
                   accessToken: cachedToken.accessToken,
@@ -63,6 +63,7 @@ export class TokenGuard implements CanActivate {
               });
               return of(false);
             }
+            return of(false);
           }),
         );
       }),

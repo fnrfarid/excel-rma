@@ -42,7 +42,7 @@ export class ConnectService {
     frappeBearerToken: FrappeBearerTokenWebhookInterface,
   ) {
     const token = await this.tokenCacheService.findOne({
-      email: frappeBearerToken.user,
+      accessToken: frappeBearerToken.access_token,
     });
     if (!token) {
       const tokenObject = new TokenCache();
@@ -52,18 +52,30 @@ export class ConnectService {
       );
       this.tokenCacheService
         .save(mappedToken)
+        .then(success => {
+          this.getUserRoles(frappeBearerToken);
+          this.getUserTerritory(frappeBearerToken);
+        })
+        .catch(error => {});
+    }
+    return;
+  }
+
+  async updateFrappeBearerToken(
+    frappeBearerToken: FrappeBearerTokenWebhookInterface,
+  ) {
+    const token = await this.tokenCacheService.findOne({
+      accessToken: frappeBearerToken.access_token,
+    });
+    if (token) {
+      this.tokenCacheService
+        .updateOne(
+          { accessToken: frappeBearerToken.access_token },
+          { $set: { accessToken: frappeBearerToken.access_token } },
+        )
         .then(success => {})
         .catch(error => {});
     }
-    this.tokenCacheService
-      .updateOne(
-        { email: frappeBearerToken.user },
-        { $set: { accessToken: frappeBearerToken.access_token } },
-      )
-      .then(success => {})
-      .catch(error => {});
-    this.getUserRoles(frappeBearerToken);
-    this.getUserTerritory(frappeBearerToken);
     return;
   }
 
@@ -111,7 +123,7 @@ export class ConnectService {
       .subscribe({
         next: success => {},
         error: err => {
-          this.errorLogService.createErrorLog(err, 'User', 'tokenCache', {});
+          this.errorLogService.createErrorLog(err, 'User', 'token_cache', {});
         },
       });
   }
@@ -166,7 +178,7 @@ export class ConnectService {
       .subscribe({
         next: success => {},
         error: err => {
-          this.errorLogService.createErrorLog(err, 'User', 'tokenCache', {});
+          this.errorLogService.createErrorLog(err, 'User', 'token_cache', {});
         },
       });
   }

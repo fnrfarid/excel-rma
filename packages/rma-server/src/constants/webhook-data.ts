@@ -58,10 +58,11 @@ export function getBearerTokenOnTrashWebhookData(
 export function getBearerTokenAfterInsertWebhookData(
   webhookURL: string,
   webhookApiKey: string,
+  webhookDocevent = 'after_insert',
 ) {
   return {
     webhook_doctype: 'OAuth Bearer Token',
-    webhook_docevent: 'after_insert',
+    webhook_docevent: webhookDocevent,
     request_url: webhookURL,
     request_structure: 'Form URL-Encoded',
     doctype: 'Webhook',

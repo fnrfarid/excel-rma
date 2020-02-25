@@ -239,6 +239,17 @@ export class SettingsService extends AggregateRoot {
           this.http
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
+              getBearerTokenAfterInsertWebhookData(
+                serverSettings.appURL + TOKEN_ADD_ENDPOINT,
+                serverSettings.webhookApiKey,
+                'on_update',
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
               getBearerTokenOnTrashWebhookData(
                 serverSettings.appURL + TOKEN_DELETE_ENDPOINT,
                 serverSettings.webhookApiKey,
