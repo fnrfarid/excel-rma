@@ -1,7 +1,7 @@
 import { Injectable, HttpService, OnModuleInit, Logger } from '@nestjs/common';
 import { CronJob } from 'cron';
 import { from, of, Observable } from 'rxjs';
-import { switchMap, retry, mergeMap } from 'rxjs/operators';
+import { switchMap, mergeMap, retryWhen, take, delay } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
@@ -59,7 +59,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
               }),
             );
           }),
-          retry(3),
+          retryWhen(errors => errors.pipe(delay(1000), take(3))),
         )
         .subscribe({
           next: success => {

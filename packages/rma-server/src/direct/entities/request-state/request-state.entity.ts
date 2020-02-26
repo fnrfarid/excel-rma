@@ -13,4 +13,7 @@ export class RequestState extends BaseEntity {
 
   @Column()
   creation: Date;
+
+  @Column()
+  email: string;
 }

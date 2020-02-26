@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map, delay, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { from } from 'rxjs';
+import { from, forkJoin, of } from 'rxjs';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
@@ -10,7 +10,11 @@ import {
   LOGGED_IN,
   AUTH_SERVER_URL,
 } from '../constants/storage';
-import { DIRECT_PROFILE_ENDPOINT } from '../constants/url-strings';
+import {
+  DIRECT_PROFILE_ENDPOINT,
+  IS_BACKEND_CONNECTED_ENDPOINT,
+  CONNECT_BACKEND_ENDPOINT,
+} from '../constants/url-strings';
 import { IDTokenClaims } from '../common/interfaces/id-token-claims.interfaces';
 import { LoginService } from '../api/login/login.service';
 import { StorageService } from '../api/storage/storage.service';
@@ -86,18 +90,42 @@ export class HomePage implements OnInit {
             [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
           };
 
-          return this.http.get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
-            headers,
+          return forkJoin({
+            profile: this.http.get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
+              headers,
+            }),
+            token: of(token),
           });
         }),
       )
       .subscribe({
         error: error => this.appService.setupImplicitFlow(),
-        next: profile => {
+        next: ({ profile, token }) => {
           this.spinner = false;
           this.email = profile.email;
           this.fullName = profile.name;
+          this.checkBackendConnection(token);
         },
       });
+  }
+
+  checkBackendConnection(token: string) {
+    const headers = {
+      [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+    };
+    this.http
+      .get<{ isConnected: boolean }>(IS_BACKEND_CONNECTED_ENDPOINT, { headers })
+      .subscribe({
+        next: res => {
+          if (!res.isConnected) {
+            window.location.href =
+              CONNECT_BACKEND_ENDPOINT + '?access_token=' + token;
+          }
+        },
+      });
+  }
+
+  connectBackend() {
+    window.location.href = CONNECT_BACKEND_ENDPOINT;
   }
 }

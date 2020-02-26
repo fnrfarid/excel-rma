@@ -1,6 +1,9 @@
 import { ForbiddenException, Injectable, HttpService } from '@nestjs/common';
 import { from, of, Observable, throwError } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
+import { stringify } from 'querystring';
+import { AxiosResponse } from 'axios';
+import * as uuidv4 from 'uuid/v4';
 import { TokenCache } from '../../entities/token-cache/token-cache.entity';
 import { TokenCacheService } from '../../entities/token-cache/token-cache.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
@@ -12,9 +15,10 @@ import {
   REFRESH_TOKEN,
   CONTENT_TYPE,
   REDIRECT_ENDPOINT,
+  ACTIVE,
+  REVOKED,
 } from '../../../constants/app-strings';
-import { AxiosResponse } from 'axios';
-import { stringify } from 'querystring';
+import { INVALID_SERVICE_ACCOUNT } from '../../../constants/messages';
 
 @Injectable()
 export class ClientTokenManagerService {
@@ -24,13 +28,14 @@ export class ClientTokenManagerService {
     private readonly http: HttpService,
   ) {}
 
-  payloadMapper(res: AxiosResponse) {
-    return {
+  payloadMapper(settings: ServerSettings) {
+    return (res: AxiosResponse) => ({
       accessToken: res.data.access_token,
       refreshToken: res.data.refresh_token,
       exp: Math.floor(Date.now() / 1000) + Number(res.data.expires_in),
       scope: res.data.scope.split(' '),
-    };
+      email: settings.serviceAccountUser,
+    });
   }
 
   getClientToken(): Observable<TokenCache> {
@@ -56,7 +61,10 @@ export class ClientTokenManagerService {
           return of(null);
         }
         return from(
-          this.tokenCache.findOne({ email: settings.serviceAccountUser }),
+          this.tokenCache.findOne({
+            email: settings.serviceAccountUser,
+            status: ACTIVE,
+          }),
         );
       }),
     );
@@ -75,9 +83,22 @@ export class ClientTokenManagerService {
           redirect_uri: settings.appURL + REDIRECT_ENDPOINT,
           scope: settings.scope.join(' '),
         };
-        return this.http.post(settings.tokenURL, stringify(body), { headers });
+        return this.http
+          .post(settings.tokenURL, stringify(body), { headers })
+          .pipe(map(this.payloadMapper(settings)));
       }),
-      map(this.payloadMapper),
+      map(token => {
+        this.tokenCache
+          .save({
+            ...token,
+            status: ACTIVE,
+            uuid: uuidv4(),
+          })
+          .then(saved => {})
+          .catch(error => {});
+
+        return token;
+      }),
     );
   }
 
@@ -98,15 +119,23 @@ export class ClientTokenManagerService {
         return this.http
           .post(settings.tokenURL, stringify(body), { headers })
           .pipe(
-            map(this.payloadMapper),
+            map(this.payloadMapper(settings)),
             switchMap(tokenPayload => {
               this.revokeToken(settings$, token);
               return from(
-                this.tokenCache.findOne({ uuid: settings.clientTokenUuid }),
+                this.tokenCache.findOne({
+                  email: settings.serviceAccountUser,
+                  status: ACTIVE,
+                }),
               ).pipe(
                 switchMap(savedToken => {
-                  if (!savedToken) return throwError(new ForbiddenException());
-                  return this.updateToken(savedToken, tokenPayload);
+                  if (!savedToken) {
+                    return throwError(
+                      new ForbiddenException(INVALID_SERVICE_ACCOUNT),
+                    );
+                  }
+                  token.email = settings.serviceAccountUser;
+                  return this.updateToken(savedToken, token);
                 }),
               );
             }),
@@ -131,7 +160,15 @@ export class ClientTokenManagerService {
         }),
       )
       .subscribe({
-        next: success => {},
+        next: success => {
+          this.tokenCache
+            .updateOne(
+              { accessToken: token.accessToken },
+              { $set: { status: REVOKED } },
+            )
+            .then(saved => {})
+            .catch(error => {});
+        },
         error: error => {},
       });
   }
@@ -139,8 +176,9 @@ export class ClientTokenManagerService {
   updateToken(token: TokenCache, tokenPayload) {
     Object.assign(token, tokenPayload);
     token.exp = tokenPayload.exp;
+    token.status = ACTIVE;
     this.tokenCache
-      .save(token)
+      .updateOne({ accessToken: token.accessToken }, { $set: token })
       .then(success => {})
       .catch(error => {});
     return of(token);
