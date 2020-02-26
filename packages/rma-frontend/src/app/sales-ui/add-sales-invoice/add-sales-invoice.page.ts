@@ -42,6 +42,7 @@ export class AddSalesInvoicePage implements OnInit {
   postingDate: string;
   dueDate: string;
   address = {} as any;
+  remarks = '';
   displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
   warehouseFormControl = new FormControl('');
   filteredWarehouseList: Observable<any[]>;
@@ -270,6 +271,7 @@ export class AddSalesInvoicePage implements OnInit {
       salesInvoiceDetails.total = 0;
       salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
       salesInvoiceDetails.status = DRAFT;
+      salesInvoiceDetails.remarks = this.remarks;
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;

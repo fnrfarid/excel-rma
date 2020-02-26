@@ -18,4 +18,10 @@ export class ConnectController {
   async frappeTokenAdded(@Body() payload: FrappeBearerTokenWebhookInterface) {
     return await this.connectService.createFrappeBearerToken(payload);
   }
+
+  @Post('v1/token_updated')
+  @UseGuards(FrappeWebhookGuard)
+  async frappeTokenUpdated(@Body() payload: FrappeBearerTokenWebhookInterface) {
+    return await this.connectService.updateFrappeBearerToken(payload);
+  }
 }

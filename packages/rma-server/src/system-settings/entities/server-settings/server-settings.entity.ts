@@ -50,9 +50,6 @@ export class ServerSettings extends BaseEntity {
   callbackProtocol: string;
 
   @Column()
-  clientTokenUuid: string;
-
-  @Column()
   scope: string[];
 
   @Column()

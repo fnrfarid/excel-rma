@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Observable, from, forkJoin, throwError, of } from 'rxjs';
-import { switchMap, catchError, map, retry } from 'rxjs/operators';
+import { switchMap, catchError, map } from 'rxjs/operators';
 import { randomBytes } from 'crypto';
 import { ServerSettingsService } from '../../entities/server-settings/server-settings.service';
 import { ServerSettings } from '../../entities/server-settings/server-settings.entity';
@@ -239,6 +239,17 @@ export class SettingsService extends AggregateRoot {
           this.http
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
+              getBearerTokenAfterInsertWebhookData(
+                serverSettings.appURL + TOKEN_ADD_ENDPOINT,
+                serverSettings.webhookApiKey,
+                'on_update',
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
               getBearerTokenOnTrashWebhookData(
                 serverSettings.appURL + TOKEN_DELETE_ENDPOINT,
                 serverSettings.webhookApiKey,
@@ -458,7 +469,6 @@ export class SettingsService extends AggregateRoot {
           }),
         );
       }),
-      retry(3),
     );
   }
 }

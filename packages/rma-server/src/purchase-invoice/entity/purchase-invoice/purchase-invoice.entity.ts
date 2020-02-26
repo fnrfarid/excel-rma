@@ -16,6 +16,9 @@ export class PurchaseInvoice extends BaseEntity {
   uuid: string;
 
   @Column()
+  created_on: Date;
+
+  @Column()
   created_by: string;
 
   @Column()

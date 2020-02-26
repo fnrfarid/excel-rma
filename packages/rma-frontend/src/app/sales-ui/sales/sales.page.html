@@ -159,11 +159,21 @@
         </ng-container>
         <!-- posting_date Column -->
         <ng-container matColumnDef="posting_date">
-          <mat-header-cell mat-sort-header="posting_date" *matHeaderCellDef>
+          <mat-header-cell mat-sort-header="created_on" *matHeaderCellDef>
             Date
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
             {{( getDate(row.posting_date) | date:'dd-MM-yyyy' )}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="remarks">
+          <mat-header-cell *matHeaderCellDef>
+            Remarks
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.remarks}}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>

@@ -1,10 +1,4 @@
-import {
-  IsUrl,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsUrl, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ServerSettingsDto {
@@ -60,15 +54,6 @@ export class ServerSettingsDto {
     required: true,
   })
   callbackProtocol: string;
-
-  @IsOptional()
-  @IsUUID()
-  @ApiProperty({
-    description: 'The uuid for client-token.',
-    type: 'string',
-    required: true,
-  })
-  clientTokenUuid: string;
 
   @IsNotEmpty()
   @ApiProperty({

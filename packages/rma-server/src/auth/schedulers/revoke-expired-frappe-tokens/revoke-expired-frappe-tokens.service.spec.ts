@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/common';
 import { RevokeExpiredFrappeTokensService } from './revoke-expired-frappe-tokens.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { ClientTokenManagerService } from '../../aggregates/client-token-manager/client-token-manager.service';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 describe('RevokeExpiredFrappeTokensService', () => {
   let service: RevokeExpiredFrappeTokensService;
@@ -14,6 +15,7 @@ describe('RevokeExpiredFrappeTokensService', () => {
         { provide: ServerSettingsService, useValue: {} },
         { provide: ClientTokenManagerService, useValue: {} },
         { provide: HttpService, useValue: {} },
+        { provide: ErrorLogService, useValue: {} },
       ],
     }).compile();
 

@@ -43,6 +43,7 @@ import {
 import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-note-service/delivery-note-webhook.dto';
 import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -58,28 +59,35 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   addSalesInvoice(salesInvoicePayload: SalesInvoiceDto, clientHttpRequest) {
-    return this.validateSalesInvoicePolicy
-      .validateCustomer(salesInvoicePayload)
-      .pipe(
-        switchMap(() => {
-          return this.validateSalesInvoicePolicy.validateItems(
-            salesInvoicePayload.items,
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        return this.validateSalesInvoicePolicy
+          .validateCustomer(salesInvoicePayload)
+          .pipe(
+            switchMap(() => {
+              return this.validateSalesInvoicePolicy.validateItems(
+                salesInvoicePayload.items,
+              );
+            }),
+            switchMap(() => {
+              const salesInvoice = new SalesInvoice();
+              Object.assign(salesInvoice, salesInvoicePayload);
+              salesInvoice.createdByEmail = clientHttpRequest.token.email;
+              salesInvoice.createdBy = clientHttpRequest.token.fullName;
+              salesInvoice.uuid = uuidv4();
+              salesInvoice.created_on = new DateTime(
+                settings.timeZone,
+              ).toJSDate();
+              salesInvoice.isSynced = false;
+              salesInvoice.inQueue = false;
+              this.apply(
+                new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest),
+              );
+              return of({});
+            }),
           );
-        }),
-        switchMap(() => {
-          const salesInvoice = new SalesInvoice();
-          Object.assign(salesInvoice, salesInvoicePayload);
-          salesInvoice.createdByEmail = clientHttpRequest.token.email;
-          salesInvoice.createdBy = clientHttpRequest.token.fullName;
-          salesInvoice.uuid = uuidv4();
-          salesInvoice.isSynced = false;
-          salesInvoice.inQueue = false;
-          this.apply(
-            new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest),
-          );
-          return of({});
-        }),
-      );
+      }),
+    );
   }
 
   async retrieveSalesInvoice(uuid: string, req) {
@@ -265,6 +273,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       payment_schedule: salesInvoice.payment_schedule,
       payments: salesInvoice.payments,
       sales_team: salesInvoice.sales_team,
+      remarks: salesInvoice.remarks,
     };
   }
 

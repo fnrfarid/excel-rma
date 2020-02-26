@@ -1,7 +1,7 @@
 import { Injectable, HttpService, OnModuleInit, Logger } from '@nestjs/common';
 import { CronJob } from 'cron';
 import { from, of, Observable } from 'rxjs';
-import { switchMap, retry, mergeMap } from 'rxjs/operators';
+import { switchMap, mergeMap, retryWhen, take, delay } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
@@ -22,6 +22,7 @@ import {
   REVOKE_FRAPPE_TOKEN_SUCCESS,
   REVOKE_FRAPPE_TOKEN_ERROR,
 } from '../../../constants/messages';
+import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 
 export const FRAPPE_TOKEN_CLEANUP_CRON_STRING = '0 */15 * * * *';
 
@@ -31,6 +32,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
     private readonly settings: ServerSettingsService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly http: HttpService,
+    private readonly errorLog: ErrorLogService,
   ) {}
 
   onModuleInit() {
@@ -57,14 +59,19 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
               }),
             );
           }),
-          retry(3),
+          retryWhen(errors => errors.pipe(delay(1000), take(3))),
         )
         .subscribe({
           next: success => {
             Logger.log(REVOKE_FRAPPE_TOKEN_SUCCESS, this.constructor.name);
           },
           error: error => {
-            Logger.error(REVOKE_FRAPPE_TOKEN_ERROR, this.constructor.name);
+            this.errorLog.createErrorLog(error);
+            Logger.error(
+              REVOKE_FRAPPE_TOKEN_ERROR,
+              error,
+              this.constructor.name,
+            );
           },
         });
     });

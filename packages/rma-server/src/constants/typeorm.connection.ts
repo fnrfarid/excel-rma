@@ -12,7 +12,6 @@ import {
 import { MongoConnectionOptions } from 'typeorm/driver/mongodb/MongoConnectionOptions';
 import { ServerSettings } from '../system-settings/entities/server-settings/server-settings.entity';
 import { TokenCache } from '../auth/entities/token-cache/token-cache.entity';
-import { FrappeToken } from '../direct/entities/frappe-token/frappe-token.entity';
 import { RequestState } from '../direct/entities/request-state/request-state.entity';
 import { Customer } from '../customer/entity/customer/customer.entity';
 import { Item } from '../item/entity/item/item.entity';
@@ -42,7 +41,6 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
     synchronize: true,
     entities: [
       ServerSettings,
-      FrappeToken,
       RequestState,
       Customer,
       Item,

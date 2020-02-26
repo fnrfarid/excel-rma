@@ -133,6 +133,7 @@ export class SalesInvoiceDetails {
   delivery_note_items?: Item[];
   delivery_warehouse?: string;
   isCampaign?: boolean;
+  remarks?: string;
 }
 
 export class SalesInvoiceItem {

@@ -50,6 +50,8 @@ export const API_ITEM_GET_BY_CODE = '/api/item/v1/get_by_item_code';
 export const LIST_PURCHASE_INVOICE_ENDPOINT = '/api/purchase_invoice/v1/list';
 export const PURCHASE_INVOICE_GET_ONE_ENDPOINT =
   '/api/purchase_invoice/v1/get/';
+export const CREATE_PURCHASE_RECEIPT_BULK_ENDPOINT =
+  '/api/purchase_receipt/v1/create_bulk';
 export const CREATE_PURCHASE_RECEIPT_ENDPOINT =
   '/api/purchase_receipt/v1/create';
 export const GET_TIME_ZONE =
@@ -68,3 +70,6 @@ export const ERPNEXT_WAREHOUSE_ENDPOINT =
   '/api/command/user/api/resource/Warehouse';
 export const API_ITEM_SET_PURCHASE_WARRANTY_DAYS =
   '/api/item/v1/set_purchase_warranty_days';
+export const IS_BACKEND_CONNECTED_ENDPOINT =
+  '/api/direct/v1/verify_backend_connection';
+export const CONNECT_BACKEND_ENDPOINT = '/api/direct/connect';
