@@ -22,6 +22,8 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import {
   REDIRECT_ENDPOINT,
   TWENTY_MINUTES_IN_SECONDS,
+  ACTIVE,
+  REVOKED,
 } from '../../../constants/app-strings';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
@@ -41,12 +43,13 @@ export class DirectService {
     private readonly errorLogService: ErrorLogService,
   ) {}
 
-  connectClientForUser(redirect: string) {
+  connectClientForUser(redirect: string, token: TokenCache) {
     return from(
       this.requestStateService.save({
         uuid: uuidv4(),
         redirect,
         creation: new Date(),
+        email: token.email,
       }),
     ).pipe(
       switchMap(state => {
@@ -96,11 +99,13 @@ export class DirectService {
                 },
               });
             }),
+            map(tokenData => tokenData.data as BearerToken),
+            switchMap(token => this.saveToken(token)),
           );
         }),
       )
       .subscribe({
-        next: response => {
+        next: token => {
           const redirect = this.localState.redirect || '/';
 
           this.deleteRequestState(this.localState);
@@ -114,48 +119,47 @@ export class DirectService {
       });
   }
 
-  saveToken(token: BearerToken, settings: ServerSettings) {
-    let email;
+  saveToken(token: BearerToken) {
     if (!token || !token.access_token) {
       return throwError(new BadGatewayException(INVALID_FRAPPE_TOKEN));
     }
-    return this.http
-      .get(settings.profileURL, {
-        headers: {
-          authorization: 'Bearer ' + token.access_token,
-        },
-      })
-      .pipe(
-        map(res => res.data),
-        switchMap(profile => {
-          email = profile.email;
-          return from(this.tokenCacheService.findOne({ email }));
-        }),
-        switchMap((localToken: TokenCache) => {
-          // Set Saved Token Expiration Time
-          const exp = Date.now() / 1000 + (token.expires_in || 3600);
+    return from(
+      this.tokenCacheService.findOne({
+        email: this.localState.email,
+        refreshToken: { $exists: true, $ne: null },
+      }),
+    ).pipe(
+      switchMap((localToken: TokenCache) => {
+        // Set Saved Token Expiration Time
+        const exp = Date.now() / 1000 + (token.expires_in || 3600);
 
-          if (!localToken) {
-            return from(
-              this.tokenCacheService.save({
-                uuid: uuidv4(),
-                accessToken: token.access_token,
-                refreshToken: token.refresh_token,
-                email,
-                exp,
-              }),
-            );
-          }
+        if (!localToken) {
+          return from(
+            this.tokenCacheService.save({
+              uuid: uuidv4(),
+              accessToken: token.access_token,
+              refreshToken: token.refresh_token,
+              email: this.localState.email,
+              status: ACTIVE,
+              exp,
+            }),
+          );
+        }
 
-          this.revokeToken(localToken.accessToken);
-          localToken.uuid = uuidv4();
-          localToken.email = email;
-          localToken.accessToken = token.access_token;
-          localToken.refreshToken = token.refresh_token;
-          localToken.exp = exp;
-          return from(this.tokenCacheService.save(localToken));
-        }),
-      );
+        this.revokeToken(localToken.accessToken);
+        localToken.email = this.localState.email;
+        localToken.accessToken = token.access_token;
+        localToken.refreshToken = token.refresh_token;
+        localToken.exp = exp;
+        localToken.status = ACTIVE;
+        return from(
+          this.tokenCacheService.updateOne(
+            { uuid: localToken.uuid },
+            { $set: localToken },
+          ),
+        );
+      }),
+    );
   }
 
   deleteRequestState(requestState: RequestState) {
@@ -182,7 +186,22 @@ export class DirectService {
         }),
       )
       .subscribe({
-        next: success => {},
+        next: success => {
+          this.tokenCacheService
+            .findOne({ accessToken })
+            .then(token => {
+              if (token) {
+                return this.tokenCacheService.updateOne(
+                  {
+                    accessToken: token.accessToken,
+                  },
+                  { $set: { status: REVOKED } },
+                );
+              }
+            })
+            .then(revoked => {})
+            .catch(error => {});
+        },
         error: error => {
           this.errorLogService.createErrorLog(error, undefined, undefined, {
             token: { accessToken },
@@ -196,6 +215,7 @@ export class DirectService {
       this.tokenCacheService.findOne({
         email,
         refreshToken: { $exists: true, $ne: null },
+        status: ACTIVE,
       }),
     ).pipe(
       switchMap(token => {
@@ -251,6 +271,30 @@ export class DirectService {
               return throwError(
                 new ForbiddenException(err, INVALID_FRAPPE_TOKEN),
               );
+            }),
+            map(token => {
+              this.tokenCacheService
+                .findOne({
+                  accessToken: token.accessToken,
+                })
+                .then(localToken => {
+                  if (localToken) {
+                    return this.tokenCacheService.updateOne(
+                      {
+                        accessToken: localToken.accessToken,
+                      },
+                      { $set: localToken },
+                    );
+                  }
+                  return this.tokenCacheService.save({
+                    ...localToken,
+                    uuid: uuidv4(),
+                  });
+                })
+                .then(saved => {})
+                .catch(error => {});
+              this.revokeToken(frappeToken.accessToken);
+              return token;
             }),
           );
       }),

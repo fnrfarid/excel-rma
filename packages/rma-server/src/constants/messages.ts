@@ -54,3 +54,4 @@ export const RESET_CREDIT_LIMIT_SUCCESS = 'Credit Limit Reset';
 export const RESET_CREDIT_LIMIT_ERROR = 'Error during Credit Limit Reset';
 export const INVALID_ITEM_NAME_QUERY =
   'Invalid Query, please provide an array item_names : [ "name1"...]';
+export const INVALID_SERVICE_ACCOUNT = 'Invalid Service Account Token';

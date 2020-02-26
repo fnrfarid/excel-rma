@@ -8,8 +8,10 @@ export class DirectController {
   constructor(private readonly direct: DirectService) {}
 
   @Get('connect')
-  connectFrappe(@Query('redirect') redirect, @Res() res: Response) {
-    this.direct.connectClientForUser(redirect).subscribe({
+  @UseGuards(TokenGuard)
+  connectFrappe(@Query('redirect') redirect, @Res() res: Response, @Req() req) {
+    const { token } = req;
+    this.direct.connectClientForUser(redirect, token).subscribe({
       next: success => res.redirect(success.redirect),
       error: ({ error }) => {
         res.status(500);
