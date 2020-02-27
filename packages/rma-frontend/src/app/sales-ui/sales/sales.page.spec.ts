@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Location } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 
 import { SalesPage } from './sales.page';
@@ -30,6 +30,7 @@ describe('SalesPage', () => {
         MaterialModule,
         HttpClientTestingModule,
         FormsModule,
+        ReactiveFormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
       ],
