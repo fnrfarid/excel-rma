@@ -24,7 +24,7 @@ export class SalesInvoiceService {
 
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
-
+    let dateQuery = {};
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
@@ -38,7 +38,19 @@ export class SalesInvoiceService {
       }
     }
 
-    const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
+    if (filter_query.fromDate && filter_query.toDate) {
+      dateQuery = {
+        created_on: {
+          $gte: new Date(filter_query.fromDate),
+          $lte: new Date(filter_query.toDate),
+        },
+      };
+    }
+
+    const $and: any[] = [
+      filter_query ? this.getFilterQuery(filter_query) : {},
+      dateQuery,
+    ];
 
     const where: { $and: any } = { $and };
     const results = await this.salesInvoiceRepository.find({
@@ -77,6 +89,10 @@ export class SalesInvoiceService {
           query[key] = true;
         } else if (key === 'isCampaign' && query[key] === false) {
           query[key] = false;
+        } else if (key === 'fromDate') {
+          delete query[key];
+        } else if (key === 'toDate') {
+          delete query[key];
         } else {
           query[key] = new RegExp(query[key], 'i');
         }
