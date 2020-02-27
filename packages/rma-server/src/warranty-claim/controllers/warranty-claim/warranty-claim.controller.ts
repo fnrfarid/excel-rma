@@ -38,8 +38,8 @@ export class WarrantyClaimController {
   @Post('v1/create')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  create(@Body() warrantyClaimPayload: WarrantyClaimDto, @Req() req) {
-    return this.commandBus.execute(
+  async create(@Body() warrantyClaimPayload: WarrantyClaimDto, @Req() req) {
+    return await this.commandBus.execute(
       new AddWarrantyClaimCommand(warrantyClaimPayload, req),
     );
   }

@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WarrantyTabsPage } from './warranty-tabs.page';
 import { Location } from '@angular/common';
+import { STORAGE_TOKEN } from '../../api/storage/storage.service';
 
 describe('WarrantyTabsPage', () => {
   let component: WarrantyTabsPage;
@@ -17,6 +18,7 @@ describe('WarrantyTabsPage', () => {
           provide: Location,
           useValue: {},
         },
+        { provide: STORAGE_TOKEN, useValue: {} },
       ],
     }).compileComponents();
   }));

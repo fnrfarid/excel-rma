@@ -7,6 +7,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WarrantyService } from '../warranty-tabs/warranty.service';
+import { of } from 'rxjs';
 
 describe('WarrantyPage', () => {
   let component: WarrantyPage;
@@ -21,12 +24,23 @@ describe('WarrantyPage', () => {
         FormsModule,
         BrowserAnimationsModule,
         ReactiveFormsModule,
+        HttpClientTestingModule,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
           provide: Location,
           useValue: {},
+        },
+        {
+          provide: WarrantyService,
+          useValue: {
+            getWarrantyInvoiceList: (...args) => of({}),
+            getStore: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
+            }),
+          },
         },
       ],
     }).compileComponents();

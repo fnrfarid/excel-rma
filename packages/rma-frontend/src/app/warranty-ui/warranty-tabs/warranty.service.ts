@@ -1,10 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
-  HandleError,
-  HttpErrorHandler,
-} from '../../common/interfaces/services/http-error-handler/http-error-handler.service';
-import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
@@ -12,19 +8,22 @@ import {
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
-
+import { WarrantyInvoice } from '../../common/interfaces/warranty.interface';
+import { Item } from '../../common/interfaces/warranty.interface';
+import { LIST_WARRANTY_INVOICE_ENDPOINT } from '../../constants/url-strings';
+import { APIResponse } from '../../common/interfaces/sales.interface';
 @Injectable({
   providedIn: 'root',
 })
 export class WarrantyService {
-  handleError: HandleError;
-
+  warrentyInvoiceList: Array<WarrantyInvoice>;
+  warrentyList: Array<Item>;
   constructor(
-    httpErrorHandler: HttpErrorHandler,
     private http: HttpClient,
     private readonly storage: StorageService,
   ) {
-    this.handleError = httpErrorHandler.createHandleError('ListingService');
+    this.warrentyInvoiceList = [];
+    this.warrentyList = [];
   }
 
   findModels(
@@ -50,7 +49,31 @@ export class WarrantyService {
       }),
     );
   }
+  getWarrantyInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+    if (!sortOrder) sortOrder = { posting_date: 'desc' };
+    if (!query) query = {};
 
+    try {
+      sortOrder = JSON.stringify(sortOrder);
+    } catch (error) {
+      sortOrder = JSON.stringify({ posting_date: 'desc' });
+    }
+    const url = LIST_WARRANTY_INVOICE_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('sort', sortOrder)
+      .set('filter_query', JSON.stringify(query));
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {
