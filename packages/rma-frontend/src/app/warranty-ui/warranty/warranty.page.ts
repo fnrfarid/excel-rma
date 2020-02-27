@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { WarrantyClaimsDataSource } from './warranty-claims-datasource';
 import { Location } from '@angular/common';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
-import { WarrantyInvoice } from '../../common/interfaces/warranty.interface';
+import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
 
 @Component({
   selector: 'app-warranty',
@@ -12,7 +12,7 @@ import { WarrantyInvoice } from '../../common/interfaces/warranty.interface';
   styleUrls: ['./warranty.page.scss'],
 })
 export class WarrantyPage implements OnInit {
-  warrentyInvoiceList: Array<WarrantyInvoice>;
+  warrantyInvoiceList: Array<WarrantyClaims>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -53,10 +53,6 @@ export class WarrantyPage implements OnInit {
   ngOnInit() {
     this.dataSource = new WarrantyClaimsDataSource(this.warrantyService);
     this.dataSource.loadItems();
-  }
-
-  navigateBasedOnRoles(row) {
-    return this.warrantyService.getWarrantyInvoiceList;
   }
 
   getUpdate(event) {
@@ -104,6 +100,7 @@ export class WarrantyPage implements OnInit {
   navigateBack() {
     this.location.back();
   }
+
   getDate(date: string) {
     return new Date(date);
   }

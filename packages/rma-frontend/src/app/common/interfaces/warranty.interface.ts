@@ -1,4 +1,4 @@
-export class WarrantyInvoice {
+export class WarrantyClaims {
   uuid: string;
   customer: string;
   company: string;

@@ -47,7 +47,7 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
     }
     this.loadingSubject.next(true);
     this.warrantyService
-      .getWarrantyInvoiceList(sortOrder, pageIndex, pageSize, query)
+      .getWarrantyClaimsList(sortOrder, pageIndex, pageSize, query)
       .pipe(
         map((res: ListResponse) => {
           this.data = res.docs;

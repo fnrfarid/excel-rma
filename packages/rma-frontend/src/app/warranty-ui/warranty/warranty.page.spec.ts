@@ -35,7 +35,7 @@ describe('WarrantyPage', () => {
         {
           provide: WarrantyService,
           useValue: {
-            getWarrantyInvoiceList: (...args) => of({}),
+            getWarrantyClaimsList: (...args) => of({}),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

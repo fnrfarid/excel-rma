@@ -8,7 +8,7 @@ import {
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
-import { WarrantyInvoice } from '../../common/interfaces/warranty.interface';
+import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
 import { Item } from '../../common/interfaces/warranty.interface';
 import { LIST_WARRANTY_INVOICE_ENDPOINT } from '../../constants/url-strings';
 import { APIResponse } from '../../common/interfaces/sales.interface';
@@ -16,14 +16,14 @@ import { APIResponse } from '../../common/interfaces/sales.interface';
   providedIn: 'root',
 })
 export class WarrantyService {
-  warrentyInvoiceList: Array<WarrantyInvoice>;
-  warrentyList: Array<Item>;
+  warrantyInvoiceList: Array<WarrantyClaims>;
+  warrantyList: Array<Item>;
   constructor(
     private http: HttpClient,
     private readonly storage: StorageService,
   ) {
-    this.warrentyInvoiceList = [];
-    this.warrentyList = [];
+    this.warrantyInvoiceList = [];
+    this.warrantyList = [];
   }
 
   findModels(
@@ -49,7 +49,7 @@ export class WarrantyService {
       }),
     );
   }
-  getWarrantyInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+  getWarrantyClaimsList(sortOrder, pageNumber = 0, pageSize = 10, query) {
     if (!sortOrder) sortOrder = { posting_date: 'desc' };
     if (!query) query = {};
 
