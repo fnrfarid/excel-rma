@@ -13,6 +13,7 @@ import {
   ADD_SALES_INVOICE_PAGE_URL,
 } from '../../constants/url-strings';
 import { map, filter } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-sales',
@@ -52,6 +53,9 @@ export class SalesPage implements OnInit {
   branch: string = '';
   total: number = 0;
   campaign: string = 'All';
+  fromDateFormControl = new FormControl();
+  toDateFormControl = new FormControl();
+
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
@@ -108,6 +112,22 @@ export class SalesPage implements OnInit {
     );
   }
 
+  dateFilter() {
+    if (this.fromDateFormControl.value && this.toDateFormControl.value)
+      this.setFilter();
+  }
+
+  clearFilters() {
+    this.customer = '';
+    this.status = 'All';
+    this.name = '';
+    this.branch = '';
+    this.campaign = 'All';
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.dataSource.loadItems();
+  }
+
   setFilter(event?) {
     const query: any = {};
     if (this.customer) query.customer = this.customer;
@@ -120,6 +140,12 @@ export class SalesPage implements OnInit {
       } else if (this.campaign === 'No') {
         query.isCampaign = false;
       }
+    }
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date().setDate(
+        this.fromDateFormControl.value.getDate(),
+      );
+      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
     }
     const sortQuery = {};
     if (event) {

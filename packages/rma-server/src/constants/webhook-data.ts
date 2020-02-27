@@ -1799,6 +1799,10 @@ export function salesInvoiceOnSubmitWebhookData(
         key: 'sales_team',
         fieldname: 'sales_team',
       },
+      {
+        key: 'remarks',
+        fieldname: 'remarks',
+      },
     ],
   };
 }

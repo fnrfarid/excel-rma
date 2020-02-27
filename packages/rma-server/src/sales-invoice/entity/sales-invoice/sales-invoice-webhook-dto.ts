@@ -128,6 +128,9 @@ export class SalesInvoiceWebhookDto {
 
   @IsOptional()
   sales_team: any[];
+
+  @IsOptional()
+  remarks: string;
 }
 
 export class SalesInvoiceWebhookTaxDto {
