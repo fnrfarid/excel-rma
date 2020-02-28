@@ -12,7 +12,7 @@ import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
   styleUrls: ['./warranty.page.scss'],
 })
 export class WarrantyPage implements OnInit {
-  warrantyInvoiceList: Array<WarrantyClaims>;
+  warrantyClaimsList: Array<WarrantyClaims>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 

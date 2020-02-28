@@ -8,23 +8,16 @@ import {
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
-import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
-import { Item } from '../../common/interfaces/warranty.interface';
 import { LIST_WARRANTY_INVOICE_ENDPOINT } from '../../constants/url-strings';
 import { APIResponse } from '../../common/interfaces/sales.interface';
 @Injectable({
   providedIn: 'root',
 })
 export class WarrantyService {
-  warrantyInvoiceList: Array<WarrantyClaims>;
-  warrantyList: Array<Item>;
   constructor(
     private http: HttpClient,
     private readonly storage: StorageService,
-  ) {
-    this.warrantyInvoiceList = [];
-    this.warrantyList = [];
-  }
+  ) {}
 
   findModels(
     model: string,
