@@ -137,8 +137,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   async submitPurchaseReceipt() {
     const loading = await this.loadingController.create({
-      message: 'Creating Serials',
-      spinner: 'bubbles',
+      message: 'Creating Serials...!',
     });
     await loading.present();
 
