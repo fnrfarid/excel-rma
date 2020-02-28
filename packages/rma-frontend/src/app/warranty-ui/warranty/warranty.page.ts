@@ -44,7 +44,7 @@ export class WarrantyPage implements OnInit {
   territory: string;
   serial: string;
   toDate: string;
-  row: Array<any>;
+
   constructor(
     private location: Location,
     private readonly warrantyService: WarrantyService,
