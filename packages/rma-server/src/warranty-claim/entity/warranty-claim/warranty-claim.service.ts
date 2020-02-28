@@ -28,7 +28,9 @@ export class WarrantyClaimService {
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
-      sortQuery = { posting_date: 'desc' };
+      sortQuery = {
+        claim_no: 'desc',
+      };
     }
 
     for (const key of Object.keys(sortQuery)) {
