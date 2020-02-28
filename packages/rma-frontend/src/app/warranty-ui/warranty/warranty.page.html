@@ -144,7 +144,7 @@
               (matSortChange)="setFilter($event)"
             >
               <ng-container matColumnDef="claim_no">
-                <mat-header-cell *matHeaderCellDef>
+                <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
                   Claim no
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
@@ -154,7 +154,7 @@
               </ng-container>
 
               <ng-container matColumnDef="claim_type">
-                <mat-header-cell *matHeaderCellDef>
+                <mat-header-cell *matHeaderCellDef mat-sort-header="claim_type">
                   Claim Type
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
@@ -164,7 +164,10 @@
               </ng-container>
 
               <ng-container matColumnDef="received_date">
-                <mat-header-cell *matHeaderCellDef>
+                <mat-header-cell
+                  *matHeaderCellDef
+                  mat-sort-header="received_date"
+                >
                   Received Date
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
