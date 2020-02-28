@@ -14,7 +14,8 @@ import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/wa
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { INVALID_FILE, DRAFT_STATUS } from '../../../constants/app-strings';
+
+import { INVALID_FILE } from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
   BulkWarrantyClaim,
@@ -106,11 +107,23 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   createBulkSerials(claims: BulkWarrantyClaim[], clientHttpRequest) {
     claims.forEach(claim => {
       const serialNo: SerialNoDto = {
-        serial_no: claim.serial_no,
-        item_code: claim.item_code,
-        warranty_expiry_date: claim.itemWarrantyDate,
-        company: claim.company,
         supplier: claim.supplier,
+        serial_no: claim.serial_no,
+        claim_no: claim.claim_no,
+        claim_type: claim.claim_type,
+        customer_third_party: claim.customer_third_party,
+        item_code: claim.item_code,
+        claimed_serial: claim.claimed_serial,
+        invoice_no: claim.invoice_no,
+        service_charge: claim.service_charge,
+        claim_status: claim.claim_status,
+        warranty_status: claim.warranty_status,
+        receiving_branch: claim.receiving_branch,
+        delivery_branch: claim.delivery_branch,
+        received_by: claim.received_by,
+        delivered_by: claim.delivered_by,
+        received_date: new Date(),
+        deliver_date: new Date(),
       };
       return this.serialNoAggregateService
         .validateNewSerialNo(serialNo, clientHttpRequest)
@@ -130,14 +143,23 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     const mappedClaims = [];
     claims.forEach(claim => {
       const warrantyClaim = new WarrantyClaim();
-      warrantyClaim.company = claim.company;
-      warrantyClaim.createdOn = new Date();
-      warrantyClaim.uuid = uuidv4();
-      warrantyClaim.item_code = claim.item_code;
       warrantyClaim.serialNo = claim.serial_no;
-      warrantyClaim.status = DRAFT_STATUS;
-      warrantyClaim.supplier = claim.supplier;
-      warrantyClaim.itemWarrantyDate = claim.itemWarrantyDate;
+      warrantyClaim.claim_no = claim.claim_no;
+      warrantyClaim.claim_type = claim.claim_type;
+      warrantyClaim.customer_third_party = claim.customer_third_party;
+      warrantyClaim.item_code = claim.item_code;
+      warrantyClaim.claimed_serial = claim.claimed_serial;
+      warrantyClaim.invoice_no = claim.invoice_no;
+      warrantyClaim.service_charge = claim.service_charge;
+      warrantyClaim.claim_status = claim.claim_status;
+      warrantyClaim.warranty_status = claim.warranty_status;
+      warrantyClaim.receiving_branch = claim.receiving_branch;
+      warrantyClaim.delivery_branch = claim.delivery_branch;
+      warrantyClaim.received_by = claim.received_by;
+      warrantyClaim.delivered_by = claim.delivered_by;
+      warrantyClaim.received_date = new Date();
+      warrantyClaim.deliver_date = new Date();
+      warrantyClaim.uuid = uuidv4();
       mappedClaims.push(warrantyClaim);
     });
     return mappedClaims;

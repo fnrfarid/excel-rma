@@ -1,7 +1,7 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-
-import { BehaviorSubject, Observable } from 'rxjs';
-
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, catchError, finalize } from 'rxjs/operators';
+import { WarrantyService } from '../warranty-tabs/warranty.service';
 export interface ListingData {
   customer: string;
   claim_no: string;
@@ -24,12 +24,14 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
   data: ListingData[];
   length: number;
   offset: number;
-
+  total = new BehaviorSubject<number>(0);
   itemSubject = new BehaviorSubject<ListingData[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
 
   loading$ = this.loadingSubject.asObservable();
-
+  constructor(private warrantyService: WarrantyService) {
+    super();
+  }
   connect(collectionViewer: CollectionViewer): Observable<ListingData[]> {
     return this.itemSubject.asObservable();
   }
@@ -41,24 +43,23 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
 
   loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
     if (!sortOrder) {
-      sortOrder = { posting_date: 'desc' };
+      sortOrder = { created_on: 'desc' };
     }
     this.loadingSubject.next(true);
-    const item: ListingData[] = [
-      {
-        customer: 'Hardik',
-        claim_no: '001',
-        third_party: 'Yes',
-        product: 'TP link router',
-        from_date: '20-02-2020',
-        claim_status: 'Claimed',
-        claim_type: 'Valid',
-        branch: 'Finish goods',
-        serial: 'ABC123',
-        to_date: '20-04-2020',
-      },
-    ];
-
-    this.itemSubject.next(item);
+    this.warrantyService
+      .getWarrantyClaimsList(sortOrder, pageIndex, pageSize, query)
+      .pipe(
+        map((res: ListResponse) => {
+          this.data = res.docs;
+          this.offset = res.offset;
+          this.length = res.length;
+          return res.docs;
+        }),
+        catchError(error => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe(items => {
+        this.itemSubject.next(items);
+      });
   }
 }
