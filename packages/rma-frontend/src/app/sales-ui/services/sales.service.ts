@@ -112,12 +112,24 @@ export class SalesService {
     );
   }
 
-  getItemList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+  getItemList(
+    filter = {},
+    sortOrder: any = { item_name: 'asc' },
+    pageIndex = 0,
+    pageSize = 10,
+  ) {
+    try {
+      sortOrder = JSON.stringify(sortOrder);
+    } catch {
+      sortOrder = JSON.stringify({ item_name: 'asc' });
+    }
     const url = LIST_ITEMS_ENDPOINT;
+    const query: any = {};
+    query.item_name = filter;
     const params = new HttpParams()
       .set('limit', pageSize.toString())
-      .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
+      .set('offset', (pageIndex * pageSize).toString())
+      .set('search', JSON.stringify(query))
       .set('sort', sortOrder);
     return this.getHeaders().pipe(
       switchMap(headers => {
