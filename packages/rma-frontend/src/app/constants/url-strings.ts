@@ -73,3 +73,5 @@ export const API_ITEM_SET_PURCHASE_WARRANTY_DAYS =
 export const IS_BACKEND_CONNECTED_ENDPOINT =
   '/api/direct/v1/verify_backend_connection';
 export const CONNECT_BACKEND_ENDPOINT = '/api/direct/connect';
+export const LIST_WARRANTY_INVOICE_ENDPOINT = 'api/warranty_claim/v1/list';
+export const VIEW_WARRANTY_INVOICE_PAGE_URL = 'view-warranty';

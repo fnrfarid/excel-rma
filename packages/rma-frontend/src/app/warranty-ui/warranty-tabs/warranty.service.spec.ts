@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { WarrantyService } from './warranty.service';
+import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { HttpErrorHandler } from '../../common/interfaces/services/http-error-handler/http-error-handler.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { STORAGE_TOKEN } from '../../api/storage/storage.service';

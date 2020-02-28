@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-
 import { WarrantyClaimsDataSource } from './warranty-claims-datasource';
 import { Location } from '@angular/common';
+import { WarrantyService } from '../warranty-tabs/warranty.service';
+import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
 
 @Component({
   selector: 'app-warranty',
@@ -11,6 +12,7 @@ import { Location } from '@angular/common';
   styleUrls: ['./warranty.page.scss'],
 })
 export class WarrantyPage implements OnInit {
+  warrantyClaimsList: Array<WarrantyClaims>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
@@ -21,8 +23,9 @@ export class WarrantyPage implements OnInit {
     'received_date',
     'deliver_date',
     'customer_third_party',
-    'item',
+    'item_code',
     'claimed_serial',
+    'invoice_no',
     'service_charge',
     'claim_status',
     'warranty_status',
@@ -30,7 +33,6 @@ export class WarrantyPage implements OnInit {
     'delivery_branch',
     'received_by',
     'delivered_by',
-    'invoice_no',
   ];
   customer: string;
   claimNo: string;
@@ -43,13 +45,16 @@ export class WarrantyPage implements OnInit {
   serial: string;
   toDate: string;
 
-  constructor(private location: Location) {}
+  constructor(
+    private location: Location,
+    private readonly warrantyService: WarrantyService,
+  ) {}
 
   ngOnInit() {
-    this.dataSource = new WarrantyClaimsDataSource();
-
+    this.dataSource = new WarrantyClaimsDataSource(this.warrantyService);
     this.dataSource.loadItems();
   }
+
   getUpdate(event) {
     const query: any = {};
 
@@ -63,6 +68,7 @@ export class WarrantyPage implements OnInit {
 
   setFilter(event?) {
     const query: any = {};
+
     if (this.customer) query.customer = this.customer;
     if (this.claimNo) query.claimNo = this.claimNo;
     if (this.thirdParty) query.thirdParty = this.thirdParty;
@@ -93,5 +99,9 @@ export class WarrantyPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  getDate(date: string) {
+    return new Date(date);
   }
 }
