@@ -8,6 +8,7 @@ import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { filter } from 'rxjs/operators';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -28,6 +29,7 @@ export class DetailsComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private location: Location,
     private readonly router: Router,
+    private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
@@ -81,23 +83,38 @@ export class DetailsComponent implements OnInit {
     });
   }
 
-  submitSalesInvoice() {
+  async submitSalesInvoice() {
+    const loading = await this.loadingController.create({
+      message: 'Submitting Invoice...!',
+    });
+    await loading.present();
     this.salesService
       .submitSalesInvoice(this.route.snapshot.params.invoiceUuid)
       .subscribe({
         next: success => {
+          loading.dismiss();
           this.location.back();
+        },
+        error: err => {
+          loading.dismiss();
         },
       });
   }
 
-  rejectSalesInvoice() {
+  async rejectSalesInvoice() {
+    const loading = await this.loadingController.create({
+      message: 'Rejecting Invoice...!',
+    });
     const payload = {} as SalesInvoiceDetails;
     payload.uuid = this.route.snapshot.params.invoiceUuid;
     payload.status = REJECTED;
     this.salesService.updateSalesInvoice(payload).subscribe({
       next: success => {
         this.location.back();
+        loading.dismiss();
+      },
+      error: err => {
+        loading.dismiss();
       },
     });
   }

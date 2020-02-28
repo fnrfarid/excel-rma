@@ -89,6 +89,7 @@
         <ion-col>
           <mat-form-field class="example-full-width">
             <input
+              oninput="this.value = this.value.toUpperCase()"
               matInput
               placeholder="From Range"
               type="text"
@@ -101,6 +102,7 @@
           <mat-form-field class="example-full-width">
             <input
               type="text"
+              oninput="this.value = this.value.toUpperCase()"
               matInput
               placeholder="To Range"
               type="string"
@@ -258,6 +260,7 @@
             matInput
             *ngIf="row.serial_no.length === 1 ? true : false"
             [(ngModel)]="row.serial_no[0]"
+            oninput="this.value = this.value.toUpperCase()"
           />
           <p *ngIf="row.serial_no.length === 1 ? false : true">
             {{ getSerialsInputValue(row) }}
