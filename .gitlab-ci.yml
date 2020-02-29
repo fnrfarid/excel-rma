@@ -1,5 +1,3 @@
-image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
-
 services:
   - name: docker:dind
     alias: docker
@@ -10,6 +8,7 @@ stages:
   - deploy
 
 test_rma_frontend:
+  image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
   stage: tests
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
@@ -38,6 +37,7 @@ test_rma_frontend:
     - docker
 
 test_rma_mobile:
+  image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
   stage: tests
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
@@ -67,6 +67,7 @@ test_rma_mobile:
     - docker
 
 test_rma_server:
+  image: node:latest
   stage: tests
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
