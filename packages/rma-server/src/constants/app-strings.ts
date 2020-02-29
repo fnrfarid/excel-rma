@@ -30,7 +30,7 @@ export const REVOKE_ENDPOINT =
   '/api/method/frappe.integrations.oauth2.revoke_token';
 export const TOKEN_ENDPOINT =
   '/api/method/frappe.integrations.oauth2.get_token';
-export const TWENTY_MINUTES_IN_SECONDS = 3600 - 120; // 20 min * 60 sec;
+export const TWENTY_MINUTES_IN_SECONDS = 20 * 60; // 20 min * 60 sec;
 export const SCOPE = 'all openid';
 export const ACTIVE = 'Active';
 export const REVOKED = 'Revoked';
