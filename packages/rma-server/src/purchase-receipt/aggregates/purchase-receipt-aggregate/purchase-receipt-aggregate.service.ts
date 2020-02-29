@@ -39,6 +39,7 @@ import {
   SERIAL_NO_DOCTYPE_NAME,
   MONGO_INSERT_MANY_BATCH_NUMBER,
   SERIAL_NO_VALIDATION_BATCH_SIZE,
+  VALIDATE_AUTH_STRING,
 } from '../../../constants/app-strings';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
@@ -50,6 +51,7 @@ import { PurchaseReceiptService } from '../../../purchase-receipt/entity/purchas
 import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
+import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -61,6 +63,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     private readonly errorLogService: ErrorLogService,
     private readonly purchaseReceiptService: PurchaseReceiptService,
     private readonly serialNoService: SerialNoService,
+    private readonly tokenService: DirectService,
   ) {
     super();
   }
@@ -345,7 +348,8 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           purchase_invoice_name,
           batch,
         );
-        return of({});
+        return throwError(new BadRequestException());
+        // return of({});
       }),
     );
   }
@@ -374,9 +378,34 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         }),
         bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
         concatMap(receipt => {
-          return this.frappeInsertMany(settings, receipt, clientHttpRequest);
+          return of({}).pipe(
+            mergeMap(object => {
+              return this.frappeInsertMany(
+                settings,
+                receipt,
+                clientHttpRequest,
+              );
+            }),
+            catchError(err => {
+              if (
+                (err.response && err.response.status === 403) ||
+                (err.response.data &&
+                  err.response.data.exc.includes(VALIDATE_AUTH_STRING))
+              ) {
+                return this.tokenService
+                  .getUserAccessToken(clientHttpRequest.token.email)
+                  .pipe(
+                    mergeMap(token => {
+                      clientHttpRequest.token.accessToken = token.accessToken;
+                      return throwError(new BadRequestException(err));
+                    }),
+                  );
+              }
+              return throwError(new BadRequestException(err));
+            }),
+            retry(3),
+          );
         }),
-        retry(3),
       )
       .subscribe({
         next: (success: { data: { message: string[] }; config: any }) => {

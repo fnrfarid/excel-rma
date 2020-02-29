@@ -30,7 +30,7 @@ export const REVOKE_ENDPOINT =
   '/api/method/frappe.integrations.oauth2.revoke_token';
 export const TOKEN_ENDPOINT =
   '/api/method/frappe.integrations.oauth2.get_token';
-export const TWENTY_MINUTES_IN_SECONDS = 20 * 60; // 20 min * 60 sec;
+export const TWENTY_MINUTES_IN_SECONDS = 3600 - 120; // 20 min * 60 sec;
 export const SCOPE = 'all openid';
 export const ACTIVE = 'Active';
 export const REVOKED = 'Revoked';
@@ -109,3 +109,4 @@ export const FRAPPE_INSERT_MANY_BATCH_COUNT = 5;
 export const PURCHASE_RECEIPT_DOCTYPE_NAME = 'Purchase Receipt';
 export const SERIAL_NO_DOCTYPE_NAME = 'Serial No';
 export const MONGO_INSERT_MANY_BATCH_NUMBER = 100000;
+export const VALIDATE_AUTH_STRING = 'validate_oauth';
