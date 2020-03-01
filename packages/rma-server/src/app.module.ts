@@ -30,6 +30,7 @@ import { PurchaseInvoiceModule } from './purchase-invoice/purchase-invoice.modul
 import { PurchaseReceiptModule } from './purchase-receipt/purchase-receipt.module';
 import { CommonDepModule } from './common-dep/common-dep.module';
 import { ErrorLogModule } from './error-log/error-logs-invoice.module';
+import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { ErrorLogModule } from './error-log/error-logs-invoice.module';
     SerialNoModule,
     WarrantyClaimModule,
     DeliveryNoteModule,
+    PurchaseOrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
