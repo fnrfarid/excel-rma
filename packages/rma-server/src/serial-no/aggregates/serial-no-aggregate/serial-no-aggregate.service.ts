@@ -37,6 +37,7 @@ import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -48,6 +49,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
     private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
     private readonly errorLogService: ErrorLogService,
+    private readonly salesInvoiceService: SalesInvoiceService,
   ) {
     super();
   }
@@ -237,5 +239,78 @@ export class SerialNoAggregateService extends AggregateRoot {
 
   validateSerials(payload: ValidateSerialsDto) {
     return this.serialNoPolicyService.validateSerials(payload);
+  }
+
+  getSalesInvoiceDeliveryNoteSerials(
+    find,
+    search,
+    offset,
+    limit,
+    clientHttpRequest,
+  ) {
+    return this.salesInvoiceService
+      .asyncAggregate([
+        {
+          $match: {
+            $or: [{ uuid: find }, { name: find }],
+          },
+        },
+        {
+          $project: {
+            delivery_note_items: 1,
+            _id: 0,
+          },
+        },
+        { $unwind: '$delivery_note_items' },
+        {
+          $project: {
+            _id: '$_id',
+            serials: {
+              $split: ['$delivery_note_items.serial_no', '\n'],
+            },
+          },
+        },
+        {
+          $unwind: '$serials',
+        },
+        {
+          $group: {
+            _id: 0,
+            serial_no: {
+              $push: '$serials',
+            },
+          },
+        },
+        { $unwind: '$serial_no' },
+        { $match: { serial_no: { $regex: search, $options: 'i' } } },
+        {
+          $lookup: {
+            from: 'serial_no',
+            localField: 'serial_no',
+            foreignField: 'serial_no',
+            as: 'serials',
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            serials: 1,
+          },
+        },
+        {
+          $unwind: '$serials',
+        },
+        { $replaceRoot: { newRoot: '$serials' } },
+        { $skip: offset },
+        { $limit: limit },
+      ])
+      .pipe(
+        switchMap((serial: any[]) => {
+          if (!serial || !serial.length) {
+            return throwError(new NotFoundException());
+          }
+          return of(serial);
+        }),
+      );
   }
 }
