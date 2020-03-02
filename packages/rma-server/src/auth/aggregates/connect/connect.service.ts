@@ -27,6 +27,7 @@ import {
 } from '../../../constants/app-strings';
 import { HUNDRED_NUMBERSTRING } from '../../../constants/app-strings';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 
 @Injectable()
 export class ConnectService {
@@ -79,7 +80,7 @@ export class ConnectService {
     return;
   }
 
-  getUserRoles(frappeToken: { user: string }) {
+  getUserRoles(frappeToken: FrappeBearerTokenWebhookInterface) {
     return this.settingService
       .find()
       .pipe(
@@ -87,35 +88,15 @@ export class ConnectService {
           if (!settings.authServerURL) {
             return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
           }
+
+          if (settings.serviceAccountUser === frappeToken.user) {
+            return this.getRolesRequest(settings, frappeToken, {
+              accessToken: frappeToken.access_token,
+            });
+          }
           return this.clientTokenManager.getClientToken().pipe(
             switchMap(token => {
-              return this.http
-                .get(
-                  settings.authServerURL +
-                    FRAPPE_API_GET_USER_INFO_ENDPOINT +
-                    frappeToken.user,
-                  { headers: this.getAuthorizationHeaders(token.accessToken) },
-                )
-                .pipe(
-                  map(data => data.data.data),
-                  mergeMap((userInfo: FrappeUserInfoInterface) => {
-                    const roles = this.mapUserRoles(userInfo.roles);
-                    this.tokenCacheService
-                      .updateMany(
-                        { email: frappeToken.user },
-                        {
-                          $set: {
-                            roles,
-                            name: userInfo.first_name,
-                            fullName: userInfo.full_name,
-                          },
-                        },
-                      )
-                      .then(success => {})
-                      .catch(error => {});
-                    return of({});
-                  }),
-                );
+              return this.getRolesRequest(settings, frappeToken, token);
             }),
           );
         }),
@@ -128,7 +109,7 @@ export class ConnectService {
       });
   }
 
-  getUserTerritory(frappeToken: { user: string }) {
+  getUserTerritory(frappeToken: FrappeBearerTokenWebhookInterface) {
     return this.settingService
       .find()
       .pipe(
@@ -136,41 +117,16 @@ export class ConnectService {
           if (!settings.authServerURL) {
             return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
           }
+
+          if (settings.serviceAccountUser === frappeToken.user) {
+            return this.getTerritoryRequest(settings, frappeToken, {
+              accessToken: frappeToken.access_token,
+            });
+          }
+
           return this.clientTokenManager.getClientToken().pipe(
             switchMap(token => {
-              const params = {
-                fields: JSON.stringify([
-                  ['allow', '=', 'Territory'],
-                  ['user', '=', frappeToken.user],
-                ]),
-                filters: JSON.stringify(['for_value']),
-                limit_page_length: HUNDRED_NUMBERSTRING,
-              };
-              return this.http
-                .get(
-                  settings.authServerURL +
-                    FRAPPE_API_GET_USER_PERMISSION_ENDPOINT,
-                  {
-                    headers: this.getAuthorizationHeaders(token.accessToken),
-                    params,
-                  },
-                )
-                .pipe(
-                  map(data => data.data.data),
-                  mergeMap((userTerritory: { for_value: string }[]) => {
-                    const territory = this.mapUserTerritory(userTerritory);
-                    this.tokenCacheService
-                      .updateMany(
-                        { email: frappeToken.user },
-                        {
-                          $set: { territory },
-                        },
-                      )
-                      .then(success => {})
-                      .catch(error => {});
-                    return of({});
-                  }),
-                );
+              return this.getTerritoryRequest(settings, frappeToken, token);
             }),
           );
         }),
@@ -227,5 +183,75 @@ export class ConnectService {
     const token = await this.tokenCacheService.findOne(params);
     if (!token) throw new NotFoundException();
     return token;
+  }
+
+  getRolesRequest(
+    settings: ServerSettings,
+    frappeToken: FrappeBearerTokenWebhookInterface,
+    token: { accessToken: string },
+  ) {
+    return this.http
+      .get(
+        settings.authServerURL +
+          FRAPPE_API_GET_USER_INFO_ENDPOINT +
+          frappeToken.user,
+        { headers: this.getAuthorizationHeaders(token.accessToken) },
+      )
+      .pipe(
+        map(data => data.data.data),
+        mergeMap((userInfo: FrappeUserInfoInterface) => {
+          const roles = this.mapUserRoles(userInfo.roles);
+          this.tokenCacheService
+            .updateMany(
+              { email: frappeToken.user },
+              {
+                $set: {
+                  roles,
+                  name: userInfo.first_name,
+                  fullName: userInfo.full_name,
+                },
+              },
+            )
+            .then(success => {})
+            .catch(error => {});
+          return of({});
+        }),
+      );
+  }
+
+  getTerritoryRequest(
+    settings: ServerSettings,
+    frappeToken: FrappeBearerTokenWebhookInterface,
+    token: { accessToken: string },
+  ) {
+    const params = {
+      fields: JSON.stringify([
+        ['allow', '=', 'Territory'],
+        ['user', '=', frappeToken.user],
+      ]),
+      filters: JSON.stringify(['for_value']),
+      limit_page_length: HUNDRED_NUMBERSTRING,
+    };
+    return this.http
+      .get(settings.authServerURL + FRAPPE_API_GET_USER_PERMISSION_ENDPOINT, {
+        headers: this.getAuthorizationHeaders(token.accessToken),
+        params,
+      })
+      .pipe(
+        map(data => data.data.data),
+        mergeMap((userTerritory: { for_value: string }[]) => {
+          const territory = this.mapUserTerritory(userTerritory);
+          this.tokenCacheService
+            .updateMany(
+              { email: frappeToken.user },
+              {
+                $set: { territory },
+              },
+            )
+            .then(success => {})
+            .catch(error => {});
+          return of({});
+        }),
+      );
   }
 }

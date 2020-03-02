@@ -25,6 +25,7 @@ import {
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoCommand } from '../../command/assign-serial-no/assign-serial-no.command';
 import { ValidateSerialsQuery } from '../../query/validate-serial/validate-serial.query';
+import { RetrieveSalesInvoiceDeliveredSerialNoQuery } from '../../query/retrieve-sales-invoice-delivered-serial-no/retrieve-sales-invoice-delivered-serial-no.query'; // eslint-disable-line
 import {
   DELIVERY_NOTE,
   PURCHASE_RECEIPT,
@@ -76,6 +77,26 @@ export class SerialNoController {
         limit,
         sort,
         search,
+        clientHttpRequest,
+      ),
+    );
+  }
+
+  @Get('v1/get_sales_invoice_delivered_serials')
+  @UseGuards(TokenGuard)
+  getSalesInvoiceDeliveredSerials(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 10,
+    @Query('search') search = '',
+    @Query('find') find,
+    @Req() clientHttpRequest,
+  ) {
+    return this.queryBus.execute(
+      new RetrieveSalesInvoiceDeliveredSerialNoQuery(
+        offset,
+        limit,
+        search,
+        find,
         clientHttpRequest,
       ),
     );

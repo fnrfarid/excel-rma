@@ -8,11 +8,13 @@ import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurchaseReceiptService } from './entity/purchase-receipt.service';
 import { PurchaseReceipt } from './entity/purchase-receipt.entity';
+import { DirectModule } from '../direct/direct.module';
 
 @Module({
   imports: [
     PurchaseInvoiceEntitiesModule,
     SerialNoEntitiesModule,
+    DirectModule,
     ErrorLogModule,
     TypeOrmModule.forFeature([PurchaseReceipt]),
   ],

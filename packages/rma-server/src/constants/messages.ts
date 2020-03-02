@@ -46,6 +46,7 @@ export const DELIVERY_NOTE_DOES_NOT_EXIST = 'Delivery note not exist';
 export const NO_DELIVERY_NOTE_FOUND = 'Invalid Request, No Delivery Note Found';
 export const SALES_INVOICE_INVALID = 'Sales invoice is invalid';
 export const PURCHASE_INVOICE_ALREADY_EXIST = 'Purchase invoice already exist';
+export const PURCHASE_ORDER_ALREADY_EXIST = 'Purchase order already exist';
 export const PURCHASE_INVOICE_NOT_FOUND = 'Purchase invoice not found';
 export const REVOKE_FRAPPE_TOKEN_SUCCESS = 'Revoked expired frappe tokens';
 export const REVOKE_FRAPPE_TOKEN_ERROR =

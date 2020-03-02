@@ -225,7 +225,7 @@ export class DirectService {
         const expiration = token.exp - TWENTY_MINUTES_IN_SECONDS;
 
         if (Date.now() / 1000 > expiration) {
-          return this.refreshToken(token);
+          return this.refreshToken(token, email);
         }
 
         return of(token);
@@ -233,7 +233,7 @@ export class DirectService {
     );
   }
 
-  refreshToken(frappeToken: TokenCache) {
+  refreshToken(frappeToken: TokenCache, email: string) {
     return this.settingService.find().pipe(
       switchMap(settings => {
         const requestBody = {
@@ -255,6 +255,8 @@ export class DirectService {
                 refreshToken: data.refresh_token,
                 exp: Math.floor(Date.now() / 1000) + Number(data.expires_in),
                 scope: data.scope.split(' '),
+                status: ACTIVE,
+                email,
               } as TokenCache;
             }),
             switchMap(bearerToken => {
@@ -283,11 +285,11 @@ export class DirectService {
                       {
                         accessToken: localToken.accessToken,
                       },
-                      { $set: localToken },
+                      { $set: token },
                     );
                   }
                   return this.tokenCacheService.save({
-                    ...localToken,
+                    ...token,
                     uuid: uuidv4(),
                   });
                 })

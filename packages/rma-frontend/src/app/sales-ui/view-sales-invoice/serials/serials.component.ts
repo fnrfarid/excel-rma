@@ -36,6 +36,7 @@ import {
 } from '../../../common/interfaces/sales.interface';
 import { Location } from '@angular/common';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -93,6 +94,7 @@ export class SerialsComponent implements OnInit {
     public dialog: MatDialog,
     private location: Location,
     private readonly csvService: CsvJsonService,
+    private readonly loadingController: LoadingController,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -362,7 +364,10 @@ export class SerialsComponent implements OnInit {
       : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
   }
 
-  submitDeliveryNote() {
+  async submitDeliveryNote() {
+    const loading = await this.loadingController.create({
+      message: 'Creating Delivery Note...!',
+    });
     const assignSerial = {} as SerialAssign;
     assignSerial.company = this.salesInvoiceDetails.company;
     assignSerial.customer = this.salesInvoiceDetails.customer;
@@ -386,11 +391,11 @@ export class SerialsComponent implements OnInit {
       serialItem.rate = 0;
       serialItem.item_code = item_code;
       this.serialDataSource.data().forEach(item => {
-        if (item_code === item.item_code && item.serial_no[0] !== '') {
-          serialItem.qty += 1;
-          serialItem.amount += item.rate;
-          serialItem.serial_no.push(item.serial_no[0]);
+        if (item_code === item.item_code && item.serial_no) {
           serialItem.rate = item.rate;
+          serialItem.qty += item.qty;
+          serialItem.amount += item.qty * item.rate;
+          serialItem.serial_no.push(...item.serial_no);
         }
       });
       assignSerial.total += serialItem.amount;
@@ -401,12 +406,14 @@ export class SerialsComponent implements OnInit {
     if (this.validateSerials(assignSerial.items)) {
       this.salesService.assignSerials(assignSerial).subscribe({
         next: success => {
+          loading.dismiss();
           this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
             duration: 2500,
           });
           this.location.back();
         },
         error: err => {
+          loading.dismiss();
           if (err.status === 406) {
             const errMessage = err.error.message.split('\\n');
             this.snackBar.open(

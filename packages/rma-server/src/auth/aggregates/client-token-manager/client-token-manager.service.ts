@@ -135,6 +135,7 @@ export class ClientTokenManagerService {
                     );
                   }
                   token.email = settings.serviceAccountUser;
+                  token.exp = tokenPayload.exp;
                   return this.updateToken(savedToken, token);
                 }),
               );
@@ -182,16 +183,6 @@ export class ClientTokenManagerService {
       .then(success => {})
       .catch(error => {});
     return of(token);
-  }
-
-  saveNewToken(settings$: Observable<ServerSettings>, tokenPayload) {
-    const saveToken = new TokenCache();
-    saveToken.accessToken = tokenPayload.accessToken;
-    saveToken.refreshToken = tokenPayload.refreshToken;
-    saveToken.exp = tokenPayload.exp;
-    saveToken.scope = tokenPayload.scope;
-
-    return from(this.tokenCache.save(saveToken));
   }
 
   deleteInvalidToken(token: TokenCache) {
