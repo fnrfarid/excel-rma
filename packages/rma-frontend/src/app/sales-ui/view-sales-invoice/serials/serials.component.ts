@@ -391,11 +391,11 @@ export class SerialsComponent implements OnInit {
       serialItem.rate = 0;
       serialItem.item_code = item_code;
       this.serialDataSource.data().forEach(item => {
-        if (item_code === item.item_code && item.serial_no[0] !== '') {
-          serialItem.qty += 1;
-          serialItem.amount += item.rate;
-          serialItem.serial_no.push(item.serial_no[0]);
+        if (item_code === item.item_code && item.serial_no) {
           serialItem.rate = item.rate;
+          serialItem.qty += item.qty;
+          serialItem.amount += item.qty * item.rate;
+          serialItem.serial_no.push(...item.serial_no);
         }
       });
       assignSerial.total += serialItem.amount;
