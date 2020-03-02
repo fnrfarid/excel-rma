@@ -34,6 +34,7 @@ import {
   API_TERRITORY_GET_WAREHOUSES,
   RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
   RELAY_GET_FULL_ADDRESS_ENDPOINT,
+  GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -63,6 +64,24 @@ export class SalesService {
       }),
     );
   }
+
+  getDeliveredSerials(uuid: string, search: string) {
+    const url = GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', '5')
+      .set('offset', '0')
+      .set('find', uuid)
+      .set('search', search);
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
   getSalesInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
     if (!sortOrder) sortOrder = { posting_date: 'desc' };
     if (!query) query = {};

@@ -75,3 +75,5 @@ export const IS_BACKEND_CONNECTED_ENDPOINT =
 export const CONNECT_BACKEND_ENDPOINT = '/api/direct/connect';
 export const LIST_WARRANTY_INVOICE_ENDPOINT = 'api/warranty_claim/v1/list';
 export const VIEW_WARRANTY_INVOICE_PAGE_URL = 'view-warranty';
+export const GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT =
+  '/api/serial_no/v1/get_sales_invoice_delivered_serials';
