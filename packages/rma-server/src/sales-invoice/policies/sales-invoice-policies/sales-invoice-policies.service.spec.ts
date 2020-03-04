@@ -3,6 +3,9 @@ import { SalesInvoicePoliciesService } from './sales-invoice-policies.service';
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { AssignSerialNoPoliciesService } from '../../../serial-no/policies/assign-serial-no-policies/assign-serial-no-policies.service';
+import { HttpService } from '@nestjs/common';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
 describe('SalesInvoicePoliciesService', () => {
   let service: SalesInvoicePoliciesService;
@@ -23,6 +26,9 @@ describe('SalesInvoicePoliciesService', () => {
           provide: AssignSerialNoPoliciesService,
           useValue: {},
         },
+        { provide: HttpService, useValue: {} },
+        { provide: ClientTokenManagerService, useValue: {} },
+        { provide: SettingsService, useValue: {} },
       ],
     }).compile();
 

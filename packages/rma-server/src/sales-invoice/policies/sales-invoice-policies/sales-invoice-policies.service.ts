@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
-import { from, throwError, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { from, throwError, of, forkJoin } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 import {
   SALES_INVOICE_NOT_FOUND,
   CUSTOMER_AND_CONTACT_INVALID,
@@ -14,7 +14,21 @@ import { CustomerService } from '../../../customer/entity/customer/customer.serv
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
 import { ItemDto } from '../../entity/sales-invoice/sales-invoice-dto';
 import { AssignSerialNoPoliciesService } from '../../../serial-no/policies/assign-serial-no-policies/assign-serial-no-policies.service';
-import { DRAFT_STATUS } from '../../../constants/app-strings';
+import {
+  DRAFT_STATUS,
+  COMPLETED_STATUS,
+  TO_DELIVER_STATUS,
+  AUTHORIZATION,
+  BEARER_HEADER_VALUE_PREFIX,
+  CANCELED_STATUS,
+} from '../../../constants/app-strings';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import {
+  FRAPPE_API_SALES_INVOICE_ENDPOINT,
+  POST_DELIVERY_NOTE_ENDPOINT,
+} from '../../../constants/routes';
+import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -22,6 +36,9 @@ export class SalesInvoicePoliciesService {
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly customerService: CustomerService,
     private readonly assignSerialPolicyService: AssignSerialNoPoliciesService,
+    private readonly http: HttpService,
+    private readonly clientToken: ClientTokenManagerService,
+    private readonly settings: SettingsService,
   ) {}
 
   validateSalesInvoice(uuid: string) {
@@ -141,5 +158,99 @@ export class SalesInvoicePoliciesService {
 
   getMessage(notFoundMessage, expected, found) {
     return `${notFoundMessage}, expected ${expected || 0} found ${found || 0}`;
+  }
+
+  validateInvoiceStateForCancel(status: string) {
+    if (status === TO_DELIVER_STATUS || status === COMPLETED_STATUS) {
+      return of(true);
+    }
+    return throwError(
+      new BadRequestException(
+        `Cannot cancel sales invoice with status ${status}`,
+      ),
+    );
+  }
+
+  validateInvoiceOnErp(salesInvoicePayload: { uuid: string; name: string }) {
+    return forkJoin({
+      token: this.clientToken.getClientToken(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ token, settings }) => {
+        return this.http
+          .get(
+            `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${salesInvoicePayload.name}`,
+            {
+              headers: {
+                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
+              },
+            },
+          )
+          .pipe(
+            map(res => res.data),
+            switchMap(async (invoice: { docstatus: number }) => {
+              if (invoice.docstatus === 2) {
+                await this.salesInvoiceService.updateOne(
+                  { uuid: salesInvoicePayload.uuid },
+                  {
+                    $set: {
+                      status: CANCELED_STATUS,
+                      inQueue: false,
+                      isSynced: true,
+                    },
+                  },
+                );
+                return throwError(
+                  new BadRequestException('Invoice already Cancelled'),
+                );
+              }
+              return of(true);
+            }),
+          );
+      }),
+    );
+  }
+
+  getCanceledDeliveryNotes(salesInvoicePayload: SalesInvoice) {
+    return forkJoin({
+      token: this.clientToken.getClientToken(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ token, settings }) => {
+        const deliveryNoteNames = [
+          ...new Set(
+            salesInvoicePayload.delivery_note_items.map(
+              item => item.delivery_note,
+            ),
+          ),
+        ];
+        const params = {
+          filters: JSON.stringify([
+            ['name', 'in', deliveryNoteNames],
+            ['docstatus', '=', 2],
+          ]),
+        };
+        return this.http
+          .get(`${settings.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}`, {
+            params,
+            headers: {
+              [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
+            },
+          })
+          .pipe(
+            map(res => res.data.data),
+            switchMap((deliveryNotes: any[]) => {
+              const DNNameMap = {};
+              deliveryNoteNames.forEach(DN => {
+                DNNameMap[DN] = true;
+              });
+              deliveryNotes.forEach(delivery_note => {
+                delete DNNameMap[delivery_note.name];
+              });
+              return of(Object.keys(DNNameMap));
+            }),
+          );
+      }),
+    );
   }
 }
