@@ -23,6 +23,7 @@ import { SubmitSalesInvoiceCommand } from '../../command/submit-sales-invoice/su
 import { CreateSalesReturnCommand } from '../../command/create-sales-return/create-sales-return.command';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
 import { SalesInvoiceListQueryDto } from '../../../constants/listing-dto/sales-invoice-list-query';
+import { CancelSalesInvoiceCommand } from '../../command/cancel-sales-invoice/cancel-sales-invoice.command';
 
 @Controller('sales_invoice')
 export class SalesInvoiceController {
@@ -60,6 +61,12 @@ export class SalesInvoiceController {
   @UsePipes()
   submitSalesInvoice(@Param('uuid') uuid: string, @Req() req) {
     return this.commandBus.execute(new SubmitSalesInvoiceCommand(uuid, req));
+  }
+
+  @Post('v1/cancel/:uuid')
+  @UseGuards(TokenGuard)
+  cancelSalesInvoice(@Param('uuid') uuid: string, @Req() req) {
+    return this.commandBus.execute(new CancelSalesInvoiceCommand(uuid, req));
   }
 
   @Get('v1/get/:uuid')

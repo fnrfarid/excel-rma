@@ -17,7 +17,7 @@ import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-
 import { SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, concatMap, toArray } from 'rxjs/operators';
 import { throwError, of, from } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -25,6 +25,8 @@ import {
   CONTENT_TYPE,
   APPLICATION_JSON_CONTENT_TYPE,
   DRAFT_STATUS,
+  TO_DELIVER_STATUS,
+  COMPLETED_STATUS,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -32,6 +34,7 @@ import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
   LIST_CREDIT_NOTE_ENDPOINT,
+  FRAPPE_CLIENT_CANCEL,
 } from '../../../constants/routes';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
@@ -44,6 +47,7 @@ import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-n
 import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { DateTime } from 'luxon';
+import { SalesInvoiceCanceledEvent } from '../../event/sales-invoice-canceled/sales-invoice-canceled.event';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -128,6 +132,21 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     this.apply(new SalesInvoiceUpdatedEvent(updatePayload));
   }
 
+  cancelSalesInvoice(uuid: string, clientHttpRequest: any) {
+    return this.validateSalesInvoicePolicy.validateSalesInvoice(uuid).pipe(
+      switchMap(salesInvoice => {
+        if (
+          salesInvoice.status === TO_DELIVER_STATUS ||
+          salesInvoice.status === COMPLETED_STATUS
+        ) {
+          this.apply(new SalesInvoiceCanceledEvent(salesInvoice));
+          return this.syncCancelSalesInvoice(salesInvoice, clientHttpRequest);
+        }
+        return of({});
+      }),
+    );
+  }
+
   submitSalesInvoice(uuid: string, clientHttpRequest: any) {
     return this.validateSalesInvoicePolicy.validateSalesInvoice(uuid).pipe(
       switchMap(salesInvoice => {
@@ -168,6 +187,109 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           );
       }),
     );
+  }
+
+  cancelAllDeliveryNotes(
+    deliveryNoteNames: string[],
+    invoice_name: string,
+    clientHttpRequest: any,
+  ) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        if (!settings || !settings.authServerURL)
+          return throwError(new NotImplementedException());
+        return from(deliveryNoteNames).pipe(
+          concatMap(delivery_note_name => {
+            const url = `${settings.authServerURL}${FRAPPE_CLIENT_CANCEL}`;
+            const body = {
+              doctype: 'Delivery Note',
+              name: delivery_note_name,
+            };
+
+            return this.http
+              .post(url, JSON.stringify(body), {
+                headers: {
+                  [AUTHORIZATION]:
+                    BEARER_HEADER_VALUE_PREFIX +
+                    clientHttpRequest.token.accessToken,
+                  [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
+                  [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
+                },
+              })
+              .pipe(map(data => data.data.data));
+          }),
+          toArray(),
+          switchMap(() => {
+            return this.cancelSalesInvoiceFromErp(
+              invoice_name,
+              clientHttpRequest,
+            );
+          }),
+          catchError(err => {
+            return throwError(
+              new BadRequestException(
+                err.response ? err.response.data.exc : err,
+              ),
+            );
+          }),
+        );
+      }),
+    );
+  }
+
+  cancelSalesInvoiceFromErp(invoice_name: string, clientHttpRequest: any) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        if (!settings || !settings.authServerURL)
+          return throwError(new NotImplementedException());
+
+        const url = `${settings.authServerURL}${FRAPPE_CLIENT_CANCEL}`;
+        const body = {
+          doctype: 'Sales Invoice',
+          name: invoice_name,
+        };
+        return this.http
+          .post(url, JSON.stringify(body), {
+            headers: {
+              [AUTHORIZATION]:
+                BEARER_HEADER_VALUE_PREFIX +
+                clientHttpRequest.token.accessToken,
+              [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
+              [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
+            },
+          })
+          .pipe(
+            map(data => data.data.data),
+            catchError(err => {
+              return throwError(
+                new BadRequestException(
+                  err.response ? err.response.data.exc : err,
+                ),
+              );
+            }),
+          );
+      }),
+    );
+  }
+
+  syncCancelSalesInvoice(salesInvoice: SalesInvoice, clientHttpRequest: any) {
+    if (salesInvoice.delivery_note_items.length !== 0) {
+      const deliveryNoteNames = [
+        ...new Set(
+          salesInvoice.delivery_note_items.map(item => item.delivery_note),
+        ),
+      ];
+      return this.cancelAllDeliveryNotes(
+        deliveryNoteNames,
+        salesInvoice.name,
+        clientHttpRequest,
+      );
+    } else {
+      return this.cancelSalesInvoiceFromErp(
+        salesInvoice.name,
+        clientHttpRequest,
+      );
+    }
   }
 
   syncSubmittedSalesInvoice(

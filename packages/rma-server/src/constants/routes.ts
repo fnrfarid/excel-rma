@@ -58,6 +58,7 @@ export const ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT =
 export const FRAPPE_API_GET_DOCTYPE_COUNT =
   '/api/method/frappe.client.get_count';
 export const FRAPPE_API_INSERT_MANY = '/api/method/frappe.client.insert_many';
+export const FRAPPE_CLIENT_CANCEL = '/api/method/frappe.client.cancel';
 export const MAP_PO_TO_PI_ENDPOINT =
   '/api/method/erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_invoice';
 export const PURCHASE_ORDER_ON_SUBMIT_ENDPOINT =

@@ -35,6 +35,7 @@ import {
   RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
   RELAY_GET_FULL_ADDRESS_ENDPOINT,
   GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT,
+  CANCEL_SALES_INVOICE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -233,6 +234,15 @@ export class SalesService {
 
   submitSalesInvoice(uuid: string) {
     const url = `${SUBMIT_SALES_INVOICE_ENDPOINT}/${uuid}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
+  cancelSalesInvoice(uuid: string) {
+    const url = `${CANCEL_SALES_INVOICE_ENDPOINT}/${uuid}`;
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, {}, { headers });

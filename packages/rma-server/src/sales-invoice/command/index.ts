@@ -3,6 +3,7 @@ import { RemoveSalesInvoiceHandler } from './remove-sales-invoice/remove-sales-i
 import { UpdateSalesInvoiceHandler } from './update-sales-invoice/update-sales-invoice.handler';
 import { SubmitSalesInvoiceHandler } from './submit-sales-invoice/submit-sales-invoice.handler';
 import { CreateSalesReturnHandler } from './create-sales-return/create-sales-return.handler';
+import { CancelSalesInvoiceHandler } from './cancel-sales-invoice/cancel-sales-invoice.handler';
 
 export const SalesInvoiceCommandManager = [
   AddSalesInvoiceHandler,
@@ -10,4 +11,5 @@ export const SalesInvoiceCommandManager = [
   UpdateSalesInvoiceHandler,
   SubmitSalesInvoiceHandler,
   CreateSalesReturnHandler,
+  CancelSalesInvoiceHandler,
 ];

@@ -1,32 +1,48 @@
+<ion-fab
+  *ngIf="salesInvoiceDetails?.status === 'Draft'"
+  vertical="top"
+  horizontal="end"
+  slot="fixed"
+  class="ion-margin-end"
+>
+  <ion-fab-button class="fab-position">
+    <ion-icon name="lock-closed-outline"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-list side="start">
+    <ion-button color="danger" (click)="rejectSalesInvoice()">
+      Reject
+    </ion-button>
+    <ion-button
+      color="warning"
+      [routerLink]="['/sales/add-sales-invoice', 'edit', invoiceUuid]"
+    >
+      Edit
+    </ion-button>
+    <ion-button (click)="submitSalesInvoice()">
+      Submit
+    </ion-button>
+  </ion-fab-list>
+</ion-fab>
+<ion-fab
+  vertical="top"
+  horizontal="end"
+  slot="fixed"
+  *ngIf="
+    salesInvoiceDetails?.status === 'To Deliver' ||
+    salesInvoiceDetails?.status === 'Completed'
+  "
+  class="ion-margin-end"
+>
+  <ion-fab-button
+    color="danger"
+    class="fab-position"
+    (click)="cancelSalesInvoice()"
+  >
+    <ion-icon name="close-outline"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 <ion-card>
   <ion-card-content>
-    <ion-fab
-      *ngIf="
-        !salesInvoiceDetails?.submitted &&
-        salesInvoiceDetails?.status !== 'Rejected'
-      "
-      vertical="top"
-      horizontal="end"
-      slot="fixed"
-    >
-      <ion-fab-button>
-        <ion-icon name="lock-closed-outline"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-list side="start">
-        <ion-button color="danger" (click)="rejectSalesInvoice()">
-          Reject
-        </ion-button>
-        <ion-button
-          color="warning"
-          [routerLink]="['/sales/add-sales-invoice', 'edit', invoiceUuid]"
-        >
-          Edit
-        </ion-button>
-        <ion-button (click)="submitSalesInvoice()">
-          Submit
-        </ion-button>
-      </ion-fab-list>
-    </ion-fab>
     <ion-grid class="ion-no-padding">
       <ion-row>
         <ion-col>
