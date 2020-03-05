@@ -26,7 +26,7 @@ import {
   mergeMap,
   retry,
 } from 'rxjs/operators';
-import { throwError, of, from } from 'rxjs';
+import { throwError, of, from, forkJoin } from 'rxjs';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
@@ -144,75 +144,30 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   cancelSalesInvoice(uuid: string, clientHttpRequest: any) {
     return this.validateSalesInvoicePolicy.validateSalesInvoice(uuid).pipe(
       switchMap(salesInvoice => {
-        return this.validateSalesInvoicePolicy
-          .validateQueueState(salesInvoice)
-          .pipe(
-            switchMap(() => {
-              return this.validateSalesInvoicePolicy
-                .validateInvoiceStateForCancel(salesInvoice.status)
-                .pipe(
-                  switchMap(() => {
-                    return this.validateSalesInvoicePolicy
-                      .validateInvoiceOnErp(salesInvoice)
-                      .pipe(
-                        switchMap(() => {
-                          return this.validateSalesInvoicePolicy
-                            .getCanceledDeliveryNotes(salesInvoice)
-                            .pipe(
-                              switchMap(deliveryNoteNames => {
-                                return from(
-                                  this.salesInvoiceService.updateOne(
-                                    { uuid: salesInvoice.uuid },
-                                    {
-                                      $set: { inQueue: true, isSynced: false },
-                                    },
-                                  ),
-                                ).pipe(
-                                  switchMap(() => {
-                                    this.apply(
-                                      new SalesInvoiceCanceledEvent(
-                                        salesInvoice,
-                                      ),
-                                    );
-                                    this.syncCancelSalesInvoice(
-                                      deliveryNoteNames,
-                                      salesInvoice,
-                                      clientHttpRequest,
-                                    ).subscribe({
-                                      next: async res => {
-                                        await this.salesInvoiceService.updateOne(
-                                          { uuid: salesInvoice.uuid },
-                                          {
-                                            $set: {
-                                              inQueue: false,
-                                              isSynced: true,
-                                            },
-                                          },
-                                        );
-                                      },
-                                      error: async err => {
-                                        await this.salesInvoiceService.updateOne(
-                                          { uuid: salesInvoice.uuid },
-                                          {
-                                            $set: {
-                                              inQueue: false,
-                                              isSynced: false,
-                                            },
-                                          },
-                                        );
-                                      },
-                                    });
-                                    return of({});
-                                  }),
-                                );
-                              }),
-                            );
-                        }),
-                      );
-                  }),
-                );
-            }),
-          );
+        return forkJoin({
+          queueState: this.validateSalesInvoicePolicy.validateQueueState(
+            salesInvoice,
+          ),
+          invoiceState: this.validateSalesInvoicePolicy.validateInvoiceStateForCancel(
+            salesInvoice.status,
+          ),
+          invoiceOnErp: this.validateSalesInvoicePolicy.validateInvoiceOnErp(
+            salesInvoice,
+          ),
+          deliveryNoteNames: this.validateSalesInvoicePolicy.getCanceledDeliveryNotes(
+            salesInvoice,
+          ),
+        }).pipe(
+          switchMap(({ deliveryNoteNames }) => {
+            this.apply(new SalesInvoiceCanceledEvent(salesInvoice));
+            this.syncCancelSalesInvoice(
+              deliveryNoteNames,
+              salesInvoice,
+              clientHttpRequest,
+            );
+            return of({});
+          }),
+        );
       }),
     );
   }
@@ -369,18 +324,49 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     salesInvoice: SalesInvoice,
     clientHttpRequest: any,
   ) {
-    if (deliveryNoteNames.length !== 0) {
-      return this.cancelAllDeliveryNotes(
-        deliveryNoteNames,
-        salesInvoice.name,
-        clientHttpRequest,
-      );
-    } else {
-      return this.cancelSalesInvoiceFromErp(
-        salesInvoice.name,
-        clientHttpRequest,
-      );
-    }
+    (deliveryNoteNames.length !== 0
+      ? this.cancelAllDeliveryNotes(
+          deliveryNoteNames,
+          salesInvoice.name,
+          clientHttpRequest,
+        )
+      : this.cancelSalesInvoiceFromErp(salesInvoice.name, clientHttpRequest)
+    ).subscribe({
+      next: res => {
+        this.salesInvoiceService
+          .updateOne(
+            { uuid: salesInvoice.uuid },
+            {
+              $set: {
+                inQueue: false,
+                isSynced: true,
+              },
+            },
+          )
+          .then(() => {})
+          .catch(() => {});
+      },
+      error: err => {
+        this.salesInvoiceService
+          .updateOne(
+            { uuid: salesInvoice.uuid },
+            {
+              $set: {
+                inQueue: false,
+                isSynced: false,
+              },
+            },
+          )
+          .then(() => {})
+          .catch(() => {});
+        this.errorLogService.createErrorLog(
+          err,
+          'Sales Invoice',
+          'salesInvoice',
+          clientHttpRequest,
+        );
+      },
+    });
   }
 
   syncSubmittedSalesInvoice(

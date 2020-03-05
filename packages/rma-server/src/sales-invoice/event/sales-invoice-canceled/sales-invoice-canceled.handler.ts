@@ -6,13 +6,13 @@ import { SalesInvoiceCanceledEvent } from './sales-invoice-canceled.event';
 @EventsHandler(SalesInvoiceCanceledEvent)
 export class SalesInvoiceCanceledHandler
   implements IEventHandler<SalesInvoiceCanceledEvent> {
-  constructor(private readonly object: SalesInvoiceService) {}
+  constructor(private readonly salesService: SalesInvoiceService) {}
 
   async handle(event: SalesInvoiceCanceledEvent) {
-    const { salesInvoice: updatePayload } = event;
-    await this.object.updateOne(
-      { uuid: updatePayload.uuid },
-      { $set: { status: CANCELED_STATUS } },
+    const { salesInvoice } = event;
+    await this.salesService.updateOne(
+      { uuid: salesInvoice.uuid },
+      { $set: { status: CANCELED_STATUS, inQueue: true, isSynced: false } },
     );
   }
 }

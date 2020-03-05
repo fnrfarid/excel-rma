@@ -240,17 +240,25 @@ export class SalesInvoicePoliciesService {
           .pipe(
             map(res => res.data.data),
             switchMap((deliveryNotes: any[]) => {
-              const DNNameMap = {};
-              deliveryNoteNames.forEach(DN => {
-                DNNameMap[DN] = true;
-              });
-              deliveryNotes.forEach(delivery_note => {
-                delete DNNameMap[delivery_note.name];
-              });
+              const DNNameMap = this.mapDeliveryNoteName(
+                deliveryNoteNames,
+                deliveryNotes,
+              );
               return of(Object.keys(DNNameMap));
             }),
           );
       }),
     );
+  }
+
+  mapDeliveryNoteName(deliveryNoteNames: string[], deliveryNotes: any[]) {
+    const DNNameMap = {};
+    deliveryNoteNames.forEach(DN => {
+      DNNameMap[DN] = true;
+    });
+    deliveryNotes.forEach(delivery_note => {
+      delete DNNameMap[delivery_note.name];
+    });
+    return DNNameMap;
   }
 }
