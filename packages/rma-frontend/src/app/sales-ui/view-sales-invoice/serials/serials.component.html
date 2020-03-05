@@ -122,7 +122,10 @@
   </ion-card-content>
 </ion-card>
 
-<ion-grid class="ion-no-padding" *ngIf="filteredItemList.length === 0">
+<ion-grid
+  class="ion-no-padding"
+  *ngIf="salesInvoiceDetails && filteredItemList.length === 0"
+>
   <ion-row>
     <ion-col>
       <ion-text class="ion-text-center" style="color: black;">
@@ -282,6 +285,132 @@
       ></mat-header-row>
       <mat-row
         *matRowDef="let row; columns: serialDisplayedColumns; let i = index"
+      ></mat-row>
+    </mat-table>
+  </ion-card-content>
+</ion-card>
+
+<ion-card
+  *ngIf="
+    salesInvoiceDetails &&
+    salesInvoiceDetails?.delivery_note_items?.length !== 0
+  "
+>
+  <ion-card-header>
+    <ion-card-title>
+      <ion-text color="tertiary">
+        Delivered Serials
+      </ion-text>
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content class="ion-no-padding">
+    <div class="search-models ion-padding">
+      <mat-form-field class="mat-input-wrapper">
+        <input
+          matInput
+          placeholder="Search"
+          [(ngModel)]="deliveredSerialsSearch"
+          (keyup.enter)="setFilter()"
+        />
+        <button mat-button matSuffix (click)="setFilter()">
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+    <mat-table
+      #table
+      [dataSource]="deliveredSerialsDataSource"
+      style="width: 100%;"
+    >
+      <!-- Serial No -->
+      <ng-container matColumnDef="serial_no">
+        <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.serial_no }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- item_code -->
+      <ng-container matColumnDef="item_code">
+        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.item_code }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- purchase_date -->
+      <ng-container matColumnDef="purchase_date">
+        <mat-header-cell *matHeaderCellDef>Purchase Date</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.purchase_date }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- purchase_rate -->
+      <ng-container matColumnDef="purchase_rate">
+        <mat-header-cell *matHeaderCellDef>Purchase Rate</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.purchase_rate }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- supplier -->
+      <ng-container matColumnDef="supplier">
+        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.supplier }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- warehouse -->
+      <ng-container matColumnDef="warehouse">
+        <mat-header-cell *matHeaderCellDef>Warehouse</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.warehouse }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- company -->
+      <ng-container matColumnDef="company">
+        <mat-header-cell *matHeaderCellDef>Company</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.company }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- purchase_document_no -->
+      <ng-container matColumnDef="purchase_document_no">
+        <mat-header-cell *matHeaderCellDef>Purchase Invoice</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.purchase_document_no }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="deliveredSerialsDisplayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="
+          let row;
+          columns: deliveredSerialsDisplayedColumns;
+          let i = index
+        "
       ></mat-row>
     </mat-table>
   </ion-card-content>

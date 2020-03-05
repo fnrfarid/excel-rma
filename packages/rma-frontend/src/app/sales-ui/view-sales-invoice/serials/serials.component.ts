@@ -29,7 +29,11 @@ import {
 import { SalesInvoiceDetails } from '../details/details.component';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { SerialDataSource, ItemDataSource } from './serials-datasource';
+import {
+  SerialDataSource,
+  ItemDataSource,
+  DeliveredSerialsDataSource,
+} from './serials-datasource';
 import {
   SerialAssign,
   SerialNo,
@@ -87,6 +91,19 @@ export class SerialsComponent implements OnInit {
   ];
   serialDataSource: SerialDataSource;
 
+  deliveredSerialsDataSource: DeliveredSerialsDataSource;
+  deliveredSerialsDisplayedColumns = [
+    'serial_no',
+    'item_code',
+    'purchase_date',
+    'purchase_rate',
+    'supplier',
+    'company',
+    'purchase_document_no',
+    'warehouse',
+  ];
+  deliveredSerialsSearch: string = '';
+
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -103,6 +120,7 @@ export class SerialsComponent implements OnInit {
   ngOnInit() {
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
+    this.deliveredSerialsDataSource = new DeliveredSerialsDataSource();
     this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -113,23 +131,36 @@ export class SerialsComponent implements OnInit {
   }
 
   getSerialPrefix(startSerial, endSerial) {
-    if (!startSerial || !endSerial) return { start: 0, end: 0, prefix: '' };
-    const serialStartNumber = startSerial.match(/\d+/g);
-    const serialEndNumber = endSerial.match(/\d+/g);
-    let start = Number(
-      serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
-    );
-    let end = Number(serialEndNumber[serialEndNumber.length - 1].match(/\d+/g));
-    const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
-      /\d+$/,
-      '',
-    );
-    if (start > end) {
-      const tmp = start;
-      start = end;
-      end = tmp;
+    try {
+      const serialStartNumber = startSerial.match(/\d+/g);
+      const serialEndNumber = endSerial.match(/\d+/g);
+      let serialPadding = serialEndNumber[serialEndNumber?.length - 1]?.length;
+      if (
+        serialStartNumber[serialStartNumber?.length - 1]?.length >
+        serialEndNumber[serialEndNumber?.length - 1]?.length
+      ) {
+        serialPadding =
+          serialStartNumber[serialStartNumber?.length - 1]?.length;
+      }
+      let start = Number(
+        serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
+      );
+      let end = Number(
+        serialEndNumber[serialEndNumber.length - 1].match(/\d+/g),
+      );
+      const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
+        /\d+$/,
+        '',
+      );
+      if (start > end) {
+        const tmp = start;
+        start = end;
+        end = tmp;
+      }
+      return { start, end, prefix, serialPadding };
+    } catch {
+      return { start: 0, end: 0, prefix: '' };
     }
-    return { start, end, prefix };
   }
 
   getStringPrefix(arr1: string[]) {
@@ -171,25 +202,21 @@ export class SerialsComponent implements OnInit {
   }
 
   getSerialsFromRange(startSerial: string, endSerial: string) {
-    const { start, end, prefix } = this.getSerialPrefix(startSerial, endSerial);
+    const { start, end, prefix, serialPadding } = this.getSerialPrefix(
+      startSerial,
+      endSerial,
+    );
     if (!this.isNumber(start) || !this.isNumber(end)) {
       this.getMessage(
         'Invalid serial range, end should be a number found character',
       );
       return [];
     }
-    const data: any[] = _.range(
-      start > end ? Number(start) + 1 : start,
-      end > start ? Number(end) + 1 : end,
-    );
-    const maxSerial =
-      start.toString().length > end.toString().length
-        ? start.toString().length
-        : end.toString().length;
+    const data: any[] = _.range(start, end);
     let i = 0;
     for (const value of data) {
       if (value) {
-        data[i] = `${prefix}${this.getPaddedNumber(value, maxSerial)}`;
+        data[i] = `${prefix}${this.getPaddedNumber(value, serialPadding)}`;
         i++;
       }
     }
@@ -219,6 +246,9 @@ export class SerialsComponent implements OnInit {
   getSalesInvoice(uuid: string) {
     return this.salesService.getSalesInvoice(uuid).subscribe({
       next: (itemList: SalesInvoiceDetails) => {
+        if (itemList.delivery_note_items) {
+          this.getDeliveredSerials(itemList.uuid);
+        }
         this.salesInvoiceDetails = itemList as SalesInvoiceDetails;
         this.filteredItemList = this.getFilteredItems(itemList);
         this.itemDataSource.loadItems(
@@ -239,6 +269,19 @@ export class SerialsComponent implements OnInit {
         );
       },
     });
+  }
+
+  getDeliveredSerials(uuid) {
+    this.salesService
+      .getDeliveredSerials(uuid, this.deliveredSerialsSearch)
+      .subscribe({
+        next: success => {
+          this.deliveredSerialsDataSource.update(success);
+        },
+        error: err => {
+          this.deliveredSerialsDataSource.update([]);
+        },
+      });
   }
 
   async assignSingularSerials(row: Item) {
@@ -274,6 +317,10 @@ export class SerialsComponent implements OnInit {
     this.updateProductState(row.item_code, serials.length);
     this.serialDataSource.update(data);
     this.resetRangeState();
+  }
+
+  setFilter(event?) {
+    this.getDeliveredSerials(this.salesInvoiceDetails.uuid);
   }
 
   assignSerial(itemRow: Item) {
@@ -368,6 +415,7 @@ export class SerialsComponent implements OnInit {
     const loading = await this.loadingController.create({
       message: 'Creating Delivery Note...!',
     });
+    await loading.present();
     const assignSerial = {} as SerialAssign;
     assignSerial.company = this.salesInvoiceDetails.company;
     assignSerial.customer = this.salesInvoiceDetails.customer;
@@ -431,6 +479,7 @@ export class SerialsComponent implements OnInit {
         },
       });
     } else {
+      loading.dismiss();
       this.snackBar.open('Error : Duplicate Serial number assigned.', CLOSE, {
         duration: 2500,
       });
@@ -525,6 +574,7 @@ export class SerialsComponent implements OnInit {
         : (this.csvFileInput.nativeElement.value = '');
     };
   }
+
   addSerialsFromCsvJson(csvJsonObj: CsvJsonObj | any) {
     const data = this.itemDataSource.data();
     data.forEach(element => {

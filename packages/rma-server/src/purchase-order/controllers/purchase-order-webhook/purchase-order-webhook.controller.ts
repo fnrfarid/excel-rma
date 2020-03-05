@@ -16,7 +16,7 @@ export class PurchaseOrderWebhookController {
     private readonly purchaseOrderWebhookAggregate: PurchaseOrderWebhookAggregateService,
   ) {}
   @Post('webhook/v1/create')
-  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UsePipes(ValidationPipe)
   @UseGuards(FrappeWebhookGuard)
   purchaseInvoiceCreated(
     @Body() purchaseOrderPayload: PurchaseOrderWebhookDto,

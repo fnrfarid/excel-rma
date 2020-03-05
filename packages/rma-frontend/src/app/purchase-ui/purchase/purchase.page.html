@@ -116,7 +116,7 @@
             Date
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.posting_date}}
+            {{row.posting_date | date:'dd-MM-yyyy'}}
           </mat-cell>
         </ng-container>
 

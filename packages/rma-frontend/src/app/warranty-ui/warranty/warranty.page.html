@@ -171,7 +171,7 @@
                   Received Date
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
-                  {{row.received_date}}
+                  {{row.received_date }}
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
               </ng-container>
@@ -181,7 +181,7 @@
                   Deliver Date
                 </mat-header-cell>
                 <mat-cell *matCellDef="let row">
-                  {{row.deliver_date}}
+                  {{row.deliver_date }}
                 </mat-cell>
                 <mat-footer-cell *matFooterCellDef></mat-footer-cell>
               </ng-container>
@@ -301,6 +301,7 @@
 
               <mat-row
                 *matRowDef="let row; columns: displayedColumns;"
+                [routerLink]="['/warranty/view-warranty-claims',row.claim_no]"
               ></mat-row>
               <mat-footer-row
                 class="footer"

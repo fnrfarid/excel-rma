@@ -13,6 +13,7 @@ export const SALES_INVOICE_GET_ONE_ENDPOINT = '/api/sales_invoice/v1/get/';
 export const CREATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/create';
 export const UPDATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/update';
 export const SUBMIT_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/submit';
+export const CANCEL_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/cancel';
 export const CREATE_SALES_RETURN_ENDPOINT =
   'api/sales_invoice/v1/create_return';
 export const GET_SETTINGS_ENDPOINT = '/api/settings/v1/get';
@@ -75,3 +76,5 @@ export const IS_BACKEND_CONNECTED_ENDPOINT =
 export const CONNECT_BACKEND_ENDPOINT = '/api/direct/connect';
 export const LIST_WARRANTY_INVOICE_ENDPOINT = 'api/warranty_claim/v1/list';
 export const VIEW_WARRANTY_INVOICE_PAGE_URL = 'view-warranty';
+export const GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT =
+  '/api/serial_no/v1/get_sales_invoice_delivered_serials';
