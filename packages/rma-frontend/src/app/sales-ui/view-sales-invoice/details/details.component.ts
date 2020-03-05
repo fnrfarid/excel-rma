@@ -8,7 +8,7 @@ import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { filter } from 'rxjs/operators';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -30,6 +30,7 @@ export class DetailsComponent implements OnInit {
     private location: Location,
     private readonly router: Router,
     private readonly loadingController: LoadingController,
+    private readonly alertController: AlertController,
   ) {}
 
   ngOnInit() {
@@ -105,6 +106,7 @@ export class DetailsComponent implements OnInit {
     const loading = await this.loadingController.create({
       message: 'Rejecting Invoice...!',
     });
+    await loading.present();
     const payload = {} as SalesInvoiceDetails;
     payload.uuid = this.route.snapshot.params.invoiceUuid;
     payload.status = REJECTED;
@@ -117,6 +119,50 @@ export class DetailsComponent implements OnInit {
         loading.dismiss();
       },
     });
+  }
+
+  async presentAlertConfirm() {}
+
+  async cancelSalesInvoice() {
+    const alert = await this.alertController.create({
+      header: 'Cancel Sales Invoice',
+      message: `Are you sure you want to cancel ${this.salesInvoiceDetails.name} ?`,
+      buttons: [
+        {
+          text: 'No',
+          handler: () => {},
+        },
+        {
+          text: 'Yes',
+          cssClass: 'cancel',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Cancelling Invoice...!',
+            });
+            await loading.present();
+            this.salesService
+              .cancelSalesInvoice(this.route.snapshot.params.invoiceUuid)
+              .subscribe({
+                next: success => {
+                  loading.dismiss();
+                  this.location.back();
+                },
+                error: err => {
+                  loading.dismiss();
+                  const errMessage = err.error.message.split('\\n');
+                  this.snackBar.open(
+                    errMessage[errMessage.length - 2].split(':')[1],
+                    CLOSE,
+                    { duration: 2500 },
+                  );
+                },
+              });
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
 }
 
