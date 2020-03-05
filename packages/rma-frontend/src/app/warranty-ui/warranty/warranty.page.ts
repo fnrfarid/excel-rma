@@ -5,6 +5,7 @@ import { WarrantyClaimsDataSource } from './warranty-claims-datasource';
 import { Location } from '@angular/common';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-warranty',
@@ -44,6 +45,8 @@ export class WarrantyPage implements OnInit {
   territory: string;
   serial: string;
   toDate: string;
+  fromDateFormControl = new FormControl();
+  toDateFormControl = new FormControl();
 
   constructor(
     private location: Location,
@@ -89,6 +92,12 @@ export class WarrantyPage implements OnInit {
       }
     }
 
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date().setDate(
+        this.fromDateFormControl.value.getDate(),
+      );
+      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+    }
     this.dataSource.loadItems(
       sortQuery,
       this.paginator.pageIndex,
@@ -99,9 +108,5 @@ export class WarrantyPage implements OnInit {
 
   navigateBack() {
     this.location.back();
-  }
-
-  getDate(date: string) {
-    return new Date(date);
   }
 }

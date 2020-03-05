@@ -78,7 +78,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     'item_code',
     'item_name',
     'qty',
-    // 'warranty_date',
     'serial_no',
     'delete',
   ];

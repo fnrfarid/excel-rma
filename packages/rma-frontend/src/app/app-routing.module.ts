@@ -96,6 +96,13 @@ const routes: Routes = [
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
   {
+    path: 'warranty/view-warranty-claims/:claim_no',
+    loadChildren: () =>
+      import(
+        './warranty-ui/view-warranty-claims/view-warranty-claims.module'
+      ).then(m => m.ViewWarrantyClaimsPageModule),
+  },
+  {
     path: 'sales/add-sales-return/:invoiceUuid',
     loadChildren: () =>
       import('./sales-ui/add-sales-return/add-sales-return.module').then(
