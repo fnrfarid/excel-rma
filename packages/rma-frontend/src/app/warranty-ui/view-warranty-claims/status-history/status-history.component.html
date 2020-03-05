@@ -1,0 +1,279 @@
+<!-- 1 this is for list -->
+<ion-card>
+  <ion-card-header>
+    <ion-grid>
+      <ion-row>
+        <ion-col class="ion-text-left">
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Status History
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-header>
+
+  <ion-card-content class="ion-no-padding">
+    <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+      <ng-container matColumnDef="date">
+        <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container *ngIf="row.date">
+            {{ row.date }}
+          </ng-container>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="posting_time">
+        <mat-header-cell *matHeaderCellDef>Posting Time</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.posting_time }}
+          </ng-container>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status_from">
+        <mat-header-cell *matHeaderCellDef>Status From</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.status_from }}
+          </ng-container>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="transfer_branch">
+        <mat-header-cell *matHeaderCellDef>Transfer Branch</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.transfer_branch }}
+          </ng-container>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="current_status_verdict">
+        <mat-header-cell *matHeaderCellDef
+          >Current Status / Verdict</mat-header-cell
+        >
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.current_status_verdict }}
+          </ng-container>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef>Description</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ row.description }}
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+      </ng-container>
+
+      <!-- colume name not maintion in excel sheet -->
+      <ng-container matColumnDef="repaired">
+        <mat-header-cell *matHeaderCellDef>Repaired</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ row.repaired }}
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status_by">
+        <mat-header-cell *matHeaderCellDef>Status By</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ row.status_by }}
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="rollback">
+        <mat-header-cell *matHeaderCellDef>Rollback</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          {{ row.rollback }}
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+      </ng-container>
+
+      <mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      <mat-footer-row
+        class="footer"
+        *matFooterRowDef="displayedColumns; sticky: true"
+      ></mat-footer-row>
+    </mat-table>
+  </ion-card-content>
+</ion-card>
+<!-- 2.If status "Repaired" is selected this table appears -->
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Delivery Status: Repaired
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content> </ion-card-content>
+</ion-card>
+<!--  -->
+<!-- 3.If status "Repaired" is selected this table appears and submitting it will create two stock entry vouchers for replaced and damaged product -->
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Delivery Status: Replaced
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Replace Warehouse</ion-label>
+            <ion-input placeholder="Replace Warehouse" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Damaged Warehouse</ion-label>
+            <ion-input placeholder="Damaged Warehouse" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Replace Product</ion-label>
+            <ion-input placeholder="Replace Product" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Damaged Product</ion-label>
+            <ion-input placeholder="Damaged Product" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Replace Serial</ion-label>
+            <ion-input placeholder="Replace Serial" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col> </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Remarks</ion-label>
+            <ion-input placeholder="Remarks" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col> </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+<!-- 4.If status "Upgraded" is selected this child table appears and submitting it will create two stock entry vouchers for replaced and damaged product. -->
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Delivery Status: Upgraded
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Upgrade Warehouse</ion-label>
+            <ion-input placeholder="Upgrade Warehouse" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Damaged Warehouse</ion-label>
+            <ion-input placeholder="Damaged Warehouse" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Replace Product</ion-label>
+            <ion-input placeholder="Replace Product" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Damaged Product</ion-label>
+            <ion-input placeholder="Damaged Product" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Replace Serial</ion-label>
+            <ion-input placeholder="Replace Serial" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col> </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Remarks</ion-label>
+            <ion-input placeholder="Remarks" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col> </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+<!-- 5.If status "Rejected" is selected this child table appears -->
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Delivery Status: Rejected
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+  <ion-card-content> </ion-card-content>
+</ion-card>
