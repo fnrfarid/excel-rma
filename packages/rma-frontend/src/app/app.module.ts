@@ -23,7 +23,6 @@ import { AppCommonModule } from './common/app-common.module';
 import { TimeService } from './api/time/time.service';
 import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
 import { CsvJsonService } from './api/csv-json/csv-json.service';
-// import { ViewWarrantyClaimsPageModule } from './warranty-ui/view-warranty-claims/view-warranty-claims.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,7 +38,6 @@ import { CsvJsonService } from './api/csv-json/csv-json.service';
     PurchaseUiModule,
     BrowserAnimationsModule,
     AppCommonModule,
-    // ViewWarrantyClaimsPageModule,
     WarrantyUiModule,
   ],
   providers: [

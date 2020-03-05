@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Item } from '../../../common/interfaces/warranty.interface';
 @Component({
   selector: 'claim-details',
   templateUrl: './claim-details.component.html',
@@ -23,7 +22,7 @@ export class ClaimDetailsComponent implements OnInit {
     'service_invoice_no',
     'servicing_amount',
   ];
-  itemDetail = Item;
+
   constructor() {}
 
   ngOnInit() {}
