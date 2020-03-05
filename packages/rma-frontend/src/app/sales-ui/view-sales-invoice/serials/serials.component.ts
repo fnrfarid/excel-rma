@@ -131,23 +131,36 @@ export class SerialsComponent implements OnInit {
   }
 
   getSerialPrefix(startSerial, endSerial) {
-    if (!startSerial || !endSerial) return { start: 0, end: 0, prefix: '' };
-    const serialStartNumber = startSerial.match(/\d+/g);
-    const serialEndNumber = endSerial.match(/\d+/g);
-    let start = Number(
-      serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
-    );
-    let end = Number(serialEndNumber[serialEndNumber.length - 1].match(/\d+/g));
-    const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
-      /\d+$/,
-      '',
-    );
-    if (start > end) {
-      const tmp = start;
-      start = end;
-      end = tmp;
+    try {
+      const serialStartNumber = startSerial.match(/\d+/g);
+      const serialEndNumber = endSerial.match(/\d+/g);
+      let serialPadding = serialEndNumber[serialEndNumber?.length - 1]?.length;
+      if (
+        serialStartNumber[serialStartNumber?.length - 1]?.length >
+        serialEndNumber[serialEndNumber?.length - 1]?.length
+      ) {
+        serialPadding =
+          serialStartNumber[serialStartNumber?.length - 1]?.length;
+      }
+      let start = Number(
+        serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
+      );
+      let end = Number(
+        serialEndNumber[serialEndNumber.length - 1].match(/\d+/g),
+      );
+      const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
+        /\d+$/,
+        '',
+      );
+      if (start > end) {
+        const tmp = start;
+        start = end;
+        end = tmp;
+      }
+      return { start, end, prefix, serialPadding };
+    } catch {
+      return { start: 0, end: 0, prefix: '' };
     }
-    return { start, end, prefix };
   }
 
   getStringPrefix(arr1: string[]) {
@@ -189,25 +202,21 @@ export class SerialsComponent implements OnInit {
   }
 
   getSerialsFromRange(startSerial: string, endSerial: string) {
-    const { start, end, prefix } = this.getSerialPrefix(startSerial, endSerial);
+    const { start, end, prefix, serialPadding } = this.getSerialPrefix(
+      startSerial,
+      endSerial,
+    );
     if (!this.isNumber(start) || !this.isNumber(end)) {
       this.getMessage(
         'Invalid serial range, end should be a number found character',
       );
       return [];
     }
-    const data: any[] = _.range(
-      start > end ? Number(start) + 1 : start,
-      end > start ? Number(end) + 1 : end,
-    );
-    const maxSerial =
-      start.toString().length > end.toString().length
-        ? start.toString().length
-        : end.toString().length;
+    const data: any[] = _.range(start, end);
     let i = 0;
     for (const value of data) {
       if (value) {
-        data[i] = `${prefix}${this.getPaddedNumber(value, maxSerial)}`;
+        data[i] = `${prefix}${this.getPaddedNumber(value, serialPadding)}`;
         i++;
       }
     }
