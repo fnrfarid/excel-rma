@@ -67,6 +67,20 @@ export class WarrantyService {
       }),
     );
   }
+  //--------------------
+  getWarrantyClaim(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(`${WARRANTY_CLAIM_GET_ONE_ENDPOINT}${uuid}`, {
+          headers,
+        });
+      }),
+    );
+  }
+  getStore() {
+    return this.storage;
+  }
+  //-----------------------
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {
