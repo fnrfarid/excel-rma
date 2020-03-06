@@ -5,7 +5,16 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Serial Number</ion-label>
-            <ion-input placeholder="Serial Number" type="text"></ion-input>
+            <ion-input
+              placeholder="Serial Number"
+              readonly="true"
+              type="string"
+              value="{{
+                warrantyClaimsDetails?.serial_no
+                  ? warrantyClaimsDetails.serial_no
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
