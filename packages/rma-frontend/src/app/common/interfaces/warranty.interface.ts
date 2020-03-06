@@ -54,3 +54,9 @@ export interface SerialNo {
   amount: number;
   serial_no: string[];
 }
+
+//------------------
+export interface WarrantyClaimsDetails {
+  serial_no: string;
+  address_display: string;
+}
