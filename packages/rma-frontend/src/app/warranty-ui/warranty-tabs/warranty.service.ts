@@ -8,7 +8,10 @@ import {
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
-import { LIST_WARRANTY_INVOICE_ENDPOINT } from '../../constants/url-strings';
+import {
+  LIST_WARRANTY_INVOICE_ENDPOINT,
+  WARRANTY_CLAIM_GET_ONE_ENDPOINT,
+} from '../../constants/url-strings';
 import { APIResponse } from '../../common/interfaces/sales.interface';
 @Injectable({
   providedIn: 'root',
@@ -67,6 +70,17 @@ export class WarrantyService {
       }),
     );
   }
+
+  getWarrantyClaim(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(`${WARRANTY_CLAIM_GET_ONE_ENDPOINT}${uuid}`, {
+          headers,
+        });
+      }),
+    );
+  }
+
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {

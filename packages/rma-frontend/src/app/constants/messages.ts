@@ -5,3 +5,5 @@ export const SERIAL_ASSIGNED = 'Serials successfully assigned ';
 export const ERROR_FETCHING_PURCHASE_INVOICE =
   'Error fetching Purchase Invoice - Code ';
 export const INSUFFICIENT_STOCK_BALANCE = 'Insufficient stock';
+export const ERROR_FETCHING_WARRANTY_CLAIM =
+  'Error fetching Warranty claim - Code ';

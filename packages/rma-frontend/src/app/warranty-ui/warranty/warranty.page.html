@@ -301,7 +301,7 @@
 
               <mat-row
                 *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="['/warranty/view-warranty-claims',row.claim_no]"
+                [routerLink]="['/warranty/view-warranty-claims',row.uuid]"
               ></mat-row>
               <mat-footer-row
                 class="footer"
