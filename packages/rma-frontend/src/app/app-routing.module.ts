@@ -96,7 +96,7 @@ const routes: Routes = [
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
   {
-    path: 'warranty/view-warranty-claims/:claim_no',
+    path: 'warranty/view-warranty-claims/:uuid',
     loadChildren: () =>
       import(
         './warranty-ui/view-warranty-claims/view-warranty-claims.module'
