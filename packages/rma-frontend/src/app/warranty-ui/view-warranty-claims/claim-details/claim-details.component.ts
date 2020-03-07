@@ -57,8 +57,6 @@ export class ClaimDetailsComponent implements OnInit {
           .address_display
           ? this.warrantyClaimsDetails.address_display.replace(/<br>/g, '\n')
           : undefined;
-        this.dataSource = res.items;
-        this.warrantyService.getStore();
       },
       error: err => {
         this.snackBar.open(

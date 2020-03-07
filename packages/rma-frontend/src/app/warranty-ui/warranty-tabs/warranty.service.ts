@@ -70,7 +70,7 @@ export class WarrantyService {
       }),
     );
   }
-  // --------------------
+
   getWarrantyClaim(uuid: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -80,10 +80,7 @@ export class WarrantyService {
       }),
     );
   }
-  getStore() {
-    return this.storage;
-  }
-  // -----------------------
+
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {
