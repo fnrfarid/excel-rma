@@ -116,4 +116,18 @@ export class ServerSettingsDto {
     type: 'string',
   })
   debtorAccount: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'ERPNext service account key',
+    type: 'string',
+  })
+  serviceAccountApiKey: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'ERPNext service account secret',
+    type: 'string',
+  })
+  serviceAccountApiSecret: string;
 }

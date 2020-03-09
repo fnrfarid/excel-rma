@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
+import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
+import { MongoRepository, Connection } from 'typeorm';
 import { ServerSettings } from './server-settings.entity';
 import { settingsAlreadyExists } from '../../../constants/exceptions';
-import { DEFAULT } from '../../../constants/typeorm.connection';
+import {
+  DEFAULT,
+  TOKEN_CACHE_CONNECTION,
+} from '../../../constants/typeorm.connection';
 
 @Injectable()
 export class ServerSettingsService {
   constructor(
     @InjectRepository(ServerSettings, DEFAULT)
     private readonly idpSettingsRepository: MongoRepository<ServerSettings>,
+    @InjectConnection(DEFAULT)
+    private readonly defaultConnection: Connection,
+    @InjectConnection(TOKEN_CACHE_CONNECTION)
+    private readonly cacheConnection: Connection,
   ) {}
 
   async save(params) {
@@ -47,5 +54,13 @@ export class ServerSettingsService {
 
   async count() {
     return this.idpSettingsRepository.count();
+  }
+
+  getCacheConnection() {
+    return this.cacheConnection;
+  }
+
+  getDefaultConnection() {
+    return this.defaultConnection;
   }
 }
