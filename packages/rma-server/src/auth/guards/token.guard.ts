@@ -7,11 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TokenCacheService } from '../../auth/entities/token-cache/token-cache.service';
-import {
-  TOKEN,
-  BEARER_HEADER_VALUE_PREFIX,
-  ACTIVE,
-} from '../../constants/app-strings';
+import { TOKEN, ACTIVE } from '../../constants/app-strings';
 import {
   switchMap,
   map,
@@ -86,19 +82,14 @@ export class TokenGuard implements CanActivate {
         if (!settings) {
           return throwError(new NotImplementedException());
         }
-        return this.clientTokenManager.getClientToken().pipe(
-          switchMap(token => {
+        return this.clientTokenManager.getServiceAccountApiHeaders().pipe(
+          switchMap(headers => {
             return this.http
               .get(
                 settings.authServerURL +
                   FRAPPE_API_GET_OAUTH_BEARER_TOKEN_ENDPOINT +
                   accessToken,
-                {
-                  headers: {
-                    Authorization:
-                      BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-                  },
-                },
+                { headers },
               )
               .pipe(
                 map(data => data.data.data),

@@ -10,8 +10,6 @@ import {
   ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT,
 } from '../../../constants/routes';
 import {
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
   CONTENT_TYPE,
   APPLICATION_JSON_CONTENT_TYPE,
   ACCEPT,
@@ -42,7 +40,6 @@ export class ResetCreditLimitService implements OnModuleInit {
           baseCreditLimitAmount: { $exists: true },
           tempCreditLimitPeriod: { $lte: now },
         });
-        const headers: { [key: string]: string } = {};
 
         from(customers)
           .pipe(
@@ -56,10 +53,8 @@ export class ResetCreditLimitService implements OnModuleInit {
                 .catch(error => {});
               return this.settings.find().pipe(
                 switchMap(settings => {
-                  return this.clientToken.getClientToken().pipe(
-                    switchMap(token => {
-                      headers[AUTHORIZATION] =
-                        BEARER_HEADER_VALUE_PREFIX + token.accessToken;
+                  return this.clientToken.getServiceAccountApiHeaders().pipe(
+                    switchMap(headers => {
                       headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
                       headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
                       return this.http

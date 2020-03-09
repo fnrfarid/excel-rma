@@ -103,14 +103,14 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
   }
 
   relayListWarehouses(query) {
-    return this.clientToken.getClientToken().pipe(
-      switchMap(token => {
+    return this.clientToken.getServiceAccountApiHeaders().pipe(
+      switchMap(headers => {
         return this.settingsService.find().pipe(
           switchMap(settings => {
             const url = settings.authServerURL + ERPNEXT_API_WAREHOUSE_ENDPOINT;
             return this.http
               .get(url, {
-                headers: this.getAuthorizationHeaders(token),
+                headers,
                 params: query,
               })
               .pipe(map(res => res.data));

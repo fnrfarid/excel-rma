@@ -6,11 +6,7 @@ import { from, throwError, of, forkJoin } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import * as uuidv4 from 'uuid/v4';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
-import {
-  SUBMITTED_STATUS,
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
-} from '../../../constants/app-strings';
+import { SUBMITTED_STATUS } from '../../../constants/app-strings';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
@@ -68,18 +64,14 @@ export class PurchaseInvoiceWebhookAggregateService {
 
   getUserDetails(email: string) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         return this.http
           .get(
             settings.authServerURL + FRAPPE_API_GET_USER_INFO_ENDPOINT + email,
-            {
-              headers: {
-                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-              },
-            },
+            { headers },
           )
           .pipe(map(res => res.data.data));
       }),

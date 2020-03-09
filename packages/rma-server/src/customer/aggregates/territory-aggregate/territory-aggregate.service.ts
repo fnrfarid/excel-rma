@@ -18,10 +18,6 @@ import {
   API_RESOURCE_TERRITORY,
   ERPNEXT_API_WAREHOUSE_ENDPOINT,
 } from '../../../constants/routes';
-import {
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
-} from '../../../constants/app-strings';
 
 @Injectable()
 export class TerritoryAggregateService {
@@ -94,11 +90,8 @@ export class TerritoryAggregateService {
   checkLocalTerritoryAndWarehouse(territory: Territory): Observable<boolean> {
     return this.settings.find().pipe(
       switchMap(settings => {
-        return this.clientToken.getClientToken().pipe(
-          switchMap(token => {
-            const headers = {
-              [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-            };
+        return this.clientToken.getServiceAccountApiHeaders().pipe(
+          switchMap(headers => {
             return this.http
               .get(
                 settings.authServerURL +
