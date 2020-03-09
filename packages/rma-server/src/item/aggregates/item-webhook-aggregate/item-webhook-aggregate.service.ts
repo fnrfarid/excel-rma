@@ -70,18 +70,14 @@ export class ItemWebhookAggregateService extends AggregateRoot {
           if (!settings.authServerURL) {
             return throwError(new NotImplementedException());
           }
-          return this.clientTokenManager.getClientToken().pipe(
-            switchMap(token => {
+          return this.clientTokenManager.getServiceAccountApiHeaders().pipe(
+            switchMap(headers => {
               return this.http
                 .get(
                   settings.authServerURL +
                     FRAPPE_API_GET_ITEM_ENDPOINT +
                     item.item_code,
-                  {
-                    headers: this.settingsService.getAuthorizationHeaders(
-                      token,
-                    ),
-                  },
+                  { headers },
                 )
                 .pipe(
                   map(data => data.data.data),

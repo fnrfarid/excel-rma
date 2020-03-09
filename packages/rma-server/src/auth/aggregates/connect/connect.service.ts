@@ -94,9 +94,9 @@ export class ConnectService {
               accessToken: frappeToken.access_token,
             });
           }
-          return this.clientTokenManager.getClientToken().pipe(
-            switchMap(token => {
-              return this.getRolesRequest(settings, frappeToken, token);
+          return this.clientTokenManager.getServiceAccountApiHeaders().pipe(
+            switchMap(headers => {
+              return this.getRolesRequest(settings, frappeToken, headers);
             }),
           );
         }),
@@ -124,9 +124,9 @@ export class ConnectService {
             });
           }
 
-          return this.clientTokenManager.getClientToken().pipe(
-            switchMap(token => {
-              return this.getTerritoryRequest(settings, frappeToken, token);
+          return this.clientTokenManager.getServiceAccountApiHeaders().pipe(
+            switchMap(headers => {
+              return this.getTerritoryRequest(settings, frappeToken, headers);
             }),
           );
         }),
@@ -188,14 +188,14 @@ export class ConnectService {
   getRolesRequest(
     settings: ServerSettings,
     frappeToken: FrappeBearerTokenWebhookInterface,
-    token: { accessToken: string },
+    headers,
   ) {
     return this.http
       .get(
         settings.authServerURL +
           FRAPPE_API_GET_USER_INFO_ENDPOINT +
           frappeToken.user,
-        { headers: this.getAuthorizationHeaders(token.accessToken) },
+        { headers },
       )
       .pipe(
         map(data => data.data.data),
@@ -222,7 +222,7 @@ export class ConnectService {
   getTerritoryRequest(
     settings: ServerSettings,
     frappeToken: FrappeBearerTokenWebhookInterface,
-    token: { accessToken: string },
+    headers,
   ) {
     const params = {
       fields: JSON.stringify([
@@ -234,7 +234,7 @@ export class ConnectService {
     };
     return this.http
       .get(settings.authServerURL + FRAPPE_API_GET_USER_PERMISSION_ENDPOINT, {
-        headers: this.getAuthorizationHeaders(token.accessToken),
+        headers,
         params,
       })
       .pipe(

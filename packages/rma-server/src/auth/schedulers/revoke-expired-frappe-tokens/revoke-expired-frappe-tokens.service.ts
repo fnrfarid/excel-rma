@@ -10,14 +10,11 @@ import { ClientTokenManagerService } from '../../aggregates/client-token-manager
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { OAUTH_BEARER_TOKEN_ENDPOINT } from '../../../constants/routes';
 import {
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
   APP_WWW_FORM_URLENCODED,
   CONTENT_TYPE,
   HUNDRED_NUMBERSTRING,
 } from '../../../constants/app-strings';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
-import { TokenCache } from '../../entities/token-cache/token-cache.entity';
 import {
   REVOKE_FRAPPE_TOKEN_SUCCESS,
   REVOKE_FRAPPE_TOKEN_ERROR,
@@ -36,7 +33,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    let tokenCache: TokenCache;
+    let authHeaders = {};
     const job = new CronJob(FRAPPE_TOKEN_CLEANUP_CRON_STRING, async () => {
       from(this.settings.find())
         .pipe(
@@ -44,12 +41,12 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
             const nowInServerTimeZone = new DateTime(
               settings.timeZone,
             ).toFormat('yyyy-MM-dd HH:mm:ss');
-            return this.clientToken.getClientToken().pipe(
-              switchMap(token => {
-                tokenCache = token;
+            return this.clientToken.getServiceAccountApiHeaders().pipe(
+              switchMap(headers => {
+                authHeaders = headers;
                 return this.getFrappeTokens(
                   settings,
-                  tokenCache,
+                  authHeaders,
                   nowInServerTimeZone,
                 );
               }),
@@ -88,14 +85,10 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
 
   getFrappeTokens(
     settings: ServerSettings,
-    token: TokenCache,
+    headers,
     nowInServerTimeZone: string,
     iterationCount: number = 0,
   ): Observable<AxiosResponse> {
-    const headers = {
-      [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-    };
-
     const params = {
       fields: JSON.stringify(['access_token', 'name']),
       filters: JSON.stringify([
@@ -118,7 +111,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
             iterationCount++;
             return this.getFrappeTokens(
               settings,
-              token,
+              headers,
               nowInServerTimeZone,
               iterationCount,
             );

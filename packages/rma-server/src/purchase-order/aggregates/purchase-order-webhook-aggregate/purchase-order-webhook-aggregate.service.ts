@@ -82,18 +82,14 @@ export class PurchaseOrderWebhookAggregateService {
 
   getUserDetails(email: string) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         return this.http
           .get(
             settings.authServerURL + FRAPPE_API_GET_USER_INFO_ENDPOINT + email,
-            {
-              headers: {
-                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-              },
-            },
+            { headers },
           )
           .pipe(map(res => res.data.data));
       }),
@@ -107,11 +103,13 @@ export class PurchaseOrderWebhookAggregateService {
     return this.direct
       .getUserAccessToken(order.owner)
       .pipe(
-        catchError(error => this.clientToken.getClientToken()),
-        switchMap(token => {
-          const headers = {
+        map(token => {
+          return {
             [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
           };
+        }),
+        catchError(error => this.clientToken.getServiceAccountApiHeaders()),
+        switchMap(headers => {
           return this.http
             .get(settings.authServerURL + MAP_PO_TO_PI_ENDPOINT, {
               params: { source_name: order.name },

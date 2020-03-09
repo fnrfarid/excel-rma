@@ -12,10 +12,6 @@ import { Customer } from '../../entity/customer/customer.entity';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
-import {
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
-} from '../../../constants/app-strings';
 
 @Injectable()
 export class CustomerAggregateService extends AggregateRoot {
@@ -76,18 +72,14 @@ export class CustomerAggregateService extends AggregateRoot {
 
   getUserDetails(email: string) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         return this.http
           .get(
             settings.authServerURL + FRAPPE_API_GET_USER_INFO_ENDPOINT + email,
-            {
-              headers: {
-                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-              },
-            },
+            { headers },
           )
           .pipe(map(res => res.data.data));
       }),

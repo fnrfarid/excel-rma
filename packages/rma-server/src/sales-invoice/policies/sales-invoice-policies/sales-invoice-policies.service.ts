@@ -18,8 +18,6 @@ import {
   DRAFT_STATUS,
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
   CANCELED_STATUS,
 } from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
@@ -173,18 +171,14 @@ export class SalesInvoicePoliciesService {
 
   validateInvoiceOnErp(salesInvoicePayload: { uuid: string; name: string }) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         return this.http
           .get(
             `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${salesInvoicePayload.name}`,
-            {
-              headers: {
-                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-              },
-            },
+            { headers },
           )
           .pipe(
             map(res => res.data),
@@ -213,10 +207,10 @@ export class SalesInvoicePoliciesService {
 
   getCanceledDeliveryNotes(salesInvoicePayload: SalesInvoice) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         const deliveryNoteNames = [
           ...new Set(
             salesInvoicePayload.delivery_note_items.map(
@@ -233,9 +227,7 @@ export class SalesInvoicePoliciesService {
         return this.http
           .get(`${settings.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}`, {
             params,
-            headers: {
-              [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-            },
+            headers,
           })
           .pipe(
             map(res => res.data.data),

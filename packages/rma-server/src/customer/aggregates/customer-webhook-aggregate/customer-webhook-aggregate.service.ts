@@ -69,38 +69,34 @@ export class CustomerWebhookAggregateService extends AggregateRoot {
           if (!settings.authServerURL) {
             return throwError(new NotImplementedException());
           }
-          return this.clientTokenManager.getClientToken().pipe(
-            switchMap(token => {
+          return this.clientTokenManager.getServiceAccountApiHeaders().pipe(
+            switchMap(headers => {
               const url =
                 settings.authServerURL +
                 FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT +
                 customer.payment_terms;
-              return this.http
-                .get(url, {
-                  headers: this.settingsService.getAuthorizationHeaders(token),
-                })
-                .pipe(
-                  map(data => data.data.data),
-                  switchMap(
-                    (response: {
-                      template_name: string;
-                      terms: PaymentTemplateTermsInterface[];
-                    }) => {
-                      const creditDays: number = this.mapCustomerCreditDays(
-                        response.terms,
-                      );
-                      return this.customerService.updateOne(
-                        { uuid: customer.uuid },
-                        {
-                          $set: {
-                            credit_days: creditDays,
-                            isSynced: true,
-                          },
+              return this.http.get(url, { headers }).pipe(
+                map(data => data.data.data),
+                switchMap(
+                  (response: {
+                    template_name: string;
+                    terms: PaymentTemplateTermsInterface[];
+                  }) => {
+                    const creditDays: number = this.mapCustomerCreditDays(
+                      response.terms,
+                    );
+                    return this.customerService.updateOne(
+                      { uuid: customer.uuid },
+                      {
+                        $set: {
+                          credit_days: creditDays,
+                          isSynced: true,
                         },
-                      );
-                    },
-                  ),
-                );
+                      },
+                    );
+                  },
+                ),
+              );
             }),
             retry(3),
           );
