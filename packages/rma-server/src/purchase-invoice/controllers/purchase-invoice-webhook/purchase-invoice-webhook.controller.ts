@@ -27,4 +27,10 @@ export class PurchaseInvoiceWebhookController {
       purchaseInvoicePayload,
     );
   }
+
+  @Post('webhook/v1/cancel')
+  @UseGuards(FrappeWebhookGuard)
+  purchaseInvoiceCancelled(@Body('name') name: string) {
+    return this.purchaseInvoiceWebhookAggregate.cancelPurchaseInvoice(name);
+  }
 }

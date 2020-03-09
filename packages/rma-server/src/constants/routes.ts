@@ -67,3 +67,5 @@ export const ERPNEXT_PURCHASE_INVOICE_ENDPOINT =
   '/api/resource/Purchase%20Invoice';
 export const FRAPPE_CLIENT_SUBMIT_ENDPOINT = '/api/method/frappe.client.submit';
 export const API_RESOURCE = '/api/resource/';
+export const PURCHASE_INVOICE_ON_CANCEL_ENDPOINT =
+  '/api/purchase_invoice/webhook/v1/cancel';

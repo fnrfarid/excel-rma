@@ -77,4 +77,18 @@ export class PurchaseInvoiceWebhookAggregateService {
       }),
     );
   }
+
+  cancelPurchaseInvoice(name: string) {
+    return from(this.purchaseInvoiceService.findOne({ name })).pipe(
+      switchMap(invoice => {
+        if (!invoice) return of({ purchaseInvoiceNotFound: true });
+        return from(
+          this.purchaseInvoiceService.updateOne(
+            { uuid: invoice.uuid },
+            { $set: { docstatus: 2 } },
+          ),
+        );
+      }),
+    );
+  }
 }
