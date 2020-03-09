@@ -1,0 +1,177 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>add-warranty-claim</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-grid class="ion-no-padding">
+    <ion-row class="ion-no-padding">
+      <ion-col class="ion-no-padding">
+        <ion-card>
+          <ion-card-header>
+            <ion-row class="align">
+              <ion-col>
+                <ion-card-title>
+                  <!-- 1st card title -->
+                  <ion-text color="tertiary">
+                    Warranty & Non Warranty Claim Creation Form
+                  </ion-text>
+                  <!-- 2nd card title -->
+                  <ion-text color="tertiary">
+                    Non Serial Warranty Claim Creation Form
+                  </ion-text>
+                  <!-- 3rd card title -->
+                  <ion-text color="tertiary">
+                    Third Party Warranty Claim Creation Form
+                  </ion-text>
+                </ion-card-title>
+              </ion-col>
+            </ion-row>
+          </ion-card-header>
+          <ion-card-content class="ion-padding">
+            <ion-grid class="page-background">
+              <ion-row class="page-background">
+                <ion-col class="page-background">
+                  <mat-form-field>
+                    <input matInput placeholder="Serial Number" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Claim Type" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="INV No" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Warranty End Date" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Product Name" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Product Brand" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Customer Name" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Third Pary Name" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Customer Contact" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Third Party Contact" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Customer Address" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Third Party Address" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Receive Date & Time" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Deliver Date" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Receiving Branch" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <mat-label>problem</mat-label>
+                    <mat-select [formControl]="problem" multiple>
+                      <mat-select-trigger>
+                        {{problem.value ? problem.value[0] : ''}}
+                        <span
+                          *ngIf="problem.value?.length > 1"
+                          class="example-additional-selection"
+                        >
+                          (+{{problem.value.length - 1}}
+                          {{problem.value?.length=== 2 ? 'other' : 'others'}})
+                        </span>
+                      </mat-select-trigger>
+                      <mat-option
+                        *ngFor="let problems of problemList"
+                        [value]="problems"
+                        >{{problems}}</mat-option
+                      >
+                    </mat-select>
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Delivery Branch" />
+                  </mat-form-field>
+                </ion-col>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Additional Receive/Remarks" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <mat-form-field>
+                    <input matInput placeholder="Problem Details" />
+                  </mat-form-field>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
