@@ -66,3 +66,4 @@ export const PURCHASE_ORDER_ON_SUBMIT_ENDPOINT =
 export const ERPNEXT_PURCHASE_INVOICE_ENDPOINT =
   '/api/resource/Purchase%20Invoice';
 export const FRAPPE_CLIENT_SUBMIT_ENDPOINT = '/api/method/frappe.client.submit';
+export const API_RESOURCE = '/api/resource/';

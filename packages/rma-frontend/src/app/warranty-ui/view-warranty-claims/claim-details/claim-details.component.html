@@ -5,13 +5,22 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Serial Number</ion-label>
-            <ion-input placeholder="Serial Number" type="text"></ion-input>
+            <ion-input placeholder="Serial Number" readonly="true"></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Claim Type</ion-label>
-            <ion-input placeholder="Claim Type" type="text"></ion-input>
+            <ion-input
+              placeholder="Claim Type"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.claim_type
+                  ? warrantyClaimsDetails.claim_type
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -108,7 +117,13 @@
             <ion-label position="floating">Receive Date & Time</ion-label>
             <ion-input
               placeholder="Receive Date & Time"
+              readonly="true"
               type="text"
+              value="{{
+                warrantyClaimsDetails?.received_date
+                  ? warrantyClaimsDetails.received_date
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -116,8 +131,14 @@
           <ion-item lines="none">
             <ion-label position="floating">Deliver Date & Time</ion-label>
             <ion-input
-              placeholder="Deliver Date & Time"
+              placeholder="Receive Date & Time"
+              readonly="true"
               type="text"
+              value="{{
+                warrantyClaimsDetails?.deliver_date
+                  ? warrantyClaimsDetails.deliver_date
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -127,7 +148,16 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Receiving Branch</ion-label>
-            <ion-input placeholder="Receiving Branch" type="text"></ion-input>
+            <ion-input
+              placeholder="Delivery Branch"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.receiving_branch
+                  ? warrantyClaimsDetails.receiving_branch
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -142,7 +172,16 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Delivery Branch</ion-label>
-            <ion-input placeholder="Delivery Branch" type="text"></ion-input>
+            <ion-input
+              placeholder="Delivery Branch"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.delivery_branch
+                  ? warrantyClaimsDetails.delivery_branch
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>

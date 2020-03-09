@@ -23,6 +23,7 @@ import { MapTerritoryComponent } from './map-territory/map-territory.component';
 })
 export class SettingsPage implements OnInit {
   hideSASecret: boolean = true;
+  hideSAApiSecret: boolean = true;
 
   companySettingsForm = new FormGroup({
     authServerURL: new FormControl(),
@@ -37,6 +38,8 @@ export class SettingsPage implements OnInit {
     validateStock: new FormControl(),
     transferWarehouse: new FormControl(),
     debtorAccount: new FormControl(),
+    serviceAccountApiKey: new FormControl(),
+    serviceAccountApiSecret: new FormControl(),
   });
 
   companies: Observable<unknown[]> = this.companySettingsForm
@@ -128,6 +131,12 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm
           .get('transferWarehouse')
           .setValue(res.transferWarehouse);
+        this.companySettingsForm
+          .get('serviceAccountApiKey')
+          .setValue(res.serviceAccountApiKey);
+        this.companySettingsForm
+          .get('serviceAccountApiSecret')
+          .setValue(res.serviceAccountApiSecret);
       },
     });
 
@@ -154,6 +163,8 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('validateStock').value,
         this.companySettingsForm.get('debtorAccount').value,
         this.companySettingsForm.get('transferWarehouse').value,
+        this.companySettingsForm.get('serviceAccountApiKey').value,
+        this.companySettingsForm.get('serviceAccountApiSecret').value,
       )
       .subscribe({
         next: success => {

@@ -79,6 +79,12 @@ export class ServerSettings extends BaseEntity {
   @Column()
   debtorAccount: string;
 
+  @Column()
+  serviceAccountApiKey: string;
+
+  @Column()
+  serviceAccountApiSecret: string;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();

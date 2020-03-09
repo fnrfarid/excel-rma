@@ -23,6 +23,14 @@
                   </ion-text>
                 </ion-card-title>
               </ion-col>
+              <ion-col class="ion-text-right">
+                <ion-button
+                  color="tertiary"
+                  [routerLink]="['/warranty/add-warranty-claim', 'add']"
+                >
+                  Add
+                </ion-button>
+              </ion-col>
             </ion-row>
           </ion-card-header>
 
@@ -301,7 +309,7 @@
 
               <mat-row
                 *matRowDef="let row; columns: displayedColumns;"
-                [routerLink]="['/warranty/view-warranty-claims',row.claim_no]"
+                [routerLink]="['/warranty/view-warranty-claims',row.uuid]"
               ></mat-row>
               <mat-footer-row
                 class="footer"

@@ -52,6 +52,13 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'warranty/add-warranty-claim/:uuid',
+    loadChildren: () =>
+      import('./warranty-ui/add-warranty-claim/add-warranty-claim.module').then(
+        m => m.AddWarrantyClaimPageModule,
+      ),
+  },
+  {
     path: 'add-purchase-invoice',
     loadChildren: () =>
       import(
@@ -96,7 +103,7 @@ const routes: Routes = [
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
   {
-    path: 'warranty/view-warranty-claims/:claim_no',
+    path: 'warranty/view-warranty-claims/:uuid',
     loadChildren: () =>
       import(
         './warranty-ui/view-warranty-claims/view-warranty-claims.module'
@@ -120,6 +127,13 @@ const routes: Routes = [
 
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
+  {
+    path: 'add-warranty-claim',
+    loadChildren: () =>
+      import('./warranty-ui/add-warranty-claim/add-warranty-claim.module').then(
+        m => m.AddWarrantyClaimPageModule,
+      ),
+  },
 ];
 
 @NgModule({
