@@ -122,6 +122,8 @@ export class SettingsService {
     validateStock: boolean,
     debtorAccount: string,
     transferWarehouse: string,
+    serviceAccountApiKey: string,
+    serviceAccountApiSecret: string,
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -140,6 +142,8 @@ export class SettingsService {
             validateStock,
             debtorAccount,
             transferWarehouse,
+            serviceAccountApiKey,
+            serviceAccountApiSecret,
           },
           { headers },
         );

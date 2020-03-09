@@ -17,6 +17,8 @@ import {
   REDIRECT_ENDPOINT,
   ACTIVE,
   REVOKED,
+  AUTHORIZATION,
+  TOKEN_HEADER_VALUE_PREFIX,
 } from '../../../constants/app-strings';
 import { INVALID_SERVICE_ACCOUNT } from '../../../constants/messages';
 
@@ -189,6 +191,18 @@ export class ClientTokenManagerService {
     return from(this.settings.find()).pipe(
       switchMap(settingsUpdated => {
         return from(this.tokenCache.deleteMany({ uuid: token.uuid }));
+      }),
+    );
+  }
+
+  getServiceAccountApiHeaders() {
+    return from(this.settings.find()).pipe(
+      map(settings => {
+        const headers = {};
+        headers[AUTHORIZATION] = TOKEN_HEADER_VALUE_PREFIX;
+        headers[AUTHORIZATION] += settings.serviceAccountApiKey + ':';
+        headers[AUTHORIZATION] += settings.serviceAccountApiSecret;
+        return headers;
       }),
     );
   }

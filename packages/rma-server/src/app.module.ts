@@ -31,6 +31,7 @@ import { PurchaseReceiptModule } from './purchase-receipt/purchase-receipt.modul
 import { CommonDepModule } from './common-dep/common-dep.module';
 import { ErrorLogModule } from './error-log/error-logs-invoice.module';
 import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
+import { SyncModule } from './sync/sync.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
     WarrantyClaimModule,
     DeliveryNoteModule,
     PurchaseOrderModule,
+    SyncModule,
   ],
   controllers: [AppController],
   providers: [AppService],

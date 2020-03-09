@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken, getConnectionToken } from '@nestjs/typeorm';
 import { ServerSettings } from './server-settings.entity';
 import { ServerSettingsService } from './server-settings.service';
+import {
+  DEFAULT,
+  TOKEN_CACHE_CONNECTION,
+} from '../../../constants/typeorm.connection';
 
 describe('ServerSettingsService', () => {
   let service: ServerSettingsService;
@@ -12,6 +16,14 @@ describe('ServerSettingsService', () => {
         {
           provide: getRepositoryToken(ServerSettings),
           useValue: {}, // provide mock values
+        },
+        {
+          provide: getConnectionToken(DEFAULT),
+          useValue: {},
+        },
+        {
+          provide: getConnectionToken(TOKEN_CACHE_CONNECTION),
+          useValue: {},
         },
       ],
     }).compile();

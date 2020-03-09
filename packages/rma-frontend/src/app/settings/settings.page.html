@@ -171,6 +171,28 @@
             {{hideSASecret ? 'visibility' : 'visibility_off'}}
           </mat-icon>
         </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Service Account API Key"
+            type="text"
+            formControlName="serviceAccountApiKey"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            required
+            formControlName="serviceAccountApiSecret"
+            matInput
+            type="password"
+            placeholder="Service Account API Secret"
+            [type]="hideSAApiSecret ? 'password' : 'text'"
+          />
+          <mat-icon matSuffix (click)="hideSAApiSecret = !hideSAApiSecret">
+            {{hideSAApiSecret ? 'visibility' : 'visibility_off'}}
+          </mat-icon>
+        </mat-form-field>
       </form>
       <ion-grid class="ion-padding">
         <ion-row>
