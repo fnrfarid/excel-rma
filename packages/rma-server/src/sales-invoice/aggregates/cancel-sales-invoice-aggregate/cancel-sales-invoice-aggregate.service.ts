@@ -149,9 +149,6 @@ export class CancelSalesInvoiceAggregateService extends AggregateRoot {
                   })
                   .pipe(map(data => data.data.data));
               }),
-              catchError(err => {
-                return throwError(new BadRequestException(err));
-              }),
               retry(3),
             );
           }),
