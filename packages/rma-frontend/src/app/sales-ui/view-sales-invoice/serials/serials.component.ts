@@ -212,7 +212,7 @@ export class SerialsComponent implements OnInit {
       );
       return [];
     }
-    const data: any[] = _.range(start, end);
+    const data: any[] = _.range(start, end + 1);
     let i = 0;
     for (const value of data) {
       if (value) {

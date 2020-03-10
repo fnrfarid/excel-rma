@@ -5,7 +5,14 @@ import { StorageService, STORAGE_TOKEN } from './storage.service';
 describe('StorageService', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
-      providers: [{ provide: STORAGE_TOKEN, useValue: {} }],
+      providers: [
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve(),
+          },
+        },
+      ],
     }),
   );
 
