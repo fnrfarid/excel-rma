@@ -25,6 +25,7 @@ import { PurchaseInvoice } from '../purchase-invoice/entity/purchase-invoice/pur
 import { ErrorLog } from '../error-log/error-log-service/error-log.entity';
 import { PurchaseReceipt } from '../purchase-receipt/entity/purchase-receipt.entity';
 import { PurchaseOrder } from '../purchase-order/entity/purchase-order/purchase-order.entity';
+import { StockEntry } from '../stock-entry/stock-entry/stock-entry.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -51,6 +52,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       WarrantyClaim,
       DeliveryNote,
       Territory,
+      StockEntry,
       PurchaseInvoice,
       PurchaseReceipt,
       ErrorLog,
