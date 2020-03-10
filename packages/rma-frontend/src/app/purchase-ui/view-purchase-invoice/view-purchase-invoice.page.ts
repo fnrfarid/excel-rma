@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
+import { PurchaseService } from '../services/purchase.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-view-purchase-invoice',
@@ -8,11 +10,25 @@ import { Location } from '@angular/common';
 })
 export class ViewPurchaseInvoicePage implements OnInit {
   selectedSegment: any;
+  docstatus: number;
+  invoiceUuid: string;
 
-  constructor(private readonly location: Location) {}
+  constructor(
+    private readonly location: Location,
+    private readonly purchase: PurchaseService,
+    private readonly route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
     this.selectedSegment = 0;
+    this.docstatus = 0;
+    this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
+    this.purchase.getPurchaseInvoice(this.invoiceUuid).subscribe({
+      next: res => {
+        this.docstatus = res.docstatus;
+      },
+      error: error => {},
+    });
   }
 
   navigateBack() {

@@ -52,9 +52,12 @@ export class PurchaseService {
   getPurchaseInvoice(uuid: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get(`${PURCHASE_INVOICE_GET_ONE_ENDPOINT}${uuid}`, {
-          headers,
-        });
+        return this.http.get<any>(
+          `${PURCHASE_INVOICE_GET_ONE_ENDPOINT}${uuid}`,
+          {
+            headers,
+          },
+        );
       }),
     );
   }

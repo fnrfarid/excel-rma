@@ -6,7 +6,10 @@ import { from, throwError, of, forkJoin } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import * as uuidv4 from 'uuid/v4';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
-import { SUBMITTED_STATUS } from '../../../constants/app-strings';
+import {
+  SUBMITTED_STATUS,
+  CANCELED_STATUS,
+} from '../../../constants/app-strings';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
@@ -85,7 +88,13 @@ export class PurchaseInvoiceWebhookAggregateService {
         return from(
           this.purchaseInvoiceService.updateOne(
             { uuid: invoice.uuid },
-            { $set: { docstatus: 2 } },
+            {
+              $set: {
+                docstatus: 2,
+                status: CANCELED_STATUS,
+                submitted: false,
+              },
+            },
           ),
         );
       }),
