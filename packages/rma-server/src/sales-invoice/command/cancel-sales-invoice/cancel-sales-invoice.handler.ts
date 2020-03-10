@@ -1,13 +1,13 @@
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
-import { SalesInvoiceAggregateService } from '../../aggregates/sales-invoice-aggregate/sales-invoice-aggregate.service';
 import { CancelSalesInvoiceCommand } from './cancel-sales-invoice.command';
+import { CancelSalesInvoiceAggregateService } from '../../aggregates/cancel-sales-invoice-aggregate/cancel-sales-invoice-aggregate.service';
 
 @CommandHandler(CancelSalesInvoiceCommand)
 export class CancelSalesInvoiceHandler
   implements ICommandHandler<CancelSalesInvoiceCommand> {
   constructor(
     private publisher: EventPublisher,
-    private manager: SalesInvoiceAggregateService,
+    private manager: CancelSalesInvoiceAggregateService,
   ) {}
 
   async execute(command: CancelSalesInvoiceCommand) {
