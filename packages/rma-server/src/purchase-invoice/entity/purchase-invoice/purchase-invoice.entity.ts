@@ -134,7 +134,7 @@ export class PurchaseInvoice extends BaseEntity {
 export class PurchaseReceiptMetaData {
   purchase_document_type: string;
   purchase_document_no: string;
-  purchase_receipt_name: string;
+  purchase_invoice_name: string;
   amount: number;
   cost_center: string;
   expense_account: string;

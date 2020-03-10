@@ -6,7 +6,7 @@ export class PurchaseReceipt {
   _id: ObjectID;
 
   @Column()
-  purchase_receipt_name: string;
+  purchase_invoice_name: string;
 
   @Column()
   amount: number;
