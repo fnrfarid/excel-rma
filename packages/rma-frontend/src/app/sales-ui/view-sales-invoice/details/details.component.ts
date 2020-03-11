@@ -194,6 +194,7 @@ export class SalesInvoiceDetails {
   pos_total_qty?: number;
   name?: string;
   delivery_note_items?: Item[];
+  delivered_items_map?: any;
   delivery_warehouse?: string;
   isCampaign?: boolean;
   remarks?: string;

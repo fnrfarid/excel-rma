@@ -290,12 +290,7 @@
   </ion-card-content>
 </ion-card>
 
-<ion-card
-  *ngIf="
-    salesInvoiceDetails &&
-    salesInvoiceDetails?.delivery_note_items?.length !== 0
-  "
->
+<ion-card *ngIf="salesInvoiceDetails && !disableDeliveredSerialsCard">
   <ion-card-header>
     <ion-card-title>
       <ion-text color="tertiary">
