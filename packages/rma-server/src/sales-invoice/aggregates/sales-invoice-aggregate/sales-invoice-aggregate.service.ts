@@ -91,7 +91,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   async retrieveSalesInvoice(uuid: string, req) {
-    const provider = await this.salesInvoiceService.findOne({ uuid });
+    const provider = await this.salesInvoiceService.findOne(
+      { uuid },
+      undefined,
+      true,
+    );
     if (!provider) throw new NotFoundException();
     return provider;
   }

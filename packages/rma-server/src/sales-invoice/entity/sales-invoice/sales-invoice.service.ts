@@ -20,8 +20,13 @@ export class SalesInvoiceService {
     return await this.salesInvoiceRepository.insertOne(salesInvoice);
   }
 
-  async findOne(query, param?) {
-    return await this.salesInvoiceRepository.findOne(query, param);
+  async findOne(query, param?, flag = false) {
+    const select: any[] = this.getColumns();
+    flag ? select.splice(select.indexOf('delivery_note_items'), 1) : select;
+    return await this.salesInvoiceRepository.findOne({
+      select,
+      where: query,
+    });
   }
 
   async list(skip, take, sort, filter_query?) {
@@ -55,11 +60,15 @@ export class SalesInvoiceService {
     ];
 
     const where: { $and: any } = { $and };
+
+    const select: any[] = this.getColumns();
+    select.splice(select.indexOf('delivery_note_items'), 1);
     const results = await this.salesInvoiceRepository.find({
       skip,
       take,
       where,
       order: sortQuery,
+      select,
     });
 
     return {
@@ -111,5 +120,11 @@ export class SalesInvoiceService {
         return aggregateData.toArray();
       }),
     );
+  }
+
+  getColumns() {
+    return this.salesInvoiceRepository.manager.connection
+      .getMetadata(SalesInvoice)
+      .ownColumns.map(column => column.propertyName);
   }
 }

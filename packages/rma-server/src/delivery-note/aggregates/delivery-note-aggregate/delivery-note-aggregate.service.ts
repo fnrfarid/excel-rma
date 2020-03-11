@@ -148,6 +148,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
         switchMap((response: DeliveryNoteResponseInterface) => {
           const serials = [];
           const items = [];
+          const delivered_items_map = {};
           response.items.filter(item => {
             serials.push(item.serial_no);
             items.push({
@@ -164,6 +165,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
               cost_center: item.cost_center,
               delivery_note: response.name,
             });
+            delivered_items_map[item.item_code] = item.qty;
             return;
           });
           this.serialNoService
@@ -173,16 +175,37 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
             )
             .then(success => {})
             .catch(error => {});
+
           this.salesInvoiceService
-            .updateMany(
-              { name: assignPayload.sales_invoice_name },
-              {
-                $push: { delivery_note_items: { $each: items } },
-                $set: { status: COMPLETED_STATUS },
-              },
-            )
-            .then(success => {})
+            .findOne({
+              name: assignPayload.sales_invoice_name,
+            })
+            .then(sales_invoice => {
+              for (const key of Object.keys(delivered_items_map)) {
+                if (sales_invoice.delivered_items_map[key]) {
+                  sales_invoice.delivered_items_map[key] +=
+                    delivered_items_map[key];
+                } else {
+                  sales_invoice.delivered_items_map[key] =
+                    delivered_items_map[key];
+                }
+              }
+              this.salesInvoiceService
+                .updateMany(
+                  { name: assignPayload.sales_invoice_name },
+                  {
+                    $push: { delivery_note_items: { $each: items } },
+                    $set: {
+                      status: COMPLETED_STATUS,
+                      delivered_items_map: sales_invoice.delivered_items_map,
+                    },
+                  },
+                )
+                .then(success => {})
+                .catch(error => {});
+            })
             .catch(error => {});
+
           return of({});
         }),
         catchError(err => {
