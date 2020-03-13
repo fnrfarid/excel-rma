@@ -56,10 +56,21 @@ export class AddSalesReturnPage implements OnInit {
         this.warehouseFormControl.setValue(res.delivery_warehouse);
         this.postingDateFormControl.setValue(new Date(res.posting_date));
         this.dueDateFormControl.setValue(new Date(res.due_date));
-        this.dataSource = res.delivery_note_items;
+        this.dataSource = this.getFilteredItems(res);
         this.calculateTotal(this.dataSource);
       },
     });
+  }
+
+  getFilteredItems(salesInvoice: SalesInvoiceDetails) {
+    const filteredItemList = [];
+    salesInvoice.items.forEach(item => {
+      if (salesInvoice.delivered_items_map[item.item_code]) {
+        item.qty = salesInvoice.delivered_items_map[item.item_code];
+        filteredItemList.push(item);
+      }
+    });
+    return filteredItemList;
   }
 
   submitSalesReturn() {
@@ -127,6 +138,4 @@ export class AddSalesReturnPage implements OnInit {
   navigateBack() {
     this.location.back();
   }
-
-  selectedPostingDate(event) {}
 }

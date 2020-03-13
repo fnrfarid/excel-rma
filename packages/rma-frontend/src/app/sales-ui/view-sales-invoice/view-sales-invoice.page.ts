@@ -13,7 +13,7 @@ export class ViewSalesInvoicePage implements OnInit {
   selectedSegment: any;
   sales_invoice_name: string = '';
   invoiceUuid: string = '';
-  deliveryItemCount: number;
+  showReturnTab: boolean;
   isCampaign: boolean;
 
   constructor(
@@ -24,14 +24,13 @@ export class ViewSalesInvoicePage implements OnInit {
 
   ngOnInit() {
     this.selectedSegment = 0;
-    this.deliveryItemCount = 0;
+    this.showReturnTab = false;
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
       next: (res: SalesInvoiceDetails) => {
         this.isCampaign = res.isCampaign;
-        this.deliveryItemCount = res.delivery_note_items
-          ? res.delivery_note_items.length
-          : 0;
+        this.showReturnTab =
+          Object.keys(res.delivered_items_map).length === 0 ? false : true;
         this.sales_invoice_name = res.name;
       },
     });
