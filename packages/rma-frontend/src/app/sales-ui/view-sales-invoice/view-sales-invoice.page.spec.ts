@@ -23,7 +23,7 @@ describe('ViewSalesInvoicePage', () => {
         {
           provide: SalesService,
           useValue: {
-            getSalesInvoice: (...args) => of({}),
+            getSalesInvoice: (...args) => of({ delivered_items_map: {} }),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
