@@ -8,9 +8,11 @@ import { ItemWebhookController } from './controllers/item-webhook/item-webhook.c
 import { ItemCommandHandlers } from './commands';
 import { ItemEventHandlers } from './events';
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
+import { SyncModule } from '../sync/sync.module';
+import { DirectModule } from '../direct/direct.module';
 
 @Module({
-  imports: [ItemEntitiesModule, ErrorLogModule],
+  imports: [ItemEntitiesModule, ErrorLogModule, SyncModule, DirectModule],
   controllers: [ItemController, ItemWebhookController],
   providers: [
     ...ItemAggregatesManager,
@@ -18,6 +20,7 @@ import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
     ...ItemCommandHandlers,
     ...ItemEventHandlers,
     ItemPoliciesService,
+    // ItemSyncService,
   ],
   exports: [ItemEntitiesModule, ...ItemAggregatesManager],
 })

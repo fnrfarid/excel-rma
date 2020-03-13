@@ -16,4 +16,7 @@ export class RequestState extends BaseEntity {
 
   @Column()
   email: string;
+
+  @Column()
+  syncDocType: string;
 }

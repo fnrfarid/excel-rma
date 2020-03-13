@@ -142,6 +142,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   remarks: string;
+
+  @Column()
+  modified: string;
 }
 
 export class Tax {

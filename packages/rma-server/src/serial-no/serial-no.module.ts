@@ -13,6 +13,8 @@ import { AssignSerialNoPoliciesService } from './policies/assign-serial-no-polic
 import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
+import { DirectModule } from '../direct/direct.module';
+import { SyncModule } from '../sync/sync.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
     SalesInvoiceEntitiesModule,
     ErrorLogModule,
     DeliveryNoteModule,
+    SyncModule,
+    DirectModule,
   ],
   controllers: [SerialNoController, SerialNoWebhookController],
   providers: [
@@ -31,6 +35,7 @@ import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
     ...SerialNoCommandManager,
     SerialNoPoliciesService,
     AssignSerialNoPoliciesService,
+    // SerialNoSyncService,
   ],
   exports: [
     SerialNoEntitiesModule,
