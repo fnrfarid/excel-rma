@@ -5,3 +5,5 @@ export const settingsAlreadyExists = new HttpException(
   SETUP_ALREADY_COMPLETE,
   HttpStatus.BAD_REQUEST,
 );
+
+export class SyncAlreadyInProgressException extends Error {}
