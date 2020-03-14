@@ -1,0 +1,162 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Sales Invoice
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Serial Range</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="example-full-width">
+              <input matInput oninput="this.value = this.value.toUpperCase()" placeholder="From Range" type="text"
+                name="From Range" [(ngModel)]="rangePickerState.fromRange"
+                (ngModelChange)="this.fromRangeUpdate.next($event)" required />
+            </mat-form-field>
+            <mat-form-field class="example-full-width">
+              <input type="text" oninput="this.value = this.value.toUpperCase()" matInput placeholder="To Range"
+                type="string" name="To Range" [(ngModel)]="rangePickerState.toRange"
+                (ngModelChange)="this.toRangeUpdate.next($event)" />
+            </mat-form-field>
+          </ion-col>
+
+          <ion-col>
+            <ion-text color="primary">
+              <h3>Total : {{ rangePickerState.serials.length }}</h3>
+            </ion-text>
+          </ion-col>
+
+          <ion-col>
+
+            <mat-form-field class="example-full-width">
+              <input type="text" placeholder="Source Warehouse" matInput [formControl]="warehouseState.s_warehouse"
+                [matAutocomplete]="from_warehouse" />
+              <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
+                <mat-option *ngFor="let warehouse of filteredWarehouseList | async" [value]="warehouse.name">
+                  {{ warehouse.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+              <input type="text" placeholder="Target Warehouse" matInput [formControl]="warehouseState.t_warehouse"
+                [matAutocomplete]="warehouse"/>
+              <mat-autocomplete autoActiveFirstOption #warehouse="matAutocomplete">
+                <mat-option *ngFor="let warehouse of filteredWarehouseList | async" [value]="warehouse.name">
+                  {{ warehouse.name }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+
+
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-row class="align">
+        <ion-col>
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Transfer Serials
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+        <ion-col class="ion-text-right">
+          <ion-button
+            color="tertiary"
+            (click)="addRow()">
+            Add
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-card-header>
+
+    <ion-card-content class="ion-no-padding">
+      <mat-table #table [dataSource]="materialTransferDataSource" style="width: 100%;">
+        <ng-container matColumnDef="s_warehouse">
+          <mat-header-cell *matHeaderCellDef>Source Warehouse</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.s_warehouse }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="t_warehouse">
+          <mat-header-cell *matHeaderCellDef>Target Warehouse</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.t_warehouse }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="item_name">
+          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.item_name }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="qty">
+          <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.qty }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+
+        <ng-container matColumnDef="serial_no">
+          <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
+          <mat-cell appearance="outline" *matCellDef="let row">
+            <input
+              matInput
+              *ngIf="row.serial_no.length === 1 ? true : false"
+              [(ngModel)]="row.serial_no[0]"
+              oninput="this.value = this.value.toUpperCase()"
+            />
+            <p *ngIf="row.serial_no.length === 1 ? false : true">
+              {{ getSerialsInputValue(row) }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="delete">
+          <mat-header-cell *matHeaderCellDef>Delete Serials</mat-header-cell>
+          <mat-cell *matCellDef="let row; let i = index">
+            <ion-button color="danger" fill="clear" (click)="deleteRow(row, i)">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="materialTransferDisplayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: materialTransferDisplayedColumns; let i = index"
+        ></mat-row>
+      </mat-table>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

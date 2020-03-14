@@ -59,10 +59,6 @@ export class StockEntryItemDto {
   qty: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  amount: number;
-
-  @IsNotEmpty()
   @IsString()
   serial_no: string;
 }
