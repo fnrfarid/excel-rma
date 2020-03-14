@@ -17,6 +17,11 @@
 
 .mat-column-total {
   display: flex;
-  margin-right: 20px;
+  justify-content: flex-end;
+}
+
+.mat-column-due_amount {
+  display: flex;
+  padding-right: 20px;
   justify-content: flex-end;
 }

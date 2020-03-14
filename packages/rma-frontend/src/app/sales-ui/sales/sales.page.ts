@@ -32,6 +32,7 @@ export class SalesPage implements OnInit {
     'posting_date',
     'customer',
     'total',
+    'due_amount',
     'remarks',
     'territory',
     'created_by',
@@ -52,6 +53,8 @@ export class SalesPage implements OnInit {
   name: string = '';
   branch: string = '';
   total: number = 0;
+  dueTotal: number = 0;
+  disableRefresh: boolean = false;
   campaign: string = 'All';
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
@@ -81,6 +84,11 @@ export class SalesPage implements OnInit {
         },
         error: err => {},
       });
+    this.dataSource.disableRefresh.subscribe({
+      next: res => {
+        this.disableRefresh = res;
+      },
+    });
   }
 
   getTotal() {
@@ -88,6 +96,17 @@ export class SalesPage implements OnInit {
       next: total => {
         this.total = total;
       },
+    });
+    this.dataSource.dueAmountTotal.subscribe({
+      next: dueTotal => {
+        this.dueTotal = dueTotal;
+      },
+    });
+  }
+
+  syncOutstandingAmount() {
+    this.dataSource.syncOutstandingAmount().subscribe({
+      next: res => {},
     });
   }
 

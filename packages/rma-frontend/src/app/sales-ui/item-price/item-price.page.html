@@ -182,11 +182,13 @@
             <ion-text *ngIf="row.selling_price">
               {{row.selling_price | curFormat | async}}
             </ion-text>
-            <ion-icon
-              (click)="loadPrice(row, i)"
+            <ion-button
               *ngIf="!row.selling_price"
-              name="refresh"
-            ></ion-icon>
+              (click)="loadPrice(row, i)"
+              fill="clear"
+            >
+              <ion-icon slot="icon-only" name="refresh"></ion-icon>
+            </ion-button>
           </td>
         </ng-container>
 

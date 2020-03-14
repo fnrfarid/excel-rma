@@ -4,6 +4,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { HttpService } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
+import { SalesInvoiceAggregateService } from '../../aggregates/sales-invoice-aggregate/sales-invoice-aggregate.service';
 
 describe('SalesInvoice Controller', () => {
   let controller: SalesInvoiceController;
@@ -26,6 +27,10 @@ describe('SalesInvoice Controller', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: SalesInvoiceAggregateService,
           useValue: {},
         },
       ],

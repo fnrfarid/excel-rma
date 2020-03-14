@@ -18,7 +18,7 @@ import { SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap, map, catchError } from 'rxjs/operators';
-import { throwError, of, from } from 'rxjs';
+import { throwError, of, from, forkJoin } from 'rxjs';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
@@ -44,6 +44,7 @@ import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-n
 import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { DateTime } from 'luxon';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -54,6 +55,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly validateSalesInvoicePolicy: SalesInvoicePoliciesService,
     private readonly deliveryNoteService: DeliveryNoteService,
     private readonly errorLogService: ErrorLogService,
+    private readonly clientToken: ClientTokenManagerService,
   ) {
     super();
   }
@@ -344,6 +346,36 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                 },
               });
             return of({});
+          }),
+        );
+      }),
+    );
+  }
+
+  updateOutstandingAmount(invoice_name: string) {
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settingsService.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        if (!settings || !settings.authServerURL)
+          return throwError(new NotImplementedException());
+        const url = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice_name}`;
+        return this.http.get(url, { headers }).pipe(
+          map(res => res.data.data),
+          switchMap(sales_invoice => {
+            this.salesInvoiceService
+              .updateOne(
+                { name: invoice_name },
+                {
+                  $set: {
+                    outstanding_amount: sales_invoice.outstanding_amount,
+                  },
+                },
+              )
+              .then(success => {})
+              .catch(error => {});
+            return of({ outstanding_amount: sales_invoice.outstanding_amount });
           }),
         );
       }),
