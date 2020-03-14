@@ -321,7 +321,7 @@ export class SalesService {
           .get<{ territory: string[] }>(GET_USER_PROFILE_ROLES, { headers })
           .pipe(
             switchMap(profile => {
-              if (profile.territory.length > 0) {
+              if (profile.territory && profile.territory.length > 0) {
                 const territories = profile.territory;
                 let httpParams = new HttpParams();
                 territories.forEach(territory => {

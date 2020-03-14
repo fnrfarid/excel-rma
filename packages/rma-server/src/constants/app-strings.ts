@@ -111,3 +111,7 @@ export const SERIAL_NO_DOCTYPE_NAME = 'Serial No';
 export const MONGO_INSERT_MANY_BATCH_NUMBER = 100000;
 export const VALIDATE_AUTH_STRING = 'validate_oauth';
 export const TOKEN_HEADER_VALUE_PREFIX = 'token ';
+export const STOCK_MATERIAL_TRANSFER = 'Material Transfer';
+export const STOCK_ENTRY = 'Stock Entry';
+export const ITEM_DOCTYPE = 'Item';
+export const SALES_INVOICE_DOCTYPE = 'Sales Invoice';

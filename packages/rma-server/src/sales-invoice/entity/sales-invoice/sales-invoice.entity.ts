@@ -90,6 +90,9 @@ export class SalesInvoice extends BaseEntity {
   delivery_note_items: any[] = [];
 
   @Column()
+  delivered_items_map: any = {};
+
+  @Column()
   pricing_rules: [];
 
   @Column()
@@ -139,6 +142,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   remarks: string;
+
+  @Column()
+  modified: string;
 }
 
 export class Tax {

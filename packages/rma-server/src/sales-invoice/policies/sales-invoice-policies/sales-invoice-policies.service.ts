@@ -18,8 +18,6 @@ import {
   DRAFT_STATUS,
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
   CANCELED_STATUS,
 } from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
@@ -28,7 +26,6 @@ import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
-import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -173,18 +170,14 @@ export class SalesInvoicePoliciesService {
 
   validateInvoiceOnErp(salesInvoicePayload: { uuid: string; name: string }) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         return this.http
           .get(
             `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${salesInvoicePayload.name}`,
-            {
-              headers: {
-                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-              },
-            },
+            { headers },
           )
           .pipe(
             map(res => res.data),
@@ -211,54 +204,64 @@ export class SalesInvoicePoliciesService {
     );
   }
 
-  getCanceledDeliveryNotes(salesInvoicePayload: SalesInvoice) {
+  getDeliveryNotes(sales_invoice_name: string) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
-        const deliveryNoteNames = [
-          ...new Set(
-            salesInvoicePayload.delivery_note_items.map(
-              item => item.delivery_note,
-            ),
-          ),
-        ];
+      switchMap(({ headers, settings }) => {
         const params = {
           filters: JSON.stringify([
-            ['name', 'in', deliveryNoteNames],
-            ['docstatus', '=', 2],
+            ['against_sales_invoice', '=', sales_invoice_name],
+            ['docstatus', '!=', 2],
           ]),
         };
         return this.http
           .get(`${settings.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}`, {
             params,
-            headers: {
-              [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-            },
+            headers,
           })
           .pipe(
             map(res => res.data.data),
             switchMap((deliveryNotes: any[]) => {
-              const DNNameMap = this.mapDeliveryNoteName(
-                deliveryNoteNames,
-                deliveryNotes,
-              );
-              return of(Object.keys(DNNameMap));
+              return of(deliveryNotes.map(delivery_note => delivery_note.name));
             }),
           );
       }),
     );
   }
 
-  mapDeliveryNoteName(deliveryNoteNames: string[], deliveryNotes: any[]) {
-    const DNNameMap = {};
-    deliveryNoteNames.forEach(DN => {
-      DNNameMap[DN] = true;
-    });
-    deliveryNotes.forEach(delivery_note => {
-      delete DNNameMap[delivery_note.name];
-    });
-    return DNNameMap;
+  getSalesInvoices(sales_invoice_name: string) {
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        const params = {
+          filters: JSON.stringify([
+            ['return_against', '=', sales_invoice_name],
+            ['docstatus', '!=', 2],
+          ]),
+        };
+        return this.http
+          .get(
+            `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}`,
+            {
+              params,
+              headers,
+            },
+          )
+          .pipe(
+            map(res => res.data.data),
+            switchMap((salesInvoices: any[]) => {
+              if (salesInvoices.length !== 0)
+                return of(
+                  salesInvoices.map(sales_invoice => sales_invoice.name),
+                );
+              return of([]);
+            }),
+          );
+      }),
+    );
   }
 }

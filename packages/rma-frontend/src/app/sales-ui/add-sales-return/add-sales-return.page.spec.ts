@@ -44,7 +44,8 @@ describe('AddSalesReturnPage', () => {
         {
           provide: SalesService,
           useValue: {
-            getSalesInvoice: (...args) => of({ delivery_note_items: [] }),
+            getSalesInvoice: (...args) =>
+              of({ items: [], delivered_items_map: {} }),
             getWarehouseList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),

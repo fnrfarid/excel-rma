@@ -46,6 +46,7 @@ import {
   salesInvoiceOnCancelWebhookData,
   salesInvoiceOnSubmitWebhookData,
   purchaseOrderOnSubmitWebhookData,
+  purchaseInvoiceOnCancelWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
@@ -71,6 +72,7 @@ import {
   DELIVERY_NOTE_AFTER_INSERT_ENDPOINT,
   SALES_INVOICE_ON_CANCEL_ENDPOINT,
   PURCHASE_ORDER_ON_SUBMIT_ENDPOINT,
+  PURCHASE_INVOICE_ON_CANCEL_ENDPOINT,
 } from '../../../constants/routes';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import {
@@ -126,10 +128,10 @@ export class SettingsService extends AggregateRoot {
     return this.find().pipe(
       switchMap(settings => {
         serverSettings = settings;
-        return this.clientToken.getClientToken();
+        return this.clientToken.getServiceAccountApiHeaders();
       }),
-      switchMap(token => {
-        headers[AUTHORIZATION] = BEARER_HEADER_VALUE_PREFIX + token.accessToken;
+      switchMap(authHeaders => {
+        headers[AUTHORIZATION] = authHeaders[AUTHORIZATION];
         return forkJoin(
           // Item Webhooks
           this.http
@@ -364,6 +366,17 @@ export class SettingsService extends AggregateRoot {
               { headers },
             )
             .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              purchaseInvoiceOnCancelWebhookData(
+                serverSettings.appURL + PURCHASE_INVOICE_ON_CANCEL_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
         );
       }),
       catchError(error => {
@@ -427,14 +440,14 @@ export class SettingsService extends AggregateRoot {
   }
 
   relayListCompanies(query) {
-    return this.clientToken.getClientToken().pipe(
-      switchMap(token => {
+    return this.clientToken.getServiceAccountApiHeaders().pipe(
+      switchMap(headers => {
         return from(this.serverSettingsService.find()).pipe(
           switchMap(settings => {
             const url = settings.authServerURL + FRAPPE_API_COMPANY_ENDPOINT;
             return this.http
               .get(url, {
-                headers: this.getAuthorizationHeaders(token),
+                headers,
                 params: query,
               })
               .pipe(map(res => res.data));
@@ -450,11 +463,11 @@ export class SettingsService extends AggregateRoot {
         if (!settings.authServerURL) {
           return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
         }
-        return this.clientToken.getClientToken().pipe(
-          switchMap(token => {
+        return this.clientToken.getServiceAccountApiHeaders().pipe(
+          switchMap(headers => {
             return this.http
               .get(settings.authServerURL + FRAPPE_API_GET_GLOBAL_DEFAULTS, {
-                headers: this.getAuthorizationHeaders(token),
+                headers,
               })
               .pipe(
                 map(data => data.data.data),
@@ -462,7 +475,7 @@ export class SettingsService extends AggregateRoot {
                   return this.http
                     .get(
                       settings.authServerURL + FRAPPE_API_GET_SYSTEM_SETTINGS,
-                      { headers: this.getAuthorizationHeaders(token) },
+                      { headers },
                     )
                     .pipe(
                       map(data => data.data.data),

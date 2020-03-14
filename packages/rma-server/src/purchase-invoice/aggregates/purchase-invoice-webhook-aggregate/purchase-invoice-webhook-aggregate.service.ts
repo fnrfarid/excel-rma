@@ -8,8 +8,7 @@ import * as uuidv4 from 'uuid/v4';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
 import {
   SUBMITTED_STATUS,
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
+  CANCELED_STATUS,
 } from '../../../constants/app-strings';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
@@ -68,20 +67,36 @@ export class PurchaseInvoiceWebhookAggregateService {
 
   getUserDetails(email: string) {
     return forkJoin({
-      token: this.clientToken.getClientToken(),
+      headers: this.clientToken.getServiceAccountApiHeaders(),
       settings: this.settings.find(),
     }).pipe(
-      switchMap(({ token, settings }) => {
+      switchMap(({ headers, settings }) => {
         return this.http
           .get(
             settings.authServerURL + FRAPPE_API_GET_USER_INFO_ENDPOINT + email,
-            {
-              headers: {
-                [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + token.accessToken,
-              },
-            },
+            { headers },
           )
           .pipe(map(res => res.data.data));
+      }),
+    );
+  }
+
+  cancelPurchaseInvoice(name: string) {
+    return from(this.purchaseInvoiceService.findOne({ name })).pipe(
+      switchMap(invoice => {
+        if (!invoice) return of({ purchaseInvoiceNotFound: true });
+        return from(
+          this.purchaseInvoiceService.updateOne(
+            { uuid: invoice.uuid },
+            {
+              $set: {
+                docstatus: 2,
+                status: CANCELED_STATUS,
+                submitted: false,
+              },
+            },
+          ),
+        );
       }),
     );
   }

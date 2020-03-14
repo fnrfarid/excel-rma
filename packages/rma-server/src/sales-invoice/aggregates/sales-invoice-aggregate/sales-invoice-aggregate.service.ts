@@ -17,23 +17,14 @@ import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-
 import { SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import {
-  switchMap,
-  map,
-  catchError,
-  concatMap,
-  toArray,
-  mergeMap,
-  retry,
-} from 'rxjs/operators';
-import { throwError, of, from, forkJoin } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
+import { throwError, of, from } from 'rxjs';
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
   CONTENT_TYPE,
   APPLICATION_JSON_CONTENT_TYPE,
   DRAFT_STATUS,
-  VALIDATE_AUTH_STRING,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -41,7 +32,6 @@ import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
   LIST_CREDIT_NOTE_ENDPOINT,
-  FRAPPE_CLIENT_CANCEL,
 } from '../../../constants/routes';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
@@ -54,8 +44,6 @@ import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-n
 import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { DateTime } from 'luxon';
-import { SalesInvoiceCanceledEvent } from '../../event/sales-invoice-canceled/sales-invoice-canceled.event';
-import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -66,7 +54,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly validateSalesInvoicePolicy: SalesInvoicePoliciesService,
     private readonly deliveryNoteService: DeliveryNoteService,
     private readonly errorLogService: ErrorLogService,
-    private readonly tokenService: DirectService,
   ) {
     super();
   }
@@ -104,7 +91,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   async retrieveSalesInvoice(uuid: string, req) {
-    const provider = await this.salesInvoiceService.findOne({ uuid });
+    const provider = await this.salesInvoiceService.findOne(
+      { uuid },
+      undefined,
+      true,
+    );
     if (!provider) throw new NotFoundException();
     return provider;
   }
@@ -139,37 +130,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       );
     }
     this.apply(new SalesInvoiceUpdatedEvent(updatePayload));
-  }
-
-  cancelSalesInvoice(uuid: string, clientHttpRequest: any) {
-    return this.validateSalesInvoicePolicy.validateSalesInvoice(uuid).pipe(
-      switchMap(salesInvoice => {
-        return forkJoin({
-          queueState: this.validateSalesInvoicePolicy.validateQueueState(
-            salesInvoice,
-          ),
-          invoiceState: this.validateSalesInvoicePolicy.validateInvoiceStateForCancel(
-            salesInvoice.status,
-          ),
-          invoiceOnErp: this.validateSalesInvoicePolicy.validateInvoiceOnErp(
-            salesInvoice,
-          ),
-          deliveryNoteNames: this.validateSalesInvoicePolicy.getCanceledDeliveryNotes(
-            salesInvoice,
-          ),
-        }).pipe(
-          switchMap(({ deliveryNoteNames }) => {
-            this.apply(new SalesInvoiceCanceledEvent(salesInvoice));
-            this.syncCancelSalesInvoice(
-              deliveryNoteNames,
-              salesInvoice,
-              clientHttpRequest,
-            );
-            return of({});
-          }),
-        );
-      }),
-    );
   }
 
   submitSalesInvoice(uuid: string, clientHttpRequest: any) {
@@ -212,161 +172,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           );
       }),
     );
-  }
-
-  cancelAllDeliveryNotes(
-    deliveryNoteNames: string[],
-    invoice_name: string,
-    clientHttpRequest: any,
-  ) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        if (!settings || !settings.authServerURL)
-          return throwError(new NotImplementedException());
-        return from(deliveryNoteNames).pipe(
-          concatMap(delivery_note_name => {
-            return of({}).pipe(
-              mergeMap(() => {
-                const url = `${settings.authServerURL}${FRAPPE_CLIENT_CANCEL}`;
-                const body = {
-                  doctype: 'Delivery Note',
-                  name: delivery_note_name,
-                };
-
-                return this.http
-                  .post(url, JSON.stringify(body), {
-                    headers: {
-                      [AUTHORIZATION]:
-                        BEARER_HEADER_VALUE_PREFIX +
-                        clientHttpRequest.token.accessToken,
-                      [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
-                      [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
-                    },
-                  })
-                  .pipe(map(data => data.data.data));
-              }),
-              catchError(err => {
-                if (
-                  (err.response && err.response.status === 403) ||
-                  (err.response.data &&
-                    err.response.data.exc.includes(VALIDATE_AUTH_STRING))
-                ) {
-                  return this.tokenService
-                    .getUserAccessToken(clientHttpRequest.token.email)
-                    .pipe(
-                      mergeMap(token => {
-                        clientHttpRequest.token.accessToken = token.accessToken;
-                        return throwError(new BadRequestException(err));
-                      }),
-                    );
-                }
-                return throwError(new BadRequestException(err));
-              }),
-              retry(3),
-            );
-          }),
-          toArray(),
-          switchMap(() => {
-            return this.cancelSalesInvoiceFromErp(
-              invoice_name,
-              clientHttpRequest,
-            );
-          }),
-          catchError(err => {
-            return throwError(
-              new BadRequestException(
-                err.response ? err.response.data.exc : err,
-              ),
-            );
-          }),
-        );
-      }),
-    );
-  }
-
-  cancelSalesInvoiceFromErp(invoice_name: string, clientHttpRequest: any) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        if (!settings || !settings.authServerURL)
-          return throwError(new NotImplementedException());
-
-        const url = `${settings.authServerURL}${FRAPPE_CLIENT_CANCEL}`;
-        const body = {
-          doctype: 'Sales Invoice',
-          name: invoice_name,
-        };
-        return this.http
-          .post(url, JSON.stringify(body), {
-            headers: {
-              [AUTHORIZATION]:
-                BEARER_HEADER_VALUE_PREFIX +
-                clientHttpRequest.token.accessToken,
-              [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
-              [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
-            },
-          })
-          .pipe(
-            map(data => data.data.data),
-            catchError(err => {
-              return throwError(
-                new BadRequestException(
-                  err.response ? err.response.data.exc : err,
-                ),
-              );
-            }),
-          );
-      }),
-    );
-  }
-
-  syncCancelSalesInvoice(
-    deliveryNoteNames: string[],
-    salesInvoice: SalesInvoice,
-    clientHttpRequest: any,
-  ) {
-    (deliveryNoteNames.length !== 0
-      ? this.cancelAllDeliveryNotes(
-          deliveryNoteNames,
-          salesInvoice.name,
-          clientHttpRequest,
-        )
-      : this.cancelSalesInvoiceFromErp(salesInvoice.name, clientHttpRequest)
-    ).subscribe({
-      next: res => {
-        this.salesInvoiceService
-          .updateOne(
-            { uuid: salesInvoice.uuid },
-            {
-              $set: {
-                inQueue: false,
-                isSynced: true,
-              },
-            },
-          )
-          .then(() => {})
-          .catch(() => {});
-      },
-      error: err => {
-        this.salesInvoiceService
-          .updateOne(
-            { uuid: salesInvoice.uuid },
-            {
-              $set: {
-                inQueue: false,
-                isSynced: false,
-              },
-            },
-          )
-          .then(() => {})
-          .catch(() => {});
-        this.errorLogService.createErrorLog(
-          err,
-          'Sales Invoice',
-          'salesInvoice',
-          clientHttpRequest,
-        );
-      },
-    });
   }
 
   syncSubmittedSalesInvoice(

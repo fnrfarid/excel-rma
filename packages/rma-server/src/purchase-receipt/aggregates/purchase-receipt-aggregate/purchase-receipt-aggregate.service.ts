@@ -629,16 +629,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchaseReceipt.items.forEach(item => {
       const purchaseInvoiceReceiptItem = new PurchaseReceiptMetaData();
       purchaseInvoiceReceiptItem.purchase_document_type =
-        item.purchase_document_type;
-      purchaseInvoiceReceiptItem.purchase_document_no =
-        item.purchase_document_no;
-      purchaseInvoiceReceiptItem.purchase_receipt_name = purchaseReceipt.name;
+        purchaseReceipt.doctype;
+      purchaseInvoiceReceiptItem.purchase_document_no = purchaseReceipt.name;
+      purchaseInvoiceReceiptItem.purchase_invoice_name = purchase_invoice_name;
       purchaseInvoiceReceiptItem.amount = item.amount;
       purchaseInvoiceReceiptItem.cost_center = item.cost_center;
       purchaseInvoiceReceiptItem.expense_account = item.expense_account;
       purchaseInvoiceReceiptItem.item_code = item.item_code;
       purchaseInvoiceReceiptItem.item_name = item.item_name;
-      purchaseInvoiceReceiptItem.name = item.name || purchase_invoice_name;
+      purchaseInvoiceReceiptItem.name = purchaseReceipt.name;
       purchaseInvoiceReceiptItem.qty = item.qty;
       purchaseInvoiceReceiptItem.rate = item.rate;
       purchaseInvoiceReceiptItem.warehouse = item.warehouse;
@@ -646,7 +645,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       purchaseInvoiceReceiptItem.deliveredBy = clientHttpRequest.token.fullName;
       purchaseInvoiceReceiptItem.deliveredByEmail =
         clientHttpRequest.token.email;
-      purchaseInvoiceReceiptItem.purchase_receipt_name = purchase_invoice_name;
       purchaseReceiptItems.push(purchaseInvoiceReceiptItem);
     });
     return purchaseReceiptItems;

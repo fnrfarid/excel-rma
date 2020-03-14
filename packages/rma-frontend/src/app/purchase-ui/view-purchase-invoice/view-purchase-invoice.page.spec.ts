@@ -1,9 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Location } from '@angular/common';
+import { RouterTestingModule } from '@angular/router/testing';
+import { of } from 'rxjs';
 
 import { ViewPurchaseInvoicePage } from './view-purchase-invoice.page';
-import { Location } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { PurchaseService } from '../services/purchase.service';
 
 describe('ViewPurchaseInvoicePage', () => {
   let component: ViewPurchaseInvoicePage;
@@ -12,12 +15,18 @@ describe('ViewPurchaseInvoicePage', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ViewPurchaseInvoicePage],
-      imports: [IonicModule.forRoot()],
+      imports: [IonicModule.forRoot(), RouterTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
           provide: Location,
           useValue: {},
+        },
+        {
+          provide: PurchaseService,
+          useValue: {
+            getPurchaseInvoice: (...args) => of({}),
+          },
         },
       ],
     }).compileComponents();

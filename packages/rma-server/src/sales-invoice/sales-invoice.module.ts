@@ -12,6 +12,7 @@ import { SerialNoModule } from '../serial-no/serial-no.module';
 import { SalesInvoiceWebhookController } from './controllers/sales-invoice-webhook/sales-invoice-webhook.controller';
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 import { DirectModule } from '../direct/direct.module';
+import { SyncModule } from '../sync/sync.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DirectModule } from '../direct/direct.module';
     SerialNoModule,
     ErrorLogModule,
     DirectModule,
+    SyncModule,
   ],
   controllers: [SalesInvoiceController, SalesInvoiceWebhookController],
   providers: [
@@ -29,6 +31,7 @@ import { DirectModule } from '../direct/direct.module';
     ...SalesInvoiceEventManager,
     ...SalesInvoiceCommandManager,
     SalesInvoicePoliciesService,
+    // SalesInvoiceSyncService,
   ],
   exports: [SalesInvoiceEntitiesModule],
 })

@@ -4,6 +4,7 @@ export interface PurchaseReceiptResponseInterface {
   status: string;
   company: string;
   supplier: string;
+  doctype: string;
   total: number;
   in_words: string;
   supplier_name: string;
@@ -13,8 +14,8 @@ export interface PurchaseReceiptResponseInterface {
 export interface PurchaseReceiptResponseItemInterface {
   amount: number;
   cost_center: string;
-  purchase_document_type: string;
-  purchase_document_no: string;
+  parenttype: string;
+  parent: string;
   expense_account: string;
   item_code: string;
   item_name: string;

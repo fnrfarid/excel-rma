@@ -56,39 +56,35 @@ export class DeliveryNoteWebhookAggregateService {
         if (!settings.authServerURL) {
           return throwError(new NotImplementedException());
         }
-        return this.clientTokenManager.getClientToken().pipe(
-          switchMap(token => {
+        return this.clientTokenManager.getServiceAccountApiHeaders().pipe(
+          switchMap(headers => {
             const url =
               settings.authServerURL +
               LIST_DELIVERY_NOTE_ENDPOINT +
               deliveryNotePayload.name;
-            return this.http
-              .get(url, {
-                headers: this.settingsService.getAuthorizationHeaders(token),
-              })
-              .pipe(
-                map(res => res.data.data),
-                switchMap(response => {
-                  const deliveryNoteItems = this.mapDeliveryNoteItems(
-                    response.items,
-                  );
-                  const deliveryNoteTaxes = this.mapDeliveryNoteTaxes(
-                    response.taxes,
-                  );
-                  return from(
-                    this.deliveryNoteService.updateOne(
-                      { name: deliveryNotePayload.name },
-                      {
-                        $set: {
-                          items: deliveryNoteItems,
-                          taxes: deliveryNoteTaxes,
-                          isSynced: true,
-                        },
+            return this.http.get(url, { headers }).pipe(
+              map(res => res.data.data),
+              switchMap(response => {
+                const deliveryNoteItems = this.mapDeliveryNoteItems(
+                  response.items,
+                );
+                const deliveryNoteTaxes = this.mapDeliveryNoteTaxes(
+                  response.taxes,
+                );
+                return from(
+                  this.deliveryNoteService.updateOne(
+                    { name: deliveryNotePayload.name },
+                    {
+                      $set: {
+                        items: deliveryNoteItems,
+                        taxes: deliveryNoteTaxes,
+                        isSynced: true,
                       },
-                    ),
-                  );
-                }),
-              );
+                    },
+                  ),
+                );
+              }),
+            );
           }),
           retry(3),
         );

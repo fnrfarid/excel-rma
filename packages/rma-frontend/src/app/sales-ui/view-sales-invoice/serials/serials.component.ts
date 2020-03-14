@@ -103,7 +103,7 @@ export class SerialsComponent implements OnInit {
     'warehouse',
   ];
   deliveredSerialsSearch: string = '';
-
+  disableDeliveredSerialsCard: boolean = false;
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -212,7 +212,7 @@ export class SerialsComponent implements OnInit {
       );
       return [];
     }
-    const data: any[] = _.range(start, end);
+    const data: any[] = _.range(start, end + 1);
     let i = 0;
     for (const value of data) {
       if (value) {
@@ -230,12 +230,9 @@ export class SerialsComponent implements OnInit {
   getFilteredItems(salesInvoice: SalesInvoiceDetails) {
     const filteredItemList = [];
     salesInvoice.items.forEach(item => {
-      salesInvoice.delivery_note_items.filter(deliveredItem => {
-        if (item.item_code === deliveredItem.item_code) {
-          item.qty -= deliveredItem.qty;
-          return deliveredItem;
-        }
-      });
+      if (salesInvoice.delivered_items_map[item.item_code]) {
+        item.qty -= salesInvoice.delivered_items_map[item.item_code];
+      }
       if (item.qty !== 0) {
         filteredItemList.push(item);
       }
@@ -250,6 +247,10 @@ export class SerialsComponent implements OnInit {
           this.getDeliveredSerials(itemList.uuid);
         }
         this.salesInvoiceDetails = itemList as SalesInvoiceDetails;
+        this.disableDeliveredSerialsCard =
+          Object.keys(this.salesInvoiceDetails.delivered_items_map).length === 0
+            ? true
+            : false;
         this.filteredItemList = this.getFilteredItems(itemList);
         this.itemDataSource.loadItems(
           this.filteredItemList.filter(item => {

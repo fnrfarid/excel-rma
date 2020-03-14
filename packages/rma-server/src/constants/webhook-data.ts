@@ -1944,3 +1944,27 @@ export function purchaseOrderOnSubmitWebhookData(
     ],
   };
 }
+
+export function purchaseInvoiceOnCancelWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Purchase Invoice',
+    webhook_docevent: 'on_cancel',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [{ fieldname: 'name', key: 'name' }],
+  };
+}
