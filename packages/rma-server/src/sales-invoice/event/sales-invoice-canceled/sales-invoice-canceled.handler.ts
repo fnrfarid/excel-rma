@@ -12,7 +12,14 @@ export class SalesInvoiceCanceledHandler
     const { salesInvoice } = event;
     await this.salesService.updateOne(
       { uuid: salesInvoice.uuid },
-      { $set: { status: CANCELED_STATUS, inQueue: true, isSynced: false } },
+      {
+        $set: {
+          status: CANCELED_STATUS,
+          inQueue: true,
+          isSynced: false,
+          outstanding_amount: 0,
+        },
+      },
     );
   }
 }

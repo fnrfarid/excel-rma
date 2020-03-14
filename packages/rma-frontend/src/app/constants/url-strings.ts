@@ -9,6 +9,8 @@ export const LIST_WAREHOUSE_ENDPOINT =
 export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';
 export const LIST_CUSTOMER_ENDPOINT = 'api/customer/v1/list';
 export const LIST_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/list';
+export const UPDATE_OUTSTANDING_AMOUNT_ENDPOINT =
+  'api/sales_invoice/v1/update_outstanding_amount/';
 export const SALES_INVOICE_GET_ONE_ENDPOINT = '/api/sales_invoice/v1/get/';
 export const CREATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/create';
 export const UPDATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/update';

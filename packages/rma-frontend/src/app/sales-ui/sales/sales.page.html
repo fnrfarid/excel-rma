@@ -139,17 +139,25 @@
               <mat-datepicker #toDate disabled="false"></mat-datepicker>
             </mat-form-field>
           </ion-col>
-          <ion-row>
-            <ion-col size="auto">
-              <ion-button
-                color="tertiary"
-                (click)="clearFilters()"
-                fill="outline"
-              >
-                Clear
-              </ion-button>
-            </ion-col>
-          </ion-row>
+          <ion-col size="auto">
+            <ion-button
+              color="tertiary"
+              (click)="clearFilters()"
+              fill="outline"
+            >
+              Clear
+            </ion-button>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button
+              color="tertiary"
+              (click)="syncOutstandingAmount()"
+              fill="outline"
+              [disabled]="disableRefresh"
+            >
+              Refresh
+            </ion-button>
+          </ion-col>
         </ion-row>
       </ion-grid>
       <table
@@ -261,11 +269,7 @@
         </ng-container>
 
         <ng-container matColumnDef="total">
-          <mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header="total"
-            style="justify-content: flex-start;"
-          >
+          <mat-header-cell *matHeaderCellDef mat-sort-header="total">
             Invoice Amount
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
@@ -273,6 +277,21 @@
           </mat-cell>
           <mat-footer-cell *matFooterCellDef>
             {{ total | curFormat | async }}
+          </mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="due_amount">
+          <mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header="outstanding_amount"
+          >
+            Due Amount
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.outstanding_amount | curFormat | async }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef>
+            {{ dueTotal | curFormat | async }}
           </mat-footer-cell>
         </ng-container>
 

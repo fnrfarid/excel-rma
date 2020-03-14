@@ -36,6 +36,7 @@ import {
   RELAY_GET_FULL_ADDRESS_ENDPOINT,
   GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT,
   CANCEL_SALES_INVOICE_ENDPOINT,
+  UPDATE_OUTSTANDING_AMOUNT_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -106,6 +107,15 @@ export class SalesService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  updateOutstandingAmount(invoice_name: string) {
+    const url = `${UPDATE_OUTSTANDING_AMOUNT_ENDPOINT}${invoice_name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
       }),
     );
   }
