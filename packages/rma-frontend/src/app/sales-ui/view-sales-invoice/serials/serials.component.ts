@@ -89,6 +89,15 @@ export class SerialsComponent implements OnInit {
     'serial_no',
     'delete',
   ];
+  materialTransferDisplayedColumns = [
+    's_warehouse',
+    't_warehouse',
+    'item_code',
+    'item_name',
+    'qty',
+    'amount',
+    'serial_no',
+  ];
   serialDataSource: SerialDataSource;
 
   deliveredSerialsDataSource: DeliveredSerialsDataSource;

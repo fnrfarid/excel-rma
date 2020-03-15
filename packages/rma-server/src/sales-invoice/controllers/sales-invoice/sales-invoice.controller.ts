@@ -24,12 +24,14 @@ import { CreateSalesReturnCommand } from '../../command/create-sales-return/crea
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
 import { SalesInvoiceListQueryDto } from '../../../constants/listing-dto/sales-invoice-list-query';
 import { CancelSalesInvoiceCommand } from '../../command/cancel-sales-invoice/cancel-sales-invoice.command';
+import { SalesInvoiceAggregateService } from '../../aggregates/sales-invoice-aggregate/sales-invoice-aggregate.service';
 
 @Controller('sales_invoice')
 export class SalesInvoiceController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly salesInvoiceAggregate: SalesInvoiceAggregateService,
   ) {}
 
   @Post('v1/create')
@@ -100,5 +102,14 @@ export class SalesInvoiceController {
     return this.commandBus.execute(
       new CreateSalesReturnCommand(createReturnPayload, req),
     );
+  }
+
+  @Post('v1/update_outstanding_amount/:name')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async updateOutstandingAmount(@Param('name') invoice_name: string) {
+    return await this.salesInvoiceAggregate
+      .updateOutstandingAmount(invoice_name)
+      .toPromise();
   }
 }

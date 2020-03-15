@@ -28,7 +28,6 @@ export class SalesInvoiceWebhookAggregateService {
               { name: salesInvoicePayload.name },
               {
                 $set: {
-                  outstanding_amount: salesInvoicePayload.outstanding_amount,
                   address_display: salesInvoicePayload.address_display,
                 },
               },

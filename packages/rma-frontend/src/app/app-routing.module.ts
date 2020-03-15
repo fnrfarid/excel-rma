@@ -38,6 +38,11 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'stock-entry',
+    loadChildren: () =>
+      import('./stock-entry/stock-entry.module').then(m => m.StockEntryModule),
+  },
+  {
     path: 'sales/add-sales-invoice/:calledFrom',
     loadChildren: () =>
       import('./sales-ui/add-sales-invoice/add-sales-invoice.module').then(

@@ -222,11 +222,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       });
   }
 
-  // onPrefixChange(value) {
-  //   this.generateSerials(undefined, undefined, value);
-  // }
-
-  async generateSerials(fromRange?, toRange?) {
+  generateSerials(fromRange?, toRange?) {
     this.rangePickerState.serials =
       this.getSerialsFromRange(
         fromRange || this.rangePickerState.fromRange || 0,
