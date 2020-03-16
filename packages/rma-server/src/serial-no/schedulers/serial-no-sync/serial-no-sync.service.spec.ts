@@ -3,6 +3,7 @@ import { SerialNoSyncService } from './serial-no-sync.service';
 import { SyncAggregateService } from '../../../sync/aggregates/sync-aggregate/sync-aggregate.service';
 import { RequestStateService } from '../../../direct/entities/request-state/request-state.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
 describe('SerialNoSyncService', () => {
   let service: SerialNoSyncService;
@@ -14,6 +15,7 @@ describe('SerialNoSyncService', () => {
         { provide: SyncAggregateService, useValue: {} },
         { provide: SerialNoService, useValue: {} },
         { provide: RequestStateService, useValue: {} },
+        { provide: AGENDA_TOKEN, useValue: {} },
       ],
     }).compile();
 

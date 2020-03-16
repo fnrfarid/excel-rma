@@ -1,5 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CronJob } from 'cron';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import {
   flatMap,
   toArray,
@@ -9,6 +8,7 @@ import {
 } from 'rxjs/operators';
 import { of, from, throwError } from 'rxjs';
 import * as uuidv4 from 'uuid/v4';
+import * as Agenda from 'agenda';
 
 import { SyncAggregateService } from '../../../sync/aggregates/sync-aggregate/sync-aggregate.service';
 import { ITEM_DOCTYPE } from '../../../constants/app-strings';
@@ -16,19 +16,22 @@ import { ItemService } from '../../entity/item/item.service';
 import { Item } from '../../entity/item/item.entity';
 import { RequestStateService } from '../../../direct/entities/request-state/request-state.service';
 import { SyncAlreadyInProgressException } from '../../../constants/exceptions';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
-export const ITEM_SYNC_CRON_STRING = '0 */15 * * * *';
+export const ITEM_SYNC_SCHEDULE = 'ITEM_SYNC_SCHEDULE';
 
 @Injectable()
 export class ItemSyncService implements OnModuleInit {
   constructor(
+    @Inject(AGENDA_TOKEN)
+    private readonly agenda: Agenda,
     private readonly sync: SyncAggregateService,
     private readonly item: ItemService,
     private readonly requestState: RequestStateService,
   ) {}
 
   onModuleInit() {
-    const job = new CronJob(ITEM_SYNC_CRON_STRING, async () => {
+    this.agenda.define(ITEM_SYNC_SCHEDULE, async job => {
       from(this.requestState.findOne({ syncDocType: ITEM_DOCTYPE }))
         .pipe(
           switchMap(state => {
@@ -98,6 +101,9 @@ export class ItemSyncService implements OnModuleInit {
           error: error => {},
         });
     });
-    job.start();
+    this.agenda
+      .every('15 minutes', ITEM_SYNC_SCHEDULE)
+      .then(scheduled => {})
+      .catch(error => {});
   }
 }
