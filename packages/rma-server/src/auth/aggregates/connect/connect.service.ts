@@ -175,8 +175,8 @@ export class ConnectService {
     return userTerritory;
   }
 
-  tokenDeleted(accessToken: string) {
-    return this.tokenCacheService.deleteMany({ accessToken });
+  async tokenDeleted(accessToken: string) {
+    return await this.tokenCacheService.deleteMany({ accessToken });
   }
 
   async findCachedToken(params) {

@@ -1,12 +1,11 @@
-import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
+import { Injectable, HttpService } from '@nestjs/common';
 import { PurchaseOrderWebhookDto } from '../../entity/purchase-order/purchase-order-webhook-dto';
 import { PurchaseOrderService } from '../../entity/purchase-order/purchase-order.service';
 import { PurchaseOrder } from '../../entity/purchase-order/purchase-order.entity';
-import { from, throwError, of, forkJoin } from 'rxjs';
+import { from, of, forkJoin } from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
 import * as uuidv4 from 'uuid/v4';
 import { DateTime } from 'luxon';
-import { PURCHASE_ORDER_ALREADY_EXIST } from '../../../constants/messages';
 import {
   SUBMITTED_STATUS,
   AUTHORIZATION,
@@ -47,20 +46,23 @@ export class PurchaseOrderWebhookAggregateService {
       settings: this.settings.find(),
     }).pipe(
       switchMap(({ purchaseOrder, settings }) => {
-        if (purchaseOrder) {
-          return throwError(
-            new BadRequestException(PURCHASE_ORDER_ALREADY_EXIST),
-          );
-        }
         const provider = this.mapPurchaseOrder(purchaseOrderPayload);
         provider.created_on = new DateTime(settings.timeZone).toJSDate();
         return this.getUserDetails(purchaseOrderPayload.owner).pipe(
           switchMap(user => {
             provider.created_by = user.full_name;
-            this.purchaseOrderService
-              .create(provider)
-              .then(success => {})
-              .catch(error => {});
+            if (purchaseOrder) {
+              this.purchaseOrderService
+                .updateOne({ name: purchaseOrder.name }, { $set: provider })
+                .then(success => {})
+                .catch(error => {});
+            } else {
+              this.purchaseOrderService
+                .create(provider)
+                .then(success => {})
+                .catch(error => {});
+            }
+
             this.createPurchaseInvoice(purchaseOrderPayload, settings);
             return of({});
           }),
@@ -123,7 +125,10 @@ export class PurchaseOrderWebhookAggregateService {
                 return this.http
                   .post(
                     settings.authServerURL + ERPNEXT_PURCHASE_INVOICE_ENDPOINT,
-                    invoice.message,
+                    {
+                      ...invoice.message,
+                      owner: order.owner,
+                    },
                     { headers },
                   )
                   .pipe(map(res => res.data));

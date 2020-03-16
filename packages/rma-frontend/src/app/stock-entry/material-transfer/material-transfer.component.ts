@@ -8,14 +8,18 @@ import {
   switchMap,
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE } from 'src/app/constants/app-string';
+import { CLOSE, MATERIAL_TRANSFER } from '../../constants/app-string';
 import * as _ from 'lodash';
 import { FormControl } from '@angular/forms';
-import { SalesService } from 'src/app/sales-ui/services/sales.service';
+import { SalesService } from '../../sales-ui/services/sales.service';
 import {
   MaterialTransferDataSource,
   StockEntryRow,
+  MaterialTransferDto,
 } from './material-transfer.datasource';
+import { DEFAULT_COMPANY } from '../../constants/storage';
+import { TimeService } from '../../api/time/time.service';
+import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 
 @Component({
   selector: 'app-material-transfer',
@@ -30,7 +34,8 @@ export class MaterialTransferComponent implements OnInit {
     toRange: '',
     serials: [],
   };
-  filteredWarehouseList: Observable<any[]>;
+  filteredWarehouseList1: Observable<any[]>;
+  filteredWarehouseList2: Observable<any[]>;
   warehouseState = {
     s_warehouse: new FormControl(''),
     t_warehouse: new FormControl(''),
@@ -51,6 +56,8 @@ export class MaterialTransferComponent implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly location: Location,
     private readonly salesService: SalesService,
+    private readonly timeService: TimeService,
+    private readonly stockEntryService: StockEntryService,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -58,15 +65,17 @@ export class MaterialTransferComponent implements OnInit {
 
   ngOnInit() {
     this.materialTransferDataSource = new MaterialTransferDataSource();
-    this.filteredWarehouseList = this.warehouseState.s_warehouse.valueChanges.pipe(
+    this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
       startWith(''),
+      debounceTime(300),
       switchMap(value => {
         return this.salesService.getWarehouseList(value);
       }),
     );
 
-    this.filteredWarehouseList = this.warehouseState.t_warehouse.valueChanges.pipe(
+    this.filteredWarehouseList2 = this.warehouseState.t_warehouse.valueChanges.pipe(
       startWith(''),
+      debounceTime(300),
       switchMap(value => {
         return this.salesService.getWarehouseList(value);
       }),
@@ -132,18 +141,7 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   addRow() {
-    if (
-      !this.warehouseState.s_warehouse.value ||
-      !this.warehouseState.t_warehouse.value
-    ) {
-      this.getMessage('Please select source and target warehouse.');
-      return;
-    }
-
-    if (!this.rangePickerState.serials[0]) {
-      this.getMessage('Please select a serial range.');
-      return;
-    }
+    if (!this.validateMaterialTransferData()) return;
 
     this.salesService.getSerial(this.rangePickerState.serials[0]).subscribe({
       next: (success: { item: { item_code: string; item_name: string } }[]) => {
@@ -173,6 +171,46 @@ export class MaterialTransferComponent implements OnInit {
     };
   }
 
+  async createMaterialTransfer() {
+    if (this.materialTransferDataSource.data().length === 0) {
+      this.getMessage('Please Add serials for transfer');
+      return;
+    }
+    const body = new MaterialTransferDto();
+    const date = await this.timeService.getDateAndTime(new Date());
+    body.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
+    body.posting_date = date.date;
+    body.posting_time = date.time;
+    body.stock_entry_type = MATERIAL_TRANSFER;
+    body.items = this.materialTransferDataSource.data();
+    this.stockEntryService.createMaterialTransfer(body).subscribe({
+      next: response => {
+        this.getMessage('Stock Entry Created');
+        this.resetRangeState();
+        this.materialTransferDataSource.update([]);
+      },
+      error: err => {
+        this.getMessage(err.error.message);
+      },
+    });
+  }
+
+  validateMaterialTransferData() {
+    if (
+      !this.warehouseState.s_warehouse.value ||
+      !this.warehouseState.t_warehouse.value
+    ) {
+      this.getMessage('Please select source and target warehouse.');
+      return false;
+    }
+
+    if (!this.rangePickerState.serials[0]) {
+      this.getMessage('Please select a serial range.');
+      return false;
+    }
+    return true;
+  }
+
   isNumber(number) {
     return !isNaN(parseFloat(number)) && isFinite(number);
   }
@@ -183,19 +221,16 @@ export class MaterialTransferComponent implements OnInit {
       : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
   }
 
-  getMessage(message) {
-    return this.snackBar.open(message, CLOSE, { duration: 4500 });
+  getMessage(notFoundMessage, expected?, found?) {
+    return this.snackBar.open(notFoundMessage, CLOSE, { duration: 4500 });
+    //   return this.snackBar.open(
+    //     expected && found
+    //       ? `${notFoundMessage}, expected ${expected} found ${found}`
+    //       : `${notFoundMessage}`,
+    //     CLOSE,
+    //     { verticalPosition: 'top', duration: 2500 },
+    //   );
   }
-
-  // getMessage(notFoundMessage, expected?, found?) {
-  //   return this.snackBar.open(
-  //     expected && found
-  //       ? `${notFoundMessage}, expected ${expected} found ${found}`
-  //       : `${notFoundMessage}`,
-  //     CLOSE,
-  //     { verticalPosition: 'top', duration: 2500 },
-  //   );
-  // }
 
   getPaddedNumber(num, numberLength) {
     return _.padStart(num, numberLength, '0');

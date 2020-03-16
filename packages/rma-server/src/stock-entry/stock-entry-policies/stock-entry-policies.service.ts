@@ -22,21 +22,20 @@ export class StockEntryPoliciesService {
   validateStockSerials(items: StockEntryItemDto[]) {
     return from(items).pipe(
       switchMap(item => {
-        const serials = item.serial_no.split('\n');
         return from(
           this.serialNoService.count({
-            serial_no: { $in: [...serials] },
+            serial_no: { $in: item.serial_no },
             warehouse: item.s_warehouse,
             item_code: item.item_code,
           }),
         ).pipe(
           switchMap(count => {
-            if (count === serials.length) {
+            if (count === item.serial_no.length) {
               return of(true);
             }
             return throwError(
               new BadRequestException(
-                `Expected ${serials.length} serials for Item: ${item.item_name}, found ${count}.`,
+                `Expected ${item.serial_no.length} serials for Item: ${item.item_name} at warehouse: ${item.s_warehouse}, found ${count}.`,
               ),
             );
           }),
