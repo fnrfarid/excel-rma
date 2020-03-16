@@ -1,10 +1,16 @@
-import { Injectable, HttpService, OnModuleInit, Logger } from '@nestjs/common';
-import { CronJob } from 'cron';
+import {
+  Injectable,
+  HttpService,
+  OnModuleInit,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import { from, of, Observable } from 'rxjs';
 import { switchMap, mergeMap, retryWhen, take, delay } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
+import * as Agenda from 'agenda';
 
 import { ClientTokenManagerService } from '../../aggregates/client-token-manager/client-token-manager.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
@@ -20,12 +26,14 @@ import {
   REVOKE_FRAPPE_TOKEN_ERROR,
 } from '../../../constants/messages';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
-export const FRAPPE_TOKEN_CLEANUP_CRON_STRING = '0 */15 * * * *';
-
+export const REVOKE_EXPIRED_FRAPPE_TOKEN = 'REVOKE_EXPIRED_FRAPPE_TOKEN';
 @Injectable()
 export class RevokeExpiredFrappeTokensService implements OnModuleInit {
   constructor(
+    @Inject(AGENDA_TOKEN)
+    private readonly agenda: Agenda,
     private readonly settings: ServerSettingsService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly http: HttpService,
@@ -33,8 +41,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    let authHeaders = {};
-    const job = new CronJob(FRAPPE_TOKEN_CLEANUP_CRON_STRING, async () => {
+    this.agenda.define(REVOKE_EXPIRED_FRAPPE_TOKEN, async job => {
       from(this.settings.find())
         .pipe(
           switchMap(settings => {
@@ -43,10 +50,9 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
             ).toFormat('yyyy-MM-dd HH:mm:ss');
             return this.clientToken.getServiceAccountApiHeaders().pipe(
               switchMap(headers => {
-                authHeaders = headers;
                 return this.getFrappeTokens(
                   settings,
-                  authHeaders,
+                  headers,
                   nowInServerTimeZone,
                 );
               }),
@@ -72,7 +78,11 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
           },
         });
     });
-    job.start();
+
+    this.agenda
+      .every('15 minutes', REVOKE_EXPIRED_FRAPPE_TOKEN)
+      .then(scheduled => {})
+      .catch(error => {});
   }
 
   revokeToken(settings: ServerSettings, token: string): Observable<unknown> {

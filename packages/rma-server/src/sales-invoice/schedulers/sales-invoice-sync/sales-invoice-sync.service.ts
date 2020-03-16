@@ -1,5 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CronJob } from 'cron';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import {
   flatMap,
   toArray,
@@ -9,6 +8,7 @@ import {
 } from 'rxjs/operators';
 import { of, from, throwError } from 'rxjs';
 import * as uuidv4 from 'uuid/v4';
+import * as Agenda from 'agenda';
 
 import { SyncAggregateService } from '../../../sync/aggregates/sync-aggregate/sync-aggregate.service';
 import { SALES_INVOICE_DOCTYPE } from '../../../constants/app-strings';
@@ -16,19 +16,22 @@ import { RequestStateService } from '../../../direct/entities/request-state/requ
 import { SyncAlreadyInProgressException } from '../../../constants/exceptions';
 import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.service';
 import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
-export const SALES_INVOICE_SYNC_CRON_STRING = '0 */15 * * * *';
+export const SALES_INVOICE_SYNC_SCHEDULE = 'SALES_INVOICE_SYNC_SCHEDULE';
 
 @Injectable()
 export class SalesInvoiceSyncService implements OnModuleInit {
   constructor(
+    @Inject(AGENDA_TOKEN)
+    private readonly agenda: Agenda,
     private readonly sync: SyncAggregateService,
     private readonly salesInvoice: SalesInvoiceService,
     private readonly requestState: RequestStateService,
   ) {}
 
   onModuleInit() {
-    const job = new CronJob(SALES_INVOICE_SYNC_CRON_STRING, async () => {
+    this.agenda.define(SALES_INVOICE_SYNC_SCHEDULE, async job => {
       from(this.requestState.findOne({ syncDocType: SALES_INVOICE_DOCTYPE }))
         .pipe(
           switchMap(state => {
@@ -99,6 +102,10 @@ export class SalesInvoiceSyncService implements OnModuleInit {
           error: error => {},
         });
     });
-    job.start();
+
+    this.agenda
+      .every('15 minutes', SALES_INVOICE_SYNC_SCHEDULE)
+      .then(scheduled => {})
+      .catch(error => {});
   }
 }

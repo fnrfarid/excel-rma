@@ -3,6 +3,7 @@ import { ItemSyncService } from './item-sync.service';
 import { SyncAggregateService } from '../../../sync/aggregates/sync-aggregate/sync-aggregate.service';
 import { ItemService } from '../../../item/entity/item/item.service';
 import { RequestStateService } from '../../../direct/entities/request-state/request-state.service';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
 describe('ItemSyncService', () => {
   let service: ItemSyncService;
@@ -14,6 +15,7 @@ describe('ItemSyncService', () => {
         { provide: SyncAggregateService, useValue: {} },
         { provide: ItemService, useValue: {} },
         { provide: RequestStateService, useValue: {} },
+        { provide: AGENDA_TOKEN, useValue: {} },
       ],
     }).compile();
 

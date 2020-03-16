@@ -1,14 +1,20 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CronJob } from 'cron';
-import { TokenCacheService } from '../../entities/token-cache/token-cache.service';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
+import * as Agenda from 'agenda';
 
-export const TOKEN_CLEANUP_CRON_STRING = '0 */15 * * * *';
+import { TokenCacheService } from '../../entities/token-cache/token-cache.service';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
+
+export const CLEAN_EXPIRED_TOKEN_QUEUE = 'CLEAN_EXPIRED_TOKEN_QUEUE';
 
 @Injectable()
 export class CleanExpiredTokenCacheService implements OnModuleInit {
-  constructor(private readonly tokenCache: TokenCacheService) {}
+  constructor(
+    @Inject(AGENDA_TOKEN)
+    private readonly agenda: Agenda,
+    private readonly tokenCache: TokenCacheService,
+  ) {}
   onModuleInit() {
-    const job = new CronJob(TOKEN_CLEANUP_CRON_STRING, async () => {
+    this.agenda.define(CLEAN_EXPIRED_TOKEN_QUEUE, async job => {
       const query: { [key: string]: any } = {
         exp: { $lte: Math.floor(new Date().valueOf() / 1000) },
       };
@@ -21,6 +27,9 @@ export class CleanExpiredTokenCacheService implements OnModuleInit {
       });
     });
 
-    job.start();
+    this.agenda
+      .every('15 minutes', CLEAN_EXPIRED_TOKEN_QUEUE)
+      .then(scheduled => {})
+      .catch(error => {});
   }
 }
