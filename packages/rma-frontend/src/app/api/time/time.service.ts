@@ -15,4 +15,16 @@ export class TimeService {
       .setZone(timeZone)
       .toFormat('yyyy-MM-dd HH:mm:ss');
   }
+
+  async getDateAndTime(time: Date) {
+    const timeZone = await this.storage.getItem(TIME_ZONE);
+    return {
+      date: DateTime.fromJSDate(time)
+        .setZone(timeZone)
+        .toFormat('yyyy-MM-dd'),
+      time: DateTime.fromJSDate(time)
+        .setZone(timeZone)
+        .toFormat('HH:mm:ss'),
+    };
+  }
 }

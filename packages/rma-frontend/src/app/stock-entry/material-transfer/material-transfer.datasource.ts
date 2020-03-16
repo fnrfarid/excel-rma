@@ -34,5 +34,17 @@ export class StockEntryRow {
   item_code: string;
   item_name: string;
   qty: number;
-  serial_no: string[];
+  serial_no: any;
+}
+
+export class MaterialTransferDto {
+  stock_entry_type: string;
+
+  company: string;
+
+  posting_date: string;
+
+  posting_time: string;
+
+  items: StockEntryRow[];
 }

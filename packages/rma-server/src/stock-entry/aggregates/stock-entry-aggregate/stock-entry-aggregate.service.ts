@@ -50,6 +50,9 @@ export class StockEntryAggregateService {
       .find()
       .pipe(
         switchMap(settings => {
+          payload.items.filter(item => {
+            item.serial_no = item.serial_no.join('\n');
+          });
           return this.http.post(
             settings.authServerURL + STOCK_ENTRY_API_ENDPOINT,
             payload,

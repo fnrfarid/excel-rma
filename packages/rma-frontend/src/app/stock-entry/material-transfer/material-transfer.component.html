@@ -14,7 +14,22 @@
 <ion-content>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Serial Range</ion-card-title>
+      <ion-row class="align">
+        <ion-col>
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Serial Range
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+        <ion-col class="ion-text-right">
+          <ion-button
+            color="tertiary"
+            (click)="createMaterialTransfer()">
+            Create
+          </ion-button>
+        </ion-col>
+      </ion-row>
     </ion-card-header>
     <ion-card-content>
       <ion-grid class="ion-no-padding">
@@ -44,8 +59,8 @@
               <input type="text" placeholder="Source Warehouse" matInput [formControl]="warehouseState.s_warehouse"
                 [matAutocomplete]="from_warehouse" />
               <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
-                <mat-option *ngFor="let warehouse of filteredWarehouseList | async" [value]="warehouse.name">
-                  {{ warehouse.name }}
+                <mat-option *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse.name">
+                  {{ s_warehouse.name }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
@@ -54,7 +69,7 @@
               <input type="text" placeholder="Target Warehouse" matInput [formControl]="warehouseState.t_warehouse"
                 [matAutocomplete]="warehouse"/>
               <mat-autocomplete autoActiveFirstOption #warehouse="matAutocomplete">
-                <mat-option *ngFor="let warehouse of filteredWarehouseList | async" [value]="warehouse.name">
+                <mat-option *ngFor="let warehouse of filteredWarehouseList2 | async" [value]="warehouse.name">
                   {{ warehouse.name }}
                 </mat-option>
               </mat-autocomplete>
