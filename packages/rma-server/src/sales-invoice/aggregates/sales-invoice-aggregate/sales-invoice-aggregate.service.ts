@@ -334,7 +334,18 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   deliveryNoteData.issue_credit_note = true;
                   const delivery = this.mapCreateDeliveryNote(response);
                   Object.assign(deliveryNoteData, delivery);
-                  this.deliveryNoteService.create(deliveryNoteData);
+                  const returned_items_map = this.getReturnedItemsMap(
+                    deliveryNoteData.items,
+                    salesInvoice,
+                  );
+                  this.deliveryNoteService
+                    .create(deliveryNoteData)
+                    .then(() => {})
+                    .catch(() => {});
+                  this.salesInvoiceService.updateOne(
+                    { uuid: salesInvoice.uuid },
+                    { $set: { returned_items_map } },
+                  );
                 },
                 error: err => {
                   this.errorLogService.createErrorLog(
@@ -480,5 +491,23 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       });
     });
     return itemData;
+  }
+
+  getReturnedItemsMap(
+    items: CreateDeliveryNoteItemInterface[],
+    sales_invoice: SalesInvoice,
+  ) {
+    const returnItemsMap = {};
+    items.forEach(item => {
+      returnItemsMap[item.item_code] = item.qty;
+    });
+    for (const key of Object.keys(returnItemsMap)) {
+      if (sales_invoice.returned_items_map[key]) {
+        sales_invoice.returned_items_map[key] += returnItemsMap[key];
+      } else {
+        sales_invoice.returned_items_map[key] = returnItemsMap[key];
+      }
+    }
+    return sales_invoice.returned_items_map;
   }
 }
