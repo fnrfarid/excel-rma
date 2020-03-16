@@ -5,6 +5,7 @@ import {
   ValidateNested,
   IsNumber,
   IsOptional,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -59,6 +60,6 @@ export class StockEntryItemDto {
   qty: number;
 
   @IsNotEmpty()
-  @IsString()
-  serial_no: string;
+  @IsArray()
+  serial_no: string[];
 }
