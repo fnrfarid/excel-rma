@@ -8,6 +8,7 @@ import { ErrorLogService } from '../../../error-log/error-log-service/error-log.
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
+import { PurchaseReceiptSyncService } from '../../schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 
 describe('PurchaseInvoiceAggregateService', () => {
   let service: PurchaseReceiptAggregateService;
@@ -46,6 +47,10 @@ describe('PurchaseInvoiceAggregateService', () => {
         },
         {
           provide: DirectService,
+          useValue: {},
+        },
+        {
+          provide: PurchaseReceiptSyncService,
           useValue: {},
         },
       ],

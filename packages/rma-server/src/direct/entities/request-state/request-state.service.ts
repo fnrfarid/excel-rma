@@ -23,6 +23,10 @@ export class RequestStateService {
     return await this.requestStateRepository.findOne(params);
   }
 
+  async findAndModify(query, update, options?) {
+    return await this.requestStateRepository.findOneAndUpdate(query, update);
+  }
+
   async count() {
     return await this.requestStateRepository.count();
   }

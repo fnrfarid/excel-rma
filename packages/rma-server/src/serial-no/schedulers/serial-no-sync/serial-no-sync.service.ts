@@ -1,5 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CronJob } from 'cron';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import {
   flatMap,
   toArray,
@@ -9,6 +8,7 @@ import {
 } from 'rxjs/operators';
 import { of, from, throwError } from 'rxjs';
 import * as uuidv4 from 'uuid/v4';
+import * as Agenda from 'agenda';
 
 import { SyncAggregateService } from '../../../sync/aggregates/sync-aggregate/sync-aggregate.service';
 import { SERIAL_NO_DOCTYPE_NAME } from '../../../constants/app-strings';
@@ -16,19 +16,22 @@ import { RequestStateService } from '../../../direct/entities/request-state/requ
 import { SyncAlreadyInProgressException } from '../../../constants/exceptions';
 import { SerialNoService } from '../../entity/serial-no/serial-no.service';
 import { SerialNo } from '../../entity/serial-no/serial-no.entity';
+import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
-export const SERIAL_NO_SYNC_CRON_STRING = '0 */15 * * * *';
+export const SERIAL_NO_SYNC_SCHEDULE = 'SERIAL_NO_SYNC_SCHEDULE';
 
 @Injectable()
 export class SerialNoSyncService implements OnModuleInit {
   constructor(
+    @Inject(AGENDA_TOKEN)
+    private readonly agenda: Agenda,
     private readonly sync: SyncAggregateService,
     private readonly serial: SerialNoService,
     private readonly requestState: RequestStateService,
   ) {}
 
   onModuleInit() {
-    const job = new CronJob(SERIAL_NO_SYNC_CRON_STRING, async () => {
+    this.agenda.define(SERIAL_NO_SYNC_SCHEDULE, async job => {
       from(this.requestState.findOne({ syncDocType: SERIAL_NO_DOCTYPE_NAME }))
         .pipe(
           switchMap(state => {
@@ -96,6 +99,10 @@ export class SerialNoSyncService implements OnModuleInit {
           error: error => {},
         });
     });
-    job.start();
+
+    this.agenda
+      .every('15 minutes', SERIAL_NO_SYNC_SCHEDULE)
+      .then(scheduled => {})
+      .catch(error => {});
   }
 }

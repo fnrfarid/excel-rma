@@ -39,7 +39,6 @@ import {
   SERIAL_NO_DOCTYPE_NAME,
   MONGO_INSERT_MANY_BATCH_NUMBER,
   SERIAL_NO_VALIDATION_BATCH_SIZE,
-  VALIDATE_AUTH_STRING,
 } from '../../../constants/app-strings';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
@@ -48,10 +47,9 @@ import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { PurchaseReceiptService } from '../../../purchase-receipt/entity/purchase-receipt.service';
-import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
-import { DirectService } from '../../../direct/aggregates/direct/direct.service';
+import { PurchaseReceiptSyncService } from '../../schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -63,7 +61,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     private readonly errorLogService: ErrorLogService,
     private readonly purchaseReceiptService: PurchaseReceiptService,
     private readonly serialNoService: SerialNoService,
-    private readonly tokenService: DirectService,
+    private readonly prSyncService: PurchaseReceiptSyncService,
   ) {
     super();
   }
@@ -172,24 +170,14 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           if (response.message === 0) {
             return bulk
               ? of(true)
-              : this.createFrappeSerials(
-                  createSerialsBatch,
-                  body,
-                  settings,
-                  clientHttpRequest,
-                );
+              : this.createFrappeSerials(createSerialsBatch, body);
           }
           return of(response.message);
         }),
       );
   }
 
-  createFrappeSerials(
-    createSerialsBatch,
-    body: PurchaseReceiptDto,
-    settings: ServerSettings,
-    clientHttpRequest,
-  ) {
+  createFrappeSerials(createSerialsBatch, body: PurchaseReceiptDto) {
     const keys = Object.keys(createSerialsBatch);
     return from(keys).pipe(
       mergeMap(item_code => {
@@ -226,11 +214,12 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchaseReceipt: PurchaseReceiptDto,
     item: PurchaseReceiptItemDto,
   ) {
+    // this needs to change unnecessary mergemap createdSerial is now a Batch. no need for pipe.
     return from(createdSerialsBatch[item_code]).pipe(
-      mergeMap(data => {
+      mergeMap(serial => {
         return of({
           doctype: SERIAL_NO_DOCTYPE_NAME,
-          serial_no: data,
+          serial_no: serial,
           item_code,
           purchase_date: purchaseReceipt.posting_date,
           purchase_time: purchaseReceipt.posting_time,
@@ -298,14 +287,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchase_invoice_name,
     batch: SerialMapResponseInterface,
   ) {
-    return from(
-      this.createFrappeSerials(
-        batch.createSerialsBatch,
-        body,
-        settings,
-        clientHttpRequest,
-      ),
-    )
+    return from(this.createFrappeSerials(batch.createSerialsBatch, body))
       .pipe(
         switchMap(data => {
           return of(true);
@@ -348,8 +330,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           purchase_invoice_name,
           batch,
         );
-        return throwError(new BadRequestException());
-        // return of({});
+        return of({});
       }),
     );
   }
@@ -378,84 +359,17 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         }),
         bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
         concatMap(receipt => {
-          return of({}).pipe(
-            mergeMap(object => {
-              return this.frappeInsertMany(
-                settings,
-                receipt,
-                clientHttpRequest,
-              );
-            }),
-            catchError(err => {
-              if (
-                (err.response && err.response.status === 403) ||
-                (err.response.data &&
-                  err.response.data.exc.includes(VALIDATE_AUTH_STRING))
-              ) {
-                return this.tokenService
-                  .getUserAccessToken(clientHttpRequest.token.email)
-                  .pipe(
-                    mergeMap(token => {
-                      clientHttpRequest.token.accessToken = token.accessToken;
-                      return throwError(new BadRequestException(err));
-                    }),
-                  );
-              }
-              return throwError(new BadRequestException(err));
-            }),
-            retry(3),
-          );
+          this.prSyncService.addToQueueNow({
+            payload: receipt,
+            token: clientHttpRequest.token,
+            settings,
+            purchase_invoice_name,
+          });
+          return of({});
         }),
       )
       .subscribe({
-        next: (success: { data: { message: string[] }; config: any }) => {
-          this.purchaseInvoiceService
-            .updateOne(
-              { name: purchase_invoice_name },
-              {
-                $push: {
-                  purchase_receipt_names: { $each: success.data.message },
-                },
-                $set: { status: COMPLETED_STATUS },
-              },
-            )
-            .then(done => {})
-            .catch(error => {});
-
-          const purchaseReceiptMany = [];
-          const data = JSON.parse(JSON.parse(success.config.data).docs);
-
-          data.forEach(item => {
-            const purchaseReceiptMetaData = this.mapPurchaseReceiptMetaData(
-              item,
-              clientHttpRequest,
-              purchase_invoice_name,
-            );
-            this.updatePurchaseReceiptSerials(purchaseReceiptMetaData);
-            purchaseReceiptMany.push(...purchaseReceiptMetaData);
-          });
-
-          this.purchaseReceiptService
-            .insertMany(purchaseReceiptMany)
-            .then(done => {})
-            .catch(error => {});
-
-          purchaseReceiptMany.forEach(element => {
-            this.serialNoService
-              .updateMany(
-                { serial_no: { $in: element.serial_no } },
-                {
-                  $set: {
-                    warehouse: element.warehouse,
-                    purchase_document_type: element.purchase_document_type,
-                    purchase_document_no: element.purchase_document_no,
-                  },
-                },
-              )
-              .then(done => {})
-              .catch(error => {});
-          });
-        },
+        next: success => {},
         error: err => {
           this.errorLogService.createErrorLog(
             err,
@@ -465,23 +379,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           );
         },
       });
-  }
-
-  frappeInsertMany(
-    settings: ServerSettings,
-    body,
-    clientHttpRequest,
-  ): Observable<any> {
-    return this.http.post<any>(
-      settings.authServerURL + FRAPPE_API_INSERT_MANY,
-      { docs: JSON.stringify(body) },
-      {
-        headers: this.settingsService.getAuthorizationHeaders(
-          clientHttpRequest.token,
-        ),
-        timeout: 10000000,
-      },
-    );
   }
 
   getMapPurchaseReceipts(body: PurchaseReceiptDto) {
@@ -664,6 +561,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     const body = purchaseInvoicePayload;
     return { body, item_count };
   }
+
   async retrievePurchaseInvoice(uuid: string, req) {
     return;
   }
