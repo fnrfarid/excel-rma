@@ -21,6 +21,8 @@ export class PurchaseReceiptItemDto {
   @IsString()
   warehouse: string;
 
+  purchase_order?: string;
+
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)

@@ -24,6 +24,9 @@ export class PurchaseReceipt {
   item_name: string;
 
   @Column()
+  purchase_order?: string;
+
+  @Column()
   name: string;
 
   @Column()
