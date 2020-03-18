@@ -1,5 +1,5 @@
 import { PurchaseReceiptAggregateService } from './purchase-receipt-aggregate/purchase-receipt-aggregate.service';
 
-export const PurchaseInvoiceAggregatesManager = [
+export const PurchaseReceiptAggregatesManager = [
   PurchaseReceiptAggregateService,
 ];

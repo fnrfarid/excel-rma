@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PurchaseInvoiceAggregatesManager } from './aggregates';
+import { PurchaseReceiptAggregatesManager } from './aggregates';
 import { PurchaseReceiptController } from './controllers/purchase-receipt/purchase-receipt.controller';
 import { PurchaseInvoiceEntitiesModule } from '../purchase-invoice/entity/entity.module';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurchaseReceiptService } from './entity/purchase-receipt.service';
 import { PurchaseReceipt } from './entity/purchase-receipt.entity';
 import { DirectModule } from '../direct/direct.module';
+import { PurchaseReceiptSchedularManager } from './schedular';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { DirectModule } from '../direct/direct.module';
   ],
   controllers: [PurchaseReceiptController],
   providers: [
-    ...PurchaseInvoiceAggregatesManager,
+    ...PurchaseReceiptAggregatesManager,
+    ...PurchaseReceiptSchedularManager,
     PurchaseReceiptPoliciesService,
     PurchaseReceiptService,
   ],

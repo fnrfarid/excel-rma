@@ -20,7 +20,6 @@ import { DirectModule } from '../direct/direct.module';
     ...ItemCommandHandlers,
     ...ItemEventHandlers,
     ItemPoliciesService,
-    // ItemSyncService,
   ],
   exports: [ItemEntitiesModule, ...ItemAggregatesManager],
 })
