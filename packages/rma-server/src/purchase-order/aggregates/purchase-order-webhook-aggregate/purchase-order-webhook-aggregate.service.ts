@@ -142,9 +142,20 @@ export class PurchaseOrderWebhookAggregateService {
               }),
             );
         }),
+        map(data => {
+          return data.data.message;
+        }),
       )
       .subscribe({
-        next: invoice => {},
+        next: invoice => {
+          this.purchaseOrderService
+            .updateOne(
+              { name: order.name },
+              { $set: { purchase_invoice_name: invoice.name } },
+            )
+            .then(success => {})
+            .catch(error => {});
+        },
         error: error => {
           const errorJson = JSON.stringify(
             error,

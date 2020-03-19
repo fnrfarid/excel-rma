@@ -126,6 +126,8 @@ export class PurchaseOrder {
   @Column()
   doctype: string;
   @Column()
+  purchase_invoice_name: string;
+  @Column()
   items: PurchaseOrderItem[];
   @Column()
   pricing_rules: any[];

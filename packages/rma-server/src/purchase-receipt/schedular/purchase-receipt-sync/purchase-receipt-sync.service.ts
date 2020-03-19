@@ -86,6 +86,9 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
             }),
           );
         }
+        if (err.response && err.response.status === 417) {
+          return of({});
+        }
         return throwError(new BadRequestException(err));
       }),
       retry(3),
@@ -212,6 +215,9 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
     settings: any;
     purchase_invoice_name: string;
   }) {
-    this.agenda.now(CREATE_PURCHASE_RECEIPT_JOB, data);
+    this.agenda
+      .now(CREATE_PURCHASE_RECEIPT_JOB, data)
+      .then(success => {})
+      .catch(err => {});
   }
 }
