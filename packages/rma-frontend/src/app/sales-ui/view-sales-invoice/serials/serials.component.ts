@@ -251,16 +251,16 @@ export class SerialsComponent implements OnInit {
 
   getSalesInvoice(uuid: string) {
     return this.salesService.getSalesInvoice(uuid).subscribe({
-      next: (itemList: SalesInvoiceDetails) => {
-        if (itemList.delivery_note_items) {
-          this.getDeliveredSerials(itemList.uuid);
+      next: (sales_invoice: SalesInvoiceDetails) => {
+        if (sales_invoice.delivery_note_items) {
+          this.getDeliveredSerials(sales_invoice.uuid);
         }
-        this.salesInvoiceDetails = itemList as SalesInvoiceDetails;
+        this.salesInvoiceDetails = sales_invoice as SalesInvoiceDetails;
         this.disableDeliveredSerialsCard =
           Object.keys(this.salesInvoiceDetails.delivered_items_map).length === 0
             ? true
             : false;
-        this.filteredItemList = this.getFilteredItems(itemList);
+        this.filteredItemList = this.getFilteredItems(sales_invoice);
         this.itemDataSource.loadItems(
           this.filteredItemList.filter(item => {
             item.assigned = 0;
