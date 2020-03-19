@@ -30,4 +30,5 @@ export class PurchaseInvoiceDetails {
   items?: Item[];
   contact_display?: string;
   purchase_receipt_items: any[];
+  purchase_receipt_items_map?: any;
 }

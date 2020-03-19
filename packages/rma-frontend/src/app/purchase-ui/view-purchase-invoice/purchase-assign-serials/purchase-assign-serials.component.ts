@@ -82,6 +82,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     'delete',
   ];
   serialDataSource: SerialDataSource;
+  filteredItemList = [];
 
   constructor(
     private readonly snackBar: MatSnackBar,
@@ -101,7 +102,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.itemDataSource = new ItemDataSource();
     this.purchaseReceiptDate = this.getParsedDate(this.date.value);
     this.getPuchaseInvoice(this.route.snapshot.params.invoiceUuid);
-    this.purchaseInvoiceDetails = {} as PurchaseInvoiceDetails;
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
@@ -110,12 +110,27 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     );
   }
 
+  getFilteredItems(purchaseInvoice: PurchaseInvoiceDetails) {
+    const filteredItemList = [];
+    purchaseInvoice.items.forEach(item => {
+      if (purchaseInvoice.purchase_receipt_items_map[item.item_code]) {
+        item.qty -= purchaseInvoice.purchase_receipt_items_map[item.item_code];
+      }
+      if (item.qty !== 0) {
+        filteredItemList.push(item);
+      }
+    });
+    return filteredItemList;
+  }
+
   getPuchaseInvoice(uuid: string) {
     this.purchaseService.getPurchaseInvoice(uuid).subscribe({
       next: (res: PurchaseInvoiceDetails) => {
-        this.purchaseInvoiceDetails = res;
+        this.purchaseInvoiceDetails = res as PurchaseInvoiceDetails;
+
+        this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(
-          res.items.filter(item => {
+          this.filteredItemList.filter(item => {
             item.assigned = 0;
             item.remaining = item.qty;
             return item;
