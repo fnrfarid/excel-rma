@@ -256,6 +256,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     clientHttpRequest,
     purchase_invoice_name: string,
   ) {
+    this.updatePurchaseReceiptItemsMap(purchase_invoice_name, payload);
     return from(
       this.purchaseOrderService.findOne({ purchase_invoice_name }),
     ).pipe(
@@ -294,11 +295,13 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
   createBatchedFrappeSerials(
     settings,
-    body,
+    body: PurchaseReceiptDto,
     clientHttpRequest,
     purchase_invoice_name,
     batch: SerialMapResponseInterface,
   ) {
+    this.updatePurchaseReceiptItemsMap(purchase_invoice_name, body);
+
     return from(this.createFrappeSerials(batch.createSerialsBatch, body))
       .pipe(
         switchMap(data => {
@@ -582,6 +585,39 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     });
     const body = purchaseInvoicePayload;
     return { body, item_count };
+  }
+
+  getPurchaseReceiptItemsMap(
+    items: PurchaseReceiptItemDto[],
+    purchase_receipt_items_map: any,
+  ) {
+    items.forEach(item => {
+      if (purchase_receipt_items_map[item.item_code]) {
+        purchase_receipt_items_map[item.item_code] += item.qty;
+      } else {
+        purchase_receipt_items_map[item.item_code] = item.qty;
+      }
+    });
+    return purchase_receipt_items_map;
+  }
+
+  updatePurchaseReceiptItemsMap(
+    purchase_invoice_name: string,
+    payload: PurchaseReceiptDto,
+  ) {
+    this.purchaseInvoiceService
+      .findOne({ name: purchase_invoice_name })
+      .then(purchase_invoice => {
+        const purchase_receipt_items_map = this.getPurchaseReceiptItemsMap(
+          payload.items,
+          purchase_invoice.purchase_receipt_items_map,
+        );
+        this.purchaseInvoiceService.updateOne(
+          { name: purchase_invoice_name },
+          { $set: { purchase_receipt_items_map } },
+        );
+      })
+      .catch(() => {});
   }
 
   async retrievePurchaseInvoice(uuid: string, req) {

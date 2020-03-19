@@ -129,6 +129,9 @@ export class PurchaseInvoice extends BaseEntity {
 
   @Column()
   purchase_receipt_names: string[];
+
+  @Column()
+  purchase_receipt_items_map: any = {};
 }
 
 export class PurchaseReceiptMetaData {

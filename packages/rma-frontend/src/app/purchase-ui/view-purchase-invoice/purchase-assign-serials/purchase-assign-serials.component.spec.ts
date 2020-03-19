@@ -47,7 +47,8 @@ describe('PurchaseAssignSerialsComponent', () => {
         {
           provide: PurchaseService,
           useValue: {
-            getPurchaseInvoice: (...args) => of({ items: [] }),
+            getPurchaseInvoice: (...args) =>
+              of({ items: [], purchase_receipt_items_map: {} }),
           },
         },
         {
