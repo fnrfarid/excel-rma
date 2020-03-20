@@ -21,6 +21,7 @@
     <ion-fab-button
       *ngIf="calledFrom === 'add'"
       class="fab-position"
+      [disabled]="salesInvoiceForm.invalid"
       (click)="submitDraft()"
     >
       <ion-icon name="add"></ion-icon>
@@ -28,172 +29,184 @@
     <ion-fab-button
       *ngIf="calledFrom === 'edit'"
       class="fab-position"
+      [disabled]="salesInvoiceForm.invalid"
       (click)="updateSalesInvoice()"
     >
       <ion-icon name="create"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-text color="tertiary">
-          Details
-        </ion-text>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-grid class="ion-no-padding">
-        <ion-row class="align">
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                matInput
-                placeholder="Naming Series"
-                readonly
-                value="SINV-####"
-              />
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                matInput
-                placeholder="Company"
-                readonly
-                [formControl]="companyFormControl"
-              />
-              <mat-error *ngIf="companyFormControl.hasError('required')">
-                Company is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row class="align">
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                type="text"
-                placeholder="Select Customer"
-                matInput
-                [formControl]="customerFormControl"
-                [matAutocomplete]="auto"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #auto="matAutocomplete"
-                [displayWith]="getOptionText"
-                (optionSelected)="customerChanged($event.option.value)"
-              >
-                <mat-option
-                  *ngFor="let option of filteredCustomerList | async"
-                  [value]="option"
+  <form [formGroup]="salesInvoiceForm">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Details
+          </ion-text>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="ion-no-padding">
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  placeholder="Naming Series"
+                  readonly
+                  value="SINV-####"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Company"
+                  readonly
+                  formControlName="company"
+                />
+                <mat-error *ngIf="f.company.hasError('required')">
+                  Company is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select Customer"
+                  matInput
+                  formControlName="customer"
+                  [matAutocomplete]="auto"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #auto="matAutocomplete"
+                  [displayWith]="getOptionText"
+                  (optionSelected)="customerChanged($event.option.value)"
                 >
-                  {{ option.customer_name }}
-                </mat-option>
-              </mat-autocomplete>
-              <mat-error *ngIf="customerFormControl.hasError('required')">
-                Customer is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                matInput
-                [matDatepicker]="postingDate"
-                placeholder="Posting Date"
-                readonly
-                [formControl]="postingDateFormControl"
-                (dateChange)="selectedPostingDate($event)"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="postingDate"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #postingDate disabled="false"></mat-datepicker>
-              <mat-error *ngIf="postingDateFormControl.hasError('required')">
-                Posting Date is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row class="align">
-          <ion-col size-md="6">
-            <mat-form-field class="example-full-width">
-              <input
-                type="text"
-                placeholder="Select Warehouse"
-                matInput
-                [formControl]="warehouseFormControl"
-                [matAutocomplete]="warehouse"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #warehouse="matAutocomplete"
-                (optionSelected)="updateStockBalance($event.option.value)"
-              >
-                <mat-option
-                  *ngFor="let warehouse of filteredWarehouseList | async"
-                  [value]="warehouse.name"
+                  <mat-option
+                    *ngFor="let option of filteredCustomerList | async"
+                    [value]="option"
+                  >
+                    {{ option.customer_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.customer.hasError('required')">
+                  Customer is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  matInput
+                  [matDatepicker]="postingDate"
+                  placeholder="Posting Date"
+                  readonly
+                  formControlName="postingDate"
+                  (dateChange)="selectedPostingDate($event)"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="postingDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #postingDate disabled="false"></mat-datepicker>
+                <mat-error *ngIf="f.postingDate.hasError('required')">
+                  Posting Date is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col size-md="6">
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select Warehouse"
+                  matInput
+                  formControlName="warehouse"
+                  [matAutocomplete]="warehouse"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #warehouse="matAutocomplete"
+                  (optionSelected)="updateStockBalance($event.option.value)"
                 >
-                  {{ warehouse.name }}
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                matInput
-                [matDatepicker]="dueDate"
-                placeholder="Due Date"
-                readonly
-                [formControl]="dueDateFormControl"
-                (dateChange)="selectedDueDate($event)"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="dueDate"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #dueDate disabled="false"></mat-datepicker>
-              <mat-error *ngIf="dueDateFormControl.hasError('required')">
-                Due Date is <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <mat-form-field class="mat-input-wrapper" appearance="none">
-              <mat-checkbox matInput [formControl]="campaignInvoiceFormControl">
-                Campaign Invoice
-              </mat-checkbox>
-              <input matInput disabled />
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                matInput
-                placeholder="Remaining Balance"
-                readonly
-                [value]="remainingBalanceFormControl.value | curFormat | async"
-                [formControl]="remainingBalanceFormControl"
-              />
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size-md="6">
-            <mat-form-field class="example-full-width">
-              <mat-label>Remarks</mat-label>
-              <textarea matInput [(ngModel)]="remarks"></textarea>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
+                  <mat-option
+                    *ngFor="let warehouse of filteredWarehouseList | async"
+                    [value]="warehouse.name"
+                  >
+                    {{ warehouse.name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.warehouse.hasError('required')">
+                  Warehouse is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  matInput
+                  [matDatepicker]="dueDate"
+                  placeholder="Due Date"
+                  readonly
+                  formControlName="dueDate"
+                  (dateChange)="selectedDueDate($event)"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="dueDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #dueDate disabled="false"></mat-datepicker>
+                <mat-error *ngIf="f.dueDate.hasError('required')">
+                  Due Date is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="mat-input-wrapper" appearance="none">
+                <mat-checkbox matInput formControlName="campaign">
+                  Campaign Invoice
+                </mat-checkbox>
+                <input matInput disabled />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  placeholder="Remaining Balance"
+                  readonly
+                  formControlName="balance"
+                  [value]="salesInvoiceForm.get('balance').value | curFormat | async"
+                />
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size-md="6">
+              <mat-form-field class="example-full-width">
+                <mat-label>Remarks</mat-label>
+                <textarea matInput formControlName="remarks"></textarea>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </form>
+
   <ion-card>
     <ion-card-header>
       <ion-row class="align">
@@ -362,7 +375,9 @@
         </ion-text>
       </ion-card-title>
     </ion-card-header>
-    <ion-card-content *ngIf="address.name && customerFormControl.value">
+    <ion-card-content
+      *ngIf="address.name && salesInvoiceForm.get('customer').value"
+    >
       <ion-grid class="ion-no-padding">
         <ion-row>
           <ion-col>
@@ -379,7 +394,9 @@
         </ion-row>
       </ion-grid>
     </ion-card-content>
-    <ion-card-content *ngIf="!address.name && customerFormControl.value ">
+    <ion-card-content
+      *ngIf="!address.name && salesInvoiceForm.get('customer').value "
+    >
       <ion-text class="example-full-width">
         No address assigned to customer
       </ion-text>
