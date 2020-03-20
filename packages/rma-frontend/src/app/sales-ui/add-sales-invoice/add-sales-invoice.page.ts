@@ -86,6 +86,9 @@ export class AddSalesInvoicePage implements OnInit {
           this.calculateTotal(res.items);
           this.salesInvoiceForm.get('campaign').setValue(res.isCampaign);
           this.salesInvoiceForm.get('remarks').setValue(res.remarks);
+          this.salesInvoiceForm
+            .get('warehouse')
+            .setValue(res.delivery_warehouse);
         },
       });
     }
