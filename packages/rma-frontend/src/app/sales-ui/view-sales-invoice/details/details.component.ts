@@ -97,6 +97,12 @@ export class DetailsComponent implements OnInit {
           this.location.back();
         },
         error: err => {
+          const errMessage = err.error.message.split('\\n');
+          this.snackBar.open(
+            errMessage[errMessage.length - 2].split(':')[1],
+            CLOSE,
+            { duration: 2500 },
+          );
           loading.dismiss();
         },
       });
@@ -120,8 +126,6 @@ export class DetailsComponent implements OnInit {
       },
     });
   }
-
-  async presentAlertConfirm() {}
 
   async cancelSalesInvoice() {
     const alert = await this.alertController.create({

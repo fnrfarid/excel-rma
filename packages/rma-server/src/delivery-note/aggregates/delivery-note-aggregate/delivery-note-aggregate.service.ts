@@ -24,6 +24,7 @@ import {
   BEARER_HEADER_VALUE_PREFIX,
   DELIVERY_NOTE_LIST_FIELD,
   COMPLETED_STATUS,
+  TO_DELIVER_STATUS,
 } from '../../../constants/app-strings';
 import { AssignSerialDto } from '../../../serial-no/entity/serial-no/assign-serial-dto';
 import {
@@ -46,6 +47,7 @@ import * as uuidv4 from 'uuid/v4';
 import { DeliveryNoteDeletedEvent } from '../../events/delivery-note-deleted/delivery-note-deleted-event';
 import { DeliveryNoteCreatedEvent } from '../../events/delivery-note-created/delivery-note-created-event';
 import { CreateDeliveryNoteDto } from '../../entity/delivery-note-service/create-delivery-note.dto';
+import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
   constructor(
@@ -190,13 +192,14 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
                     delivered_items_map[key];
                 }
               }
+              const status = this.getStatus(sales_invoice);
               this.salesInvoiceService
                 .updateMany(
                   { name: assignPayload.sales_invoice_name },
                   {
                     $push: { delivery_note_items: { $each: items } },
                     $set: {
-                      status: COMPLETED_STATUS,
+                      status,
                       delivered_items_map: sales_invoice.delivered_items_map,
                     },
                   },
@@ -214,6 +217,15 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           );
         }),
       );
+  }
+
+  getStatus(sales_invoice: SalesInvoice) {
+    let total = 0;
+    for (const key of Object.keys(sales_invoice.delivered_items_map)) {
+      total += sales_invoice.delivered_items_map[key];
+    }
+    if (total === sales_invoice.total_qty) return COMPLETED_STATUS;
+    else return TO_DELIVER_STATUS;
   }
 
   mapCreateDeliveryNote(

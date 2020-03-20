@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { Observable, throwError, of, from, forkJoin } from 'rxjs';
 import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
 import { Location } from '@angular/common';
@@ -42,17 +42,14 @@ export class AddSalesInvoicePage implements OnInit {
   postingDate: string;
   dueDate: string;
   address = {} as any;
-  remarks = '';
   displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
-  warehouseFormControl = new FormControl('');
   filteredWarehouseList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
-  companyFormControl = new FormControl('', [Validators.required]);
-  customerFormControl = new FormControl('', [Validators.required]);
-  postingDateFormControl = new FormControl('', [Validators.required]);
-  dueDateFormControl = new FormControl('', [Validators.required]);
-  campaignInvoiceFormControl = new FormControl('');
-  remainingBalanceFormControl = new FormControl('');
+  salesInvoiceForm: FormGroup;
+
+  get f() {
+    return this.salesInvoiceForm.controls;
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -65,44 +62,55 @@ export class AddSalesInvoicePage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
-    this.postingDateFormControl.setValue(new Date());
+    this.salesInvoiceForm.get('postingDate').setValue(new Date());
     this.calledFrom = this.route.snapshot.params.calledFrom;
     if (this.calledFrom === 'edit') {
       this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
       this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
         next: (res: SalesInvoiceDetails) => {
-          this.companyFormControl.setValue(res.company);
-          this.customerFormControl.setValue({
+          this.salesInvoiceForm.get('company').setValue(res.company);
+          this.salesInvoiceForm.get('customer').setValue({
             customer_name: res.customer,
             owner: res.contact_email,
           });
           this.getRemainingBalance();
-          this.postingDateFormControl.setValue(new Date(res.posting_date));
-          this.dueDateFormControl.setValue(new Date(res.due_date));
+          this.salesInvoiceForm
+            .get('postingDate')
+            .setValue(new Date(res.posting_date));
+          this.salesInvoiceForm.get('dueDate').setValue(new Date(res.due_date));
           this.dataSource.loadItems(res.items);
           this.calculateTotal(res.items);
-          this.campaignInvoiceFormControl.setValue(res.isCampaign);
+          this.salesInvoiceForm.get('campaign').setValue(res.isCampaign);
+          this.salesInvoiceForm.get('remarks').setValue(res.remarks);
+          this.salesInvoiceForm
+            .get('warehouse')
+            .setValue(res.delivery_warehouse);
         },
       });
     }
-    this.filteredCustomerList = this.customerFormControl.valueChanges.pipe(
-      startWith(''),
-      switchMap(value => {
-        return this.salesService
-          .getCustomerList(value)
-          .pipe(map(res => res.docs));
-      }),
-    );
+    this.filteredCustomerList = this.salesInvoiceForm
+      .get('customer')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService
+            .getCustomerList(value)
+            .pipe(map(res => res.docs));
+        }),
+      );
 
-    this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
-      startWith(''),
-      switchMap(value => {
-        return this.salesService.getWarehouseList(value);
-      }),
-    );
+    this.filteredWarehouseList = this.salesInvoiceForm
+      .get('warehouse')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getWarehouseList(value);
+        }),
+      );
 
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -113,12 +121,16 @@ export class AddSalesInvoicePage implements OnInit {
             .getItems([DEFAULT_COMPANY])
             .then(items => {
               if (items[DEFAULT_COMPANY]) {
-                this.companyFormControl.setValue(items[DEFAULT_COMPANY]);
+                this.salesInvoiceForm
+                  .get('company')
+                  .setValue(items[DEFAULT_COMPANY]);
                 this.getRemainingBalance();
               } else {
                 this.getApiInfo().subscribe({
                   next: res => {
-                    this.companyFormControl.setValue(res.defaultCompany);
+                    this.salesInvoiceForm
+                      .get('company')
+                      .setValue(res.defaultCompany);
                   },
                   error: error => {},
                 });
@@ -129,6 +141,19 @@ export class AddSalesInvoicePage implements OnInit {
       });
   }
 
+  createFormGroup() {
+    this.salesInvoiceForm = new FormGroup({
+      warehouse: new FormControl('', [Validators.required]),
+      company: new FormControl('', [Validators.required]),
+      customer: new FormControl('', [Validators.required]),
+      postingDate: new FormControl('', [Validators.required]),
+      dueDate: new FormControl('', [Validators.required]),
+      campaign: new FormControl(''),
+      balance: new FormControl(''),
+      remarks: new FormControl(''),
+    });
+  }
+
   addItem() {
     const data = this.dataSource.data();
     const item = {} as Item;
@@ -137,7 +162,9 @@ export class AddSalesInvoicePage implements OnInit {
     item.rate = 0;
     item.item_code = '';
     item.minimumPrice = 0;
-    item.stock = this.warehouseFormControl.value ? 'Select an Item' : '';
+    item.stock = this.salesInvoiceForm.get('warehouse').value
+      ? 'Select an Item'
+      : '';
     data.push(item);
     this.dataSource.update(data);
   }
@@ -169,7 +196,7 @@ export class AddSalesInvoicePage implements OnInit {
   getWarehouseStock(item_code: string) {
     return this.itemPriceService.getStockBalance(
       item_code,
-      this.warehouseFormControl.value,
+      this.salesInvoiceForm.get('warehouse').value,
     );
   }
 
@@ -179,7 +206,7 @@ export class AddSalesInvoicePage implements OnInit {
     }
     const copy = this.dataSource.data().slice();
     Object.assign(row, item);
-    if (this.warehouseFormControl.value) {
+    if (this.salesInvoiceForm.get('warehouse').value) {
       this.getWarehouseStock(item.item_code).subscribe({
         next: res => {
           row.qty = 1;
@@ -233,8 +260,8 @@ export class AddSalesInvoicePage implements OnInit {
     if (customer.credit_days) {
       const date = new Date();
       date.setDate(date.getDate() + customer.credit_days);
-      this.dueDateFormControl.setValue(date);
-    } else this.dueDateFormControl.setValue('');
+      this.salesInvoiceForm.get('dueDate').setValue(date);
+    } else this.salesInvoiceForm.get('dueDate').setValue('');
 
     this.salesService.getAddress(customer.name).subscribe({
       next: res => {
@@ -254,24 +281,33 @@ export class AddSalesInvoicePage implements OnInit {
     );
     if (isValid) {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
-      salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
-      salesInvoiceDetails.isCampaign = this.campaignInvoiceFormControl.value;
-      salesInvoiceDetails.company = this.companyFormControl.value;
+      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
+        'customer',
+      ).value.customer_name;
+      salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
+        'campaign',
+      ).value;
+      salesInvoiceDetails.company = this.salesInvoiceForm.get('company').value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
-        this.postingDateFormControl.value,
+        this.salesInvoiceForm.get('postingDate').value,
       );
       salesInvoiceDetails.posting_time = this.getFrappeTime();
       salesInvoiceDetails.set_posting_time = 1;
       salesInvoiceDetails.due_date = this.getParsedDate(
-        this.dueDateFormControl.value,
+        this.salesInvoiceForm.get('dueDate').value,
       );
       salesInvoiceDetails.territory = 'All Territories';
       salesInvoiceDetails.update_stock = 0;
       salesInvoiceDetails.total_qty = 0;
       salesInvoiceDetails.total = 0;
-      salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
+      salesInvoiceDetails.contact_email = this.salesInvoiceForm.get(
+        'customer',
+      ).value.owner;
       salesInvoiceDetails.status = DRAFT;
-      salesInvoiceDetails.remarks = this.remarks;
+      salesInvoiceDetails.remarks = this.salesInvoiceForm.get('remarks').value;
+      salesInvoiceDetails.delivery_warehouse = this.salesInvoiceForm.get(
+        'warehouse',
+      ).value;
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;
@@ -311,23 +347,31 @@ export class AddSalesInvoicePage implements OnInit {
     );
     if (isValid) {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
-      salesInvoiceDetails.customer = this.customerFormControl.value.customer_name;
-      salesInvoiceDetails.isCampaign = this.campaignInvoiceFormControl.value;
-      salesInvoiceDetails.company = this.companyFormControl.value;
+      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
+        'customer',
+      ).value.customer_name;
+      salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
+        'campaign',
+      ).value;
+      salesInvoiceDetails.company = this.salesInvoiceForm.get('company').value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
-        this.postingDateFormControl.value,
+        this.salesInvoiceForm.get('postingDate').value,
       );
       salesInvoiceDetails.posting_time = this.getFrappeTime();
       salesInvoiceDetails.set_posting_time = 1;
       salesInvoiceDetails.due_date = this.getParsedDate(
-        this.dueDateFormControl.value,
+        this.salesInvoiceForm.get('dueDate').value,
       );
       salesInvoiceDetails.territory = 'All Territories';
       salesInvoiceDetails.update_stock = 0;
       salesInvoiceDetails.total_qty = 0;
       salesInvoiceDetails.total = 0;
-      salesInvoiceDetails.contact_email = this.customerFormControl.value.owner;
+      salesInvoiceDetails.contact_email = this.salesInvoiceForm.get(
+        'customer',
+      ).value.owner;
       salesInvoiceDetails.status = DRAFT;
+      salesInvoiceDetails.remarks = this.salesInvoiceForm.get('remarks').value;
+
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;
@@ -437,8 +481,8 @@ export class AddSalesInvoicePage implements OnInit {
             debtorAccount,
             time,
             'Customer',
-            this.customerFormControl.value.name,
-            this.companyFormControl.value,
+            this.salesInvoiceForm.get('customer').value.customer_name,
+            this.salesInvoiceForm.get('company').value,
             headers,
           );
         }),
@@ -450,17 +494,18 @@ export class AddSalesInvoicePage implements OnInit {
           const creditLimits: {
             company: string;
             credit_limit: number;
-          }[] = this.customerFormControl.value.credit_limits;
+          }[] = this.salesInvoiceForm.get('customer').value.credit_limits;
 
           const limits = creditLimits.filter(
-            limit => limit.company === this.companyFormControl.value,
+            limit =>
+              limit.company === this.salesInvoiceForm.get('company').value,
           );
 
           if (limits.length) {
             creditLimit = Number(limits[0].credit_limit) - Number(message);
           }
 
-          this.remainingBalanceFormControl.setValue(creditLimit);
+          this.salesInvoiceForm.get('balance').setValue(creditLimit);
         },
         error: error => {
           let frappeError = error.message || UPDATE_ERROR;
