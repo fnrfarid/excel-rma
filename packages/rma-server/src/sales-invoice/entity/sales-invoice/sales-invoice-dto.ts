@@ -60,6 +60,10 @@ export class SalesInvoiceDto {
   @Type(() => ItemDto)
   items: ItemDto[];
 
+  @IsNotEmpty()
+  @IsString()
+  delivery_warehouse: string;
+
   @IsOptional()
   @IsNumber()
   set_posting_time: number;

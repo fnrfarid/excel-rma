@@ -268,6 +268,7 @@ export class SerialsComponent implements OnInit {
             return item;
           }),
         );
+        this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
       },
       error: err => {
         this.snackBar.open(

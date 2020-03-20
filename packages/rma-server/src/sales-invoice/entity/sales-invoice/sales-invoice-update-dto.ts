@@ -128,6 +128,9 @@ export class SalesInvoiceUpdateDto {
 
   @IsOptional()
   isCampaign: boolean;
+
+  @IsOptional()
+  remarks: string;
 }
 
 export class TaxDto {
