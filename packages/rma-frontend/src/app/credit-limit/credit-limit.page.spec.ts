@@ -49,7 +49,12 @@ describe('CreditLimitPage', () => {
           },
         },
         { provide: Location, useValue: {} },
-        { provide: StorageService, useValue: {} },
+        {
+          provide: StorageService,
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
+        },
         { provide: PopoverController, useValue: {} },
       ],
     }).compileComponents();

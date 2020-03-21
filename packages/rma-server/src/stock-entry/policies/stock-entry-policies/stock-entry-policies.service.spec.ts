@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StockEntryPoliciesService } from './stock-entry-policies.service';
-import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 describe('StockEntryPoliciesService', () => {
   let service: StockEntryPoliciesService;

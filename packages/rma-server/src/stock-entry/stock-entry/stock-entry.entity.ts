@@ -39,6 +39,12 @@ export class StockEntry extends BaseEntity {
   doctype: string;
 
   @Column()
+  inQueue: boolean;
+
+  @Column()
+  isSynced: boolean;
+
+  @Column()
   items: StockEntryItem[];
 }
 

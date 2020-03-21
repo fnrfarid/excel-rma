@@ -17,7 +17,9 @@ describe('csvJsonService', () => {
         },
         {
           provide: StorageService,
-          useValue: {},
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
         },
         {
           provide: SalesService,
