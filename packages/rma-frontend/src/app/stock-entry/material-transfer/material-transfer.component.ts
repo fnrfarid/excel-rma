@@ -34,6 +34,7 @@ export class MaterialTransferComponent implements OnInit {
     toRange: '',
     serials: [],
   };
+  company: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
   warehouseState = {
@@ -63,13 +64,15 @@ export class MaterialTransferComponent implements OnInit {
     this.onToRange(this.value);
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
     this.materialTransferDataSource = new MaterialTransferDataSource();
     this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        return this.salesService.getWarehouseList(value);
+        const filter = `[["name","like","%${value}%"],["company","=","${this.company}"]]`;
+        return this.salesService.getWarehouseList(value, filter);
       }),
     );
 
@@ -77,7 +80,8 @@ export class MaterialTransferComponent implements OnInit {
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        return this.salesService.getWarehouseList(value);
+        const filter = `[["name","like","%${value}%"],["company","=","${this.company}"]]`;
+        return this.salesService.getWarehouseList(value, filter);
       }),
     );
   }
@@ -178,7 +182,7 @@ export class MaterialTransferComponent implements OnInit {
     }
     const body = new MaterialTransferDto();
     const date = await this.timeService.getDateAndTime(new Date());
-    body.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
+    body.company = this.company;
     body.posting_date = date.date;
     body.posting_time = date.time;
     body.stock_entry_type = MATERIAL_TRANSFER;

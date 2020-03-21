@@ -35,7 +35,12 @@ describe('ItemPricePage', () => {
       providers: [
         { provide: ItemPriceService, useValue: {} },
         { provide: Location, useValue: {} },
-        { provide: StorageService, useValue: {} },
+        {
+          provide: StorageService,
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
+        },
       ],
     }).compileComponents();
   }));
