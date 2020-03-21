@@ -2,8 +2,8 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import {
   StockEntryDto,
   StockEntryItemDto,
-} from '../stock-entry/stock-entry-dto';
-import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
+} from '../../stock-entry/stock-entry-dto';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { switchMap } from 'rxjs/operators';
 import { from, of, throwError } from 'rxjs';
 

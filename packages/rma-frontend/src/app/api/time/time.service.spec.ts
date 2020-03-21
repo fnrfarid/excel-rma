@@ -9,7 +9,9 @@ describe('TimeService', () => {
         TimeService,
         {
           provide: StorageService,
-          useValue: {},
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
         },
       ],
     }),

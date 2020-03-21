@@ -316,12 +316,12 @@ export class SalesService {
     );
   }
 
-  getWarehouseList(value: string) {
+  getWarehouseList(value: string, filter?) {
     const url = LIST_WAREHOUSE_ENDPOINT;
     const params = new HttpParams({
       fromObject: {
         fields: '["*"]',
-        filters: `[["name","like","%${value}%"]]`,
+        filters: filter ? filter : `[["name","like","%${value}%"]]`,
       },
     });
 
