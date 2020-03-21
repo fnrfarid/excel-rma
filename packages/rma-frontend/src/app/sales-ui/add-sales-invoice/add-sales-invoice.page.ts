@@ -514,7 +514,9 @@ export class AddSalesInvoicePage implements OnInit {
       .pipe(
         switchMap(({ token, time, debtorAccount }) => {
           if (!debtorAccount) {
-            return throwError({ debtorAccountNotFound: true });
+            return throwError({
+              message: 'Please select Debtor Account in settings',
+            });
           }
           const headers = {
             [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
