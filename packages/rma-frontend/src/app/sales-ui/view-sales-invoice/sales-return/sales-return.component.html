@@ -1,11 +1,13 @@
+<ion-fab vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
+  <ion-fab-button
+    [routerLink]="['/sales/add-sales-return', invoiceUuid]"
+    class="fab-position"
+  >
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 <ion-card>
   <ion-card-content class="table-container ion-no-padding">
-    <ion-fab vertical="top" horizontal="end" slot="fixed">
-      <ion-fab-button [routerLink]="['/sales/add-sales-return', invoiceUuid]">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-
     <div class="loading-shade" *ngIf="dataSource.loading$ | async">
       <mat-progress-bar
         *ngIf="dataSource.loading$ | async"
