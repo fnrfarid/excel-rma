@@ -24,7 +24,7 @@ export class CustomerService {
     return await this.customerRepository.findOne(param, options);
   }
 
-  async list(skip, take, search, sort) {
+  async list(skip, take, search, sort, territories: string[]) {
     const sortQuery = { name: sort };
     const nameExp = new RegExp(search, 'i');
     const columns = this.customerRepository.manager.connection
@@ -36,7 +36,11 @@ export class CustomerService {
       filter[field] = nameExp;
       return filter;
     });
-    const $and: any[] = [{ $or }];
+
+    const customerQuery =
+      territories.length !== 0 ? { territory: { $in: territories } } : {};
+
+    const $and: any[] = [{ $or }, customerQuery];
 
     const where: { $and: any } = { $and };
 
