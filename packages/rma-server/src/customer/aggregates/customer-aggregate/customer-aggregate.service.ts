@@ -41,7 +41,14 @@ export class CustomerAggregateService extends AggregateRoot {
     if (sort !== 'ASC') {
       sort = 'DESC';
     }
-    return await this.customerService.list(offset, limit, search, sort);
+
+    return await this.customerService.list(
+      offset,
+      limit,
+      search,
+      sort,
+      clientHttpRequest.token.territory,
+    );
   }
 
   async removeCustomer(uuid: string) {
