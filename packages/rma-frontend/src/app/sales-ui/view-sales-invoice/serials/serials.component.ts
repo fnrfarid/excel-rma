@@ -78,6 +78,7 @@ export class SerialsComponent implements OnInit {
     'qty',
     'assigned',
     'remaining',
+    'has_serial_no',
     'add_serial',
   ];
   itemDataSource: ItemDataSource;
@@ -308,11 +309,15 @@ export class SerialsComponent implements OnInit {
       row.remaining >= 30
         ? await dialogRef.afterClosed().toPromise()
         : row.remaining;
-    if (serials) {
+    if (serials && serials <= row.remaining) {
       this.addSingularSerials(row, serials);
       this.resetRangeState();
       this.updateProductState(row, serials);
+      return;
     }
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
   }
 
   assignRangeSerial(row: Item, serials: string[]) {
@@ -322,6 +327,7 @@ export class SerialsComponent implements OnInit {
       item_name: row.item_name,
       qty: serials.length,
       rate: row.rate,
+      has_serial_no: row.has_serial_no,
       amount: row.amount,
       serial_no: serials,
     });
@@ -335,7 +341,14 @@ export class SerialsComponent implements OnInit {
   }
 
   assignSerial(itemRow: Item) {
-    if (!this.rangePickerState.serials.length) {
+    if (itemRow.has_serial_no === 0) {
+      this.addNonSerialItem(itemRow);
+      return;
+    }
+    if (
+      !this.rangePickerState.serials.length ||
+      this.rangePickerState.serials.length === 1
+    ) {
       this.assignSingularSerials(itemRow);
       return;
     }
@@ -351,6 +364,32 @@ export class SerialsComponent implements OnInit {
       { item_code: itemRow.item_code, serials: this.rangePickerState.serials },
       itemRow,
     );
+  }
+
+  async addNonSerialItem(row: Item) {
+    const dialogRef = this.dialog.open(AssignNonSerialsItemDialog, {
+      width: '250px',
+      data: { qty: row.remaining || 0, remaining: row.remaining },
+    });
+    const assignValue = await dialogRef.afterClosed().toPromise();
+    if (assignValue && assignValue <= row.remaining) {
+      const serials = this.serialDataSource.data();
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: assignValue,
+        rate: row.rate,
+        amount: row.amount,
+        has_serial_no: row.has_serial_no,
+        serial_no: ['Non Serial Item'],
+      });
+      this.serialDataSource.update(serials);
+      this.updateProductState(row.item_code, assignValue);
+      return;
+    }
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
   }
 
   validateSerial(item: { item_code: string; serials: string[] }, row: Item) {
@@ -378,6 +417,7 @@ export class SerialsComponent implements OnInit {
         item_code: row.item_code,
         item_name: row.item_name,
         qty: 1,
+        has_serial_no: row.has_serial_no,
         rate: row.rate,
         amount: row.amount,
         serial_no: [''],
@@ -424,7 +464,8 @@ export class SerialsComponent implements OnInit {
 
   async submitDeliveryNote() {
     const loading = await this.loadingController.create({
-      message: 'Creating Delivery Note...!',
+      message:
+        'Creating Delivery Note! more then 500 serials may take some time, get some coffee!',
     });
     await loading.present();
     const assignSerial = {} as SerialAssign;
@@ -453,6 +494,7 @@ export class SerialsComponent implements OnInit {
         if (item_code === item.item_code && item.serial_no) {
           serialItem.rate = item.rate;
           serialItem.qty += item.qty;
+          serialItem.has_serial_no = item.has_serial_no;
           serialItem.amount += item.qty * item.rate;
           serialItem.serial_no.push(...item.serial_no);
         }
@@ -643,6 +685,7 @@ export interface SerialItem {
   item_code: string;
   item_name: string;
   qty: number;
+  has_serial_no: number;
   rate: number;
   amount: number;
   serial_no: string[];
@@ -653,6 +696,7 @@ export interface Item {
   item_code: string;
   qty: number;
   assigned: number;
+  has_serial_no: number;
   remaining: number;
   rate?: number;
   amount?: number;
@@ -665,6 +709,20 @@ export interface Item {
 export class AssignSerialsDialog {
   constructor(
     public dialogRef: MatDialogRef<AssignSerialsDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {}
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'assign-non-serials-item-dialog',
+  templateUrl: 'assign-non-serials-item-dialog.html',
+})
+export class AssignNonSerialsItemDialog {
+  constructor(
+    public dialogRef: MatDialogRef<AssignNonSerialsItemDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {}
   onNoClick(): void {

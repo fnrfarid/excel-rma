@@ -345,6 +345,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       item_name: row.item_name,
       qty: serials.length,
       rate: row.rate,
+      has_serial_no: row.has_serial_no,
       amount: row.amount,
       serial_no: serials,
     });
@@ -427,6 +428,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         item_name: row.item_name,
         qty: 1,
         rate: row.rate,
+        has_serial_no: row.has_serial_no,
         amount: row.amount,
         serial_no: [''],
       });
