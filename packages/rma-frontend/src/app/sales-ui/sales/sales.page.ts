@@ -166,14 +166,16 @@ export class SalesPage implements OnInit {
       );
       query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
     }
-    const sortQuery = {};
+    let sortQuery = {};
     if (event) {
       for (const key of Object.keys(event)) {
-        if (key === 'active') {
+        if (key === 'active' && event.direction !== '') {
           sortQuery[event[key]] = event.direction;
         }
       }
     }
+    sortQuery =
+      Object.keys(sortQuery).length === 0 ? { created_on: 'DESC' } : sortQuery;
 
     this.dataSource.loadItems(
       sortQuery,
