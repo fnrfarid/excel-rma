@@ -97,6 +97,7 @@ export class InlineEditComponent {
               selectedItem.name = this.itemFormControl.value.name;
               selectedItem.owner = this.itemFormControl.value.owner;
               selectedItem.rate = 0;
+              selectedItem.has_serial_no = res.item.has_serial_no;
               if (res.priceListArray.length > 0) {
                 selectedItem.rate = res.priceListArray[0].price_list_rate;
               }

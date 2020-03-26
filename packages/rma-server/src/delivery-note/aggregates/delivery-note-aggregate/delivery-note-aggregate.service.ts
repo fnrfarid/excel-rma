@@ -152,7 +152,9 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           const items = [];
           const delivered_items_map = {};
           response.items.filter(item => {
-            serials.push(item.serial_no);
+            if (item.serial_no) {
+              serials.push(item.serial_no.split('\n'));
+            }
             items.push({
               item_code: item.item_code,
               item_name: item.item_name,
@@ -245,10 +247,6 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
       assignPayload.items,
       assignPayload,
     );
-    // deliveryNoteBody.pricing_rules = []
-    // deliveryNoteBody.packed_items = []
-    // deliveryNoteBody.taxes = []
-    // deliveryNoteBody.sales_team = []
     return deliveryNoteBody;
   }
 
@@ -258,7 +256,11 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
   ) {
     items.filter(element => {
       element.against_sales_invoice = assignPayload.sales_invoice_name;
-      element.serial_no = element.serial_no.join('\n');
+      if (element.has_serial_no) {
+        element.serial_no = element.serial_no.join('\n');
+      } else {
+        delete element.serial_no;
+      }
     });
     return items;
   }

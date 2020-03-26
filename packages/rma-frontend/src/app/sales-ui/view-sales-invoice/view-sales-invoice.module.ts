@@ -14,6 +14,7 @@ import { SalesReturnComponent } from './sales-return/sales-return.component';
 import {
   SerialsComponent,
   AssignSerialsDialog,
+  AssignNonSerialsItemDialog,
 } from './serials/serials.component';
 import { MaterialModule } from '../../material/material.module';
 import { EditTableComponent } from './edit-table/edit-table.component';
@@ -36,9 +37,10 @@ const routes: Routes = [
     AppCommonModule,
     RouterModule.forChild(routes),
   ],
-  entryComponents: [AssignSerialsDialog],
+  entryComponents: [AssignSerialsDialog, AssignNonSerialsItemDialog],
   declarations: [
     AssignSerialsDialog,
+    AssignNonSerialsItemDialog,
     ViewSalesInvoicePage,
     DetailsComponent,
     AccountsComponent,

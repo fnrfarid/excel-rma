@@ -1,10 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { FormControl, Validators, FormGroup } from '@angular/forms';
+import {
+  FormControl,
+  Validators,
+  FormGroup,
+  FormArray,
+  AbstractControl,
+} from '@angular/forms';
 import { Observable, throwError, of, from, forkJoin } from 'rxjs';
 import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
 import { Location } from '@angular/common';
-
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
@@ -46,7 +51,7 @@ export class AddSalesInvoicePage implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
   salesInvoiceForm: FormGroup;
-
+  itemsControl: FormArray;
   get f() {
     return this.salesInvoiceForm.controls;
   }
@@ -142,16 +147,49 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   createFormGroup() {
-    this.salesInvoiceForm = new FormGroup({
-      warehouse: new FormControl('', [Validators.required]),
-      company: new FormControl('', [Validators.required]),
-      customer: new FormControl('', [Validators.required]),
-      postingDate: new FormControl('', [Validators.required]),
-      dueDate: new FormControl('', [Validators.required]),
-      campaign: new FormControl(''),
-      balance: new FormControl(''),
-      remarks: new FormControl(''),
-    });
+    this.salesInvoiceForm = new FormGroup(
+      {
+        warehouse: new FormControl('', [Validators.required]),
+        company: new FormControl('', [Validators.required]),
+        customer: new FormControl('', [Validators.required]),
+        postingDate: new FormControl('', [Validators.required]),
+        dueDate: new FormControl('', [Validators.required]),
+        campaign: new FormControl(false),
+        balance: new FormControl(''),
+        remarks: new FormControl(''),
+        items: new FormArray([], this.itemValidator),
+      },
+      {
+        validators: [this.dueDateValidator],
+      },
+    );
+    this.itemsControl = this.salesInvoiceForm.get('items') as FormArray;
+  }
+
+  dueDateValidator(abstractControl: AbstractControl) {
+    const dueDate = abstractControl.get('dueDate').value;
+    if (!dueDate) {
+      abstractControl.get('dueDate').setErrors({ required: true });
+      return;
+    }
+    const postingDate = abstractControl.get('postingDate').value;
+
+    if (dueDate.setHours(0, 0, 0, 0) < postingDate.setHours(0, 0, 0, 0)) {
+      abstractControl.get('dueDate').setErrors({ dueDate: true });
+    } else return null;
+  }
+
+  itemValidator(items: FormArray) {
+    if (items.length === 0) {
+      return { items: true };
+    } else {
+      const itemList = items
+        .getRawValue()
+        .filter(item => item.item_name !== '');
+      if (itemList.length !== items.length) {
+        return { items: true };
+      } else return null;
+    }
   }
 
   addItem() {
@@ -166,6 +204,7 @@ export class AddSalesInvoicePage implements OnInit {
       ? 'Select an Item'
       : '';
     data.push(item);
+    this.itemsControl.push(new FormControl(item));
     this.dataSource.update(data);
   }
 
@@ -200,7 +239,7 @@ export class AddSalesInvoicePage implements OnInit {
     );
   }
 
-  updateItem(row: Item, item: Item) {
+  updateItem(row: Item, index: number, item: Item) {
     if (item == null) {
       return;
     }
@@ -223,6 +262,7 @@ export class AddSalesInvoicePage implements OnInit {
       this.calculateTotal(this.dataSource.data().slice());
       this.dataSource.update(copy);
     }
+    this.itemsControl.controls[index].setValue(item);
   }
 
   updateQuantity(row: Item, quantity: number) {
@@ -252,6 +292,7 @@ export class AddSalesInvoicePage implements OnInit {
 
   deleteRow(i: number) {
     this.dataSource.data().splice(i, 1);
+    this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
   }
@@ -472,7 +513,9 @@ export class AddSalesInvoicePage implements OnInit {
       .pipe(
         switchMap(({ token, time, debtorAccount }) => {
           if (!debtorAccount) {
-            return throwError({ debtorAccountNotFound: true });
+            return throwError({
+              message: 'Please select Debtor Account in settings',
+            });
           }
           const headers = {
             [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,

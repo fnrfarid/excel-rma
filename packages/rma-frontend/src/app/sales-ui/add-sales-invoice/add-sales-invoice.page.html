@@ -167,8 +167,15 @@
                   [for]="dueDate"
                 ></mat-datepicker-toggle>
                 <mat-datepicker #dueDate disabled="false"></mat-datepicker>
-                <mat-error *ngIf="f.dueDate.hasError('required')">
+                <mat-error
+                  *ngIf="f.dueDate.errors && f.dueDate.hasError('required')"
+                >
                   Due Date is <strong>required</strong>
+                </mat-error>
+                <mat-error
+                  *ngIf="f.dueDate.errors && f.dueDate.hasError('dueDate')"
+                >
+                  Due Date cannot be before posting date
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -238,7 +245,7 @@
           <ng-container matColumnDef="item">
             <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
             <mat-cell
-              *matCellDef="let row"
+              *matCellDef="let row;let i = index"
               [satPopoverAnchor]="p"
               tabindex="0"
               (keyup.enter)="p.open()"
@@ -255,7 +262,7 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateItem(row, $event)"
+                (closed)="updateItem(row,i,$event)"
               >
                 <inline-edit
                   style="width: 400px !important;"
