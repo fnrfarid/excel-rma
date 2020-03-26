@@ -30,6 +30,7 @@ export class PurchaseInvoiceService {
 
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
+    let dateQuery = {};
 
     try {
       sortQuery = JSON.parse(sort);
@@ -44,7 +45,19 @@ export class PurchaseInvoiceService {
       }
     }
 
-    const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
+    if (filter_query.fromDate && filter_query.toDate) {
+      dateQuery = {
+        created_on: {
+          $gte: new Date(filter_query.fromDate),
+          $lte: new Date(filter_query.toDate),
+        },
+      };
+    }
+
+    const $and: any[] = [
+      filter_query ? this.getFilterQuery(filter_query) : {},
+      dateQuery,
+    ];
 
     const where: { $and: any } = { $and };
 
@@ -67,6 +80,10 @@ export class PurchaseInvoiceService {
     keys.forEach(key => {
       if (query[key]) {
         if (key === 'status' && query[key] === 'All') {
+          delete query[key];
+        } else if (key === 'fromDate') {
+          delete query[key];
+        } else if (key === 'toDate') {
           delete query[key];
         } else {
           query[key] = new RegExp(query[key], 'i');

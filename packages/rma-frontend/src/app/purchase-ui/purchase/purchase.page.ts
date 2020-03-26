@@ -5,6 +5,9 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { PurchaseInvoice } from '../../common/interfaces/purchase.interface';
 import { Location } from '@angular/common';
+import { FormControl } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-purchase',
@@ -31,14 +34,31 @@ export class PurchasePage implements OnInit {
   status: string = 'All';
   name: string = '';
   search: string = '';
+  total: number = 0;
+  fromDateFormControl = new FormControl();
+  toDateFormControl = new FormControl();
   constructor(
     private location: Location,
     private readonly purchaseService: PurchaseService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
     this.dataSource = new PurchaseInvoiceDataSource(this.purchaseService);
-    this.dataSource.loadItems();
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map(event => {
+          this.dataSource.loadItems(undefined, undefined, undefined, {});
+          return event;
+        }),
+      )
+      .subscribe({
+        next: res => {
+          this.getTotal();
+        },
+        error: err => {},
+      });
   }
 
   getUpdate(event) {
@@ -54,20 +74,41 @@ export class PurchasePage implements OnInit {
     );
   }
 
+  getTotal() {
+    this.dataSource.total.subscribe({
+      next: total => {
+        this.total = total;
+      },
+    });
+  }
+
+  dateFilter() {
+    if (this.fromDateFormControl.value && this.toDateFormControl.value)
+      this.setFilter();
+  }
+
   setFilter(event?) {
     const query: any = {};
     if (this.supplier) query.supplier_name = this.supplier;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
-
-    const sortQuery = {};
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date().setDate(
+        this.fromDateFormControl.value.getDate(),
+      );
+      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+    }
+    let sortQuery = {};
     if (event) {
       for (const key of Object.keys(event)) {
-        if (key === 'active') {
+        if (key === 'active' && event.direction !== '') {
           sortQuery[event[key]] = event.direction;
         }
       }
     }
+
+    sortQuery =
+      Object.keys(sortQuery).length === 0 ? { created_on: 'DESC' } : sortQuery;
 
     this.dataSource.loadItems(
       sortQuery,
@@ -84,6 +125,15 @@ export class PurchasePage implements OnInit {
       this.status = status;
       this.setFilter();
     }
+  }
+
+  clearFilters() {
+    this.supplier = '';
+    this.name = '';
+    this.status = 'All';
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.dataSource.loadItems();
   }
 
   navigateBack() {

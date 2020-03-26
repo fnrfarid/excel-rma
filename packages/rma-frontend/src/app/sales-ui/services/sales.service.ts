@@ -85,13 +85,13 @@ export class SalesService {
   }
 
   getSalesInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
-    if (!sortOrder) sortOrder = { posting_date: 'desc' };
+    if (!sortOrder) sortOrder = { created_on: 'desc' };
     if (!query) query = {};
 
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch (error) {
-      sortOrder = JSON.stringify({ posting_date: 'desc' });
+      sortOrder = JSON.stringify({ created_on: 'desc' });
     }
 
     const url = LIST_SALES_INVOICE_ENDPOINT;
