@@ -45,11 +45,13 @@ export class AssignSerialNoPoliciesService {
             let total_qty = 0;
 
             serialProvider.items.forEach(element => {
-              item.add(element.item_code);
-              total_qty += element.qty;
-              element.serial_no.forEach(serial => {
-                serial_no.add(serial);
-              });
+              if (element.has_serial_no) {
+                item.add(element.item_code);
+                total_qty += element.qty;
+                element.serial_no.forEach(serial => {
+                  serial_no.add(serial);
+                });
+              }
             });
 
             const item_array: any[] = Array.from(item);

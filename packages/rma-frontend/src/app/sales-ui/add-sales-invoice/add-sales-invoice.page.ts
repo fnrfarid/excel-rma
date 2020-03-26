@@ -10,7 +10,6 @@ import {
 import { Observable, throwError, of, from, forkJoin } from 'rxjs';
 import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
 import { Location } from '@angular/common';
-
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';

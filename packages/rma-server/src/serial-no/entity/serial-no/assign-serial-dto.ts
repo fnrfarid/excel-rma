@@ -61,6 +61,10 @@ export class DeliveryNoteItemDto {
 
   @IsNotEmpty()
   @IsNumber()
+  has_serial_no: number;
+
+  @IsNotEmpty()
+  @IsNumber()
   amount: number;
 
   @IsNotEmpty()

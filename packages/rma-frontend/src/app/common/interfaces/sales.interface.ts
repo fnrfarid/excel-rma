@@ -22,6 +22,7 @@ export class Item {
   description?: string;
   serial_no?: string;
   delivery_note?: string;
+  has_serial_no?: number;
   against_sales_invoice?: string;
   stock?: any;
   assigned?: number;
