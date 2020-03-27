@@ -33,6 +33,7 @@ import { Item } from '../../../common/interfaces/sales.interface';
 import {
   AssignSerialsDialog,
   CsvJsonObj,
+  AssignNonSerialsItemDialog,
 } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 
@@ -71,6 +72,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     'qty',
     'assigned',
     'remaining',
+    'has_serial_no',
     'add_serial',
   ];
   itemDataSource: ItemDataSource;
@@ -101,7 +103,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
     this.purchaseReceiptDate = this.getParsedDate(this.date.value);
-    this.getPuchaseInvoice(this.route.snapshot.params.invoiceUuid);
+    this.getPurchaseInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
@@ -114,28 +116,23 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     const filteredItemList = [];
     purchaseInvoice.items.forEach(item => {
       if (purchaseInvoice.purchase_receipt_items_map[item.item_code]) {
-        item.qty -= purchaseInvoice.purchase_receipt_items_map[item.item_code];
+        item.assigned =
+          purchaseInvoice.purchase_receipt_items_map[item.item_code] || 0;
+        item.remaining =
+          item.qty - purchaseInvoice.purchase_receipt_items_map[item.item_code];
       }
-      if (item.qty !== 0) {
-        filteredItemList.push(item);
-      }
+      filteredItemList.push(item);
     });
     return filteredItemList;
   }
 
-  getPuchaseInvoice(uuid: string) {
+  getPurchaseInvoice(uuid: string) {
     this.purchaseService.getPurchaseInvoice(uuid).subscribe({
       next: (res: PurchaseInvoiceDetails) => {
         this.purchaseInvoiceDetails = res as PurchaseInvoiceDetails;
 
         this.filteredItemList = this.getFilteredItems(res);
-        this.itemDataSource.loadItems(
-          this.filteredItemList.filter(item => {
-            item.assigned = 0;
-            item.remaining = item.qty;
-            return item;
-          }),
-        );
+        this.itemDataSource.loadItems(this.filteredItemList);
       },
       error: err => {
         this.snackBar.open(
@@ -150,6 +147,12 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   }
 
   async submitPurchaseReceipt() {
+    if (!this.warehouseFormControl.value) {
+      this.snackBar.open('Please select a warehouse.', CLOSE, {
+        duration: 200,
+      });
+      return;
+    }
     const loading = await this.loadingController.create({
       message: 'Creating Serials...!',
     });
@@ -181,11 +184,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
       this.serialDataSource.data().forEach(item => {
         if (item_code === item.item_code && item.serial_no.length !== 0) {
+          purchaseReceiptItem.has_serial_no = item.has_serial_no || 0;
           purchaseReceiptItem.qty += item.qty;
           purchaseReceiptItem.amount += item.rate * item.qty;
-          item.serial_no.forEach(serial => {
-            purchaseReceiptItem.serial_no.push(serial);
-          });
+          purchaseReceiptItem.serial_no.push(...item.serial_no);
           purchaseReceiptItem.rate = item.rate;
           purchaseReceiptItem.item_name = item.item_name;
         }
@@ -354,8 +356,44 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.resetRangeState();
   }
 
+  async addNonSerialItem(row: Item) {
+    const dialogRef = this.dialog.open(AssignNonSerialsItemDialog, {
+      width: '250px',
+      data: { qty: row.remaining || 0, remaining: row.remaining },
+    });
+
+    const assignValue = await dialogRef.afterClosed().toPromise();
+    if (assignValue && assignValue <= row.remaining) {
+      const serials = this.serialDataSource.data();
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: assignValue,
+        rate: row.rate,
+        amount: row.amount,
+        has_serial_no: row.has_serial_no,
+        serial_no: ['Non Serial Item'],
+      });
+      this.serialDataSource.update(serials);
+      this.updateProductState(row.item_code, assignValue);
+      return;
+    }
+
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
+  }
+
   assignSerial(itemRow: Item) {
-    if (!this.rangePickerState.serials.length) {
+    if (!itemRow.has_serial_no) {
+      this.addNonSerialItem(itemRow);
+      return;
+    }
+
+    if (
+      !this.rangePickerState.serials.length ||
+      this.rangePickerState.serials.length === 1
+    ) {
       this.assignSingularSerials(itemRow);
       return;
     }

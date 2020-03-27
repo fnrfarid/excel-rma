@@ -241,11 +241,11 @@ export class SerialsComponent implements OnInit {
     const filteredItemList = [];
     salesInvoice.items.forEach(item => {
       if (salesInvoice.delivered_items_map[item.item_code]) {
-        item.qty -= salesInvoice.delivered_items_map[item.item_code];
+        item.assigned = salesInvoice.delivered_items_map[item.item_code] || 0;
+        item.remaining =
+          item.qty - salesInvoice.delivered_items_map[item.item_code];
       }
-      if (item.qty !== 0) {
-        filteredItemList.push(item);
-      }
+      filteredItemList.push(item);
     });
     return filteredItemList;
   }
@@ -262,13 +262,7 @@ export class SerialsComponent implements OnInit {
             ? true
             : false;
         this.filteredItemList = this.getFilteredItems(sales_invoice);
-        this.itemDataSource.loadItems(
-          this.filteredItemList.filter(item => {
-            item.assigned = 0;
-            item.remaining = item.qty;
-            return item;
-          }),
-        );
+        this.itemDataSource.loadItems(this.filteredItemList);
         this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
       },
       error: err => {
@@ -341,7 +335,7 @@ export class SerialsComponent implements OnInit {
   }
 
   assignSerial(itemRow: Item) {
-    if (itemRow.has_serial_no === 0) {
+    if (!itemRow.has_serial_no) {
       this.addNonSerialItem(itemRow);
       return;
     }

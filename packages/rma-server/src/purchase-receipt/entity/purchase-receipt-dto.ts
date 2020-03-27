@@ -5,6 +5,7 @@ import {
   ValidateNested,
   IsArray,
   ArrayMinSize,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -22,6 +23,10 @@ export class PurchaseReceiptItemDto {
   warehouse: string;
 
   purchase_order?: string;
+
+  @IsOptional()
+  @IsNumber()
+  has_serial_no: number;
 
   @IsNotEmpty()
   @IsArray()
@@ -79,6 +84,7 @@ export class PurchaseReceiptDto {
   total: number;
 
   @IsNotEmpty()
+  @ArrayMinSize(1)
   @ValidateNested()
   @Type(() => PurchaseReceiptItemDto)
   items: PurchaseReceiptItemDto[];
