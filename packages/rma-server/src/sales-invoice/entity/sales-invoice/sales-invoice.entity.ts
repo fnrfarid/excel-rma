@@ -164,7 +164,7 @@ export class Item {
   name: string;
   owner: string;
   item_code: string;
-  has_serial_no: number;
+  has_serial_no?: number;
   item_name: string;
   qty: number;
   rate: number;

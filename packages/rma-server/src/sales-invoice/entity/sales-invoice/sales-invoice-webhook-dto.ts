@@ -189,6 +189,10 @@ export class SalesInvoiceWebhookItemDto {
   rate: number;
 
   @IsNumber()
+  @IsOptional()
+  has_serial_no?: number;
+
+  @IsNumber()
   @IsNotEmpty()
   amount: number;
 }
