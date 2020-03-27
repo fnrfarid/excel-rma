@@ -153,13 +153,19 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     bulk?: boolean,
   ): Observable<boolean | number> {
     bulk = bulk ? bulk : false;
+
     const { serials, createSerialsBatch } = serialsNo
       ? serialsNo
       : this.getMappedSerials(body);
+
+    if (!serials || serials.length === 0) {
+      return of(true);
+    }
     const frappeBody = {
       doctype: 'Serial No',
       filters: { serial_no: ['in', serials], warehouse: ['!=', ''] },
     };
+
     return this.http
       .post(settings.authServerURL + FRAPPE_API_GET_DOCTYPE_COUNT, frappeBody, {
         headers: this.settingsService.getAuthorizationHeaders(
@@ -239,13 +245,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     const createSerialsBatch: { [key: string]: string[] } = {};
     const serials = [];
     purchaseReceipt.items.forEach(element => {
-      const serial = element.serial_no.split('\n');
-      if (createSerialsBatch[element.item_code]) {
-        createSerialsBatch[element.item_code].push(...serial);
-      } else {
-        createSerialsBatch[element.item_code] = serials;
+      if (element.has_serial_no) {
+        const serial = element.serial_no.split('\n');
+        if (createSerialsBatch[element.item_code]) {
+          createSerialsBatch[element.item_code].push(...serial);
+        } else {
+          createSerialsBatch[element.item_code] = serials;
+        }
+        serials.push(...serial);
       }
-      serials.push(...serial);
     });
     return { serials, createSerialsBatch };
   }
@@ -256,13 +264,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     clientHttpRequest,
     purchase_invoice_name: string,
   ) {
-    this.updatePurchaseReceiptItemsMap(purchase_invoice_name, payload);
     return from(
       this.purchaseOrderService.findOne({ purchase_invoice_name }),
     ).pipe(
       switchMap(purchaseOrder => {
         payload.items.filter(item => {
           item.purchase_order = purchaseOrder.name;
+          if (!item.has_serial_no) {
+            delete item.serial_no;
+          }
         });
         return this.http
           .post(
@@ -281,6 +291,10 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           .pipe(
             map(data => data.data.data),
             switchMap((purchaseReceipt: PurchaseReceiptResponseInterface) => {
+              this.updatePurchaseReceiptItemsMap(
+                purchase_invoice_name,
+                payload,
+              );
               this.linkPurchaseInvoice(
                 purchaseReceipt,
                 purchase_invoice_name,
@@ -407,7 +421,14 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     const purchaseReceipts = [];
     body.items.forEach(item => {
       if (item.qty > PURCHASE_RECEIPT_BATCH_SIZE) {
-        const quotient = Math.floor(item.qty / PURCHASE_RECEIPT_BATCH_SIZE);
+        if (!item.has_serial_no) {
+          const receiptItem = new PurchaseReceiptItemDto();
+          Object.assign(receiptItem, item);
+          receiptItem.serial_no = undefined;
+          purchaseReceipts.push(receiptItem);
+          return;
+        }
+
         const remainder = item.qty % PURCHASE_RECEIPT_BATCH_SIZE;
         const serials = item.serial_no.split('\n');
 
@@ -426,9 +447,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         quotientItem.qty = 200;
         quotientItem.amount = quotientItem.qty * quotientItem.rate;
         quotientItem.serial_no = serials;
-        purchaseReceipts.push(
-          ...this.generateBatchedReceipt(quotientItem, quotient),
-        );
+        purchaseReceipts.push(...this.generateBatchedReceipt(quotientItem));
       } else {
         purchaseReceipts.push(item);
       }
@@ -437,7 +456,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     return purchaseReceipts;
   }
 
-  generateBatchedReceipt(receipt: PurchaseReceiptItemDto, len: number) {
+  generateBatchedReceipt(receipt: PurchaseReceiptItemDto) {
     const purchaseReceipts = [];
     from(receipt.serial_no)
       .pipe(
@@ -580,7 +599,9 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     let item_count = 0;
     purchaseInvoicePayload.items.filter(item => {
       item.serial_no = item.serial_no.join('\n');
-      item_count += item.qty;
+      if (item.has_serial_no) {
+        item_count += item.qty;
+      }
       return item;
     });
     const body = purchaseInvoicePayload;

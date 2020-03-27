@@ -1,9 +1,12 @@
-import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
-import { PurchaseInvoiceWebhookDto } from '../../entity/purchase-invoice/purchase-invoice-webhook-dto';
+import { Injectable, HttpService } from '@nestjs/common';
+import {
+  PurchaseInvoiceWebhookDto,
+  PurchaseInvoiceItemDto,
+} from '../../entity/purchase-invoice/purchase-invoice-webhook-dto';
 import { PurchaseInvoiceService } from '../../entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseInvoice } from '../../entity/purchase-invoice/purchase-invoice.entity';
-import { from, throwError, of, forkJoin } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { from, of, forkJoin } from 'rxjs';
+import { switchMap, map, toArray, mergeMap } from 'rxjs/operators';
 import * as uuidv4 from 'uuid/v4';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
 import {
@@ -14,6 +17,7 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
 import { DateTime } from 'luxon';
+import { ItemService } from '../../../item/entity/item/item.service';
 @Injectable()
 export class PurchaseInvoiceWebhookAggregateService {
   constructor(
@@ -21,6 +25,7 @@ export class PurchaseInvoiceWebhookAggregateService {
     private readonly clientToken: ClientTokenManagerService,
     private readonly settings: SettingsService,
     private readonly http: HttpService,
+    private readonly itemService: ItemService,
   ) {}
 
   purchaseInvoiceCreated(purchaseInvoicePayload: PurchaseInvoiceWebhookDto) {
@@ -34,20 +39,21 @@ export class PurchaseInvoiceWebhookAggregateService {
     }).pipe(
       switchMap(({ purchaseInvoice, settings }) => {
         if (purchaseInvoice) {
-          return throwError(
-            new BadRequestException(PURCHASE_INVOICE_ALREADY_EXIST),
-          );
+          return of({ message: PURCHASE_INVOICE_ALREADY_EXIST });
         }
-        const provider = this.mapPurchaseInvoice(purchaseInvoicePayload);
-        provider.created_on = new DateTime(settings.timeZone).toJSDate();
-        return this.getUserDetails(purchaseInvoicePayload.owner).pipe(
-          switchMap(user => {
-            provider.created_by = user.full_name;
-            this.purchaseInvoiceService
-              .create(provider)
-              .then(success => {})
-              .catch(error => {});
-            return of({});
+        return this.mapPurchaseInvoice(purchaseInvoicePayload).pipe(
+          switchMap(provider => {
+            provider.created_on = new DateTime(settings.timeZone).toJSDate();
+            return this.getUserDetails(purchaseInvoicePayload.owner).pipe(
+              switchMap(user => {
+                provider.created_by = user.full_name;
+                this.purchaseInvoiceService
+                  .create(provider)
+                  .then(success => {})
+                  .catch(error => {});
+                return of({});
+              }),
+            );
           }),
         );
       }),
@@ -55,14 +61,35 @@ export class PurchaseInvoiceWebhookAggregateService {
   }
 
   mapPurchaseInvoice(purchaseInvoicePayload: PurchaseInvoiceWebhookDto) {
-    const purchaseInvoice = new PurchaseInvoice();
-    Object.assign(purchaseInvoice, purchaseInvoicePayload);
-    purchaseInvoice.uuid = uuidv4();
-    purchaseInvoice.isSynced = true;
-    purchaseInvoice.status = SUBMITTED_STATUS;
-    purchaseInvoice.inQueue = false;
-    purchaseInvoice.submitted = true;
-    return purchaseInvoice;
+    return this.getSerializedItem(purchaseInvoicePayload.items).pipe(
+      switchMap(serializedItems => {
+        const purchaseInvoice = new PurchaseInvoice();
+        Object.assign(purchaseInvoice, purchaseInvoicePayload);
+        purchaseInvoice.uuid = uuidv4();
+        purchaseInvoice.isSynced = true;
+        purchaseInvoice.status = SUBMITTED_STATUS;
+        purchaseInvoice.inQueue = false;
+        purchaseInvoice.submitted = true;
+        purchaseInvoice.items = serializedItems;
+        return of(purchaseInvoice);
+      }),
+    );
+  }
+
+  getSerializedItem(items: PurchaseInvoiceItemDto[]) {
+    return from(items).pipe(
+      mergeMap(item => {
+        return from(
+          this.itemService.findOne({ item_code: item.item_code }),
+        ).pipe(
+          switchMap(response => {
+            item.has_serial_no = response ? response.has_serial_no : undefined;
+            return of(item);
+          }),
+        );
+      }),
+      toArray(),
+    );
   }
 
   getUserDetails(email: string) {

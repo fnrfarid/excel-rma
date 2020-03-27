@@ -231,6 +231,10 @@ export class PurchaseInvoiceItemDto {
   received_qty: number;
 
   @IsNumber()
+  @IsOptional()
+  has_serial_no: number;
+
+  @IsNumber()
   @IsNotEmpty()
   qty: number;
 
