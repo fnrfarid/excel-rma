@@ -70,6 +70,51 @@
             </mat-form-field>
           </ion-col>
         </ion-row>
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="fromDate"
+                placeholder="From Date"
+                readonly
+                [formControl]="fromDateFormControl"
+                (dateChange)="dateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="fromDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #fromDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="toDate"
+                placeholder="To Date"
+                readonly
+                [formControl]="toDateFormControl"
+                (dateChange)="dateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="toDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #toDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+          <ion-col size="auto">
+            <ion-button
+              color="tertiary"
+              (click)="clearFilters()"
+              fill="outline"
+            >
+              Clear
+            </ion-button>
+          </ion-col>
+        </ion-row>
       </ion-grid>
       <mat-table
         class="full-width-table"
@@ -85,6 +130,7 @@
           <mat-cell *matCellDef="let row">
             {{row.name}}
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">
@@ -109,6 +155,7 @@
               {{row.status}}
             </ion-text>
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="date">
@@ -118,6 +165,7 @@
           <mat-cell *matCellDef="let row">
             {{row.posting_date | date:'dd-MM-yyyy'}}
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="supplier">
@@ -127,15 +175,25 @@
           <mat-cell *matCellDef="let row">
             {{row.supplier}}
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef>
+            Total
+          </mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="total">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="total">
+          <mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header="total"
+            style="display: flex;justify-content: center;"
+          >
             Total
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
             {{row.total | curFormat | async }}
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef>
+            {{ total | curFormat | async }}
+          </mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="created_by">
@@ -145,6 +203,7 @@
           <mat-cell *matCellDef="let row">
             {{ row.created_by }}
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="delivered_by">
@@ -155,6 +214,7 @@
             {{row.purchase_receipt_items ?
             row?.purchase_receipt_items[0]?.deliveredBy : '' }}
           </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <mat-header-row
@@ -164,6 +224,10 @@
           *matRowDef="let row; columns: displayedColumns;"
           [routerLink]="['/purchase/view-purchase-invoice',row.uuid]"
         ></mat-row>
+        <mat-footer-row
+          class="footer"
+          *matFooterRowDef="displayedColumns; sticky: true"
+        ></mat-footer-row>
       </mat-table>
 
       <mat-card-actions>

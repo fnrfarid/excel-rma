@@ -24,13 +24,13 @@ export class PurchaseService {
   constructor(private http: HttpClient, private storage: StorageService) {}
 
   getPurchaseInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
-    if (!sortOrder) sortOrder = { posting_date: 'desc' };
+    if (!sortOrder) sortOrder = { created_on: 'desc' };
     if (!query) query = {};
 
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch (error) {
-      sortOrder = JSON.stringify({ posting_date: 'desc' });
+      sortOrder = JSON.stringify({ created_on: 'desc' });
     }
 
     const url = LIST_PURCHASE_INVOICE_ENDPOINT;

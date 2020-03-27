@@ -178,6 +178,7 @@ export class PurchaseInvoiceItem {
   image: string;
   warehouse: string;
   serial_no: string;
+  has_serial_no: number;
   expense_account: string;
   cost_center: string;
   received_qty: number;

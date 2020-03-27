@@ -19,6 +19,7 @@ export class PurchaseInvoiceDataSource extends DataSource<ListingData> {
   data: ListingData[];
   length: number;
   offset: number;
+  total = new BehaviorSubject<number>(0);
 
   itemSubject = new BehaviorSubject<ListingData[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
@@ -52,6 +53,17 @@ export class PurchaseInvoiceDataSource extends DataSource<ListingData> {
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
-      .subscribe(items => this.itemSubject.next(items));
+      .subscribe(items => {
+        this.calculateTotal(items);
+        this.itemSubject.next(items);
+      });
+  }
+
+  calculateTotal(purchaseInvoices: ListingData[]) {
+    let sum = 0;
+    purchaseInvoices.forEach(invoice => {
+      sum += invoice.total;
+    });
+    this.total.next(sum);
   }
 }

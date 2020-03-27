@@ -15,6 +15,7 @@ export interface PurchaseReceiptItem {
   item_name: string;
   warehouse: string;
   serial_no: string[];
+  has_serial_no: number;
   qty: number;
   rate: number;
   amount: number;
