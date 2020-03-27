@@ -115,6 +115,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   getFilteredItems(purchaseInvoice: PurchaseInvoiceDetails) {
     const filteredItemList = [];
     purchaseInvoice.items.forEach(item => {
+      item.assigned = 0;
+      item.remaining = item.qty;
       if (purchaseInvoice.purchase_receipt_items_map[item.item_code]) {
         item.assigned =
           purchaseInvoice.purchase_receipt_items_map[item.item_code] || 0;
