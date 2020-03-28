@@ -41,11 +41,26 @@ import {
 import { Location } from '@angular/common';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { LoadingController } from '@ionic/angular';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../../constants/date-format';
 
 @Component({
   selector: 'sales-invoice-serials',
   templateUrl: './serials.component.html',
   styleUrls: ['./serials.component.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class SerialsComponent implements OnInit {
   @ViewChild('csvFileInput', { static: false })
