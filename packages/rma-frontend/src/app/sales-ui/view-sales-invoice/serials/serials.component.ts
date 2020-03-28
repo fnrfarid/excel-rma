@@ -69,6 +69,7 @@ export class SerialsComponent implements OnInit {
     serials: [],
   };
 
+  DEFAULT_SERIAL_RANGE = { start: 0, end: 0, prefix: '', serialPadding: 0 };
   filteredItemList = [];
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
@@ -141,27 +142,36 @@ export class SerialsComponent implements OnInit {
   }
 
   getSerialPrefix(startSerial, endSerial) {
+    if (!startSerial || !endSerial) {
+      return this.DEFAULT_SERIAL_RANGE;
+    }
+
+    if (startSerial.length !== endSerial.length) {
+      this.getMessage('Length for From Range and To Range should be the same.');
+      return this.DEFAULT_SERIAL_RANGE;
+    }
+
     try {
+      const prefix = this.getStringPrefix([startSerial, endSerial]);
+
+      if (!prefix) {
+        this.getMessage('Invalid serial prefix, please enter valid serials');
+        return this.DEFAULT_SERIAL_RANGE;
+      }
+
       const serialStartNumber = startSerial.match(/\d+/g);
       const serialEndNumber = endSerial.match(/\d+/g);
-      let serialPadding = serialEndNumber[serialEndNumber?.length - 1]?.length;
-      if (
-        serialStartNumber[serialStartNumber?.length - 1]?.length >
-        serialEndNumber[serialEndNumber?.length - 1]?.length
-      ) {
-        serialPadding =
-          serialStartNumber[serialStartNumber?.length - 1]?.length;
-      }
+      const serialPadding =
+        serialEndNumber[serialEndNumber?.length - 1]?.length;
+
       let start = Number(
         serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
       );
+
       let end = Number(
         serialEndNumber[serialEndNumber.length - 1].match(/\d+/g),
       );
-      const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
-        /\d+$/,
-        '',
-      );
+
       if (start > end) {
         const tmp = start;
         start = end;
@@ -169,18 +179,26 @@ export class SerialsComponent implements OnInit {
       }
       return { start, end, prefix, serialPadding };
     } catch {
-      return { start: 0, end: 0, prefix: '' };
+      return this.DEFAULT_SERIAL_RANGE;
     }
   }
 
   getStringPrefix(arr1: string[]) {
     const arr = arr1.concat().sort(),
-      a1 = arr[0],
-      a2 = arr[arr.length - 1],
-      L = a1.length;
+      fromRange = arr[0],
+      toRange = arr[1],
+      L = fromRange.length;
     let i = 0;
-    while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
-    return a1.substring(0, i);
+    while (i < L && fromRange.charAt(i) === toRange.charAt(i)) i++;
+    const prefix = fromRange.substring(0, i).replace(/\d+$/, '');
+
+    const fromRangePostFix = fromRange.replace(prefix, '');
+    const toRangePostFix = toRange.replace(prefix, '');
+
+    if (!/^\d+$/.test(fromRangePostFix) || !/^\d+$/.test(toRangePostFix)) {
+      return false;
+    }
+    return prefix;
   }
 
   onFromRange(value) {
@@ -222,6 +240,11 @@ export class SerialsComponent implements OnInit {
       );
       return [];
     }
+
+    if (!prefix || prefix.length === 0) {
+      return [];
+    }
+
     const data: any[] = _.range(start, end + 1);
     let i = 0;
     for (const value of data) {
@@ -591,19 +614,22 @@ export class SerialsComponent implements OnInit {
                     item_names.push(key);
                     itemObj[key] = {
                       serial: data[key].serial_no.length,
-                      serial_no: data[key].serial_no,
+                      serial_no: data[key].serial_no.map(serial => {
+                        return serial.toUpperCase();
+                      }),
                     };
                   }
                 }
+
                 // validate Json serials with remaining products to be assigned.
                 return this.validateJson(itemObj)
                   ? // if valid ping backend to validate found serials
                     this.csvService.validateSerials(item_names, itemObj).pipe(
                       switchMap((response: boolean) => {
+                        this.csvFileInput.nativeElement.value = '';
                         if (response) {
                           return of(itemObj);
                         }
-                        this.csvFileInput.nativeElement.value = '';
                         return of(false);
                       }),
                     )
@@ -646,7 +672,7 @@ export class SerialsComponent implements OnInit {
     const data = this.itemDataSource.data();
     for (const value of data) {
       if (json[value.item_name]) {
-        if (value.remaining !== json[value.item_name].serial) {
+        if (value.remaining < json[value.item_name].serial) {
           this.getMessage(`Item ${value.item_name} has
           ${value.remaining} remaining, but provided
           ${json[value.item_name].serial} serials.`);

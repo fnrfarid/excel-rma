@@ -97,30 +97,38 @@ export class SerialNoPoliciesService {
   }
 
   validateSerialsForDeliveryNote(payload: ValidateSerialsDto) {
-    return this.serialNoService.asyncAggregate([
-      {
-        $match: {
-          serial_no: { $in: payload.serials },
-          $or: [
-            { item_code: payload.item_code },
-            { item_name: payload.item_code },
-          ],
-        },
-      },
-      {
-        $group: {
-          _id: 'validSerials',
-          foundSerials: { $push: '$serial_no' },
-        },
-      },
-      {
-        $project: {
-          notFoundSerials: {
-            $setDifference: [payload.serials, '$foundSerials'],
+    return from(
+      this.itemService.findOne({
+        $or: [
+          { item_code: payload.item_code },
+          { item_name: payload.item_code },
+        ],
+      }),
+    ).pipe(
+      switchMap(item => {
+        return this.serialNoService.asyncAggregate([
+          {
+            $match: {
+              serial_no: { $in: payload.serials },
+              $or: [{ item_code: item.item_code }],
+            },
           },
-        },
-      },
-    ]);
+          {
+            $group: {
+              _id: 'validSerials',
+              foundSerials: { $push: '$serial_no' },
+            },
+          },
+          {
+            $project: {
+              notFoundSerials: {
+                $setDifference: [payload.serials, '$foundSerials'],
+              },
+            },
+          },
+        ]);
+      }),
+    );
   }
 
   validateSerialsForPurchaseReceipt(payload: ValidateSerialsDto) {

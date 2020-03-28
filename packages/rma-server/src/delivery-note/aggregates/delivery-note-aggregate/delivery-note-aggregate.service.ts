@@ -153,7 +153,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           const delivered_items_map = {};
           response.items.filter(item => {
             if (item.serial_no) {
-              serials.push(item.serial_no.split('\n'));
+              serials.push(...item.serial_no.split('\n'));
             }
             items.push({
               item_code: item.item_code,
