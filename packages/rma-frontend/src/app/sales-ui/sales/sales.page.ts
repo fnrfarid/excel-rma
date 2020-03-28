@@ -58,7 +58,8 @@ export class SalesPage implements OnInit {
   campaign: string = 'All';
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
-
+  singleDateFormControl = new FormControl();
+  sortQuery: any = {};
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
@@ -122,9 +123,30 @@ export class SalesPage implements OnInit {
         query.isCampaign = false;
       }
     }
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date().setDate(
+        this.fromDateFormControl.value.getDate(),
+      );
+      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+    }
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+
     if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
-      undefined,
+      this.sortQuery,
       event.pageIndex,
       event.pageSize,
       query,
@@ -132,8 +154,15 @@ export class SalesPage implements OnInit {
   }
 
   dateFilter() {
-    if (this.fromDateFormControl.value && this.toDateFormControl.value)
-      this.setFilter();
+    this.singleDateFormControl.setValue('');
+    // if (this.fromDateFormControl.value && this.toDateFormControl.value)
+    this.setFilter();
+  }
+
+  singleDateFilter() {
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.setFilter();
   }
 
   clearFilters() {
@@ -144,6 +173,7 @@ export class SalesPage implements OnInit {
     this.campaign = 'All';
     this.fromDateFormControl.setValue('');
     this.toDateFormControl.setValue('');
+    this.singleDateFormControl.setValue('');
     this.dataSource.loadItems();
   }
 
@@ -166,19 +196,35 @@ export class SalesPage implements OnInit {
       );
       query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
     }
-    let sortQuery = {};
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+    this.sortQuery = {};
     if (event) {
       for (const key of Object.keys(event)) {
         if (key === 'active' && event.direction !== '') {
-          sortQuery[event[key]] = event.direction;
+          this.sortQuery[event[key]] = event.direction;
         }
       }
     }
-    sortQuery =
-      Object.keys(sortQuery).length === 0 ? { created_on: 'DESC' } : sortQuery;
+    this.sortQuery =
+      Object.keys(this.sortQuery).length === 0
+        ? { created_on: 'DESC' }
+        : this.sortQuery;
 
     this.dataSource.loadItems(
-      sortQuery,
+      this.sortQuery,
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,
