@@ -8,11 +8,26 @@ import {
   SHORT_DURATION,
   CLOSE,
 } from '../../constants/app-string';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-update-credit-limit',
   templateUrl: './update-credit-limit.component.html',
   styleUrls: ['./update-credit-limit.component.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class UpdateCreditLimitComponent implements OnInit {
   uuid: string;

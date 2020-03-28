@@ -36,11 +36,26 @@ import {
   AssignNonSerialsItemDialog,
 } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../../constants/date-format';
 
 @Component({
   selector: 'purchase-assign-serials',
   templateUrl: './purchase-assign-serials.component.html',
   styleUrls: ['./purchase-assign-serials.component.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class PurchaseAssignSerialsComponent implements OnInit {
   @ViewChild('csvFileInput', { static: false })

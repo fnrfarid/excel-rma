@@ -8,11 +8,26 @@ import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-purchase',
   templateUrl: './purchase.page.html',
   styleUrls: ['./purchase.page.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class PurchasePage implements OnInit {
   salesInvoiceList: Array<PurchaseInvoice>;
@@ -21,6 +36,7 @@ export class PurchasePage implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: PurchaseInvoiceDataSource;
   displayedColumns = [
+    'sr_no',
     'purchase_invoice_number',
     'status',
     'date',
@@ -94,9 +110,9 @@ export class PurchasePage implements OnInit {
     if (this.name) query.name = this.name;
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
       query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.getDate(),
+        this.fromDateFormControl.value.date(),
       );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
     }
     let sortQuery = {};
     if (event) {

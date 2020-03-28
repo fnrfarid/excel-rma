@@ -14,11 +14,26 @@ import {
 } from '../../constants/url-strings';
 import { map, filter } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-sales',
   templateUrl: './sales.page.html',
   styleUrls: ['./sales.page.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class SalesPage implements OnInit {
   salesInvoiceList: Array<SalesInvoice>;
@@ -27,6 +42,7 @@ export class SalesPage implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: SalesInvoiceDataSource;
   displayedColumns = [
+    'sr_no',
     'name',
     'status',
     'posting_date',
@@ -125,9 +141,9 @@ export class SalesPage implements OnInit {
     }
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
       query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.getDate(),
+        this.fromDateFormControl.value.date(),
       );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
     }
     if (this.singleDateFormControl.value) {
       query.fromDate = new Date(this.singleDateFormControl.value).setHours(
@@ -155,7 +171,6 @@ export class SalesPage implements OnInit {
 
   dateFilter() {
     this.singleDateFormControl.setValue('');
-    // if (this.fromDateFormControl.value && this.toDateFormControl.value)
     this.setFilter();
   }
 
@@ -192,9 +207,9 @@ export class SalesPage implements OnInit {
     }
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
       query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.getDate(),
+        this.fromDateFormControl.value.date(),
       );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
     }
     if (this.singleDateFormControl.value) {
       query.fromDate = new Date(this.singleDateFormControl.value).setHours(

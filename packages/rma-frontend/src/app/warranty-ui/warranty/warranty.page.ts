@@ -19,6 +19,7 @@ export class WarrantyPage implements OnInit {
 
   dataSource: WarrantyClaimsDataSource;
   displayedColumns = [
+    'sr_no',
     'claim_no',
     'claim_type',
     'received_date',
@@ -94,9 +95,9 @@ export class WarrantyPage implements OnInit {
 
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
       query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.getDate(),
+        this.fromDateFormControl.value.date(),
       );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.getDate());
+      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
     }
     this.dataSource.loadItems(
       sortQuery,

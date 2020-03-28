@@ -31,11 +31,26 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ItemPriceService } from '../services/item-price.service';
 import { INSUFFICIENT_STOCK_BALANCE } from '../../constants/messages';
 import { TimeService } from '../../api/time/time.service';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-add-sales-invoice',
   templateUrl: './add-sales-invoice.page.html',
   styleUrls: ['./add-sales-invoice.page.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;

@@ -8,11 +8,26 @@ import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.compo
 import { Item } from '../../common/interfaces/sales.interface';
 import { SalesReturn } from '../../common/interfaces/sales-return.interface';
 import { startWith, switchMap } from 'rxjs/operators';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-add-sales-return',
   templateUrl: './add-sales-return.page.html',
   styleUrls: ['./add-sales-return.page.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class AddSalesReturnPage implements OnInit {
   displayedColumns = ['item', 'quantity', 'rate', 'total'];
