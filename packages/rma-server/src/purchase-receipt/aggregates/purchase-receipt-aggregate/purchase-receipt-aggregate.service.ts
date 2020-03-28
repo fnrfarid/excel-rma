@@ -244,13 +244,14 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
   ): SerialMapResponseInterface {
     const createSerialsBatch: { [key: string]: string[] } = {};
     const serials = [];
+    // Something fucked up
     purchaseReceipt.items.forEach(element => {
       if (element.has_serial_no) {
         const serial = element.serial_no.split('\n');
         if (createSerialsBatch[element.item_code]) {
           createSerialsBatch[element.item_code].push(...serial);
         } else {
-          createSerialsBatch[element.item_code] = serials;
+          createSerialsBatch[element.item_code] = serial;
         }
         serials.push(...serial);
       }
