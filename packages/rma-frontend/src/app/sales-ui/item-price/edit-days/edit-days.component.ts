@@ -13,7 +13,7 @@ export class EditDaysComponent implements OnInit {
     return this._value;
   }
   set value(val) {
-    this.frmCtrl.setValue({ purchaseWarrantyDays: val });
+    this.frmCtrl.setValue({ purchaseWarrantyMonths: val });
     this.days = val;
     this._value = val;
   }

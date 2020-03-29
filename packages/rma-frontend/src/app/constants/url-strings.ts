@@ -72,7 +72,7 @@ export const ERPNEXT_ACCOUNT_ENDPOINT =
 export const ERPNEXT_WAREHOUSE_ENDPOINT =
   '/api/command/user/api/resource/Warehouse';
 export const API_ITEM_SET_PURCHASE_WARRANTY_DAYS =
-  '/api/item/v1/set_purchase_warranty_days';
+  '/api/item/v1/set_warranty_months';
 export const IS_BACKEND_CONNECTED_ENDPOINT =
   '/api/direct/v1/verify_backend_connection';
 export const CONNECT_BACKEND_ENDPOINT = '/api/direct/connect';

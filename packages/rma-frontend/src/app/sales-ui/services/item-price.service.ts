@@ -80,12 +80,15 @@ export class ItemPriceService {
     );
   }
 
-  setPurchaseWarrantyDays(itemUuid: string, days: number) {
+  setWarrantyMonths(
+    itemUuid: string,
+    body: { purchaseWarrantyMonths?: number; salesWarrantyMonths?: number },
+  ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(
           API_ITEM_SET_PURCHASE_WARRANTY_DAYS + '/' + itemUuid,
-          { days },
+          body,
           {
             headers,
           },

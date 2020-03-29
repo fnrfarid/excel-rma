@@ -126,5 +126,8 @@ export class Item extends BaseEntity {
   minimumPrice: number;
 
   @Column()
-  purchaseWarrantyDays: number;
+  purchaseWarrantyMonths: number;
+
+  @Column()
+  salesWarrantyMonths: number;
 }
