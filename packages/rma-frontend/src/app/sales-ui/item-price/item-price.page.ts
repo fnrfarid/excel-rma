@@ -20,15 +20,15 @@ export class ItemPricePage implements OnInit {
   displayedColumns = [
     'name',
     'item_name',
-    'brand',
-    'purchaseWarrantyDays',
-    'selling_price',
     'price',
+    'purchaseWarrantyMonths',
+    'salesWarrantyMonths',
+    'selling_price',
   ];
   itemName: string = '';
   brand: string = '';
   itemGroup: string = '';
-  purchaseWarrantyDays: string = '';
+  purchaseWarrantyMonths: string = '';
   constructor(
     private readonly location: Location,
     private readonly router: Router,
@@ -76,11 +76,22 @@ export class ItemPricePage implements OnInit {
     );
   }
 
-  updatePurchaseWarrantyDays(row: ListingData, days: number) {
-    this.itemPriceService.setPurchaseWarrantyDays(row.uuid, days).subscribe({
-      next: success => (row.purchaseWarrantyDays = days),
-      error: error => {},
-    });
+  updatePurchaseWarrantyMonths(row: ListingData, days: number) {
+    this.itemPriceService
+      .setWarrantyMonths(row.uuid, { purchaseWarrantyMonths: days })
+      .subscribe({
+        next: success => (row.purchaseWarrantyMonths = days),
+        error: error => {},
+      });
+  }
+
+  updateSalesWarrantyMonths(row: ListingData, days: number) {
+    this.itemPriceService
+      .setWarrantyMonths(row.uuid, { salesWarrantyMonths: days })
+      .subscribe({
+        next: success => (row.salesWarrantyMonths = days),
+        error: error => {},
+      });
   }
 
   updateMinPrice(row: ListingData, minPrice: number) {

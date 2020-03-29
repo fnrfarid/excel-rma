@@ -1,18 +1,15 @@
 import { IEventHandler, EventsHandler } from '@nestjs/cqrs';
-import { PurchaseWarrantyDaysSetEvent } from './purchase-warranty-days-set.event';
+import { WarrantyMonthsSetEvent } from './purchase-warranty-days-set.event';
 import { ItemService } from '../../entity/item/item.service';
 
-@EventsHandler(PurchaseWarrantyDaysSetEvent)
-export class PurchaseWarrantyDaysSetHandler
-  implements IEventHandler<PurchaseWarrantyDaysSetEvent> {
+@EventsHandler(WarrantyMonthsSetEvent)
+export class WarrantyMonthsSetHandler
+  implements IEventHandler<WarrantyMonthsSetEvent> {
   constructor(private readonly itemService: ItemService) {}
-  handle(event: PurchaseWarrantyDaysSetEvent) {
-    const { item } = event;
+  handle(event: WarrantyMonthsSetEvent) {
+    const { updatePayload, uuid } = event;
     this.itemService
-      .updateOne(
-        { uuid: item.uuid },
-        { $set: { purchaseWarrantyDays: item.purchaseWarrantyDays } },
-      )
+      .updateOne({ uuid }, { $set: updatePayload })
       .then(saved => {})
       .catch(error => {});
   }
