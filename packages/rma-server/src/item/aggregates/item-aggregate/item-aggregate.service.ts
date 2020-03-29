@@ -2,7 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { ItemService } from '../../entity/item/item.service';
 import { MinimumItemPriceSetEvent } from '../../events/minimum-item-price-set/minimum-item-price-set.event';
-import { PurchaseWarrantyDaysSetEvent } from '../../events/purchase-warranty-days-set/purchase-warranty-days-set.event';
+import { WarrantyMonthsSetEvent } from '../../events/purchase-warranty-days-set/purchase-warranty-days-set.event';
+import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
+import { ITEM_NOT_FOUND } from '../../../constants/messages';
 
 @Injectable()
 export class ItemAggregateService extends AggregateRoot {
@@ -26,10 +28,12 @@ export class ItemAggregateService extends AggregateRoot {
     this.apply(new MinimumItemPriceSetEvent(item));
   }
 
-  async setPurchaseWarrantyDays(uuid: string, purchaseWarrantyDays: number) {
+  async setWarrantyMonths(uuid: string, updatePayload: SetWarrantyMonthsDto) {
     const item = await this.itemService.findOne({ uuid });
-    item.purchaseWarrantyDays = purchaseWarrantyDays;
-    this.apply(new PurchaseWarrantyDaysSetEvent(item));
+    if (!item) {
+      throw new NotFoundException(ITEM_NOT_FOUND);
+    }
+    this.apply(new WarrantyMonthsSetEvent(updatePayload, uuid));
   }
 
   async retrieveItemByCode(code: string, req) {

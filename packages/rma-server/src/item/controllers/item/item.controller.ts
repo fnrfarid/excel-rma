@@ -8,6 +8,8 @@ import {
   Post,
   Body,
   BadRequestException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { RetrieveItemQuery } from '../../query/get-item/retrieve-item.query';
@@ -20,7 +22,8 @@ import { SetMinimumItemPriceCommand } from '../../commands/set-minimum-item-pric
 import { RetrieveItemByCodeQuery } from '../../query/get-item-by-code/retrieve-item-by-code-.query';
 import { RetrieveItemByNamesQuery } from '../../query/get-item-by-names/retrieve-item-by-names-.query';
 import { INVALID_ITEM_NAME_QUERY } from '../../../constants/messages';
-import { SetPurchaseWarrantyDaysCommand } from '../../commands/set-purchase-warranty-days/set-purchase-warranty-days.command';
+import { SetWarrantyMonthsCommand } from '../../commands/set-purchase-warranty-days/set-purchase-warranty-days.command';
+import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
 
 @Controller('item')
 export class ItemController {
@@ -82,11 +85,15 @@ export class ItemController {
   }
 
   @Roles(SYSTEM_MANAGER)
-  @Post('v1/set_purchase_warranty_days/:uuid')
+  @Post('v1/set_warranty_months/:uuid')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
   @UseGuards(TokenGuard, RoleGuard)
-  async setPurchaseWarrantyDays(@Param('uuid') uuid, @Body('days') days) {
+  async setWarrantyMonths(
+    @Param('uuid') uuid,
+    @Body() payload: SetWarrantyMonthsDto,
+  ) {
     return await this.commandBus.execute(
-      new SetPurchaseWarrantyDaysCommand(uuid, days),
+      new SetWarrantyMonthsCommand(uuid, payload),
     );
   }
 }

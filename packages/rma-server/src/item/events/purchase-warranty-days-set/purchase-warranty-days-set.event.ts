@@ -1,6 +1,9 @@
 import { IEvent } from '@nestjs/cqrs';
-import { Item } from '../../entity/item/item.entity';
+import { SetWarrantyMonthsDto } from 'src/item/entity/item/set-warranty-months-dto';
 
-export class PurchaseWarrantyDaysSetEvent implements IEvent {
-  constructor(public readonly item: Item) {}
+export class WarrantyMonthsSetEvent implements IEvent {
+  constructor(
+    public readonly updatePayload: SetWarrantyMonthsDto,
+    public readonly uuid: string,
+  ) {}
 }

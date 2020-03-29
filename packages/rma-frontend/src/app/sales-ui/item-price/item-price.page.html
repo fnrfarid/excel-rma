@@ -99,23 +99,14 @@
           </td>
         </ng-container>
 
-        <!-- Brand -->
-        <ng-container matColumnDef="brand">
-          <th mat-header-cell *matHeaderCellDef>
-            Brand
-          </th>
-          <td mat-cell *matCellDef="let row">
-            {{row.brand}}
-          </td>
-        </ng-container>
-        <!-- purchase Warranty Days Column -->
-        <ng-container matColumnDef="purchaseWarrantyDays">
-          <th mat-header-cell *matHeaderCellDef class="ion-text-right">
-            Purchase Warranty Days
+        <!-- sales Warranty Months Column -->
+        <ng-container matColumnDef="salesWarrantyMonths">
+          <th mat-header-cell *matHeaderCellDef class="ion-text-center">
+            Sales Warranty Months
           </th>
 
           <td
-            class="ion-text-right"
+            class="ion-text-center"
             mat-cell
             *matCellDef="let row"
             [satPopoverAnchor]="d"
@@ -124,26 +115,56 @@
             (click)="d.open()"
           >
             <ion-text>
-              {{row.purchaseWarrantyDays}}
+              {{row.salesWarrantyMonths}}
             </ion-text>
             <sat-popover
               #d
               hasBackdrop
               xAlign="start"
               yAlign="start"
-              (closed)="updatePurchaseWarrantyDays(row, $event)"
+              (closed)="updateSalesWarrantyMonths(row, $event)"
             >
-              <edit-days [value]="row.purchaseWarrantyDays"></edit-days>
+              <edit-days [value]="row.salesWarrantyMonths"></edit-days>
+            </sat-popover>
+          </td>
+        </ng-container>
+
+        <!-- purchase Warranty Months Column -->
+        <ng-container matColumnDef="purchaseWarrantyMonths">
+          <th mat-header-cell *matHeaderCellDef class="ion-text-center">
+            Purchase Warranty Months
+          </th>
+
+          <td
+            class="ion-text-center"
+            mat-cell
+            *matCellDef="let row"
+            [satPopoverAnchor]="d"
+            tabindex="0"
+            (keyup.enter)="d.open()"
+            (click)="d.open()"
+          >
+            <ion-text>
+              {{row.purchaseWarrantyMonths}}
+            </ion-text>
+            <sat-popover
+              #d
+              hasBackdrop
+              xAlign="start"
+              yAlign="start"
+              (closed)="updatePurchaseWarrantyMonths(row, $event)"
+            >
+              <edit-days [value]="row.purchaseWarrantyMonths"></edit-days>
             </sat-popover>
           </td>
         </ng-container>
         <!-- Price Column -->
         <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef class="ion-text-right">
+          <th mat-header-cell *matHeaderCellDef class="ion-text-center">
             Price
           </th>
           <td
-            class="ion-text-right"
+            class="ion-text-center"
             mat-cell
             *matCellDef="let row"
             [satPopoverAnchor]="p"
