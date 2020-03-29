@@ -19,7 +19,6 @@ test_rma_frontend:
       - packages/rma-frontend/**/*
     refs:
       - merge_requests
-      - master
   before_script:
     - cd packages/rma-frontend
     - npm install
@@ -49,7 +48,6 @@ test_rma_mobile:
       - packages/rma-mobile/**/*
     refs:
       - merge_requests
-      - master
   before_script:
     - cd packages/rma-mobile
     - npm install
@@ -79,7 +77,6 @@ test_rma_server:
       - packages/rma-server/**/*
     refs:
       - merge_requests
-      - master
   before_script:
     - cd packages/rma-server
     - npm install

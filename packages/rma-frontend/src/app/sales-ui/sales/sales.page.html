@@ -11,7 +11,7 @@
 
 <ion-content class="page-background">
   <ion-card>
-    <ion-card-header>
+    <ion-card-header style="padding-bottom: 0;">
       <ion-row class="align">
         <ion-col>
           <ion-card-title>
@@ -105,7 +105,10 @@
           </ion-col>
         </ion-row>
         <ion-row>
-          <ion-col>
+          <ion-col class="ion-text-center">
+            <ion-text color="medium" class="date-filter-text">
+              Range Date
+            </ion-text>
             <mat-form-field class="full-width">
               <input
                 matInput
@@ -121,8 +124,6 @@
               ></mat-datepicker-toggle>
               <mat-datepicker #fromDate disabled="false"></mat-datepicker>
             </mat-form-field>
-          </ion-col>
-          <ion-col>
             <mat-form-field class="full-width">
               <input
                 matInput
@@ -139,7 +140,25 @@
               <mat-datepicker #toDate disabled="false"></mat-datepicker>
             </mat-form-field>
           </ion-col>
-          <ion-col size="auto">
+          <ion-col class="ion-text-center">
+            <ion-text color="medium" class="date-filter-text">
+              Single Date
+            </ion-text>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="singleDate"
+                placeholder="Select Date"
+                readonly
+                [formControl]="singleDateFormControl"
+                (dateChange)="singleDateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="singleDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #singleDate disabled="false"></mat-datepicker>
+            </mat-form-field>
             <ion-button
               color="tertiary"
               (click)="clearFilters()"
@@ -147,15 +166,13 @@
             >
               Clear
             </ion-button>
-          </ion-col>
-          <ion-col size="auto">
             <ion-button
               color="tertiary"
               (click)="syncOutstandingAmount()"
               fill="outline"
               [disabled]="disableRefresh"
             >
-              Refresh
+              Sync Data
             </ion-button>
           </ion-col>
         </ion-row>
@@ -168,6 +185,13 @@
         (matSortChange)="setFilter($event)"
         style="width: 100%;"
       >
+        <ng-container matColumnDef="sr_no">
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+          <mat-cell *matCellDef="let row;let i=index ">
+            {{i+1}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
         <!-- customer Column -->
         <ng-container matColumnDef="customer">
           <mat-header-cell *matHeaderCellDef mat-sort-header="customer">
