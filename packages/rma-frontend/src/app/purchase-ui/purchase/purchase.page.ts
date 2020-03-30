@@ -53,6 +53,7 @@ export class PurchasePage implements OnInit {
   total: number = 0;
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
+  singleDateFormControl = new FormControl();
   constructor(
     private location: Location,
     private readonly purchaseService: PurchaseService,
@@ -82,6 +83,20 @@ export class PurchasePage implements OnInit {
     if (this.supplier) query.supplier_name = this.supplier;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
     this.dataSource.loadItems(
       undefined,
       event.pageIndex,
@@ -100,7 +115,8 @@ export class PurchasePage implements OnInit {
 
   dateFilter() {
     if (this.fromDateFormControl.value && this.toDateFormControl.value)
-      this.setFilter();
+      this.singleDateFormControl.setValue('');
+    this.setFilter();
   }
 
   setFilter(event?) {
@@ -113,6 +129,20 @@ export class PurchasePage implements OnInit {
         this.fromDateFormControl.value.date(),
       );
       query.toDate = new Date().setDate(this.toDateFormControl.value.date());
+    }
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
     }
     let sortQuery = {};
     if (event) {
@@ -143,12 +173,19 @@ export class PurchasePage implements OnInit {
     }
   }
 
+  singleDateFilter() {
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.setFilter();
+  }
+
   clearFilters() {
     this.supplier = '';
     this.name = '';
     this.status = 'All';
     this.fromDateFormControl.setValue('');
     this.toDateFormControl.setValue('');
+    this.singleDateFormControl.setValue('');
     this.dataSource.loadItems();
   }
 
