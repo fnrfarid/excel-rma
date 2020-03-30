@@ -58,7 +58,6 @@ export class AddSalesInvoicePage implements OnInit {
   calledFrom: string;
   dataSource: ItemsDataSource;
   series: string;
-  total: number = 0;
   postingDate: string;
   dueDate: string;
   address = {} as any;
@@ -170,27 +169,38 @@ export class AddSalesInvoicePage implements OnInit {
         postingDate: new FormControl('', [Validators.required]),
         dueDate: new FormControl('', [Validators.required]),
         campaign: new FormControl(false),
-        balance: new FormControl(''),
+        balance: new FormControl(0),
         remarks: new FormControl(''),
         items: new FormArray([], this.itemValidator),
+        total: new FormControl(0),
       },
       {
-        validators: [this.dueDateValidator],
+        validators: [this.dueDateValidator, this.creditLimitValidator],
       },
     );
     this.itemsControl = this.salesInvoiceForm.get('items') as FormArray;
   }
 
   dueDateValidator(abstractControl: AbstractControl) {
-    const dueDate = abstractControl.get('dueDate').value;
+    const dueDate = new Date(abstractControl.get('dueDate').value);
     if (!dueDate) {
       abstractControl.get('dueDate').setErrors({ required: true });
       return;
     }
-    const postingDate = abstractControl.get('postingDate').value;
+    const postingDate = new Date(abstractControl.get('postingDate').value);
 
     if (dueDate.setHours(0, 0, 0, 0) < postingDate.setHours(0, 0, 0, 0)) {
       abstractControl.get('dueDate').setErrors({ dueDate: true });
+    } else return null;
+  }
+
+  creditLimitValidator(abstractControl: AbstractControl) {
+    const balance = abstractControl.get('balance').value;
+    const total = abstractControl.get('total').value;
+    if (balance < total) {
+      abstractControl.get('balance').markAsTouched();
+      abstractControl.get('customer').markAsTouched();
+      abstractControl.get('balance').setErrors({ min: true });
     } else return null;
   }
 
@@ -464,10 +474,11 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   calculateTotal(itemList: Item[]) {
-    this.total = 0;
+    let sum = 0;
     itemList.forEach(item => {
-      this.total += item.qty * item.rate;
+      sum += item.qty * item.rate;
     });
+    this.salesInvoiceForm.get('total').setValue(sum);
   }
 
   selectedPostingDate($event) {

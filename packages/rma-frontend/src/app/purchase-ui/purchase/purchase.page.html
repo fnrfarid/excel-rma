@@ -105,7 +105,26 @@
               <mat-datepicker #toDate disabled="false"></mat-datepicker>
             </mat-form-field>
           </ion-col>
-          <ion-col size="auto">
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="singleDate"
+                placeholder="Select Date"
+                readonly
+                [formControl]="singleDateFormControl"
+                (dateChange)="singleDateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="singleDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #singleDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+          <ion-col class="ion-text-center">
             <ion-button
               color="tertiary"
               (click)="clearFilters()"
