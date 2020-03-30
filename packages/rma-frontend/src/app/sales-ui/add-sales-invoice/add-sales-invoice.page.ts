@@ -182,12 +182,12 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   dueDateValidator(abstractControl: AbstractControl) {
-    const dueDate = abstractControl.get('dueDate').value;
+    const dueDate = new Date(abstractControl.get('dueDate').value);
     if (!dueDate) {
       abstractControl.get('dueDate').setErrors({ required: true });
       return;
     }
-    const postingDate = abstractControl.get('postingDate').value;
+    const postingDate = new Date(abstractControl.get('postingDate').value);
 
     if (dueDate.setHours(0, 0, 0, 0) < postingDate.setHours(0, 0, 0, 0)) {
       abstractControl.get('dueDate').setErrors({ dueDate: true });
