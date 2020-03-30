@@ -1,5 +1,5 @@
 import { ICommand } from '@nestjs/cqrs';
-import { SetWarrantyMonthsDto } from 'src/item/entity/item/set-warranty-months-dto';
+import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
 
 export class SetWarrantyMonthsCommand implements ICommand {
   constructor(

@@ -48,7 +48,6 @@ export class CsvJsonService {
       );
       return false;
     }
-    this.snackBar.open(`CSV headers validated.`, CLOSE, { duration: 1500 });
     return true;
   }
 
@@ -95,7 +94,7 @@ export class CsvJsonService {
                 );
               }
               this.snackBar.open(
-                `Item not found : 
+                `Item not found :
               ${_.differenceWith(
                 item_names,
                 response.map(element => {
