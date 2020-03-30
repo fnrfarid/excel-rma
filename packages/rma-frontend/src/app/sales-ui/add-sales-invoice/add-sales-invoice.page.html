@@ -198,6 +198,11 @@
                   formControlName="balance"
                   [value]="salesInvoiceForm.get('balance').value | curFormat | async"
                 />
+                <mat-error
+                  *ngIf="f.balance.errors && f.balance.hasError('min')"
+                >
+                  Credit limit exceeded
+                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -344,7 +349,7 @@
               >{{row.rate * row.qty | curFormat | async}}</mat-cell
             >
             <mat-footer-cell *matFooterCellDef
-              >{{total | curFormat | async }}</mat-footer-cell
+              >{{f.total.value | curFormat | async }}</mat-footer-cell
             >
           </ng-container>
           <ng-container matColumnDef="delete">
