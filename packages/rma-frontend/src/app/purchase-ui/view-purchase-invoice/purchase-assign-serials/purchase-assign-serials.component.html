@@ -233,9 +233,10 @@
         <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <input
+            matInput
             oninput="this.value = this.value.toUpperCase()"
-            *ngIf="row.serial_no.length === 1 ? true : false"
-            disabled="row.has_serial_no"
+            *ngIf="!row.serial_no[1]"
+            [disabled]="row.serial_no[0] === 'Non Serial Item' ? true : false"
             [(ngModel)]="row.serial_no[0]"
           />
           <p *ngIf="row.serial_no.length === 1 ? false : true">
