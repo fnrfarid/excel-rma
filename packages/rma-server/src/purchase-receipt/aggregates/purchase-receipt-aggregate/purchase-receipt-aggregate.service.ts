@@ -39,9 +39,13 @@ import {
   SERIAL_NO_DOCTYPE_NAME,
   MONGO_INSERT_MANY_BATCH_NUMBER,
   SERIAL_NO_VALIDATION_BATCH_SIZE,
+  SUBMITTED_STATUS,
 } from '../../../constants/app-strings';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
-import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
+import {
+  PurchaseReceiptMetaData,
+  PurchaseInvoice,
+} from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/purchase-receipt-policies.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
@@ -524,7 +528,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           $push: {
             purchase_receipt_names: { $each: [purchaseReceipt.name] },
           },
-          $set: { status: COMPLETED_STATUS },
         },
       )
       .then(done => {})
@@ -634,12 +637,28 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           payload.items,
           purchase_invoice.purchase_receipt_items_map,
         );
+        const status = this.getStatus(
+          purchase_invoice,
+          purchase_receipt_items_map,
+        );
         this.purchaseInvoiceService.updateOne(
           { name: purchase_invoice_name },
-          { $set: { purchase_receipt_items_map } },
+          { $set: { purchase_receipt_items_map, status } },
         );
       })
       .catch(() => {});
+  }
+
+  getStatus(
+    purchase_invoice: PurchaseInvoice,
+    purchase_receipt_items_map: any,
+  ) {
+    let total = 0;
+    for (const key of Object.keys(purchase_receipt_items_map)) {
+      total += purchase_receipt_items_map[key];
+    }
+    if (total === purchase_invoice.total_qty) return COMPLETED_STATUS;
+    else return SUBMITTED_STATUS;
   }
 
   async retrievePurchaseInvoice(uuid: string, req) {
