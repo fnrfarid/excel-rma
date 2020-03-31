@@ -700,8 +700,22 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   addSerialsFromCsvJson(csvJsonObj: CsvJsonObj | any) {
     const data = this.itemDataSource.data();
-    data.forEach(element => {
-      this.assignRangeSerial(element, csvJsonObj[element.item_name].serial_no);
+    data.some(element => {
+      if (csvJsonObj[element.item_name]) {
+        if (!element.has_serial_no) {
+          this.snackBar.open(
+            `${element.item_name} is not a non-serial item.`,
+            CLOSE,
+            { duration: 3500 },
+          );
+          return true;
+        }
+        this.assignRangeSerial(
+          element,
+          csvJsonObj[element.item_name].serial_no,
+        );
+        return false;
+      }
     });
   }
 }

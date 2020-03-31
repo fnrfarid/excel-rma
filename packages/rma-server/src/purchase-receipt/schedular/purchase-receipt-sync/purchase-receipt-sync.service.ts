@@ -14,7 +14,6 @@ import { ServerSettings } from '../../../system-settings/entities/server-setting
 import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { COMPLETED_STATUS } from '../../../constants/app-strings';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
@@ -118,7 +117,6 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
           $push: {
             purchase_receipt_names: { $each: success.data.message },
           },
-          $set: { status: COMPLETED_STATUS },
         },
       )
       .then(done => {})

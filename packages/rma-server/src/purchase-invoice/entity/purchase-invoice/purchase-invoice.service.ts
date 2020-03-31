@@ -2,6 +2,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PurchaseInvoice } from './purchase-invoice.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class PurchaseInvoiceService {
@@ -28,6 +30,35 @@ export class PurchaseInvoiceService {
     return await this.purchaseInvoiceRepository.findOne(param, options);
   }
 
+  aggregateList($skip = 0, $limit = 10, $match, $sort, $group) {
+    return this.asyncAggregate([
+      { $match },
+      { $skip },
+      { $limit },
+      {
+        $lookup: {
+          from: 'purchase_receipt',
+          localField: 'purchase_receipt_names',
+          foreignField: 'name',
+          as: 'purchase_receipt',
+        },
+      },
+      {
+        $unwind: '$purchase_receipt',
+      },
+      { $group },
+      { $sort },
+    ]);
+  }
+
+  asyncAggregate(query) {
+    return of(this.purchaseInvoiceRepository.aggregate(query)).pipe(
+      switchMap((aggregateData: any) => {
+        return aggregateData.toArray();
+      }),
+    );
+  }
+
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
     let dateQuery = {};
@@ -37,9 +68,16 @@ export class PurchaseInvoiceService {
     } catch (error) {
       sortQuery = { created_on: 'desc' };
     }
-
+    sortQuery =
+      Object.keys(sortQuery).length === 0 ? { created_on: 'desc' } : sortQuery;
     for (const key of Object.keys(sortQuery)) {
       sortQuery[key] = sortQuery[key].toUpperCase();
+      if (sortQuery[key] === 'ASC') {
+        sortQuery[key] = 1;
+      }
+      if (sortQuery[key] === 'DESC') {
+        sortQuery[key] = -1;
+      }
       if (!sortQuery[key]) {
         delete sortQuery[key];
       }
@@ -58,15 +96,17 @@ export class PurchaseInvoiceService {
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
     ];
+    const $group = this.getKeys();
 
     const where: { $and: any } = { $and };
 
-    const results = await this.purchaseInvoiceRepository.find({
+    const results = await this.aggregateList(
       skip,
       take,
       where,
-      order: sortQuery,
-    });
+      sortQuery,
+      $group,
+    ).toPromise();
 
     return {
       docs: results || [],
@@ -81,18 +121,34 @@ export class PurchaseInvoiceService {
       if (query[key]) {
         if (key === 'status' && query[key] === 'All') {
           delete query[key];
-        } else if (key === 'fromDate') {
-          delete query[key];
-        } else if (key === 'toDate') {
+        } else if (key === 'fromDate' || key === 'toDate') {
           delete query[key];
         } else {
-          query[key] = new RegExp(query[key], 'i');
+          query[key] = { $regex: query[key], $options: 'i' };
         }
       } else {
         delete query[key];
       }
     });
     return query;
+  }
+
+  getKeys() {
+    const group: any = {};
+    const keys = this.purchaseInvoiceRepository.manager.connection
+      .getMetadata(PurchaseInvoice)
+      .ownColumns.map(column => column.propertyName);
+    keys.splice(keys.indexOf('_id'), 1);
+    keys.splice(keys.indexOf('purchase_receipt_names'), 1);
+
+    group._id = '$' + '_id';
+    group.delivered_by = { $addToSet: '$purchase_receipt.deliveredBy' };
+    keys.forEach(key => {
+      group[key] = {
+        $first: '$' + key,
+      };
+    });
+    return group;
   }
 
   async deleteOne(query, options?) {
