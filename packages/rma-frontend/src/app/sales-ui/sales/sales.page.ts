@@ -140,10 +140,18 @@ export class SalesPage implements OnInit {
       }
     }
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.date(),
+      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
       );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
+      query.toDate = new Date(this.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
     }
     if (this.singleDateFormControl.value) {
       query.fromDate = new Date(this.singleDateFormControl.value).setHours(
@@ -206,10 +214,18 @@ export class SalesPage implements OnInit {
       }
     }
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.date(),
+      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
       );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
+      query.toDate = new Date(this.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
     }
     if (this.singleDateFormControl.value) {
       query.fromDate = new Date(this.singleDateFormControl.value).setHours(

@@ -37,15 +37,22 @@ export class SalesInvoiceService {
     } catch (error) {
       sortQuery = { created_on: 'desc' };
     }
-
+    sortQuery =
+      Object.keys(sortQuery).length === 0 ? { created_on: 'desc' } : sortQuery;
     for (const key of Object.keys(sortQuery)) {
       sortQuery[key] = sortQuery[key].toUpperCase();
+      if (sortQuery[key] === 'ASC') {
+        sortQuery[key] = 1;
+      }
+      if (sortQuery[key] === 'DESC') {
+        sortQuery[key] = -1;
+      }
       if (!sortQuery[key]) {
         delete sortQuery[key];
       }
     }
 
-    if (filter_query.fromDate && filter_query.toDate) {
+    if (filter_query?.fromDate && filter_query?.toDate) {
       dateQuery = {
         created_on: {
           $gte: new Date(filter_query.fromDate),
@@ -59,23 +66,39 @@ export class SalesInvoiceService {
       dateQuery,
     ];
 
+    const $group = this.getKeys();
+
     const where: { $and: any } = { $and };
 
-    const select: any[] = this.getColumns();
-    select.splice(select.indexOf('delivery_note_items'), 1);
-    const results = await this.salesInvoiceRepository.find({
+    const results = await this.aggregateList(
       skip,
       take,
       where,
-      order: sortQuery,
-      select,
-    });
+      sortQuery,
+      $group,
+    ).toPromise();
 
     return {
       docs: results || [],
       length: await this.salesInvoiceRepository.count(where),
       offset: skip,
     };
+  }
+
+  aggregateList($skip = 0, $limit = 10, $match, $sort, $group) {
+    return this.asyncAggregate([
+      { $match },
+      { $skip },
+      { $limit },
+      {
+        $unwind: {
+          path: '$delivery_note_items',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      { $group },
+      { $sort },
+    ]);
   }
 
   async deleteOne(query, param?) {
@@ -100,12 +123,10 @@ export class SalesInvoiceService {
           query[key] = true;
         } else if (key === 'isCampaign' && query[key] === false) {
           query[key] = false;
-        } else if (key === 'fromDate') {
-          delete query[key];
-        } else if (key === 'toDate') {
+        } else if (key === 'fromDate' || key === 'toDate') {
           delete query[key];
         } else {
-          query[key] = new RegExp(query[key], 'i');
+          query[key] = { $regex: query[key], $options: 'i' };
         }
       } else {
         delete query[key];
@@ -120,6 +141,22 @@ export class SalesInvoiceService {
         return aggregateData.toArray();
       }),
     );
+  }
+
+  getKeys() {
+    const group: any = {};
+    const keys = this.getColumns();
+    keys.splice(keys.indexOf('_id'), 1);
+    keys.splice(keys.indexOf('delivery_note_items'), 1);
+
+    group._id = '$' + '_id';
+    group.delivered_by = { $addToSet: '$delivery_note_items.deliveredBy' };
+    keys.forEach(key => {
+      group[key] = {
+        $first: '$' + key,
+      };
+    });
+    return group;
   }
 
   getColumns() {
