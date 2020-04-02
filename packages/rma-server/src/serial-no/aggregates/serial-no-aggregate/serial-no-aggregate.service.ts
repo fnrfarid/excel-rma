@@ -241,6 +241,21 @@ export class SerialNoAggregateService extends AggregateRoot {
     return this.serialNoPolicyService.validateSerials(payload);
   }
 
+  getPurchaseInvoiceDeliveredSerials(
+    purchase_receipt_names,
+    search,
+    skip = 0,
+    take = 10,
+    clientHttpRequest,
+  ) {
+    return this.serialNoService.listPurchasedSerial(
+      purchase_receipt_names,
+      skip,
+      take,
+      search,
+    );
+  }
+
   getSalesInvoiceDeliveryNoteSerials(
     find,
     search,

@@ -70,3 +70,13 @@ mat-cell {
   top: 25px;
   right: 0;
 }
+
+.mat-paginator-sticky {
+  bottom: 0px;
+  position: sticky;
+  z-index: 10;
+}
+
+.mat-column-sr_no {
+  flex: 0 0 5%;
+}

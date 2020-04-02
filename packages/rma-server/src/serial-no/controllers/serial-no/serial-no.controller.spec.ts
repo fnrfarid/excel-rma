@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SerialNoController } from './serial-no.controller';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
+import { SerialNoAggregateService } from '../../aggregates/serial-no-aggregate/serial-no-aggregate.service';
 
 describe('SerialNo Controller', () => {
   let controller: SerialNoController;
@@ -16,6 +17,10 @@ describe('SerialNo Controller', () => {
         },
         {
           provide: QueryBus,
+          useValue: {},
+        },
+        {
+          provide: SerialNoAggregateService,
           useValue: {},
         },
       ],

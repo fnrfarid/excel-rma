@@ -3,13 +3,13 @@
   horizontal="end"
   slot="fixed"
   class="ion-margin-end"
-  *ngIf="filteredItemList.length !== 0"
+  *ngIf="remaining > 0"
 >
   <ion-fab-button class="fab-position" (click)="submitDeliveryNote()">
     <ion-icon name="lock-closed"></ion-icon>
   </ion-fab-button>
 </ion-fab>
-<ion-card *ngIf="filteredItemList.length !== 0">
+<ion-card *ngIf="remaining > 0">
   <ion-card-content>
     <ion-grid class="ion-no-padding">
       <ion-row class="align">
@@ -79,7 +79,7 @@
 </ion-card>
 
 <!-- Serial Range Card -->
-<ion-card *ngIf="filteredItemList.length !== 0">
+<ion-card *ngIf="remaining > 0">
   <ion-card-header>
     <ion-card-title>
       <ion-text color="tertiary">
@@ -126,10 +126,7 @@
   </ion-card-content>
 </ion-card>
 
-<ion-grid
-  class="ion-no-padding"
-  *ngIf="salesInvoiceDetails && filteredItemList.length === 0"
->
+<ion-grid class="ion-no-padding" *ngIf="salesInvoiceDetails && remaining === 0">
   <ion-row>
     <ion-col>
       <ion-text class="ion-text-center" style="color: black;">
@@ -139,7 +136,7 @@
   </ion-row>
 </ion-grid>
 
-<ion-card *ngIf="filteredItemList.length !== 0">
+<ion-card *ngIf="remaining > 0">
   <ion-card-header>
     <ion-card-title>
       <ion-text color="tertiary">
@@ -225,7 +222,7 @@
   </ion-card-content>
 </ion-card>
 
-<ion-card *ngIf="filteredItemList.length !== 0">
+<ion-card *ngIf="remaining > 0">
   <ion-card-header>
     <ion-card-title>
       <ion-text color="tertiary">

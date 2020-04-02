@@ -130,6 +130,8 @@ export class SerialsComponent implements OnInit {
   ];
   deliveredSerialsSearch: string = '';
   disableDeliveredSerialsCard: boolean = false;
+  remaining: number = 0;
+
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -277,6 +279,7 @@ export class SerialsComponent implements OnInit {
 
   getFilteredItems(salesInvoice: SalesInvoiceDetails) {
     const filteredItemList = [];
+    let remaining = 0;
     salesInvoice.items.forEach(item => {
       item.assigned = 0;
       item.remaining = item.qty;
@@ -285,8 +288,10 @@ export class SerialsComponent implements OnInit {
         item.remaining =
           item.qty - salesInvoice.delivered_items_map[item.item_code];
       }
+      remaining += item.remaining;
       filteredItemList.push(item);
     });
+    this.remaining = remaining;
     return filteredItemList;
   }
 

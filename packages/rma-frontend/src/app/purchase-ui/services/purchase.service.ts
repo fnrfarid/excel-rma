@@ -13,6 +13,7 @@ import {
   API_INFO_ENDPOINT,
   CREATE_PURCHASE_RECEIPT_ENDPOINT,
   CREATE_PURCHASE_RECEIPT_BULK_ENDPOINT,
+  GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
 import { PurchaseReceipt } from '../../common/interfaces/purchase-receipt.interface';
@@ -84,6 +85,28 @@ export class PurchaseService {
           uploadData,
           { headers },
         );
+      }),
+    );
+  }
+
+  getDeliveredSerials(purchase_receipt_names, search, offset, limit) {
+    const url = GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', limit.toString())
+      .set('offset', (offset * limit).toString())
+      .set('search', search);
+    const blob = new Blob([JSON.stringify(purchase_receipt_names)], {
+      type: 'application/json',
+    });
+    const uploadData = new FormData();
+    uploadData.append('file', blob, 'purchase_receipts');
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, uploadData, {
+          params,
+          headers,
+        });
       }),
     );
   }
