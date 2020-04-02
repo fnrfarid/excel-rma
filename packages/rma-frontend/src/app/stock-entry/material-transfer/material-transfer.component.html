@@ -11,7 +11,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="page-background">
   <ion-card>
     <ion-card-header>
       <ion-row class="align">
@@ -23,9 +23,7 @@
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right">
-          <ion-button
-            color="tertiary"
-            (click)="createMaterialTransfer()">
+          <ion-button color="tertiary" (click)="createMaterialTransfer()">
             Create
           </ion-button>
         </ion-col>
@@ -36,14 +34,28 @@
         <ion-row>
           <ion-col>
             <mat-form-field class="example-full-width">
-              <input matInput oninput="this.value = this.value.toUpperCase()" placeholder="From Range" type="text"
-                name="From Range" [(ngModel)]="rangePickerState.fromRange"
-                (ngModelChange)="this.fromRangeUpdate.next($event)" required />
+              <input
+                matInput
+                oninput="this.value = this.value.toUpperCase()"
+                placeholder="From Range"
+                type="text"
+                name="From Range"
+                [(ngModel)]="rangePickerState.fromRange"
+                (ngModelChange)="this.fromRangeUpdate.next($event)"
+                required
+              />
             </mat-form-field>
             <mat-form-field class="example-full-width">
-              <input type="text" oninput="this.value = this.value.toUpperCase()" matInput placeholder="To Range"
-                type="string" name="To Range" [(ngModel)]="rangePickerState.toRange"
-                (ngModelChange)="this.toRangeUpdate.next($event)" />
+              <input
+                type="text"
+                oninput="this.value = this.value.toUpperCase()"
+                matInput
+                placeholder="To Range"
+                type="string"
+                name="To Range"
+                [(ngModel)]="rangePickerState.toRange"
+                (ngModelChange)="this.toRangeUpdate.next($event)"
+              />
             </mat-form-field>
           </ion-col>
 
@@ -54,28 +66,47 @@
           </ion-col>
 
           <ion-col>
-
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Source Warehouse" matInput [formControl]="warehouseState.s_warehouse"
-                [matAutocomplete]="from_warehouse" />
-              <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
-                <mat-option *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse.name">
+              <input
+                type="text"
+                placeholder="Source Warehouse"
+                matInput
+                [formControl]="warehouseState.s_warehouse"
+                [matAutocomplete]="from_warehouse"
+              />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #from_warehouse="matAutocomplete"
+              >
+                <mat-option
+                  *ngFor="let s_warehouse of filteredWarehouseList1 | async"
+                  [value]="s_warehouse.name"
+                >
                   {{ s_warehouse.name }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
 
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Target Warehouse" matInput [formControl]="warehouseState.t_warehouse"
-                [matAutocomplete]="warehouse"/>
-              <mat-autocomplete autoActiveFirstOption #warehouse="matAutocomplete">
-                <mat-option *ngFor="let warehouse of filteredWarehouseList2 | async" [value]="warehouse.name">
+              <input
+                type="text"
+                placeholder="Target Warehouse"
+                matInput
+                [formControl]="warehouseState.t_warehouse"
+                [matAutocomplete]="warehouse"
+              />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #warehouse="matAutocomplete"
+              >
+                <mat-option
+                  *ngFor="let warehouse of filteredWarehouseList2 | async"
+                  [value]="warehouse.name"
+                >
                   {{ warehouse.name }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>
-
-
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -93,9 +124,7 @@
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right">
-          <ion-button
-            color="tertiary"
-            (click)="addRow()">
+          <ion-button color="tertiary" (click)="addRow()">
             Add
           </ion-button>
         </ion-col>
@@ -103,7 +132,11 @@
     </ion-card-header>
 
     <ion-card-content class="ion-no-padding">
-      <mat-table #table [dataSource]="materialTransferDataSource" style="width: 100%;">
+      <mat-table
+        #table
+        [dataSource]="materialTransferDataSource"
+        style="width: 100%;"
+      >
         <ng-container matColumnDef="s_warehouse">
           <mat-header-cell *matHeaderCellDef>Source Warehouse</mat-header-cell>
           <mat-cell *matCellDef="let row">
@@ -140,7 +173,6 @@
           </mat-cell>
         </ng-container>
 
-
         <ng-container matColumnDef="serial_no">
           <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
           <mat-cell appearance="outline" *matCellDef="let row">
@@ -169,7 +201,11 @@
           *matHeaderRowDef="materialTransferDisplayedColumns; sticky: true"
         ></mat-header-row>
         <mat-row
-          *matRowDef="let row; columns: materialTransferDisplayedColumns; let i = index"
+          *matRowDef="
+            let row;
+            columns: materialTransferDisplayedColumns;
+            let i = index
+          "
         ></mat-row>
       </mat-table>
     </ion-card-content>

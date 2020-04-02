@@ -9,6 +9,8 @@ import {
   Get,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
@@ -30,12 +32,15 @@ import {
   DELIVERY_NOTE,
   PURCHASE_RECEIPT,
 } from '../../../constants/app-strings';
+import { SerialNoAggregateService } from '../../aggregates/serial-no-aggregate/serial-no-aggregate.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('serial_no')
 export class SerialNoController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly serialAggregateService: SerialNoAggregateService,
   ) {}
 
   @Post('v1/create')
@@ -99,6 +104,25 @@ export class SerialNoController {
         find,
         clientHttpRequest,
       ),
+    );
+  }
+
+  @Post('v1/get_purchase_invoice_delivered_serials')
+  @UseGuards(TokenGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async getPurchaseInvoiceDeliveredSerials(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 10,
+    @Query('search') search = '',
+    @UploadedFile('file') file,
+    @Req() clientHttpRequest,
+  ) {
+    return await this.serialAggregateService.getPurchaseInvoiceDeliveredSerials(
+      JSON.parse(file.buffer),
+      search,
+      +offset,
+      +limit,
+      clientHttpRequest,
     );
   }
 

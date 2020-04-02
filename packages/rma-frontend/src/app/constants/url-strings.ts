@@ -80,5 +80,7 @@ export const LIST_WARRANTY_INVOICE_ENDPOINT = 'api/warranty_claim/v1/list';
 export const VIEW_WARRANTY_INVOICE_PAGE_URL = 'view-warranty';
 export const GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT =
   '/api/serial_no/v1/get_sales_invoice_delivered_serials';
+export const GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT =
+  '/api/serial_no/v1/get_purchase_invoice_delivered_serials';
 export const WARRANTY_CLAIM_GET_ONE_ENDPOINT = '/api/warranty_claim/v1/get/';
 export const STOCK_ENTRY_CREATE_ENDPOINT = '/api/stock_entry/v1/create';

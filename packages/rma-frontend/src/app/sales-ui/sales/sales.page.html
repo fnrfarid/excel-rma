@@ -229,8 +229,7 @@
             Delivered By
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{ (row.delivery_note_items.length === 0) ? '' :
-            row.delivery_note_items[0]?.deliveredBy }}
+            {{ (row.delivered_by.length === 0) ? '' : row.delivered_by[0] }}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>

@@ -43,6 +43,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
+import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -100,8 +101,24 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     'delete',
   ];
   serialDataSource: SerialDataSource;
+  deliveredSerialsDisplayedColumns = [
+    'sr_no',
+    'serial_no',
+    'item_code',
+    'purchase_date',
+    'purchase_rate',
+    'supplier',
+    'company',
+    'purchase_document_no',
+    'warehouse',
+  ];
+  purchasedSerialsDataSource: PurchasedSerialsDataSource;
+  displayDeliveredSerialsTable: boolean = false;
+  remaining: number = 0;
+  deliveredSerialsSearch: string = '';
   filteredItemList = [];
-
+  index: number = 0;
+  size: number = 10;
   constructor(
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
@@ -118,6 +135,9 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.onToRange(this.value);
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
+    this.purchasedSerialsDataSource = new PurchasedSerialsDataSource(
+      this.purchaseService,
+    );
     this.purchaseReceiptDate = this.getParsedDate(this.date.value);
     this.getPurchaseInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
@@ -130,6 +150,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   getFilteredItems(purchaseInvoice: PurchaseInvoiceDetails) {
     const filteredItemList = [];
+    let remaining = 0;
     purchaseInvoice.items.forEach(item => {
       item.assigned = 0;
       item.remaining = item.qty;
@@ -139,8 +160,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         item.remaining =
           item.qty - purchaseInvoice.purchase_receipt_items_map[item.item_code];
       }
+      remaining += item.remaining;
       filteredItemList.push(item);
     });
+    this.remaining = remaining;
     return filteredItemList;
   }
 
@@ -148,9 +171,15 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.purchaseService.getPurchaseInvoice(uuid).subscribe({
       next: (res: PurchaseInvoiceDetails) => {
         this.purchaseInvoiceDetails = res as PurchaseInvoiceDetails;
-
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
+        this.displayDeliveredSerialsTable =
+          Object.keys(res.purchase_receipt_items_map).length !== 0
+            ? true
+            : false;
+        if (this.displayDeliveredSerialsTable) {
+          this.getDeliveredSerials();
+        }
       },
       error: err => {
         this.snackBar.open(
@@ -162,6 +191,30 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         );
       },
     });
+  }
+
+  getDeliveredSerials() {
+    this.purchasedSerialsDataSource.loadItems(
+      this.purchaseInvoiceDetails.purchase_receipt_names,
+      this.deliveredSerialsSearch,
+      this.index,
+      this.size,
+    );
+  }
+
+  setFilter() {
+    this.getDeliveredSerials();
+  }
+
+  getUpdate(event) {
+    this.index = event.pageIndex;
+    this.size = event.pageSize;
+    this.purchasedSerialsDataSource.loadItems(
+      this.purchaseInvoiceDetails.purchase_receipt_names,
+      this.deliveredSerialsSearch,
+      this.index,
+      this.size,
+    );
   }
 
   async submitPurchaseReceipt() {
