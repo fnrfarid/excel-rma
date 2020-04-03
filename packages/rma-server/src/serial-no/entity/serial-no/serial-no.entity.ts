@@ -120,4 +120,7 @@ export class SerialNo extends BaseEntity {
 
   @Column()
   isSynced: boolean;
+
+  @Column()
+  purchase_date: string;
 }

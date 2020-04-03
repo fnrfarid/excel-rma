@@ -313,7 +313,7 @@
 </ion-card>
 
 <ion-card *ngIf="salesInvoiceDetails && !disableDeliveredSerialsCard">
-  <ion-card-header>
+  <ion-card-header style="padding-bottom: 0;">
     <ion-card-title>
       <ion-text color="tertiary">
         Delivered Serials
@@ -337,8 +337,14 @@
     <mat-table
       #table
       [dataSource]="deliveredSerialsDataSource"
-      style="width: 100%;"
+      style="width: 100%;max-height: 58vh;overflow: auto;"
     >
+      <ng-container matColumnDef="sr_no">
+        <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+        <mat-cell *matCellDef="let row; let i = index">
+          {{ i + 1 }}
+        </mat-cell>
+      </ng-container>
       <!-- salesWarrantyDate -->
       <ng-container matColumnDef="salesWarrantyDate">
         <mat-header-cell *matHeaderCellDef>Sales Warranty Date</mat-header-cell>
@@ -364,7 +370,7 @@
         <mat-header-cell *matHeaderCellDef>Purchase Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.purchase_date }}
+            {{ row.purchase_date | date: 'dd-MM-yyyy' }}
           </ng-container>
         </mat-cell>
       </ng-container>
@@ -430,5 +436,15 @@
         "
       ></mat-row>
     </mat-table>
+    <mat-card-actions>
+      <mat-paginator
+        #paginator
+        class="mat-paginator-sticky"
+        (page)="getUpdate($event)"
+        [length]="deliveredSerialsDataSource.length"
+        [pageSizeOptions]="[10, 50, 100, 500]"
+      >
+      </mat-paginator>
+    </mat-card-actions>
   </ion-card-content>
 </ion-card>
