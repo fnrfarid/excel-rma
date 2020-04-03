@@ -44,7 +44,10 @@ export class PurchaseInvoiceService {
         },
       },
       {
-        $unwind: '$purchase_receipt',
+        $unwind: {
+          path: '$purchase_receipt',
+          preserveNullAndEmptyArrays: true,
+        },
       },
       { $group },
       { $sort },
