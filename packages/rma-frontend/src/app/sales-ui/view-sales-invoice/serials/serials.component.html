@@ -146,11 +146,11 @@
   </ion-card-header>
   <ion-card-content class="ion-no-padding">
     <mat-table #table [dataSource]="itemDataSource" style="width: 100%;">
-      <ng-container matColumnDef="item_code">
-        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+      <ng-container matColumnDef="salesWarrantyMonths">
+        <mat-header-cell *matHeaderCellDef>Warranty In Months</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.item_code }}
+            {{ row.salesWarrantyMonths }}
           </ng-container>
         </mat-cell>
       </ng-container>
@@ -339,22 +339,22 @@
       [dataSource]="deliveredSerialsDataSource"
       style="width: 100%;"
     >
-      <!-- Serial No -->
+      <!-- salesWarrantyDate -->
+      <ng-container matColumnDef="salesWarrantyDate">
+        <mat-header-cell *matHeaderCellDef>Sales Warranty Date</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ row.warranty?.salesWarrantyDate }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <!-- serial no-->
       <ng-container matColumnDef="serial_no">
         <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
             {{ row.serial_no }}
-          </ng-container>
-        </mat-cell>
-      </ng-container>
-
-      <!-- item_code -->
-      <ng-container matColumnDef="item_code">
-        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.item_code }}
           </ng-container>
         </mat-cell>
       </ng-container>

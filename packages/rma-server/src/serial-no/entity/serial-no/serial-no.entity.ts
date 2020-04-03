@@ -7,6 +7,12 @@ import {
   Index,
 } from 'typeorm';
 
+export class Warranty {
+  purchaseWarrantyDate: string;
+  salesWarrantyDate: string;
+  purchasedOn: Date;
+  soldOn: Date;
+}
 @Entity()
 export class SerialNo extends BaseEntity {
   @ObjectIdColumn()
@@ -105,6 +111,9 @@ export class SerialNo extends BaseEntity {
 
   @Column()
   company: string;
+
+  @Column()
+  warranty: Warranty;
 
   @Column()
   doctype: string;
