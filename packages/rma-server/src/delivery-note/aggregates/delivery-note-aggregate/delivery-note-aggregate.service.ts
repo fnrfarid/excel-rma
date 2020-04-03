@@ -26,6 +26,7 @@ import {
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
 } from '../../../constants/app-strings';
+import { DateTime } from 'luxon';
 import { AssignSerialDto } from '../../../serial-no/entity/serial-no/assign-serial-dto';
 import {
   CreateDeliveryNoteInterface,
@@ -123,6 +124,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
   }
 
   createDeliveryNote(assignPayload: AssignSerialDto, clientHttpRequest) {
+    let timezone;
     return this.settingsService
       .find()
       .pipe(
@@ -130,6 +132,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           if (!settings) {
             return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
           }
+          timezone = settings.timeZone;
           this.salesInvoiceService
             .updateOne(
               { name: assignPayload.sales_invoice_name },
@@ -151,6 +154,23 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           const serials = [];
           const items = [];
           const delivered_items_map = {};
+          assignPayload.items.forEach(item => {
+            if (item.has_serial_no) {
+              this.serialNoService
+                .updateMany(
+                  { serial_no: { $in: item.serial_no.split('\n') } },
+                  {
+                    $set: {
+                      'warranty.salesWarrantyDate': item.warranty_date,
+                      'warranty.soldOn': new DateTime(timezone).toJSDate(),
+                    },
+                  },
+                )
+                .then(success => {})
+                .catch(err => {});
+            }
+          });
+
           response.items.filter(item => {
             if (item.serial_no) {
               serials.push(...item.serial_no.split('\n'));

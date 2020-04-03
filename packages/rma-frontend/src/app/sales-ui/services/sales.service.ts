@@ -180,20 +180,6 @@ export class SalesService {
     );
   }
 
-  getItem(uuid: string) {
-    let foundItem = {} as Item;
-    foundItem.item_code = '';
-    foundItem.item_name = '';
-    foundItem.qty = null;
-    foundItem.rate = null;
-
-    this.itemList.forEach(item => {
-      if (item.item_code === uuid) foundItem = item;
-    });
-
-    return of(foundItem);
-  }
-
   getDeliveryNoteList(pageNumber?, pageSize?) {
     const url = LIST_SALES_INVOICE_ENDPOINT;
     const params = new HttpParams()

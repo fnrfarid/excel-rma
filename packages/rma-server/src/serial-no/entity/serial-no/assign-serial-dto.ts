@@ -64,10 +64,14 @@ export class DeliveryNoteItemDto {
   has_serial_no: number;
 
   @IsNotEmpty()
+  @IsString()
+  warranty_date: string;
+
+  @IsNotEmpty()
   @IsNumber()
   amount: number;
 
   @IsNotEmpty()
   @IsArray()
-  serial_no: string[];
+  serial_no: any;
 }
