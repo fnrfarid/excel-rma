@@ -79,6 +79,31 @@ export class SerialNoService {
     };
   }
 
+  async listDeliveredSerial(delivery_note_names, search, skip = 0, take = 10) {
+    const serialNoQuery = {
+      delivery_note: { $in: delivery_note_names },
+    };
+    const searchQuery = {
+      serial_no: { $regex: search, $options: 'i' },
+    };
+
+    const $and: any[] = [serialNoQuery, searchQuery];
+
+    const where: { $and: any } = { $and };
+
+    const counter = await this.serialNoRepository.findAndCount({
+      where,
+      skip,
+      take,
+    });
+
+    return {
+      docs: counter[0] || [],
+      length: counter[1],
+      offset: skip,
+    };
+  }
+
   async deleteOne(query, options?) {
     return await this.serialNoRepository.deleteOne(query, options);
   }

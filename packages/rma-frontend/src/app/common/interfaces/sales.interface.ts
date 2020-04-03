@@ -23,6 +23,7 @@ export class Item {
   serial_no?: string;
   delivery_note?: string;
   has_serial_no?: number;
+  salesWarrantyMonths?: number;
   against_sales_invoice?: string;
   stock?: any;
   assigned?: number;

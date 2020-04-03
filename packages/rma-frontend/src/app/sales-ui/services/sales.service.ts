@@ -67,11 +67,11 @@ export class SalesService {
     );
   }
 
-  getDeliveredSerials(uuid: string, search: string) {
+  getDeliveredSerials(uuid: string, search: string, offset, limit) {
     const url = GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT;
     const params = new HttpParams()
-      .set('limit', '5')
-      .set('offset', '0')
+      .set('limit', limit.toString())
+      .set('offset', (offset * limit).toString())
       .set('find', uuid)
       .set('search', search);
     return this.getHeaders().pipe(
@@ -178,20 +178,6 @@ export class SalesService {
           );
       }),
     );
-  }
-
-  getItem(uuid: string) {
-    let foundItem = {} as Item;
-    foundItem.item_code = '';
-    foundItem.item_name = '';
-    foundItem.qty = null;
-    foundItem.rate = null;
-
-    this.itemList.forEach(item => {
-      if (item.item_code === uuid) foundItem = item;
-    });
-
-    return of(foundItem);
   }
 
   getDeliveryNoteList(pageNumber?, pageSize?) {
