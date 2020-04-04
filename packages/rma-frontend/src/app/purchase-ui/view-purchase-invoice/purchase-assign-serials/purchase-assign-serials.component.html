@@ -358,41 +358,34 @@
       </ng-container>
 
       <!-- item_code -->
-      <ng-container matColumnDef="item_code">
-        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+      <ng-container matColumnDef="item_name">
+        <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.item_code }}
+            {{ itemMap[row.item_code]?.item_name }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="purchase_warranty_period">
+        <mat-header-cell *matHeaderCellDef
+          >Purchase Warranty Period [Months]</mat-header-cell
+        >
+        <mat-cell *matCellDef="let row">
+          <ng-container>
+            {{ itemMap[row.item_code]?.purchaseWarrantyMonths }}
           </ng-container>
         </mat-cell>
       </ng-container>
 
       <!-- purchase_date -->
-      <ng-container matColumnDef="purchase_date">
-        <mat-header-cell *matHeaderCellDef>Purchase Date</mat-header-cell>
+      <ng-container matColumnDef="purchase_warranty_expiry">
+        <mat-header-cell *matHeaderCellDef
+          >Purchase Warranty Expiry</mat-header-cell
+        >
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.purchase_date | date: 'dd-MM-yyyy' }}
-          </ng-container>
-        </mat-cell>
-      </ng-container>
-
-      <!-- purchase_rate -->
-      <ng-container matColumnDef="purchase_rate">
-        <mat-header-cell *matHeaderCellDef>Purchase Rate</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.purchase_rate }}
-          </ng-container>
-        </mat-cell>
-      </ng-container>
-
-      <!-- supplier -->
-      <ng-container matColumnDef="supplier">
-        <mat-header-cell *matHeaderCellDef>Supplier</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.supplier }}
+            {{ row.warranty?.purchaseWarrantyDate | date: 'dd-MM-yyyy' }}
           </ng-container>
         </mat-cell>
       </ng-container>
@@ -403,26 +396,6 @@
         <mat-cell *matCellDef="let row">
           <ng-container>
             {{ row.warehouse }}
-          </ng-container>
-        </mat-cell>
-      </ng-container>
-
-      <!-- company -->
-      <ng-container matColumnDef="company">
-        <mat-header-cell *matHeaderCellDef>Company</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.company }}
-          </ng-container>
-        </mat-cell>
-      </ng-container>
-
-      <!-- purchase_document_no -->
-      <ng-container matColumnDef="purchase_document_no">
-        <mat-header-cell *matHeaderCellDef>Purchase Receipt</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.purchase_document_no }}
           </ng-container>
         </mat-cell>
       </ng-container>
