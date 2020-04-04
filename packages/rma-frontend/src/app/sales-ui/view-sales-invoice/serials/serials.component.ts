@@ -123,20 +123,19 @@ export class SerialsComponent implements OnInit {
   deliveredSerialsDataSource: DeliveredSerialsDataSource;
   deliveredSerialsDisplayedColumns = [
     'sr_no',
-    'serial_no',
-    'purchase_date',
-    'purchase_rate',
-    'salesWarrantyDate',
-    'supplier',
-    'purchase_document_no',
-    'delivery_note',
+    'item_name',
     'warehouse',
+    'sales_warranty_period',
+    'sales_warranty_expiry',
+    'serial_no',
   ];
   deliveredSerialsSearch: string = '';
   disableDeliveredSerialsCard: boolean = false;
   remaining: number = 0;
   index: number = 0;
   size: number = 10;
+  itemMap: any = {};
+
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -289,6 +288,7 @@ export class SerialsComponent implements OnInit {
     const filteredItemList = [];
     let remaining = 0;
     salesInvoice.items.forEach(item => {
+      this.itemMap[item.item_code] = item;
       item.assigned = 0;
       item.remaining = item.qty;
       if (salesInvoice.delivered_items_map[item.item_code]) {
@@ -318,6 +318,10 @@ export class SerialsComponent implements OnInit {
       )
       .subscribe({
         next: success => {
+          success.forEach(item => {
+            this.itemMap[item.item_code].salesWarrantyMonths =
+              item.salesWarrantyMonths;
+          });
           this.itemDataSource.loadItems(success);
         },
         error: err => {},
