@@ -18,7 +18,7 @@ import { SerialNo } from '../../entity/serial-no/serial-no.entity';
 import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap, retry } from 'rxjs/operators';
-import { throwError, of } from 'rxjs';
+import { throwError, of, from } from 'rxjs';
 import {
   AUTHORIZATION,
   CONTENT_TYPE,
@@ -276,55 +276,31 @@ export class SerialNoAggregateService extends AggregateRoot {
             _id: 0,
           },
         },
-        { $unwind: '$delivery_note_items' },
         {
-          $project: {
-            _id: '$_id',
-            serials: {
-              $split: ['$delivery_note_items.serial_no', '\n'],
-            },
+          $unwind: {
+            path: '$delivery_note_items',
+            preserveNullAndEmptyArrays: true,
           },
-        },
-        {
-          $unwind: '$serials',
         },
         {
           $group: {
             _id: 0,
-            serial_no: {
-              $push: '$serials',
+            delivery_note_names: {
+              $push: '$delivery_note_items.delivery_note',
             },
           },
         },
-        { $unwind: '$serial_no' },
-        { $match: { serial_no: { $regex: search, $options: 'i' } } },
-        {
-          $lookup: {
-            from: 'serial_no',
-            localField: 'serial_no',
-            foreignField: 'serial_no',
-            as: 'serials',
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            serials: 1,
-          },
-        },
-        {
-          $unwind: '$serials',
-        },
-        { $replaceRoot: { newRoot: '$serials' } },
-        { $skip: offset },
-        { $limit: limit },
       ])
       .pipe(
-        switchMap((serial: any[]) => {
-          if (!serial || !serial.length) {
-            return throwError(new NotFoundException());
-          }
-          return of(serial);
+        switchMap(delivery_note_names => {
+          return from(
+            this.serialNoService.listDeliveredSerial(
+              delivery_note_names[0].delivery_note_names,
+              search,
+              offset,
+              limit,
+            ),
+          );
         }),
       );
   }

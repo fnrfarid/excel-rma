@@ -122,6 +122,7 @@ export class SerialsComponent implements OnInit {
 
   deliveredSerialsDataSource: DeliveredSerialsDataSource;
   deliveredSerialsDisplayedColumns = [
+    'sr_no',
     'serial_no',
     'purchase_date',
     'purchase_rate',
@@ -134,7 +135,8 @@ export class SerialsComponent implements OnInit {
   deliveredSerialsSearch: string = '';
   disableDeliveredSerialsCard: boolean = false;
   remaining: number = 0;
-
+  index: number = 0;
+  size: number = 10;
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -152,7 +154,9 @@ export class SerialsComponent implements OnInit {
   ngOnInit() {
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
-    this.deliveredSerialsDataSource = new DeliveredSerialsDataSource();
+    this.deliveredSerialsDataSource = new DeliveredSerialsDataSource(
+      this.salesService,
+    );
     this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -349,16 +353,23 @@ export class SerialsComponent implements OnInit {
   }
 
   getDeliveredSerials(uuid) {
-    this.salesService
-      .getDeliveredSerials(uuid, this.deliveredSerialsSearch)
-      .subscribe({
-        next: success => {
-          this.deliveredSerialsDataSource.update(success);
-        },
-        error: err => {
-          this.deliveredSerialsDataSource.update([]);
-        },
-      });
+    this.deliveredSerialsDataSource.loadItems(
+      uuid,
+      this.deliveredSerialsSearch,
+      this.index,
+      this.size,
+    );
+  }
+
+  getUpdate(event) {
+    this.index = event.pageIndex;
+    this.size = event.pageSize;
+    this.deliveredSerialsDataSource.loadItems(
+      this.salesInvoiceDetails.uuid,
+      this.deliveredSerialsSearch,
+      this.index,
+      this.size,
+    );
   }
 
   async assignSingularSerials(row: Item) {
