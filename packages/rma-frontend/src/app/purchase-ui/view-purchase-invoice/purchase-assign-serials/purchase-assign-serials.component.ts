@@ -107,14 +107,11 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   serialDataSource: SerialDataSource;
   deliveredSerialsDisplayedColumns = [
     'sr_no',
-    'serial_no',
-    'item_code',
-    'purchase_date',
-    'purchase_rate',
-    'supplier',
-    'company',
-    'purchase_document_no',
+    'item_name',
     'warehouse',
+    'purchase_warranty_period',
+    'purchase_warranty_expiry',
+    'serial_no',
   ];
   purchasedSerialsDataSource: PurchasedSerialsDataSource;
   displayDeliveredSerialsTable: boolean = false;
@@ -123,6 +120,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   filteredItemList = [];
   index: number = 0;
   size: number = 10;
+  itemMap: any = {};
+
   constructor(
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
@@ -157,6 +156,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     const filteredItemList = [];
     let remaining = 0;
     purchaseInvoice.items.forEach(item => {
+      this.itemMap[item.item_code] = item;
       item.assigned = 0;
       item.remaining = item.qty;
       if (purchaseInvoice.purchase_receipt_items_map[item.item_code]) {
@@ -316,6 +316,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       )
       .subscribe({
         next: success => {
+          success.forEach(item => {
+            this.itemMap[item.item_code].purchaseWarrantyMonths =
+              item.purchaseWarrantyMonths;
+          });
           this.itemDataSource.loadItems(success);
         },
         error: err => {},
