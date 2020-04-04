@@ -475,7 +475,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     });
     this.updateProductState(row.item_code, serials.length);
     this.serialDataSource.update(data);
-    console.log(this.serialDataSource.data());
     this.resetRangeState();
   }
 
@@ -596,7 +595,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         serial_no: [''],
       });
       this.serialDataSource.update(serials);
-      console.log(this.serialDataSource.data());
     });
   }
 

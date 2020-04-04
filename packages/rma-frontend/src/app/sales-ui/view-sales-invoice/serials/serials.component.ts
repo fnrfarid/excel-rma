@@ -128,8 +128,8 @@ export class SerialsComponent implements OnInit {
     'purchase_rate',
     'salesWarrantyDate',
     'supplier',
-    'company',
     'purchase_document_no',
+    'delivery_note',
     'warehouse',
   ];
   deliveredSerialsSearch: string = '';
