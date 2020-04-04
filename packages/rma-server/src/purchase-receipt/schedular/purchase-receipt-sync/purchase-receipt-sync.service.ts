@@ -5,6 +5,7 @@ import {
   BadRequestException,
   HttpService,
 } from '@nestjs/common';
+import { DateTime } from 'luxon';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { of, throwError, Observable } from 'rxjs';
@@ -19,6 +20,7 @@ import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
+import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
 
@@ -68,6 +70,7 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
               job.purchase_invoice_name,
               job.token,
             );
+            this.linkPurchaseWarranty(job.payload, job.settings);
             return of({});
           }),
         );
@@ -92,6 +95,38 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
       }),
       retry(3),
     );
+  }
+
+  linkPurchaseWarranty(
+    payload: PurchaseReceiptDto[],
+    settings: ServerSettings,
+  ) {
+    payload.forEach(receipt => {
+      receipt.items.forEach(item => {
+        if (!item.has_serial_no) {
+          return;
+        }
+
+        if (typeof item.serial_no === 'string') {
+          item.serial_no = item.serial_no.split('\n');
+        }
+
+        this.serialNoService
+          .updateMany(
+            { serial_no: { $in: item.serial_no } },
+            {
+              $set: {
+                'warranty.purchaseWarrantyDate': item.warranty_date,
+                'warranty.purchasedOn': new DateTime(
+                  settings.timeZone,
+                ).toJSDate(),
+              },
+            },
+          )
+          .then(success => {})
+          .catch(err => {});
+      });
+    });
   }
 
   frappeInsertMany(settings: ServerSettings, body, token): Observable<any> {
