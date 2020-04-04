@@ -136,11 +136,11 @@
   </ion-card-header>
   <ion-card-content class="ion-no-padding">
     <mat-table #table [dataSource]="itemDataSource" style="width: 100%;">
-      <ng-container matColumnDef="item_code">
-        <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
+      <ng-container matColumnDef="purchaseWarrantyMonths">
+        <mat-header-cell *matHeaderCellDef>Warranty In Months</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.item_code }}
+            {{ row.purchaseWarrantyMonths }}
           </ng-container>
         </mat-cell>
       </ng-container>
@@ -246,6 +246,23 @@
           <ng-container>
             {{ row.qty }}
           </ng-container>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="warranty_date">
+        <mat-header-cell *matHeaderCellDef>Warranty Date</mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <input
+            matInput
+            [(ngModel)]="row.warranty_date"
+            [matDatepicker]="warranty_date"
+            disabled
+          />
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="warranty_date"
+          ></mat-datepicker-toggle>
+          <mat-datepicker #warranty_date disabled="false"></mat-datepicker>
         </mat-cell>
       </ng-container>
 

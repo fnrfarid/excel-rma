@@ -444,6 +444,7 @@ export class SerialsComponent implements OnInit {
         item_code: row.item_code,
         item_name: row.item_name,
         qty: assignValue,
+        warranty_date: await this.getWarrantyDate(row.salesWarrantyMonths),
         rate: row.rate,
         amount: row.amount,
         has_serial_no: row.has_serial_no,
