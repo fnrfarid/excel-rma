@@ -5,6 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
+import { DateTime } from 'luxon';
 import {
   PurchaseReceiptDto,
   PurchaseReceiptItemDto,
@@ -89,8 +90,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               const { body, item_count } = this.mapPurchaseInvoiceReceipt(
                 purchaseInvoicePayload,
               );
-
-              return item_count < 500
+              return item_count < 200
                 ? this.validateFrappeSerials(
                     settings,
                     body,
@@ -273,6 +273,13 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       this.purchaseOrderService.findOne({ purchase_invoice_name }),
     ).pipe(
       switchMap(purchaseOrder => {
+        if (!purchaseOrder) {
+          return throwError(
+            new BadRequestException(
+              'Purchase Order not found for provided invoice.',
+            ),
+          );
+        }
         payload.items.filter(item => {
           item.purchase_order = purchaseOrder.name;
           if (!item.has_serial_no) {
@@ -305,11 +312,39 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
                 purchase_invoice_name,
                 clientHttpRequest,
               );
+              this.linkPurchaseWarranty(payload, settings);
               return of({});
             }),
           );
       }),
     );
+  }
+
+  linkPurchaseWarranty(payload: PurchaseReceiptDto, settings: ServerSettings) {
+    payload.items.forEach(item => {
+      if (!item.has_serial_no) {
+        return;
+      }
+
+      if (typeof item.serial_no === 'string') {
+        item.serial_no = item.serial_no.split('\n');
+      }
+
+      this.serialNoService
+        .updateMany(
+          { serial_no: { $in: item.serial_no } },
+          {
+            $set: {
+              'warranty.purchaseWarrantyDate': item.warranty_date,
+              'warranty.purchasedOn': new DateTime(
+                settings.timeZone,
+              ).toJSDate(),
+            },
+          },
+        )
+        .then(success => {})
+        .catch(err => {});
+    });
   }
 
   createBatchedFrappeSerials(

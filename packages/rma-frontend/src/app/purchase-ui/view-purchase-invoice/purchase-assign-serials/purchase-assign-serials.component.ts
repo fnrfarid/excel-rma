@@ -14,6 +14,8 @@ import {
   map,
   bufferCount,
   delay,
+  mergeMap,
+  toArray,
 } from 'rxjs/operators';
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { CLOSE, PURCHASE_RECEIPT } from '../../../constants/app-string';
@@ -44,6 +46,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
+import { TimeService } from '../../../api/time/time.service';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -84,12 +87,12 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
   itemDisplayedColumns = [
-    'item_code',
     'item_name',
     'qty',
     'assigned',
     'remaining',
     'has_serial_no',
+    'purchaseWarrantyMonths',
     'add_serial',
   ];
   itemDataSource: ItemDataSource;
@@ -97,6 +100,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     'item_code',
     'item_name',
     'qty',
+    'warranty_date',
     'serial_no',
     'delete',
   ];
@@ -127,6 +131,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     private readonly salesService: SalesService,
     public dialog: MatDialog,
     private loadingController: LoadingController,
+    private readonly timeService: TimeService,
     private readonly csvService: CsvJsonService,
   ) {}
 
@@ -180,6 +185,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         if (this.displayDeliveredSerialsTable) {
           this.getDeliveredSerials();
         }
+        this.getItemsWarranty();
       },
       error: err => {
         this.snackBar.open(
@@ -256,6 +262,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       this.serialDataSource.data().forEach(item => {
         if (item_code === item.item_code && item.serial_no.length !== 0) {
           purchaseReceiptItem.has_serial_no = item.has_serial_no || 0;
+          purchaseReceiptItem.warranty_date = item.warranty_date;
           purchaseReceiptItem.qty += item.qty;
           purchaseReceiptItem.amount += item.rate * item.qty;
           purchaseReceiptItem.serial_no.push(...item.serial_no);
@@ -292,6 +299,27 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         });
       },
     });
+  }
+
+  getItemsWarranty() {
+    from(this.itemDataSource.data())
+      .pipe(
+        mergeMap(item => {
+          return this.salesService.getItemFromRMAServer(item.item_code).pipe(
+            switchMap(warrantyItem => {
+              item.purchaseWarrantyMonths = warrantyItem.purchaseWarrantyMonths;
+              return of(item);
+            }),
+          );
+        }),
+        toArray(),
+      )
+      .subscribe({
+        next: success => {
+          this.itemDataSource.loadItems(success);
+        },
+        error: err => {},
+      });
   }
 
   onFromRange(value) {
@@ -433,13 +461,14 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     }
   }
 
-  assignRangeSerial(row: Item, serials: string[]) {
+  async assignRangeSerial(row: Item, serials: string[]) {
     const data = this.serialDataSource.data();
     data.push({
       item_code: row.item_code,
       item_name: row.item_name,
       qty: serials.length,
       rate: row.rate,
+      warranty_date: await this.getWarrantyDate(row.purchaseWarrantyMonths),
       has_serial_no: row.has_serial_no,
       amount: row.amount,
       serial_no: serials,
@@ -462,6 +491,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         item_code: row.item_code,
         item_name: row.item_name,
         qty: assignValue,
+        warranty_date: await this.getWarrantyDate(row.purchaseWarrantyMonths),
         rate: row.rate,
         amount: row.amount,
         has_serial_no: row.has_serial_no,
@@ -553,18 +583,26 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   addSingularSerials(row, serialCount) {
     this.updateProductState(row.item_code, serialCount);
     const serials = this.serialDataSource.data();
-    Array.from({ length: serialCount }, (x, i) => {
+    Array.from({ length: serialCount }, async (x, i) => {
       serials.push({
         item_code: row.item_code,
         item_name: row.item_name,
+        warranty_date: await this.getWarrantyDate(row.purchaseWarrantyMonths),
         qty: 1,
         rate: row.rate,
         has_serial_no: row.has_serial_no,
         amount: row.amount,
         serial_no: [''],
       });
+      this.serialDataSource.update(serials);
     });
-    this.serialDataSource.update(serials);
+  }
+
+  async getWarrantyDate(purchaseWarrantyMonths: number) {
+    let date = new Date();
+    date = new Date(date.setMonth(date.getMonth() + purchaseWarrantyMonths));
+    const dateTime = await this.timeService.getDateAndTime(date);
+    return dateTime.date;
   }
 
   updateProductState(item_code, assigned) {
