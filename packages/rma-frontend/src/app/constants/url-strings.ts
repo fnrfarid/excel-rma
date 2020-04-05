@@ -29,6 +29,8 @@ export const RELAY_LIST_PRICELIST_ENDPOINT =
   '/api/command/user/api/resource/Price%20List';
 export const RELAY_GET_ITEMPRICE_ENDPOINT =
   '/api/command/user/api/resource/Item Price';
+export const RELAY_GET_DELIVERY_NOTE_ENDPOINT =
+  '/api/command/user/api/resource/Delivery Note';
 export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
   '/api/command/user/api/method/erpnext.stock.utils.get_stock_balance';
 export const RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT =
@@ -84,3 +86,7 @@ export const GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT =
   '/api/serial_no/v1/get_purchase_invoice_delivered_serials';
 export const WARRANTY_CLAIM_GET_ONE_ENDPOINT = '/api/warranty_claim/v1/get/';
 export const STOCK_ENTRY_CREATE_ENDPOINT = '/api/stock_entry/v1/create';
+export const PRINT_SALES_INVOICE_PDF_METHOD =
+  '/api/method/frappe.utils.print_format.download_pdf';
+export const PRINT_DELIVERY_NOTE_PDF_METHOD =
+  '/api/method/frappe.utils.print_format.download_multi_pdf';

@@ -6,6 +6,7 @@ import { ViewSalesInvoicePage } from './view-sales-invoice.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SalesService } from '../services/sales.service';
 import { of } from 'rxjs';
+import { PopoverController } from '@ionic/angular';
 
 describe('ViewSalesInvoicePage', () => {
   let component: ViewSalesInvoicePage;
@@ -30,6 +31,7 @@ describe('ViewSalesInvoicePage', () => {
             }),
           },
         },
+        { provide: PopoverController, useValue: {} },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
