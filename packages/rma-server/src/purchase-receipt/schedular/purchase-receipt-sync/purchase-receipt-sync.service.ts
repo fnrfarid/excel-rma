@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  OnModuleInit,
-  Inject,
-  BadRequestException,
-  HttpService,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit, Inject, HttpService } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
@@ -84,14 +78,14 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
             mergeMap(token => {
               job.token.accessToken = token.accessToken;
-              return throwError(new BadRequestException(err));
+              return throwError(err);
             }),
           );
         }
         if (err.response && err.response.status === 417) {
           return of({});
         }
-        return throwError(new BadRequestException(err));
+        return throwError(err);
       }),
       retry(3),
     );
