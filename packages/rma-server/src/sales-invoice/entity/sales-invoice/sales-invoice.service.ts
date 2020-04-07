@@ -88,8 +88,6 @@ export class SalesInvoiceService {
   aggregateList($skip = 0, $limit = 10, $match, $sort, $group) {
     return this.asyncAggregate([
       { $match },
-      { $skip },
-      { $limit },
       {
         $unwind: {
           path: '$delivery_note_items',
@@ -98,6 +96,8 @@ export class SalesInvoiceService {
       },
       { $group },
       { $sort },
+      { $skip },
+      { $limit },
     ]);
   }
 
