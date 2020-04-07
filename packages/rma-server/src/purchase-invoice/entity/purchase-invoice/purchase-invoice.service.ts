@@ -33,8 +33,6 @@ export class PurchaseInvoiceService {
   aggregateList($skip = 0, $limit = 10, $match, $sort, $group) {
     return this.asyncAggregate([
       { $match },
-      { $skip },
-      { $limit },
       {
         $lookup: {
           from: 'purchase_receipt',
@@ -51,6 +49,8 @@ export class PurchaseInvoiceService {
       },
       { $group },
       { $sort },
+      { $skip },
+      { $limit },
     ]);
   }
 
