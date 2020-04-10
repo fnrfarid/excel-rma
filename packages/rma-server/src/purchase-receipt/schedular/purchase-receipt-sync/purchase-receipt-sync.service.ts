@@ -248,6 +248,13 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
     settings: any;
     purchase_invoice_name: string;
   }) {
+    data.payload.forEach(element => {
+      if (typeof element.items[0].serial_no !== 'string') {
+        try {
+          element.items[0].serial_no = element.items[0].serial_no.join('\n');
+        } catch {}
+      }
+    });
     this.agenda
       .now(CREATE_PURCHASE_RECEIPT_JOB, data)
       .then(success => {})

@@ -34,7 +34,7 @@ import {
   ACCEPT,
   APPLICATION_JSON_CONTENT_TYPE,
   COMPLETED_STATUS,
-  PURCHASE_RECEIPT_BATCH_SIZE,
+  PURCHASE_RECEIPT_SERIALS_BATCH_SIZE,
   FRAPPE_INSERT_MANY_BATCH_COUNT,
   PURCHASE_RECEIPT_DOCTYPE_NAME,
   SERIAL_NO_DOCTYPE_NAME,
@@ -90,7 +90,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               const { body, item_count } = this.mapPurchaseInvoiceReceipt(
                 purchaseInvoicePayload,
               );
-              return item_count < 200
+              return item_count < 20
                 ? this.validateFrappeSerials(
                     settings,
                     body,
@@ -411,18 +411,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchase_invoice_name: string,
   ) {
     const purchaseReceipts = this.getMapPurchaseReceipts(body);
-    return from(purchaseReceipts)
+    return from(this.purchaseOrderService.findOne({ purchase_invoice_name }))
       .pipe(
-        mergeMap(receipts => {
-          try {
-            receipts.serial_no = receipts.serial_no.join('\n');
-          } catch {
-            receipts.serial_no = receipts.serial_no;
-          }
-          return from(
-            this.purchaseOrderService.findOne({ purchase_invoice_name }),
-          ).pipe(
-            switchMap(purchaseOrder => {
+        switchMap(purchaseOrder => {
+          return from(purchaseReceipts).pipe(
+            concatMap(receipts => {
               receipts.purchase_order = purchaseOrder.name;
               const data: any = new PurchaseReceiptDto();
               Object.assign(data, body);
@@ -431,17 +424,17 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               data.owner = clientHttpRequest.token.email;
               return of(data);
             }),
+            bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
+            concatMap(receipt => {
+              this.prSyncService.addToQueueNow({
+                payload: receipt,
+                token: clientHttpRequest.token,
+                settings,
+                purchase_invoice_name,
+              });
+              return of({});
+            }),
           );
-        }),
-        bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
-        concatMap(receipt => {
-          this.prSyncService.addToQueueNow({
-            payload: receipt,
-            token: clientHttpRequest.token,
-            settings,
-            purchase_invoice_name,
-          });
-          return of({});
         }),
       )
       .subscribe({
@@ -457,10 +450,18 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       });
   }
 
+  getSplicedSerials(serial_no: any) {
+    if (typeof serial_no === 'object') {
+      return serial_no.join('\n');
+    } else {
+      return serial_no;
+    }
+  }
+
   getMapPurchaseReceipts(body: PurchaseReceiptDto) {
     const purchaseReceipts = [];
     body.items.forEach(item => {
-      if (item.qty > PURCHASE_RECEIPT_BATCH_SIZE) {
+      if (item.qty > PURCHASE_RECEIPT_SERIALS_BATCH_SIZE) {
         if (!item.has_serial_no) {
           const receiptItem = new PurchaseReceiptItemDto();
           Object.assign(receiptItem, item);
@@ -469,7 +470,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           return;
         }
 
-        const remainder = item.qty % PURCHASE_RECEIPT_BATCH_SIZE;
+        const remainder = item.qty % PURCHASE_RECEIPT_SERIALS_BATCH_SIZE;
         const serials = item.serial_no.split('\n');
 
         if (remainder) {
@@ -478,7 +479,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           const serialsNo = serials.splice(0, remainder);
           offsetItem.qty = remainder;
           offsetItem.amount = offsetItem.qty * offsetItem.rate;
-          offsetItem.serial_no = serialsNo;
+          offsetItem.serial_no = this.getSplicedSerials(serialsNo);
           purchaseReceipts.push(offsetItem);
         }
 
@@ -489,6 +490,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         quotientItem.serial_no = serials;
         purchaseReceipts.push(...this.generateBatchedReceipt(quotientItem));
       } else {
+        item.serial_no = this.getSplicedSerials(item.serial_no);
         purchaseReceipts.push(item);
       }
     });
@@ -501,11 +503,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     from(receipt.serial_no)
       .pipe(
         map(serial => serial),
-        bufferCount(200),
+        bufferCount(PURCHASE_RECEIPT_SERIALS_BATCH_SIZE),
         switchMap(serials => {
           const data = new PurchaseReceiptItemDto();
           Object.assign(data, receipt);
-          data.serial_no = serials;
+          data.serial_no = this.getSplicedSerials(serials);
           purchaseReceipts.push(data);
           return of(purchaseReceipts);
         }),

@@ -55,5 +55,6 @@ export class StockEntryItem {
   item_name: string;
   qty: number;
   transfer_qty: number;
+  transferWarehouse: string;
   serial_no: any;
 }

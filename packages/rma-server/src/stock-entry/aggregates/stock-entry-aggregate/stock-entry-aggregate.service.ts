@@ -7,9 +7,9 @@ import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { from } from 'rxjs';
 import { STOCK_ENTRY } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
-import { CREATE_STOCK_ENTRY_JOB } from '../../schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
+import { CREATE_STOCK_ENTRY_JOB } from '../../schedular/stock-entry-sync/stock-entry-sync.service';
 
 @Injectable()
 export class StockEntryAggregateService {
@@ -21,7 +21,7 @@ export class StockEntryAggregateService {
   ) {}
 
   create(payload: StockEntryDto, req) {
-    return this.stockEntryPolicies.validateStockEntry(payload).pipe(
+    return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
         const stockEntry = this.setStockEntryDefaults(payload, req);
         this.addToQueueNow({ payload: stockEntry, token: req.token });
