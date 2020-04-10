@@ -148,11 +148,16 @@ export class SerialNoController {
   @Post('v1/validate')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  validateSerialNo(@Req() clientHttpRequest, @Body() body: ValidateSerialsDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  validateSerialNo(
+    @Req() clientHttpRequest,
+    @Body() body: ValidateSerialsDto,
+    @UploadedFile('file') file,
+  ) {
     body.validateFor =
       body.validateFor === PURCHASE_RECEIPT ? body.validateFor : DELIVERY_NOTE;
     return this.queryBus.execute(
-      new ValidateSerialsQuery(body, clientHttpRequest),
+      new ValidateSerialsQuery(body, clientHttpRequest, file),
     );
   }
 }

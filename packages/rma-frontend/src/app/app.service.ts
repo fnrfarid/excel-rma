@@ -20,6 +20,7 @@ import {
   STATE,
   TOKEN,
   SCOPES_OPENID_ALL,
+  TRANSFER_WAREHOUSE,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -91,12 +92,15 @@ export class AppService {
         default_currency: string;
         country: string;
         time_zone: string;
+        transferWarehouse: string;
       }) => {
         this.storage
           .setItem(DEFAULT_CURRENCY_KEY, success.default_currency)
           .then(() => this.storage.setItem(COUNTRY, success.country))
           .then(() => this.storage.setItem(TIME_ZONE, success.time_zone))
-          .then(() => {});
+          .then(() =>
+            this.storage.setItem(TRANSFER_WAREHOUSE, success.transferWarehouse),
+          );
       },
       error: err => {},
     });

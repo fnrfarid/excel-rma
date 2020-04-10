@@ -5,5 +5,6 @@ export class ValidateSerialsQuery implements IQuery {
   constructor(
     public readonly payload: ValidateSerialsDto,
     public readonly clientHttpReq: any,
+    public readonly file: any,
   ) {}
 }

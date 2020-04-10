@@ -4,7 +4,7 @@ import { DirectService } from '../../../direct/aggregates/direct/direct.service'
 import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntryJobService } from './purchase-receipt-sync.service';
+import { StockEntryJobService } from './stock-entry-sync.service';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 
 describe('StockEntryJobService', () => {

@@ -71,11 +71,11 @@ export class SerialNoDto {
 }
 
 export class ValidateSerialsDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   serials: string[];
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   item_code: string;
 

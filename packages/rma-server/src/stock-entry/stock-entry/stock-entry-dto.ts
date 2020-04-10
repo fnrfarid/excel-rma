@@ -49,6 +49,10 @@ export class StockEntryItemDto {
 
   @IsNotEmpty()
   @IsString()
+  transferWarehouse: string;
+
+  @IsNotEmpty()
+  @IsString()
   item_code: string;
 
   @IsNotEmpty()

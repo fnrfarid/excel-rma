@@ -53,13 +53,14 @@ export class StockEntryJobService implements OnModuleInit {
     );
   }
 
-  createStockEntry(job) {
+  createStockEntry(job: { payload: StockEntry; token: any }) {
     const payload = job.payload;
     return of({}).pipe(
       mergeMap(object => {
         return this.settingsService.find().pipe(
           switchMap(settings => {
             payload.items.filter(item => {
+              item.t_warehouse = item.transferWarehouse;
               if (typeof item.serial_no === 'object') {
                 item.serial_no = item.serial_no.join('\n');
               }

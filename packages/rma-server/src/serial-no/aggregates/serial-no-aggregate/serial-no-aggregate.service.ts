@@ -3,6 +3,7 @@ import {
   NotFoundException,
   HttpService,
   NotImplementedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import * as uuidv4 from 'uuid/v4';
@@ -38,6 +39,7 @@ import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-p
 import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
+import { INVALID_FILE } from '../../../constants/app-strings';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -239,6 +241,21 @@ export class SerialNoAggregateService extends AggregateRoot {
 
   validateSerials(payload: ValidateSerialsDto) {
     return this.serialNoPolicyService.validateSerials(payload);
+  }
+
+  validateBulkSerialFile(file) {
+    return from(this.getJsonData(file)).pipe(
+      switchMap((data: ValidateSerialsDto) => {
+        if (!data) {
+          return throwError(new BadRequestException(INVALID_FILE));
+        }
+        return this.validateSerials(data);
+      }),
+    );
+  }
+
+  getJsonData(file) {
+    return of(JSON.parse(file.buffer));
   }
 
   getPurchaseInvoiceDeliveredSerials(
