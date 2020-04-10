@@ -19,6 +19,7 @@ import {
 import { MaterialModule } from '../../material/material.module';
 import { EditTableComponent } from './edit-table/edit-table.component';
 import { AppCommonModule } from '../../common/app-common.module';
+import { PrintComponent } from './print/print.component';
 
 const routes: Routes = [
   {
@@ -49,6 +50,7 @@ const routes: Routes = [
     SalesReturnComponent,
     SerialsComponent,
     EditTableComponent,
+    PrintComponent,
   ],
 })
 export class ViewSalesInvoicePageModule {}

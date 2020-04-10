@@ -3,6 +3,8 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { SalesService } from '../services/sales.service';
 import { SalesInvoiceDetails } from './details/details.component';
+import { PopoverController } from '@ionic/angular';
+import { PrintComponent } from './print/print.component';
 
 @Component({
   selector: 'app-view-sales-invoice',
@@ -15,11 +17,12 @@ export class ViewSalesInvoicePage implements OnInit {
   invoiceUuid: string = '';
   showReturnTab: boolean;
   isCampaign: boolean;
-
+  status: string = '';
   constructor(
     private readonly location: Location,
     private route: ActivatedRoute,
     private salesService: SalesService,
+    private popoverController: PopoverController,
   ) {}
 
   ngOnInit() {
@@ -32,8 +35,22 @@ export class ViewSalesInvoicePage implements OnInit {
         this.showReturnTab =
           Object.keys(res.delivered_items_map).length === 0 ? false : true;
         this.sales_invoice_name = res.name;
+        this.status = res.status;
       },
     });
+  }
+
+  async showPrintOptions(ev) {
+    const popover = await this.popoverController.create({
+      component: PrintComponent,
+      componentProps: {
+        invoice_name: this.sales_invoice_name,
+      },
+      event: ev,
+      translucent: false,
+    });
+
+    return await popover.present();
   }
 
   navigateBack() {

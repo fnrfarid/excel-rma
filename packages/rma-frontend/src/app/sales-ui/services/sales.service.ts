@@ -37,6 +37,7 @@ import {
   GET_SALES_INVOICE_DELIVERED_SERIALS_ENDPOINT,
   CANCEL_SALES_INVOICE_ENDPOINT,
   UPDATE_OUTSTANDING_AMOUNT_ENDPOINT,
+  RELAY_GET_DELIVERY_NOTE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -358,6 +359,22 @@ export class SalesService {
                 .pipe(map(res => res.data));
             }),
           );
+      }),
+    );
+  }
+
+  getDeliveryNoteNames(invoice_name: string) {
+    const url = RELAY_GET_DELIVERY_NOTE_ENDPOINT;
+    const params = new HttpParams({
+      fromObject: {
+        filters: `[["against_sales_invoice","=","${invoice_name}"],["status","!=","Cancelled"]]`,
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http
+          .get<any>(url, { params, headers })
+          .pipe(map(res => res.data));
       }),
     );
   }
