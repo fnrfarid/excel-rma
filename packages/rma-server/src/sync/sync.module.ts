@@ -5,6 +5,7 @@ import { SystemSettingsModule } from '../system-settings/system-settings.module'
 import { FrappeJobService } from './schedular/frappe-jobs-queue/frappe-jobs-queue.service';
 import { PurchaseReceiptModule } from '../purchase-receipt/purchase-receipt.module';
 import { StockEntryModule } from '../stock-entry/stock-entry.module';
+import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { StockEntryModule } from '../stock-entry/stock-entry.module';
     HttpModule,
     PurchaseReceiptModule,
     StockEntryModule,
+    DeliveryNoteModule,
   ],
   providers: [SyncAggregateService, FrappeJobService],
   exports: [SyncAggregateService],

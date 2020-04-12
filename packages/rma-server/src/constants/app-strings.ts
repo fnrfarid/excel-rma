@@ -116,3 +116,4 @@ export const STOCK_ENTRY = 'Stock Entry';
 export const ITEM_DOCTYPE = 'Item';
 export const SALES_INVOICE_DOCTYPE = 'Sales Invoice';
 export const FRAPPE_QUEUE_JOB = 'FRAPPE_QUEUE_JOB';
+export const CREATE_DELIVERY_NOTE_JOB = 'CREATE_DELIVERY_NOTE_JOB';

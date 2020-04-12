@@ -120,6 +120,7 @@ export class DeliveryNoteItems {
   conversion_factor: number;
   stock_qty: number;
   price_list_rate: number;
+  warranty_date?: string;
   base_price_list_rate: number;
   rate: number;
   serial_no: string;
