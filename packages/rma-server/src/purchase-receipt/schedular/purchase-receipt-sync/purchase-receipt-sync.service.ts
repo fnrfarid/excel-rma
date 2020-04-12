@@ -190,20 +190,30 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
 
   updatePurchaseReceiptSerials(purchaseReceipts: PurchaseReceiptMetaData[]) {
     purchaseReceipts.forEach(element => {
-      this.serialNoService
-        .updateMany(
-          { serial_no: { $in: element.serial_no } },
-          {
-            $set: {
-              warehouse: element.warehouse,
-              purchase_document_type: element.purchase_document_type,
-              purchase_document_no: element.purchase_document_no,
-            },
-          },
-        )
-        .then(success => {})
-        .catch(error => {});
+      let serials: any = element.serial_no;
+      try {
+        serials = serials.split('\n');
+        this.updateSerials(element, serials);
+        return;
+      } catch {}
+      this.updateSerials(element, serials);
     });
+  }
+
+  updateSerials(element, serials) {
+    this.serialNoService
+      .updateMany(
+        { serial_no: { $in: serials } },
+        {
+          $set: {
+            warehouse: element.warehouse,
+            purchase_document_type: element.purchase_document_type,
+            purchase_document_no: element.purchase_document_no,
+          },
+        },
+      )
+      .then(success => {})
+      .catch(error => {});
   }
 
   mapPurchaseReceiptMetaData(
