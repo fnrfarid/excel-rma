@@ -1,10 +1,13 @@
-import { Injectable, OnModuleInit, Inject, HttpService } from '@nestjs/common';
+import { Injectable, Inject, HttpService } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { of, throwError, Observable } from 'rxjs';
 import { mergeMap, catchError, retry, switchMap } from 'rxjs/operators';
-import { VALIDATE_AUTH_STRING } from '../../../constants/app-strings';
+import {
+  VALIDATE_AUTH_STRING,
+  FRAPPE_QUEUE_JOB,
+} from '../../../constants/app-strings';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
@@ -19,7 +22,7 @@ import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
 
 @Injectable()
-export class PurchaseReceiptSyncService implements OnModuleInit {
+export class PurchaseReceiptSyncService {
   constructor(
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
@@ -31,22 +34,12 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
   ) {}
 
-  async onModuleInit() {
-    this.agenda.define(
-      CREATE_PURCHASE_RECEIPT_JOB,
-      { concurrency: 1 },
-      async (job: any, done) => {
-        // Please note done callback will work only when concurrency is provided.
-        this.createPurchaseReceipt(job.attrs.data)
-          .toPromise()
-          .then(success => {
-            return done();
-          })
-          .catch(err => {
-            return done(err);
-          });
-      },
-    );
+  execute(job) {
+    return this.createPurchaseReceipt(job.attrs.data);
+  }
+
+  failureCallback(job) {
+    return;
   }
 
   createPurchaseReceipt(job: {
@@ -251,7 +244,9 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
     token: any;
     settings: any;
     purchase_invoice_name: string;
+    type?: string;
   }) {
+    data.type = CREATE_PURCHASE_RECEIPT_JOB;
     data.payload.forEach(element => {
       if (typeof element.items[0].serial_no !== 'string') {
         try {
@@ -260,7 +255,7 @@ export class PurchaseReceiptSyncService implements OnModuleInit {
       }
     });
     this.agenda
-      .now(CREATE_PURCHASE_RECEIPT_JOB, data)
+      .now(FRAPPE_QUEUE_JOB, data)
       .then(success => {})
       .catch(err => {});
   }

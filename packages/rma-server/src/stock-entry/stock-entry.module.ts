@@ -24,6 +24,6 @@ import { StockEntryJobService } from './schedular/stock-entry-sync/stock-entry-s
     StockEntryService,
     StockEntryJobService,
   ],
-  exports: [],
+  exports: [StockEntryJobService],
 })
 export class StockEntryModule {}
