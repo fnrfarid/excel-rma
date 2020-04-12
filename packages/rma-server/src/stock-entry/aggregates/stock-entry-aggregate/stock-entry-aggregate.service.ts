@@ -5,7 +5,7 @@ import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/s
 import { switchMap } from 'rxjs/operators';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { from } from 'rxjs';
-import { STOCK_ENTRY } from '../../../constants/app-strings';
+import { STOCK_ENTRY, FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
@@ -44,9 +44,10 @@ export class StockEntryAggregateService {
     return stockEntry;
   }
 
-  addToQueueNow(data: { payload: any; token: any }) {
+  addToQueueNow(data: { payload: any; token: any; type?: string }) {
+    data.type = CREATE_STOCK_ENTRY_JOB;
     this.agenda
-      .now(CREATE_STOCK_ENTRY_JOB, data)
+      .now(FRAPPE_QUEUE_JOB, data)
       .then(success => {})
       .catch(err => {});
   }
