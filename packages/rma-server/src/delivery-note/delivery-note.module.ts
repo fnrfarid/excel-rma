@@ -9,12 +9,15 @@ import { DeliveryNoteCommandHandler } from './command';
 import { DeliveryNoteQueryManager } from './queries';
 import { DeliveryNoteCommandManager } from './commands';
 import { DeliveryNoteEventManager } from './events';
+import { DeliveryNoteJobService } from './schedular/delivery-note-job/delivery-note-job.service';
+import { DirectModule } from '../direct/direct.module';
 
 @Module({
   imports: [
     DeliveryNoteEntitiesModule,
     SerialNoEntitiesModule,
     SalesInvoiceEntitiesModule,
+    DirectModule,
   ],
   controllers: [DeliveryNoteController, DeliveryNoteWebhookController],
   providers: [
@@ -23,7 +26,12 @@ import { DeliveryNoteEventManager } from './events';
     ...DeliveryNoteQueryManager,
     ...DeliveryNoteCommandManager,
     ...DeliveryNoteEventManager,
+    DeliveryNoteJobService,
   ],
-  exports: [DeliveryNoteEntitiesModule, ...DeliveryNoteAggregatesManager],
+  exports: [
+    DeliveryNoteEntitiesModule,
+    ...DeliveryNoteAggregatesManager,
+    DeliveryNoteJobService,
+  ],
 })
 export class DeliveryNoteModule {}

@@ -2,8 +2,14 @@ import { Injectable, Inject, HttpService } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import { of, throwError, Observable } from 'rxjs';
-import { mergeMap, catchError, retry, switchMap } from 'rxjs/operators';
+import { of, throwError, Observable, from } from 'rxjs';
+import {
+  mergeMap,
+  catchError,
+  retry,
+  switchMap,
+  concatMap,
+} from 'rxjs/operators';
 import {
   VALIDATE_AUTH_STRING,
   FRAPPE_QUEUE_JOB,
@@ -182,15 +188,30 @@ export class PurchaseReceiptSyncService {
   }
 
   updatePurchaseReceiptSerials(purchaseReceipts: PurchaseReceiptMetaData[]) {
-    purchaseReceipts.forEach(element => {
-      let serials: any = element.serial_no;
-      try {
-        serials = serials.split('\n');
-        this.updateSerials(element, serials);
-        return;
-      } catch {}
-      this.updateSerials(element, serials);
-    });
+    return from(purchaseReceipts)
+      .pipe(
+        concatMap((receipt: { serial_no: any }) => {
+          try {
+            return of({
+              element: receipt,
+              serials: receipt.serial_no.split('\n'),
+            });
+          } catch {
+            return of({
+              element: receipt,
+              serials: receipt.serial_no,
+            });
+          }
+        }),
+        switchMap(({ serials, element }) => {
+          this.updateSerials(element, serials);
+          return of({});
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
   }
 
   updateSerials(element, serials) {

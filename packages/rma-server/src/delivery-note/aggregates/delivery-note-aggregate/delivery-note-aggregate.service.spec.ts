@@ -6,6 +6,7 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { DeliveryNoteService } from '../../entity/delivery-note-service/delivery-note.service';
+import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delivery-note-job.service';
 
 describe('DeliveryNoteAggregateService', () => {
   let service: DeliveryNoteAggregateService;
@@ -20,6 +21,7 @@ describe('DeliveryNoteAggregateService', () => {
         { provide: SerialNoService, useValue: {} },
         { provide: SalesInvoiceService, useValue: {} },
         { provide: DeliveryNoteService, useValue: {} },
+        { provide: DeliveryNoteJobService, useValue: {} },
       ],
     }).compile();
 
