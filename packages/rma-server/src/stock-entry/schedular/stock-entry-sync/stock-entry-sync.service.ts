@@ -1,12 +1,4 @@
-import {
-  Injectable,
-  OnModuleInit,
-  Inject,
-  HttpService,
-  BadRequestException,
-} from '@nestjs/common';
-import * as Agenda from 'agenda';
-import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
+import { Injectable, HttpService, BadRequestException } from '@nestjs/common';
 import { switchMap, mergeMap, catchError, retry } from 'rxjs/operators';
 import { VALIDATE_AUTH_STRING } from '../../../constants/app-strings';
 import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
@@ -20,10 +12,8 @@ import { StockEntryService } from '../../stock-entry/stock-entry.service';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()
-export class StockEntryJobService implements OnModuleInit {
+export class StockEntryJobService {
   constructor(
-    @Inject(AGENDA_TOKEN)
-    private readonly agenda: Agenda,
     private readonly tokenService: DirectService,
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
@@ -31,35 +21,26 @@ export class StockEntryJobService implements OnModuleInit {
     private readonly stockEntryService: StockEntryService,
   ) {}
 
-  async onModuleInit() {
-    this.agenda.define(
-      CREATE_STOCK_ENTRY_JOB,
-      { concurrency: 1 },
-      async (job: any, done) => {
-        // Please note done callback will work only when concurrency is provided.
-        this.createStockEntry(job.attrs.data)
-          .toPromise()
-          .then(success => {
-            return done();
-          })
-          .catch(err => {
-            this.updateStockEntryState(job.attrs.data.payload.uuid, {
-              isSynced: false,
-              inQueue: false,
-            });
-            return done(err);
-          });
-      },
-    );
+  execute(job) {
+    return this.createStockEntry(job.attrs.data);
   }
 
-  createStockEntry(job) {
+  failureCallback(job) {
+    this.updateStockEntryState(job.attrs.data.payload.uuid, {
+      isSynced: false,
+      inQueue: false,
+    });
+    return;
+  }
+
+  createStockEntry(job: { payload: StockEntry; token: any }) {
     const payload = job.payload;
     return of({}).pipe(
       mergeMap(object => {
         return this.settingsService.find().pipe(
           switchMap(settings => {
             payload.items.filter(item => {
+              item.t_warehouse = item.transferWarehouse;
               if (typeof item.serial_no === 'object') {
                 item.serial_no = item.serial_no.join('\n');
               }

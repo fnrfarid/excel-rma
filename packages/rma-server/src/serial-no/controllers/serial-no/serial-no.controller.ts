@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
@@ -117,6 +118,10 @@ export class SerialNoController {
     @UploadedFile('file') file,
     @Req() clientHttpRequest,
   ) {
+    if (!file || !file.buffer || file.buffer.toString()) {
+      throw new BadRequestException('Invalid File');
+    }
+
     return await this.serialAggregateService.getPurchaseInvoiceDeliveredSerials(
       JSON.parse(file.buffer),
       search,
@@ -148,11 +153,16 @@ export class SerialNoController {
   @Post('v1/validate')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  validateSerialNo(@Req() clientHttpRequest, @Body() body: ValidateSerialsDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  validateSerialNo(
+    @Req() clientHttpRequest,
+    @Body() body: ValidateSerialsDto,
+    @UploadedFile('file') file,
+  ) {
     body.validateFor =
       body.validateFor === PURCHASE_RECEIPT ? body.validateFor : DELIVERY_NOTE;
     return this.queryBus.execute(
-      new ValidateSerialsQuery(body, clientHttpRequest),
+      new ValidateSerialsQuery(body, clientHttpRequest, file),
     );
   }
 }

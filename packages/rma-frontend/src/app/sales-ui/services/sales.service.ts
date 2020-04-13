@@ -42,6 +42,7 @@ import {
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
 import { SalesReturn } from '../../common/interfaces/sales-return.interface';
+import { JSON_BODY_MAX_SIZE } from '../../constants/app-string';
 
 @Injectable({
   providedIn: 'root',
@@ -61,9 +62,27 @@ export class SalesService {
     serials: string[];
     validateFor?: string;
   }) {
+    if (JSON.stringify(item).length < JSON_BODY_MAX_SIZE) {
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http.post('/api/serial_no/v1/validate', item, {
+            headers,
+          });
+        }),
+      );
+    }
+    const blob = new Blob([JSON.stringify(item)], {
+      type: 'application/json',
+    });
+
+    const uploadData = new FormData();
+
+    uploadData.append('file', blob, 'payload');
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post('/api/serial_no/v1/validate', item, { headers });
+        return this.http.post('/api/serial_no/v1/validate', uploadData, {
+          headers,
+        });
       }),
     );
   }

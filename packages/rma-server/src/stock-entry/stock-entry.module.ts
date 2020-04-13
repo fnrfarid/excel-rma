@@ -7,8 +7,8 @@ import { StockEntry } from './stock-entry/stock-entry.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockEntryService } from './stock-entry/stock-entry.service';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
-import { StockEntryJobService } from './schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { DirectModule } from '../direct/direct.module';
+import { StockEntryJobService } from './schedular/stock-entry-sync/stock-entry-sync.service';
 
 @Module({
   imports: [
@@ -24,6 +24,6 @@ import { DirectModule } from '../direct/direct.module';
     StockEntryService,
     StockEntryJobService,
   ],
-  exports: [],
+  exports: [StockEntryJobService],
 })
 export class StockEntryModule {}

@@ -17,7 +17,7 @@ import {
   StockEntryRow,
   MaterialTransferDto,
 } from './material-transfer.datasource';
-import { DEFAULT_COMPANY } from '../../constants/storage';
+import { DEFAULT_COMPANY, TRANSFER_WAREHOUSE } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 
@@ -37,6 +37,7 @@ export class MaterialTransferComponent implements OnInit {
   company: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
+  transferWarehouse: string;
   warehouseState = {
     s_warehouse: new FormControl(''),
     t_warehouse: new FormControl(''),
@@ -65,6 +66,9 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.transferWarehouse = await this.salesService
+      .getStore()
+      .getItem(TRANSFER_WAREHOUSE);
     this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
     this.materialTransferDataSource = new MaterialTransferDataSource();
     this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
@@ -176,6 +180,13 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   async createMaterialTransfer() {
+    if (!this.transferWarehouse) {
+      this.getMessage(
+        'Please select a transfer warehouse in settings, for material transfer.',
+      );
+      return;
+    }
+
     if (this.materialTransferDataSource.data().length === 0) {
       this.getMessage('Please Add serials for transfer');
       return;
@@ -186,7 +197,11 @@ export class MaterialTransferComponent implements OnInit {
     body.posting_date = date.date;
     body.posting_time = date.time;
     body.stock_entry_type = MATERIAL_TRANSFER;
-    body.items = this.materialTransferDataSource.data();
+    body.items = this.materialTransferDataSource.data().filter(serials => {
+      serials.transferWarehouse = this.transferWarehouse;
+      return serials;
+    });
+
     this.stockEntryService.createMaterialTransfer(body).subscribe({
       next: response => {
         this.getMessage('Stock Entry Created');

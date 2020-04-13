@@ -34,7 +34,7 @@ import {
   ACCEPT,
   APPLICATION_JSON_CONTENT_TYPE,
   COMPLETED_STATUS,
-  PURCHASE_RECEIPT_BATCH_SIZE,
+  PURCHASE_RECEIPT_SERIALS_BATCH_SIZE,
   FRAPPE_INSERT_MANY_BATCH_COUNT,
   PURCHASE_RECEIPT_DOCTYPE_NAME,
   SERIAL_NO_DOCTYPE_NAME,
@@ -90,7 +90,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               const { body, item_count } = this.mapPurchaseInvoiceReceipt(
                 purchaseInvoicePayload,
               );
-              return item_count < 200
+              return item_count < 20
                 ? this.validateFrappeSerials(
                     settings,
                     body,
@@ -201,7 +201,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         );
       }),
       bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
-      concatMap(data => {
+      switchMap(data => {
         return from(
           this.serialNoService.insertMany(data, { ordered: true }),
         ).pipe(
@@ -249,7 +249,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     const createSerialsBatch: { [key: string]: string[] } = {};
     const serials = [];
     // Something fucked up
-    purchaseReceipt.items.forEach(element => {
+    for (const element of purchaseReceipt.items) {
       if (element.has_serial_no) {
         const serial = element.serial_no.split('\n');
         if (createSerialsBatch[element.item_code]) {
@@ -257,9 +257,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         } else {
           createSerialsBatch[element.item_code] = serial;
         }
-        serials.push(...serial);
+        for (const serial_no of serial) {
+          serials.push(serial_no);
+        }
       }
-    });
+    }
     return { serials, createSerialsBatch };
   }
 
@@ -411,18 +413,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchase_invoice_name: string,
   ) {
     const purchaseReceipts = this.getMapPurchaseReceipts(body);
-    return from(purchaseReceipts)
+    return from(this.purchaseOrderService.findOne({ purchase_invoice_name }))
       .pipe(
-        mergeMap(receipts => {
-          try {
-            receipts.serial_no = receipts.serial_no.join('\n');
-          } catch {
-            receipts.serial_no = receipts.serial_no;
-          }
-          return from(
-            this.purchaseOrderService.findOne({ purchase_invoice_name }),
-          ).pipe(
-            switchMap(purchaseOrder => {
+        switchMap(purchaseOrder => {
+          return from(purchaseReceipts).pipe(
+            concatMap(receipts => {
               receipts.purchase_order = purchaseOrder.name;
               const data: any = new PurchaseReceiptDto();
               Object.assign(data, body);
@@ -431,17 +426,17 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               data.owner = clientHttpRequest.token.email;
               return of(data);
             }),
+            bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
+            concatMap(receipt => {
+              this.prSyncService.addToQueueNow({
+                payload: receipt,
+                token: clientHttpRequest.token,
+                settings,
+                purchase_invoice_name,
+              });
+              return of({});
+            }),
           );
-        }),
-        bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
-        concatMap(receipt => {
-          this.prSyncService.addToQueueNow({
-            payload: receipt,
-            token: clientHttpRequest.token,
-            settings,
-            purchase_invoice_name,
-          });
-          return of({});
         }),
       )
       .subscribe({
@@ -457,10 +452,18 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       });
   }
 
+  getSplicedSerials(serial_no: any) {
+    if (typeof serial_no === 'object') {
+      return serial_no.join('\n');
+    } else {
+      return serial_no;
+    }
+  }
+
   getMapPurchaseReceipts(body: PurchaseReceiptDto) {
     const purchaseReceipts = [];
-    body.items.forEach(item => {
-      if (item.qty > PURCHASE_RECEIPT_BATCH_SIZE) {
+    for (const item of body.items) {
+      if (item.qty > PURCHASE_RECEIPT_SERIALS_BATCH_SIZE) {
         if (!item.has_serial_no) {
           const receiptItem = new PurchaseReceiptItemDto();
           Object.assign(receiptItem, item);
@@ -469,7 +472,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           return;
         }
 
-        const remainder = item.qty % PURCHASE_RECEIPT_BATCH_SIZE;
+        const remainder = item.qty % PURCHASE_RECEIPT_SERIALS_BATCH_SIZE;
         const serials = item.serial_no.split('\n');
 
         if (remainder) {
@@ -478,7 +481,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           const serialsNo = serials.splice(0, remainder);
           offsetItem.qty = remainder;
           offsetItem.amount = offsetItem.qty * offsetItem.rate;
-          offsetItem.serial_no = serialsNo;
+          offsetItem.serial_no = this.getSplicedSerials(serialsNo);
           purchaseReceipts.push(offsetItem);
         }
 
@@ -487,11 +490,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         quotientItem.qty = 200;
         quotientItem.amount = quotientItem.qty * quotientItem.rate;
         quotientItem.serial_no = serials;
-        purchaseReceipts.push(...this.generateBatchedReceipt(quotientItem));
+        const generatedReceipts = this.generateBatchedReceipt(quotientItem);
+        for (const receipt of generatedReceipts) {
+          purchaseReceipts.push(receipt);
+        }
       } else {
+        item.serial_no = this.getSplicedSerials(item.serial_no);
         purchaseReceipts.push(item);
       }
-    });
+    }
 
     return purchaseReceipts;
   }
@@ -501,11 +508,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     from(receipt.serial_no)
       .pipe(
         map(serial => serial),
-        bufferCount(200),
+        bufferCount(PURCHASE_RECEIPT_SERIALS_BATCH_SIZE),
         switchMap(serials => {
           const data = new PurchaseReceiptItemDto();
           Object.assign(data, receipt);
-          data.serial_no = serials;
+          data.serial_no = this.getSplicedSerials(serials);
           purchaseReceipts.push(data);
           return of(purchaseReceipts);
         }),
@@ -636,13 +643,12 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchaseInvoicePayload.docstatus = 1;
     purchaseInvoicePayload.is_return = 0;
     let item_count = 0;
-    purchaseInvoicePayload.items.filter(item => {
+    for (const item of purchaseInvoicePayload.items) {
       item.serial_no = item.serial_no.join('\n');
       if (item.has_serial_no) {
         item_count += item.qty;
       }
-      return item;
-    });
+    }
     const body = purchaseInvoicePayload;
     return { body, item_count };
   }

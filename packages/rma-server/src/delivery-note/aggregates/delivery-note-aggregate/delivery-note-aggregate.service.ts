@@ -11,7 +11,6 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import {
   ERPNEXT_API_WAREHOUSE_ENDPOINT,
   LIST_DELIVERY_NOTE_ENDPOINT,
-  POST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
 import {
   PLEASE_RUN_SETUP,
@@ -26,14 +25,11 @@ import {
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
 } from '../../../constants/app-strings';
-import { DateTime } from 'luxon';
 import { AssignSerialDto } from '../../../serial-no/entity/serial-no/assign-serial-dto';
 import {
   CreateDeliveryNoteInterface,
   CreateDeliveryNoteItemInterface,
 } from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
-import { DeliveryNoteResponseInterface } from '../../entity/delivery-note-service/delivery-note-response-interface';
-import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { DeliveryNoteService } from '../../entity/delivery-note-service/delivery-note.service';
@@ -49,15 +45,16 @@ import { DeliveryNoteDeletedEvent } from '../../events/delivery-note-deleted/del
 import { DeliveryNoteCreatedEvent } from '../../events/delivery-note-created/delivery-note-created-event';
 import { CreateDeliveryNoteDto } from '../../entity/delivery-note-service/create-delivery-note.dto';
 import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
+import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delivery-note-job.service';
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
   constructor(
     private readonly settingsService: SettingsService,
     private readonly http: HttpService,
-    private readonly serialNoService: SerialNoService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly deliveryNoteService: DeliveryNoteService,
+    private readonly deliveryNoteJobService: DeliveryNoteJobService,
   ) {
     super();
   }
@@ -124,7 +121,6 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
   }
 
   createDeliveryNote(assignPayload: AssignSerialDto, clientHttpRequest) {
-    let timezone;
     return this.settingsService
       .find()
       .pipe(
@@ -132,7 +128,6 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           if (!settings) {
             return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
           }
-          timezone = settings.timeZone;
           this.salesInvoiceService
             .updateOne(
               { name: assignPayload.sales_invoice_name },
@@ -141,64 +136,22 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
             .then(success => {})
             .catch(error => {});
           const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
-          return this.http.post(
-            settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
-            deliveryNoteBody,
-            { headers: this.getAuthorizationHeaders(clientHttpRequest.token) },
-          );
+          this.deliveryNoteJobService.addToQueueNow({
+            payload: deliveryNoteBody,
+            sales_invoice_name: assignPayload.sales_invoice_name,
+            settings,
+            token: clientHttpRequest.token,
+          });
+          return of(deliveryNoteBody);
         }),
       )
-      .pipe(map(data => data.data.data))
       .pipe(
-        switchMap((response: DeliveryNoteResponseInterface) => {
-          const serials = [];
-          const items = [];
+        switchMap(response => {
           const delivered_items_map = {};
-          assignPayload.items.forEach(item => {
-            if (item.has_serial_no) {
-              this.serialNoService
-                .updateMany(
-                  { serial_no: { $in: item.serial_no.split('\n') } },
-                  {
-                    $set: {
-                      'warranty.salesWarrantyDate': item.warranty_date,
-                      'warranty.soldOn': new DateTime(timezone).toJSDate(),
-                    },
-                  },
-                )
-                .then(success => {})
-                .catch(err => {});
-            }
-          });
 
-          response.items.filter(item => {
-            if (item.serial_no) {
-              serials.push(...item.serial_no.split('\n'));
-            }
-            items.push({
-              item_code: item.item_code,
-              item_name: item.item_name,
-              description: item.description,
-              deliveredBy: clientHttpRequest.token.fullName,
-              deliveredByEmail: clientHttpRequest.token.email,
-              qty: item.qty,
-              rate: item.rate,
-              amount: item.amount,
-              serial_no: item.serial_no,
-              expense_account: item.expense_account,
-              cost_center: item.cost_center,
-              delivery_note: response.name,
-            });
+          response.items.forEach(item => {
             delivered_items_map[item.item_code] = item.qty;
-            return;
           });
-          this.serialNoService
-            .updateMany(
-              { serial_no: { $in: serials } },
-              { $set: { delivery_note: response.name } },
-            )
-            .then(success => {})
-            .catch(error => {});
 
           this.salesInvoiceService
             .findOne({
@@ -214,12 +167,12 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
                     delivered_items_map[key];
                 }
               }
+
               const status = this.getStatus(sales_invoice);
               this.salesInvoiceService
                 .updateMany(
                   { name: assignPayload.sales_invoice_name },
                   {
-                    $push: { delivery_note_items: { $each: items } },
                     $set: {
                       status,
                       delivered_items_map: sales_invoice.delivered_items_map,
@@ -254,15 +207,9 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     assignPayload: AssignSerialDto,
   ): CreateDeliveryNoteInterface {
     const deliveryNoteBody: CreateDeliveryNoteInterface = {};
+    Object.assign(deliveryNoteBody, assignPayload);
     deliveryNoteBody.docstatus = 1;
-    deliveryNoteBody.posting_date = assignPayload.posting_date;
-    deliveryNoteBody.posting_time = assignPayload.posting_time;
     deliveryNoteBody.is_return = false;
-    deliveryNoteBody.set_warehouse = assignPayload.set_warehouse;
-    deliveryNoteBody.customer = assignPayload.customer;
-    deliveryNoteBody.company = assignPayload.company;
-    deliveryNoteBody.total_qty = assignPayload.total_qty;
-    deliveryNoteBody.total = assignPayload.total;
     deliveryNoteBody.items = this.mapSerialsFromItem(
       assignPayload.items,
       assignPayload,

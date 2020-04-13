@@ -8,7 +8,10 @@ export class ValidateSerialsHandler
   constructor(private readonly manager: SerialNoAggregateService) {}
 
   async execute(query: ValidateSerialsQuery) {
-    const { payload } = query;
+    const { payload, file } = query;
+    if (file) {
+      return this.manager.validateBulkSerialFile(file).toPromise();
+    }
     return this.manager.validateSerials(payload).toPromise();
   }
 }

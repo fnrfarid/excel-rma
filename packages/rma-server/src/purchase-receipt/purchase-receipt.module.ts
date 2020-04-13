@@ -28,6 +28,6 @@ import { PurchaseOrderEntitiesModule } from '../purchase-order/entity/entity.mod
     PurchaseReceiptPoliciesService,
     PurchaseReceiptService,
   ],
-  exports: [],
+  exports: [...PurchaseReceiptSchedularManager],
 })
 export class PurchaseReceiptModule {}

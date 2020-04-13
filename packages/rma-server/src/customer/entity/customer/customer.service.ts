@@ -38,7 +38,9 @@ export class CustomerService {
     });
 
     const customerQuery =
-      territories.length !== 0 ? { territory: { $in: territories } } : {};
+      territories && territories.length !== 0
+        ? { territory: { $in: territories } }
+        : {};
 
     const $and: any[] = [{ $or }, customerQuery];
 

@@ -486,6 +486,7 @@ export class SettingsService extends AggregateRoot {
                             country: globalDefaults.country,
                             default_currency: globalDefaults.default_currency,
                             time_zone: systemSettings.time_zone,
+                            transferWarehouse: settings.transferWarehouse,
                           });
                         },
                       ),
