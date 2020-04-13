@@ -268,13 +268,13 @@ export class PurchaseReceiptSyncService {
     type?: string;
   }) {
     data.type = CREATE_PURCHASE_RECEIPT_JOB;
-    data.payload.forEach(element => {
+    for (const element of data.payload) {
       if (typeof element.items[0].serial_no !== 'string') {
         try {
           element.items[0].serial_no = element.items[0].serial_no.join('\n');
         } catch {}
       }
-    });
+    }
     this.agenda
       .now(FRAPPE_QUEUE_JOB, data)
       .then(success => {})

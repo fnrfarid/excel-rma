@@ -201,7 +201,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         );
       }),
       bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
-      concatMap(data => {
+      switchMap(data => {
         return from(
           this.serialNoService.insertMany(data, { ordered: true }),
         ).pipe(
@@ -249,7 +249,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     const createSerialsBatch: { [key: string]: string[] } = {};
     const serials = [];
     // Something fucked up
-    purchaseReceipt.items.forEach(element => {
+    for (const element of purchaseReceipt.items) {
       if (element.has_serial_no) {
         const serial = element.serial_no.split('\n');
         if (createSerialsBatch[element.item_code]) {
@@ -257,9 +257,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         } else {
           createSerialsBatch[element.item_code] = serial;
         }
-        serials.push(...serial);
+        for (const serial_no of serial) {
+          serials.push(serial_no);
+        }
       }
-    });
+    }
     return { serials, createSerialsBatch };
   }
 
@@ -460,7 +462,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
   getMapPurchaseReceipts(body: PurchaseReceiptDto) {
     const purchaseReceipts = [];
-    body.items.forEach(item => {
+    for (const item of body.items) {
       if (item.qty > PURCHASE_RECEIPT_SERIALS_BATCH_SIZE) {
         if (!item.has_serial_no) {
           const receiptItem = new PurchaseReceiptItemDto();
@@ -488,12 +490,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         quotientItem.qty = 200;
         quotientItem.amount = quotientItem.qty * quotientItem.rate;
         quotientItem.serial_no = serials;
-        purchaseReceipts.push(...this.generateBatchedReceipt(quotientItem));
+        const generatedReceipts = this.generateBatchedReceipt(quotientItem);
+        for (const receipt of generatedReceipts) {
+          purchaseReceipts.push(receipt);
+        }
       } else {
         item.serial_no = this.getSplicedSerials(item.serial_no);
         purchaseReceipts.push(item);
       }
-    });
+    }
 
     return purchaseReceipts;
   }
@@ -638,13 +643,12 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchaseInvoicePayload.docstatus = 1;
     purchaseInvoicePayload.is_return = 0;
     let item_count = 0;
-    purchaseInvoicePayload.items.filter(item => {
+    for (const item of purchaseInvoicePayload.items) {
       item.serial_no = item.serial_no.join('\n');
       if (item.has_serial_no) {
         item_count += item.qty;
       }
-      return item;
-    });
+    }
     const body = purchaseInvoicePayload;
     return { body, item_count };
   }

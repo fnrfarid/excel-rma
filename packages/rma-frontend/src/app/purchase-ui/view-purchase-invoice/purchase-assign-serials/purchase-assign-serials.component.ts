@@ -250,7 +250,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       ...new Set(this.serialDataSource.data().map(item => item.item_code)),
     ];
 
-    filteredItemCodeList.forEach(item_code => {
+    for (const item_code of filteredItemCodeList) {
       const purchaseReceiptItem = {} as PurchaseReceiptItem;
       purchaseReceiptItem.warehouse = this.warehouseFormControl.value;
       purchaseReceiptItem.serial_no = [];
@@ -258,22 +258,23 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       purchaseReceiptItem.amount = 0;
       purchaseReceiptItem.rate = 0;
       purchaseReceiptItem.item_code = item_code;
-
-      this.serialDataSource.data().forEach(item => {
+      for (const item of this.serialDataSource.data()) {
         if (item_code === item.item_code && item.serial_no.length !== 0) {
           purchaseReceiptItem.has_serial_no = item.has_serial_no || 0;
           purchaseReceiptItem.warranty_date = item.warranty_date;
           purchaseReceiptItem.qty += item.qty;
           purchaseReceiptItem.amount += item.rate * item.qty;
-          purchaseReceiptItem.serial_no.push(...item.serial_no);
+          for (const serial_no of item.serial_no) {
+            purchaseReceiptItem.serial_no.push(serial_no);
+          }
           purchaseReceiptItem.rate = item.rate;
           purchaseReceiptItem.item_name = item.item_name;
         }
-      });
+      }
       purchaseReceipt.total += purchaseReceiptItem.amount;
       purchaseReceipt.total_qty += purchaseReceiptItem.qty;
       purchaseReceipt.items.push(purchaseReceiptItem);
-    });
+    }
 
     this.purchaseService.createPurchaseReceipt(purchaseReceipt).subscribe({
       next: success => {
