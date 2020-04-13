@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
@@ -117,6 +118,10 @@ export class SerialNoController {
     @UploadedFile('file') file,
     @Req() clientHttpRequest,
   ) {
+    if (!file || !file.buffer || file.buffer.toString()) {
+      throw new BadRequestException('Invalid File');
+    }
+
     return await this.serialAggregateService.getPurchaseInvoiceDeliveredSerials(
       JSON.parse(file.buffer),
       search,

@@ -48,9 +48,11 @@ export class PurchaseReceiptPoliciesService {
 
   getSerials(purchaseReceiptPayload: PurchaseReceiptDto) {
     const serials = [];
-    purchaseReceiptPayload.items.forEach(item => {
-      serials.push(...item.serial_no);
-    });
+    for (const item of purchaseReceiptPayload.items) {
+      for (const serial_no of item.serial_no) {
+        serials.push(serial_no);
+      }
+    }
     return serials;
   }
 
