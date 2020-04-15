@@ -1,13 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subject, of, from } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { SalesService } from '../services/sales.service';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { Item } from '../../common/interfaces/sales.interface';
 import { SalesReturn } from '../../common/interfaces/sales-return.interface';
-import { startWith, switchMap } from 'rxjs/operators';
+import {
+  startWith,
+  switchMap,
+  debounceTime,
+  distinctUntilChanged,
+  toArray,
+  mergeMap,
+} from 'rxjs/operators';
+import * as _ from 'lodash';
 import {
   DateAdapter,
   MAT_DATE_LOCALE,
@@ -15,7 +23,17 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
-
+import {
+  ItemDataSource,
+  SerialDataSource,
+} from '../view-sales-invoice/serials/serials-datasource';
+import { CLOSE } from '../../constants/app-string';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  AssignSerialsDialog,
+  AssignNonSerialsItemDialog,
+} from '../view-sales-invoice/serials/serials.component';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-add-sales-return',
   templateUrl: './add-sales-return.page.html',
@@ -30,9 +48,11 @@ import { MY_FORMATS } from '../../constants/date-format';
   ],
 })
 export class AddSalesReturnPage implements OnInit {
+  @ViewChild('csvFileInput', { static: false })
+  csvFileInput: ElementRef;
+  value: string;
   displayedColumns = ['item', 'quantity', 'rate', 'total'];
   invoiceUuid: string;
-  dataSource = [];
   total: number = 0;
   salesInvoiceDetails: SalesInvoiceDetails;
   customerFormControl = new FormControl();
@@ -43,15 +63,51 @@ export class AddSalesReturnPage implements OnInit {
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
   getOptionText = '';
+  rangePickerState = {
+    prefix: '',
+    fromRange: '',
+    toRange: '',
+    serials: [],
+  };
+  DEFAULT_SERIAL_RANGE = { start: 0, end: 0, prefix: '', serialPadding: 0 };
+  fromRangeUpdate = new Subject<string>();
+  toRangeUpdate = new Subject<string>();
+  itemDisplayedColumns = [
+    'item_name',
+    'qty',
+    'assigned',
+    'remaining',
+    'has_serial_no',
+    'salesWarrantyMonths',
+    'add_serial',
+  ];
+  itemDataSource: ItemDataSource;
+  serialDisplayedColumns = [
+    'item_code',
+    'item_name',
+    'qty',
+    'serial_no',
+    'delete',
+  ];
+  serialDataSource: SerialDataSource;
+  filteredItemList = [];
+
   constructor(
     private readonly location: Location,
     private readonly route: ActivatedRoute,
     private readonly salesService: SalesService,
-  ) {}
+    private readonly snackBar: MatSnackBar,
+    public dialog: MatDialog,
+  ) {
+    this.onFromRange(this.value);
+    this.onToRange(this.value);
+  }
 
   ngOnInit() {
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
     this.salesInvoiceDetails = {} as SalesInvoiceDetails;
+    this.serialDataSource = new SerialDataSource();
+    this.itemDataSource = new ItemDataSource();
     this.getSalesInvoice();
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -59,6 +115,121 @@ export class AddSalesReturnPage implements OnInit {
         return this.salesService.getWarehouseList(value);
       }),
     );
+  }
+
+  onFromRange(value) {
+    this.fromRangeUpdate
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(v => {
+        this.generateSerials(value, this.rangePickerState.toRange);
+      });
+  }
+
+  onToRange(value) {
+    this.toRangeUpdate
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(v => {
+        this.generateSerials(this.rangePickerState.fromRange, value);
+      });
+  }
+
+  generateSerials(fromRange?, toRange?) {
+    this.rangePickerState.serials =
+      this.getSerialsFromRange(
+        fromRange || this.rangePickerState.fromRange || 0,
+        toRange || this.rangePickerState.toRange || 0,
+      ) || [];
+  }
+
+  isNumber(number) {
+    return !isNaN(parseFloat(number)) && isFinite(number);
+  }
+
+  getSerialsFromRange(startSerial: string, endSerial: string) {
+    const { start, end, prefix, serialPadding } = this.getSerialPrefix(
+      startSerial,
+      endSerial,
+    );
+    if (!this.isNumber(start) || !this.isNumber(end)) {
+      this.getMessage(
+        'Invalid serial range, end should be a number found character',
+      );
+      return [];
+    }
+
+    if (!prefix || prefix.length === 0) {
+      return [];
+    }
+
+    const data: any[] = _.range(start, end + 1);
+    let i = 0;
+    for (const value of data) {
+      if (value) {
+        data[i] = `${prefix}${this.getPaddedNumber(value, serialPadding)}`;
+        i++;
+      }
+    }
+    return data;
+  }
+
+  getSerialPrefix(startSerial, endSerial) {
+    if (!startSerial || !endSerial) {
+      return this.DEFAULT_SERIAL_RANGE;
+    }
+
+    if (startSerial.length !== endSerial.length) {
+      this.getMessage('Length for From Range and To Range should be the same.');
+      return this.DEFAULT_SERIAL_RANGE;
+    }
+
+    try {
+      const prefix = this.getStringPrefix([startSerial, endSerial]);
+
+      if (!prefix) {
+        this.getMessage('Invalid serial prefix, please enter valid serials');
+        return this.DEFAULT_SERIAL_RANGE;
+      }
+
+      const serialStartNumber = startSerial.match(/\d+/g);
+      const serialEndNumber = endSerial.match(/\d+/g);
+      const serialPadding =
+        serialEndNumber[serialEndNumber?.length - 1]?.length;
+
+      let start = Number(
+        serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
+      );
+
+      let end = Number(
+        serialEndNumber[serialEndNumber.length - 1].match(/\d+/g),
+      );
+
+      if (start > end) {
+        const tmp = start;
+        start = end;
+        end = tmp;
+      }
+      return { start, end, prefix, serialPadding };
+    } catch {
+      return this.DEFAULT_SERIAL_RANGE;
+    }
+  }
+
+  getStringPrefix(arr1: string[]) {
+    const arr = arr1.concat().sort(),
+      fromRange = arr[0],
+      toRange = arr[1],
+      L = fromRange.length;
+    let i = 0;
+    while (i < L && fromRange.charAt(i) === toRange.charAt(i)) i++;
+    const prefix = fromRange.substring(0, i).replace(/\d+$/, '');
+
+    const fromRangePostFix = fromRange.replace(prefix, '');
+    const toRangePostFix = toRange.replace(prefix, '');
+
+    if (!/^\d+$/.test(fromRangePostFix) || !/^\d+$/.test(toRangePostFix)) {
+      return false;
+    }
+    return prefix;
   }
 
   getSalesInvoice() {
@@ -71,18 +242,44 @@ export class AddSalesReturnPage implements OnInit {
         this.warehouseFormControl.setValue(res.delivery_warehouse);
         this.postingDateFormControl.setValue(new Date(res.posting_date));
         this.dueDateFormControl.setValue(new Date(res.due_date));
-        this.dataSource = this.getFilteredItems(res);
-        this.calculateTotal(this.dataSource);
+        this.filteredItemList = this.getFilteredItems(res);
+        this.itemDataSource.loadItems(this.filteredItemList);
+        this.getItemsWarranty();
       },
     });
+  }
+
+  getItemsWarranty() {
+    from(this.itemDataSource.data())
+      .pipe(
+        mergeMap(item => {
+          return this.salesService.getItemFromRMAServer(item.item_code).pipe(
+            switchMap(warrantyItem => {
+              item.salesWarrantyMonths = warrantyItem.salesWarrantyMonths;
+              return of(item);
+            }),
+          );
+        }),
+        toArray(),
+      )
+      .subscribe({
+        next: success => {
+          this.itemDataSource.loadItems(success);
+        },
+        error: err => {},
+      });
   }
 
   getFilteredItems(salesInvoice: SalesInvoiceDetails) {
     const filteredItemList = [];
     salesInvoice.items.forEach(item => {
+      item.assigned = 0;
+      item.remaining = item.qty;
       if (salesInvoice.delivered_items_map[item.item_code]) {
         item.qty = salesInvoice.delivered_items_map[item.item_code];
-        item.qty = salesInvoice.returned_items_map[item.item_code]
+        item.assigned =
+          0 - salesInvoice.returned_items_map[item.item_code] || 0;
+        item.remaining = salesInvoice.returned_items_map[item.item_code]
           ? item.qty + salesInvoice.returned_items_map[item.item_code]
           : item.qty;
         filteredItemList.push(item);
@@ -90,6 +287,125 @@ export class AddSalesReturnPage implements OnInit {
     });
 
     return filteredItemList;
+  }
+
+  validateSerial(item: { item_code: string; serials: string[] }, row: Item) {
+    this.assignRangeSerial(row, this.rangePickerState.serials);
+  }
+
+  async assignRangeSerial(row: Item, serials: string[]) {
+    const data = this.serialDataSource.data();
+    data.push({
+      item_code: row.item_code,
+      item_name: row.item_name,
+      qty: serials.length,
+      rate: row.rate,
+      has_serial_no: row.has_serial_no,
+      amount: row.amount,
+      serial_no: serials,
+    });
+    this.updateProductState(row.item_code, serials.length);
+    this.serialDataSource.update(data);
+    this.resetRangeState();
+  }
+
+  getSerialsInputValue(row) {
+    return row.serial_no.length === 1
+      ? row.serial_no[0]
+      : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
+  }
+
+  assignSerial(itemRow: Item) {
+    if (!itemRow.has_serial_no) {
+      this.addNonSerialItem(itemRow);
+      return;
+    }
+    if (
+      !this.rangePickerState.serials.length ||
+      this.rangePickerState.serials.length === 1
+    ) {
+      this.assignSingularSerials(itemRow);
+      return;
+    }
+    if (itemRow.remaining < this.rangePickerState.serials.length) {
+      this.snackBar.open(
+        `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
+        CLOSE,
+        { duration: 2500 },
+      );
+      return;
+    }
+    this.validateSerial(
+      { item_code: itemRow.item_code, serials: this.rangePickerState.serials },
+      itemRow,
+    );
+  }
+
+  async assignSingularSerials(row: Item) {
+    const dialogRef =
+      row.remaining >= 30
+        ? this.dialog.open(AssignSerialsDialog, {
+            width: '250px',
+            data: { serials: row.remaining || 0 },
+          })
+        : null;
+
+    const serials =
+      row.remaining >= 30
+        ? await dialogRef.afterClosed().toPromise()
+        : row.remaining;
+    if (serials && serials <= row.remaining) {
+      this.addSingularSerials(row, serials);
+      this.resetRangeState();
+      this.updateProductState(row, serials);
+      return;
+    }
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
+  }
+
+  addSingularSerials(row, serialCount) {
+    this.updateProductState(row.item_code, serialCount);
+    const serials = this.serialDataSource.data();
+    Array.from({ length: serialCount }, async (x, i) => {
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: 1,
+        rate: row.rate,
+        has_serial_no: row.has_serial_no,
+        amount: row.amount,
+        serial_no: [''],
+      });
+      this.serialDataSource.update(serials);
+    });
+  }
+
+  async addNonSerialItem(row: Item) {
+    const dialogRef = this.dialog.open(AssignNonSerialsItemDialog, {
+      width: '250px',
+      data: { qty: row.remaining || 0, remaining: row.remaining },
+    });
+    const assignValue = await dialogRef.afterClosed().toPromise();
+    if (assignValue && assignValue <= row.remaining) {
+      const serials = this.serialDataSource.data();
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: assignValue,
+        rate: row.rate,
+        amount: row.amount,
+        has_serial_no: row.has_serial_no,
+        serial_no: ['Non Serial Item'],
+      });
+      this.serialDataSource.update(serials);
+      this.updateProductState(row.item_code, assignValue);
+      return;
+    }
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
   }
 
   submitSalesReturn() {
@@ -101,15 +417,32 @@ export class AddSalesReturnPage implements OnInit {
     salesReturn.is_return = true;
     salesReturn.total = 0;
     salesReturn.total_qty = 0;
-    salesReturn.items = this.dataSource.filter((item: Item) => {
-      item.against_sales_invoice = this.salesInvoiceDetails.name;
-      item.qty = 0 - item.qty;
-      item.rate = 0 - item.rate;
-      item.amount = item.rate * item.qty;
-      salesReturn.total += item.amount;
-      salesReturn.total_qty += item.qty;
-      return item;
-    });
+    salesReturn.items = [];
+    const filteredItemCodeList = [
+      ...new Set(this.serialDataSource.data().map(item => item.item_code)),
+    ];
+
+    for (const item_code of filteredItemCodeList) {
+      const serialItem = {} as SerialReturnItem;
+      serialItem.serial_no = [];
+      serialItem.qty = 0;
+      serialItem.amount = 0;
+      serialItem.rate = 0;
+      serialItem.item_code = item_code;
+      for (const item of this.serialDataSource.data()) {
+        if (item_code === item.item_code && item.serial_no) {
+          serialItem.rate = 0 - item.rate;
+          serialItem.qty -= item.qty;
+          serialItem.amount += item.qty * item.rate;
+          serialItem.serial_no.push(...item.serial_no);
+        }
+      }
+      serialItem.serial_no = serialItem.serial_no.join('\n');
+      serialItem.against_sales_invoice = this.salesInvoiceDetails.name;
+      salesReturn.total += serialItem.amount;
+      salesReturn.total_qty += serialItem.qty;
+      salesReturn.items.push(serialItem);
+    }
     salesReturn.posting_date = this.getParsedDate(
       this.postingDateFormControl.value,
     );
@@ -122,21 +455,18 @@ export class AddSalesReturnPage implements OnInit {
     });
   }
 
-  calculateTotal(itemList: Item[]) {
-    this.total = 0;
-    itemList.forEach(item => {
-      this.total += item.qty * item.rate;
-    });
-  }
+  fileChangedEvent($event) {}
 
-  updateQuantity(row: Item, quantity: number) {
-    if (quantity == null) {
-      return;
-    }
-    const index = this.dataSource.indexOf(row);
-    row.qty = quantity;
-    this.dataSource[index].qty = quantity;
-    this.calculateTotal(this.dataSource);
+  updateProductState(item_code, assigned) {
+    const itemState = this.itemDataSource.data();
+    itemState.filter(product => {
+      if (product.item_code === item_code) {
+        product.assigned = product.assigned + assigned;
+        product.remaining = product.qty - product.assigned;
+      }
+      return product;
+    });
+    this.itemDataSource.update(itemState);
   }
 
   getFrappeTime() {
@@ -154,7 +484,58 @@ export class AddSalesReturnPage implements OnInit {
     ].join('-');
   }
 
+  getPaddedNumber(num, numberLength) {
+    return _.padStart(num, numberLength, '0');
+  }
+
+  getMessage(notFoundMessage, expected?, found?) {
+    return this.snackBar.open(
+      expected && found
+        ? `${notFoundMessage}, expected ${expected} found ${found}`
+        : `${notFoundMessage}`,
+      CLOSE,
+      { duration: 4500 },
+    );
+  }
+
+  deleteRow(row, i) {
+    let serialData = this.serialDataSource.data();
+    serialData.length === 1 ? (serialData = []) : serialData.splice(i, 1);
+
+    this.serialDataSource.update(serialData);
+    const itemData = this.itemDataSource.data();
+
+    itemData.filter(item => {
+      if (item.item_code === row.item_code) {
+        item.assigned = item.assigned - row.qty;
+        item.remaining = item.remaining + row.qty;
+      }
+      return item;
+    });
+
+    this.itemDataSource.update(itemData);
+  }
+
+  resetRangeState() {
+    this.rangePickerState = {
+      prefix: '',
+      fromRange: '',
+      toRange: '',
+      serials: [],
+    };
+  }
+
   navigateBack() {
     this.location.back();
   }
+}
+
+export interface SerialReturnItem {
+  item_code: string;
+  qty: number;
+  rate: number;
+  item_name: string;
+  amount: number;
+  against_sales_invoice: string;
+  serial_no: any;
 }
