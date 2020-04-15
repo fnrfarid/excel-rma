@@ -1,3 +1,18 @@
+::-ms-browse {
+  background: #633ce0;
+  color: #ffffff;
+  border: 1px solid #633ce0;
+  padding: 10px;
+  border-radius: 15px;
+}
+::-webkit-file-upload-button {
+  background: #633ce0;
+  color: #ffffff;
+  border: 1px solid #633ce0;
+  padding: 10px;
+  border-radius: 15px;
+}
+
 .add-comment {
   opacity: 0.4;
 }
@@ -9,7 +24,7 @@
 }
 
 .example-full-width {
-  width: 100%;
+  width: 97%;
   color: black;
 }
 

@@ -11,6 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Location } from '@angular/common';
 import { SalesService } from '../services/sales.service';
 import { of } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -39,6 +40,10 @@ describe('AddSalesReturnPage', () => {
       providers: [
         {
           provide: Location,
+          useValue: {},
+        },
+        {
+          provide: MatSnackBar,
           useValue: {},
         },
         {
