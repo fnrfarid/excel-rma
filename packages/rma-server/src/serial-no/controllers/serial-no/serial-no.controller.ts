@@ -118,7 +118,12 @@ export class SerialNoController {
     @UploadedFile('file') file,
     @Req() clientHttpRequest,
   ) {
-    if (!file || !file.buffer || file.buffer.toString()) {
+    if (
+      !file ||
+      !file.buffer ||
+      file.buffer.toString() === '' ||
+      file.buffer.toString() === 'undefined'
+    ) {
       throw new BadRequestException('Invalid File');
     }
 
