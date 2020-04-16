@@ -91,6 +91,7 @@ export class AddSalesReturnPage implements OnInit {
   ];
   serialDataSource: SerialDataSource;
   filteredItemList = [];
+  deliveryNoteNames = [];
 
   constructor(
     private readonly location: Location,
@@ -245,8 +246,19 @@ export class AddSalesReturnPage implements OnInit {
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
         this.getItemsWarranty();
+        this.getDeliveryNoteNames();
       },
     });
+  }
+
+  getDeliveryNoteNames() {
+    this.salesService
+      .getDeliveryNoteNames(this.salesInvoiceDetails.name)
+      .subscribe({
+        next: res => {
+          this.deliveryNoteNames = res.map(data => data.name);
+        },
+      });
   }
 
   getItemsWarranty() {
@@ -290,7 +302,27 @@ export class AddSalesReturnPage implements OnInit {
   }
 
   validateSerial(item: { item_code: string; serials: string[] }, row: Item) {
-    this.assignRangeSerial(row, this.rangePickerState.serials);
+    this.salesService
+      .validateReturnSerials({
+        item_code: item.item_code,
+        serials: item.serials,
+        delivery_note_names: this.deliveryNoteNames,
+        warehouse: this.warehouseFormControl.value,
+      })
+      .subscribe({
+        next: (success: { notFoundSerials: string[] }) => {
+          success.notFoundSerials && success.notFoundSerials.length
+            ? this.snackBar.open(
+                `Invalid Serials ${success.notFoundSerials
+                  .splice(0, 5)
+                  .join(', ')}...`,
+                CLOSE,
+                { duration: 2500 },
+              )
+            : this.assignRangeSerial(row, this.rangePickerState.serials);
+        },
+        error: err => {},
+      });
   }
 
   async assignRangeSerial(row: Item, serials: string[]) {

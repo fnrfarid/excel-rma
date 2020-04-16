@@ -56,6 +56,7 @@ describe('AddSalesReturnPage', () => {
                 returned_items_map: {},
               }),
             getWarehouseList: (...args) => of([{}]),
+            getDeliveryNoteNames: (...args) => of([{ name: '' }]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),
             }),
