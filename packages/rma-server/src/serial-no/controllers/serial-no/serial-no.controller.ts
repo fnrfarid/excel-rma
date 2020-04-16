@@ -24,6 +24,7 @@ import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
 import {
   SerialNoDto,
   ValidateSerialsDto,
+  ValidateReturnSerialsDto,
 } from '../../entity/serial-no/serial-no-dto';
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoCommand } from '../../command/assign-serial-no/assign-serial-no.command';
@@ -169,5 +170,21 @@ export class SerialNoController {
     return this.queryBus.execute(
       new ValidateSerialsQuery(body, clientHttpRequest, file),
     );
+  }
+
+  @Post('v1/validate_return_serials')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UseInterceptors(FileInterceptor('file'))
+  validateReturnSerialNo(
+    @Body() body: ValidateReturnSerialsDto,
+    @UploadedFile('file') file,
+  ) {
+    if (file) {
+      return this.serialAggregateService
+        .validateBulkReturnSerialFile(file)
+        .toPromise();
+    }
+    return this.serialAggregateService.validateReturnSerials(body).toPromise();
   }
 }

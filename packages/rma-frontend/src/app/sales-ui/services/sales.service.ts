@@ -38,6 +38,7 @@ import {
   CANCEL_SALES_INVOICE_ENDPOINT,
   UPDATE_OUTSTANDING_AMOUNT_ENDPOINT,
   RELAY_GET_DELIVERY_NOTE_ENDPOINT,
+  VALIDATE_RETURN_SERIALS,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -81,6 +82,37 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post('/api/serial_no/v1/validate', uploadData, {
+          headers,
+        });
+      }),
+    );
+  }
+
+  validateReturnSerials(item: {
+    item_code: string;
+    serials: string[];
+    delivery_note_names: string[];
+    warehouse: string;
+  }) {
+    if (JSON.stringify(item).length < JSON_BODY_MAX_SIZE) {
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http.post(VALIDATE_RETURN_SERIALS, item, {
+            headers,
+          });
+        }),
+      );
+    }
+    const blob = new Blob([JSON.stringify(item)], {
+      type: 'application/json',
+    });
+
+    const uploadData = new FormData();
+
+    uploadData.append('file', blob, 'payload');
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(VALIDATE_RETURN_SERIALS, uploadData, {
           headers,
         });
       }),

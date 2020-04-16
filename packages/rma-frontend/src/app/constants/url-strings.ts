@@ -90,3 +90,5 @@ export const PRINT_SALES_INVOICE_PDF_METHOD =
   '/api/method/frappe.utils.print_format.download_pdf';
 export const PRINT_DELIVERY_NOTE_PDF_METHOD =
   '/api/method/frappe.utils.print_format.download_multi_pdf';
+export const VALIDATE_RETURN_SERIALS =
+  '/api/serial_no/v1/validate_return_serials';

@@ -83,3 +83,21 @@ export class ValidateSerialsDto {
   @IsString()
   validateFor: string;
 }
+
+export class ValidateReturnSerialsDto {
+  @IsOptional()
+  @IsArray()
+  serials: string[];
+
+  @IsOptional()
+  @IsString()
+  item_code: string;
+
+  @IsOptional()
+  @IsArray()
+  delivery_note_names: string[];
+
+  @IsOptional()
+  @IsString()
+  warehouse: string;
+}
