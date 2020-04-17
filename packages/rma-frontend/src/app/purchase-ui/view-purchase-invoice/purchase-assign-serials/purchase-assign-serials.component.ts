@@ -47,7 +47,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 import { TimeService } from '../../../api/time/time.service';
-import { SerialsService } from 'src/app/common/helpers/serials/serials.service';
+import { SerialsService } from '../../../common/helpers/serials/serials.service';
 
 @Component({
   selector: 'purchase-assign-serials',

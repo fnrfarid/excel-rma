@@ -51,7 +51,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { TimeService } from '../../../api/time/time.service';
-import { SerialsService } from 'src/app/common/helpers/serials/serials.service';
+import { SerialsService } from '../../../common/helpers/serials/serials.service';
 
 @Component({
   selector: 'sales-invoice-serials',
