@@ -32,8 +32,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AssignSerialsDialog,
   AssignNonSerialsItemDialog,
+  CsvJsonObj,
 } from '../view-sales-invoice/serials/serials.component';
 import { MatDialog } from '@angular/material/dialog';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 @Component({
   selector: 'app-add-sales-return',
   templateUrl: './add-sales-return.page.html',
@@ -99,6 +101,7 @@ export class AddSalesReturnPage implements OnInit {
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
     public dialog: MatDialog,
+    private readonly csvService: CsvJsonService,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -487,7 +490,116 @@ export class AddSalesReturnPage implements OnInit {
     });
   }
 
-  fileChangedEvent($event) {}
+  fileChangedEvent($event) {
+    const reader = new FileReader();
+    reader.readAsText($event.target.files[0]);
+    reader.onload = (file: any) => {
+      const csvData = file.target.result;
+      const headers = csvData
+        .split('\n')[0]
+        .replace(/"/g, '')
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+        .split(',');
+      // validate file headers
+      this.csvService.validateHeaders(headers)
+        ? // if valid convert to json.
+          this.csvService
+            .csvToJSON(csvData)
+            .pipe(
+              switchMap(json => {
+                // club json data to item_name as unique { blue cotton candy : { serials : [1,2,3..]}, ...  }
+                const data = this.csvService.mapJson(json);
+                // name of all items [ "blue cotton candy" ...]
+                const item_names = [];
+                // obj map for item and number of serial present like - { blue cotton candy : 50  }
+                const itemObj: CsvJsonObj = {};
+
+                // get all item_name and validate from current remaining items and then the API
+                for (const key in data) {
+                  if (key) {
+                    item_names.push(key);
+                    itemObj[key] = {
+                      serial: data[key].serial_no.length,
+                      serial_no: data[key].serial_no.map(serial => {
+                        return serial.toUpperCase();
+                      }),
+                    };
+                  }
+                }
+
+                // validate Json serials with remaining products to be assigned.
+                return this.validateJson(itemObj)
+                  ? // if valid ping backend to validate found serials
+                    this.csvService
+                      .validateReturnSerials(
+                        item_names,
+                        itemObj,
+                        this.deliveryNoteNames,
+                        this.warehouseFormControl.value,
+                      )
+                      .pipe(
+                        switchMap((response: boolean) => {
+                          this.csvFileInput.nativeElement.value = '';
+                          if (response) {
+                            return of(itemObj);
+                          }
+                          return of(false);
+                        }),
+                      )
+                  : of(false);
+              }),
+            )
+            .subscribe({
+              next: (response: CsvJsonObj | boolean) => {
+                response ? this.addSerialsFromCsvJson(response) : null;
+                // reset file input, restart the flow.
+                this.csvFileInput.nativeElement.value = '';
+              },
+              error: err => {
+                this.csvFileInput.nativeElement.value = '';
+              },
+            })
+        : (this.csvFileInput.nativeElement.value = '');
+    };
+  }
+
+  validateJson(json: CsvJsonObj) {
+    let isValid = true;
+    const data = this.itemDataSource.data();
+    for (const value of data) {
+      if (json[value.item_name]) {
+        if (value.remaining < json[value.item_name].serial) {
+          this.getMessage(`Item ${value.item_name} has
+          ${value.remaining} remaining, but provided
+          ${json[value.item_name].serial} serials.`);
+          isValid = false;
+          break;
+        }
+      }
+    }
+    return isValid;
+  }
+
+  addSerialsFromCsvJson(csvJsonObj: CsvJsonObj | any) {
+    const data = this.itemDataSource.data();
+    data.some(element => {
+      if (csvJsonObj[element.item_name]) {
+        if (!element.has_serial_no) {
+          this.snackBar.open(
+            `${element.item_name} is not a non-serial item.`,
+            CLOSE,
+            { duration: 3500 },
+          );
+          return true;
+        }
+        this.assignRangeSerial(
+          element,
+          csvJsonObj[element.item_name].serial_no,
+        );
+        return false;
+      }
+    });
+  }
 
   updateProductState(item_code, assigned) {
     const itemState = this.itemDataSource.data();
