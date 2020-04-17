@@ -23,9 +23,9 @@ import {
 import { DEFAULT_COMPANY, TRANSFER_WAREHOUSE } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
-import { SerialsService } from '../../../common/helpers/serials/serials.service';
-import { CsvJsonObj } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
-import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
+import { SerialsService } from '../../common/helpers/serials/serials.service';
+import { CsvJsonObj } from '../../sales-ui/view-sales-invoice/serials/serials.component';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 
 @Component({
   selector: 'app-material-transfer',
