@@ -1,15 +1,21 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryDto } from '../../stock-entry/stock-entry-dto';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { switchMap } from 'rxjs/operators';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
-import { from } from 'rxjs';
-import { STOCK_ENTRY, FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
+import { from, throwError, of } from 'rxjs';
+import {
+  STOCK_ENTRY,
+  FRAPPE_QUEUE_JOB,
+  STOCK_ENTRY_SERIALS_BATCH_SIZE,
+} from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { CREATE_STOCK_ENTRY_JOB } from '../../schedular/stock-entry-sync/stock-entry-sync.service';
+import { INVALID_FILE } from '../../../constants/app-strings';
+import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 
 @Injectable()
 export class StockEntryAggregateService {
@@ -18,16 +24,33 @@ export class StockEntryAggregateService {
     private readonly agenda: Agenda,
     private readonly stockEntryService: StockEntryService,
     private readonly stockEntryPolicies: StockEntryPoliciesService,
+    private readonly serialBatchService: SerialBatchService,
   ) {}
 
-  create(payload: StockEntryDto, req) {
+  createStockEntry(payload: StockEntryDto, req) {
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
         const stockEntry = this.setStockEntryDefaults(payload, req);
-        this.addToQueueNow({ payload: stockEntry, token: req.token });
+        this.batchQueueStockEntry(payload, req);
         return from(this.stockEntryService.create(stockEntry));
       }),
     );
+  }
+
+  batchQueueStockEntry(payload: StockEntryDto, req) {
+    this.serialBatchService
+      .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
+      .pipe(
+        switchMap((itemBatch: any) => {
+          payload.items = [itemBatch];
+          this.addToQueueNow({ payload, token: req.token });
+          return of();
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
   }
 
   setStockEntryDefaults(payload: StockEntryDto, clientHttpRequest): StockEntry {
@@ -50,5 +73,20 @@ export class StockEntryAggregateService {
       .now(FRAPPE_QUEUE_JOB, data)
       .then(success => {})
       .catch(err => {});
+  }
+
+  StockEntryFromFile(file, req) {
+    return from(this.getJsonData(file)).pipe(
+      switchMap((data: StockEntryDto) => {
+        if (!data) {
+          return throwError(new BadRequestException(INVALID_FILE));
+        }
+        return this.createStockEntry(data, req);
+      }),
+    );
+  }
+
+  getJsonData(file) {
+    return of(JSON.parse(file.buffer));
   }
 }

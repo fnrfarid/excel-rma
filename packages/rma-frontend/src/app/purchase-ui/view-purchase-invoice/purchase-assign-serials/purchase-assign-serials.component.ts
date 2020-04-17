@@ -47,6 +47,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 import { TimeService } from '../../../api/time/time.service';
+import { SerialsService } from 'src/app/common/helpers/serials/serials.service';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -83,7 +84,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     serials: [],
   };
 
-  DEFAULT_SERIAL_RANGE = { start: 0, end: 0, prefix: '', serialPadding: 0 };
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
   itemDisplayedColumns = [
@@ -132,6 +132,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     private loadingController: LoadingController,
     private readonly timeService: TimeService,
     private readonly csvService: CsvJsonService,
+    private readonly serialsService: SerialsService,
   ) {}
 
   ngOnInit() {
@@ -345,105 +346,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   generateSerials(fromRange?, toRange?) {
     this.rangePickerState.serials =
-      this.getSerialsFromRange(
+      this.serialsService.getSerialsFromRange(
         fromRange || this.rangePickerState.fromRange || 0,
         toRange || this.rangePickerState.toRange || 0,
       ) || [];
-  }
-
-  isNumber(number) {
-    return !isNaN(parseFloat(number)) && isFinite(number);
-  }
-
-  getSerialsFromRange(startSerial: string, endSerial: string) {
-    const { start, end, prefix, serialPadding } = this.getSerialPrefix(
-      startSerial,
-      endSerial,
-    );
-    if (!this.isNumber(start) || !this.isNumber(end)) {
-      this.getMessage(
-        'Invalid serial range, end should be a number found character',
-      );
-      return [];
-    }
-
-    if (!prefix || prefix.length === 0) {
-      return [];
-    }
-
-    const data: any[] = _.range(start, end + 1);
-    let i = 0;
-    for (const value of data) {
-      if (value) {
-        data[i] = `${prefix}${this.getPaddedNumber(value, serialPadding)}`;
-        i++;
-      }
-    }
-    return data;
-  }
-
-  getSerialPrefix(startSerial, endSerial) {
-    if (!startSerial || !endSerial) {
-      return this.DEFAULT_SERIAL_RANGE;
-    }
-
-    if (startSerial.length !== endSerial.length) {
-      this.getMessage('Length for From Range and To Range should be the same.');
-      return this.DEFAULT_SERIAL_RANGE;
-    }
-
-    try {
-      const prefix = this.getStringPrefix([startSerial, endSerial]);
-
-      if (!prefix) {
-        this.getMessage('Invalid serial prefix, please enter valid serials');
-        return this.DEFAULT_SERIAL_RANGE;
-      }
-
-      const serialStartNumber = startSerial.match(/\d+/g);
-      const serialEndNumber = endSerial.match(/\d+/g);
-      const serialPadding =
-        serialEndNumber[serialEndNumber?.length - 1]?.length;
-
-      let start = Number(
-        serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
-      );
-
-      let end = Number(
-        serialEndNumber[serialEndNumber.length - 1].match(/\d+/g),
-      );
-
-      if (start > end) {
-        const tmp = start;
-        start = end;
-        end = tmp;
-      }
-      return { start, end, prefix, serialPadding };
-    } catch {
-      return this.DEFAULT_SERIAL_RANGE;
-    }
-  }
-
-  getStringPrefix(arr1: string[]) {
-    const arr = arr1.concat().sort(),
-      fromRange = arr[0],
-      toRange = arr[1],
-      L = fromRange.length;
-    let i = 0;
-    while (i < L && fromRange.charAt(i) === toRange.charAt(i)) i++;
-    const prefix = fromRange.substring(0, i).replace(/\d+$/, '');
-
-    const fromRangePostFix = fromRange.replace(prefix, '');
-    const toRangePostFix = toRange.replace(prefix, '');
-
-    if (!/^\d+$/.test(fromRangePostFix) || !/^\d+$/.test(toRangePostFix)) {
-      return false;
-    }
-    return prefix;
-  }
-
-  getPaddedNumber(num, numberLength) {
-    return _.padStart(num, numberLength, '0');
   }
 
   async assignSingularSerials(row: Item) {

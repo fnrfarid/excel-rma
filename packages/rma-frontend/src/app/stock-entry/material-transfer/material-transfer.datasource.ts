@@ -33,6 +33,7 @@ export class StockEntryRow {
   t_warehouse: string;
   item_code: string;
   transferWarehouse: string;
+  has_serial_no: number;
   item_name: string;
   qty: number;
   serial_no: any;
