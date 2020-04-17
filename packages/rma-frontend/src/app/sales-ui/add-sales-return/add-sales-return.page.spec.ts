@@ -12,6 +12,7 @@ import { Location } from '@angular/common';
 import { SalesService } from '../services/sales.service';
 import { of } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -44,6 +45,10 @@ describe('AddSalesReturnPage', () => {
         },
         {
           provide: MatSnackBar,
+          useValue: {},
+        },
+        {
+          provide: CsvJsonService,
           useValue: {},
         },
         {
