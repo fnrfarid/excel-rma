@@ -118,3 +118,12 @@ export const ITEM_DOCTYPE = 'Item';
 export const SALES_INVOICE_DOCTYPE = 'Sales Invoice';
 export const FRAPPE_QUEUE_JOB = 'FRAPPE_QUEUE_JOB';
 export const CREATE_DELIVERY_NOTE_JOB = 'CREATE_DELIVERY_NOTE_JOB';
+export const STOCK_ENTRY_LIST_ITEM_SELECT_KEYS = [
+  's_warehouse',
+  't_warehouse',
+  'item_code',
+  'item_name',
+  'qty',
+  'transfer_qty',
+  'transferWarehouse',
+];

@@ -40,6 +40,18 @@ const routes: Routes = [
   {
     path: 'stock-entry',
     loadChildren: () =>
+      import('./stock-entry/stock-entry-list/stock-entry-list.module').then(
+        m => m.StockEntryListModule,
+      ),
+  },
+  {
+    path: 'material-transfer',
+    loadChildren: () =>
+      import('./stock-entry/stock-entry.module').then(m => m.StockEntryModule),
+  },
+  {
+    path: 'material-transfer/:uuid',
+    loadChildren: () =>
       import('./stock-entry/stock-entry.module').then(m => m.StockEntryModule),
   },
   {

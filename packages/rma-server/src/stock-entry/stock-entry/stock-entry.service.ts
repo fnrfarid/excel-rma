@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { StockEntry } from './stock-entry.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
+import { STOCK_ENTRY_LIST_ITEM_SELECT_KEYS } from '../../constants/app-strings';
 
 @Injectable()
 export class StockEntryService {
@@ -29,7 +30,7 @@ export class StockEntryService {
       sortQuery = JSON.parse(sort);
     } catch (error) {
       sortQuery = {
-        claim_no: 'desc',
+        posting_date: 'desc',
       };
     }
 
@@ -44,11 +45,16 @@ export class StockEntryService {
 
     const where: { $and: any } = { $and };
 
-    const results = await this.stockEntryRepository.find({
+    const select: string[] = this.getSelectKeys();
+
+    const db: any = this.stockEntryRepository;
+
+    const results = await db.find({
       skip,
       take,
       where,
       order: sortQuery,
+      select,
     });
 
     return {
@@ -58,15 +64,22 @@ export class StockEntryService {
     };
   }
 
+  getSelectKeys() {
+    const select = STOCK_ENTRY_LIST_ITEM_SELECT_KEYS.map(key => `items.${key}`);
+    select.push(
+      ...this.stockEntryRepository.manager.connection
+        .getMetadata(StockEntry)
+        .ownColumns.map(column => column.propertyName),
+    );
+    select.splice(select.indexOf('items'), 1);
+    return select;
+  }
+
   getFilterQuery(query) {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        if (key === 'status' && query[key] === 'All') {
-          delete query[key];
-        } else {
-          query[key] = new RegExp(query[key], 'i');
-        }
+        query[key] = new RegExp(query[key], 'i');
       } else {
         delete query[key];
       }

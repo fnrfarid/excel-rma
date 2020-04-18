@@ -73,6 +73,7 @@ export class PurchaseInvoiceService {
     }
     sortQuery =
       Object.keys(sortQuery).length === 0 ? { created_on: 'desc' } : sortQuery;
+
     for (const key of Object.keys(sortQuery)) {
       sortQuery[key] = sortQuery[key].toUpperCase();
       if (sortQuery[key] === 'ASC') {
@@ -86,7 +87,7 @@ export class PurchaseInvoiceService {
       }
     }
 
-    if (filter_query.fromDate && filter_query.toDate) {
+    if (filter_query && filter_query.fromDate && filter_query.toDate) {
       dateQuery = {
         created_on: {
           $gte: new Date(filter_query.fromDate),

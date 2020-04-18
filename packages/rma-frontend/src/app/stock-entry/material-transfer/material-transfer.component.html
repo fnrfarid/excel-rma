@@ -19,11 +19,14 @@
       <ion-grid class="ion-no-padding">
         <ion-row>
           <ion-col>
-      <input #csvFileInput type="file" id="txtFileUpload" (change)="fileChangedEvent($event)" accept=".csv" />
+      <input [disabled]="readonly" #csvFileInput type="file" id="txtFileUpload" (change)="fileChangedEvent($event)" accept=".csv" />
       </ion-col>
       <ion-col class="ion-text-right">
-        <ion-button color="tertiary" (click)="createMaterialTransfer()">
+        <ion-button *ngIf="!readonly" color="tertiary" (click)="createMaterialTransfer()">
           Submit Transfer
+        </ion-button>
+        <ion-button *ngIf="readonly" color="tertiary" (click)="acceptTransfer()">
+          Accept Transfer
         </ion-button>
       </ion-col>
       </ion-row>
@@ -31,7 +34,7 @@
     </ion-card-content>
   </ion-card>
 
-<ion-content class="page-background">
+<ion-content class="page-background" >
   <ion-card>
     <ion-card-header>
       <ion-row class="align">
@@ -43,7 +46,7 @@
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right">
-          <ion-button color="tertiary" (click)="addRow()">
+          <ion-button [disabled]="readonly" color="tertiary" (click)="addRow()">
             Add
           </ion-button>
         </ion-col>
@@ -54,12 +57,12 @@
         <ion-row>
           <ion-col>
             <mat-form-field class="example-full-width">
-              <input matInput oninput="this.value = this.value.toUpperCase()" placeholder="From Range" type="text"
+              <input [disabled]="readonly" matInput oninput="this.value = this.value.toUpperCase()" placeholder="From Range" type="text"
                 name="From Range" [(ngModel)]="rangePickerState.fromRange"
                 (ngModelChange)="this.fromRangeUpdate.next($event)" required />
             </mat-form-field>
             <mat-form-field class="example-full-width">
-              <input type="text" oninput="this.value = this.value.toUpperCase()" matInput placeholder="To Range"
+              <input [disabled]="readonly" type="text" oninput="this.value = this.value.toUpperCase()" matInput placeholder="To Range"
                 type="string" name="To Range" [(ngModel)]="rangePickerState.toRange"
                 (ngModelChange)="this.toRangeUpdate.next($event)" />
             </mat-form-field>
@@ -73,9 +76,9 @@
 
           <ion-col>
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Source Warehouse" matInput [formControl]="warehouseState.s_warehouse"
+              <input  type="text" placeholder="Source Warehouse" matInput [formControl]="warehouseState.s_warehouse"
                 [matAutocomplete]="from_warehouse" />
-              <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
+              <mat-autocomplete  autoActiveFirstOption #from_warehouse="matAutocomplete">
                 <mat-option *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse.name">
                   {{ s_warehouse.name }}
                 </mat-option>
@@ -83,7 +86,7 @@
             </mat-form-field>
 
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Target Warehouse" matInput [formControl]="warehouseState.t_warehouse"
+              <input type="text"  placeholder="Target Warehouse" matInput [formControl]="warehouseState.t_warehouse"
                 [matAutocomplete]="warehouse" />
               <mat-autocomplete autoActiveFirstOption #warehouse="matAutocomplete">
                 <mat-option *ngFor="let warehouse of filteredWarehouseList2 | async" [value]="warehouse.name">
@@ -151,9 +154,9 @@
         <ng-container matColumnDef="serial_no">
           <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
           <mat-cell appearance="outline" *matCellDef="let row">
-            <input matInput *ngIf="row.serial_no.length === 1 ? true : false" [(ngModel)]="row.serial_no[0]"
+            <input matInput *ngIf="row.serial_no?.length === 1 ? true : false" [(ngModel)]="row.serial_no[0]"
               oninput="this.value = this.value.toUpperCase()" />
-            <p *ngIf="row.serial_no.length === 1 ? false : true">
+            <p *ngIf="row.serial_no?.length === 1 ? false : true">
               {{ getSerialsInputValue(row) }}
             </p>
           </mat-cell>
@@ -162,7 +165,7 @@
         <ng-container matColumnDef="delete">
           <mat-header-cell *matHeaderCellDef>Delete Serials</mat-header-cell>
           <mat-cell *matCellDef="let row; let i = index">
-            <ion-button color="danger" fill="clear" (click)="deleteRow(row, i)">
+            <ion-button [disabled]="readonly" color="danger" fill="clear" (click)="deleteRow(row, i)">
               <ion-icon name="trash"></ion-icon>
             </ion-button>
           </mat-cell>

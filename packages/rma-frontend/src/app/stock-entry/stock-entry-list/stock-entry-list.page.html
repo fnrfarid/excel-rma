@@ -1,0 +1,171 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Stock Entry</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-card>
+    <ion-card-header>
+      <ion-row class="align">
+        <ion-col>
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Material Transfers
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+      </ion-row>
+    </ion-card-header>
+    <div class="loading-shade" *ngIf="dataSource.loading$ | async">
+      <mat-progress-bar
+        *ngIf="dataSource.loading$ | async"
+        mode="indeterminate"
+      ></mat-progress-bar>
+    </div>
+    <ion-card-content class="ion-no-padding">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                placeholder="Search"
+                [(ngModel)]="search"
+                (keyup.enter)="setFilter()"
+              />
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <mat-table
+        class="full-width-table"
+        [dataSource]="dataSource"
+        matSort
+        (matSortChange)="setFilter($event)"
+        style="width: 100%;"
+      >
+        <ng-container matColumnDef="sr_no">
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+          <mat-cell *matCellDef="let row;let i=index ">
+            {{i+1}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="createdByEmail">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="name">
+            Created By
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.createdByEmail}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <!-- <ng-container matColumnDef="createdBy">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="createdBy"
+            >Name</mat-header-cell
+          >
+          <mat-cell *matCellDef="let row">
+            <ion-text
+              [ngStyle]="{
+              color: 'green'
+            }"
+              *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' || row.status === 'Completed'"
+            >
+              {{row.status}}
+            </ion-text>
+            <ion-text
+              *ngIf="row.status === 'Draft' || row.status === 'Rejected' || row.status === 'Canceled'"
+              [ngStyle]="{
+              color: 'red'
+            }"
+            >
+              {{row.status}}
+            </ion-text>
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container> -->
+
+        <ng-container matColumnDef="posting_date">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="created_on">
+            Posting Date
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.posting_date | date:'dd-MM-yyyy'}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="createdBy">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="supplier">
+            Name
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.createdBy}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="company">
+          <mat-header-cell *matHeaderCellDef>
+            Company
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{ row.company }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="posting_time">
+          <mat-header-cell *matHeaderCellDef>
+            Posting Time
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{ row.posting_time }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="transferWarehouse">
+          <mat-header-cell *matHeaderCellDef>
+            Transfer Warehouse
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.delivered_by ? row?.items[0].transferWarehouse : '' }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: displayedColumns;"
+          [routerLink]="['/material-transfer/',row.uuid]"
+        ></mat-row>
+        <mat-footer-row
+          class="footer"
+          *matFooterRowDef="displayedColumns; sticky: true"
+        ></mat-footer-row>
+      </mat-table>
+
+      <mat-card-actions>
+        <mat-paginator
+          #paginator
+          class="mat-paginator-sticky"
+          (page)="getUpdate($event)"
+          [length]="dataSource.length"
+          [pageSizeOptions]="[10, 50, 100, 500]"
+        >
+        </mat-paginator>
+      </mat-card-actions>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

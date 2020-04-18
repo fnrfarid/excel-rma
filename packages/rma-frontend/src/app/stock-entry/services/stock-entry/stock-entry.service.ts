@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { StorageService } from '../../../api/storage/storage.service';
 import { from } from 'rxjs';
 import {
@@ -43,6 +43,32 @@ export class StockEntryService {
     );
   }
 
+  getStockEntry(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get('/api/stock_entry/v1/get/' + uuid, { headers });
+      }),
+    );
+  }
+
+  getStockEntryList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+    if (!query) query = {};
+
+    const url = 'api/stock_entry/v1/list';
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('query', JSON.stringify(query));
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {
