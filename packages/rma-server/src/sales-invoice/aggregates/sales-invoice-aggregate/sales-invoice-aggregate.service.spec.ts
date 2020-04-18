@@ -5,9 +5,9 @@ import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.se
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
-import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 describe('SalesInvoiceAggregateService', () => {
   let service: SalesInvoiceAggregateService;
@@ -37,7 +37,7 @@ describe('SalesInvoiceAggregateService', () => {
           useValue: {},
         },
         {
-          provide: DeliveryNoteService,
+          provide: SerialNoService,
           useValue: {},
         },
         {
