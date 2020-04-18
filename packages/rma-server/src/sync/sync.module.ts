@@ -6,6 +6,7 @@ import { FrappeJobService } from './schedular/frappe-jobs-queue/frappe-jobs-queu
 import { PurchaseReceiptModule } from '../purchase-receipt/purchase-receipt.module';
 import { StockEntryModule } from '../stock-entry/stock-entry.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
+import { SerialBatchService } from './aggregates/serial-batch/serial-batch.service';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
     StockEntryModule,
     DeliveryNoteModule,
   ],
-  providers: [SyncAggregateService, FrappeJobService],
-  exports: [SyncAggregateService],
+  providers: [SyncAggregateService, FrappeJobService, SerialBatchService],
+  exports: [SyncAggregateService, SerialBatchService],
 })
 export class SyncModule {}

@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Subject, Observable, of, from } from 'rxjs';
 import { Location } from '@angular/common';
 import {
   debounceTime,
   distinctUntilChanged,
   startWith,
   switchMap,
+  mergeMap,
+  toArray,
+  catchError,
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE, MATERIAL_TRANSFER } from '../../constants/app-string';
@@ -20,6 +23,9 @@ import {
 import { DEFAULT_COMPANY, TRANSFER_WAREHOUSE } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
+import { SerialsService } from '../../common/helpers/serials/serials.service';
+import { CsvJsonObj } from '../../sales-ui/view-sales-invoice/serials/serials.component';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 
 @Component({
   selector: 'app-material-transfer',
@@ -42,6 +48,10 @@ export class MaterialTransferComponent implements OnInit {
     s_warehouse: new FormControl(''),
     t_warehouse: new FormControl(''),
   };
+
+  @ViewChild('csvFileInput', { static: false })
+  csvFileInput: ElementRef;
+
   materialTransferDataSource: MaterialTransferDataSource;
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
@@ -54,12 +64,26 @@ export class MaterialTransferComponent implements OnInit {
     'delete',
   ];
 
+  popWarehouse = switchMap((warehouses: any[]) => {
+    return from(warehouses).pipe(
+      mergeMap(warehouse => {
+        if (warehouse.name === this.transferWarehouse) {
+          return of();
+        }
+        return of(warehouse);
+      }),
+      toArray(),
+    );
+  });
+
   constructor(
     private readonly snackBar: MatSnackBar,
     private readonly location: Location,
     private readonly salesService: SalesService,
     private readonly timeService: TimeService,
     private readonly stockEntryService: StockEntryService,
+    private readonly serialService: SerialsService,
+    private readonly csvService: CsvJsonService,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -76,7 +100,13 @@ export class MaterialTransferComponent implements OnInit {
       debounceTime(300),
       switchMap(value => {
         const filter = `[["name","like","%${value}%"],["company","=","${this.company}"]]`;
-        return this.salesService.getWarehouseList(value, filter);
+        return this.salesService
+          .getWarehouseList(value, filter)
+          .pipe(this.popWarehouse);
+      }),
+      catchError(err => {
+        this.getMessage('Error occurred in fetching warehouses.');
+        return of([]);
       }),
     );
 
@@ -85,7 +115,9 @@ export class MaterialTransferComponent implements OnInit {
       debounceTime(300),
       switchMap(value => {
         const filter = `[["name","like","%${value}%"],["company","=","${this.company}"]]`;
-        return this.salesService.getWarehouseList(value, filter);
+        return this.salesService
+          .getWarehouseList(value, filter)
+          .pipe(this.popWarehouse);
       }),
     );
   }
@@ -112,32 +144,10 @@ export class MaterialTransferComponent implements OnInit {
 
   generateSerials(fromRange?, toRange?) {
     this.rangePickerState.serials =
-      this.getSerialsFromRange(
+      this.serialService.getSerialsFromRange(
         fromRange || this.rangePickerState.fromRange || 0,
         toRange || this.rangePickerState.toRange || 0,
       ) || [];
-  }
-
-  getSerialsFromRange(startSerial: string, endSerial: string) {
-    const { start, end, prefix, serialPadding } = this.getSerialPrefix(
-      startSerial,
-      endSerial,
-    );
-    if (!this.isNumber(start) || !this.isNumber(end)) {
-      this.getMessage(
-        'Invalid serial range, end should be a number found character',
-      );
-      return [];
-    }
-    const data: any[] = _.range(start, end + 1);
-    let i = 0;
-    for (const value of data) {
-      if (value) {
-        data[i] = `${prefix}${this.getPaddedNumber(value, serialPadding)}`;
-        i++;
-      }
-    }
-    return data;
   }
 
   deleteRow(row, i) {
@@ -150,26 +160,40 @@ export class MaterialTransferComponent implements OnInit {
 
   addRow() {
     if (!this.validateMaterialTransferData()) return;
-
-    this.salesService.getSerial(this.rangePickerState.serials[0]).subscribe({
-      next: (success: { item: { item_code: string; item_name: string } }[]) => {
-        const materialTransferData = this.materialTransferDataSource.data();
-        const materialTransferRow = new StockEntryRow();
-        materialTransferRow.s_warehouse = this.warehouseState.s_warehouse.value;
-        materialTransferRow.t_warehouse = this.warehouseState.t_warehouse.value;
-        materialTransferRow.item_code = success[0].item.item_code;
-        materialTransferRow.item_name = success[0].item.item_name;
-        materialTransferRow.qty = this.rangePickerState.serials.length;
-        materialTransferRow.serial_no = this.rangePickerState.serials;
-        this.resetRangeState();
-        materialTransferData.push(materialTransferRow);
-        this.materialTransferDataSource.update(materialTransferData);
-      },
-      error: err => {
-        this.getMessage("Provided serial doesn't exist.");
-      },
-    });
+    this.salesService
+      .getSerial(this.rangePickerState.serials[0])
+      .pipe(
+        switchMap((success: { item: ItemInterface }[]) => {
+          return this.salesService.getItemByItemNames([
+            success[0].item.item_name,
+          ]);
+        }),
+      )
+      .subscribe({
+        next: (success: ItemInterface[]) => {
+          this.assignSerials(this.rangePickerState.serials, success[0]);
+        },
+        error: err => {
+          this.getMessage("Provided serial doesn't exist.");
+        },
+      });
   }
+
+  assignSerials(serials, item: ItemInterface) {
+    const materialTransferData = this.materialTransferDataSource.data();
+    const materialTransferRow = new StockEntryRow();
+    materialTransferRow.s_warehouse = this.warehouseState.s_warehouse.value;
+    materialTransferRow.t_warehouse = this.warehouseState.t_warehouse.value;
+    materialTransferRow.item_code = item.item_code;
+    materialTransferRow.item_name = item.item_name;
+    materialTransferRow.qty = serials.length;
+    materialTransferRow.serial_no = serials;
+    materialTransferRow.has_serial_no = item.has_serial_no;
+    this.resetRangeState();
+    materialTransferData.push(materialTransferRow);
+    this.materialTransferDataSource.update(materialTransferData);
+  }
+
   resetRangeState() {
     this.rangePickerState = {
       prefix: '',
@@ -197,9 +221,9 @@ export class MaterialTransferComponent implements OnInit {
     body.posting_date = date.date;
     body.posting_time = date.time;
     body.stock_entry_type = MATERIAL_TRANSFER;
-    body.items = this.materialTransferDataSource.data().filter(serials => {
-      serials.transferWarehouse = this.transferWarehouse;
-      return serials;
+    body.items = this.materialTransferDataSource.data().filter(item => {
+      item.transferWarehouse = this.transferWarehouse;
+      return item;
     });
 
     this.stockEntryService.createMaterialTransfer(body).subscribe({
@@ -215,14 +239,11 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   validateMaterialTransferData() {
-    if (
-      !this.warehouseState.s_warehouse.value ||
-      !this.warehouseState.t_warehouse.value
-    ) {
-      this.getMessage('Please select source and target warehouse.');
-      return false;
-    }
-
+    return this.validateWarehouseState() && this.validateRangePickerState()
+      ? true
+      : false;
+  }
+  validateRangePickerState() {
     if (!this.rangePickerState.serials[0]) {
       this.getMessage('Please select a serial range.');
       return false;
@@ -230,8 +251,15 @@ export class MaterialTransferComponent implements OnInit {
     return true;
   }
 
-  isNumber(number) {
-    return !isNaN(parseFloat(number)) && isFinite(number);
+  validateWarehouseState() {
+    if (
+      !this.warehouseState.s_warehouse.value ||
+      !this.warehouseState.t_warehouse.value
+    ) {
+      this.getMessage('Please select source and target warehouse.');
+      return false;
+    }
+    return true;
   }
 
   getSerialsInputValue(row) {
@@ -242,59 +270,92 @@ export class MaterialTransferComponent implements OnInit {
 
   getMessage(notFoundMessage, expected?, found?) {
     return this.snackBar.open(notFoundMessage, CLOSE, { duration: 4500 });
-    //   return this.snackBar.open(
-    //     expected && found
-    //       ? `${notFoundMessage}, expected ${expected} found ${found}`
-    //       : `${notFoundMessage}`,
-    //     CLOSE,
-    //     { verticalPosition: 'top', duration: 2500 },
-    //   );
   }
 
-  getPaddedNumber(num, numberLength) {
-    return _.padStart(num, numberLength, '0');
-  }
-
-  getSerialPrefix(startSerial, endSerial) {
-    try {
-      const serialStartNumber = startSerial.match(/\d+/g);
-      const serialEndNumber = endSerial.match(/\d+/g);
-      let serialPadding = serialEndNumber[serialEndNumber?.length - 1]?.length;
-      if (
-        serialStartNumber[serialStartNumber?.length - 1]?.length >
-        serialEndNumber[serialEndNumber?.length - 1]?.length
-      ) {
-        serialPadding =
-          serialStartNumber[serialStartNumber?.length - 1]?.length;
-      }
-      let start = Number(
-        serialStartNumber[serialStartNumber.length - 1].match(/\d+/g),
-      );
-      let end = Number(
-        serialEndNumber[serialEndNumber.length - 1].match(/\d+/g),
-      );
-      const prefix = this.getStringPrefix([startSerial, endSerial]).replace(
-        /\d+$/,
-        '',
-      );
-      if (start > end) {
-        const tmp = start;
-        start = end;
-        end = tmp;
-      }
-      return { start, end, prefix, serialPadding };
-    } catch {
-      return { start: 0, end: 0, prefix: '' };
+  fileChangedEvent($event): void {
+    if (!this.validateWarehouseState()) {
+      this.csvFileInput.nativeElement.value = '';
+      return;
     }
+    const reader = new FileReader();
+    reader.readAsText($event.target.files[0]);
+    reader.onload = (file: any) => {
+      const csvData = file.target.result;
+      const headers = csvData
+        .split('\n')[0]
+        .replace(/"/g, '')
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+        .split(',');
+      // validate file headers
+      if (this.csvService.validateHeaders(headers)) {
+        this.csvService
+          .csvToJSON(csvData)
+          .pipe(
+            switchMap((json: any) => {
+              const data = this.csvService.mapJson(json);
+              const item_names = [];
+              const itemObj: CsvJsonObj = {};
+
+              for (const key in data) {
+                if (key) {
+                  item_names.push(key);
+                  itemObj[key] = {
+                    serial: data[key].serial_no.length,
+                    serial_no: data[key].serial_no.map(serial => {
+                      return serial.toUpperCase();
+                    }),
+                  };
+                }
+              }
+              return of(itemObj);
+            }),
+          )
+          .subscribe({
+            next: (response: CsvJsonObj) => {
+              response ? this.addSerialsFromCsvJson(response) : null;
+              this.csvFileInput.nativeElement.value = '';
+            },
+            error: err => {
+              this.csvFileInput.nativeElement.value = '';
+            },
+          });
+      } else {
+        this.csvFileInput.nativeElement.value = '';
+      }
+    };
   }
 
-  getStringPrefix(arr1: string[]) {
-    const arr = arr1.concat().sort(),
-      a1 = arr[0],
-      a2 = arr[arr.length - 1],
-      L = a1.length;
-    let i = 0;
-    while (i < L && a1.charAt(i) === a2.charAt(i)) i++;
-    return a1.substring(0, i);
+  addSerialsFromCsvJson(csvJsonObj: CsvJsonObj) {
+    const item_names = Object.keys(csvJsonObj);
+    return this.salesService
+      .getItemByItemNames(item_names)
+      .pipe(
+        switchMap((items: ItemInterface[]) => {
+          this.addItemCodeToCsvJson(csvJsonObj, items);
+          return of();
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
   }
+
+  addItemCodeToCsvJson(csvJsonObj: CsvJsonObj, items: ItemInterface[]) {
+    items.forEach(item => {
+      if (item.has_serial_no) {
+        this.assignSerials(csvJsonObj[item.item_name].serial_no, item);
+      } else {
+        this.getMessage(
+          `Provided item ${item.item_name}, is non serials item.`,
+        );
+      }
+    });
+  }
+}
+
+export class ItemInterface {
+  item_code: string;
+  item_name: string;
+  has_serial_no: number;
 }

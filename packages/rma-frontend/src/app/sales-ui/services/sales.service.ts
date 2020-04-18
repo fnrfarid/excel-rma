@@ -58,6 +58,18 @@ export class SalesService {
     this.itemList = [];
   }
 
+  getItemByItemNames(item_names: string[]) {
+    const params = new HttpParams().set(
+      'item_names',
+      JSON.stringify(item_names),
+    );
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get('/api/item/v1/get_by_names', { headers, params });
+      }),
+    );
+  }
+
   validateSerials(item: {
     item_code: string;
     serials: string[];
@@ -362,7 +374,6 @@ export class SalesService {
         filters: filter ? filter : `[["name","like","%${value}%"]]`,
       },
     });
-
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http

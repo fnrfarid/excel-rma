@@ -56,6 +56,10 @@ export class StockEntryItemDto {
   item_code: string;
 
   @IsNotEmpty()
+  @IsNumber()
+  has_serial_no: number;
+
+  @IsNotEmpty()
   @IsString()
   item_name: string;
 

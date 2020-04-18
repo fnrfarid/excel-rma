@@ -89,18 +89,28 @@ export class StockEntryJobService {
     from(payload.items)
       .pipe(
         switchMap(item => {
-          return from(
-            this.serialNoService.updateMany(
-              { serial_no: { $in: [...item.serial_no.split('\n')] } },
-              { $set: { warehouse: item.t_warehouse } },
-            ),
-          );
+          const serials = this.getSplitSerials(item.serial_no);
+          return this.updateMongoSerials(serials, item.t_warehouse);
         }),
       )
       .subscribe({
         next: success => {},
         error: err => {},
       });
+  }
+
+  updateMongoSerials(serials, warehouse) {
+    return from(
+      this.serialNoService.updateMany(
+        { serial_no: { $in: serials } },
+        { $set: { warehouse } },
+      ),
+    );
+  }
+
+  getSplitSerials(serials) {
+    const serial_no = serials.split('\n');
+    return serial_no;
   }
 
   updateStockEntryState(
