@@ -41,10 +41,10 @@ import {
   CreateDeliveryNoteItemInterface,
 } from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
 import { DeliveryNoteWebhookDto } from '../../../delivery-note/entity/delivery-note-service/delivery-note-webhook.dto';
-import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note-service/delivery-note.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { DateTime } from 'luxon';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
@@ -53,7 +53,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly settingsService: SettingsService,
     private readonly http: HttpService,
     private readonly validateSalesInvoicePolicy: SalesInvoicePoliciesService,
-    private readonly deliveryNoteService: DeliveryNoteService,
+    private readonly serialNoService: SerialNoService,
     private readonly errorLogService: ErrorLogService,
     private readonly clientToken: ClientTokenManagerService,
   ) {
@@ -322,26 +322,20 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               )
               .pipe(map(data => data.data.data))
               .subscribe({
-                next: response => {
-                  const deliveryNoteData = new DeliveryNote();
-                  deliveryNoteData.uuid = uuidv4();
-                  deliveryNoteData.isSynced = false;
-                  deliveryNoteData.inQueue = false;
-                  deliveryNoteData.is_return = true;
-                  deliveryNoteData.createdByEmail =
-                    clientHttpRequest.token.email;
-                  deliveryNoteData.createdBy = clientHttpRequest.token.fullName;
-                  deliveryNoteData.issue_credit_note = true;
-                  const delivery = this.mapCreateDeliveryNote(response);
-                  Object.assign(deliveryNoteData, delivery);
+                next: (response: DeliveryNoteWebhookDto) => {
+                  const items = this.mapSerialsFromItem(response.items);
+
                   const returned_items_map = this.getReturnedItemsMap(
-                    deliveryNoteData.items,
+                    items,
                     salesInvoice,
                   );
-                  this.deliveryNoteService
-                    .create(deliveryNoteData)
-                    .then(() => {})
-                    .catch(() => {});
+
+                  this.linkSalesReturn(
+                    items,
+                    response.name,
+                    clientHttpRequest.token,
+                    salesInvoice.name,
+                  );
                   this.salesInvoiceService.updateOne(
                     { uuid: salesInvoice.uuid },
                     { $set: { returned_items_map } },
@@ -361,6 +355,49 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         );
       }),
     );
+  }
+
+  linkSalesReturn(
+    items: any[],
+    sales_return_name: string,
+    token: any,
+    sales_invoice_name: string,
+  ) {
+    const serials = [];
+
+    items = items.filter(item => {
+      if (item.serial_no) {
+        serials.push(...item.serial_no.split('\n'));
+      }
+      item.deliveredBy = token.fullName;
+      item.deliveredByEmail = token.email;
+      item.sales_return_name = sales_return_name;
+      return item;
+    });
+    this.serialNoService
+      .updateMany(
+        { serial_no: { $in: serials } },
+        { $set: { sales_return_name } },
+      )
+      .then(success => {})
+      .catch(error => {});
+
+    this.salesInvoiceService
+      .findOne({
+        name: sales_invoice_name,
+      })
+      .then(sales_invoice => {
+        this.salesInvoiceService
+          .updateMany(
+            { name: sales_invoice_name },
+            {
+              $push: { returned_items: { $each: items } },
+            },
+          )
+          .then(success => {})
+          .catch(error => {});
+      })
+      .catch(error => {});
   }
 
   updateOutstandingAmount(invoice_name: string) {

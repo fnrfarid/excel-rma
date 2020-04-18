@@ -90,6 +90,9 @@ export class SalesInvoice extends BaseEntity {
   delivery_note_items: any[] = [];
 
   @Column()
+  returned_items: any[] = [];
+
+  @Column()
   delivered_items_map: any = {};
 
   @Column()
