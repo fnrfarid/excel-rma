@@ -7,6 +7,6 @@ import { SerialsService } from './helpers/serials/serials.service';
   imports: [CommonModule],
   declarations: [CurrencyFormatPipe],
   providers: [CurrencyPipe, SerialsService],
-  exports: [CurrencyFormatPipe, SerialsService],
+  exports: [CurrencyFormatPipe],
 })
 export class AppCommonModule {}
