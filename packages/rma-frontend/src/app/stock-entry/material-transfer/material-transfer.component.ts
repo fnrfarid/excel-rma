@@ -26,6 +26,7 @@ import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { SerialsService } from '../../common/helpers/serials/serials.service';
 import { CsvJsonObj } from '../../sales-ui/view-sales-invoice/serials/serials.component';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-material-transfer',
@@ -40,6 +41,7 @@ export class MaterialTransferComponent implements OnInit {
     toRange: '',
     serials: [],
   };
+  readonly: boolean = false;
   company: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
@@ -51,7 +53,7 @@ export class MaterialTransferComponent implements OnInit {
 
   @ViewChild('csvFileInput', { static: false })
   csvFileInput: ElementRef;
-
+  uuid: string;
   materialTransferDataSource: MaterialTransferDataSource;
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
@@ -76,6 +78,11 @@ export class MaterialTransferComponent implements OnInit {
     );
   });
 
+  CATCH_ERROR: any = catchError(err => {
+    this.getMessage('Error occurred in fetching warehouses.');
+    return of([]);
+  });
+
   constructor(
     private readonly snackBar: MatSnackBar,
     private readonly location: Location,
@@ -84,6 +91,7 @@ export class MaterialTransferComponent implements OnInit {
     private readonly stockEntryService: StockEntryService,
     private readonly serialService: SerialsService,
     private readonly csvService: CsvJsonService,
+    private route: ActivatedRoute,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
@@ -95,6 +103,19 @@ export class MaterialTransferComponent implements OnInit {
       .getItem(TRANSFER_WAREHOUSE);
     this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
     this.materialTransferDataSource = new MaterialTransferDataSource();
+    this.uuid = this.route.snapshot.params.uuid;
+
+    if (this.uuid) {
+      this.readonly = true;
+      this.stockEntryService.getStockEntry(this.uuid).subscribe({
+        next: (success: any) => {
+          this.materialTransferDataSource.update(success.items);
+        },
+        error: err => {},
+      });
+      return;
+    }
+
     this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
@@ -104,10 +125,7 @@ export class MaterialTransferComponent implements OnInit {
           .getWarehouseList(value, filter)
           .pipe(this.popWarehouse);
       }),
-      catchError(err => {
-        this.getMessage('Error occurred in fetching warehouses.');
-        return of([]);
-      }),
+      this.CATCH_ERROR,
     );
 
     this.filteredWarehouseList2 = this.warehouseState.t_warehouse.valueChanges.pipe(
@@ -119,6 +137,7 @@ export class MaterialTransferComponent implements OnInit {
           .getWarehouseList(value, filter)
           .pipe(this.popWarehouse);
       }),
+      this.CATCH_ERROR,
     );
   }
 
@@ -177,6 +196,9 @@ export class MaterialTransferComponent implements OnInit {
           this.getMessage("Provided serial doesn't exist.");
         },
       });
+  }
+  acceptTransfer() {
+    this.getMessage('Coming soon');
   }
 
   assignSerials(serials, item: ItemInterface) {
@@ -263,9 +285,13 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   getSerialsInputValue(row) {
-    return row.serial_no.length === 1
-      ? row.serial_no[0]
-      : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
+    if (row.serial_no && row.serial_no.length === 1) {
+      return row.serial_no[0];
+    }
+    if (row.serial_no && row.serial_no.length > 1) {
+      return `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
+    }
+    return '';
   }
 
   getMessage(notFoundMessage, expected?, found?) {

@@ -2,17 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material/material.module';
 import { MaterialTransferComponent } from './material-transfer/material-transfer.component';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AppCommonModule } from '../common/app-common.module';
-
-const routes: Routes = [
-  {
-    path: '',
-    component: MaterialTransferComponent,
-  },
-];
 
 @NgModule({
   declarations: [MaterialTransferComponent],
@@ -23,7 +16,12 @@ const routes: Routes = [
     IonicModule,
     MaterialModule,
     AppCommonModule,
-    RouterModule.forChild(routes),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: MaterialTransferComponent,
+      },
+    ]),
   ],
   exports: [],
   providers: [],

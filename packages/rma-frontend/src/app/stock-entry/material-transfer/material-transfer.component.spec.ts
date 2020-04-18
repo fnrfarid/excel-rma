@@ -13,6 +13,7 @@ import { SerialsService } from '../../common/helpers/serials/serials.service';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('MaterialTransferComponent', () => {
   let component: MaterialTransferComponent;
@@ -29,6 +30,7 @@ describe('MaterialTransferComponent', () => {
         BrowserAnimationsModule,
         BrowserDynamicTestingModule,
         HttpClientTestingModule,
+        RouterTestingModule,
       ],
       providers: [
         {

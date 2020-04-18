@@ -9,8 +9,8 @@ export class RetrievePurchaseInvoiceListQueryHandler
   async execute(query: RetrievePurchaseInvoiceListQuery) {
     const { offset, limit, sort, filter_query } = query;
     return await this.manager.getPurchaseInvoiceList(
-      Number(offset),
-      Number(limit),
+      Number(offset) || 0,
+      Number(limit) || 10,
       sort,
       filter_query,
     );

@@ -89,4 +89,25 @@ export class StockEntryAggregateService {
   getJsonData(file) {
     return of(JSON.parse(file.buffer));
   }
+
+  getStockEntryList(offset, limit, sort, filter_query) {
+    return this.stockEntryService.list(offset, limit, sort, filter_query);
+  }
+
+  getStockEntry(uuid: string) {
+    return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(data => {
+        data.items.filter(item => {
+          if (item.serial_no && item.serial_no.length) {
+            item.serial_no = [
+              item.serial_no[0],
+              item.serial_no[item.serial_no.length - 1],
+            ];
+          }
+          return item;
+        });
+        return of(data);
+      }),
+    );
+  }
 }
