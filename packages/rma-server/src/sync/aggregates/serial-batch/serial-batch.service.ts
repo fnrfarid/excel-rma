@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { from, of } from 'rxjs';
-import { concatMap, bufferCount, mergeMap } from 'rxjs/operators';
+import { bufferCount, mergeMap, toArray } from 'rxjs/operators';
 
 @Injectable()
 export class SerialBatchService {
@@ -8,23 +8,24 @@ export class SerialBatchService {
 
   batchItems(itemsArray: ItemBatchInterface[], batchSize: number) {
     return from(itemsArray).pipe(
-      concatMap(item => {
+      mergeMap(item => {
         return this.batchSingleItem(item, batchSize);
       }),
+      toArray(),
     );
   }
 
   batchSingleItem(item: ItemBatchInterface, batchSize: number) {
-    const serials = item.serial_no;
-    delete item.serial_no;
+    const itemPayload = item;
+    const serials = itemPayload.serial_no;
     return from(serials).pipe(
-      concatMap(serial => {
+      mergeMap(serial => {
         return of(serial);
       }),
       bufferCount(batchSize),
       mergeMap(batchSerial => {
         const singleBatch: { serial_no?: any; qty?: number } = {};
-        Object.assign(singleBatch, item);
+        Object.assign(singleBatch, itemPayload);
         singleBatch.qty = batchSerial.length;
         singleBatch.serial_no = batchSerial.join('\n');
         return of(singleBatch);

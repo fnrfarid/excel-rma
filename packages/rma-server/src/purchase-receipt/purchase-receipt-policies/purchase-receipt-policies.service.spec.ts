@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseReceiptPoliciesService } from './purchase-receipt-policies.service';
 import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
 import { PurchaseInvoiceService } from '../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
+import { PurchaseOrderService } from '../../purchase-order/entity/purchase-order/purchase-order.service';
 
 describe('PurchaseReceiptPoliciesService', () => {
   let service: PurchaseReceiptPoliciesService;
@@ -16,6 +17,10 @@ describe('PurchaseReceiptPoliciesService', () => {
         },
         {
           provide: PurchaseInvoiceService,
+          useValue: {},
+        },
+        {
+          provide: PurchaseOrderService,
           useValue: {},
         },
       ],

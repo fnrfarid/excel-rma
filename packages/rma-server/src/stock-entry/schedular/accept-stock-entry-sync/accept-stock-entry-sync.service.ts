@@ -9,10 +9,8 @@ import { of, throwError, from } from 'rxjs';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 
-export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
-export const ACCEPT_STOCK_ENTRY_JOB = 'ACCEPT_STOCK_ENTRY_JOB';
 @Injectable()
-export class StockEntryJobService {
+export class AcceptStockEntryJobService {
   constructor(
     private readonly tokenService: DirectService,
     private readonly http: HttpService,
@@ -22,7 +20,7 @@ export class StockEntryJobService {
   ) {}
 
   execute(job) {
-    return this.createStockEntry(job.attrs.data);
+    return this.AcceptStockEntry(job.attrs.data);
   }
 
   failureCallback(job) {
@@ -33,14 +31,14 @@ export class StockEntryJobService {
     return;
   }
 
-  createStockEntry(job: { payload: StockEntry; token: any }) {
+  AcceptStockEntry(job: { payload: StockEntry; token: any }) {
     const payload = job.payload;
     return of({}).pipe(
       mergeMap(object => {
         return this.settingsService.find().pipe(
           switchMap(settings => {
             payload.items.filter((item: any) => {
-              item.t_warehouse = item.transferWarehouse;
+              item.s_warehouse = item.transferWarehouse;
               if (typeof item.serial_no === 'object') {
                 item.serial_no = item.serial_no.join('\n');
               }
@@ -61,7 +59,8 @@ export class StockEntryJobService {
       catchError(err => {
         if (
           (err.response && err.response.status === 403) ||
-          (err.response.data &&
+          (err.response &&
+            err.response.data &&
             err.response.data.exc.includes(VALIDATE_AUTH_STRING))
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
@@ -70,6 +69,10 @@ export class StockEntryJobService {
               return throwError(new BadRequestException(err));
             }),
           );
+        }
+        if (err.response && err.response.status === 417) {
+          this.failureCallback(job);
+          return of({});
         }
         return throwError(err);
       }),

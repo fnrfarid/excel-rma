@@ -38,9 +38,11 @@ export class StockEntryListPage implements OnInit {
   dataSource: StockEntryListDataSource;
   displayedColumns = [
     'sr_no',
+    's_warehouse',
+    't_warehouse',
+    'status',
     'createdByEmail',
     'createdBy',
-    'transferWarehouse',
     'company',
     'posting_date',
     'posting_time',

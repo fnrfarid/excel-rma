@@ -43,6 +43,7 @@ export class MaterialTransferComponent implements OnInit {
   };
   readonly: boolean = false;
   company: string;
+  status: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
   transferWarehouse: string;
@@ -109,6 +110,7 @@ export class MaterialTransferComponent implements OnInit {
       this.readonly = true;
       this.stockEntryService.getStockEntry(this.uuid).subscribe({
         next: (success: any) => {
+          this.status = success.status;
           this.materialTransferDataSource.update(success.items);
         },
         error: err => {},
@@ -143,6 +145,10 @@ export class MaterialTransferComponent implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  rejectTransfer() {
+    this.getMessage('Coming Soon.');
   }
 
   onFromRange(value) {
@@ -198,7 +204,18 @@ export class MaterialTransferComponent implements OnInit {
       });
   }
   acceptTransfer() {
-    this.getMessage('Coming soon');
+    this.stockEntryService.acceptMaterialTransfer(this.uuid).subscribe({
+      next: success => {
+        this.getMessage('Stock entry accepted successfully');
+      },
+      error: err => {
+        this.getMessage(
+          err.error && err.error.message
+            ? err.error.message
+            : 'Error occurred while accepting stock transfer',
+        );
+      },
+    });
   }
 
   assignSerials(serials, item: ItemInterface) {
