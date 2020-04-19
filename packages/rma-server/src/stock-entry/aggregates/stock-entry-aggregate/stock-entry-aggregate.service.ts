@@ -2,18 +2,23 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryDto } from '../../stock-entry/stock-entry-dto';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, mergeMap, retry, concatMap } from 'rxjs/operators';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { from, throwError, of } from 'rxjs';
 import {
   STOCK_ENTRY,
   FRAPPE_QUEUE_JOB,
   STOCK_ENTRY_SERIALS_BATCH_SIZE,
+  STOCK_ENTRY_IN_TRANSIT_STATUS,
+  STOCK_ENTRY_DELIVERED_STATUS,
 } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import { CREATE_STOCK_ENTRY_JOB } from '../../schedular/stock-entry-sync/stock-entry-sync.service';
+import {
+  CREATE_STOCK_ENTRY_JOB,
+  ACCEPT_STOCK_ENTRY_JOB,
+} from '../../schedular/stock-entry-sync/stock-entry-sync.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 
@@ -31,8 +36,13 @@ export class StockEntryAggregateService {
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
         const stockEntry = this.setStockEntryDefaults(payload, req);
-        this.batchQueueStockEntry(payload, req);
-        return from(this.stockEntryService.create(stockEntry));
+        return from(this.stockEntryService.create(stockEntry)).pipe(
+          switchMap(success => {
+            payload.docstatus = 1;
+            this.batchQueueStockEntry(payload, req);
+            return of({});
+          }),
+        );
       }),
     );
   }
@@ -42,8 +52,26 @@ export class StockEntryAggregateService {
       .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
       .pipe(
         switchMap((itemBatch: any) => {
-          payload.items = [itemBatch];
-          this.addToQueueNow({ payload, token: req.token });
+          this.batchAddToQueue(itemBatch, payload, req, CREATE_STOCK_ENTRY_JOB);
+          return of({});
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
+  }
+
+  batchAddToQueue(itemBatch, payload, req, type) {
+    payload.items = [];
+    from(itemBatch)
+      .pipe(
+        concatMap(item => {
+          payload.items = [item];
+          return from(this.addToQueueNow({ payload, token: req.token, type }));
+        }),
+        retry(3),
+        switchMap(success => {
           return of();
         }),
       )
@@ -61,18 +89,15 @@ export class StockEntryAggregateService {
     stockEntry.createdOn = payload.posting_date;
     stockEntry.createdByEmail = clientHttpRequest.token.email;
     stockEntry.createdBy = clientHttpRequest.token.fullName;
+    stockEntry.status = STOCK_ENTRY_IN_TRANSIT_STATUS;
     stockEntry.isSynced = false;
     stockEntry.inQueue = true;
     stockEntry.docstatus = 1;
     return stockEntry;
   }
 
-  addToQueueNow(data: { payload: any; token: any; type?: string }) {
-    data.type = CREATE_STOCK_ENTRY_JOB;
-    this.agenda
-      .now(FRAPPE_QUEUE_JOB, data)
-      .then(success => {})
-      .catch(err => {});
+  addToQueueNow(data: { payload: any; token: any; type: string }) {
+    return this.agenda.now(FRAPPE_QUEUE_JOB, data);
   }
 
   StockEntryFromFile(file, req) {
@@ -107,6 +132,38 @@ export class StockEntryAggregateService {
           return item;
         });
         return of(data);
+      }),
+    );
+  }
+
+  acceptStockEntry(uuid: string, req) {
+    return from(this.stockEntryService.findOne({ uuid })).pipe(
+      mergeMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry not found.'));
+        }
+        const payload: any = stockEntry;
+        this.stockEntryService
+          .updateOne(
+            { uuid },
+            { $set: { status: STOCK_ENTRY_DELIVERED_STATUS } },
+          )
+          .catch(err => {})
+          .then(success => {});
+        return this.serialBatchService
+          .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
+          .pipe(
+            switchMap((itemBatch: any) => {
+              payload.items = [itemBatch];
+              this.batchAddToQueue(
+                itemBatch,
+                payload,
+                req,
+                ACCEPT_STOCK_ENTRY_JOB,
+              );
+              return of({});
+            }),
+          );
       }),
     );
   }

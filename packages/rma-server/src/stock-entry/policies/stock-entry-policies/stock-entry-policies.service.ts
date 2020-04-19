@@ -4,7 +4,7 @@ import {
   StockEntryItemDto,
 } from '../../stock-entry/stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { switchMap, mergeMap, concatMap } from 'rxjs/operators';
+import { switchMap, mergeMap, toArray } from 'rxjs/operators';
 import { from, of, throwError } from 'rxjs';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
@@ -17,15 +17,11 @@ export class StockEntryPoliciesService {
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
     return this.settingsService.find().pipe(
-      mergeMap(settings => {
+      switchMap(settings => {
         return this.validateStockSerials(
           payload.items,
           settings,
           clientHttpRequest,
-        ).pipe(
-          switchMap(isValid => {
-            return of(isValid);
-          }),
         );
       }),
     );
@@ -37,7 +33,7 @@ export class StockEntryPoliciesService {
     clientHttpRequest,
   ) {
     return from(items).pipe(
-      concatMap(item => {
+      mergeMap(item => {
         return from(
           this.serialNoService.count({
             serial_no: { $in: item.serial_no },
@@ -45,7 +41,7 @@ export class StockEntryPoliciesService {
             item_code: item.item_code,
           }),
         ).pipe(
-          switchMap(count => {
+          mergeMap(count => {
             if (count === item.serial_no.length) {
               return of(true);
             }
@@ -56,6 +52,10 @@ export class StockEntryPoliciesService {
             );
           }),
         );
+      }),
+      toArray(),
+      switchMap(isValid => {
+        return of(true);
       }),
     );
   }
