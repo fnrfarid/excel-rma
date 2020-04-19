@@ -6,11 +6,26 @@ import { Location } from '@angular/common';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
 import { FormControl } from '@angular/forms';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-warranty',
   templateUrl: './warranty.page.html',
   styleUrls: ['./warranty.page.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class WarrantyPage implements OnInit {
   warrantyClaimsList: Array<WarrantyClaims>;
@@ -37,17 +52,23 @@ export class WarrantyPage implements OnInit {
     'delivered_by',
   ];
   customer: string;
-  claimNo: string;
-  thirdParty: string;
+  claim_no: string;
+  customer_third_party: string;
   product: string;
-  fromDate: string;
-  claimStatus: string;
-  claimType: string;
+  claim_status: string = 'All';
+  claim_type: string;
   territory: string;
-  serial: string;
-  toDate: string;
+  claimed_serial: string;
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
+  singleDateFormControl = new FormControl();
+  claimStatusList: string[] = [
+    'In Progress',
+    'To Deliver',
+    'Delivered',
+    'Rejected',
+    'All',
+  ];
 
   constructor(
     private location: Location,
@@ -60,10 +81,17 @@ export class WarrantyPage implements OnInit {
   }
 
   getUpdate(event) {
-    const query: any = {};
-
+    const query: any = this.getFilterQuery();
+    const sortQuery = {};
+    if (event) {
+      for (const key of Object.keys(event)) {
+        if (key === 'active' && event.direction !== '') {
+          sortQuery[event[key]] = event.direction;
+        }
+      }
+    }
     this.dataSource.loadItems(
-      undefined,
+      sortQuery,
       event.pageIndex,
       event.pageSize,
       query,
@@ -71,40 +99,102 @@ export class WarrantyPage implements OnInit {
   }
 
   setFilter(event?) {
-    const query: any = {};
-
-    if (this.customer) query.customer = this.customer;
-    if (this.claimNo) query.claimNo = this.claimNo;
-    if (this.thirdParty) query.thirdParty = this.thirdParty;
-    if (this.product) query.product = this.product;
-    if (this.fromDate) query.fromDate = this.fromDate;
-    if (this.claimStatus) query.claimStatus = this.claimStatus;
-    if (this.claimType) query.claimType = this.claimType;
-    if (this.territory) query.territory = this.territory;
-    if (this.serial) query.serial = this.serial;
-    if (this.toDate) query.toDate = this.toDate;
+    const query: any = this.getFilterQuery();
 
     const sortQuery = {};
     if (event) {
       for (const key of Object.keys(event)) {
-        if (key === 'active') {
+        if (key === 'active' && event.direction !== '') {
           sortQuery[event[key]] = event.direction;
         }
       }
     }
 
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date().setDate(
-        this.fromDateFormControl.value.date(),
-      );
-      query.toDate = new Date().setDate(this.toDateFormControl.value.date());
-    }
     this.dataSource.loadItems(
       sortQuery,
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,
     );
+  }
+
+  getFilterQuery() {
+    const query: any = {};
+    if (this.customer) query.customer = this.customer;
+    if (this.claim_no) query.claim_no = this.claim_no;
+    if (this.customer_third_party)
+      query.customer_third_party = this.customer_third_party;
+    if (this.product) query.product = this.product;
+    if (this.claim_status) query.claim_status = this.claim_status;
+    if (this.claim_type) query.claim_type = this.claim_type;
+    if (this.territory) query.territory = this.territory;
+    if (this.claimed_serial) query.claimed_serial = this.claimed_serial;
+
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+    return query;
+  }
+
+  statusChange(status) {
+    if (status === 'All') {
+      this.dataSource.loadItems();
+    } else {
+      this.claim_status = status;
+      this.setFilter();
+    }
+  }
+
+  dateFilter() {
+    this.singleDateFormControl.setValue('');
+    this.setFilter();
+  }
+
+  singleDateFilter() {
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.setFilter();
+  }
+
+  clearFilters() {
+    this.customer = '';
+    this.claim_no = '';
+    this.customer_third_party = '';
+    this.product = '';
+    this.claim_status = 'All';
+    this.claim_type = '';
+    this.territory = '';
+    this.claimed_serial = '';
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.singleDateFormControl.setValue('');
+    this.dataSource.loadItems();
   }
 
   navigateBack() {
