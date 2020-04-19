@@ -71,7 +71,10 @@
           </ion-col>
         </ion-row>
         <ion-row>
-          <ion-col>
+          <ion-col class="ion-text-center">
+            <ion-text color="medium" class="date-filter-text">
+              Range Date
+            </ion-text>
             <mat-form-field class="full-width">
               <input
                 matInput
@@ -87,8 +90,6 @@
               ></mat-datepicker-toggle>
               <mat-datepicker #fromDate disabled="false"></mat-datepicker>
             </mat-form-field>
-          </ion-col>
-          <ion-col>
             <mat-form-field class="full-width">
               <input
                 matInput
@@ -105,9 +106,10 @@
               <mat-datepicker #toDate disabled="false"></mat-datepicker>
             </mat-form-field>
           </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
+          <ion-col class="ion-text-center">
+            <ion-text color="medium" class="date-filter-text">
+              Single Date
+            </ion-text>
             <mat-form-field class="full-width">
               <input
                 matInput
@@ -123,8 +125,6 @@
               ></mat-datepicker-toggle>
               <mat-datepicker #singleDate disabled="false"></mat-datepicker>
             </mat-form-field>
-          </ion-col>
-          <ion-col class="ion-text-center">
             <ion-button
               color="tertiary"
               (click)="clearFilters()"

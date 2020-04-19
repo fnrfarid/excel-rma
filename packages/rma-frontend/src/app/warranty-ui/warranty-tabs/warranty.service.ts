@@ -46,13 +46,13 @@ export class WarrantyService {
     );
   }
   getWarrantyClaimsList(sortOrder, pageNumber = 0, pageSize = 10, query) {
-    if (!sortOrder) sortOrder = { posting_date: 'desc' };
+    if (!sortOrder) sortOrder = { createdOn: 'desc' };
     if (!query) query = {};
 
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch (error) {
-      sortOrder = JSON.stringify({ posting_date: 'desc' });
+      sortOrder = JSON.stringify({ createdOn: 'desc' });
     }
     const url = LIST_WARRANTY_INVOICE_ENDPOINT;
     const params = new HttpParams()
