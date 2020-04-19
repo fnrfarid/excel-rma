@@ -27,6 +27,9 @@ export class StockEntry extends BaseEntity {
   stock_entry_type: string;
 
   @Column()
+  status: string;
+
+  @Column()
   company: string;
 
   @Column()
@@ -54,7 +57,8 @@ export class StockEntryItem {
   item_code: string;
   item_name: string;
   qty: number;
+  has_serial_no: number;
   transfer_qty: number;
   transferWarehouse: string;
-  serial_no: any;
+  serial_no: string[];
 }

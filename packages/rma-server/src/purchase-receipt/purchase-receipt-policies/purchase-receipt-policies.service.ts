@@ -5,12 +5,14 @@ import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { PurchaseInvoiceService } from '../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PURCHASE_INVOICE_NOT_FOUND } from '../../constants/messages';
+import { PurchaseOrderService } from '../../purchase-order/entity/purchase-order/purchase-order.service';
 
 @Injectable()
 export class PurchaseReceiptPoliciesService {
   constructor(
     private readonly serialNoService: SerialNoService,
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
+    private readonly purchaseOrderService: PurchaseOrderService,
   ) {}
 
   validatePurchaseReceipt(purchaseReceiptPayload: PurchaseReceiptDto) {
@@ -66,6 +68,20 @@ export class PurchaseReceiptPoliciesService {
         if (!purchaseInvoice) {
           return throwError(
             new BadRequestException(PURCHASE_INVOICE_NOT_FOUND),
+          );
+        }
+        return from(
+          this.purchaseOrderService.findOne({
+            purchase_invoice_name: purchaseInvoice.name,
+          }),
+        );
+      }),
+      switchMap(response => {
+        if (!response) {
+          return throwError(
+            new BadRequestException(
+              'No purchase order was found against this invoice.',
+            ),
           );
         }
         return of(true);

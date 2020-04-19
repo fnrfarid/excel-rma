@@ -4,6 +4,7 @@ import { FrappeJobService } from './frappe-jobs-queue.service';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { StockEntryJobService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
+import { AcceptStockEntryJobService } from '../../../stock-entry/schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
 
 describe('FrappeJobService', () => {
   let service: FrappeJobService;
@@ -23,6 +24,10 @@ describe('FrappeJobService', () => {
         },
         {
           provide: DeliveryNoteJobService,
+          useValue: {},
+        },
+        {
+          provide: AcceptStockEntryJobService,
           useValue: {},
         },
       ],

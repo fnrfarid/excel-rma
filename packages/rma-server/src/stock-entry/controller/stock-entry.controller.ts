@@ -67,4 +67,10 @@ export class StockEntryController {
   getStockEntry(@Param('uuid') uuid, @Req() req) {
     return this.aggregate.getStockEntry(uuid);
   }
+
+  @Post('v1/accept_transfer/:uuid')
+  @UseGuards(TokenGuard)
+  acceptStockEntry(@Param('uuid') uuid, @Req() req) {
+    return this.aggregate.acceptStockEntry(uuid, req);
+  }
 }

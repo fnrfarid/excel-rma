@@ -43,6 +43,18 @@ export class StockEntryService {
     );
   }
 
+  acceptMaterialTransfer(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          '/api/stock_entry/v1/accept_transfer/' + uuid,
+          {},
+          { headers },
+        );
+      }),
+    );
+  }
+
   getStockEntry(uuid: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {
