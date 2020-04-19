@@ -43,7 +43,7 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
 
   loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
     if (!sortOrder) {
-      sortOrder = { created_on: 'desc' };
+      sortOrder = { createdOn: 'desc' };
     }
     this.loadingSubject.next(true);
     this.warrantyService

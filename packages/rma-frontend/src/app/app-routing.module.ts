@@ -141,9 +141,6 @@ const routes: Routes = [
       ),
     canActivate: [SystemManagerGuard],
   },
-
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: '**', redirectTo: 'home' },
   {
     path: 'add-warranty-claim',
     loadChildren: () =>
@@ -151,6 +148,8 @@ const routes: Routes = [
         m => m.AddWarrantyClaimPageModule,
       ),
   },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' },
 ];
 
 @NgModule({
