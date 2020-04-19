@@ -7,6 +7,7 @@ import { SerialNoService } from '../../entity/serial-no/serial-no.service';
 import {
   SerialNoDto,
   ValidateSerialsDto,
+  ValidateReturnSerialsDto,
 } from '../../entity/serial-no/serial-no-dto';
 import { from, of, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -93,6 +94,70 @@ export class SerialNoPoliciesService {
           }
         },
       ),
+    );
+  }
+
+  validateReturnSerials(payload: ValidateReturnSerialsDto) {
+    return from(
+      this.itemService.findOne({
+        $or: [
+          { item_code: payload.item_code },
+          { item_name: payload.item_code },
+        ],
+      }),
+    ).pipe(
+      switchMap(item => {
+        return this.serialNoService
+          .asyncAggregate([
+            {
+              $match: {
+                $and: [
+                  {
+                    delivery_note: { $in: payload.delivery_note_names },
+                  },
+                  {
+                    serial_no: { $in: payload.serials },
+                  },
+                  {
+                    item_code: item.item_code,
+                  },
+                  {
+                    warehouse: payload.warehouse,
+                  },
+                ],
+              },
+            },
+            {
+              $group: {
+                _id: 'validSerials',
+                foundSerials: { $push: '$serial_no' },
+              },
+            },
+            {
+              $project: {
+                notFoundSerials: {
+                  $setDifference: [payload.serials, '$foundSerials'],
+                },
+              },
+            },
+          ])
+          .pipe(
+            switchMap(
+              (
+                data: {
+                  _id: string;
+                  notFoundSerials: string[];
+                }[],
+              ) => {
+                return of({
+                  notFoundSerials: data[0]
+                    ? data[0].notFoundSerials
+                    : payload.serials,
+                });
+              },
+            ),
+          );
+      }),
     );
   }
 

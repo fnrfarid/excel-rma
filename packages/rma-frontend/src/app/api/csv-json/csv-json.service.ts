@@ -6,7 +6,6 @@ import { of, from } from 'rxjs';
 import * as CSVTOJSON from 'csvjson-csv2json';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE, DELIVERY_NOTE } from '../../constants/app-string';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { switchMap, map } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
@@ -24,7 +23,6 @@ export class CsvJsonService {
   arrayBuffer;
   constructor(
     private readonly snackBar: MatSnackBar,
-    private readonly http: HttpClient,
     private storage: StorageService,
     private readonly salesService: SalesService,
   ) {}
@@ -61,40 +59,37 @@ export class CsvJsonService {
     return out;
   }
 
-  validateSerials(
+  validateReturnSerials(
     item_names: string[],
     itemObj: CsvJsonObj,
-    validateFor?: string,
+    delivery_note_names: string[],
+    warehouse: string,
   ) {
-    const params = new HttpParams().set(
-      'item_names',
-      JSON.stringify(item_names),
-    );
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http
-          .get('/api/item/v1/get_by_names', { headers, params })
-          .pipe(
-            switchMap((response: any[]) => {
-              if (response.length === item_names.length) {
-                return this.validateSerialsWithItem(itemObj, validateFor).pipe(
-                  switchMap(isValid => {
-                    if (isValid.length) {
-                      this.snackBar.open(
-                        `${isValid.length} Invalid Serials: ${isValid
-                          .splice(0, 5)
-                          .join(', ')}`,
-                        CLOSE,
-                        { duration: 2500 },
-                      );
-                      return of(false);
-                    }
-                    return of(true);
-                  }),
+    return this.salesService.getItemByItemNames(item_names).pipe(
+      switchMap((response: any[]) => {
+        if (response.length === item_names.length) {
+          return this.validateReturnSerialsWithItem(
+            itemObj,
+            delivery_note_names,
+            warehouse,
+          ).pipe(
+            switchMap(isValid => {
+              if (isValid.length) {
+                this.snackBar.open(
+                  `${isValid.length} Invalid Serials: ${isValid
+                    .splice(0, 5)
+                    .join(', ')}`,
+                  CLOSE,
+                  { duration: 2500 },
                 );
+                return of(false);
               }
-              this.snackBar.open(
-                `Item not found :
+              return of(true);
+            }),
+          );
+        }
+        this.snackBar.open(
+          `Item not found :
               ${_.differenceWith(
                 item_names,
                 response.map(element => {
@@ -104,10 +99,76 @@ export class CsvJsonService {
                 }),
                 _.isEqual,
               ).join(', ')}`,
-                CLOSE,
-                { duration: 2500 },
-              );
-              return of(false);
+          CLOSE,
+          { duration: 2500 },
+        );
+        return of(false);
+      }),
+    );
+  }
+
+  validateSerials(
+    item_names: string[],
+    itemObj: CsvJsonObj,
+    validateFor?: string,
+  ) {
+    return this.salesService.getItemByItemNames(item_names).pipe(
+      switchMap((response: any[]) => {
+        if (response.length === item_names.length) {
+          return this.validateSerialsWithItem(itemObj, validateFor).pipe(
+            switchMap(isValid => {
+              if (isValid.length) {
+                this.snackBar.open(
+                  `${isValid.length} Invalid Serials: ${isValid
+                    .splice(0, 5)
+                    .join(', ')}`,
+                  CLOSE,
+                  { duration: 2500 },
+                );
+                return of(false);
+              }
+              return of(true);
+            }),
+          );
+        }
+        this.snackBar.open(
+          `Item not found :
+              ${_.differenceWith(
+                item_names,
+                response.map(element => {
+                  return item_names.includes(element.item_name)
+                    ? element.item_name
+                    : undefined;
+                }),
+                _.isEqual,
+              ).join(', ')}`,
+          CLOSE,
+          { duration: 2500 },
+        );
+        return of(false);
+      }),
+    );
+  }
+
+  validateReturnSerialsWithItem(
+    itemObj: CsvJsonObj,
+    delivery_note_names,
+    warehouse,
+  ) {
+    const invalidSerials = [];
+    return from(Object.keys(itemObj)).pipe(
+      switchMap(key => {
+        return this.salesService
+          .validateReturnSerials({
+            item_code: key,
+            serials: itemObj[key].serial_no,
+            delivery_note_names,
+            warehouse,
+          })
+          .pipe(
+            switchMap((data: { notFoundSerials: string[] }) => {
+              invalidSerials.push(...data.notFoundSerials);
+              return of(invalidSerials);
             }),
           );
       }),

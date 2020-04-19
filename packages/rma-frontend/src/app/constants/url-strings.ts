@@ -86,7 +86,11 @@ export const GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT =
   '/api/serial_no/v1/get_purchase_invoice_delivered_serials';
 export const WARRANTY_CLAIM_GET_ONE_ENDPOINT = '/api/warranty_claim/v1/get/';
 export const STOCK_ENTRY_CREATE_ENDPOINT = '/api/stock_entry/v1/create';
+export const STOCK_ENTRY_CREATE_FROM_FILE_ENDPOINT =
+  '/api/stock_entry/v1/create_from_file';
 export const PRINT_SALES_INVOICE_PDF_METHOD =
   '/api/method/frappe.utils.print_format.download_pdf';
 export const PRINT_DELIVERY_NOTE_PDF_METHOD =
   '/api/method/frappe.utils.print_format.download_multi_pdf';
+export const VALIDATE_RETURN_SERIALS =
+  '/api/serial_no/v1/validate_return_serials';

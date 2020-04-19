@@ -1,18 +1,13 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, catchError, finalize } from 'rxjs/operators';
-import { WarrantyService } from '../warranty-tabs/warranty.service';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { StockEntryService } from '../services/stock-entry/stock-entry.service';
+
 export interface ListingData {
-  customer: string;
-  claim_no: string;
-  third_party: string;
-  product: string;
-  from_date: string;
-  claim_status: string;
-  claim_type: string;
-  branch: string;
-  serial: string;
-  to_date: string;
+  uuid: string;
+  supplier: string;
+  status: string;
+  total: number;
 }
 
 export interface ListResponse {
@@ -20,18 +15,21 @@ export interface ListResponse {
   length: number;
   offset: number;
 }
-export class WarrantyClaimsDataSource extends DataSource<ListingData> {
+export class StockEntryListDataSource extends DataSource<ListingData> {
   data: ListingData[];
   length: number;
   offset: number;
   total = new BehaviorSubject<number>(0);
+
   itemSubject = new BehaviorSubject<ListingData[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
 
   loading$ = this.loadingSubject.asObservable();
-  constructor(private warrantyService: WarrantyService) {
+
+  constructor(private StockEntryListService: StockEntryService) {
     super();
   }
+
   connect(collectionViewer: CollectionViewer): Observable<ListingData[]> {
     return this.itemSubject.asObservable();
   }
@@ -42,12 +40,13 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
   }
 
   loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
-    if (!sortOrder) {
-      sortOrder = { createdOn: 'desc' };
-    }
     this.loadingSubject.next(true);
-    this.warrantyService
-      .getWarrantyClaimsList(sortOrder, pageIndex, pageSize, query)
+    this.StockEntryListService.getStockEntryList(
+      sortOrder,
+      pageIndex,
+      pageSize,
+      query,
+    )
       .pipe(
         map((res: ListResponse) => {
           this.data = res.docs;
@@ -55,11 +54,44 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
           this.length = res.length;
           return res.docs;
         }),
-        catchError(error => of([])),
+        catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe(items => {
+        this.calculateTotal(items);
         this.itemSubject.next(items);
       });
   }
+
+  calculateTotal(StockEntryList: ListingData[]) {
+    let sum = 0;
+    StockEntryList.forEach(invoice => {
+      sum += invoice.total;
+    });
+    this.total.next(sum);
+  }
+}
+
+export class StockEntryListData {
+  _id: string;
+  uuid: string;
+  docstatus: number;
+  createdOn: string;
+  createdByEmail: string;
+  createdBy: string;
+  stock_entry_type: string;
+  company: string;
+  posting_date: string;
+  posting_time: string;
+  doctype: string;
+  items: StockEntryListItem[];
+}
+
+export class StockEntryListItem {
+  s_warehouse: string;
+  t_warehouse: string;
+  item_code: string;
+  item_name: string;
+  qty: number;
+  transferWarehouse: string;
 }

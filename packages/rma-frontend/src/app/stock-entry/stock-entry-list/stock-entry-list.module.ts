@@ -1,26 +1,31 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Routes, RouterModule } from '@angular/router';
+
 import { IonicModule } from '@ionic/angular';
 
-import { WarrantyPageRoutingModule } from './warranty-routing.module';
-import { WarrantyPage } from './warranty.page';
+import { StockEntryListPage } from './stock-entry-list.page';
 import { MaterialModule } from '../../material/material.module';
-import { HttpClientModule } from '@angular/common/http';
 import { AppCommonModule } from '../../common/app-common.module';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: StockEntryListPage,
+  },
+];
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     IonicModule,
-    WarrantyPageRoutingModule,
     MaterialModule,
-    HttpClientModule,
+    ReactiveFormsModule,
+    RouterModule.forChild(routes),
     AppCommonModule,
   ],
-  declarations: [WarrantyPage],
-  providers: [],
+  declarations: [StockEntryListPage],
 })
-export class WarrantyPageModule {}
+export class StockEntryListModule {}

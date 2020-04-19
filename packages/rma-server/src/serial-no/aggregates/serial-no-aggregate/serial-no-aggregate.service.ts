@@ -12,6 +12,7 @@ import { SerialNoService } from '../../entity/serial-no/serial-no.service';
 import {
   SerialNoDto,
   ValidateSerialsDto,
+  ValidateReturnSerialsDto,
 } from '../../entity/serial-no/serial-no-dto';
 import { SerialNoRemovedEvent } from '../../event/serial-no-removed/serial-no-removed.event';
 import { SerialNoUpdatedEvent } from '../../event/serial-no-updated/serial-no-updated.event';
@@ -235,6 +236,21 @@ export class SerialNoAggregateService extends AggregateRoot {
           assignPayload,
           clientHttpRequest,
         );
+      }),
+    );
+  }
+
+  validateReturnSerials(payload: ValidateReturnSerialsDto) {
+    return this.serialNoPolicyService.validateReturnSerials(payload);
+  }
+
+  validateBulkReturnSerialFile(file) {
+    return from(this.getJsonData(file)).pipe(
+      switchMap((data: ValidateReturnSerialsDto) => {
+        if (!data) {
+          return throwError(new BadRequestException(INVALID_FILE));
+        }
+        return this.validateReturnSerials(data);
       }),
     );
   }

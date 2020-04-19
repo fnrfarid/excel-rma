@@ -15,10 +15,6 @@ import { RemovePurchaseInvoiceCommand } from '../../command/remove-purchase-invo
 import { RetrievePurchaseInvoiceQuery } from '../../query/get-purchase-invoice/retrieve-purchase-invoice.query';
 import { RetrievePurchaseInvoiceListQuery } from '../../query/list-purchase-invoice/retrieve-purchase-invoice-list.query';
 import { PurchaseInvoiceListQueryDto } from '../../../constants/listing-dto/purchase-invoice-list-query';
-// import { PurchaseInvoiceDto } from '../../entity/purchase-invoice/purchase-invoice-dto';
-// import { AddPurchaseInvoiceCommand } from '../../command/add-purchase-invoice/add-purchase-invoice.command';
-// import { UpdatePurchaseInvoiceCommand } from '../../command/update-purchase-invoice/update-purchase-invoice.command';
-// import { UpdatePurchaseInvoiceDto } from '../../entity/purchase-invoice/update-purchase-invoice-dto';
 
 @Controller('purchase_invoice')
 export class PurchaseInvoiceController {
@@ -26,13 +22,6 @@ export class PurchaseInvoiceController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
-
-  // @Post('v1/create')
-  // @UseGuards(TokenGuard)
-  // @UsePipes(new ValidationPipe({ whitelist: true }))
-  // create(@Body() purchaseInvoicePayload: PurchaseInvoiceDto, @Req() req) {
-  //   return this.commandBus.execute(new AddPurchaseInvoiceCommand(purchaseInvoicePayload, req));
-  // }
 
   @Post('v1/remove/:uuid')
   @UseGuards(TokenGuard)
@@ -63,11 +52,4 @@ export class PurchaseInvoiceController {
       new RetrievePurchaseInvoiceListQuery(offset, limit, sort, filter),
     );
   }
-
-  // @Post('v1/update')
-  // @UseGuards(TokenGuard)
-  // @UsePipes(new ValidationPipe({ whitelist: true }))
-  // updateClient(@Body() updatePayload: UpdatePurchaseInvoiceDto) {
-  //   return this.commandBus.execute(new UpdatePurchaseInvoiceCommand(updatePayload));
-  // }
 }

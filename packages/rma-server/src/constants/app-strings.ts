@@ -104,6 +104,7 @@ export const SALES_INVOICE_STATUS_ENUM = [
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
 export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 200;
+export const STOCK_ENTRY_SERIALS_BATCH_SIZE = 200;
 export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
 export const FRAPPE_INSERT_MANY_BATCH_COUNT = 5;
 export const PURCHASE_RECEIPT_DOCTYPE_NAME = 'Purchase Receipt';
@@ -117,3 +118,12 @@ export const ITEM_DOCTYPE = 'Item';
 export const SALES_INVOICE_DOCTYPE = 'Sales Invoice';
 export const FRAPPE_QUEUE_JOB = 'FRAPPE_QUEUE_JOB';
 export const CREATE_DELIVERY_NOTE_JOB = 'CREATE_DELIVERY_NOTE_JOB';
+export const STOCK_ENTRY_LIST_ITEM_SELECT_KEYS = [
+  's_warehouse',
+  't_warehouse',
+  'item_code',
+  'item_name',
+  'qty',
+  'transfer_qty',
+  'transferWarehouse',
+];

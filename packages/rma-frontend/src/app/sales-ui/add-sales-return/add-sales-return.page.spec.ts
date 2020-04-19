@@ -11,6 +11,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Location } from '@angular/common';
 import { SalesService } from '../services/sales.service';
 import { of } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -42,6 +44,14 @@ describe('AddSalesReturnPage', () => {
           useValue: {},
         },
         {
+          provide: MatSnackBar,
+          useValue: {},
+        },
+        {
+          provide: CsvJsonService,
+          useValue: {},
+        },
+        {
           provide: SalesService,
           useValue: {
             getSalesInvoice: (...args) =>
@@ -51,6 +61,7 @@ describe('AddSalesReturnPage', () => {
                 returned_items_map: {},
               }),
             getWarehouseList: (...args) => of([{}]),
+            getDeliveryNoteNames: (...args) => of([{ name: '' }]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),
             }),

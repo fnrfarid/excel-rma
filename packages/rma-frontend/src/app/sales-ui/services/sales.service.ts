@@ -38,6 +38,7 @@ import {
   CANCEL_SALES_INVOICE_ENDPOINT,
   UPDATE_OUTSTANDING_AMOUNT_ENDPOINT,
   RELAY_GET_DELIVERY_NOTE_ENDPOINT,
+  VALIDATE_RETURN_SERIALS,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -55,6 +56,18 @@ export class SalesService {
     this.salesInvoiceList = [];
 
     this.itemList = [];
+  }
+
+  getItemByItemNames(item_names: string[]) {
+    const params = new HttpParams().set(
+      'item_names',
+      JSON.stringify(item_names),
+    );
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get('/api/item/v1/get_by_names', { headers, params });
+      }),
+    );
   }
 
   validateSerials(item: {
@@ -81,6 +94,37 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post('/api/serial_no/v1/validate', uploadData, {
+          headers,
+        });
+      }),
+    );
+  }
+
+  validateReturnSerials(item: {
+    item_code: string;
+    serials: string[];
+    delivery_note_names: string[];
+    warehouse: string;
+  }) {
+    if (JSON.stringify(item).length < JSON_BODY_MAX_SIZE) {
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http.post(VALIDATE_RETURN_SERIALS, item, {
+            headers,
+          });
+        }),
+      );
+    }
+    const blob = new Blob([JSON.stringify(item)], {
+      type: 'application/json',
+    });
+
+    const uploadData = new FormData();
+
+    uploadData.append('file', blob, 'payload');
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(VALIDATE_RETURN_SERIALS, uploadData, {
           headers,
         });
       }),
@@ -330,7 +374,6 @@ export class SalesService {
         filters: filter ? filter : `[["name","like","%${value}%"]]`,
       },
     });
-
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http

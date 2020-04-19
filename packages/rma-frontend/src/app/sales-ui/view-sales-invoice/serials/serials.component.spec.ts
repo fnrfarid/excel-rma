@@ -13,6 +13,7 @@ import { Location } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { TimeService } from '../../../api/time/time.service';
+import { SerialsService } from '../../../common/helpers/serials/serials.service';
 
 describe('SerialsComponent', () => {
   let component: SerialsComponent;
@@ -51,6 +52,10 @@ describe('SerialsComponent', () => {
         },
         {
           provide: CsvJsonService,
+          useValue: {},
+        },
+        {
+          provide: SerialsService,
           useValue: {},
         },
         {
