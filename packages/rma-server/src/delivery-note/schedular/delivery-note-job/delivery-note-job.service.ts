@@ -59,10 +59,11 @@ export class DeliveryNoteJobService {
           { headers: this.settingsService.getAuthorizationHeaders(job.token) },
         );
       }),
+      retry(3),
       catchError(err => {
         if (
           (err.response && err.response.status === 403) ||
-          (err.response.data &&
+          (err.response && err.response.data &&
             err.response.data.exc &&
             err.response.data.exc.includes(VALIDATE_AUTH_STRING))
         ) {
@@ -72,12 +73,13 @@ export class DeliveryNoteJobService {
               return throwError(err);
             }),
           );
-        } else {
-          this.resetSerialsMap(job.payload, job.sales_invoice_name);
-          return of({ data: { data: false } });
         }
+        // if (err.response && err.response.status === 417) {
+        //   this.resetSerialsMap(job.payload, job.sales_invoice_name);
+        //   return of({ data: { data: false } });
+        // }
+        return throwError(err);
       }),
-      retry(3),
       map(data => data.data.data),
       switchMap(success => {
         if (success) {
