@@ -58,10 +58,13 @@ export class StockEntryJobService {
           }),
         );
       }),
+      retry(3),
       catchError(err => {
         if (
           (err.response && err.response.status === 403) ||
-          (err.response.data &&
+          (err.response &&
+            err.response.data &&
+            err.response.data.exc &&
             err.response.data.exc.includes(VALIDATE_AUTH_STRING))
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
@@ -71,9 +74,15 @@ export class StockEntryJobService {
             }),
           );
         }
+        // if (err.response && err.response.status === 417) {
+        //   this.updateStockEntryState(job.payload.uuid, {
+        //     isSynced: false,
+        //     inQueue: false,
+        //   });
+        //   return of({});
+        // }
         return throwError(err);
       }),
-      retry(3),
       switchMap(success => {
         this.updateSerials(payload);
         return of({});
