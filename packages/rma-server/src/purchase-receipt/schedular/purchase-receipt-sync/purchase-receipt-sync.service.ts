@@ -74,6 +74,7 @@ export class PurchaseReceiptSyncService {
           (err.response && err.response.status === 403) ||
           (err.response &&
             err.response.data &&
+            err.response.data.exc &&
             err.response.data.exc.includes(VALIDATE_AUTH_STRING))
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
