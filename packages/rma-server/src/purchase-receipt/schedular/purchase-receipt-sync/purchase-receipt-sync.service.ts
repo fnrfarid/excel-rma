@@ -68,10 +68,12 @@ export class PurchaseReceiptSyncService {
           }),
         );
       }),
+      retry(3),
       catchError(err => {
         if (
           (err.response && err.response.status === 403) ||
-          (err.response.data &&
+          (err.response &&
+            err.response.data &&
             err.response.data.exc.includes(VALIDATE_AUTH_STRING))
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
@@ -81,12 +83,11 @@ export class PurchaseReceiptSyncService {
             }),
           );
         }
-        if (err.response && err.response.status === 417) {
-          return of({});
-        }
+        // if (err.response && err.response.status === 417) {
+        //   return of({});
+        // }
         return throwError(err);
       }),
-      retry(3),
     );
   }
 
