@@ -148,6 +148,13 @@ const routes: Routes = [
         m => m.AddWarrantyClaimPageModule,
       ),
   },
+  {
+    path: 'settings/problem',
+    loadChildren: () =>
+      import('./problem-ui/problem/problem.module').then(
+        m => m.ProblemPageModule,
+      ),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
