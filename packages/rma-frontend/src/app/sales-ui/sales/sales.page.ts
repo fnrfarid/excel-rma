@@ -88,10 +88,11 @@ export class SalesPage implements OnInit {
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        map(event => {
-          this.dataSource.loadItems(undefined, undefined, undefined, {
-            status: this.status,
-          });
+        map((event: any) => {
+          if (event.url === '/sales')
+            this.dataSource.loadItems(undefined, undefined, undefined, {
+              status: this.status,
+            });
           return event;
         }),
       )

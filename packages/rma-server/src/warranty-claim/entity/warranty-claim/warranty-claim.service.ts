@@ -24,12 +24,24 @@ export class WarrantyClaimService {
 
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
+    let dateQuery = {};
 
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
       sortQuery = {
-        claim_no: 'desc',
+        modifiedOn: 'desc',
+      };
+    }
+    sortQuery =
+      Object.keys(sortQuery).length === 0 ? { modifiedOn: 'desc' } : sortQuery;
+
+    if (filter_query?.fromDate && filter_query?.toDate) {
+      dateQuery = {
+        created_on: {
+          $gte: new Date(filter_query.fromDate),
+          $lte: new Date(filter_query.toDate),
+        },
       };
     }
 
@@ -40,11 +52,14 @@ export class WarrantyClaimService {
       }
     }
 
-    const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
+    const $and: any[] = [
+      filter_query ? this.getFilterQuery(filter_query) : {},
+      dateQuery,
+    ];
 
     const where: { $and: any } = { $and };
 
-    const results = await this.warrantyclaimRepository.find({
+    const results = await this.warrantyclaimRepository.findAndCount({
       skip,
       take,
       where,
@@ -52,8 +67,8 @@ export class WarrantyClaimService {
     });
 
     return {
-      docs: results || [],
-      length: await this.warrantyclaimRepository.count(where),
+      docs: results[0] || [],
+      length: results[1],
       offset: skip,
     };
   }

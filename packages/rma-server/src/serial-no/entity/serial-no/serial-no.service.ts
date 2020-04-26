@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { SerialNo } from './serial-no.entity';
 import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 
 @Injectable()
 export class SerialNoService {
@@ -54,54 +54,66 @@ export class SerialNoService {
     };
   }
 
-  async listPurchasedSerial(purchase_receipt_names, skip, take, search = '') {
+  listPurchasedSerial(purchase_receipt_names, skip, take, search = '') {
     const serialNoQuery = {
       purchase_document_no: { $in: purchase_receipt_names },
     };
-    const searchQuery = {
-      serial_no: { $regex: search, $options: 'i' },
-    };
 
-    const $and: any[] = [serialNoQuery, searchQuery];
+    let searchQuery = {};
+    const $and: any[] = [];
 
-    const where: { $and: any } = { $and };
+    if (search && search !== '') {
+      searchQuery = {
+        serial_no: { $regex: search.toUpperCase() },
+      };
+      $and.push(searchQuery);
+    }
 
-    const counter = await this.serialNoRepository.findAndCount({
-      where,
-      skip,
-      take,
-    });
+    $and.push(serialNoQuery);
+    return this.aggregateList($and, skip, take);
+  }
 
-    return {
-      docs: counter[0] || [],
-      length: counter[1],
-      offset: skip,
-    };
+  aggregateList(and, skip, take) {
+    return this.asyncAggregate([
+      {
+        $match: { $and: and },
+      },
+      {
+        $facet: {
+          docs: [{ $skip: skip }, { $limit: take }],
+          length: [{ $count: 'total' }],
+        },
+      },
+    ]).pipe(
+      map(data => data[0]),
+      switchMap((data: AggregatePaginationResponse) => {
+        return of({
+          docs: data.docs,
+          length:
+            data.length[0] && data.length[0].total ? data.length[0].total : 0,
+          offset: skip,
+        });
+      }),
+    );
   }
 
   async listDeliveredSerial(delivery_note_names, search, skip = 0, take = 10) {
     const serialNoQuery = {
       delivery_note: { $in: delivery_note_names },
     };
-    const searchQuery = {
-      serial_no: { $regex: search, $options: 'i' },
-    };
 
-    const $and: any[] = [serialNoQuery, searchQuery];
+    let searchQuery = {};
+    const $and: any[] = [];
 
-    const where: { $and: any } = { $and };
+    if (search && search !== '') {
+      searchQuery = {
+        serial_no: { $regex: search.toUpperCase() },
+      };
+      $and.push(searchQuery);
+    }
 
-    const counter = await this.serialNoRepository.findAndCount({
-      where,
-      skip,
-      take,
-    });
-
-    return {
-      docs: counter[0] || [],
-      length: counter[1],
-      offset: skip,
-    };
+    $and.push(serialNoQuery);
+    return this.aggregateList($and, skip, take);
   }
 
   async deleteOne(query, options?) {
@@ -131,4 +143,9 @@ export class SerialNoService {
   async count(query) {
     return await this.serialNoRepository.count(query);
   }
+}
+
+export class AggregatePaginationResponse {
+  length: { total: string }[];
+  docs: any[];
 }
