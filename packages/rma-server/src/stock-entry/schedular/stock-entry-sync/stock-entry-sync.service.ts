@@ -1,4 +1,4 @@
-import { Injectable, HttpService, BadRequestException } from '@nestjs/common';
+import { Injectable, HttpService } from '@nestjs/common';
 import { switchMap, mergeMap, catchError, retry } from 'rxjs/operators';
 import { VALIDATE_AUTH_STRING } from '../../../constants/app-strings';
 import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
@@ -61,8 +61,9 @@ export class StockEntryJobService {
       retry(3),
       catchError(err => {
         if (
-          (err.response && err.response.status === 403) ||
-          (err.response &&
+          (err && err.response && err.response.status === 403) ||
+          (err &&
+            err.response &&
             err.response.data &&
             err.response.data.exc &&
             err.response.data.exc.includes(VALIDATE_AUTH_STRING))
@@ -70,17 +71,11 @@ export class StockEntryJobService {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
             mergeMap(token => {
               job.token.accessToken = token.accessToken;
-              return throwError(new BadRequestException(err));
+              return throwError(err);
             }),
           );
         }
-        // if (err.response && err.response.status === 417) {
-        //   this.updateStockEntryState(job.payload.uuid, {
-        //     isSynced: false,
-        //     inQueue: false,
-        //   });
-        //   return of({});
-        // }
+        // new approach, we wont reset state let the user retry it from agenda UI.
         return throwError(err);
       }),
       switchMap(success => {
