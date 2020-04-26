@@ -94,3 +94,8 @@ export const PRINT_DELIVERY_NOTE_PDF_METHOD =
   '/api/method/frappe.utils.print_format.download_multi_pdf';
 export const VALIDATE_RETURN_SERIALS =
   '/api/serial_no/v1/validate_return_serials';
+export const LIST_PROBLEMS_ENDPOINT = '/api/problem/v1/list';
+export const GET_PROBLEM_ENDPOINT = '/api/problem/v1/get';
+export const ADD_PROBLEM_ENDPOINT = '/api/problem/v1/create';
+export const UPDATE_PROBLEM_ENDPOINT = '/api/problem/v1/update';
+export const DELETE_PROBLEM_ENDPOINT = '/api/problem/v1/delete';

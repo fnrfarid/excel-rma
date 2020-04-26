@@ -33,6 +33,7 @@ import { ErrorLogModule } from './error-log/error-logs-invoice.module';
 import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 import { SyncModule } from './sync/sync.module';
 import { StockEntryModule } from './stock-entry/stock-entry.module';
+import { ProblemModule } from './problem/problem.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { StockEntryModule } from './stock-entry/stock-entry.module';
     DeliveryNoteModule,
     PurchaseOrderModule,
     SyncModule,
+    ProblemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
