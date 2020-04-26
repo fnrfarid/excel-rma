@@ -13,6 +13,8 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
+import { Router, NavigationEnd } from '@angular/router';
+import { map, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-warranty',
@@ -73,11 +75,23 @@ export class WarrantyPage implements OnInit {
   constructor(
     private location: Location,
     private readonly warrantyService: WarrantyService,
+    private readonly router: Router,
   ) {}
 
   ngOnInit() {
     this.dataSource = new WarrantyClaimsDataSource(this.warrantyService);
-    this.dataSource.loadItems();
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map((event: any) => {
+          if (event.url === '/warranty') this.dataSource.loadItems();
+          return event;
+        }),
+      )
+      .subscribe({
+        next: res => {},
+        error: err => {},
+      });
   }
 
   getUpdate(event) {

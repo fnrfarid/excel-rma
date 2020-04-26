@@ -65,8 +65,9 @@ export class PurchasePage implements OnInit {
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        map(event => {
-          this.dataSource.loadItems(undefined, undefined, undefined, {});
+        map((event: any) => {
+          if (event.url === '/purchase')
+            this.dataSource.loadItems(undefined, undefined, undefined, {});
           return event;
         }),
       )
