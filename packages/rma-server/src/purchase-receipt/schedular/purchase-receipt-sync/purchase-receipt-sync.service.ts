@@ -68,7 +68,6 @@ export class PurchaseReceiptSyncService {
           }),
         );
       }),
-      retry(3),
       catchError(err => {
         if (
           (err && err.response && err.response.status === 403) ||
@@ -88,6 +87,7 @@ export class PurchaseReceiptSyncService {
         // new approach, we wont reset state let the user retry it from agenda UI.
         return throwError(err);
       }),
+      retry(3),
     );
   }
 
