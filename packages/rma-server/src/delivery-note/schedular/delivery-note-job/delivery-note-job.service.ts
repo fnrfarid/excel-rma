@@ -59,7 +59,6 @@ export class DeliveryNoteJobService {
           { headers: this.settingsService.getAuthorizationHeaders(job.token) },
         );
       }),
-      retry(3),
       catchError(err => {
         if (
           (err && err.response && err.response.status === 403) ||
@@ -79,6 +78,7 @@ export class DeliveryNoteJobService {
         // new approach, we wont reset state let the user retry it from agenda UI.
         return throwError(err);
       }),
+      retry(3),
       map(data => data.data.data),
       switchMap(success => {
         if (success) {
