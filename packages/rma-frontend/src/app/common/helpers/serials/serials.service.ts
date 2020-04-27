@@ -20,10 +20,6 @@ export class SerialsService {
       return [];
     }
 
-    if (!prefix || prefix.length === 0) {
-      return [];
-    }
-
     const data: any[] = _.range(start, end + 1);
     let i = 0;
     for (const value of data) {
@@ -67,7 +63,7 @@ export class SerialsService {
     try {
       const prefix = this.getStringPrefix([startSerial, endSerial]);
 
-      if (!prefix) {
+      if (!prefix && (isNaN(startSerial) || isNaN(endSerial))) {
         this.getMessage('Invalid serial prefix, please enter valid serials');
         return this.DEFAULT_SERIAL_RANGE;
       }
@@ -111,6 +107,6 @@ export class SerialsService {
     if (!/^\d+$/.test(fromRangePostFix) || !/^\d+$/.test(toRangePostFix)) {
       return false;
     }
-    return prefix;
+    return prefix || '';
   }
 }

@@ -225,6 +225,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   }
 
   async submitPurchaseReceipt() {
+    if (!this.validateState()) return;
+
     if (!this.warehouseFormControl.value) {
       this.snackBar.open('Please select a warehouse.', CLOSE, {
         duration: 200,
@@ -509,11 +511,49 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     });
   }
 
+  validateState() {
+    const data = this.serialDataSource.data();
+    let isValid = true;
+    let index = 0;
+    for (const item of data) {
+      index++;
+      if (!item.warranty_date) {
+        isValid = false;
+        this.getMessage(
+          `Warranty date empty for ${item.item_name} at position ${index}, please add a warranty date`,
+        );
+        break;
+      }
+      if (
+        !item.serial_no ||
+        !item.serial_no.length ||
+        item.serial_no[0] === ''
+      ) {
+        isValid = false;
+        this.getMessage(
+          `Serial No empty for ${item.item_name} at position ${index}, please add a Serial No`,
+        );
+        break;
+      }
+    }
+    return isValid;
+  }
+
   async getWarrantyDate(purchaseWarrantyMonths: number) {
     let date = new Date();
-    date = new Date(date.setMonth(date.getMonth() + purchaseWarrantyMonths));
-    const dateTime = await this.timeService.getDateAndTime(date);
-    return dateTime.date;
+    let dateTime;
+    if (purchaseWarrantyMonths) {
+      try {
+        date = new Date(
+          date.setMonth(date.getMonth() + purchaseWarrantyMonths),
+        );
+        dateTime = await this.timeService.getDateAndTime(date);
+        return dateTime.date;
+      } catch (err) {
+        this.getMessage(`Error occurred while settings warranty date: ${err}`);
+      }
+    }
+    return;
   }
 
   updateProductState(item_code, assigned) {

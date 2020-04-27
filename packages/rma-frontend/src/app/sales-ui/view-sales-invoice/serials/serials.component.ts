@@ -418,9 +418,17 @@ export class SerialsComponent implements OnInit {
 
   async getWarrantyDate(salesWarrantyMonths: number) {
     let date = new Date();
-    date = new Date(date.setMonth(date.getMonth() + salesWarrantyMonths));
-    const dateTime = await this.timeService.getDateAndTime(date);
-    return dateTime.date;
+    let dateTime;
+    if (salesWarrantyMonths) {
+      try {
+        date = new Date(date.setMonth(date.getMonth() + salesWarrantyMonths));
+        dateTime = await this.timeService.getDateAndTime(date);
+        return dateTime.date;
+      } catch (err) {
+        this.getMessage(`Error occurred while settings warranty date: ${err}`);
+      }
+    }
+    return;
   }
 
   updateProductState(item_code, assigned) {
@@ -459,7 +467,37 @@ export class SerialsComponent implements OnInit {
       : `${row.serial_no[0]} - ${row.serial_no[row.serial_no.length - 1]}`;
   }
 
+  validateState() {
+    const data = this.serialDataSource.data();
+    let isValid = true;
+    let index = 0;
+    for (const item of data) {
+      index++;
+      if (!item.warranty_date) {
+        isValid = false;
+        this.getMessage(
+          `Warranty date empty for ${item.item_name} at position ${index}, please add a warranty date`,
+        );
+        break;
+      }
+      if (
+        !item.serial_no ||
+        !item.serial_no.length ||
+        item.serial_no[0] === ''
+      ) {
+        isValid = false;
+        this.getMessage(
+          `Serial No empty for ${item.item_name} at position ${index}, please add a Serial No`,
+        );
+        break;
+      }
+    }
+    return isValid;
+  }
+
   async submitDeliveryNote() {
+    if (!this.validateState()) return;
+
     const loading = await this.loadingController.create({
       message:
         'Creating Delivery Note! more then 500 serials may take some time, get some coffee!',
