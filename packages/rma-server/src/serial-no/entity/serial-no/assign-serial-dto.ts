@@ -4,7 +4,6 @@ import {
   ValidateNested,
   IsNumber,
   IsArray,
-  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -65,8 +64,8 @@ export class DeliveryNoteItemDto {
   has_serial_no: number;
 
   @IsNotEmpty()
-  @IsDate()
-  warranty_date: Date;
+  @IsString()
+  warranty_date: string;
 
   @IsNotEmpty()
   @IsNumber()
