@@ -201,7 +201,7 @@ export class AddSalesInvoicePage implements OnInit {
       abstractControl.get('balance').markAsTouched();
       abstractControl.get('customer').markAsTouched();
       abstractControl.get('balance').setErrors({ min: true });
-    } else return null;
+    } else abstractControl.get('balance').setErrors(null);
   }
 
   itemValidator(items: FormArray) {
