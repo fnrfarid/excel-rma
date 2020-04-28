@@ -213,10 +213,10 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           }),
         );
       }),
-      retry(3),
       catchError(err => {
         return throwError(new BadRequestException(err));
       }),
+      retry(3),
     );
   }
 

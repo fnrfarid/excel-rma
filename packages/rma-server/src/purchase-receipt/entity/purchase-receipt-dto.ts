@@ -6,7 +6,6 @@ import {
   IsArray,
   ArrayMinSize,
   IsOptional,
-  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -24,8 +23,8 @@ export class PurchaseReceiptItemDto {
   warehouse: string;
 
   @IsNotEmpty()
-  @IsDate()
-  warranty_date: Date;
+  @IsString()
+  warranty_date: string;
 
   purchase_order?: string;
 
