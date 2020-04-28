@@ -96,18 +96,22 @@ export class AddSalesInvoicePage implements OnInit {
             customer_name: res.customer,
             owner: res.contact_email,
           });
-          this.getRemainingBalance();
           this.salesInvoiceForm
             .get('postingDate')
             .setValue(new Date(res.posting_date));
           this.salesInvoiceForm.get('dueDate').setValue(new Date(res.due_date));
           this.dataSource.loadItems(res.items);
+          res.items.forEach(item => {
+            this.itemsControl.push(new FormControl(item));
+          });
           this.calculateTotal(res.items);
           this.salesInvoiceForm.get('campaign').setValue(res.isCampaign);
           this.salesInvoiceForm.get('remarks').setValue(res.remarks);
           this.salesInvoiceForm
             .get('warehouse')
             .setValue(res.delivery_warehouse);
+          this.updateStockBalance(res.delivery_warehouse);
+          this.getCustomer(res.customer);
         },
       });
     }
@@ -201,7 +205,7 @@ export class AddSalesInvoicePage implements OnInit {
       abstractControl.get('balance').markAsTouched();
       abstractControl.get('customer').markAsTouched();
       abstractControl.get('balance').setErrors({ min: true });
-    } else return null;
+    } else abstractControl.get('balance').setErrors(null);
   }
 
   itemValidator(items: FormArray) {
@@ -528,6 +532,15 @@ export class AddSalesInvoicePage implements OnInit {
         return of(info);
       }),
     );
+  }
+
+  getCustomer(name: string) {
+    this.salesService.getCustomer(name).subscribe({
+      next: res => {
+        this.salesInvoiceForm.get('customer').setValue(res);
+        this.customerChanged(res);
+      },
+    });
   }
 
   getRemainingBalance() {

@@ -31,8 +31,8 @@ export class CustomerAggregateService extends AggregateRoot {
     this.apply(new CustomerAddedEvent(customer, clientHttpRequest));
   }
 
-  async retrieveCustomer(uuid: string, req) {
-    const customer = await this.customerService.findOne({ uuid });
+  async retrieveCustomer(customer_name: string, req) {
+    const customer = await this.customerService.findOne({ customer_name });
     if (!customer) throw new NotFoundException();
     return customer;
   }
