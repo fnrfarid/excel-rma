@@ -44,10 +44,12 @@ export class CustomerController {
     return this.commandBus.execute(new RemoveCustomerCommand(uuid));
   }
 
-  @Get('v1/get/:uuid')
+  @Get('v1/get/:customer_name')
   @UseGuards(TokenGuard)
-  async getCustomer(@Param('uuid') uuid, @Req() req) {
-    return await this.queryBus.execute(new RetrieveCustomerQuery(uuid, req));
+  async getCustomer(@Param('customer_name') customer_name, @Req() req) {
+    return await this.queryBus.execute(
+      new RetrieveCustomerQuery(customer_name, req),
+    );
   }
 
   @Get('v1/list')

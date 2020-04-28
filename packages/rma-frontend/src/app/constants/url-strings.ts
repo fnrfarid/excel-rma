@@ -8,6 +8,7 @@ export const LIST_WAREHOUSE_ENDPOINT =
   'api/delivery_note/v1/relay_list_warehouses';
 export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';
 export const LIST_CUSTOMER_ENDPOINT = 'api/customer/v1/list';
+export const GET_CUSTOMER_ENDPOINT = 'api/customer/v1/get';
 export const LIST_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/list';
 export const UPDATE_OUTSTANDING_AMOUNT_ENDPOINT =
   'api/sales_invoice/v1/update_outstanding_amount/';
