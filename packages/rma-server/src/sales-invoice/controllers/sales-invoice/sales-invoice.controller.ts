@@ -52,9 +52,9 @@ export class SalesInvoiceController {
   @Post('v1/update')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateClient(@Body() updatePayload: SalesInvoiceUpdateDto) {
+  updateClient(@Body() updatePayload: SalesInvoiceUpdateDto, @Req() req) {
     return this.commandBus.execute(
-      new UpdateSalesInvoiceCommand(updatePayload),
+      new UpdateSalesInvoiceCommand(updatePayload, req),
     );
   }
 
