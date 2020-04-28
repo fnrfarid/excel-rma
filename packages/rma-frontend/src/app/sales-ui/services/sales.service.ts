@@ -39,6 +39,7 @@ import {
   UPDATE_OUTSTANDING_AMOUNT_ENDPOINT,
   RELAY_GET_DELIVERY_NOTE_ENDPOINT,
   VALIDATE_RETURN_SERIALS,
+  GET_CUSTOMER_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -446,6 +447,16 @@ export class SalesService {
               return of({});
             }),
           );
+      }),
+    );
+  }
+
+  getCustomer(name: string) {
+    const url = `${GET_CUSTOMER_ENDPOINT}/${name}`;
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
       }),
     );
   }
