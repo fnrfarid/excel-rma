@@ -77,6 +77,10 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               salesInvoice.createdByEmail = clientHttpRequest.token.email;
               salesInvoice.createdBy = clientHttpRequest.token.fullName;
               salesInvoice.uuid = uuidv4();
+              salesInvoice.territory =
+                clientHttpRequest.token.territory.length !== 0
+                  ? clientHttpRequest.token.territory[0]
+                  : salesInvoice.territory;
               salesInvoice.created_on = new DateTime(
                 settings.timeZone,
               ).toJSDate();
