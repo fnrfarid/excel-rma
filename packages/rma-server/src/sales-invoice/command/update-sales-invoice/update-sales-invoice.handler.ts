@@ -11,9 +11,9 @@ export class UpdateSalesInvoiceHandler
   ) {}
 
   async execute(command: UpdateSalesInvoiceCommand) {
-    const { updatePayload } = command;
+    const { updatePayload, clientHttpRequest } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await this.manager.update(updatePayload);
+    await this.manager.update(updatePayload, clientHttpRequest);
     aggregate.commit();
   }
 }
