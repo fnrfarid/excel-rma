@@ -6,5 +6,6 @@ export class RetrieveSalesInvoiceListQuery implements IQuery {
     public limit: number,
     public sort: string,
     public filter_query: any,
+    public req: any,
   ) {}
 }
