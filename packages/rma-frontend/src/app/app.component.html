@@ -7,6 +7,28 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
+        <ion-grid *ngIf="loggedIn" class="no-padding">
+          <ion-row class="align">
+            <ion-col *ngIf="imageURL">
+              <ion-avatar class="avatar">
+                <img src="{{ imageURL }}" />
+              </ion-avatar>
+            </ion-col>
+            <ion-col *ngIf="!imageURL">
+              <ion-avatar class="avatar">
+                <img src="../assets/alternative.svg" />
+              </ion-avatar>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-text-center">
+              <ion-text class="name">
+                {{ fullName }}
+              </ion-text>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
         <ion-list>
           <ion-menu-toggle auto-hide="false">
             <ion-item

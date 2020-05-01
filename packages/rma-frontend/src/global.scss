@@ -40,6 +40,17 @@
   vertical-align: middle;
 }
 
+.name {
+  font-size: 1.4rem;
+  text-transform: capitalize;
+}
+
+.avatar {
+  margin-left: 20%;
+  width: 60%;
+  height: 60%;
+}
+
 .header-row {
   font-weight: bold;
 }
