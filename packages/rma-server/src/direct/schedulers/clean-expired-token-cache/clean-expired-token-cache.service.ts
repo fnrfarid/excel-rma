@@ -13,7 +13,7 @@ export class CleanExpiredTokenCacheService implements OnModuleInit {
     private readonly tokenCache: TokenCacheService,
   ) {}
   onModuleInit() {
-    this.agenda.define(CLEAN_TOKEN_CACHE, async job => {
+    this.agenda.define(CLEAN_TOKEN_CACHE, { concurrency: 1 }, async job => {
       await this.tokenCache.deleteMany({
         exp: { $lte: Math.floor(new Date().valueOf() / 1000) },
       });

@@ -31,74 +31,78 @@ export class SerialNoSyncService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.agenda.define(SERIAL_NO_SYNC_SCHEDULE, async job => {
-      from(this.requestState.findOne({ syncDocType: SERIAL_NO_DOCTYPE_NAME }))
-        .pipe(
-          switchMap(state => {
-            if (state) {
-              return throwError(new SyncAlreadyInProgressException());
-            }
-            return from(
-              this.requestState.save({
-                uuid: uuidv4(),
-                syncDocType: SERIAL_NO_DOCTYPE_NAME,
-              }),
-            );
-          }),
-          switchMap(state => {
-            return this.sync.syncDocTypeToEntity(
-              SERIAL_NO_DOCTYPE_NAME,
-              20,
-              '["*"]',
-            );
-          }),
-          flatMap((array: unknown[]) => array),
-          mergeMap((erpnextSerial: SerialNo) => {
-            this.serial
-              .findOne({ name: erpnextSerial.name })
-              .then(serial => {
-                if (serial && serial.modified !== erpnextSerial.modified) {
-                  return this.serial.updateOne(
-                    { name: erpnextSerial.name },
-                    { $set: erpnextSerial },
-                  );
-                } else if (!serial) {
-                  return new Promise((resolve, reject) => {
-                    erpnextSerial.uuid = uuidv4();
-                    this.serial
-                      .create(erpnextSerial)
-                      .then(() => resolve(erpnextSerial))
-                      .catch(error => reject(error));
-                  });
-                }
-              })
-              .then(success => {})
-              .catch(error => {});
-            return of(erpnextSerial);
-          }),
-          toArray(),
-          catchError(error => {
-            return of({
-              error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-            });
-          }),
-        )
-        .subscribe({
-          next: success => {
-            this.requestState
-              .findOne({ syncDocType: SERIAL_NO_DOCTYPE_NAME })
-              .then(state => {
-                if (state) {
-                  return this.requestState.deleteMany({
-                    syncDocType: SERIAL_NO_DOCTYPE_NAME,
-                  });
-                }
-              })
-              .then(deleted => {});
-          },
-          error: error => {},
-        });
-    });
+    this.agenda.define(
+      SERIAL_NO_SYNC_SCHEDULE,
+      { concurrency: 1 },
+      async job => {
+        from(this.requestState.findOne({ syncDocType: SERIAL_NO_DOCTYPE_NAME }))
+          .pipe(
+            switchMap(state => {
+              if (state) {
+                return throwError(new SyncAlreadyInProgressException());
+              }
+              return from(
+                this.requestState.save({
+                  uuid: uuidv4(),
+                  syncDocType: SERIAL_NO_DOCTYPE_NAME,
+                }),
+              );
+            }),
+            switchMap(state => {
+              return this.sync.syncDocTypeToEntity(
+                SERIAL_NO_DOCTYPE_NAME,
+                20,
+                '["*"]',
+              );
+            }),
+            flatMap((array: unknown[]) => array),
+            mergeMap((erpnextSerial: SerialNo) => {
+              this.serial
+                .findOne({ name: erpnextSerial.name })
+                .then(serial => {
+                  if (serial && serial.modified !== erpnextSerial.modified) {
+                    return this.serial.updateOne(
+                      { name: erpnextSerial.name },
+                      { $set: erpnextSerial },
+                    );
+                  } else if (!serial) {
+                    return new Promise((resolve, reject) => {
+                      erpnextSerial.uuid = uuidv4();
+                      this.serial
+                        .create(erpnextSerial)
+                        .then(() => resolve(erpnextSerial))
+                        .catch(error => reject(error));
+                    });
+                  }
+                })
+                .then(success => {})
+                .catch(error => {});
+              return of(erpnextSerial);
+            }),
+            toArray(),
+            catchError(error => {
+              return of({
+                error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+              });
+            }),
+          )
+          .subscribe({
+            next: success => {
+              this.requestState
+                .findOne({ syncDocType: SERIAL_NO_DOCTYPE_NAME })
+                .then(state => {
+                  if (state) {
+                    return this.requestState.deleteMany({
+                      syncDocType: SERIAL_NO_DOCTYPE_NAME,
+                    });
+                  }
+                })
+                .then(deleted => {});
+            },
+            error: error => {},
+          });
+      },
+    );
 
     this.agenda
       .every('15 minutes', SERIAL_NO_SYNC_SCHEDULE)
