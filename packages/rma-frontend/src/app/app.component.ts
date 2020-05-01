@@ -15,7 +15,7 @@ import {
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
-import { SYSTEM_MANAGER } from './constants/app-string';
+import { SYSTEM_MANAGER, PURCHASE_USER } from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
 
 @Component({
@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   isSettingMenuVisible: boolean = false;
   fullName: string = '';
   imageURL: string = '';
-
+  showPurchase: boolean = false;
   constructor(
     private readonly appService: AppService,
     private readonly loginService: LoginService,
@@ -117,8 +117,20 @@ export class AppComponent implements OnInit {
         ) {
           this.showSettings = true;
         }
+
+        if (
+          res &&
+          res.roles &&
+          res.roles.length > 0 &&
+          res.roles.includes(PURCHASE_USER)
+        ) {
+          this.showPurchase = true;
+        }
       },
-      error: error => (this.showSettings = false),
+      error: error => {
+        this.showSettings = false;
+        this.showPurchase = false;
+      },
     });
   }
 
