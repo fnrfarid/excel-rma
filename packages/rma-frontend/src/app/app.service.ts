@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import {
   CLIENT_ID,
   REDIRECT_URI,
@@ -21,12 +21,18 @@ import {
   TOKEN,
   SCOPES_OPENID_ALL,
   TRANSFER_WAREHOUSE,
+  ACCESS_TOKEN,
+  AUTHORIZATION,
+  BEARER_TOKEN_PREFIX,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
   GET_GLOBAL_DEFAULTS_ENDPOINT,
   API_INFO_ENDPOINT,
+  DIRECT_PROFILE_ENDPOINT,
 } from './constants/url-strings';
+import { switchMap } from 'rxjs/operators';
+import { IDTokenClaims } from './common/interfaces/id-token-claims.interfaces';
 
 @Injectable()
 export class AppService {
@@ -144,6 +150,20 @@ export class AppService {
           savedState,
         );
       });
+  }
+
+  loadProfile() {
+    return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
+      switchMap(token => {
+        const headers = {
+          [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+        };
+
+        return this.http.get<IDTokenClaims>(DIRECT_PROFILE_ENDPOINT, {
+          headers,
+        });
+      }),
+    );
   }
 
   getEncodedFrappeLoginUrl(authorizationUrl, frappe_auth_config, state) {
