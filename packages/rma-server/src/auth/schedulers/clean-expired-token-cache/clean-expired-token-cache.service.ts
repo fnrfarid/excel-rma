@@ -14,18 +14,22 @@ export class CleanExpiredTokenCacheService implements OnModuleInit {
     private readonly tokenCache: TokenCacheService,
   ) {}
   onModuleInit() {
-    this.agenda.define(CLEAN_EXPIRED_TOKEN_QUEUE, async job => {
-      const query: { [key: string]: any } = {
-        exp: { $lte: Math.floor(new Date().valueOf() / 1000) },
-      };
+    this.agenda.define(
+      CLEAN_EXPIRED_TOKEN_QUEUE,
+      { concurrency: 1 },
+      async job => {
+        const query: { [key: string]: any } = {
+          exp: { $lte: Math.floor(new Date().valueOf() / 1000) },
+        };
 
-      await this.tokenCache.deleteMany({
-        ...query,
-        ...{
-          $or: [{ refreshToken: null }, { refreshToken: { $exists: false } }],
-        },
-      });
-    });
+        await this.tokenCache.deleteMany({
+          ...query,
+          ...{
+            $or: [{ refreshToken: null }, { refreshToken: { $exists: false } }],
+          },
+        });
+      },
+    );
 
     this.agenda
       .every('15 minutes', CLEAN_EXPIRED_TOKEN_QUEUE)

@@ -31,77 +31,81 @@ export class SalesInvoiceSyncService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.agenda.define(SALES_INVOICE_SYNC_SCHEDULE, async job => {
-      from(this.requestState.findOne({ syncDocType: SALES_INVOICE_DOCTYPE }))
-        .pipe(
-          switchMap(state => {
-            if (state) {
-              return throwError(new SyncAlreadyInProgressException());
-            }
-            return from(
-              this.requestState.save({
-                uuid: uuidv4(),
-                syncDocType: SALES_INVOICE_DOCTYPE,
-              }),
-            );
-          }),
-          switchMap(state => {
-            return this.sync.syncDocTypeToEntity(
-              SALES_INVOICE_DOCTYPE,
-              20,
-              '["*"]',
-            );
-          }),
-          flatMap((array: unknown[]) => array),
-          mergeMap((erpnextSI: SalesInvoice) => {
-            this.salesInvoice
-              .findOne({ name: erpnextSI.name })
-              .then(salesInvoice => {
-                if (
-                  salesInvoice &&
-                  salesInvoice.modified !== erpnextSI.modified
-                ) {
-                  return this.salesInvoice.updateOne(
-                    { name: erpnextSI.name },
-                    { $set: erpnextSI },
-                  );
-                } else if (!salesInvoice) {
-                  return new Promise((resolve, reject) => {
-                    erpnextSI.uuid = uuidv4();
-                    this.salesInvoice
-                      .create(erpnextSI)
-                      .then(() => resolve(erpnextSI))
-                      .catch(error => reject(error));
-                  });
-                }
-              })
-              .then(success => {})
-              .catch(error => {});
-            return of(erpnextSI);
-          }),
-          toArray(),
-          catchError(error => {
-            return of({
-              error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-            });
-          }),
-        )
-        .subscribe({
-          next: success => {
-            this.requestState
-              .findOne({ syncDocType: SALES_INVOICE_DOCTYPE })
-              .then(state => {
-                if (state) {
-                  return this.requestState.deleteMany({
-                    syncDocType: SALES_INVOICE_DOCTYPE,
-                  });
-                }
-              })
-              .then(deleted => {});
-          },
-          error: error => {},
-        });
-    });
+    this.agenda.define(
+      SALES_INVOICE_SYNC_SCHEDULE,
+      { concurrency: 1 },
+      async job => {
+        from(this.requestState.findOne({ syncDocType: SALES_INVOICE_DOCTYPE }))
+          .pipe(
+            switchMap(state => {
+              if (state) {
+                return throwError(new SyncAlreadyInProgressException());
+              }
+              return from(
+                this.requestState.save({
+                  uuid: uuidv4(),
+                  syncDocType: SALES_INVOICE_DOCTYPE,
+                }),
+              );
+            }),
+            switchMap(state => {
+              return this.sync.syncDocTypeToEntity(
+                SALES_INVOICE_DOCTYPE,
+                20,
+                '["*"]',
+              );
+            }),
+            flatMap((array: unknown[]) => array),
+            mergeMap((erpnextSI: SalesInvoice) => {
+              this.salesInvoice
+                .findOne({ name: erpnextSI.name })
+                .then(salesInvoice => {
+                  if (
+                    salesInvoice &&
+                    salesInvoice.modified !== erpnextSI.modified
+                  ) {
+                    return this.salesInvoice.updateOne(
+                      { name: erpnextSI.name },
+                      { $set: erpnextSI },
+                    );
+                  } else if (!salesInvoice) {
+                    return new Promise((resolve, reject) => {
+                      erpnextSI.uuid = uuidv4();
+                      this.salesInvoice
+                        .create(erpnextSI)
+                        .then(() => resolve(erpnextSI))
+                        .catch(error => reject(error));
+                    });
+                  }
+                })
+                .then(success => {})
+                .catch(error => {});
+              return of(erpnextSI);
+            }),
+            toArray(),
+            catchError(error => {
+              return of({
+                error: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+              });
+            }),
+          )
+          .subscribe({
+            next: success => {
+              this.requestState
+                .findOne({ syncDocType: SALES_INVOICE_DOCTYPE })
+                .then(state => {
+                  if (state) {
+                    return this.requestState.deleteMany({
+                      syncDocType: SALES_INVOICE_DOCTYPE,
+                    });
+                  }
+                })
+                .then(deleted => {});
+            },
+            error: error => {},
+          });
+      },
+    );
 
     this.agenda
       .every('15 minutes', SALES_INVOICE_SYNC_SCHEDULE)
