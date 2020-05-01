@@ -106,12 +106,19 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     return provider;
   }
 
-  async getSalesInvoiceList(offset, limit, sort, filter_query?) {
+  async getSalesInvoiceList(
+    offset,
+    limit,
+    sort,
+    filter_query,
+    clientHttpRequest: any,
+  ) {
     return await this.salesInvoiceService.list(
       offset || 0,
       limit || 10,
       sort,
       filter_query,
+      clientHttpRequest.token.territory,
     );
   }
 
