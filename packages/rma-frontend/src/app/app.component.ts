@@ -28,6 +28,8 @@ export class AppComponent implements OnInit {
   subscription: Subscription;
   showSettings: boolean = false;
   isSettingMenuVisible: boolean = false;
+  fullName: string = '';
+  imageURL: string = '';
 
   constructor(
     private readonly appService: AppService,
@@ -69,6 +71,7 @@ export class AppComponent implements OnInit {
         if (event.key === LOGGED_IN && event.value === true) {
           this.loggedIn = true;
           this.checkRoles();
+          this.loadProfile();
         } else {
           this.loggedIn = false;
         }
@@ -81,9 +84,25 @@ export class AppComponent implements OnInit {
       const query = new URLSearchParams(hash);
       const token = query.get(ACCESS_TOKEN);
       this.checkRoles(token);
+      this.loadProfile();
     } else {
       this.checkRoles();
+      this.loadProfile();
     }
+  }
+
+  loadProfile() {
+    this.appService.loadProfile().subscribe({
+      error: error => {
+        this.loggedIn = false;
+        this.appService.setupImplicitFlow();
+      },
+      next: profile => {
+        this.loggedIn = true;
+        this.fullName = profile.name;
+        this.imageURL = profile.picture;
+      },
+    });
   }
 
   checkRoles(token?: string) {

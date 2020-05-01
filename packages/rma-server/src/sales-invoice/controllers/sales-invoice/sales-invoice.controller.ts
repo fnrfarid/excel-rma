@@ -82,16 +82,16 @@ export class SalesInvoiceController {
   @Get('v1/list')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ forbidNonWhitelisted: true }))
-  async listSalesInvoice(@Query() query: SalesInvoiceListQueryDto) {
+  async listSalesInvoice(@Query() query: SalesInvoiceListQueryDto, @Req() req) {
     const { offset, limit, sort, filter_query } = query;
-    let filter;
+    let filter = {};
     try {
       filter = JSON.parse(filter_query);
     } catch {
       filter;
     }
     return await this.queryBus.execute(
-      new RetrieveSalesInvoiceListQuery(offset, limit, sort, filter),
+      new RetrieveSalesInvoiceListQuery(offset, limit, sort, filter, req),
     );
   }
 

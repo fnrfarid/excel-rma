@@ -29,7 +29,7 @@ export class SalesInvoiceService {
     });
   }
 
-  async list(skip, take, sort, filter_query?) {
+  async list(skip, take, sort, filter_query, territories: string[]) {
     let sortQuery;
     let dateQuery = {};
     try {
@@ -60,10 +60,15 @@ export class SalesInvoiceService {
         },
       };
     }
+    const customerQuery =
+      territories && territories.length !== 0
+        ? { territory: { $in: territories } }
+        : {};
 
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
+      customerQuery,
     ];
 
     const $group = this.getKeys();
