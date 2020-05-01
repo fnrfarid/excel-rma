@@ -41,43 +41,47 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.agenda.define(REVOKE_EXPIRED_FRAPPE_TOKEN, async job => {
-      from(this.settings.find())
-        .pipe(
-          switchMap(settings => {
-            const nowInServerTimeZone = new DateTime(
-              settings.timeZone,
-            ).toFormat('yyyy-MM-dd HH:mm:ss');
-            return this.clientToken.getServiceAccountApiHeaders().pipe(
-              switchMap(headers => {
-                return this.getFrappeTokens(
-                  settings,
-                  headers,
-                  nowInServerTimeZone,
-                );
-              }),
-              mergeMap(moreTokens => from(moreTokens.data.data)),
-              mergeMap(({ access_token }) => {
-                return this.revokeToken(settings, access_token);
-              }),
-            );
-          }),
-          retryWhen(errors => errors.pipe(delay(1000), take(3))),
-        )
-        .subscribe({
-          next: success => {
-            Logger.log(REVOKE_FRAPPE_TOKEN_SUCCESS, this.constructor.name);
-          },
-          error: error => {
-            this.errorLog.createErrorLog(error);
-            Logger.error(
-              REVOKE_FRAPPE_TOKEN_ERROR,
-              error,
-              this.constructor.name,
-            );
-          },
-        });
-    });
+    this.agenda.define(
+      REVOKE_EXPIRED_FRAPPE_TOKEN,
+      { concurrency: 1 },
+      async job => {
+        from(this.settings.find())
+          .pipe(
+            switchMap(settings => {
+              const nowInServerTimeZone = new DateTime(
+                settings.timeZone,
+              ).toFormat('yyyy-MM-dd HH:mm:ss');
+              return this.clientToken.getServiceAccountApiHeaders().pipe(
+                switchMap(headers => {
+                  return this.getFrappeTokens(
+                    settings,
+                    headers,
+                    nowInServerTimeZone,
+                  );
+                }),
+                mergeMap(moreTokens => from(moreTokens.data.data)),
+                mergeMap(({ access_token }) => {
+                  return this.revokeToken(settings, access_token);
+                }),
+              );
+            }),
+            retryWhen(errors => errors.pipe(delay(1000), take(3))),
+          )
+          .subscribe({
+            next: success => {
+              Logger.log(REVOKE_FRAPPE_TOKEN_SUCCESS, this.constructor.name);
+            },
+            error: error => {
+              this.errorLog.createErrorLog(error);
+              Logger.error(
+                REVOKE_FRAPPE_TOKEN_ERROR,
+                error,
+                this.constructor.name,
+              );
+            },
+          });
+      },
+    );
 
     this.agenda
       .every('15 minutes', REVOKE_EXPIRED_FRAPPE_TOKEN)

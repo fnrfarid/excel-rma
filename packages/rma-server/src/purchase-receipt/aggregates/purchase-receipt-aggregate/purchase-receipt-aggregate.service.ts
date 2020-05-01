@@ -487,7 +487,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
         const quotientItem = new PurchaseReceiptItemDto();
         Object.assign(quotientItem, item);
-        quotientItem.qty = 200;
+        quotientItem.qty = PURCHASE_RECEIPT_SERIALS_BATCH_SIZE;
         quotientItem.amount = quotientItem.qty * quotientItem.rate;
         quotientItem.serial_no = serials;
         const generatedReceipts = this.generateBatchedReceipt(quotientItem);
