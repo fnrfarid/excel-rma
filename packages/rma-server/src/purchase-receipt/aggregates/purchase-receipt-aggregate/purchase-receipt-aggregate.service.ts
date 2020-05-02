@@ -202,21 +202,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       }),
       bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
       switchMap(data => {
-        return from(
-          this.serialNoService.insertMany(data, { ordered: true }),
-        ).pipe(
-          switchMap(success => {
-            return of(true);
-          }),
-          catchError(error => {
-            return of(true);
-          }),
-        );
+        return from(this.serialNoService.insertMany(data, { ordered: true }));
+      }),
+      retry(3),
+      switchMap(success => {
+        return of(true);
       }),
       catchError(err => {
         return throwError(new BadRequestException(err));
       }),
-      retry(3),
     );
   }
 
@@ -226,7 +220,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchaseReceipt: PurchaseReceiptDto,
     item: PurchaseReceiptItemDto,
   ) {
-    // this needs to change unnecessary mergemap createdSerial is now a Batch. no need for pipe.
     return from(createdSerialsBatch[item_code]).pipe(
       mergeMap(serial => {
         return of({

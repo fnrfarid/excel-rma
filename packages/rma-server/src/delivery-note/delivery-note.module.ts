@@ -11,6 +11,7 @@ import { DeliveryNoteCommandManager } from './commands';
 import { DeliveryNoteEventManager } from './events';
 import { DeliveryNoteJobService } from './schedular/delivery-note-job/delivery-note-job.service';
 import { DirectModule } from '../direct/direct.module';
+import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DirectModule } from '../direct/direct.module';
     ...DeliveryNoteCommandManager,
     ...DeliveryNoteEventManager,
     DeliveryNoteJobService,
+    SerialBatchService,
   ],
   exports: [
     DeliveryNoteEntitiesModule,

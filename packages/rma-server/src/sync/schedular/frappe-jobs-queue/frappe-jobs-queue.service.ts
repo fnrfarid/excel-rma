@@ -32,9 +32,34 @@ export class FrappeJobService implements OnModuleInit {
           })
           .catch(err => {
             this[job.attrs.data.type].failureCallback(job);
-            return done(err);
+            return done(this.getPureError(err));
           });
       },
     );
+  }
+
+  replaceErrors(keys, value) {
+    if (value instanceof Error) {
+      const error = {};
+
+      Object.getOwnPropertyNames(value).forEach(function(key) {
+        error[key] = value[key];
+      });
+
+      return error;
+    }
+
+    return value;
+  }
+
+  getPureError(error) {
+    if (error && error.response) {
+      error = error.response.data ? error.response.data : error.response;
+    }
+    try {
+      return JSON.parse(JSON.stringify(error, this.replaceErrors));
+    } catch {
+      return error.data ? error.data : error;
+    }
   }
 }
