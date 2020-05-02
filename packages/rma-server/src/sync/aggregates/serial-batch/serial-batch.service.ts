@@ -16,6 +16,10 @@ export class SerialBatchService {
   }
 
   batchSingleItem(item: ItemBatchInterface, batchSize: number) {
+    if (!item.has_serial_no) {
+      delete item.serial_no;
+      return of(item);
+    }
     const itemPayload = item;
     const serials = itemPayload.serial_no;
     return from(serials).pipe(
@@ -36,6 +40,6 @@ export class SerialBatchService {
 
 export class ItemBatchInterface {
   item_code: string;
-  serial_no: string[];
+  serial_no?: string[];
   has_serial_no: number;
 }

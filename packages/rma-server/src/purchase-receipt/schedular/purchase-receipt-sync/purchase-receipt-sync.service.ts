@@ -82,6 +82,9 @@ export class PurchaseReceiptSyncService {
               job.token.accessToken = token.accessToken;
               return throwError(err);
             }),
+            catchError(error => {
+              return throwError(err);
+            }),
           );
         }
         // new approach, we wont reset state let the user retry it from agenda UI.

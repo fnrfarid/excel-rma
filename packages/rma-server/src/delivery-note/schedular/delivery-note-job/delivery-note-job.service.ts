@@ -73,6 +73,9 @@ export class DeliveryNoteJobService {
               job.token.accessToken = token.accessToken;
               return throwError(err);
             }),
+            catchError(error => {
+              return throwError(err);
+            }),
           );
         }
         // new approach, we wont reset state let the user retry it from agenda UI.
@@ -230,9 +233,6 @@ export class DeliveryNoteJobService {
         } catch {}
       }
     });
-    this.agenda
-      .now(FRAPPE_QUEUE_JOB, data)
-      .then(success => {})
-      .catch(err => {});
+    return this.agenda.now(FRAPPE_QUEUE_JOB, data);
   }
 }
