@@ -19,11 +19,11 @@ export interface CreateDeliveryNoteInterface {
 }
 
 export interface CreateDeliveryNoteItemInterface {
-  item_code?: string;
+  item_code: string;
   qty?: number;
   rate?: number;
   amount?: number;
-  has_serial_no?: number;
+  has_serial_no: number;
   warranty_date?: string;
   against_sales_invoice?: string;
   serial_no?: any;

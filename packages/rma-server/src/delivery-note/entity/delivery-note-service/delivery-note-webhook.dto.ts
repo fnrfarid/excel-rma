@@ -133,6 +133,10 @@ export class DeliveryNoteItemsDto {
   @IsOptional()
   item_name: string;
 
+  @IsNumber()
+  @IsOptional()
+  has_serial_no: number;
+
   @IsString()
   @IsOptional()
   description: string;

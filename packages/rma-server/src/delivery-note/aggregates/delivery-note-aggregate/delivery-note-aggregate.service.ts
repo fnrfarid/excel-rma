@@ -4,8 +4,8 @@ import {
   NotImplementedException,
   BadRequestException,
 } from '@nestjs/common';
-import { throwError, of } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { throwError, of, from } from 'rxjs';
+import { switchMap, map, catchError, concatMap, retry } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import {
@@ -24,12 +24,10 @@ import {
   DELIVERY_NOTE_LIST_FIELD,
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
+  STOCK_ENTRY_SERIALS_BATCH_SIZE,
 } from '../../../constants/app-strings';
 import { AssignSerialDto } from '../../../serial-no/entity/serial-no/assign-serial-dto';
-import {
-  CreateDeliveryNoteInterface,
-  CreateDeliveryNoteItemInterface,
-} from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
+import { CreateDeliveryNoteInterface } from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { DeliveryNoteService } from '../../entity/delivery-note-service/delivery-note.service';
@@ -46,6 +44,8 @@ import { DeliveryNoteCreatedEvent } from '../../events/delivery-note-created/del
 import { CreateDeliveryNoteDto } from '../../entity/delivery-note-service/create-delivery-note.dto';
 import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delivery-note-job.service';
+import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
+import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
   constructor(
@@ -54,6 +54,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     private readonly clientToken: ClientTokenManagerService,
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly deliveryNoteService: DeliveryNoteService,
+    private readonly serialBatchService: SerialBatchService,
     private readonly deliveryNoteJobService: DeliveryNoteJobService,
   ) {
     super();
@@ -120,6 +121,54 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     );
   }
 
+  batchDeliveryNoteItems(
+    deliveryNoteBody: CreateDeliveryNoteInterface,
+    sales_invoice_name: string,
+    settings: ServerSettings,
+    token: any,
+  ) {
+    return this.serialBatchService
+      .batchItems(deliveryNoteBody.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
+      .pipe(
+        switchMap((itemBatch: any) => {
+          return this.batchAddToQueue(
+            itemBatch,
+            deliveryNoteBody,
+            token,
+            sales_invoice_name,
+            settings,
+          );
+        }),
+      )
+      .subscribe({
+        next: success => {
+          success;
+        },
+        error: err => {},
+      });
+  }
+
+  batchAddToQueue(itemBatch, payload, token, sales_invoice_name, settings) {
+    payload.items = [];
+    return from(itemBatch).pipe(
+      concatMap(item => {
+        payload.items = [item];
+        return from(
+          this.deliveryNoteJobService.addToQueueNow({
+            payload,
+            token,
+            sales_invoice_name,
+            settings,
+          }),
+        );
+      }),
+      retry(3),
+      switchMap(success => {
+        return of();
+      }),
+    );
+  }
+
   createDeliveryNote(assignPayload: AssignSerialDto, clientHttpRequest) {
     return this.settingsService
       .find()
@@ -136,17 +185,18 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
             .then(success => {})
             .catch(error => {});
           const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
-          this.deliveryNoteJobService.addToQueueNow({
-            payload: deliveryNoteBody,
-            sales_invoice_name: assignPayload.sales_invoice_name,
+          this.batchDeliveryNoteItems(
+            deliveryNoteBody,
+            assignPayload.sales_invoice_name,
             settings,
-            token: clientHttpRequest.token,
-          });
-          return of(deliveryNoteBody);
+            clientHttpRequest.token,
+          );
+          // return of(deliveryNoteBody);
+          return throwError(new BadRequestException('retry'));
         }),
       )
       .pipe(
-        switchMap(response => {
+        switchMap((response: any) => {
           const delivered_items_map = {};
 
           response.items.forEach(item => {
@@ -210,26 +260,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     Object.assign(deliveryNoteBody, assignPayload);
     deliveryNoteBody.docstatus = 1;
     deliveryNoteBody.is_return = false;
-    deliveryNoteBody.items = this.mapSerialsFromItem(
-      assignPayload.items,
-      assignPayload,
-    );
     return deliveryNoteBody;
-  }
-
-  mapSerialsFromItem(
-    items: CreateDeliveryNoteItemInterface[],
-    assignPayload: AssignSerialDto,
-  ) {
-    items.filter(element => {
-      element.against_sales_invoice = assignPayload.sales_invoice_name;
-      if (element.has_serial_no) {
-        element.serial_no = element.serial_no.join('\n');
-      } else {
-        delete element.serial_no;
-      }
-    });
-    return items;
   }
 
   addDeliveryNote(payload: CreateDeliveryNoteDto) {
