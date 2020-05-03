@@ -27,6 +27,7 @@ import { PurchaseReceipt } from '../purchase-receipt/entity/purchase-receipt.ent
 import { PurchaseOrder } from '../purchase-order/entity/purchase-order/purchase-order.entity';
 import { StockEntry } from '../stock-entry/stock-entry/stock-entry.entity';
 import { Problem } from '../problem/entity/problem/problem-entity';
+import { AgendaJob } from '../job-queue/entities/agenda-job/agenda-job.entity';
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
 
@@ -58,6 +59,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       ErrorLog,
       PurchaseOrder,
       Problem,
+      AgendaJob,
     ],
     useNewUrlParser: true,
     w: 'majority',
