@@ -12,8 +12,8 @@ export class JobQueueAggregateService {
     private readonly job: AgendaJobService,
   ) {}
 
-  async list(skip, take, sort, filter) {
-    return await this.job.list(Number(skip), Number(take), sort, filter);
+  async list(skip, take, sort, filter, token) {
+    return await this.job.list(Number(skip), Number(take), sort, token, filter);
   }
 
   async create(jobId: string) {

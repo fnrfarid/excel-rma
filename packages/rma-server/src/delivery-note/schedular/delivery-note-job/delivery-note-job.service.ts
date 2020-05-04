@@ -5,6 +5,7 @@ import {
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
   CREATE_DELIVERY_NOTE_JOB,
+  AGENDA_JOB_STATUS,
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
@@ -224,8 +225,12 @@ export class DeliveryNoteJobService {
     settings: ServerSettings;
     sales_invoice_name: string;
     type?: string;
+    parent?: string;
+    status?: string;
   }) {
     data.type = CREATE_DELIVERY_NOTE_JOB;
+    data.parent = data.sales_invoice_name;
+    data.status = AGENDA_JOB_STATUS.in_queue;
     data.payload.items.forEach(element => {
       if (typeof element.serial_no !== 'string') {
         try {

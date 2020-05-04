@@ -129,3 +129,19 @@ export const STOCK_ENTRY_LIST_ITEM_SELECT_KEYS = [
   'transfer_qty',
   'transferWarehouse',
 ];
+// following fields would be listed in API for job_queue/v1/list.
+export const FRAPPE_JOB_SELECT_FIELDS = [
+  'name',
+  'data.status',
+  'data.parent',
+  'data.payload',
+  'data.token.fullName',
+  'data.sales_invoice_name',
+  'data.type',
+];
+export const AGENDA_JOB_STATUS = {
+  success: 'Successful',
+  fail: 'Failed',
+  in_queue: 'In Queue',
+  reset: 'Reset',
+};
