@@ -1,6 +1,17 @@
 <form (ngSubmit)="onSubmit()">
-  <div class="mat-subheading-2" class="ion-text-capitalize">
-    Purchase Warranty Days
+  <div
+    class="mat-subheading-2"
+    class="ion-text-capitalize"
+    *ngIf="column === 'purchase'"
+  >
+    Purchase Warranty Months
+  </div>
+  <div
+    class="mat-subheading-2"
+    class="ion-text-capitalize"
+    *ngIf="column === 'sales'"
+  >
+    Sales Warranty Months
   </div>
   <mat-form-field>
     <input

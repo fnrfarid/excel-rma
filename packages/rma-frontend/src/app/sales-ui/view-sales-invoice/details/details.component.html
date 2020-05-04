@@ -194,13 +194,7 @@
               type="text"
               value="{{ salesInvoiceDetails?.status }}"
               placeholder="Status"
-              [ngStyle]="{
-                color:
-                  (salesInvoiceDetails?.status === 'To Deliver' ||
-                    salesInvoiceDetails?.status === 'Completed') === true
-                    ? 'green'
-                    : 'red'
-              }"
+              [ngStyle]="getStatusColor(salesInvoiceDetails?.status)"
             ></ion-input>
           </ion-item>
         </ion-col>
