@@ -6,6 +6,7 @@ import {
   Get,
   Query,
   Param,
+  Req,
 } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { JobQueueListQueryDto } from '../../../constants/listing-dto/job-queue-list-query.dto';
@@ -29,14 +30,20 @@ export class JobQueueController {
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  async list(@Query() query: JobQueueListQueryDto) {
-    const { offset, limit, sort, filter_query } = query;
+  async list(@Query() query: JobQueueListQueryDto, @Req() req) {
+    const { offset = 0, limit = 10, sort, filter_query } = query;
     let filter = {};
     try {
       filter = JSON.parse(filter_query);
     } catch {
       filter;
     }
-    return await this.aggregate.list(offset, limit, sort, filter_query);
+    return await this.aggregate.list(
+      offset,
+      limit,
+      sort,
+      filter_query,
+      req.token,
+    );
   }
 }
