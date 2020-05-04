@@ -76,6 +76,15 @@ export class SalesPage implements OnInit {
   toDateFormControl = new FormControl();
   singleDateFormControl = new FormControl();
   sortQuery: any = {};
+  statusColor = {
+    Draft: 'blue',
+    'To Deliver': '#4d2500',
+    Completed: 'green',
+    Rejected: 'red',
+    Submitted: '#4d2500',
+    Canceled: 'red',
+  };
+
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
@@ -302,5 +311,9 @@ export class SalesPage implements OnInit {
       this.campaign = campaign;
       this.setFilter();
     }
+  }
+
+  getStatusColor(status: string) {
+    return { color: this.statusColor[status] };
   }
 }

@@ -240,7 +240,7 @@ export class AddSalesReturnPage implements OnInit {
         this.customerFormControl.setValue(res.customer);
         this.branchFormControl.setValue(res.territory);
         this.warehouseFormControl.setValue(res.delivery_warehouse);
-        this.postingDateFormControl.setValue(new Date(res.posting_date));
+        this.postingDateFormControl.setValue(new Date());
         this.dueDateFormControl.setValue(new Date(res.due_date));
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
@@ -462,7 +462,7 @@ export class AddSalesReturnPage implements OnInit {
       serialItem.item_code = item_code;
       for (const item of this.serialDataSource.data()) {
         if (item_code === item.item_code && item.serial_no) {
-          serialItem.rate = 0 - item.rate;
+          serialItem.rate = item.rate;
           serialItem.qty -= item.qty;
           serialItem.amount += item.qty * item.rate;
           serialItem.serial_no.push(...item.serial_no);

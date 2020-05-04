@@ -34,6 +34,7 @@ import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 import { SyncModule } from './sync/sync.module';
 import { StockEntryModule } from './stock-entry/stock-entry.module';
 import { ProblemModule } from './problem/problem.module';
+import { JobQueueModule } from './job-queue/job-queue.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { ProblemModule } from './problem/problem.module';
     PurchaseOrderModule,
     SyncModule,
     ProblemModule,
+    JobQueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],

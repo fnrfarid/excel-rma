@@ -271,20 +271,7 @@
             >Status</mat-header-cell
           >
           <mat-cell *matCellDef="let row">
-            <ion-text
-              [ngStyle]="{
-                    color: 'green'
-                  }"
-              *ngIf="row.status === 'To Deliver' || row.status === 'Completed' "
-            >
-              {{row.status}}
-            </ion-text>
-            <ion-text
-              *ngIf="row.status === 'Draft' || row.status === 'Rejected' || row.status === 'Canceled' "
-              [ngStyle]="{
-                    color: 'red'
-                  }"
-            >
+            <ion-text [ngStyle]="getStatusColor(row.status)">
               {{row.status}}
             </ion-text>
           </mat-cell>
