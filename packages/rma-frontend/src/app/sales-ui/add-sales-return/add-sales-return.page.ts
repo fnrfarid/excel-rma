@@ -240,7 +240,7 @@ export class AddSalesReturnPage implements OnInit {
         this.customerFormControl.setValue(res.customer);
         this.branchFormControl.setValue(res.territory);
         this.warehouseFormControl.setValue(res.delivery_warehouse);
-        this.postingDateFormControl.setValue(new Date(res.posting_date));
+        this.postingDateFormControl.setValue(new Date());
         this.dueDateFormControl.setValue(new Date(res.due_date));
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
