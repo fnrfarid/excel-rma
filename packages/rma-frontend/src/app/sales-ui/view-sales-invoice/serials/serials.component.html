@@ -313,6 +313,11 @@
 </ion-card>
 
 <ion-card *ngIf="salesInvoiceDetails && !disableDeliveredSerialsCard">
+
+  <div class="loading-shade" *ngIf="deliveredSerialsDataSource.loading$ | async">
+    <mat-progress-bar *ngIf="deliveredSerialsDataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+  </div>
+
   <ion-card-header style="padding-bottom: 0;">
     <ion-card-title>
       <ion-text color="tertiary">

@@ -67,6 +67,8 @@ export class DeliveredSerialsDataSource extends DataSource<DeliveredSerial> {
   length: number;
   offset: number;
 
+  loading$ = this.loadingSubject.asObservable();
+
   constructor(private readonly salesService: SalesService) {
     super();
   }
@@ -77,9 +79,11 @@ export class DeliveredSerialsDataSource extends DataSource<DeliveredSerial> {
 
   disconnect() {
     this.itemSubject.complete();
+    this.loadingSubject.complete();
   }
 
   loadItems(uuid: string, search?, pageIndex = 0, pageSize = 10) {
+    this.loadingSubject.next(true);
     this.salesService
       .getDeliveredSerials(uuid, search, pageIndex, pageSize)
       .pipe(
