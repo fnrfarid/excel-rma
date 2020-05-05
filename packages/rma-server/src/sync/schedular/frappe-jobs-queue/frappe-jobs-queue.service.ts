@@ -1,7 +1,10 @@
 import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import { FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
+import {
+  FRAPPE_QUEUE_JOB,
+  AGENDA_JOB_STATUS,
+} from '../../../constants/app-strings';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { StockEntryJobService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
@@ -28,10 +31,11 @@ export class FrappeJobService implements OnModuleInit {
           .execute(job)
           .toPromise()
           .then(success => {
+            job.attr.data.status = AGENDA_JOB_STATUS.success;
             return done();
           })
           .catch(err => {
-            this[job.attrs.data.type].failureCallback(job);
+            job.attr.data.status = AGENDA_JOB_STATUS.fail;
             return done(this.getPureError(err));
           });
       },

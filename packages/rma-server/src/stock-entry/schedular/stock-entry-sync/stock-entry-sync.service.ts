@@ -25,7 +25,7 @@ export class StockEntryJobService {
     return this.createStockEntry(job.attrs.data);
   }
 
-  failureCallback(job) {
+  resetState(job) {
     this.updateStockEntryState(job.attrs.data.payload.uuid, {
       isSynced: false,
       inQueue: false,

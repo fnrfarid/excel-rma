@@ -19,7 +19,10 @@ import {
   CREATE_STOCK_ENTRY_JOB,
   ACCEPT_STOCK_ENTRY_JOB,
 } from '../../schedular/stock-entry-sync/stock-entry-sync.service';
-import { INVALID_FILE } from '../../../constants/app-strings';
+import {
+  INVALID_FILE,
+  AGENDA_JOB_STATUS,
+} from '../../../constants/app-strings';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 
 @Injectable()
@@ -39,7 +42,7 @@ export class StockEntryAggregateService {
         return from(this.stockEntryService.create(stockEntry)).pipe(
           switchMap(success => {
             payload.docstatus = 1;
-            this.batchQueueStockEntry(payload, req);
+            this.batchQueueStockEntry(payload, req, stockEntry.uuid);
             return of({});
           }),
         );
@@ -47,12 +50,18 @@ export class StockEntryAggregateService {
     );
   }
 
-  batchQueueStockEntry(payload: StockEntryDto, req) {
+  batchQueueStockEntry(payload: StockEntryDto, req, uuid: string) {
     this.serialBatchService
       .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
       .pipe(
         switchMap((itemBatch: any) => {
-          this.batchAddToQueue(itemBatch, payload, req, CREATE_STOCK_ENTRY_JOB);
+          this.batchAddToQueue(
+            itemBatch,
+            payload,
+            req,
+            CREATE_STOCK_ENTRY_JOB,
+            uuid,
+          );
           return of({});
         }),
       )
@@ -62,13 +71,15 @@ export class StockEntryAggregateService {
       });
   }
 
-  batchAddToQueue(itemBatch, payload, req, type) {
+  batchAddToQueue(itemBatch, payload, req, type, parentUuid: string) {
     payload.items = [];
     from(itemBatch)
       .pipe(
         concatMap(item => {
           payload.items = [item];
-          return from(this.addToQueueNow({ payload, token: req.token, type }));
+          return from(
+            this.addToQueueNow({ payload, token: req.token, type }, parentUuid),
+          );
         }),
         retry(3),
         switchMap(success => {
@@ -96,7 +107,18 @@ export class StockEntryAggregateService {
     return stockEntry;
   }
 
-  addToQueueNow(data: { payload: any; token: any; type: string }) {
+  addToQueueNow(
+    data: {
+      payload: any;
+      token: any;
+      type: string;
+      parent?: string;
+      status?: string;
+    },
+    parentUuid: string,
+  ) {
+    data.parent = parentUuid;
+    data.status = AGENDA_JOB_STATUS.in_queue;
     return this.agenda.now(FRAPPE_QUEUE_JOB, data);
   }
 
@@ -160,6 +182,7 @@ export class StockEntryAggregateService {
                 payload,
                 req,
                 ACCEPT_STOCK_ENTRY_JOB,
+                stockEntry.uuid,
               );
               return of({});
             }),

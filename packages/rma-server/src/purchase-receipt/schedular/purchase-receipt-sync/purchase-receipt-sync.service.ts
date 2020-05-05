@@ -13,6 +13,7 @@ import {
 import {
   VALIDATE_AUTH_STRING,
   FRAPPE_QUEUE_JOB,
+  AGENDA_JOB_STATUS,
 } from '../../../constants/app-strings';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { FRAPPE_API_INSERT_MANY } from '../../../constants/routes';
@@ -44,7 +45,12 @@ export class PurchaseReceiptSyncService {
     return this.createPurchaseReceipt(job.attrs.data);
   }
 
-  failureCallback(job) {
+  resetState(job: {
+    payload: any;
+    token: any;
+    settings: any;
+    purchase_invoice_name: string;
+  }) {
     return;
   }
 
@@ -270,6 +276,8 @@ export class PurchaseReceiptSyncService {
     settings: any;
     purchase_invoice_name: string;
     type?: string;
+    parent?: string;
+    status?: string;
   }) {
     data.type = CREATE_PURCHASE_RECEIPT_JOB;
     for (const element of data.payload) {
@@ -279,6 +287,8 @@ export class PurchaseReceiptSyncService {
         } catch {}
       }
     }
+    data.parent = data.purchase_invoice_name;
+    data.status = AGENDA_JOB_STATUS.in_queue;
     this.agenda
       .now(FRAPPE_QUEUE_JOB, data)
       .then(success => {})

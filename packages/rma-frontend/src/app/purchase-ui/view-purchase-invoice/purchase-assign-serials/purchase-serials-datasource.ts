@@ -11,6 +11,8 @@ export class PurchasedSerialsDataSource extends DataSource<DeliveredSerial> {
   length: number;
   offset: number;
 
+  loading$ = this.loadingSubject.asObservable();
+
   constructor(private purchaseService: PurchaseService) {
     super();
   }
@@ -20,9 +22,11 @@ export class PurchasedSerialsDataSource extends DataSource<DeliveredSerial> {
   }
   disconnect() {
     this.itemSubject.complete();
+    this.loadingSubject.complete();
   }
 
   loadItems(purchase_receipt_names, search?, pageIndex = 0, pageSize = 10) {
+    this.loadingSubject.next(true);
     this.purchaseService
       .getDeliveredSerials(purchase_receipt_names, search, pageIndex, pageSize)
       .pipe(
