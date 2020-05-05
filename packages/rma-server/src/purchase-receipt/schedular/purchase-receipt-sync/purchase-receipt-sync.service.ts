@@ -45,7 +45,12 @@ export class PurchaseReceiptSyncService {
     return this.createPurchaseReceipt(job.attrs.data);
   }
 
-  failureCallback(job) {
+  resetState(job: {
+    payload: any;
+    token: any;
+    settings: any;
+    purchase_invoice_name: string;
+  }) {
     return;
   }
 

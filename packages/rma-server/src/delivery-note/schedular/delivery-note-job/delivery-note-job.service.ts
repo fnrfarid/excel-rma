@@ -40,7 +40,12 @@ export class DeliveryNoteJobService {
     return this.createDeliveryNote(job.attrs.data);
   }
 
-  failureCallback(job) {
+  resetState(job: {
+    payload: CreateDeliveryNoteInterface;
+    token: any;
+    settings: ServerSettings;
+    sales_invoice_name: string;
+  }) {
     return;
   }
 
