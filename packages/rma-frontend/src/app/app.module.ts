@@ -24,11 +24,13 @@ import { TimeService } from './api/time/time.service';
 import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
 import { CsvJsonService } from './api/csv-json/csv-json.service';
 import { ProblemUiModule } from './problem-ui/problem-ui.module';
+import { JobModule } from './job-ui/job-ui.module';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
+    JobModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,

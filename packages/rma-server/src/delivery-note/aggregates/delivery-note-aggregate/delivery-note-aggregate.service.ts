@@ -191,8 +191,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
             settings,
             clientHttpRequest.token,
           );
-          // return of(deliveryNoteBody);
-          return throwError(new BadRequestException('retry'));
+          return of(deliveryNoteBody);
         }),
       )
       .pipe(
