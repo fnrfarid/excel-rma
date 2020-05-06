@@ -31,11 +31,11 @@ export class FrappeJobService implements OnModuleInit {
           .execute(job)
           .toPromise()
           .then(success => {
-            job.attr.data.status = AGENDA_JOB_STATUS.success;
+            job.attrs.data.status = AGENDA_JOB_STATUS.success;
             return done();
           })
           .catch(err => {
-            job.attr.data.status = AGENDA_JOB_STATUS.fail;
+            job.attrs.data.status = AGENDA_JOB_STATUS.fail;
             return done(this.getPureError(err));
           });
       },
