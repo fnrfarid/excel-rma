@@ -65,6 +65,10 @@ export class DeliveryNoteItemDto {
 
   @IsNotEmpty()
   @IsString()
+  against_sales_invoice: string;
+
+  @IsNotEmpty()
+  @IsString()
   warranty_date: string;
 
   @IsNotEmpty()
