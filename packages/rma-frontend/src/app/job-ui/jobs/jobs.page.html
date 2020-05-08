@@ -4,6 +4,55 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <h1 class="ion-text-center">Coming Soon...</h1>
+<ion-content class="page-background">
+  <ion-card>
+    <ion-card-content>
+      <div class="example-container full-width-table">
+        <table mat-table [dataSource]="dataSource">
+          <!-- Position Column -->
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{element.name}}</mat-cell>
+          </ng-container>
+
+          <!-- Weight Column -->
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+            <mat-cell *matCellDef="let element"
+              >{{element.data.status}}</mat-cell
+            >
+          </ng-container>
+
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="parent">
+            <mat-header-cell *matHeaderCellDef>Parent</mat-header-cell>
+            <mat-cell *matCellDef="let element"
+              >{{element.data.parent}}</mat-cell
+            >
+          </ng-container>
+
+          <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{element.data.type}}
+            </mat-cell>
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </table>
+      </div>
+      <mat-card-actions>
+        <mat-paginator
+          #paginator
+          class="mat-paginator-sticky"
+          (page)="getUpdate($event)"
+          [length]="dataSource.length"
+          [pageSizeOptions]="[10, 50, 100, 500]"
+        >
+        </mat-paginator>
+      </mat-card-actions>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
