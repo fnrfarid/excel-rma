@@ -1,8 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MaterialModule } from '../material/material.module';
+import { JobsPageModule } from './jobs/jobs.module';
+import { JobsService } from './jobs/jobs.service';
 
 @NgModule({
   declarations: [],
-  imports: [CommonModule],
+  imports: [CommonModule, MaterialModule, JobsPageModule],
+  providers: [JobsService],
+  exports: [JobsPageModule],
 })
-export class JobModule {}
+export class JobUIModule {}
