@@ -198,7 +198,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
         switchMap((response: any) => {
           const delivered_items_map = {};
 
-          response.items.forEach(item => {
+          assignPayload.items.forEach(item => {
             delivered_items_map[item.item_code] = item.qty;
           });
 
