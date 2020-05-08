@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { JobsService } from './jobs.service';
+import { JobsDataSource } from './jobs-datasource';
 
 @Component({
   selector: 'app-jobs',
@@ -6,7 +8,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./jobs.page.scss'],
 })
 export class JobsPage implements OnInit {
-  constructor() {}
+  displayedColumns: string[] = ['name', 'status', 'parent', 'type'];
+  dataSource: JobsDataSource;
+  sort: string = '';
+  index: number = 0;
+  size: number = 10;
 
-  ngOnInit() {}
+  constructor(private readonly jobsService: JobsService) {}
+
+  ngOnInit() {
+    this.dataSource = new JobsDataSource(this.jobsService);
+    this.dataSource.loadItems(this.sort, this.index, this.size);
+  }
+  getUpdate(event) {
+    this.index = event.pageIndex;
+    this.size = event.pageSize;
+    this.dataSource.loadItems(this.sort, this.index, this.size);
+  }
 }

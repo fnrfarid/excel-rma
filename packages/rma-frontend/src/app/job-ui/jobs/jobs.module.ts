@@ -1,15 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
 import { JobsPageRoutingModule } from './jobs-routing.module';
 
 import { JobsPage } from './jobs.page';
+import { MaterialModule } from '../../material/material.module';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, JobsPageRoutingModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule,
+    ReactiveFormsModule,
+    JobsPageRoutingModule,
+    MaterialModule,
+  ],
   declarations: [JobsPage],
 })
 export class JobsPageModule {}
