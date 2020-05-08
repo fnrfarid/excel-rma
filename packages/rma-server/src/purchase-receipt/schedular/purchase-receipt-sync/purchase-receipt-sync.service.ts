@@ -46,12 +46,41 @@ export class PurchaseReceiptSyncService {
   }
 
   resetState(job: {
-    payload: any;
+    payload: PurchaseReceiptDto[];
     token: any;
-    settings: any;
+    settings: ServerSettings;
     purchase_invoice_name: string;
   }) {
-    return;
+    const item_hash = { serials : []}
+    return from(job.payload).pipe(
+      switchMap(purchaseReceipt =>{
+        return from(purchaseReceipt.items).pipe(
+          switchMap(item => {
+            if(item_hash[item.item_code]){
+              item_hash[item.item_code] += item.qty;
+            }else{
+              item_hash[item.item_code] = item.qty;
+            }
+            item.has_serial_no ? item_hash.serials.push(item.serial_no.split('/n')) :null;
+            return of(item_hash)
+          })
+        )
+      }),
+      switchMap(hash => {
+        const decrementQuery = {}
+        const item_codes = Object.keys(hash);
+        item_codes.forEach(code =>{
+          decrementQuery[`purchase_receipt_items_map.${hash[code]}`] =  -hash[code].qty;
+        })
+        return from(this.purchaseInvoiceService.updateOne(
+          {name :job.purchase_invoice_name},
+          { $inc : decrementQuery}
+          ))
+      }),
+      switchMap(done =>{
+        return from(this.serialNoService.deleteMany({serial_no : {$in : item_hash.serials}, warehouse : {$exists : false}}))
+      })
+    )
   }
 
   createPurchaseReceipt(job: {

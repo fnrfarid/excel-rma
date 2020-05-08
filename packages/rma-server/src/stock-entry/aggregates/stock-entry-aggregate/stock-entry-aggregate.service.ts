@@ -9,8 +9,8 @@ import {
   STOCK_ENTRY,
   FRAPPE_QUEUE_JOB,
   STOCK_ENTRY_SERIALS_BATCH_SIZE,
-  STOCK_ENTRY_IN_TRANSIT_STATUS,
   STOCK_ENTRY_DELIVERED_STATUS,
+  STOCK_ENTRY_STATUS,
 } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import * as Agenda from 'agenda';
@@ -100,7 +100,7 @@ export class StockEntryAggregateService {
     stockEntry.createdOn = payload.posting_date;
     stockEntry.createdByEmail = clientHttpRequest.token.email;
     stockEntry.createdBy = clientHttpRequest.token.fullName;
-    stockEntry.status = STOCK_ENTRY_IN_TRANSIT_STATUS;
+    stockEntry.status = STOCK_ENTRY_STATUS.in_transit;
     stockEntry.isSynced = false;
     stockEntry.inQueue = true;
     stockEntry.docstatus = 1;
@@ -168,7 +168,7 @@ export class StockEntryAggregateService {
         this.stockEntryService
           .updateOne(
             { uuid },
-            { $set: { status: STOCK_ENTRY_DELIVERED_STATUS } },
+            { $set: { status: STOCK_ENTRY_STATUS.delivered } },
           )
           .catch(err => {})
           .then(success => {});
