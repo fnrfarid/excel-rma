@@ -533,8 +533,10 @@ export class SerialsComponent implements OnInit {
           serialItem.amount += item.qty * item.rate;
           serialItem.warranty_date = item.warranty_date;
           serialItem.serial_no.push(...item.serial_no);
+          serialItem.against_sales_invoice = this.salesInvoiceDetails.name;
         }
       });
+
       assignSerial.total += serialItem.amount;
       assignSerial.total_qty += serialItem.qty;
       assignSerial.items.push(serialItem);
@@ -741,6 +743,7 @@ export interface SerialItem {
   rate: number;
   amount: number;
   serial_no: string[];
+  against_sales_invoice?: string;
 }
 
 export interface Item {

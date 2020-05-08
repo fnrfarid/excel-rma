@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateSalesReturnDto {
   @IsNotEmpty()
@@ -65,6 +65,10 @@ export class SalesReturnItemDto {
 
   @IsNotEmpty()
   amount: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  has_serial_no: number;
 
   @IsNotEmpty()
   against_sales_invoice: string;

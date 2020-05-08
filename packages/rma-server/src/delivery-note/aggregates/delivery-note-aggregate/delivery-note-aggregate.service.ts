@@ -164,7 +164,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
       }),
       retry(3),
       switchMap(success => {
-        return of();
+        return of(true);
       }),
     );
   }
@@ -191,7 +191,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
             settings,
             clientHttpRequest.token,
           );
-          return of(deliveryNoteBody);
+          return of({});
         }),
       )
       .pipe(
