@@ -46,10 +46,10 @@ export class JobsDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(sortOrder?, pageIndex = 0, pageSize = 10) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
     this.loadingSubject.next(true);
     this.jobService
-      .getJobsList(sortOrder, pageIndex, pageSize)
+      .getJobsList(sortOrder, pageIndex, pageSize, query)
       .pipe(
         map((res: ListResponse) => {
           this.data = res.docs;
