@@ -22,17 +22,8 @@ import {
   toArray,
 } from 'rxjs/operators';
 import { throwError, of, Observable, from } from 'rxjs';
+import { FRAPPE_API_GET_DOCTYPE_COUNT } from '../../../constants/routes';
 import {
-  FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT,
-  FRAPPE_API_GET_DOCTYPE_COUNT,
-} from '../../../constants/routes';
-import {
-  AUTHORIZATION,
-  BEARER_HEADER_VALUE_PREFIX,
-  CONTENT_TYPE,
-  APP_WWW_FORM_URLENCODED,
-  ACCEPT,
-  APPLICATION_JSON_CONTENT_TYPE,
   COMPLETED_STATUS,
   PURCHASE_RECEIPT_SERIALS_BATCH_SIZE,
   FRAPPE_INSERT_MANY_BATCH_COUNT,
@@ -87,36 +78,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               if (!settings.authServerURL) {
                 return throwError(new NotImplementedException());
               }
-              const { body, item_count } = this.mapPurchaseInvoiceReceipt(
+              const { body } = this.mapPurchaseInvoiceReceipt(
                 purchaseInvoicePayload,
               );
-              return item_count < 20
-                ? this.validateFrappeSerials(
-                    settings,
-                    body,
-                    clientHttpRequest,
-                  ).pipe(
-                    switchMap(isValid => {
-                      return isValid === true
-                        ? this.createFrappePurchaseReceipt(
-                            settings,
-                            body,
-                            clientHttpRequest,
-                            purchaseInvoicePayload.purchase_invoice_name,
-                          )
-                        : throwError(
-                            new BadRequestException(
-                              `Provided batch have ${isValid} serials that already exists`,
-                            ),
-                          );
-                    }),
-                  )
-                : this.batchPurchaseReceipt(
-                    settings,
-                    body,
-                    clientHttpRequest,
-                    purchaseInvoicePayload.purchase_invoice_name,
-                  );
+              return this.batchPurchaseReceipt(
+                settings,
+                body,
+                clientHttpRequest,
+                purchaseInvoicePayload.purchase_invoice_name,
+              );
             }),
             catchError(err => {
               if (err.response && err.response.data) {
@@ -191,6 +161,9 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
   createFrappeSerials(createSerialsBatch, body: PurchaseReceiptDto) {
     const keys = Object.keys(createSerialsBatch);
+    if (keys.length === 0) {
+      return of(true);
+    }
     return from(keys).pipe(
       mergeMap(item_code => {
         return this.mapItemsCodeToSerials(
@@ -258,63 +231,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     return { serials, createSerialsBatch };
   }
 
-  createFrappePurchaseReceipt(
-    settings: ServerSettings,
-    payload: PurchaseReceiptDto,
-    clientHttpRequest,
-    purchase_invoice_name: string,
-  ) {
-    return from(
-      this.purchaseOrderService.findOne({ purchase_invoice_name }),
-    ).pipe(
-      switchMap(purchaseOrder => {
-        if (!purchaseOrder) {
-          return throwError(
-            new BadRequestException(
-              'Purchase Order not found for provided invoice.',
-            ),
-          );
-        }
-        payload.items.filter(item => {
-          item.purchase_order = purchaseOrder.name;
-          if (!item.has_serial_no) {
-            delete item.serial_no;
-          }
-        });
-        return this.http
-          .post(
-            settings.authServerURL + FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT,
-            payload,
-            {
-              headers: {
-                [AUTHORIZATION]:
-                  BEARER_HEADER_VALUE_PREFIX +
-                  clientHttpRequest.token.accessToken,
-                [CONTENT_TYPE]: APP_WWW_FORM_URLENCODED,
-                [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
-              },
-            },
-          )
-          .pipe(
-            map(data => data.data.data),
-            switchMap((purchaseReceipt: PurchaseReceiptResponseInterface) => {
-              this.updatePurchaseReceiptItemsMap(
-                purchase_invoice_name,
-                payload,
-              );
-              this.linkPurchaseInvoice(
-                purchaseReceipt,
-                purchase_invoice_name,
-                clientHttpRequest,
-              );
-              this.linkPurchaseWarranty(payload, settings);
-              return of({});
-            }),
-          );
-      }),
-    );
-  }
-
   linkPurchaseWarranty(payload: PurchaseReceiptDto, settings: ServerSettings) {
     payload.items.forEach(item => {
       if (!item.has_serial_no) {
@@ -353,9 +269,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
     return from(this.createFrappeSerials(batch.createSerialsBatch, body))
       .pipe(
-        switchMap(data => {
-          return of(true);
-        }),
         switchMap(success => {
           this.createBatchedPurchaseReceipts(
             settings,
@@ -460,9 +373,9 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         if (!item.has_serial_no) {
           const receiptItem = new PurchaseReceiptItemDto();
           Object.assign(receiptItem, item);
-          receiptItem.serial_no = undefined;
+          delete receiptItem.serial_no;
           purchaseReceipts.push(receiptItem);
-          return;
+          continue;
         }
 
         const remainder = item.qty % PURCHASE_RECEIPT_SERIALS_BATCH_SIZE;
