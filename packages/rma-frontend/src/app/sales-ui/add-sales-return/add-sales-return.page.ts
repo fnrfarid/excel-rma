@@ -240,7 +240,7 @@ export class AddSalesReturnPage implements OnInit {
         this.customerFormControl.setValue(res.customer);
         this.branchFormControl.setValue(res.territory);
         this.warehouseFormControl.setValue(res.delivery_warehouse);
-        this.postingDateFormControl.setValue(new Date(res.posting_date));
+        this.postingDateFormControl.setValue(new Date());
         this.dueDateFormControl.setValue(new Date(res.due_date));
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
@@ -440,6 +440,8 @@ export class AddSalesReturnPage implements OnInit {
   }
 
   submitSalesReturn() {
+    if (!this.validateState()) return;
+
     const salesReturn = {} as SalesReturn;
     salesReturn.company = this.salesInvoiceDetails.company;
     salesReturn.contact_email = this.salesInvoiceDetails.contact_email;
@@ -462,9 +464,10 @@ export class AddSalesReturnPage implements OnInit {
       serialItem.item_code = item_code;
       for (const item of this.serialDataSource.data()) {
         if (item_code === item.item_code && item.serial_no) {
-          serialItem.rate = 0 - item.rate;
+          serialItem.rate = item.rate;
           serialItem.qty -= item.qty;
           serialItem.amount += item.qty * item.rate;
+          serialItem.has_serial_no = item.has_serial_no;
           serialItem.serial_no.push(...item.serial_no);
         }
       }
@@ -557,6 +560,28 @@ export class AddSalesReturnPage implements OnInit {
             })
         : (this.csvFileInput.nativeElement.value = '');
     };
+  }
+
+  validateState() {
+    const data = this.serialDataSource.data();
+    let isValid = true;
+    let index = 0;
+    for (const item of data) {
+      index++;
+
+      if (
+        !item.serial_no ||
+        !item.serial_no.length ||
+        item.serial_no[0] === ''
+      ) {
+        isValid = false;
+        this.getMessage(
+          `Serial No empty for ${item.item_name} at position ${index}, please add a Serial No`,
+        );
+        break;
+      }
+    }
+    return isValid;
   }
 
   validateJson(json: CsvJsonObj) {
@@ -677,5 +702,6 @@ export interface SerialReturnItem {
   item_name: string;
   amount: number;
   against_sales_invoice: string;
+  has_serial_no: number;
   serial_no: any;
 }

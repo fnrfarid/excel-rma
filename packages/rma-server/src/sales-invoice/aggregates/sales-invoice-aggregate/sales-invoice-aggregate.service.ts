@@ -45,7 +45,6 @@ import { ErrorLogService } from '../../../error-log/error-log-service/error-log.
 import { DateTime } from 'luxon';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -321,7 +320,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             );
             const deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
-            this.http
+            return this.http
               .post(
                 settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
                 deliveryNote,
@@ -335,9 +334,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   },
                 },
               )
-              .pipe(map(data => data.data.data))
-              .subscribe({
-                next: (response: DeliveryNoteWebhookDto) => {
+              .pipe(
+                map(data => data.data.data),
+                switchMap((response: DeliveryNoteWebhookDto) => {
                   const items = this.mapSerialsFromItem(response.items);
 
                   const returned_items_map = this.getReturnedItemsMap(
@@ -355,17 +354,18 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                     { uuid: salesInvoice.uuid },
                     { $set: { returned_items_map } },
                   );
-                },
-                error: err => {
+                  return of({});
+                }),
+                catchError(err => {
                   this.errorLogService.createErrorLog(
                     err,
                     'Delivery Note',
                     'deliveryNote',
                     clientHttpRequest,
                   );
-                },
-              });
-            return of({});
+                  return throwError(err);
+                }),
+              );
           }),
         );
       }),

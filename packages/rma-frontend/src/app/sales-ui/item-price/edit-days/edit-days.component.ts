@@ -9,6 +9,9 @@ import { SatPopover } from '@ncstate/sat-popover';
 })
 export class EditDaysComponent implements OnInit {
   @Input()
+  column: string;
+
+  @Input()
   get value(): any {
     return this._value;
   }

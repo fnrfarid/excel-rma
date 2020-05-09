@@ -100,3 +100,4 @@ export const GET_PROBLEM_ENDPOINT = '/api/problem/v1/get';
 export const ADD_PROBLEM_ENDPOINT = '/api/problem/v1/create';
 export const UPDATE_PROBLEM_ENDPOINT = '/api/problem/v1/update';
 export const DELETE_PROBLEM_ENDPOINT = '/api/problem/v1/delete';
+export const JOB_QUEUE_LIST_ENDPOINT = '/api/job_queue/v1/list';

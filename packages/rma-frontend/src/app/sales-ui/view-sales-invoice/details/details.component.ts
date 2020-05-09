@@ -22,6 +22,14 @@ export class DetailsComponent implements OnInit {
   invoiceUuid: string;
   viewSalesInvoiceUrl: string;
   campaign: boolean;
+  statusColor = {
+    Draft: 'blue',
+    'To Deliver': '#4d2500',
+    Completed: 'green',
+    Rejected: 'red',
+    Submitted: '#4d2500',
+    Canceled: 'red',
+  };
 
   constructor(
     private readonly salesService: SalesService,
@@ -167,6 +175,10 @@ export class DetailsComponent implements OnInit {
     });
 
     await alert.present();
+  }
+
+  getStatusColor(status: string) {
+    return { color: this.statusColor[status] };
   }
 }
 

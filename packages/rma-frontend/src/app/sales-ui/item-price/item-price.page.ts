@@ -77,6 +77,7 @@ export class ItemPricePage implements OnInit {
   }
 
   updatePurchaseWarrantyMonths(row: ListingData, days: number) {
+    if (days == null) return;
     this.itemPriceService
       .setWarrantyMonths(row.uuid, { purchaseWarrantyMonths: days })
       .subscribe({
@@ -86,6 +87,8 @@ export class ItemPricePage implements OnInit {
   }
 
   updateSalesWarrantyMonths(row: ListingData, days: number) {
+    if (days == null) return;
+
     this.itemPriceService
       .setWarrantyMonths(row.uuid, { salesWarrantyMonths: days })
       .subscribe({
@@ -95,6 +98,8 @@ export class ItemPricePage implements OnInit {
   }
 
   updateMinPrice(row: ListingData, minPrice: number) {
+    if (minPrice == null) return;
+
     this.itemPriceService.setMinPrice(row.uuid, minPrice).subscribe({
       next: success => (row.minimumPrice = minPrice),
       error: error => {},

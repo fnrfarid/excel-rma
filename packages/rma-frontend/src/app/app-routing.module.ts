@@ -155,6 +155,11 @@ const routes: Routes = [
         m => m.ProblemPageModule,
       ),
   },
+  {
+    path: 'jobs',
+    loadChildren: () =>
+      import('./job-ui/jobs/jobs.module').then(m => m.JobsPageModule),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];

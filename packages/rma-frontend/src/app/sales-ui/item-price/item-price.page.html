@@ -124,7 +124,10 @@
               yAlign="start"
               (closed)="updateSalesWarrantyMonths(row, $event)"
             >
-              <edit-days [value]="row.salesWarrantyMonths"></edit-days>
+              <edit-days
+                column="sales"
+                [value]="row.salesWarrantyMonths"
+              ></edit-days>
             </sat-popover>
           </td>
         </ng-container>
@@ -154,7 +157,10 @@
               yAlign="start"
               (closed)="updatePurchaseWarrantyMonths(row, $event)"
             >
-              <edit-days [value]="row.purchaseWarrantyMonths"></edit-days>
+              <edit-days
+                column="purchase"
+                [value]="row.purchaseWarrantyMonths"
+              ></edit-days>
             </sat-popover>
           </td>
         </ng-container>

@@ -164,7 +164,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
       }),
       retry(3),
       switchMap(success => {
-        return of();
+        return of(true);
       }),
     );
   }
@@ -191,15 +191,14 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
             settings,
             clientHttpRequest.token,
           );
-          // return of(deliveryNoteBody);
-          return throwError(new BadRequestException('retry'));
+          return of({});
         }),
       )
       .pipe(
         switchMap((response: any) => {
           const delivered_items_map = {};
 
-          response.items.forEach(item => {
+          assignPayload.items.forEach(item => {
             delivered_items_map[item.item_code] = item.qty;
           });
 

@@ -372,7 +372,9 @@ export class SalesService {
     const params = new HttpParams({
       fromObject: {
         fields: '["*"]',
-        filters: filter ? filter : `[["name","like","%${value}%"]]`,
+        filters: filter
+          ? filter
+          : `[["name","like","%${value}%"],["is_group","=",0]]`,
       },
     });
     return this.getHeaders().pipe(
