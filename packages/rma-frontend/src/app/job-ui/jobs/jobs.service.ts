@@ -20,7 +20,7 @@ export class JobsService {
   ) {}
 
   getJobsList(sortOrder, pageNumber = 0, pageSize = 10, query?) {
-    if (!sortOrder) sortOrder = { created_on: 'desc' };
+    if (!sortOrder) sortOrder = { _id: -1 };
 
     try {
       sortOrder = JSON.stringify(sortOrder);
@@ -32,7 +32,8 @@ export class JobsService {
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('sort', sortOrder);
+      .set('sort', sortOrder)
+      .set('filter_query', JSON.stringify(query));
 
     return this.getHeaders().pipe(
       switchMap(headers => {
