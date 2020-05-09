@@ -1,48 +1,99 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>Jobs</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="page-background">
   <ion-card>
-    <ion-card-content>
-      <div class="example-container full-width-table">
-        <table mat-table [dataSource]="dataSource">
-          <!-- Position Column -->
-          <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-            <mat-cell *matCellDef="let element">{{element.name}}</mat-cell>
-          </ng-container>
+    <ion-card-header>
+      <ion-row class="align">
+        <ion-col>
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Background Jobs
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+      </ion-row>
+    </ion-card-header>
+    <div class="loading-shade" *ngIf="dataSource.loading$ | async">
+      <mat-progress-bar *ngIf="dataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+    </div>
 
-          <!-- Weight Column -->
-          <ng-container matColumnDef="status">
-            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-            <mat-cell *matCellDef="let element"
-              >{{element.data.status}}</mat-cell
-            >
-          </ng-container>
+    <ion-card-content class="ion-no-padding">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                placeholder="Parent Name"
+                [(ngModel)]="name"
+                (keyup.enter)="setFilter()"
+              />
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <mat-label>Status</mat-label>
+              <mat-select
+                [(value)]="status"
+                (selectionChange)="statusChange($event.value)"
+              >
+                <mat-option
+                  *ngFor="let status of jobStatus"
+                  [value]="status"
+                >
+                  {{status}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 
-          <!-- Symbol Column -->
-          <ng-container matColumnDef="parent">
-            <mat-header-cell *matHeaderCellDef>Parent</mat-header-cell>
-            <mat-cell *matCellDef="let element"
-              >{{element.data.parent}}</mat-cell
-            >
-          </ng-container>
+      <table mat-table [dataSource]="dataSource">
+        <!-- Position Column -->
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.name}}</mat-cell>
+        </ng-container>
 
-          <ng-container matColumnDef="type">
-            <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-            <mat-cell *matCellDef="let element">
-              {{element.data.type}}
-            </mat-cell>
-          </ng-container>
-          <mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-        </table>
-      </div>
+        <!-- Weight Column -->
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.data.status}}</mat-cell>
+        </ng-container>
+
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="parent">
+          <mat-header-cell *matHeaderCellDef>Parent</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.data.parent}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="serials">
+          <mat-header-cell *matHeaderCellDef>serials</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            {{element.data.type==='CREATE_PURCHASE_RECEIPT_JOB'? getPurchaseSerialValue(element.data.payload) :getSerialValue(element.data.payload) }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            {{getCamelCase(element.data.type)}}
+          </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </table>
+
       <mat-card-actions>
         <mat-paginator
           #paginator

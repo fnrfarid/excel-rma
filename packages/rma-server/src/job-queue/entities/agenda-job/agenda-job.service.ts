@@ -31,7 +31,7 @@ export class AgendaJobService {
     filter_query?,
   ) {
     let sortQuery;
-
+    filter_query = this.getFilterQuery(filter_query);
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
@@ -51,10 +51,7 @@ export class AgendaJobService {
       jobFilter['data.token.email'] = token.email;
     }
 
-    const $and: any[] = [
-      filter_query ? this.getFilterQuery(filter_query) : {},
-      jobFilter,
-    ];
+    const $and: any[] = [jobFilter, filter_query];
 
     const selectFields: any = FRAPPE_JOB_SELECT_FIELDS;
 
@@ -76,14 +73,10 @@ export class AgendaJobService {
   }
 
   getFilterQuery(query) {
-    const keys = Object.keys(query);
-    keys.forEach(key => {
-      if (query[key]) {
-        query[key] = new RegExp(query[key], 'i');
-      } else {
-        delete query[key];
-      }
-    });
-    return query;
+    try {
+      return JSON.parse(query);
+    } catch {
+      return {};
+    }
   }
 }
