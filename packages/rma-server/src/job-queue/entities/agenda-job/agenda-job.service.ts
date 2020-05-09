@@ -35,15 +35,15 @@ export class AgendaJobService {
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
-      sortQuery = { createdOn: 'desc' };
+      sortQuery = { _id: 1 };
     }
 
-    for (const key of Object.keys(sortQuery)) {
-      sortQuery[key] = sortQuery[key].toUpperCase();
-      if (!sortQuery[key]) {
-        delete sortQuery[key];
-      }
-    }
+    // for (const key of Object.keys(sortQuery)) {
+    //   sortQuery[key] = sortQuery[key].toUpperCase();
+    //   if (!sortQuery[key]) {
+    //     delete sortQuery[key];
+    //   }
+    // }
 
     const jobFilter = { name: FRAPPE_QUEUE_JOB };
 

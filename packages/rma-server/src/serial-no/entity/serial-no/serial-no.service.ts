@@ -120,6 +120,10 @@ export class SerialNoService {
     return await this.serialNoRepository.deleteOne(query, options);
   }
 
+  async deleteMany(query, options?) {
+    return await this.serialNoRepository.deleteMany(query, options);
+  }
+
   async updateOne(query, options?) {
     return await this.serialNoRepository.updateOne(query, options);
   }

@@ -92,8 +92,11 @@ export const TO_DELIVER_STATUS = 'To Deliver';
 export const REJECTED_STATUS = 'Rejected';
 export const SUBMITTED_STATUS = 'Submitted';
 export const COMPLETED_STATUS = 'Completed';
-export const STOCK_ENTRY_IN_TRANSIT_STATUS = 'In transit';
-export const STOCK_ENTRY_DELIVERED_STATUS = 'Delivered';
+export const STOCK_ENTRY_STATUS = {
+  in_transit: 'In transit',
+  delivered: 'Delivered',
+  canceled: 'Canceled',
+};
 export const CANCELED_STATUS = 'Canceled';
 export const SALES_USER = 'Sales User';
 export const SALES_MANAGER = 'Sales Manager';

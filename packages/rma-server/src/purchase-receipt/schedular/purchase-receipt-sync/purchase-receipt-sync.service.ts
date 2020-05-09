@@ -9,6 +9,7 @@ import {
   retry,
   switchMap,
   concatMap,
+  toArray,
 } from 'rxjs/operators';
 import {
   VALIDATE_AUTH_STRING,
@@ -46,12 +47,57 @@ export class PurchaseReceiptSyncService {
   }
 
   resetState(job: {
-    payload: any;
-    token: any;
-    settings: any;
-    purchase_invoice_name: string;
+    data: {
+      payload: PurchaseReceiptDto[];
+      token: any;
+      settings: ServerSettings;
+      purchase_invoice_name: string;
+    };
   }) {
-    return;
+    const item_hash = { serials: [] };
+    return of({}).pipe(
+      switchMap(parent => {
+        return from(job.data.payload);
+      }),
+      switchMap(purchaseReceipt => {
+        return from(purchaseReceipt.items).pipe(
+          switchMap(item => {
+            if (item_hash[item.item_code]) {
+              item_hash[item.item_code] += item.qty;
+            } else {
+              item_hash[item.item_code] = item.qty;
+            }
+            item.has_serial_no
+              ? item_hash.serials.push(...item.serial_no.split('\n'))
+              : null;
+            return of({});
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(success => {
+        const decrementQuery = {};
+        const item_codes = Object.keys(item_hash);
+        item_codes.forEach(code => {
+          if (code === 'serials') {
+            return;
+          }
+          decrementQuery[`purchase_receipt_items_map.${code}`] = -item_hash[
+            code
+          ];
+        });
+        return from(
+          this.purchaseInvoiceService.updateOne(
+            { name: job.data.purchase_invoice_name },
+            { $inc: decrementQuery },
+          ),
+        );
+        // below query could be modified after removing ERP validations.
+        // switchMap(done =>{
+        //   return from(this.serialNoService.deleteMany({serial_no : {$in : item_hash.serials}, warehouse : {$exists : false}}))
+        // })
+      }),
+    );
   }
 
   createPurchaseReceipt(job: {
@@ -179,22 +225,6 @@ export class PurchaseReceiptSyncService {
       .insertMany(purchaseReceiptMany)
       .then(done => {})
       .catch(error => {});
-
-    purchaseReceiptMany.forEach(element => {
-      this.serialNoService
-        .updateMany(
-          { serial_no: { $in: element.serial_no } },
-          {
-            $set: {
-              warehouse: element.warehouse,
-              purchase_document_type: element.purchase_document_type,
-              purchase_document_no: element.purchase_document_no,
-            },
-          },
-        )
-        .then(done => {})
-        .catch(error => {});
-    });
   }
 
   updatePurchaseReceiptSerials(purchaseReceipts: PurchaseReceiptMetaData[]) {
@@ -214,7 +244,9 @@ export class PurchaseReceiptSyncService {
           }
         }),
         switchMap(({ serials, element }) => {
-          this.updateSerials(element, serials);
+          if (serials) {
+            this.updateSerials(element, serials);
+          }
           return of({});
         }),
       )
@@ -262,7 +294,9 @@ export class PurchaseReceiptSyncService {
       purchaseInvoiceReceiptItem.qty = item.qty;
       purchaseInvoiceReceiptItem.rate = item.rate;
       purchaseInvoiceReceiptItem.warehouse = item.warehouse;
-      purchaseInvoiceReceiptItem.serial_no = item.serial_no.split('\n');
+      if (item.serial_no) {
+        purchaseInvoiceReceiptItem.serial_no = item.serial_no.split('\n');
+      }
       purchaseInvoiceReceiptItem.deliveredBy = token.fullName;
       purchaseInvoiceReceiptItem.deliveredByEmail = token.email;
       purchaseReceiptItems.push(purchaseInvoiceReceiptItem);

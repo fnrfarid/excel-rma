@@ -229,7 +229,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
     if (!this.warehouseFormControl.value) {
       this.snackBar.open('Please select a warehouse.', CLOSE, {
-        duration: 200,
+        duration: 3000,
       });
       return;
     }
