@@ -14,14 +14,20 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class JobsPage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  displayedColumns: string[] = ['name', 'status', 'parent', 'serials', 'type'];
+  displayedColumns: string[] = [
+    'parent',
+    'failCount',
+    'serials',
+    'status',
+    'type',
+  ];
   dataSource: JobsDataSource;
   sort: string = '';
   index: number = 0;
   size: number = 10;
   name: string;
   status: string = 'Failed';
-  jobStatus = ['Successful', 'Failed', 'In Queue', 'Reset', 'All'];
+  jobStatus = ['Successful', 'Failed', 'In Queue', 'Reset', 'All', 'Retrying'];
   constructor(
     private readonly jobsService: JobsService,
     private location: Location,
@@ -43,15 +49,15 @@ export class JobsPage implements OnInit {
   }
 
   async viewSingleJob(row) {
-    if (row.data.status !== 'Failed') {
-      return;
+    if (row.data.status === 'Failed' || row.data.status === 'Retrying') {
+      const dialogRef = this.dialog.open(ViewSingleJobPage, {
+        width: '50%',
+        height: '50%',
+        data: row,
+      });
+      await dialogRef.afterClosed().toPromise();
     }
-    const dialogRef = this.dialog.open(ViewSingleJobPage, {
-      width: '50%',
-      height: '50%',
-      data: row,
-    });
-    await dialogRef.afterClosed().toPromise();
+    return;
   }
 
   getSerialValue(element: JobItem) {

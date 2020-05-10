@@ -4,7 +4,9 @@ import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider
 import {
   FRAPPE_QUEUE_JOB,
   AGENDA_JOB_STATUS,
+  AGENDA_MAX_RETRIES,
 } from '../../../constants/app-strings';
+import { DateTime } from 'luxon';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { StockEntryJobService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
@@ -35,11 +37,34 @@ export class FrappeJobService implements OnModuleInit {
             return done();
           })
           .catch(err => {
-            job.attrs.data.status = AGENDA_JOB_STATUS.fail;
+            job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
             return done(this.getPureError(err));
           });
       },
     );
+    this.agenda.on(`fail:${FRAPPE_QUEUE_JOB}`, (error, job) =>
+      this.onJobFailure(error, job),
+    );
+  }
+
+  async onJobFailure(error: any, job: Agenda.Job<any>) {
+    const retryCount = job.attrs.failCount - 1;
+    if (retryCount <= AGENDA_MAX_RETRIES) {
+      job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
+      job.attrs.nextRunAt = this.getExponentialBackOff(
+        retryCount,
+        job.attrs.data.settings.timeZone,
+      );
+    } else {
+      job.attrs.data.status = AGENDA_JOB_STATUS.fail;
+    }
+    await job.save();
+  }
+
+  getExponentialBackOff(retryCount: number, timeZone): Date {
+    const waitInSeconds =
+      Math.pow(retryCount, 4) + 15 + Math.random() * 30 * (retryCount + 1);
+    return new DateTime(timeZone).plus({ seconds: waitInSeconds }).toJSDate();
   }
 
   replaceErrors(keys, value) {

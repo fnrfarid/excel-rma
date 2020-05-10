@@ -73,17 +73,18 @@ export class AgendaJobService {
     };
   }
 
-  updateJobTokens(expiredToken, refreshedToken, _id) {
+  updateJobTokens(expiredToken, refreshedToken) {
     this.agendaJobRepository
       .updateMany(
         {
           'data.status': AGENDA_JOB_STATUS.in_queue,
           'data.token.accessToken': expiredToken,
-          _id: { $ne: _id },
         },
         { $set: { 'data.token.accessToken': refreshedToken } },
       )
-      .then(success => {})
+      .then(success => {
+        success;
+      })
       .catch(err => {});
   }
 

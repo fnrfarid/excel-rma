@@ -6,6 +6,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { StockEntryJobService } from './stock-entry-sync.service';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
+import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 
 describe('StockEntryJobService', () => {
   let service: StockEntryJobService;
@@ -17,6 +18,10 @@ describe('StockEntryJobService', () => {
         { provide: AGENDA_TOKEN, useValue: {} },
         {
           provide: DirectService,
+          useValue: {},
+        },
+        {
+          provide: AgendaJobService,
           useValue: {},
         },
         {
