@@ -135,6 +135,9 @@ export const STOCK_ENTRY_LIST_ITEM_SELECT_KEYS = [
 // following fields would be listed in API for job_queue/v1/list.
 export const FRAPPE_JOB_SELECT_FIELDS = [
   'name',
+  'failedAt',
+  'failCount',
+  'failReason',
   'data.status',
   'data.parent',
   'data.payload',

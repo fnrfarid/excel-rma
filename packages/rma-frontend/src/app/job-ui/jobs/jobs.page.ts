@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { JobsService } from './jobs.service';
+import { JobsService } from '../jobs-service/jobs.service';
 import { JobsDataSource } from './jobs-datasource';
 import * as _ from 'lodash';
 import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
+import { ViewSingleJobPage } from '../view-single-job/view-single-job.page';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-jobs',
@@ -23,6 +25,7 @@ export class JobsPage implements OnInit {
   constructor(
     private readonly jobsService: JobsService,
     private location: Location,
+    public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -37,6 +40,18 @@ export class JobsPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  async viewSingleJob(row) {
+    if (row.data.status !== 'Failed') {
+      return;
+    }
+    const dialogRef = this.dialog.open(ViewSingleJobPage, {
+      width: '50%',
+      height: '50%',
+      data: row,
+    });
+    await dialogRef.afterClosed().toPromise();
   }
 
   getSerialValue(element: JobItem) {

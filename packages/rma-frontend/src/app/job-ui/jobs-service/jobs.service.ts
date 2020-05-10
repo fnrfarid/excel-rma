@@ -7,7 +7,7 @@ import {
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
-} from '../../../app/constants/storage';
+} from '../../constants/storage';
 import { from } from 'rxjs';
 
 @Injectable({

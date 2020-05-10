@@ -16,6 +16,8 @@ export class JobQueueAggregateService {
     return await this.job.list(Number(skip), Number(take), sort, token, filter);
   }
 
+  retryJob(job) {}
+
   async create(jobId: string) {
     const _id = new ObjectId(jobId);
     const job = await this.job.findOne({ _id });

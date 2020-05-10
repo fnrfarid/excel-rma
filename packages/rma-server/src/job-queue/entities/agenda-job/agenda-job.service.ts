@@ -6,6 +6,7 @@ import {
   FRAPPE_QUEUE_JOB,
   SYSTEM_MANAGER,
   FRAPPE_JOB_SELECT_FIELDS,
+  AGENDA_JOB_STATUS,
 } from '../../../constants/app-strings';
 
 @Injectable()
@@ -70,6 +71,20 @@ export class AgendaJobService {
       length: await this.agendaJobRepository.count(where),
       offset: skip,
     };
+  }
+
+  updateJobTokens(expiredToken, refreshedToken, _id) {
+    this.agendaJobRepository
+      .updateMany(
+        {
+          'data.status': AGENDA_JOB_STATUS.in_queue,
+          'data.token.accessToken': expiredToken,
+          _id: { $ne: _id },
+        },
+        { $set: { 'data.token.accessToken': refreshedToken } },
+      )
+      .then(success => {})
+      .catch(err => {});
   }
 
   getFilterQuery(query) {
