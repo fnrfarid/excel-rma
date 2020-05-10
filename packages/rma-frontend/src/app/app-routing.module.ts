@@ -162,6 +162,13 @@ const routes: Routes = [
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
+  {
+    path: 'view-single-job',
+    loadChildren: () =>
+      import('./job-ui/view-single-job/view-single-job.module').then(
+        m => m.ViewSingleJobPageModule,
+      ),
+  },
 ];
 
 @NgModule({
