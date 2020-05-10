@@ -150,4 +150,6 @@ export const AGENDA_JOB_STATUS = {
   fail: 'Failed',
   in_queue: 'In Queue',
   reset: 'Reset',
+  retrying: 'Retrying',
 };
+export const AGENDA_MAX_RETRIES = 3;

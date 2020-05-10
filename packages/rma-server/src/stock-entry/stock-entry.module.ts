@@ -11,6 +11,7 @@ import { DirectModule } from '../direct/direct.module';
 import { StockEntryJobService } from './schedular/stock-entry-sync/stock-entry-sync.service';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 import { AcceptStockEntryJobService } from './schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
+import { JobQueueModule } from '../job-queue/job-queue.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AcceptStockEntryJobService } from './schedular/accept-stock-entry-sync/
     TypeOrmModule.forFeature([StockEntry]),
     SerialNoEntitiesModule,
     DirectModule,
+    JobQueueModule,
   ],
   controllers: [StockEntryController],
   providers: [

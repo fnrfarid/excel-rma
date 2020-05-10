@@ -6,10 +6,10 @@ import { of, throwError, Observable, from } from 'rxjs';
 import {
   mergeMap,
   catchError,
-  retry,
   switchMap,
   concatMap,
   toArray,
+  retry,
 } from 'rxjs/operators';
 import {
   VALIDATE_AUTH_STRING,
@@ -26,9 +26,9 @@ import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchas
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
 import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
+import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
-
 @Injectable()
 export class PurchaseReceiptSyncService {
   constructor(
@@ -40,6 +40,7 @@ export class PurchaseReceiptSyncService {
     private readonly purchaseReceiptService: PurchaseReceiptService,
     private readonly serialNoService: SerialNoService,
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
+    private readonly jobService: AgendaJobService,
   ) {}
 
   execute(job) {
@@ -131,6 +132,10 @@ export class PurchaseReceiptSyncService {
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
             mergeMap(token => {
+              this.jobService.updateJobTokens(
+                job.token.accessToken,
+                token.accessToken,
+              );
               job.token.accessToken = token.accessToken;
               return throwError(err);
             }),

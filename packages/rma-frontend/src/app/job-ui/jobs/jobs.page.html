@@ -61,9 +61,9 @@
 
       <table mat-table [dataSource]="dataSource" >
         <!-- Position Column -->
-        <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.name}}</mat-cell>
+        <ng-container matColumnDef="failCount">
+          <mat-header-cell *matHeaderCellDef>Retry Count</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{element.failCount || 0}}</mat-cell>
         </ng-container>
 
         <!-- Weight Column -->
