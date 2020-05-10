@@ -1,6 +1,6 @@
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, of } from 'rxjs';
-import { JobsService } from './jobs.service';
+import { JobsService } from '../jobs-service/jobs.service';
 import { map, catchError, finalize } from 'rxjs/operators';
 
 export interface ListingData {

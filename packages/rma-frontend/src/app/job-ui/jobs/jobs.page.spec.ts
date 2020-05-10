@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { JobsPage } from './jobs.page';
-import { JobsService } from './jobs.service';
+import { JobsService } from '../jobs-service/jobs.service';
 import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MaterialModule } from '../../material/material.module';

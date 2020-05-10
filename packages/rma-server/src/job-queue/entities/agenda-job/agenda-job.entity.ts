@@ -15,6 +15,15 @@ export class AgendaJob {
   data: any;
 
   @Column()
+  failedAt: any;
+
+  @Column()
+  failCount: any;
+
+  @Column()
+  failReason: any;
+
+  @Column()
   lastModifiedBy: Date;
 
   @Column()
