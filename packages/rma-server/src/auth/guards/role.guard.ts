@@ -48,7 +48,7 @@ export class RoleGuard implements CanActivate {
         }),
         retryWhen(errors =>
           errors.pipe(
-            delay(1500),
+            delay(500),
             take(3),
             concat(throwError(new NotFoundException())),
           ),

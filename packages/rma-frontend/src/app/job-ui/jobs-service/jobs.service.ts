@@ -21,6 +21,9 @@ export class JobsService {
 
   getJobsList(sortOrder, pageNumber = 0, pageSize = 10, query?) {
     if (!sortOrder) sortOrder = { _id: -1 };
+    if (query && query['data.status'] === 'Failed') {
+      sortOrder = { failedAt: -1 };
+    }
 
     try {
       sortOrder = JSON.stringify(sortOrder);

@@ -21,6 +21,7 @@ import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice
 import { FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
 import Agenda = require('agenda');
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
+import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
@@ -34,6 +35,7 @@ export class DeliveryNoteJobService {
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
     private readonly salesInvoiceService: SalesInvoiceService,
+    private readonly jobService: AgendaJobService,
   ) {}
 
   execute(job) {
@@ -76,6 +78,10 @@ export class DeliveryNoteJobService {
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
             mergeMap(token => {
+              this.jobService.updateJobTokens(
+                job.token.accessToken,
+                token.accessToken,
+              );
               job.token.accessToken = token.accessToken;
               return throwError(err);
             }),

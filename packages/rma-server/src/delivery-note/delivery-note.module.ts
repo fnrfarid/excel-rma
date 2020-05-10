@@ -12,6 +12,7 @@ import { DeliveryNoteEventManager } from './events';
 import { DeliveryNoteJobService } from './schedular/delivery-note-job/delivery-note-job.service';
 import { DirectModule } from '../direct/direct.module';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
+import { JobQueueModule } from '../job-queue/job-queue.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch
     SerialNoEntitiesModule,
     SalesInvoiceEntitiesModule,
     DirectModule,
+    JobQueueModule,
   ],
   controllers: [DeliveryNoteController, DeliveryNoteWebhookController],
   providers: [

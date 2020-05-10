@@ -65,7 +65,7 @@ export class TokenGuard implements CanActivate {
       }),
       retryWhen(errors =>
         errors.pipe(
-          delay(1000),
+          delay(200),
           take(3),
           concat(throwError(new NotFoundException())),
         ),

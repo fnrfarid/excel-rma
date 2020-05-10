@@ -7,6 +7,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
+import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 
 describe('PurchaseReceiptSyncService', () => {
   let service: PurchaseReceiptSyncService;
@@ -18,6 +19,10 @@ describe('PurchaseReceiptSyncService', () => {
         { provide: AGENDA_TOKEN, useValue: {} },
         {
           provide: DirectService,
+          useValue: {},
+        },
+        {
+          provide: AgendaJobService,
           useValue: {},
         },
         {

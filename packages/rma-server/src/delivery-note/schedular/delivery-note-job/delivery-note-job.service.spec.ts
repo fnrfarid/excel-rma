@@ -6,6 +6,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { DeliveryNoteJobService } from './delivery-note-job.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
+import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 
 describe('DeliveryNoteJobService', () => {
   let service: DeliveryNoteJobService;
@@ -17,6 +18,10 @@ describe('DeliveryNoteJobService', () => {
         { provide: AGENDA_TOKEN, useValue: {} },
         {
           provide: DirectService,
+          useValue: {},
+        },
+        {
+          provide: AgendaJobService,
           useValue: {},
         },
         {
