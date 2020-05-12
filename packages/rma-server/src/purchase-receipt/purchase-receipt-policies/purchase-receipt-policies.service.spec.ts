@@ -3,6 +3,8 @@ import { PurchaseReceiptPoliciesService } from './purchase-receipt-policies.serv
 import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
 import { PurchaseInvoiceService } from '../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseOrderService } from '../../purchase-order/entity/purchase-order/purchase-order.service';
+import { SettingsService } from '../../system-settings/aggregates/settings/settings.service';
+import { HttpService } from '@nestjs/common';
 
 describe('PurchaseReceiptPoliciesService', () => {
   let service: PurchaseReceiptPoliciesService;
@@ -21,6 +23,14 @@ describe('PurchaseReceiptPoliciesService', () => {
         },
         {
           provide: PurchaseOrderService,
+          useValue: {},
+        },
+        {
+          provide: SettingsService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
           useValue: {},
         },
       ],

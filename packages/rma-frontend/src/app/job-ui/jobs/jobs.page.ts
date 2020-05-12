@@ -55,7 +55,10 @@ export class JobsPage implements OnInit {
         height: '50%',
         data: row,
       });
-      await dialogRef.afterClosed().toPromise();
+      const response = await dialogRef.afterClosed().toPromise();
+      if (response) {
+        this.setFilter();
+      }
     }
     return;
   }

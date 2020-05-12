@@ -103,6 +103,7 @@ export class SettingsService extends AggregateRoot {
   getAuthorizationHeaders(token: TokenCache) {
     const headers: any = {};
     headers[AUTHORIZATION] = BEARER_HEADER_VALUE_PREFIX + token.accessToken;
+    headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
     return headers;
   }
 
