@@ -88,6 +88,10 @@ export class AgendaJobService {
       .catch(err => {});
   }
 
+  async updateOne(query, params) {
+    return await this.agendaJobRepository.updateOne(query, params);
+  }
+
   getFilterQuery(query) {
     try {
       return JSON.parse(query);
