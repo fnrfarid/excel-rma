@@ -7,6 +7,7 @@ import { MaterialModule } from '../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { JobsService } from '../jobs-service/jobs.service';
 
 describe('ViewSingleJobPage', () => {
   let component: ViewSingleJobPage;
@@ -26,6 +27,10 @@ describe('ViewSingleJobPage', () => {
       providers: [
         {
           provide: MatDialogRef,
+          useValue: {},
+        },
+        {
+          provide: JobsService,
           useValue: {},
         },
         { provide: MAT_DIALOG_DATA, useValue: {} },

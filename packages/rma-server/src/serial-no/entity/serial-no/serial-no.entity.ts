@@ -126,4 +126,7 @@ export class SerialNo extends BaseEntity {
 
   @Column()
   purchase_date: string;
+
+  @Column()
+  purchase_invoice_name: string;
 }

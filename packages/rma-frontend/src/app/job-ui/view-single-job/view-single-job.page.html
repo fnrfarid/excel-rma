@@ -7,6 +7,10 @@
     <ion-toolbar>
       <ion-title>Fail Count : {{ data.failCount}}</ion-title>
       <ion-title>Failed At : {{ getParsedDate(data.failedAt)}}</ion-title>
+      <ion-button *ngIf="retry" (click)="retryJob()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Requeue
+      </ion-button>
     </ion-toolbar>
   </ion-header>
   {{ data.failReason}}
