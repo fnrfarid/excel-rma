@@ -28,6 +28,12 @@ export class JobQueueController {
     return await this.aggregate.retryJob(jobId);
   }
 
+  @Post('v1/reset')
+  @UseGuards(TokenGuard)
+  resetJob(@Body('jobId') jobId: string) {
+    return this.aggregate.resetJob(jobId);
+  }
+
   @Get('v1/retrieve/:jobId')
   @UseGuards(TokenGuard)
   async retrieve(@Param('jobId') jobId: string) {

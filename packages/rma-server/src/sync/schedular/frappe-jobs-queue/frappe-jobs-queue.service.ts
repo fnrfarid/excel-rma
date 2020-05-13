@@ -11,6 +11,7 @@ import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/
 import { StockEntryJobService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 import { AcceptStockEntryJobService } from '../../../stock-entry/schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
+import { AgendaJob } from '../../../job-queue/entities/agenda-job/agenda-job.entity';
 
 @Injectable()
 export class FrappeJobService implements OnModuleInit {
@@ -45,6 +46,10 @@ export class FrappeJobService implements OnModuleInit {
     this.agenda.on(`fail:${FRAPPE_QUEUE_JOB}`, (error, job) =>
       this.onJobFailure(error, job),
     );
+  }
+
+  resetState(job: AgendaJob) {
+    return this[job.data.type].resetState(job);
   }
 
   async onJobFailure(error: any, job: Agenda.Job<any>) {
