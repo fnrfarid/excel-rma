@@ -1,17 +1,21 @@
 
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Failed At : {{ getParsedDate(data.failedAt)}}</ion-title>
+    <ion-buttons slot="end" *ngIf="retry">
+      <ion-button (click)="retryJob()" color="primary">
+        Requeue
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-
-
-<ion-content>
-  <ion-header>
+  <!-- <ion-header>
     <ion-toolbar>
-      <ion-title>Fail Count : {{ data.failCount}}</ion-title>
-      <ion-title>Failed At : {{ getParsedDate(data.failedAt)}}</ion-title>
       <ion-button *ngIf="retry" (click)="retryJob()">
-        <ion-icon slot="start" name="add"></ion-icon>
+        <ion-icon slot="end" name="add"></ion-icon>
         Requeue
       </ion-button>
     </ion-toolbar>
-  </ion-header>
+  </ion-header> -->
   {{ data.failReason}}
-</ion-content>

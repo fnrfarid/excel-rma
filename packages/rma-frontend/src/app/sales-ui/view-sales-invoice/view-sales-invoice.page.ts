@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SalesService } from '../services/sales.service';
 import { SalesInvoiceDetails } from './details/details.component';
 import { PopoverController } from '@ionic/angular';
@@ -22,6 +22,7 @@ export class ViewSalesInvoicePage implements OnInit {
     private readonly location: Location,
     private route: ActivatedRoute,
     private salesService: SalesService,
+    private router: Router,
     private popoverController: PopoverController,
   ) {}
 
@@ -38,6 +39,10 @@ export class ViewSalesInvoicePage implements OnInit {
         this.status = res.status;
       },
     });
+  }
+
+  showJobs() {
+    this.router.navigateByUrl(`jobs?parent=${this.sales_invoice_name}`);
   }
 
   async showPrintOptions(ev) {

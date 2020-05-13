@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { ViewSingleJobPage } from '../view-single-job/view-single-job.page';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-jobs',
@@ -25,16 +26,21 @@ export class JobsPage implements OnInit {
   sort: string = '';
   index: number = 0;
   size: number = 10;
-  name: string;
+  parent: string;
   status: string = 'Failed';
   jobStatus = ['Successful', 'Failed', 'In Queue', 'Reset', 'All', 'Retrying'];
   constructor(
     private readonly jobsService: JobsService,
     private location: Location,
+    private route: ActivatedRoute,
     public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
+    if (this.route.snapshot.queryParams.parent) {
+      this.parent = this.route.snapshot.queryParams.parent.toUpperCase();
+      this.status = 'All';
+    }
     this.dataSource = new JobsDataSource(this.jobsService);
     this.setFilter();
   }
@@ -112,7 +118,7 @@ export class JobsPage implements OnInit {
   setFilter(event?) {
     const query: any = {};
     this.status !== 'All' ? (query['data.status'] = this.status) : null;
-    this.name ? (query['data.parent'] = { $regex: this.name }) : null;
+    this.parent ? (query['data.parent'] = { $regex: this.parent }) : null;
     let sortQuery = {};
     if (event) {
       for (const key of Object.keys(event)) {
