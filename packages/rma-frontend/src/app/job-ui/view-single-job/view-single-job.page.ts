@@ -10,7 +10,10 @@ import { CLOSE } from '../../constants/app-string';
   styleUrls: ['./view-single-job.page.scss'],
 })
 export class ViewSingleJobPage {
-  retry = false;
+  state = {
+    retry: false,
+    reset: false,
+  };
   constructor(
     public dialogRef: MatDialogRef<ViewSingleJobPage>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -18,15 +21,33 @@ export class ViewSingleJobPage {
     private readonly snackBar: MatSnackBar,
   ) {
     data.failReason = JSON.stringify(data.failReason);
-    if (
-      data &&
-      data.data &&
-      data.data.type === 'CREATE_PURCHASE_RECEIPT_JOB' &&
-      data.data.status === 'Failed'
-    ) {
-      this.retry = true;
-    }
+    data && data.data ? this.activateState() : null;
   }
+
+  activateState() {
+    if (
+      this.data.data.type === 'CREATE_PURCHASE_RECEIPT_JOB' &&
+      this.data.data.status === 'Failed'
+    ) {
+      this.state.retry = true;
+    }
+    this.state.reset = true;
+  }
+
+  resetJob() {
+    this.jobService.resetJob(this.data._id).subscribe({
+      next: success => {
+        this.snackBar.open('Job Reset Successfully.', CLOSE, {
+          duration: 3000,
+        });
+        this.dialogRef.close(true);
+      },
+      error: err => {
+        this.snackBar.open(err.error.message, CLOSE, { duration: 2500 });
+      },
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }

@@ -70,9 +70,13 @@ export class PurchaseReceiptSyncService {
             } else {
               item_hash[item.item_code] = item.qty;
             }
-            item.has_serial_no
-              ? item_hash.serials.push(...item.serial_no.split('\n'))
-              : null;
+            if (item.has_serial_no) {
+              if (typeof item.serial_no === 'string') {
+                item_hash.serials.push(...item.serial_no.split('\n'));
+              } else {
+                item_hash.serials.push(...item.serial_no);
+              }
+            }
             return of({});
           }),
         );

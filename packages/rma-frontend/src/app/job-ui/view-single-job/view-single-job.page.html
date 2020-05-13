@@ -2,7 +2,12 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Failed At : {{ getParsedDate(data.failedAt)}}</ion-title>
-    <ion-buttons slot="end" *ngIf="retry">
+    <ion-buttons slot="end" *ngIf="state.reset">
+      <ion-button (click)="resetJob()" color="danger">
+        Reset
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end" *ngIf="state.retry">
       <ion-button (click)="retryJob()" color="primary">
         Requeue
       </ion-button>
