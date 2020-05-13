@@ -1,4 +1,15 @@
 import { Column, ObjectIdColumn, ObjectID, Entity } from 'typeorm';
+import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
+import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
+
+export class JobData {
+  payload: any;
+  settings: ServerSettings;
+  type: string;
+  parent: string;
+  token: TokenCache;
+  status: string;
+}
 
 @Entity({ name: 'agendaJobs' })
 export class AgendaJob {
@@ -12,7 +23,7 @@ export class AgendaJob {
   type: string;
 
   @Column()
-  data: any;
+  data: JobData;
 
   @Column()
   failedAt: any;
