@@ -6,6 +6,11 @@
       </ion-button>
     </ion-buttons>
     <ion-title>Purchase Invoice</ion-title>
+    <ion-buttons slot="end" *ngIf="invoiceName">
+      <ion-button (click)="showJobs()" color="primary">
+        Jobs
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

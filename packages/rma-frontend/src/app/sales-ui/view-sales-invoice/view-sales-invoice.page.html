@@ -8,6 +8,11 @@
     <ion-title>
       Sales Invoice
     </ion-title>
+    <ion-buttons slot="end" *ngIf="sales_invoice_name">
+      <ion-button (click)="showJobs()" color="primary">
+        Jobs
+      </ion-button>
+    </ion-buttons>
     <ion-buttons slot="end" *ngIf="sales_invoice_name && status !== 'Canceled'">
       <ion-button (click)="showPrintOptions($event)" color="primary">
         <ion-icon slot="icon-only" name="print-outline"></ion-icon>
