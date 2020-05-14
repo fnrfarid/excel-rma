@@ -70,8 +70,6 @@ export class AppComponent implements OnInit {
       next: event => {
         if (event.key === LOGGED_IN && event.value === true) {
           this.loggedIn = true;
-          this.checkRoles();
-          this.loadProfile();
         } else {
           this.loggedIn = false;
         }
@@ -84,15 +82,20 @@ export class AppComponent implements OnInit {
       const query = new URLSearchParams(hash);
       const token = query.get(ACCESS_TOKEN);
       this.checkRoles(token);
-      this.loadProfile();
+      this.loadProfile(token);
     } else {
-      this.checkRoles();
-      this.loadProfile();
+      this.appService
+        .getStorage()
+        .getItem(ACCESS_TOKEN)
+        .then(token => {
+          this.checkRoles(token);
+          this.loadProfile(token);
+        });
     }
   }
 
-  loadProfile() {
-    this.appService.loadProfile().subscribe({
+  loadProfile(token: string) {
+    this.appService.loadProfile(token).subscribe({
       error: error => {
         this.loggedIn = false;
         this.appService.setupImplicitFlow();
@@ -105,7 +108,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  checkRoles(token?: string) {
+  checkRoles(token: string) {
     this.settingService.checkUserProfile(token).subscribe({
       next: res => {
         this.loggedIn = true;
