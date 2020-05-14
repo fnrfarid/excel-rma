@@ -152,4 +152,4 @@ export const AGENDA_JOB_STATUS = {
   reset: 'Reset',
   retrying: 'Retrying',
 };
-export const AGENDA_MAX_RETRIES = 3;
+export const AGENDA_MAX_RETRIES = 1;

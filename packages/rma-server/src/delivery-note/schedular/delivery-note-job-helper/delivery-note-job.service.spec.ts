@@ -4,18 +4,17 @@ import { DirectService } from '../../../direct/aggregates/direct/direct.service'
 import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { DeliveryNoteJobService } from './delivery-note-job.service';
+import { DeliveryNoteJobHelperService } from './delivery-note-job-helper.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
-import { DeliveryNoteJobHelperService } from '../../schedular/delivery-note-job-helper/delivery-note-job-helper.service';
 
-describe('DeliveryNoteJobService', () => {
-  let service: DeliveryNoteJobService;
+describe('DeliveryNoteJobHelperService', () => {
+  let service: DeliveryNoteJobHelperService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        DeliveryNoteJobService,
+        DeliveryNoteJobHelperService,
         { provide: AGENDA_TOKEN, useValue: {} },
         {
           provide: DirectService,
@@ -41,14 +40,12 @@ describe('DeliveryNoteJobService', () => {
           provide: SalesInvoiceService,
           useValue: {},
         },
-        {
-          provide: DeliveryNoteJobHelperService,
-          useValue: {},
-        },
       ],
     }).compile();
 
-    service = module.get<DeliveryNoteJobService>(DeliveryNoteJobService);
+    service = module.get<DeliveryNoteJobHelperService>(
+      DeliveryNoteJobHelperService,
+    );
   });
 
   it('should be defined', () => {

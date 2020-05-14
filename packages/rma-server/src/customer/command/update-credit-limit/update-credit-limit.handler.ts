@@ -16,7 +16,10 @@ export class UpdateCreditLimitHandler
     const { payload, req } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
 
-    const customer = await aggregate.retrieveCustomer(payload.uuid, req);
+    const customer = await aggregate.retrieveCustomer(
+      { uuid: payload.uuid },
+      req,
+    );
 
     if (!customer) {
       throw new NotFoundException(CUSTOMER_AND_CONTACT_INVALID);
