@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
 import { PurchaseReceiptDto } from '../entity/purchase-receipt-dto';
 import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
 import { from, throwError, of } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 import { PurchaseInvoiceService } from '../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PURCHASE_INVOICE_NOT_FOUND } from '../../constants/messages';
 import { PurchaseOrderService } from '../../purchase-order/entity/purchase-order/purchase-order.service';
@@ -137,10 +137,6 @@ export class PurchaseReceiptPoliciesService {
             );
           },
         ),
-        catchError(err => {
-          // remove it.
-          return throwError(err);
-        }),
       );
   }
 
@@ -194,7 +190,7 @@ export class PurchaseReceiptPoliciesService {
       }
     });
     return throwError(
-      `From Provsplitided serials : ${serials.join(
+      `From Provided serials : ${serials.join(
         ', ',
       )}. are already assigned. Try to reset job and assign valid serials.`,
     );

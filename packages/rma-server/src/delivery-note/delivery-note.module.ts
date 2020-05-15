@@ -13,6 +13,7 @@ import { DeliveryNoteJobService } from './schedular/delivery-note-job/delivery-n
 import { DirectModule } from '../direct/direct.module';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 import { JobQueueModule } from '../job-queue/job-queue.module';
+import { DeliveryNoteJobHelperService } from './schedular/delivery-note-job-helper/delivery-note-job-helper.service';
 
 @Module({
   imports: [
@@ -31,11 +32,13 @@ import { JobQueueModule } from '../job-queue/job-queue.module';
     ...DeliveryNoteEventManager,
     DeliveryNoteJobService,
     SerialBatchService,
+    DeliveryNoteJobHelperService,
   ],
   exports: [
     DeliveryNoteEntitiesModule,
     ...DeliveryNoteAggregatesManager,
     DeliveryNoteJobService,
+    DeliveryNoteJobHelperService,
   ],
 })
 export class DeliveryNoteModule {}
