@@ -76,7 +76,7 @@ export class FrappeJobService implements OnModuleInit {
     if (value instanceof Error) {
       const error = {};
 
-      Object.getOwnPropertyNames(value).forEach(function(key) {
+      Object.getOwnPropertyNames(value).forEach(function (key) {
         error[key] = value[key];
       });
 

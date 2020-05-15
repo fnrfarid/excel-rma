@@ -39,6 +39,7 @@ export class ServerSettingsDto {
   backendClientId: string;
 
   @IsString({ each: true })
+  @IsOptional()
   @ApiProperty({
     description: 'Scopes on OAuth2 client',
     type: 'string',

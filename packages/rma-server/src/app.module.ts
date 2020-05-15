@@ -12,8 +12,6 @@ import {
   DEFAULT,
 } from './constants/typeorm.connection';
 import { ConfigService } from './config/config.service';
-import { TerminusModule } from '@nestjs/terminus';
-import { TerminusOptionsService } from './system-settings/aggregates/terminus-options/terminus-options.service';
 import { DirectModule } from './direct/direct.module';
 import { CustomerModule } from './customer/customer.module';
 import { ItemModule } from './item/item.module';
@@ -51,7 +49,6 @@ import { JobQueueModule } from './job-queue/job-queue.module';
       inject: [ConfigService],
       useFactory: connectTypeORM,
     }),
-    TerminusModule.forRootAsync({ useClass: TerminusOptionsService }),
     ConfigModule,
     AuthModule,
     SystemSettingsModule,
