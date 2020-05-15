@@ -9,7 +9,7 @@ import {
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CreateDeliveryNoteInterface } from '../../entity/delivery-note-service/create-delivery-note-interface';
@@ -22,6 +22,7 @@ import { FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
 import Agenda = require('agenda');
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
+import { DeliveryNoteJobHelperService } from '../delivery-note-job-helper/delivery-note-job-helper.service';
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
@@ -36,6 +37,7 @@ export class DeliveryNoteJobService {
     private readonly settingsService: SettingsService,
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly jobService: AgendaJobService,
+    private readonly jobHelper: DeliveryNoteJobHelperService,
   ) {}
 
   execute(job) {
@@ -90,6 +92,20 @@ export class DeliveryNoteJobService {
             }),
           );
         }
+        if (
+          (err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.exc &&
+            (err.response.data.exc.includes('SerialNoWarehouseError') ||
+              err.response.data.exc.includes(
+                'does not belong to Warehouse',
+              ))) ||
+          err.response.data.exc.includes('BaseDocument') ||
+          err.response.data.exc.includes('ValueError')
+        ) {
+          return this.syncExistingSerials(job, err);
+        }
         // new approach, we wont reset state let the user retry it from agenda UI.
         return throwError(err);
       }),
@@ -110,6 +126,40 @@ export class DeliveryNoteJobService {
     );
   }
 
+  syncExistingSerials(
+    job: {
+      payload: CreateDeliveryNoteInterface;
+      token: any;
+      settings: ServerSettings;
+      sales_invoice_name: string;
+    },
+    error,
+  ): Observable<any> {
+    const serials = [];
+    job.payload.items.forEach(item => {
+      if (item.has_serial_no) {
+        if (typeof item.serial_no === 'string') {
+          serials.push(...item.serial_no.split('\n'));
+        } else {
+          serials.push(...item.serial_no);
+        }
+      }
+    });
+
+    return this.jobHelper
+      .validateFrappeSyncExistingSerials(
+        serials,
+        job.settings,
+        job.token,
+        job.sales_invoice_name,
+      )
+      .pipe(
+        switchMap(data => {
+          return of(data);
+        }),
+      );
+  }
+
   linkDeliveryNote(
     payload: CreateDeliveryNoteInterface,
     response: DeliveryNoteResponseInterface,
@@ -128,6 +178,7 @@ export class DeliveryNoteJobService {
               $set: {
                 'warranty.salesWarrantyDate': item.warranty_date,
                 'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
+                delivery_note: response.name,
               },
             },
           )
@@ -156,29 +207,15 @@ export class DeliveryNoteJobService {
       });
       return;
     });
-    this.serialNoService
-      .updateMany(
-        { serial_no: { $in: serials } },
-        { $set: { delivery_note: response.name } },
-      )
-      .then(success => {})
-      .catch(error => {});
 
     this.salesInvoiceService
-      .findOne({
-        name: sales_invoice_name,
-      })
-      .then(sales_invoice => {
-        this.salesInvoiceService
-          .updateMany(
-            { name: sales_invoice_name },
-            {
-              $push: { delivery_note_items: { $each: items } },
-            },
-          )
-          .then(success => {})
-          .catch(error => {});
-      })
+      .updateOne(
+        { name: sales_invoice_name },
+        {
+          $push: { delivery_note_items: { $each: items } },
+        },
+      )
+      .then(success => {})
       .catch(error => {});
   }
 

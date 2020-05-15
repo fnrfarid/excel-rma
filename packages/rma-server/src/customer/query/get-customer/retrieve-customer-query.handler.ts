@@ -9,6 +9,6 @@ export class RetrieveCustomerHandler
 
   async execute(query: RetrieveCustomerQuery) {
     const { req, customer_name } = query;
-    return this.manager.retrieveCustomer(customer_name, req);
+    return this.manager.retrieveCustomer({ customer_name }, req);
   }
 }

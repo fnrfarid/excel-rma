@@ -25,10 +25,7 @@ export class ViewSingleJobPage {
   }
 
   activateState() {
-    if (
-      this.data.data.type === 'CREATE_PURCHASE_RECEIPT_JOB' &&
-      this.data.data.status === 'Failed'
-    ) {
+    if (this.data.data.status === 'Failed') {
       this.state.retry = true;
     }
     this.state.reset = true;

@@ -54,7 +54,7 @@ export class FrappeJobService implements OnModuleInit {
 
   async onJobFailure(error: any, job: Agenda.Job<any>) {
     const retryCount = job.attrs.failCount - 1;
-    if (retryCount <= AGENDA_MAX_RETRIES) {
+    if (retryCount < AGENDA_MAX_RETRIES) {
       job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
       job.attrs.nextRunAt = this.getExponentialBackOff(
         retryCount,
