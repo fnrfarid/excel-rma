@@ -88,7 +88,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               this.apply(
                 new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest),
               );
-              return of({});
+              return of(salesInvoice);
             }),
           );
       }),

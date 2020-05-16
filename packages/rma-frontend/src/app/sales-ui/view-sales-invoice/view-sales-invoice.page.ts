@@ -5,6 +5,8 @@ import { SalesService } from '../services/sales.service';
 import { SalesInvoiceDetails } from './details/details.component';
 import { PopoverController } from '@ionic/angular';
 import { PrintComponent } from './print/print.component';
+import { ViewSalesInvoiceSubjectService } from './view-sales-invoice-subject.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-view-sales-invoice',
@@ -24,19 +26,30 @@ export class ViewSalesInvoicePage implements OnInit {
     private salesService: SalesService,
     private router: Router,
     private popoverController: PopoverController,
+    private siSubject: ViewSalesInvoiceSubjectService,
   ) {}
 
   ngOnInit() {
     this.selectedSegment = 0;
     this.showReturnTab = false;
     this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
+    this.siSubject.data
+      .pipe(
+        switchMap(data => {
+          return this.salesService.getSalesInvoice(
+            data.siUuid || this.invoiceUuid,
+          );
+        }),
+      )
+      .subscribe({
+        next: res => {
+          this.updateView(res);
+        },
+        error: error => {},
+      });
     this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
       next: (res: SalesInvoiceDetails) => {
-        this.isCampaign = res.isCampaign;
-        this.showReturnTab =
-          Object.keys(res.delivered_items_map).length === 0 ? false : true;
-        this.sales_invoice_name = res.name;
-        this.status = res.status;
+        this.updateView(res);
       },
     });
   }
@@ -60,5 +73,13 @@ export class ViewSalesInvoicePage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  updateView(res) {
+    this.isCampaign = res.isCampaign;
+    this.showReturnTab =
+      Object.keys(res.delivered_items_map).length === 0 ? false : true;
+    this.sales_invoice_name = res.name;
+    this.status = res.status;
   }
 }

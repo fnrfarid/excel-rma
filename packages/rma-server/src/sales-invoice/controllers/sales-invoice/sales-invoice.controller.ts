@@ -37,8 +37,8 @@ export class SalesInvoiceController {
   @Post('v1/create')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  create(@Body() salesInvoicePayload: SalesInvoiceDto, @Req() req) {
-    return this.commandBus.execute(
+  async create(@Body() salesInvoicePayload: SalesInvoiceDto, @Req() req) {
+    return await this.commandBus.execute(
       new AddSalesInvoiceCommand(salesInvoicePayload, req),
     );
   }
@@ -52,8 +52,8 @@ export class SalesInvoiceController {
   @Post('v1/update')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateClient(@Body() updatePayload: SalesInvoiceUpdateDto, @Req() req) {
-    return this.commandBus.execute(
+  async updateClient(@Body() updatePayload: SalesInvoiceUpdateDto, @Req() req) {
+    return await this.commandBus.execute(
       new UpdateSalesInvoiceCommand(updatePayload, req),
     );
   }

@@ -264,7 +264,7 @@ export class SalesService {
     const url = CREATE_SALES_INVOICE_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(url, salesDetails, {
+        return this.http.post<SalesInvoice>(url, salesDetails, {
           headers,
         });
       }),
@@ -286,7 +286,7 @@ export class SalesService {
     const url = UPDATE_SALES_INVOICE_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(url, salesDetails, {
+        return this.http.post<SalesInvoice>(url, salesDetails, {
           headers,
         });
       }),
