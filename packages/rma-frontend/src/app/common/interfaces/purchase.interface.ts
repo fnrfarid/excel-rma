@@ -8,6 +8,11 @@ export class PurchaseInvoice {
   items?: Array<Item>;
 }
 
+export class PurchaseOrder {
+  uuid: string;
+  name: string;
+}
+
 export class PurchaseInvoiceDetails {
   uuid?: string;
   name?: string;

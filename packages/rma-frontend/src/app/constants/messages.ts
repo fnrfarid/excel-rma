@@ -7,3 +7,5 @@ export const ERROR_FETCHING_PURCHASE_INVOICE =
 export const INSUFFICIENT_STOCK_BALANCE = 'Insufficient stock';
 export const ERROR_FETCHING_WARRANTY_CLAIM =
   'Error fetching Warranty claim - Code ';
+export const ERROR_FETCHING_PURCHASE_ORDER =
+  'Error fetching Purchase Order - Code ';
