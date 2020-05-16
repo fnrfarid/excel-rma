@@ -9,6 +9,7 @@ import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { filter } from 'rxjs/operators';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { ViewSalesInvoiceSubjectService } from '../view-sales-invoice-subject.service';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -39,6 +40,7 @@ export class DetailsComponent implements OnInit {
     private readonly router: Router,
     private readonly loadingController: LoadingController,
     private readonly alertController: AlertController,
+    private readonly siSub: ViewSalesInvoiceSubjectService,
   ) {}
 
   ngOnInit() {
@@ -94,7 +96,7 @@ export class DetailsComponent implements OnInit {
 
   async submitSalesInvoice() {
     const loading = await this.loadingController.create({
-      message: 'Submitting Invoice...!',
+      message: 'Submitting Invoice...',
     });
     await loading.present();
     this.salesService
@@ -102,7 +104,8 @@ export class DetailsComponent implements OnInit {
       .subscribe({
         next: success => {
           loading.dismiss();
-          this.location.back();
+          this.siSub.updatedSI(this.route.snapshot.params.invoiceUuid);
+          this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
         },
         error: err => {
           const errMessage = err.error.message.split('\\n');

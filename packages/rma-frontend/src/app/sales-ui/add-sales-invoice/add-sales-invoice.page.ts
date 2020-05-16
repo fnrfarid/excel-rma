@@ -395,7 +395,7 @@ export class AddSalesInvoicePage implements OnInit {
         )
         .subscribe({
           next: success => {
-            this.location.back();
+            this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
           error: ({ message }) => {
             if (!message) message = UPDATE_ERROR;
@@ -461,7 +461,7 @@ export class AddSalesInvoicePage implements OnInit {
         )
         .subscribe({
           next: res => {
-            this.location.back();
+            this.router.navigate(['sales', 'view-sales-invoice', res.uuid]);
           },
           error: ({ message }) => {
             if (!message) message = UPDATE_ERROR;
