@@ -1,5 +1,5 @@
 import { IQuery } from '@nestjs/cqrs';
 
 export class RetrievePurchaseOrderQuery implements IQuery {
-  constructor(public readonly uuid: string) {}
+  constructor(public readonly params: unknown) {}
 }

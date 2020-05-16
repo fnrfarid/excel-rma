@@ -8,7 +8,7 @@ export class RetrievePurchaseOrderQueryHandler
   constructor(private readonly manager: PurchaseOrderAggregateService) {}
 
   async execute(query: RetrievePurchaseOrderQuery) {
-    const { uuid } = query;
-    return this.manager.retrievePurchaseOrder(uuid);
+    const { params } = query;
+    return await this.manager.retrievePurchaseOrder(params);
   }
 }

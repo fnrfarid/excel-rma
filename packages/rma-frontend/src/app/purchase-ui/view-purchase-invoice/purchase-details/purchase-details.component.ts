@@ -6,7 +6,10 @@ import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.inte
 import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { CLOSE } from '../../../constants/app-string';
-import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
+import {
+  ERROR_FETCHING_PURCHASE_INVOICE,
+  ERROR_FETCHING_PURCHASE_ORDER,
+} from '../../../constants/messages';
 
 @Component({
   selector: 'purchase-details',
@@ -21,6 +24,8 @@ export class PurchaseDetailsComponent implements OnInit {
   viewPurchaseInvoiceUrl: string;
   total_qty: number;
   total: number;
+  viewPurchaseOrderUrl: string;
+  purchaseOrderName: string;
   constructor(
     private readonly purchaseService: PurchaseService,
     private readonly snackBar: MatSnackBar,
@@ -49,6 +54,7 @@ export class PurchaseDetailsComponent implements OnInit {
           : undefined;
         this.dataSource = res.items;
         this.calculateTotal(this.dataSource);
+        this.setupPO(res.name);
         this.purchaseService
           .getStore()
           .getItem(AUTH_SERVER_URL)
@@ -82,6 +88,41 @@ export class PurchaseDetailsComponent implements OnInit {
     itemList.forEach(item => {
       this.total += item.qty * item.rate;
       this.total_qty += item.qty;
+    });
+  }
+
+  setupPO(piNumber: string) {
+    this.purchaseService.getPOFromPINumber(piNumber).subscribe({
+      next: res => {
+        this.purchaseOrderName = res.name;
+        this.purchaseService
+          .getStore()
+          .getItem(AUTH_SERVER_URL)
+          .then(auth_url => {
+            if (auth_url) {
+              this.viewPurchaseOrderUrl = auth_url;
+              this.viewPurchaseOrderUrl += '/desk#Form/Purchase Order/';
+              this.viewPurchaseOrderUrl += res.name;
+            } else {
+              this.purchaseService.getApiInfo().subscribe({
+                next: response => {
+                  this.viewPurchaseOrderUrl = response.authServerURL;
+                  this.viewPurchaseOrderUrl += '/desk#Form/Purchase Order/';
+                  this.viewPurchaseOrderUrl += res.name;
+                },
+              });
+            }
+          });
+      },
+      error: err => {
+        this.snackBar.open(
+          err.error.message
+            ? err.error.message
+            : `${ERROR_FETCHING_PURCHASE_ORDER}${err.error.error}`,
+          CLOSE,
+          { duration: 2500 },
+        );
+      },
     });
   }
 }
