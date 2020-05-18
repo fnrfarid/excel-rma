@@ -24,6 +24,9 @@ export class Customer {
   owner: string;
 
   @Column()
+  sales_team: any[];
+
+  @Column()
   customer_name: string;
 
   @Column()

@@ -421,6 +421,10 @@ export function getCustomerAfterInsertWebhookData(
         fieldname: 'payment_terms',
         key: 'payment_terms',
       },
+      {
+        fieldname: 'sales_team',
+        key: 'sales_team',
+      },
     ],
   };
 }
@@ -480,6 +484,10 @@ export function getCustomerOnUpdateWebhookData(
       {
         fieldname: 'payment_terms',
         key: 'payment_terms',
+      },
+      {
+        fieldname: 'sales_team',
+        key: 'sales_team',
       },
     ],
   };
