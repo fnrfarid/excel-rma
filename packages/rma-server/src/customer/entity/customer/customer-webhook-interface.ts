@@ -55,6 +55,9 @@ export class CustomerWebhookDto {
   @Type(() => CreditLimitsDto)
   credit_limits: CreditLimitsDto;
 
+  @IsOptional()
+  sales_team: any[];
+
   isSynced?: boolean;
   credit_days?: number;
 }

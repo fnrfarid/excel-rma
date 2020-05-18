@@ -218,6 +218,7 @@ export class SalesInvoiceDetails {
   delivery_warehouse?: string;
   isCampaign?: boolean;
   remarks?: string;
+  sales_team?: any[];
 }
 
 export class SalesInvoiceItem {
