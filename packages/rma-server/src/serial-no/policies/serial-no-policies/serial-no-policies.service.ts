@@ -66,23 +66,12 @@ export class SerialNoPoliciesService {
     );
   }
 
-  validateCompany(serialProvider: SerialNoDto) {
-    // validate company
-  }
-
   validateSerials(payload: ValidateSerialsDto) {
     return (payload.validateFor === 'purchase_receipt'
       ? this.validateSerialsForPurchaseReceipt(payload)
       : this.validateSerialsForDeliveryNote(payload)
     ).pipe(
-      switchMap(
-        (
-          data: {
-            _id: string;
-            notFoundSerials: string[];
-            foundSerials: string[];
-          }[],
-        ) => {
+      switchMap((data: ValidateSerialsResponse[]) => {
           if (payload.validateFor === 'purchase_receipt') {
             return of({ notFoundSerials: data[0] ? data[0].foundSerials : [] });
           } else {
@@ -171,6 +160,9 @@ export class SerialNoPoliciesService {
       }),
     ).pipe(
       switchMap(item => {
+        if(!item){
+          return throwError(new BadRequestException(`Item ${payload.item_code}, not found`))
+        }
         return this.serialNoService.asyncAggregate([
           {
             $match: {
@@ -201,13 +193,13 @@ export class SerialNoPoliciesService {
       {
         $match: {
           serial_no: { $in: payload.serials },
-          warehouse: { $exists: false },
           $or: [
-            { item_code: payload.item_code },
-            { item_name: payload.item_code },
+            {"queue_state.purchase_receipt" : {$exists : true}},
+            {purchase_document_no: {$exists : true}},
           ],
         },
       },
+      { $limit : 5},
       {
         $group: {
           _id: 'validSerials',
@@ -216,4 +208,11 @@ export class SerialNoPoliciesService {
       },
     ]);
   }
+}
+
+
+export class ValidateSerialsResponse {
+  _id: string;
+  notFoundSerials: string[];
+  foundSerials: string[];
 }

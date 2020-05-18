@@ -23,7 +23,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
-import { CLOSE } from '../../../constants/app-string';
+import { CLOSE, DELIVERY_NOTE } from '../../../constants/app-string';
 import {
   ERROR_FETCHING_SALES_INVOICE,
   SERIAL_ASSIGNED,
@@ -613,59 +613,42 @@ export class SerialsComponent implements OnInit {
         .replace(/"/g, '')
         .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
         .split(',');
-      // validate file headers
-      this.csvService.validateHeaders(headers)
-        ? // if valid convert to json.
-          this.csvService
-            .csvToJSON(csvData)
-            .pipe(
-              switchMap(json => {
-                // club json data to item_name as unique { blue cotton candy : { serials : [1,2,3..]}, ...  }
-                const data = this.csvService.mapJson(json);
-                // name of all items [ "blue cotton candy" ...]
-                const item_names = [];
-                // obj map for item and number of serial present like - { blue cotton candy : 50  }
-                const itemObj: CsvJsonObj = {};
-
-                // get all item_name and validate from current remaining items and then the API
-                for (const key in data) {
-                  if (key) {
-                    item_names.push(key);
-                    itemObj[key] = {
-                      serial: data[key].serial_no.length,
-                      serial_no: data[key].serial_no.map(serial => {
-                        return serial.toUpperCase();
-                      }),
-                    };
-                  }
-                }
-
-                // validate Json serials with remaining products to be assigned.
-                return this.validateJson(itemObj)
-                  ? // if valid ping backend to validate found serials
-                    this.csvService.validateSerials(item_names, itemObj).pipe(
-                      switchMap((response: boolean) => {
-                        this.csvFileInput.nativeElement.value = '';
-                        if (response) {
-                          return of(itemObj);
-                        }
-                        return of(false);
-                      }),
-                    )
-                  : of(false);
-              }),
-            )
-            .subscribe({
-              next: (response: CsvJsonObj | boolean) => {
-                response ? this.addSerialsFromCsvJson(response) : null;
-                // reset file input, restart the flow.
-                this.csvFileInput.nativeElement.value = '';
-              },
-              error: err => {
-                this.csvFileInput.nativeElement.value = '';
-              },
-            })
-        : (this.csvFileInput.nativeElement.value = '');
+      if(this.csvService.validateHeaders(headers)){
+        this.csvService
+          .csvToJSON(csvData)
+          .pipe(
+            switchMap(json => {
+              const hashMap = this.csvService.mapJson(json);
+              const item_names = [];
+              item_names.push(...Object.keys(hashMap))
+              if(this.validateJson(hashMap)){
+                return  this.csvService.validateSerials(item_names, hashMap, DELIVERY_NOTE).pipe(
+                  switchMap((response: boolean) => {
+                    this.csvFileInput.nativeElement.value = '';
+                    if (response) {
+                      return of(hashMap);
+                    }
+                    return of(false);
+                  }),
+                )
+              }
+              return of(false);
+            }),
+          )
+          .subscribe({
+            next: (response: CsvJsonObj | boolean) => {
+              if(response){
+                this.addSerialsFromCsvJson(response)
+              }
+              this.csvFileInput.nativeElement.value = '';
+            },
+            error: err => {
+              this.csvFileInput.nativeElement.value = '';
+            },
+          })
+      }else{
+        this.csvFileInput.nativeElement.value = '';
+      }
     };
   }
 
@@ -705,10 +688,10 @@ export class SerialsComponent implements OnInit {
     const data = this.itemDataSource.data();
     for (const value of data) {
       if (json[value.item_name]) {
-        if (value.remaining < json[value.item_name].serial) {
+        if (value.remaining < json[value.item_name].serial_no.length) {
           this.getMessage(`Item ${value.item_name} has
           ${value.remaining} remaining, but provided
-          ${json[value.item_name].serial} serials.`);
+          ${json[value.item_name].serial_no.length} serials.`);
           isValid = false;
           break;
         }
@@ -730,7 +713,6 @@ export class SerialsComponent implements OnInit {
 
 export interface CsvJsonObj {
   [key: string]: {
-    serial: number;
     serial_no: string[];
   };
 }

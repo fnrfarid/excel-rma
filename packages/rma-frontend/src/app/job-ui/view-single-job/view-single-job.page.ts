@@ -50,6 +50,9 @@ export class ViewSingleJobPage {
   }
 
   getParsedDate(value) {
+    if(this.data.data.status === 'In Queue'){
+      return 'In Queue'
+    }
     const date = new Date(value);
     return [
       date.getFullYear(),

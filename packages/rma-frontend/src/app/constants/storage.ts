@@ -37,3 +37,4 @@ export const COUNTRY = 'country';
 export const TIME_ZONE = 'time_zone';
 export const TRANSFER_WAREHOUSE = 'transferWarehouse';
 export const DEFAULT_SELLING_PRICE_LIST = 'default_selling_price_list';
+export const VALIDATE_SERIAL_BUFFER_COUNT = 50000

@@ -81,11 +81,13 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               const { body } = this.mapPurchaseInvoiceReceipt(
                 purchaseInvoicePayload,
               );
-              return this.batchPurchaseReceipt(
+              const { serials, createSerialsBatch } = this.getMappedSerials(body);
+              return this.createBatchedFrappeSerials(
                 settings,
                 body,
                 clientHttpRequest,
-                purchaseInvoicePayload.purchase_invoice_name,
+                body.purchase_invoice_name,
+                {serials, createSerialsBatch},
               );
             }),
             catchError(err => {
@@ -164,8 +166,10 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     if (keys.length === 0) {
       return of(true);
     }
+    let test :any;
     return from(keys).pipe(
       mergeMap(item_code => {
+        test = new Date()
         return this.mapItemsCodeToSerials(
           item_code,
           createSerialsBatch,
@@ -174,11 +178,17 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         );
       }),
       bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
-      switchMap(data => {
-        return from(this.serialNoService.insertMany(data, { ordered: true }));
+      concatMap(data => {
+        return from(this.serialNoService.insertMany(data));
       }),
       retry(3),
       switchMap(success => {
+        return of();
+      }),
+      toArray(),
+      switchMap(success => {
+        let date:any = new Date()
+        console.log("final",test - date);
         return of(true);
       }),
       catchError(err => {
@@ -204,6 +214,12 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           purchase_rate: item.rate,
           supplier: purchaseReceipt.supplier,
           company: purchaseReceipt.company,
+          queue_state : {
+            purchase_receipt : {
+              parent: purchaseReceipt.purchase_invoice_name,
+              warehouse : item.warehouse
+            }
+          }
         });
       }),
     );
@@ -279,37 +295,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           return of({});
         }),
       )
-      .subscribe({
-        next: success => {},
-        error: err => {
-          this.errorLogService.createErrorLog(
-            err,
-            PURCHASE_RECEIPT_DOCTYPE_NAME,
-            'purchaseInvoice',
-            clientHttpRequest,
-          );
-        },
-      });
-  }
-
-  batchPurchaseReceipt(
-    settings: ServerSettings,
-    body: PurchaseReceiptDto,
-    clientHttpRequest,
-    purchase_invoice_name: string,
-  ) {
-    return this.batchValidateSerials(settings, body, clientHttpRequest).pipe(
-      switchMap((batch: SerialMapResponseInterface) => {
-        this.createBatchedFrappeSerials(
-          settings,
-          body,
-          clientHttpRequest,
-          purchase_invoice_name,
-          batch,
-        );
-        return of({});
-      }),
-    );
   }
 
   createBatchedPurchaseReceipts(

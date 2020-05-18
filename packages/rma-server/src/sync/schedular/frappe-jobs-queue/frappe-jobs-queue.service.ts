@@ -26,7 +26,7 @@ export class FrappeJobService implements OnModuleInit {
 
   async onModuleInit() {
     this.agenda.define(
-      FRAPPE_QUEUE_JOB,
+      FRAPPE_QUEUE_JOB + "1",
       { concurrency: 1 },
       async (job: any, done) => {
         // Please note done callback will work only when concurrency is provided.

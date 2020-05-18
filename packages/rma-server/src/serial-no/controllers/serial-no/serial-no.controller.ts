@@ -165,8 +165,7 @@ export class SerialNoController {
     @Body() body: ValidateSerialsDto,
     @UploadedFile('file') file,
   ) {
-    body.validateFor =
-      body.validateFor === PURCHASE_RECEIPT ? body.validateFor : DELIVERY_NOTE;
+    body.validateFor = body.validateFor === PURCHASE_RECEIPT ? body.validateFor : DELIVERY_NOTE;
     return this.queryBus.execute(
       new ValidateSerialsQuery(body, clientHttpRequest, file),
     );

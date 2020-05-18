@@ -55,7 +55,7 @@ export class JobsPage implements OnInit {
   }
 
   async viewSingleJob(row) {
-    if (row.data.status === 'Failed' || row.data.status === 'Retrying') {
+    if (row.data.status === 'Failed' || row.data.status === 'Retrying' || row.data.status === 'In Queue') {
       const dialogRef = this.dialog.open(ViewSingleJobPage, {
         width: '50%',
         height: '50%',
