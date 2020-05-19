@@ -55,9 +55,8 @@
               readonly="true"
               type="text"
               value="{{
-                purchaseInvoiceDetails.purchase_receipt_items
-                  ? (purchaseInvoiceDetails?.purchase_receipt_items)[0]
-                      ?.warehouse
+                purchaseInvoiceDetails.items
+                  ? (purchaseInvoiceDetails?.items)[0]?.warehouse
                   : 'Please assign serial to see warehouse'
               }}"
               placeholder="Warehouse"
@@ -66,7 +65,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col size-md="6" offset-md="6">
+        <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Status</ion-label>
             <ion-input
@@ -78,6 +77,20 @@
                 color:
                   purchaseInvoiceDetails?.submitted === true ? 'green' : 'red'
               }"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item
+            lines="none"
+            [href]="viewPurchaseOrderUrl"
+            target="_blank"
+          >
+            <ion-label position="floating">Purchase Order Number</ion-label>
+            <ion-input
+              [value]="purchaseOrderName"
+              readonly="true"
+              type="string"
             ></ion-input>
           </ion-item>
         </ion-col>

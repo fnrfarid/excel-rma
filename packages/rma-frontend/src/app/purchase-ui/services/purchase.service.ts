@@ -14,10 +14,12 @@ import {
   CREATE_PURCHASE_RECEIPT_ENDPOINT,
   CREATE_PURCHASE_RECEIPT_BULK_ENDPOINT,
   GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT,
+  GET_PO_FROM_PI_NUMBER_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
 import { PurchaseReceipt } from '../../common/interfaces/purchase-receipt.interface';
 import { JSON_BODY_MAX_SIZE } from '../../constants/app-string';
+import { PurchaseOrder } from 'src/app/common/interfaces/purchase.interface';
 @Injectable({
   providedIn: 'root',
 })
@@ -117,6 +119,15 @@ export class PurchaseService {
         return {
           [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
         };
+      }),
+    );
+  }
+
+  getPOFromPINumber(piNumber: string) {
+    const url = GET_PO_FROM_PI_NUMBER_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<PurchaseOrder>(url + piNumber, { headers });
       }),
     );
   }

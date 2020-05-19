@@ -7,7 +7,14 @@ import {
 } from '@nestjs/common';
 import * as Agenda from 'agenda';
 import { from } from 'rxjs';
-import { switchMap, map, retryWhen, delay, take } from 'rxjs/operators';
+import {
+  switchMap,
+  map,
+  retryWhen,
+  delay,
+  take,
+  concatMap,
+} from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CustomerService } from '../../entity/customer/customer.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
@@ -43,7 +50,7 @@ export class ResetCreditLimitService implements OnModuleInit {
     this.agenda.define(
       RESET_CUSTOMER_CREDIT_LIMIT,
       { concurrency: 1 },
-      async job => {
+      async (job, done) => {
         const now = new Date();
         const customers = await this.customer.find({
           baseCreditLimitAmount: { $exists: true },
@@ -52,7 +59,7 @@ export class ResetCreditLimitService implements OnModuleInit {
 
         from(customers)
           .pipe(
-            switchMap(customer => {
+            concatMap(customer => {
               this.customer
                 .updateOne(
                   { uuid: customer.uuid },
@@ -117,19 +124,46 @@ export class ResetCreditLimitService implements OnModuleInit {
             }),
             retryWhen(error => error.pipe(delay(1000), take(3))),
           )
-          .subscribe({
-            next: success => {
-              Logger.log(RESET_CREDIT_LIMIT_SUCCESS, this.constructor.name);
-            },
-            error: error => {
-              Logger.error(RESET_CREDIT_LIMIT_ERROR, this.constructor.name);
-            },
+          .toPromise()
+          .then(success => {
+            Logger.log(RESET_CREDIT_LIMIT_SUCCESS, this.constructor.name);
+            done();
+          })
+          .catch(error => {
+            Logger.error(RESET_CREDIT_LIMIT_ERROR, this.constructor.name);
+            done(this.getPureError(error));
           });
       },
     );
+
     this.agenda
       .every('60 minutes', RESET_CUSTOMER_CREDIT_LIMIT)
       .then(scheduled => {})
       .catch(error => {});
+  }
+
+  getPureError(error) {
+    if (error && error.response) {
+      error = error.response.data ? error.response.data : error.response;
+    }
+    try {
+      return JSON.parse(JSON.stringify(error, this.replaceErrors));
+    } catch {
+      return error.data ? error.data : error;
+    }
+  }
+
+  replaceErrors(keys, value) {
+    if (value instanceof Error) {
+      const error = {};
+
+      Object.getOwnPropertyNames(value).forEach(key => {
+        error[key] = value[key];
+      });
+
+      return error;
+    }
+
+    return value;
   }
 }
