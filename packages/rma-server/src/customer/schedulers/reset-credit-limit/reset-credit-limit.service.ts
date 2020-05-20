@@ -7,14 +7,7 @@ import {
 } from '@nestjs/common';
 import * as Agenda from 'agenda';
 import { from } from 'rxjs';
-import {
-  switchMap,
-  map,
-  retryWhen,
-  delay,
-  take,
-  concatMap,
-} from 'rxjs/operators';
+import { map, retryWhen, delay, take, mergeMap } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CustomerService } from '../../entity/customer/customer.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
@@ -59,7 +52,7 @@ export class ResetCreditLimitService implements OnModuleInit {
 
         from(customers)
           .pipe(
-            concatMap(customer => {
+            mergeMap(customer => {
               this.customer
                 .updateOne(
                   { uuid: customer.uuid },
@@ -68,9 +61,9 @@ export class ResetCreditLimitService implements OnModuleInit {
                 .then(success => {})
                 .catch(error => {});
               return this.settings.find().pipe(
-                switchMap(settings => {
+                mergeMap(settings => {
                   return this.clientToken.getServiceAccountApiHeaders().pipe(
-                    switchMap(headers => {
+                    mergeMap(headers => {
                       headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
                       headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
                       return this.http
@@ -83,7 +76,7 @@ export class ResetCreditLimitService implements OnModuleInit {
                         )
                         .pipe(
                           map(res => res.data),
-                          switchMap(erpnextCustomer => {
+                          mergeMap(erpnextCustomer => {
                             const creditLimits: any[] =
                               erpnextCustomer.credit_limits || [];
 
