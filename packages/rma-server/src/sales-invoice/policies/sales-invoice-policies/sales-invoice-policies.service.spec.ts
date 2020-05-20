@@ -6,6 +6,7 @@ import { AssignSerialNoPoliciesService } from '../../../serial-no/policies/assig
 import { HttpService } from '@nestjs/common';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
 
 describe('SalesInvoicePoliciesService', () => {
   let service: SalesInvoicePoliciesService;
@@ -26,6 +27,7 @@ describe('SalesInvoicePoliciesService', () => {
           provide: AssignSerialNoPoliciesService,
           useValue: {},
         },
+        { provide: SerialNoPoliciesService, useValue: {} },
         { provide: HttpService, useValue: {} },
         { provide: ClientTokenManagerService, useValue: {} },
         { provide: SettingsService, useValue: {} },
