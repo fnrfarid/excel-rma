@@ -12,4 +12,5 @@ export interface SalesReturn {
   total_qty: number;
   total: number;
   items: Item[];
+  delivery_note_names: string[];
 }
