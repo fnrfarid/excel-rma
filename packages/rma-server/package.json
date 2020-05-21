@@ -33,6 +33,7 @@
     "agenda": "^3.1.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
+    "cron": "^1.8.2",
     "geteventstore-promise": "^3.2.1",
     "joi": "^14.3.1",
     "luxon": "^1.24.1",
