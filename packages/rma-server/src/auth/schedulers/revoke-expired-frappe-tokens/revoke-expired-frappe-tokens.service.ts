@@ -6,11 +6,12 @@ import {
   Inject,
 } from '@nestjs/common';
 import { from, of, Observable } from 'rxjs';
-import { switchMap, mergeMap, retryWhen, take, delay } from 'rxjs/operators';
+import { concatMap } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
 import * as Agenda from 'agenda';
+import { CronJob } from 'cron';
 
 import { ClientTokenManagerService } from '../../aggregates/client-token-manager/client-token-manager.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
@@ -25,7 +26,6 @@ import {
   REVOKE_FRAPPE_TOKEN_SUCCESS,
   REVOKE_FRAPPE_TOKEN_ERROR,
 } from '../../../constants/messages';
-import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 
 export const REVOKE_EXPIRED_FRAPPE_TOKEN = 'REVOKE_EXPIRED_FRAPPE_TOKEN';
@@ -37,56 +37,62 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
     private readonly settings: ServerSettingsService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly http: HttpService,
-    private readonly errorLog: ErrorLogService,
   ) {}
 
   onModuleInit() {
+    this.defineAgendaJob();
+
+    // every 15 minutes
+    // for every second '* * * * * *';
+    const FIFTEEN_MINUTES_CRON_STRING = '0 */15 * * * *';
+
+    const cronJob = new CronJob(FIFTEEN_MINUTES_CRON_STRING, async () => {
+      this.agenda.now(REVOKE_EXPIRED_FRAPPE_TOKEN);
+    });
+    cronJob.start();
+  }
+
+  defineAgendaJob() {
     this.agenda.define(
       REVOKE_EXPIRED_FRAPPE_TOKEN,
       { concurrency: 1 },
-      async job => {
+      (job: Agenda.Job, done: (err?: Error) => void) => {
         from(this.settings.find())
           .pipe(
-            switchMap(settings => {
+            concatMap(settings => {
               const nowInServerTimeZone = new DateTime(
                 settings.timeZone,
               ).toFormat('yyyy-MM-dd HH:mm:ss');
               return this.clientToken.getServiceAccountApiHeaders().pipe(
-                switchMap(headers => {
+                concatMap(headers => {
                   return this.getFrappeTokens(
                     settings,
                     headers,
                     nowInServerTimeZone,
                   );
                 }),
-                mergeMap(moreTokens => from(moreTokens.data.data)),
-                mergeMap(({ access_token }) => {
+                concatMap(moreTokens => from(moreTokens.data.data)),
+                concatMap(({ access_token }) => {
                   return this.revokeToken(settings, access_token);
                 }),
               );
             }),
-            retryWhen(errors => errors.pipe(delay(1000), take(3))),
           )
-          .subscribe({
-            next: success => {
-              Logger.log(REVOKE_FRAPPE_TOKEN_SUCCESS, this.constructor.name);
-            },
-            error: error => {
-              this.errorLog.createErrorLog(error);
-              Logger.error(
-                REVOKE_FRAPPE_TOKEN_ERROR,
-                error,
-                this.constructor.name,
-              );
-            },
+          .toPromise()
+          .then(success => {
+            Logger.log(REVOKE_FRAPPE_TOKEN_SUCCESS, this.constructor.name);
+            done();
+            job
+              .remove()
+              .then(removed => {})
+              .catch(err => {});
+          })
+          .catch(error => {
+            done(this.getPureError(error));
+            Logger.error(REVOKE_FRAPPE_TOKEN_ERROR, this.constructor.name);
           });
       },
     );
-
-    this.agenda
-      .every('15 minutes', REVOKE_EXPIRED_FRAPPE_TOKEN)
-      .then(scheduled => {})
-      .catch(error => {});
   }
 
   revokeToken(settings: ServerSettings, token: string): Observable<unknown> {
@@ -120,7 +126,7 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
         params,
       })
       .pipe(
-        switchMap(resTokens => {
+        concatMap(resTokens => {
           if (resTokens.data.data.length === Number(HUNDRED_NUMBERSTRING)) {
             iterationCount++;
             return this.getFrappeTokens(
@@ -134,5 +140,31 @@ export class RevokeExpiredFrappeTokensService implements OnModuleInit {
           return of(resTokens as AxiosResponse);
         }),
       );
+  }
+
+  getPureError(error) {
+    if (error && error.response) {
+      error = error.response.data ? error.response.data : error.response;
+    }
+
+    try {
+      return JSON.parse(
+        JSON.stringify(error, (keys, value) => {
+          if (value instanceof Error) {
+            const err = {};
+
+            Object.getOwnPropertyNames(value).forEach(key => {
+              err[key] = value[key];
+            });
+
+            return err;
+          }
+
+          return value;
+        }),
+      );
+    } catch {
+      return error.data ? error.data : error;
+    }
   }
 }
