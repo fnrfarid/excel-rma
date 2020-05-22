@@ -6,15 +6,8 @@ import {
   Inject,
 } from '@nestjs/common';
 import * as Agenda from 'agenda';
-import { from } from 'rxjs';
-import {
-  switchMap,
-  map,
-  retryWhen,
-  delay,
-  take,
-  concatMap,
-} from 'rxjs/operators';
+import { from, forkJoin, of } from 'rxjs';
+import { map, concatMap, switchMap } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CustomerService } from '../../entity/customer/customer.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
@@ -45,101 +38,95 @@ export class ResetCreditLimitService implements OnModuleInit {
     private readonly http: HttpService,
   ) {}
 
-  onModuleInit() {
-    // Run every hour
-    this.agenda.define(
-      RESET_CUSTOMER_CREDIT_LIMIT,
-      { concurrency: 1 },
-      async (job, done) => {
-        const now = new Date();
-        const customers = await this.customer.find({
-          baseCreditLimitAmount: { $exists: true },
-          tempCreditLimitPeriod: { $lte: now },
+  async onModuleInit() {
+    this.agenda.define(RESET_CUSTOMER_CREDIT_LIMIT, (job, done) => {
+      const now = new Date();
+
+      this.resetCreditLimit(now)
+        .toPromise()
+        .then(success => {
+          Logger.log(RESET_CREDIT_LIMIT_SUCCESS, this.constructor.name);
+          return done();
+        })
+        .catch(error => {
+          Logger.error(RESET_CREDIT_LIMIT_ERROR, this.constructor.name);
+          return done(error);
         });
+    });
 
-        from(customers)
-          .pipe(
-            concatMap(customer => {
-              this.customer
-                .updateOne(
-                  { uuid: customer.uuid },
-                  { $unset: { tempCreditLimitPeriod: '' } },
-                )
-                .then(success => {})
-                .catch(error => {});
-              return this.settings.find().pipe(
-                switchMap(settings => {
-                  return this.clientToken.getServiceAccountApiHeaders().pipe(
-                    switchMap(headers => {
-                      headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
-                      headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
-                      return this.http
-                        .get(
-                          settings.authServerURL +
-                            FRAPPE_API_GET_CUSTOMER_ENDPOINT +
-                            '/' +
-                            customer.name,
-                          { headers },
-                        )
-                        .pipe(
-                          map(res => res.data),
-                          switchMap(erpnextCustomer => {
-                            const creditLimits: any[] =
-                              erpnextCustomer.credit_limits || [];
+    await this.agenda.every('1 minutes', RESET_CUSTOMER_CREDIT_LIMIT);
+  }
 
-                            for (const limit of creditLimits) {
-                              if (limit.company === settings.defaultCompany) {
-                                return this.http.put(
-                                  settings.authServerURL +
-                                    ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT +
-                                    '/' +
-                                    limit.name,
-                                  {
-                                    credit_limit:
-                                      customer.baseCreditLimitAmount,
-                                  },
-                                  { headers },
-                                );
-                              }
-                            }
-
-                            creditLimits.push({
-                              credit_limit: customer.baseCreditLimitAmount,
-                              company: settings.defaultCompany,
-                            });
-                            return this.http.put(
-                              settings.authServerURL +
-                                FRAPPE_API_GET_CUSTOMER_ENDPOINT +
-                                '/' +
-                                customer.name,
-                              { credit_limits: creditLimits },
-                              { headers },
-                            );
-                          }),
-                        );
-                    }),
-                  );
-                }),
-              );
-            }),
-            retryWhen(error => error.pipe(delay(1000), take(3))),
+  resetCreditLimit(now) {
+    const state: any = {};
+    return from(
+      this.customer.find({
+        baseCreditLimitAmount: { $exists: true },
+        tempCreditLimitPeriod: { $lte: now },
+      }),
+    ).pipe(
+      switchMap(customers => from(customers)),
+      concatMap(single_customer => {
+        this.customer
+          .updateOne(
+            { uuid: single_customer.uuid },
+            { $unset: { tempCreditLimitPeriod: '' } },
           )
-          .toPromise()
-          .then(success => {
-            Logger.log(RESET_CREDIT_LIMIT_SUCCESS, this.constructor.name);
-            done();
-          })
-          .catch(error => {
-            Logger.error(RESET_CREDIT_LIMIT_ERROR, this.constructor.name);
-            done(this.getPureError(error));
-          });
-      },
-    );
+          .then(success => {})
+          .catch(error => {});
+        return forkJoin({
+          settings: this.settings.find(),
+          headers: this.clientToken.getServiceAccountApiHeaders(),
+          customer: of(single_customer),
+        });
+      }),
+      switchMap(({ settings, headers, customer }) => {
+        state.settings = settings;
+        state.customer = customer;
+        headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
+        headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
+        state.headers = headers;
+        return this.http.get(
+          settings.authServerURL +
+            FRAPPE_API_GET_CUSTOMER_ENDPOINT +
+            '/' +
+            customer.name,
+          { headers },
+        );
+      }),
+      map(res => res.data),
+      switchMap(erpnextCustomer => {
+        const creditLimits: any[] = erpnextCustomer.credit_limits || [];
 
-    this.agenda
-      .every('60 minutes', RESET_CUSTOMER_CREDIT_LIMIT)
-      .then(scheduled => {})
-      .catch(error => {});
+        for (const limit of creditLimits) {
+          if (limit.company === state.settings.defaultCompany) {
+            return this.http.put(
+              state.settings.authServerURL +
+                ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT +
+                '/' +
+                limit.name,
+              {
+                credit_limit: state.customer.baseCreditLimitAmount,
+              },
+              { headers: state.headers },
+            );
+          }
+        }
+
+        creditLimits.push({
+          credit_limit: state.customer.baseCreditLimitAmount,
+          company: state.settings.defaultCompany,
+        });
+        return this.http.put(
+          state.settings.authServerURL +
+            FRAPPE_API_GET_CUSTOMER_ENDPOINT +
+            '/' +
+            state.customer.name,
+          { credit_limits: creditLimits },
+          { headers: state.headers },
+        );
+      }),
+    );
   }
 
   getPureError(error) {
