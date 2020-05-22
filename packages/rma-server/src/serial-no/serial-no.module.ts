@@ -41,6 +41,7 @@ import { SyncModule } from '../sync/sync.module';
     SerialNoEntitiesModule,
     ...SerialNoAggregatesManager,
     AssignSerialNoPoliciesService,
+    SerialNoPoliciesService,
   ],
 })
 export class SerialNoModule {}
