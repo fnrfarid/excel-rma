@@ -7,6 +7,9 @@ import { StockEntryModule } from '../stock-entry/stock-entry.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { FrappeJobService } from './schedular/frappe-jobs-queue/frappe-jobs-queue.service';
 import { SerialBatchService } from './aggregates/serial-batch/serial-batch.service';
+import { DataImportService } from './service/data-import/data-import.service';
+import { JsonToCsvParserService } from './service/data-import/json-to-csv-parser.service';
+import { FrappeSyncDataImportJobService } from './schedular/frappe-sync-data-import-jobs-queue/frappe-sync-data-import-jobs-queue.service';
 
 @Module({
   imports: [
@@ -17,7 +20,21 @@ import { SerialBatchService } from './aggregates/serial-batch/serial-batch.servi
     StockEntryModule,
     DeliveryNoteModule,
   ],
-  providers: [SyncAggregateService, FrappeJobService, SerialBatchService],
-  exports: [SyncAggregateService, FrappeJobService, SerialBatchService],
+  providers: [
+    SyncAggregateService,
+    FrappeJobService,
+    SerialBatchService,
+    DataImportService,
+    JsonToCsvParserService,
+    FrappeSyncDataImportJobService,
+  ],
+  exports: [
+    SyncAggregateService,
+    FrappeJobService,
+    SerialBatchService,
+    DataImportService,
+    JsonToCsvParserService,
+    FrappeSyncDataImportJobService,
+  ],
 })
 export class SyncModule {}

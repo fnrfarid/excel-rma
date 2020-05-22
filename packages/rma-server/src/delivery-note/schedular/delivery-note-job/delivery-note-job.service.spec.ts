@@ -8,6 +8,9 @@ import { DeliveryNoteJobService } from './delivery-note-job.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 import { DeliveryNoteJobHelperService } from '../../schedular/delivery-note-job-helper/delivery-note-job-helper.service';
+import { JsonToCsvParserService } from '../../../sync/service/data-import/json-to-csv-parser.service';
+import { DataImportService } from '../../../sync/service/data-import/data-import.service';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 
 describe('DeliveryNoteJobService', () => {
   let service: DeliveryNoteJobService;
@@ -45,6 +48,9 @@ describe('DeliveryNoteJobService', () => {
           provide: DeliveryNoteJobHelperService,
           useValue: {},
         },
+        { provide: JsonToCsvParserService, useValue: {} },
+        { provide: DataImportService, useValue: {} },
+        { provide: ClientTokenManagerService, useValue: {} },
       ],
     }).compile();
 
