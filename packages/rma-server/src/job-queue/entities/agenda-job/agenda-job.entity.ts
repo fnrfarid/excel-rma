@@ -1,6 +1,7 @@
 import { Column, ObjectIdColumn, ObjectID, Entity } from 'typeorm';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
+import { DataImportSuccessResponse } from '../../../sync/service/data-import/data-import.service';
 
 export class JobData {
   payload: any;
@@ -45,6 +46,9 @@ export class AgendaJob {
 
   @Column()
   repeatInterval: string;
+
+  @Column()
+  dataImport?: DataImportSuccessResponse;
 
   @Column()
   repeatTimezone: string;

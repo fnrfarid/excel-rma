@@ -40,6 +40,9 @@ export class CreateSalesReturnDto {
   @IsNotEmpty()
   items: SalesReturnItemDto[];
 
+  @IsNotEmpty()
+  delivery_note_names: string[];
+
   @IsOptional()
   pricing_rules: any[];
 

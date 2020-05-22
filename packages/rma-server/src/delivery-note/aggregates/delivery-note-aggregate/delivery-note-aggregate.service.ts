@@ -24,7 +24,7 @@ import {
   DELIVERY_NOTE_LIST_FIELD,
   COMPLETED_STATUS,
   TO_DELIVER_STATUS,
-  STOCK_ENTRY_SERIALS_BATCH_SIZE,
+  DELIVERY_NOTE_SERIAL_BATCH_SIZE,
 } from '../../../constants/app-strings';
 import { AssignSerialDto } from '../../../serial-no/entity/serial-no/assign-serial-dto';
 import { CreateDeliveryNoteInterface } from '../../../delivery-note/entity/delivery-note-service/create-delivery-note-interface';
@@ -128,7 +128,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     token: any,
   ) {
     return this.serialBatchService
-      .batchItems(deliveryNoteBody.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
+      .batchItems(deliveryNoteBody.items, DELIVERY_NOTE_SERIAL_BATCH_SIZE)
       .pipe(
         switchMap((itemBatch: any) => {
           return this.batchAddToQueue(
