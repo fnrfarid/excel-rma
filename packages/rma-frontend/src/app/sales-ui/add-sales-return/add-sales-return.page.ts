@@ -482,9 +482,20 @@ export class AddSalesReturnPage implements OnInit {
     );
     salesReturn.posting_time = this.getFrappeTime();
     salesReturn.set_warehouse = this.warehouseFormControl.value;
+    salesReturn.delivery_note_names = this.deliveryNoteNames;
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
+        this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 2500 });
         this.location.back();
+      },
+      error: err => {
+        if (err.status === 400) {
+          this.snackBar.open(
+            `Invalid Serials ${err.error.invalidSerials}...`,
+            CLOSE,
+            { duration: 2500 },
+          );
+        }
       },
     });
   }

@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   subscription: Subscription;
   showSettings: boolean = false;
   isSettingMenuVisible: boolean = false;
+  isSalesMenuVisible: boolean = false;
   fullName: string = '';
   imageURL: string = '';
   showPurchase: boolean = false;

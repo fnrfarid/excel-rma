@@ -5,6 +5,7 @@ import { AddSalesInvoicePageModule } from './add-sales-invoice/add-sales-invoice
 import { SalesService } from './services/sales.service';
 import { MaterialModule } from '../material/material.module';
 import { ViewSalesInvoicePageModule } from './view-sales-invoice/view-sales-invoice.module';
+import { ViewSalesInvoiceSubjectService } from './view-sales-invoice/view-sales-invoice-subject.service';
 
 @NgModule({
   declarations: [],
@@ -21,6 +22,6 @@ import { ViewSalesInvoicePageModule } from './view-sales-invoice/view-sales-invo
     AddSalesInvoicePageModule,
     ViewSalesInvoicePageModule,
   ],
-  providers: [SalesService],
+  providers: [SalesService, ViewSalesInvoiceSubjectService],
 })
 export class SalesUiModule {}

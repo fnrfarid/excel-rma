@@ -8,8 +8,8 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
     super();
   }
 
-  async retrievePurchaseOrder(uuid: string) {
-    return await this.purchaseOrder.findOne({ uuid });
+  async retrievePurchaseOrder(params) {
+    return await this.purchaseOrder.findOne(params);
   }
 
   getPurchaseOrderList(

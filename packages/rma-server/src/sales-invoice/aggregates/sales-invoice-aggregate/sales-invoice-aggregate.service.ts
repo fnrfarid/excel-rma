@@ -88,7 +88,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               this.apply(
                 new SalesInvoiceAddedEvent(salesInvoice, clientHttpRequest),
               );
-              return of({});
+              return of(salesInvoice);
             }),
           );
       }),
@@ -306,18 +306,22 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         if (!settings) {
           return throwError(new NotImplementedException());
         }
-        return from(
-          this.validateSalesInvoicePolicy.validateSalesReturn(
+        return forkJoin({
+          salesInvoice: this.validateSalesInvoicePolicy.validateSalesReturn(
             createReturnPayload,
           ),
-        ).pipe(
-          switchMap((salesInvoice: SalesInvoice) => {
+          valid: this.validateSalesInvoicePolicy.validateReturnSerials(
+            createReturnPayload,
+          ),
+        }).pipe(
+          switchMap(({ salesInvoice }) => {
             this.createCreditNote(
               settings,
               createReturnPayload,
               clientHttpRequest,
               salesInvoice,
             );
+            delete createReturnPayload.delivery_note_names;
             const deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
             return this.http

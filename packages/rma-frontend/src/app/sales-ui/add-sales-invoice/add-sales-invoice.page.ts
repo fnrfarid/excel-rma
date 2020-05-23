@@ -387,6 +387,17 @@ export class AddSalesInvoicePage implements OnInit {
         }
       });
       salesInvoiceDetails.items = itemList;
+      if (this.salesInvoiceForm.get('customer').value.sales_team) {
+        salesInvoiceDetails.sales_team = this.salesInvoiceForm.get(
+          'customer',
+        ).value.sales_team;
+
+        for (const sales_person of salesInvoiceDetails.sales_team) {
+          sales_person.allocated_amount =
+            (sales_person.allocated_percentage / 100) *
+            salesInvoiceDetails.total;
+        }
+      }
       this.validateStock(itemList)
         .pipe(
           switchMap(info => {
@@ -395,7 +406,7 @@ export class AddSalesInvoicePage implements OnInit {
         )
         .subscribe({
           next: success => {
-            this.location.back();
+            this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
           error: ({ message }) => {
             if (!message) message = UPDATE_ERROR;
@@ -453,6 +464,17 @@ export class AddSalesInvoicePage implements OnInit {
 
       salesInvoiceDetails.items = itemList;
       salesInvoiceDetails.uuid = this.invoiceUuid;
+      if (this.salesInvoiceForm.get('customer').value.sales_team) {
+        salesInvoiceDetails.sales_team = this.salesInvoiceForm.get(
+          'customer',
+        ).value.sales_team;
+
+        for (const sales_person of salesInvoiceDetails.sales_team) {
+          sales_person.allocated_amount =
+            (sales_person.allocated_percentage / 100) *
+            salesInvoiceDetails.total;
+        }
+      }
       this.validateStock(itemList)
         .pipe(
           switchMap(info => {
@@ -461,7 +483,7 @@ export class AddSalesInvoicePage implements OnInit {
         )
         .subscribe({
           next: res => {
-            this.location.back();
+            this.router.navigate(['sales', 'view-sales-invoice', res.uuid]);
           },
           error: ({ message }) => {
             if (!message) message = UPDATE_ERROR;

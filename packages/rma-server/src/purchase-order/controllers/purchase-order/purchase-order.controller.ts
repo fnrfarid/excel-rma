@@ -20,7 +20,17 @@ export class PurchaseOrderController {
   @Get('v1/get/:uuid')
   @UseGuards(TokenGuard)
   async getClient(@Param('uuid') uuid: string) {
-    return await this.queryBus.execute(new RetrievePurchaseOrderQuery(uuid));
+    return await this.queryBus.execute(
+      new RetrievePurchaseOrderQuery({ uuid }),
+    );
+  }
+
+  @Get('v1/get_po_from_pi_number/:name')
+  @UseGuards(TokenGuard)
+  async getPObyPINumber(@Param('name') name: string) {
+    return await this.queryBus.execute(
+      new RetrievePurchaseOrderQuery({ purchase_invoice_name: name }),
+    );
   }
 
   @Get('v1/list')

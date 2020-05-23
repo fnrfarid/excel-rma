@@ -8,7 +8,10 @@ import {
 } from '../../../constants/storage';
 import { map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
-import { LIST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/url-strings';
+import {
+  LIST_DELIVERY_NOTE_ENDPOINT,
+  RELAY_LIST_SALES_RETURN_ENDPOINT,
+} from '../../../constants/url-strings';
 @Injectable({
   providedIn: 'root',
 })
@@ -37,6 +40,26 @@ export class SalesReturnService {
           headers,
         });
       }),
+    );
+  }
+
+  getSalesReturnList(pageIndex = 0, pageSize = 10) {
+    const url = RELAY_LIST_SALES_RETURN_ENDPOINT;
+
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: '[["is_return", "=", "1"]]',
+        limit_page_length: pageSize.toString(),
+        limit_start: pageIndex.toString(),
+      },
+    });
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers, params });
+      }),
+      map(res => res.data),
     );
   }
 

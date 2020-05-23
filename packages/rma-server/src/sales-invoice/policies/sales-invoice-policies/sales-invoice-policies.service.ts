@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { from, throwError, of, forkJoin } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   SALES_INVOICE_NOT_FOUND,
   CUSTOMER_AND_CONTACT_INVALID,
@@ -26,6 +26,7 @@ import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
+import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -33,6 +34,7 @@ export class SalesInvoicePoliciesService {
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly customerService: CustomerService,
     private readonly assignSerialPolicyService: AssignSerialNoPoliciesService,
+    private readonly serialNoPoliciesService: SerialNoPoliciesService,
     private readonly http: HttpService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly settings: SettingsService,
@@ -150,6 +152,36 @@ export class SalesInvoicePoliciesService {
       new BadRequestException(
         this.getMessage(SALES_INVOICE_NOT_FOUND, 1, salesInvoiceName.length),
       ),
+    );
+  }
+
+  validateReturnSerials(payload: CreateSalesReturnDto) {
+    return from(payload.items).pipe(
+      mergeMap(item => {
+        return this.serialNoPoliciesService.validateReturnSerials({
+          delivery_note_names: payload.delivery_note_names,
+          item_code: item.item_code,
+          serials: item.serial_no.split('\n'),
+          warehouse: payload.set_warehouse,
+        });
+      }),
+      toArray(),
+      switchMap((res: { notFoundSerials: string[] }[]) => {
+        const invalidSerials = [];
+
+        res.forEach(invalidSerial => {
+          invalidSerials.push(...invalidSerial.notFoundSerials);
+        });
+
+        if (invalidSerials.length > 0) {
+          return throwError(
+            new BadRequestException({
+              invalidSerials: invalidSerials.splice(0, 5).join(', '),
+            }),
+          );
+        }
+        return of(true);
+      }),
     );
   }
 

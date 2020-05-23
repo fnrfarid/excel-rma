@@ -1,4 +1,4 @@
-import { Injectable, HttpService, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpService } from '@nestjs/common';
 import { switchMap, mergeMap, catchError, retry, map } from 'rxjs/operators';
 import {
   VALIDATE_AUTH_STRING,
@@ -6,12 +6,13 @@ import {
   TO_DELIVER_STATUS,
   CREATE_DELIVERY_NOTE_JOB,
   AGENDA_JOB_STATUS,
+  FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB,
+  DELIVERY_NOTE_DOCTYPE,
+  SYNC_DELIVERY_NOTE_JOB,
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { of, throwError, Observable } from 'rxjs';
-import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { of, throwError, Observable, from } from 'rxjs';
 import { CreateDeliveryNoteInterface } from '../../entity/delivery-note-service/create-delivery-note-interface';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { DeliveryNoteResponseInterface } from '../../entity/delivery-note-service/delivery-note-response-interface';
@@ -23,7 +24,18 @@ import Agenda = require('agenda');
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
 import { DeliveryNoteJobHelperService } from '../delivery-note-job-helper/delivery-note-job-helper.service';
-
+import { JsonToCsvParserService } from '../../../sync/service/data-import/json-to-csv-parser.service';
+import {
+  DataImportService,
+  DataImportSuccessResponse,
+} from '../../../sync/service/data-import/data-import.service';
+import * as uuid from 'uuid/v4';
+import {
+  DATA_IMPORT_API_ENDPOINT,
+  LIST_DELIVERY_NOTE_ENDPOINT,
+} from '../../../constants/routes';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { DataImportSuccessResponseInterface } from '../../../sync/service/data-import/data-import.interface';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()
@@ -32,12 +44,14 @@ export class DeliveryNoteJobService {
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
     private readonly tokenService: DirectService,
-    private readonly http: HttpService,
     private readonly serialNoService: SerialNoService,
-    private readonly settingsService: SettingsService,
     private readonly salesInvoiceService: SalesInvoiceService,
     private readonly jobService: AgendaJobService,
     private readonly jobHelper: DeliveryNoteJobHelperService,
+    private readonly csvService: JsonToCsvParserService,
+    private readonly importData: DataImportService,
+    private readonly http: HttpService,
+    private readonly clientToken: ClientTokenManagerService,
   ) {}
 
   execute(job) {
@@ -58,15 +72,19 @@ export class DeliveryNoteJobService {
     token: any;
     settings: ServerSettings;
     sales_invoice_name: string;
+    dataImport: DataImportSuccessResponse;
+    uuid: string;
   }) {
-    const payload = job.payload;
+    let payload = job.payload;
     return of({}).pipe(
-      mergeMap(object => {
-        //
-        return this.http.post(
-          job.settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
-          payload,
-          { headers: this.settingsService.getAuthorizationHeaders(job.token) },
+      switchMap(object => {
+        payload = this.setCsvDefaults(payload, job.settings);
+        const csvPayload = this.csvService.mapJsonToCsv(payload);
+        return this.importData.addDataImport(
+          DELIVERY_NOTE_DOCTYPE,
+          csvPayload,
+          job.settings,
+          job.token,
         );
       }),
       catchError(err => {
@@ -110,20 +128,30 @@ export class DeliveryNoteJobService {
         return throwError(err);
       }),
       retry(3),
-      map(data => data.data.data),
-      switchMap(success => {
-        if (success) {
-          this.linkDeliveryNote(
-            payload,
-            success,
-            job.token,
-            job.settings,
-            job.sales_invoice_name,
-          );
-        }
+      switchMap((success: DataImportSuccessResponse) => {
+        job.dataImport = success;
+        job.uuid = uuid();
+        this.addToExportedQueue(job);
         return of({});
       }),
     );
+  }
+
+  setCsvDefaults(payload, settings: ServerSettings) {
+    payload.naming_series = payload.naming_series
+      ? payload.naming_series
+      : 'SDR-';
+    payload.price_list_currency = payload.price_list_currency
+      ? payload.price_list_currency
+      : 'BDT';
+    payload.selling_price_list = payload.selling_price_list
+      ? payload.selling_price_list
+      : settings.sellingPriceList;
+    payload.plc_conversion_rate = payload.plc_conversion_rate
+      ? payload.plc_conversion_rate
+      : 1;
+    payload.status = payload.status ? payload.status : 'To Bill';
+    return payload;
   }
 
   syncExistingSerials(
@@ -173,7 +201,14 @@ export class DeliveryNoteJobService {
       if (item.has_serial_no) {
         this.serialNoService
           .updateMany(
-            { serial_no: { $in: item.serial_no.split('\n') } },
+            {
+              serial_no: {
+                $in:
+                  typeof item.serial_no === 'string'
+                    ? item.serial_no.split('\n')
+                    : item.serial_no,
+              },
+            },
             {
               $set: {
                 'warranty.salesWarrantyDate': item.warranty_date,
@@ -189,7 +224,11 @@ export class DeliveryNoteJobService {
 
     response.items.filter(item => {
       if (item.serial_no) {
-        serials.push(...item.serial_no.split('\n'));
+        serials.push(
+          ...(typeof item.serial_no === 'string'
+            ? item.serial_no.split('\n')
+            : item.serial_no),
+        );
       }
       items.push({
         item_code: item.item_code,
@@ -287,5 +326,80 @@ export class DeliveryNoteJobService {
       }
     });
     return this.agenda.now(FRAPPE_QUEUE_JOB, data);
+  }
+
+  syncImport(job: {
+    payload: DataImportSuccessResponse;
+    uuid: string;
+    type: string;
+    settings: ServerSettings;
+  }) {
+    const state: any = {};
+    return this.clientToken.getServiceAccountApiHeaders().pipe(
+      switchMap(headers => {
+        state.headers = headers;
+        return this.http.get(
+          job.settings.authServerURL +
+            DATA_IMPORT_API_ENDPOINT +
+            `/${job.payload.dataImportName}`,
+          { headers },
+        );
+      }),
+      map(data => data.data.data),
+      switchMap((response: DataImportSuccessResponseInterface) => {
+        if (response.import_status === 'Successful') {
+          const parsed_response = JSON.parse(response.log_details);
+          const link = parsed_response.messages[0].link.split('/');
+          const delivery_note = link[link.length - 1];
+          return of(delivery_note);
+        }
+        if (
+          response.import_status === 'Pending' ||
+          response.import_status === 'In Progress'
+        ) {
+          return throwError('Delivery Note is in queue');
+        }
+        return throwError(response);
+      }),
+      switchMap(delivery_note => {
+        return this.http.get(
+          job.settings.authServerURL +
+            LIST_DELIVERY_NOTE_ENDPOINT +
+            delivery_note,
+          { headers: state.headers },
+        );
+      }),
+      map(data => data.data.data),
+      switchMap((delivery_note_response: DeliveryNoteResponseInterface) => {
+        state.delivery_note_response = delivery_note_response;
+        return from(this.jobService.findOne({ 'data.uuid': job.uuid }));
+      }),
+      switchMap(parent_job => {
+        const parent_data = parent_job.data;
+        this.linkDeliveryNote(
+          parent_data.payload,
+          state.delivery_note_response,
+          parent_data.token,
+          job.settings,
+          parent_data.parent,
+        );
+        return of();
+      }),
+      retry(2),
+    );
+  }
+
+  addToExportedQueue(job: {
+    dataImport: DataImportSuccessResponse;
+    uuid: string;
+    settings: ServerSettings;
+  }) {
+    const job_data = {
+      payload: job.dataImport,
+      uuid: job.uuid,
+      type: SYNC_DELIVERY_NOTE_JOB,
+      settings: job.settings,
+    };
+    return this.agenda.now(FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB, job_data);
   }
 }

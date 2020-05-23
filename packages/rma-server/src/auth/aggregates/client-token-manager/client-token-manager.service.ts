@@ -19,6 +19,8 @@ import {
   REVOKED,
   AUTHORIZATION,
   TOKEN_HEADER_VALUE_PREFIX,
+  APPLICATION_JSON_CONTENT_TYPE,
+  ACCEPT,
 } from '../../../constants/app-strings';
 import { INVALID_SERVICE_ACCOUNT } from '../../../constants/messages';
 
@@ -202,6 +204,8 @@ export class ClientTokenManagerService {
         headers[AUTHORIZATION] = TOKEN_HEADER_VALUE_PREFIX;
         headers[AUTHORIZATION] += settings.serviceAccountApiKey + ':';
         headers[AUTHORIZATION] += settings.serviceAccountApiSecret;
+        headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
+        headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
         return headers;
       }),
     );

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DeliveryNoteAggregatesManager } from './aggregates';
 import { DeliveryNoteEntitiesModule } from './entity/delivery-note-entity.module';
 import { DeliveryNoteController } from './controller/delivery-note/delivery-note.controller';
@@ -14,6 +14,8 @@ import { DirectModule } from '../direct/direct.module';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 import { JobQueueModule } from '../job-queue/job-queue.module';
 import { DeliveryNoteJobHelperService } from './schedular/delivery-note-job-helper/delivery-note-job-helper.service';
+import { SyncModule } from '../sync/sync.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { DeliveryNoteJobHelperService } from './schedular/delivery-note-job-help
     SerialNoEntitiesModule,
     SalesInvoiceEntitiesModule,
     DirectModule,
+    forwardRef(() => SyncModule),
     JobQueueModule,
+    AuthModule,
   ],
   controllers: [DeliveryNoteController, DeliveryNoteWebhookController],
   providers: [

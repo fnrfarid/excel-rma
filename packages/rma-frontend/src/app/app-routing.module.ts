@@ -160,8 +160,6 @@ const routes: Routes = [
     loadChildren: () =>
       import('./job-ui/jobs/jobs.module').then(m => m.JobsPageModule),
   },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: '**', redirectTo: 'home' },
   {
     path: 'view-single-job',
     loadChildren: () =>
@@ -169,6 +167,15 @@ const routes: Routes = [
         m => m.ViewSingleJobPageModule,
       ),
   },
+  {
+    path: 'sales-return',
+    loadChildren: () =>
+      import('./sales-ui/sales-return/sales-return.module').then(
+        m => m.SalesReturnPageModule,
+      ),
+  },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home' },
 ];
 
 @NgModule({

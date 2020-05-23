@@ -34,7 +34,7 @@ export class FrappeJobService implements OnModuleInit {
           .execute(job)
           .toPromise()
           .then(success => {
-            job.attrs.data.status = AGENDA_JOB_STATUS.success;
+            job.attrs.data.status = AGENDA_JOB_STATUS.exported;
             return done();
           })
           .catch(err => {

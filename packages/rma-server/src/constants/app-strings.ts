@@ -108,8 +108,10 @@ export const SALES_INVOICE_STATUS_ENUM = [
 ];
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
+export const DELIVERY_NOTE_DOCTYPE = 'Delivery Note';
 export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 20;
 export const STOCK_ENTRY_SERIALS_BATCH_SIZE = 20;
+export const DELIVERY_NOTE_SERIAL_BATCH_SIZE = 1000;
 export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
 export const FRAPPE_INSERT_MANY_BATCH_COUNT = 2;
 export const PURCHASE_RECEIPT_DOCTYPE_NAME = 'Purchase Receipt';
@@ -122,6 +124,8 @@ export const STOCK_ENTRY = 'Stock Entry';
 export const ITEM_DOCTYPE = 'Item';
 export const SALES_INVOICE_DOCTYPE = 'Sales Invoice';
 export const FRAPPE_QUEUE_JOB = 'FRAPPE_QUEUE_JOB';
+export const FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB =
+  'FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB';
 export const CREATE_DELIVERY_NOTE_JOB = 'CREATE_DELIVERY_NOTE_JOB';
 export const STOCK_ENTRY_LIST_ITEM_SELECT_KEYS = [
   's_warehouse',
@@ -151,5 +155,9 @@ export const AGENDA_JOB_STATUS = {
   in_queue: 'In Queue',
   reset: 'Reset',
   retrying: 'Retrying',
+  exported: 'Exported',
 };
 export const AGENDA_MAX_RETRIES = 1;
+export const AGENDA_DATA_IMPORT_MAX_RETRIES = 4;
+export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert new records';
+export const SYNC_DELIVERY_NOTE_JOB = 'SYNC_DELIVERY_NOTE_JOB';

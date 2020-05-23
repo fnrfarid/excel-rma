@@ -34,6 +34,7 @@ describe('PurchaseDetailsComponent', () => {
           provide: PurchaseService,
           useValue: {
             getPurchaseInvoice: (...args) => of({ items: [] }),
+            getPOFromPINumber: (...args) => of({ name: 'name', uuid: 'uuid' }),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
