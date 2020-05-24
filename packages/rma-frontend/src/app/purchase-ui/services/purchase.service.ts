@@ -19,7 +19,7 @@ import {
 import { StorageService } from '../../api/storage/storage.service';
 import { PurchaseReceipt } from '../../common/interfaces/purchase-receipt.interface';
 import { JSON_BODY_MAX_SIZE } from '../../constants/app-string';
-import { PurchaseOrder } from 'src/app/common/interfaces/purchase.interface';
+import { PurchaseOrder } from '../../common/interfaces/purchase.interface';
 @Injectable({
   providedIn: 'root',
 })
