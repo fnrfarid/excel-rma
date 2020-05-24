@@ -522,7 +522,7 @@ export class AddSalesReturnPage implements OnInit {
                 // name of all items [ "blue cotton candy" ...]
                 const item_names = [];
                 // obj map for item and number of serial present like - { blue cotton candy : 50  }
-                const itemObj: CsvJsonObj = {};
+                const itemObj: any = {};
 
                 // get all item_name and validate from current remaining items and then the API
                 for (const key in data) {
@@ -595,7 +595,7 @@ export class AddSalesReturnPage implements OnInit {
     return isValid;
   }
 
-  validateJson(json: CsvJsonObj) {
+  validateJson(json: any) {
     let isValid = true;
     const data = this.itemDataSource.data();
     for (const value of data) {

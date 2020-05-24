@@ -116,7 +116,7 @@ export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
 export const FRAPPE_INSERT_MANY_BATCH_COUNT = 2;
 export const PURCHASE_RECEIPT_DOCTYPE_NAME = 'Purchase Receipt';
 export const SERIAL_NO_DOCTYPE_NAME = 'Serial No';
-export const MONGO_INSERT_MANY_BATCH_NUMBER = 1000;
+export const MONGO_INSERT_MANY_BATCH_NUMBER = 10000;
 export const VALIDATE_AUTH_STRING = 'validate_oauth';
 export const TOKEN_HEADER_VALUE_PREFIX = 'token ';
 export const STOCK_MATERIAL_TRANSFER = 'Material Transfer';
@@ -158,6 +158,6 @@ export const AGENDA_JOB_STATUS = {
   exported: 'Exported',
 };
 export const AGENDA_MAX_RETRIES = 1;
-export const AGENDA_DATA_IMPORT_MAX_RETRIES = 4;
+export const AGENDA_DATA_IMPORT_MAX_RETRIES = 3;
 export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert new records';
 export const SYNC_DELIVERY_NOTE_JOB = 'SYNC_DELIVERY_NOTE_JOB';

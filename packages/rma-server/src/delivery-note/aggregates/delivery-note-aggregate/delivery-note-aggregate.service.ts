@@ -46,6 +46,8 @@ import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-
 import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delivery-note-job.service';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
   constructor(
@@ -56,6 +58,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     private readonly deliveryNoteService: DeliveryNoteService,
     private readonly serialBatchService: SerialBatchService,
     private readonly deliveryNoteJobService: DeliveryNoteJobService,
+    private readonly serialNoService: SerialNoService,
   ) {
     super();
   }
@@ -170,77 +173,82 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
   }
 
   createDeliveryNote(assignPayload: AssignSerialDto, clientHttpRequest) {
-    return this.settingsService
-      .find()
-      .pipe(
-        switchMap(settings => {
-          if (!settings) {
-            return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
-          }
-          this.salesInvoiceService
-            .updateOne(
-              { name: assignPayload.sales_invoice_name },
-              { $set: { delivery_warehouse: assignPayload.set_warehouse } },
-            )
-            .then(success => {})
-            .catch(error => {});
-          const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
-          this.batchDeliveryNoteItems(
-            deliveryNoteBody,
-            assignPayload.sales_invoice_name,
-            settings,
-            clientHttpRequest.token,
-          );
-          return of({});
-        }),
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        if (!settings) {
+          return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
+        }
+        this.salesInvoiceService
+          .updateOne(
+            { name: assignPayload.sales_invoice_name },
+            { $set: { delivery_warehouse: assignPayload.set_warehouse } },
+          )
+          .then(success => {})
+          .catch(error => {});
+        const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
+        this.batchDeliveryNoteItems(
+          deliveryNoteBody,
+          assignPayload.sales_invoice_name,
+          settings,
+          clientHttpRequest.token,
+        );
+        return of({});
+      }),
+      switchMap((response: any) => {
+        this.updateDeliveryNoteState(assignPayload);
+        return of();
+      }),
+      catchError(err => {
+        return throwError(
+          new BadRequestException(err.response ? err.response.data.exc : err),
+        );
+      }),
+    );
+  }
+
+  updateDeliveryNoteState(assignPayload: AssignSerialDto) {
+    const incrementMap = {};
+    const serials = [];
+    assignPayload.items.forEach(item => {
+      incrementMap[`delivered_items_map.${item.item_code}`] = item.qty;
+      serials.push(item.serial_no);
+    });
+
+    this.salesInvoiceService
+      .findOne({
+        name: assignPayload.sales_invoice_name,
+      })
+      .then(sales_invoice => {
+        const status = this.getStatus(sales_invoice);
+        this.salesInvoiceService
+          .updateMany(
+            { name: assignPayload.sales_invoice_name },
+            {
+              $set: { status },
+              $inc: incrementMap,
+            },
+          )
+          .then(success => {})
+          .catch(error => {});
+      })
+      .catch(error => {});
+
+    this.serialNoService
+      .updateMany(
+        { serial_no: { $in: serials } },
+        {
+          $set: {
+            queue_state: {
+              delivery_note: {
+                parent: assignPayload.sales_invoice_name,
+                warehouse: assignPayload.set_warehouse,
+              },
+            },
+          },
+        },
       )
-      .pipe(
-        switchMap((response: any) => {
-          const delivered_items_map = {};
-
-          assignPayload.items.forEach(item => {
-            delivered_items_map[item.item_code] = item.qty;
-          });
-
-          this.salesInvoiceService
-            .findOne({
-              name: assignPayload.sales_invoice_name,
-            })
-            .then(sales_invoice => {
-              for (const key of Object.keys(delivered_items_map)) {
-                if (sales_invoice.delivered_items_map[key]) {
-                  sales_invoice.delivered_items_map[key] +=
-                    delivered_items_map[key];
-                } else {
-                  sales_invoice.delivered_items_map[key] =
-                    delivered_items_map[key];
-                }
-              }
-
-              const status = this.getStatus(sales_invoice);
-              this.salesInvoiceService
-                .updateMany(
-                  { name: assignPayload.sales_invoice_name },
-                  {
-                    $set: {
-                      status,
-                      delivered_items_map: sales_invoice.delivered_items_map,
-                    },
-                  },
-                )
-                .then(success => {})
-                .catch(error => {});
-            })
-            .catch(error => {});
-
-          return of({});
-        }),
-        catchError(err => {
-          return throwError(
-            new BadRequestException(err.response ? err.response.data.exc : err),
-          );
-        }),
-      );
+      .then(success => {})
+      .catch(error => {});
   }
 
   getStatus(sales_invoice: SalesInvoice) {
