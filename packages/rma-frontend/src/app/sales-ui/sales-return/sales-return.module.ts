@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { SalesReturnPageRoutingModule } from './sales-return-routing.module';
 
 import { SalesReturnPage } from './sales-return.page';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../material/material.module';
 
 @NgModule({
   imports: [

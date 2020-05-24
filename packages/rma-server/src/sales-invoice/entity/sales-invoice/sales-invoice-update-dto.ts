@@ -188,6 +188,10 @@ export class ItemDto {
   @IsNumber()
   rate: number;
 
+  @IsNotEmpty()
+  @IsNumber()
+  has_serial_no: number;
+
   @IsOptional()
   @IsNumber()
   amount: number;
