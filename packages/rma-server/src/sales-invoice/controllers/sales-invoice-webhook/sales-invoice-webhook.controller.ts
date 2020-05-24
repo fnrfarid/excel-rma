@@ -22,6 +22,8 @@ export class SalesInvoiceWebhookController {
   purchaseInvoiceCreated(
     @Body() purchaseInvoicePayload: SalesInvoiceWebhookDto,
   ) {
+    if (purchaseInvoicePayload.is_return) return;
+
     return this.salesInvoiceWebhookAggregate.salesInvoiceCreated(
       purchaseInvoicePayload,
     );

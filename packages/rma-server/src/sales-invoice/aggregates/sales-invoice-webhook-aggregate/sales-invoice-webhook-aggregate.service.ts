@@ -61,6 +61,7 @@ export class SalesInvoiceWebhookAggregateService {
       switchMap(serializedItems => {
         const salesInvoice = new SalesInvoice();
         Object.assign(salesInvoice, salesInvoicePayload);
+        salesInvoice.created_on = new Date();
         salesInvoice.uuid = uuidv4();
         salesInvoice.isSynced = true;
         salesInvoice.status = SUBMITTED_STATUS;
