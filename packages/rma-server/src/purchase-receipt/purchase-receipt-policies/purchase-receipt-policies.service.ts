@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
 import { PurchaseReceiptDto } from '../entity/purchase-receipt-dto';
 import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
-import { from, throwError, of } from 'rxjs';
+import { from, throwError, of, forkJoin } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { PurchaseInvoiceService } from '../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PURCHASE_INVOICE_NOT_FOUND } from '../../constants/messages';
@@ -30,21 +30,25 @@ export class PurchaseReceiptPoliciesService {
     return this.validatePurchaseInvoice(purchaseReceiptPayload).pipe(
       switchMap(valid => {
         const serials = this.getSerials(purchaseReceiptPayload);
-        return from(
-          this.serialNoService.find({
-            serial_no: { $in: serials },
-            warehouse: { $exists: true },
-          }),
-        ).pipe(
-          switchMap(foundSerials => {
-            if (foundSerials && foundSerials.length) {
-              return throwError(
-                new BadRequestException(this.getSerialMessage(foundSerials)),
-              );
-            }
-            return of(true);
-          }),
-        );
+        const where = {
+          serial_no: { $in: serials },
+          $or: [
+            { 'queue_state.purchase_receipt': { $exists: true } },
+            { purchase_document_no: { $exists: true } },
+          ],
+        };
+        return forkJoin({
+          serials: from(this.serialNoService.find({ where, take: 5 })),
+          count: this.serialNoService.count(where),
+        });
+      }),
+      switchMap(({ serials, count }) => {
+        if (count) {
+          return throwError(
+            new BadRequestException(this.getSerialMessage(serials)),
+          );
+        }
+        return of(true);
       }),
     );
   }
@@ -54,9 +58,11 @@ export class PurchaseReceiptPoliciesService {
     serial.forEach(element => {
       foundSerials.push(element.serial_no);
     });
-    return `From Provided serials ${
+    return `Found ${
       foundSerials.length
-    } already exist, found : ${foundSerials.splice(0, 5).join(', ')}..`;
+    } serials that are in a queue or already exist : ${foundSerials
+      .splice(0, 5)
+      .join(', ')}..`;
   }
 
   getSerials(purchaseReceiptPayload: PurchaseReceiptDto) {

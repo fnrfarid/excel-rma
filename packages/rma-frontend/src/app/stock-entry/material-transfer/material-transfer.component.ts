@@ -343,7 +343,6 @@ export class MaterialTransferComponent implements OnInit {
                 if (key) {
                   item_names.push(key);
                   itemObj[key] = {
-                    serial: data[key].serial_no.length,
                     serial_no: data[key].serial_no.map(serial => {
                       return serial.toUpperCase();
                     }),

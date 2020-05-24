@@ -81,11 +81,15 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               const { body } = this.mapPurchaseInvoiceReceipt(
                 purchaseInvoicePayload,
               );
-              return this.batchPurchaseReceipt(
+              const { serials, createSerialsBatch } = this.getMappedSerials(
+                body,
+              );
+              return this.createBatchedFrappeSerials(
                 settings,
                 body,
                 clientHttpRequest,
-                purchaseInvoicePayload.purchase_invoice_name,
+                body.purchase_invoice_name,
+                { serials, createSerialsBatch },
               );
             }),
             catchError(err => {
@@ -174,10 +178,20 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         );
       }),
       bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
-      switchMap(data => {
-        return from(this.serialNoService.insertMany(data, { ordered: true }));
+      concatMap(data => {
+        return from(
+          this.serialNoService.insertMany(data, { ordered: false }),
+        ).pipe(
+          catchError(err => {
+            return this.handleMongoExistingSerialsError(err, data);
+          }),
+        );
       }),
       retry(3),
+      switchMap(success => {
+        return of();
+      }),
+      toArray(),
       switchMap(success => {
         return of(true);
       }),
@@ -185,6 +199,46 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         return throwError(new BadRequestException(err));
       }),
     );
+  }
+
+  handleMongoExistingSerialsError(err, data) {
+    if (err && err.result && err.result.nInserted !== data.length) {
+      const existingSerialsMap: {
+        [key: string]: {
+          serials: string[];
+          queue_state: any;
+          item_name: string;
+        };
+      } = {};
+      data.forEach(item => {
+        if (existingSerialsMap[item.item_code]) {
+          existingSerialsMap[item.item_code].serials.push(item.serial_no);
+          return;
+        }
+        existingSerialsMap[item.item_code] = {
+          serials: [item.serial_no],
+          queue_state: item.queue_state,
+          item_name: item.item_name,
+        };
+      });
+      return from(Object.keys(existingSerialsMap)).pipe(
+        switchMap(item_code => {
+          return from(
+            this.serialNoService.updateMany(
+              { serial_no: { $in: existingSerialsMap[item_code].serials } },
+              {
+                $set: {
+                  item_code,
+                  queue_state: existingSerialsMap[item_code].queue_state,
+                  item_name: existingSerialsMap[item_code].item_name,
+                },
+              },
+            ),
+          );
+        }),
+      );
+    }
+    return throwError(err);
   }
 
   mapItemsCodeToSerials(
@@ -199,11 +253,18 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           doctype: SERIAL_NO_DOCTYPE_NAME,
           serial_no: serial,
           item_code,
+          item_name: item.item_name,
           purchase_date: purchaseReceipt.posting_date,
           purchase_time: purchaseReceipt.posting_time,
           purchase_rate: item.rate,
           supplier: purchaseReceipt.supplier,
           company: purchaseReceipt.company,
+          queue_state: {
+            purchase_receipt: {
+              parent: purchaseReceipt.purchase_invoice_name,
+              warehouse: item.warehouse,
+            },
+          },
         });
       }),
     );
@@ -267,45 +328,13 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
   ) {
     this.updatePurchaseReceiptItemsMap(purchase_invoice_name, body);
 
-    return from(this.createFrappeSerials(batch.createSerialsBatch, body))
-      .pipe(
-        switchMap(success => {
-          this.createBatchedPurchaseReceipts(
-            settings,
-            body,
-            clientHttpRequest,
-            purchase_invoice_name,
-          );
-          return of({});
-        }),
-      )
-      .subscribe({
-        next: success => {},
-        error: err => {
-          this.errorLogService.createErrorLog(
-            err,
-            PURCHASE_RECEIPT_DOCTYPE_NAME,
-            'purchaseInvoice',
-            clientHttpRequest,
-          );
-        },
-      });
-  }
-
-  batchPurchaseReceipt(
-    settings: ServerSettings,
-    body: PurchaseReceiptDto,
-    clientHttpRequest,
-    purchase_invoice_name: string,
-  ) {
-    return this.batchValidateSerials(settings, body, clientHttpRequest).pipe(
-      switchMap((batch: SerialMapResponseInterface) => {
-        this.createBatchedFrappeSerials(
+    return from(this.createFrappeSerials(batch.createSerialsBatch, body)).pipe(
+      switchMap(success => {
+        this.createBatchedPurchaseReceipts(
           settings,
           body,
           clientHttpRequest,
           purchase_invoice_name,
-          batch,
         );
         return of({});
       }),

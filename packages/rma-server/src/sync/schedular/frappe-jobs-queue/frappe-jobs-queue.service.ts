@@ -38,7 +38,10 @@ export class FrappeJobService implements OnModuleInit {
             return done();
           })
           .catch(err => {
-            job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
+            if (job.attrs.data.type === this.CREATE_DELIVERY_NOTE_JOB) {
+              job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
+            }
+            job.attrs.data.status = AGENDA_JOB_STATUS.success;
             return done(this.getPureError(err));
           });
       },
