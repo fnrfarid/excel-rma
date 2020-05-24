@@ -32,17 +32,17 @@ export class PurchaseReceiptPoliciesService {
         const serials = this.getSerials(purchaseReceiptPayload);
         const where = {
           serial_no: { $in: serials },
-          $or:[
-            {"queue_state.purchase_receipt" : {$exists : true}},
-            {purchase_document_no: {$exists : true}},
-          ]
-        }
+          $or: [
+            { 'queue_state.purchase_receipt': { $exists: true } },
+            { purchase_document_no: { $exists: true } },
+          ],
+        };
         return forkJoin({
-          serials: from(this.serialNoService.find({where,take : 5})),
+          serials: from(this.serialNoService.find({ where, take: 5 })),
           count: this.serialNoService.count(where),
         });
       }),
-      switchMap(({serials,count}) => {
+      switchMap(({ serials, count }) => {
         if (count) {
           return throwError(
             new BadRequestException(this.getSerialMessage(serials)),
@@ -58,7 +58,11 @@ export class PurchaseReceiptPoliciesService {
     serial.forEach(element => {
       foundSerials.push(element.serial_no);
     });
-    return `Found ${foundSerials.length} serials that are in a queue or already exist : ${foundSerials.splice(0, 5).join(', ')}..`;
+    return `Found ${
+      foundSerials.length
+    } serials that are in a queue or already exist : ${foundSerials
+      .splice(0, 5)
+      .join(', ')}..`;
   }
 
   getSerials(purchaseReceiptPayload: PurchaseReceiptDto) {

@@ -100,12 +100,14 @@ export class PurchaseReceiptSyncService {
           ),
         );
       }),
-      switchMap(done =>{
-        return from(this.serialNoService.updateMany(
-          {serial_no : {$in : item_hash.serials}},
-          {$unset : { "queue_state.purchase_receipt" : undefined }}
-        ));
-      })
+      switchMap(done => {
+        return from(
+          this.serialNoService.updateMany(
+            { serial_no: { $in: item_hash.serials } },
+            { $unset: { 'queue_state.purchase_receipt': undefined } },
+          ),
+        );
+      }),
     );
   }
 
@@ -209,7 +211,7 @@ export class PurchaseReceiptSyncService {
                     settings.timeZone,
                   ).toJSDate(),
                 },
-                $unset : { "queue_state.purchase_receipt" : undefined }
+                $unset: { 'queue_state.purchase_receipt': undefined },
               },
             ),
           );
@@ -331,7 +333,7 @@ export class PurchaseReceiptSyncService {
             purchase_document_type: element.purchase_document_type,
             purchase_document_no: element.purchase_document_no,
           },
-          $unset : { "queue_state.purchase_receipt" : undefined }
+          $unset: { 'queue_state.purchase_receipt': undefined },
         },
       )
       .then(success => {})
@@ -468,7 +470,7 @@ export class PurchaseReceiptSyncService {
                 purchase_document_type: 'Purchase Receipt',
                 purchase_document_no: key,
               },
-              $unset : { "queue_state.purchase_receipt" : undefined }
+              $unset: { 'queue_state.purchase_receipt': undefined },
             },
           ),
         );

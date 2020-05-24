@@ -75,6 +75,7 @@ export class SalesService {
     item_code: string;
     serials: string[];
     validateFor?: string;
+    warehouse?: string;
   }) {
     if (JSON.stringify(item).length < JSON_BODY_MAX_SIZE) {
       return this.getHeaders().pipe(

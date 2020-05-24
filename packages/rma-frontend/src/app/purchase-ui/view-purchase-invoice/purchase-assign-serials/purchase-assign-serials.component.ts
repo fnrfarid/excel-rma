@@ -227,14 +227,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   async submitPurchaseReceipt() {
     if (!this.validateState()) return;
 
-    if (!this.warehouseFormControl.value) {
-      this.snackBar.open('Please select a warehouse.', CLOSE, {
-        duration: 3000,
-      });
-      return;
-    }
     const loading = await this.loadingController.create({
-      message: 'Creating Serials...!',
+      message: 'Validating Purchase Receipt...',
     });
     await loading.present();
 
@@ -282,7 +276,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.purchaseService.createPurchaseReceipt(purchaseReceipt).subscribe({
       next: success => {
         loading.dismiss();
-        this.snackBar.open('Purchase Receipt created', CLOSE, {
+        this.snackBar.open('Purchase Receipt are added to the queue.', CLOSE, {
           duration: 2500,
         });
         this.location.back();
@@ -515,6 +509,12 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     const data = this.serialDataSource.data();
     let isValid = true;
     let index = 0;
+    if (!this.warehouseFormControl.value) {
+      this.snackBar.open('Please select a warehouse.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
     for (const item of data) {
       index++;
       if (!item.warranty_date) {
@@ -645,7 +645,12 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     ].join('-');
   }
 
-  fileChangedEvent($event): void {
+  async fileChangedEvent($event) {
+    const loading = await this.loadingController.create({
+      message: 'Fetching And validating serials for Purchase Receipt...!',
+    });
+    await loading.present();
+
     const reader = new FileReader();
     reader.readAsText($event.target.files[0]);
     reader.onload = (file: any) => {
@@ -655,40 +660,52 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         .replace(/"/g, '')
         .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
         .split(',');
-      if(this.csvService.validateHeaders(headers)){
+      if (this.csvService.validateHeaders(headers)) {
         this.csvService
           .csvToJSON(csvData)
           .pipe(
             switchMap(json => {
               const hashMap = this.csvService.mapJson(json);
               const item_names = [];
-              item_names.push(...Object.keys(hashMap))
-              if(this.validateJson(hashMap)){
-                return  this.csvService.validateSerials(item_names, hashMap, PURCHASE_RECEIPT).pipe(
-                  switchMap((response: boolean) => {
-                    this.csvFileInput.nativeElement.value = '';
-                    if (response) {
-                      return of(hashMap);
-                    }
-                    return of(false);
-                  }),
-                )
+              item_names.push(...Object.keys(hashMap));
+              if (this.validateJson(hashMap)) {
+                return this.csvService
+                  .validateSerials(item_names, hashMap, PURCHASE_RECEIPT)
+                  .pipe(
+                    switchMap((response: boolean) => {
+                      this.csvFileInput.nativeElement.value = '';
+                      if (response) {
+                        this.getMessage('Serials Validated Successfully.');
+                        return of(hashMap);
+                      }
+                      return of(false);
+                    }),
+                  );
               }
               return of(false);
             }),
           )
           .subscribe({
             next: (response: CsvJsonObj | boolean) => {
-              if(response){
-                this.addSerialsFromCsvJson(response)
+              loading.dismiss();
+              if (response) {
+                this.addSerialsFromCsvJson(response);
               }
               this.csvFileInput.nativeElement.value = '';
             },
             error: err => {
+              this.getMessage(
+                'Error occurred while validation of serials : ' +
+                  (err && err.error && err.error.message)
+                  ? err.error.message
+                  : '',
+              );
+              loading.dismiss();
               this.csvFileInput.nativeElement.value = '';
             },
-          })
-      }else{
+          });
+      } else {
+        loading.dismiss();
         this.csvFileInput.nativeElement.value = '';
       }
     };
@@ -727,7 +744,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       if (csvJsonObj[element.item_name]) {
         if (!element.has_serial_no) {
           this.snackBar.open(
-            `${element.item_name} is not a non-serial item.`,
+            `${element.item_name} is a non-serial item.`,
             CLOSE,
             { duration: 3500 },
           );

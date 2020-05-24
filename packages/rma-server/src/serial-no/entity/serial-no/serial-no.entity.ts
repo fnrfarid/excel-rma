@@ -14,19 +14,19 @@ export class Warranty {
   soldOn: Date;
 }
 export class QueueState {
-  purchase_receipt : {
-    parent: string,
-    warehouse : string;
+  purchase_receipt: {
+    parent: string;
+    warehouse: string;
   };
-  delivery_note:{
-    parent: string,
-    warehouse : string;
+  delivery_note: {
+    parent: string;
+    warehouse: string;
   };
   stock_entry: {
-    parent: string,
-    source_warehouse : string;
-    target_warehouse : string;
-  }
+    parent: string;
+    source_warehouse: string;
+    target_warehouse: string;
+  };
 }
 
 @Entity()
@@ -144,7 +144,7 @@ export class SerialNo extends BaseEntity {
   purchase_date: string;
 
   @Column()
-  queue_state: QueueState
+  queue_state: QueueState;
 
   @Column()
   purchase_invoice_name: string;

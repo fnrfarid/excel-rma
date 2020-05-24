@@ -381,18 +381,29 @@ export class SerialsComponent implements OnInit {
     });
   }
 
-  validateSerial(item: { item_code: string; serials: string[] }, row: Item) {
+  validateSerial(
+    item: { item_code: string; serials: string[]; warehouse?: string },
+    row: Item,
+  ) {
+    if (!this.warehouseFormControl.value) {
+      this.getMessage('Please select a warehouse to validate serials.');
+      return;
+    }
+    item.warehouse = this.warehouseFormControl.value;
     this.salesService.validateSerials(item).subscribe({
       next: (success: { notFoundSerials: string[] }) => {
-        success.notFoundSerials && success.notFoundSerials.length
-          ? this.snackBar.open(
-              `Invalid Serials ${success.notFoundSerials
-                .splice(0, 5)
-                .join(', ')}...`,
-              CLOSE,
-              { duration: 2500 },
-            )
-          : this.assignRangeSerial(row, this.rangePickerState.serials);
+        if (success.notFoundSerials && success.notFoundSerials.length) {
+          this.snackBar.open(
+            `Found ${success.notFoundSerials.length} Invalid Serials for
+              item: ${item.item_code} at
+              warehouse: ${item.warehouse},
+              ${success.notFoundSerials.splice(0, 5).join(', ')}...`,
+            CLOSE,
+            { duration: 5500 },
+          );
+          return;
+        }
+        this.assignRangeSerial(row, this.rangePickerState.serials);
       },
       error: err => {},
     });
@@ -471,6 +482,12 @@ export class SerialsComponent implements OnInit {
     const data = this.serialDataSource.data();
     let isValid = true;
     let index = 0;
+    if (!this.warehouseFormControl.value) {
+      this.snackBar.open('Please select a warehouse.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
     for (const item of data) {
       index++;
       if (!item.warranty_date) {
@@ -499,8 +516,7 @@ export class SerialsComponent implements OnInit {
     if (!this.validateState()) return;
 
     const loading = await this.loadingController.create({
-      message:
-        'Creating Delivery Note! more then 500 serials may take some time, get some coffee!',
+      message: 'Creating Delivery Note..',
     });
     await loading.present();
     const assignSerial = {} as SerialAssign;
@@ -603,7 +619,12 @@ export class SerialsComponent implements OnInit {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
   }
 
-  fileChangedEvent($event): void {
+  async fileChangedEvent($event) {
+    const loading = await this.loadingController.create({
+      message: 'Fetching And validating serials for Purchase Receipt...!',
+    });
+    await loading.present();
+
     const reader = new FileReader();
     reader.readAsText($event.target.files[0]);
     reader.onload = (file: any) => {
@@ -613,40 +634,63 @@ export class SerialsComponent implements OnInit {
         .replace(/"/g, '')
         .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
         .split(',');
-      if(this.csvService.validateHeaders(headers)){
+      if (this.csvService.validateHeaders(headers)) {
         this.csvService
           .csvToJSON(csvData)
           .pipe(
             switchMap(json => {
               const hashMap = this.csvService.mapJson(json);
               const item_names = [];
-              item_names.push(...Object.keys(hashMap))
-              if(this.validateJson(hashMap)){
-                return  this.csvService.validateSerials(item_names, hashMap, DELIVERY_NOTE).pipe(
-                  switchMap((response: boolean) => {
-                    this.csvFileInput.nativeElement.value = '';
-                    if (response) {
-                      return of(hashMap);
-                    }
-                    return of(false);
-                  }),
-                )
+              item_names.push(...Object.keys(hashMap));
+              if (this.validateJson(hashMap)) {
+                if (!this.warehouseFormControl.value) {
+                  this.getMessage(
+                    'Please select a warehouse to validate serials.',
+                  );
+                  return;
+                }
+                return this.csvService
+                  .validateSerials(
+                    item_names,
+                    hashMap,
+                    DELIVERY_NOTE,
+                    this.warehouseFormControl.value,
+                  )
+                  .pipe(
+                    switchMap((response: boolean) => {
+                      this.csvFileInput.nativeElement.value = '';
+                      if (response) {
+                        this.getMessage('Serials Validated Successfully.');
+                        return of(hashMap);
+                      }
+                      return of(false);
+                    }),
+                  );
               }
               return of(false);
             }),
           )
           .subscribe({
             next: (response: CsvJsonObj | boolean) => {
-              if(response){
-                this.addSerialsFromCsvJson(response)
+              loading.dismiss();
+              if (response) {
+                this.addSerialsFromCsvJson(response);
               }
               this.csvFileInput.nativeElement.value = '';
             },
             error: err => {
+              this.getMessage(
+                'Error occurred while validation of serials : ' +
+                  (err && err.error && err.error.message)
+                  ? err.error.message
+                  : '',
+              );
+              loading.dismiss();
               this.csvFileInput.nativeElement.value = '';
             },
-          })
-      }else{
+          });
+      } else {
+        loading.dismiss();
         this.csvFileInput.nativeElement.value = '';
       }
     };
@@ -658,7 +702,7 @@ export class SerialsComponent implements OnInit {
       if (csvJsonObj[element.item_name]) {
         if (!element.has_serial_no) {
           this.snackBar.open(
-            `${element.item_name} is not a non-serial item.`,
+            `${element.item_name} is a non-serial item.`,
             CLOSE,
             { duration: 3500 },
           );

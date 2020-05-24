@@ -50,8 +50,8 @@ export class ViewSingleJobPage {
   }
 
   getParsedDate(value) {
-    if(this.data.data.status === 'In Queue'){
-      return 'In Queue'
+    if (this.data && this.data.data && this.data.data.status === 'In Queue') {
+      return 'In Queue';
     }
     const date = new Date(value);
     return [

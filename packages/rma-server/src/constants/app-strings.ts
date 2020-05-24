@@ -158,6 +158,6 @@ export const AGENDA_JOB_STATUS = {
   exported: 'Exported',
 };
 export const AGENDA_MAX_RETRIES = 1;
-export const AGENDA_DATA_IMPORT_MAX_RETRIES = 4;
+export const AGENDA_DATA_IMPORT_MAX_RETRIES = 3;
 export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert new records';
 export const SYNC_DELIVERY_NOTE_JOB = 'SYNC_DELIVERY_NOTE_JOB';

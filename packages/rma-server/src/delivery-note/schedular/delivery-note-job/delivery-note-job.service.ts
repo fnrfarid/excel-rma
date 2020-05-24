@@ -215,6 +215,9 @@ export class DeliveryNoteJobService {
                 'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
                 delivery_note: response.name,
               },
+              $unset: {
+                'queue_state.delivery_note': null,
+              },
             },
           )
           .then(success => {})

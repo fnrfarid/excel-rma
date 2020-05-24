@@ -7,6 +7,7 @@ import {
   SYSTEM_MANAGER,
   FRAPPE_JOB_SELECT_FIELDS,
   AGENDA_JOB_STATUS,
+  FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB,
 } from '../../../constants/app-strings';
 
 @Injectable()
@@ -46,7 +47,9 @@ export class AgendaJobService {
     //   }
     // }
 
-    const jobFilter = { name: FRAPPE_QUEUE_JOB };
+    const jobFilter = {
+      name: { $in: [FRAPPE_QUEUE_JOB, FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB] },
+    };
 
     if (!token.roles.includes(SYSTEM_MANAGER)) {
       jobFilter['data.token.email'] = token.email;

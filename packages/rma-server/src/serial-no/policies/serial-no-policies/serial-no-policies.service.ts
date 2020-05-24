@@ -72,17 +72,16 @@ export class SerialNoPoliciesService {
       : this.validateSerialsForDeliveryNote(payload)
     ).pipe(
       switchMap((data: ValidateSerialsResponse[]) => {
-          if (payload.validateFor === 'purchase_receipt') {
-            return of({ notFoundSerials: data[0] ? data[0].foundSerials : [] });
-          } else {
-            return of({
-              notFoundSerials: data[0]
-                ? data[0].notFoundSerials
-                : payload.serials,
-            });
-          }
-        },
-      ),
+        if (payload.validateFor === 'purchase_receipt') {
+          return of({ notFoundSerials: data[0] ? data[0].foundSerials : [] });
+        } else {
+          return of({
+            notFoundSerials: data[0]
+              ? data[0].notFoundSerials
+              : payload.serials,
+          });
+        }
+      }),
     );
   }
 
@@ -151,41 +150,38 @@ export class SerialNoPoliciesService {
   }
 
   validateSerialsForDeliveryNote(payload: ValidateSerialsDto) {
-    return from(
-      this.itemService.findOne({
-        $or: [
-          { item_code: payload.item_code },
-          { item_name: payload.item_code },
-        ],
-      }),
-    ).pipe(
-      switchMap(item => {
-        if(!item){
-          return throwError(new BadRequestException(`Item ${payload.item_code}, not found`))
-        }
-        return this.serialNoService.asyncAggregate([
-          {
-            $match: {
-              serial_no: { $in: payload.serials },
-              $or: [{ item_code: item.item_code }],
-            },
+    if (!payload.item_code || !payload.warehouse) {
+      return throwError(
+        new BadRequestException(
+          'Warehouse and item_code are mandatory for delivery note serial validation.',
+        ),
+      );
+    }
+    return this.serialNoService.asyncAggregate([
+      {
+        $match: {
+          serial_no: { $in: payload.serials },
+          item_code: payload.item_code,
+          $or: [
+            { warehouse: payload.warehouse },
+            { 'queue_state.purchase_receipt.warehouse': payload.warehouse },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: 'validSerials',
+          foundSerials: { $push: '$serial_no' },
+        },
+      },
+      {
+        $project: {
+          notFoundSerials: {
+            $setDifference: [payload.serials, '$foundSerials'],
           },
-          {
-            $group: {
-              _id: 'validSerials',
-              foundSerials: { $push: '$serial_no' },
-            },
-          },
-          {
-            $project: {
-              notFoundSerials: {
-                $setDifference: [payload.serials, '$foundSerials'],
-              },
-            },
-          },
-        ]);
-      }),
-    );
+        },
+      },
+    ]);
   }
 
   validateSerialsForPurchaseReceipt(payload: ValidateSerialsDto) {
@@ -194,12 +190,12 @@ export class SerialNoPoliciesService {
         $match: {
           serial_no: { $in: payload.serials },
           $or: [
-            {"queue_state.purchase_receipt" : {$exists : true}},
-            {purchase_document_no: {$exists : true}},
+            { 'queue_state.purchase_receipt': { $exists: true } },
+            { purchase_document_no: { $exists: true } },
           ],
         },
       },
-      { $limit : 5},
+      { $limit: 5 },
       {
         $group: {
           _id: 'validSerials',
@@ -209,7 +205,6 @@ export class SerialNoPoliciesService {
     ]);
   }
 }
-
 
 export class ValidateSerialsResponse {
   _id: string;
