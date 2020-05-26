@@ -14,3 +14,22 @@ export interface SalesReturn {
   items: Item[];
   delivery_note_names: string[];
 }
+
+export interface SalesReturnDetails {
+  name?: string;
+  customer?: string;
+  deliveryNoteName?: string;
+  items?: SalesReturnItem[];
+  posting_date?: string;
+  territory?: string;
+  set_warehouse?: string;
+}
+
+export interface SalesReturnItem {
+  item_code?: string;
+  item_name?: string;
+  qty?: number;
+  rate?: number;
+  amount?: number;
+  serial_no?: string;
+}
