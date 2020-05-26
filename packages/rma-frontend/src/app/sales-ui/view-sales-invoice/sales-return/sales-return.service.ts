@@ -10,7 +10,7 @@ import { map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import {
   LIST_DELIVERY_NOTE_ENDPOINT,
-  RELAY_LIST_SALES_RETURN_ENDPOINT,
+  RELAY_GET_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/url-strings';
 @Injectable({
   providedIn: 'root',
@@ -44,7 +44,7 @@ export class SalesReturnService {
   }
 
   getSalesReturnList(pageIndex = 0, pageSize = 10) {
-    const url = RELAY_LIST_SALES_RETURN_ENDPOINT;
+    const url = RELAY_GET_DELIVERY_NOTE_ENDPOINT;
 
     const params = new HttpParams({
       fromObject: {
@@ -61,6 +61,20 @@ export class SalesReturnService {
       }),
       map(res => res.data),
     );
+  }
+
+  getSalesReturn(name: string) {
+    const url = `${RELAY_GET_DELIVERY_NOTE_ENDPOINT}/${name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
+  }
+
+  getStore() {
+    return this.storage;
   }
 
   getHeaders() {

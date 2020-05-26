@@ -174,6 +174,13 @@ const routes: Routes = [
         m => m.SalesReturnPageModule,
       ),
   },
+  {
+    path: 'sales-return/details/:name',
+    loadChildren: () =>
+      import(
+        './sales-ui/sales-return-details/sales-return-details.module'
+      ).then(m => m.SalesReturnDetailsPageModule),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
