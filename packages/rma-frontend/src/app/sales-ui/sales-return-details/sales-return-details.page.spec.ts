@@ -1,11 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
 
-import { SalesReturnPage } from './sales-return.page';
-import { MaterialModule } from '../../material/material.module';
-import { FormsModule } from '@angular/forms';
+import { SalesReturnDetailsPage } from './sales-return-details.page';
+import { Pipe, PipeTransform, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
+import { MaterialModule } from '../../material/material.module';
 import { SalesReturnService } from '../view-sales-invoice/sales-return/sales-return.service';
 import { of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -17,32 +15,34 @@ class MockPipe implements PipeTransform {
   }
 }
 
-describe('SalesReturnPage', () => {
-  let component: SalesReturnPage;
-  let fixture: ComponentFixture<SalesReturnPage>;
+describe('SalesReturnDetailsPage', () => {
+  let component: SalesReturnDetailsPage;
+  let fixture: ComponentFixture<SalesReturnDetailsPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SalesReturnPage, MockPipe],
+      declarations: [SalesReturnDetailsPage, MockPipe],
       imports: [
-        IonicModule.forRoot(),
+        RouterTestingModule.withRoutes([]),
         MaterialModule,
-        FormsModule,
         BrowserAnimationsModule,
-        RouterTestingModule,
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {
           provide: SalesReturnService,
           useValue: {
-            getSalesReturnList: (...args) => of([{}]),
+            getSalesReturn: (...args) => of({}),
+            getStore: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
+            }),
           },
         },
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SalesReturnPage);
+    fixture = TestBed.createComponent(SalesReturnDetailsPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

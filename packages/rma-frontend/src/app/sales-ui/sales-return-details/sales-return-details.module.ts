@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { SalesReturnPageRoutingModule } from './sales-return-routing.module';
+import { SalesReturnDetailsPageRoutingModule } from './sales-return-details-routing.module';
 
-import { SalesReturnPage } from './sales-return.page';
+import { SalesReturnDetailsPage } from './sales-return-details.page';
 import { MaterialModule } from '../../material/material.module';
 import { AppCommonModule } from '../../common/app-common.module';
 
@@ -15,11 +15,11 @@ import { AppCommonModule } from '../../common/app-common.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    MaterialModule,
     ReactiveFormsModule,
+    MaterialModule,
     AppCommonModule,
-    SalesReturnPageRoutingModule,
+    SalesReturnDetailsPageRoutingModule,
   ],
-  declarations: [SalesReturnPage],
+  declarations: [SalesReturnDetailsPage],
 })
-export class SalesReturnPageModule {}
+export class SalesReturnDetailsPageModule {}

@@ -44,7 +44,9 @@
         <!-- Total Column -->
         <ng-container matColumnDef="total">
           <th mat-header-cell *matHeaderCellDef>Amount</th>
-          <td mat-cell *matCellDef="let row">{{ row.total }}</td>
+          <td mat-cell *matCellDef="let row">
+            {{ 0 - row.total | curFormat | async }}
+          </td>
         </ng-container>
 
         <!-- Status Column -->
@@ -82,7 +84,11 @@
           mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"
         ></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          [routerLink]="['/sales-return/details',row.name]"
+        ></tr>
       </table>
 
       <mat-card-actions>
