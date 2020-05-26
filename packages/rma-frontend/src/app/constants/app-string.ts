@@ -14,3 +14,5 @@ export const DELIVERY_NOTE = 'delivery_note';
 export const JSON_BODY_MAX_SIZE = 8000;
 export const MATERIAL_TRANSFER = 'Material Transfer';
 export const PURCHASE_USER = 'Purchase User';
+export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
+export const EXCEL_SALES_USER = 'Excel Sales User';

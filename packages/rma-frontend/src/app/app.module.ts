@@ -25,6 +25,8 @@ import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
 import { CsvJsonService } from './api/csv-json/csv-json.service';
 import { ProblemUiModule } from './problem-ui/problem-ui.module';
 import { JobUIModule } from './job-ui/job-ui.module';
+import { ExcelSalesManagerGuard } from './common/guards/excel-sales-manager.guard';
+import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
 
 @NgModule({
   declarations: [AppComponent],
@@ -53,6 +55,8 @@ import { JobUIModule } from './job-ui/job-ui.module';
     HttpErrorHandler,
     SplashScreen,
     SystemManagerGuard,
+    ExcelSalesManagerGuard,
+    ExcelSalesUserGuard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     LoginService,
     {

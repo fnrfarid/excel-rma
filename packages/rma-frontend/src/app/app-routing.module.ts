@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { SystemManagerGuard } from './common/guards/system-manager.guard';
+import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
 
 const routes: Routes = [
   {
@@ -29,6 +30,7 @@ const routes: Routes = [
     path: 'sales',
     loadChildren: () =>
       import('./sales-ui/sales/sales.module').then(m => m.SalesPageModule),
+    canActivate: [ExcelSalesUserGuard],
   },
   {
     path: 'warranty',
@@ -95,6 +97,7 @@ const routes: Routes = [
       import('./sales-ui/view-sales-invoice/view-sales-invoice.module').then(
         m => m.ViewSalesInvoicePageModule,
       ),
+    canActivate: [ExcelSalesUserGuard],
   },
 
   {
@@ -132,6 +135,7 @@ const routes: Routes = [
       import('./sales-ui/add-sales-return/add-sales-return.module').then(
         m => m.AddSalesReturnPageModule,
       ),
+    canActivate: [ExcelSalesUserGuard],
   },
   {
     path: 'settings/credit-limit',
@@ -173,6 +177,7 @@ const routes: Routes = [
       import('./sales-ui/sales-return/sales-return.module').then(
         m => m.SalesReturnPageModule,
       ),
+    canActivate: [ExcelSalesUserGuard],
   },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
