@@ -13,7 +13,66 @@
           mode="indeterminate"
         ></mat-progress-bar>
       </div>
-
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                placeholder="Invoice Number"
+                [(ngModel)]="name"
+                (keyup.enter)="setFilter()"
+              />
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                placeholder="Customer"
+                [(ngModel)]="customer"
+                (keyup.enter)="setFilter()"
+              />
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="fromDate"
+                placeholder="From Date"
+                readonly
+                [formControl]="fromDateFormControl"
+                (dateChange)="dateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="fromDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #fromDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="toDate"
+                placeholder="To Date"
+                readonly
+                [formControl]="toDateFormControl"
+                (dateChange)="dateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="toDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #toDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
       <table
         mat-table
         class="full-width-table"
