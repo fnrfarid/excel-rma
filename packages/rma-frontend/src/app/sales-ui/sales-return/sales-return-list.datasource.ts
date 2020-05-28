@@ -35,10 +35,10 @@ export class SalesReturnListDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(pageIndex = 0, pageSize = 10) {
+  loadItems(pageIndex = 0, pageSize = 10, filters: any[]) {
     this.loadingSubject.next(true);
     this.salesReturnService
-      .getSalesReturnList(pageIndex, pageSize)
+      .getSalesReturnList(pageIndex, pageSize, filters)
       .pipe(
         map((items: ListingData[]) => {
           this.data = items;

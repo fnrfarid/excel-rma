@@ -43,18 +43,17 @@ export class SalesReturnService {
     );
   }
 
-  getSalesReturnList(pageIndex = 0, pageSize = 10) {
+  getSalesReturnList(pageIndex = 0, pageSize = 10, filters: any[]) {
     const url = RELAY_GET_DELIVERY_NOTE_ENDPOINT;
 
     const params = new HttpParams({
       fromObject: {
         fields: '["*"]',
-        filters: '[["is_return", "=", "1"]]',
+        filters: JSON.stringify(filters),
         limit_page_length: pageSize.toString(),
         limit_start: pageIndex.toString(),
       },
     });
-
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get<any>(url, { headers, params });

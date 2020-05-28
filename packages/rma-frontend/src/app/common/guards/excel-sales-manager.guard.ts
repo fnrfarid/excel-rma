@@ -4,7 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { switchMap } from 'rxjs/operators';
 import { of, from } from 'rxjs';
 import { GET_USER_PROFILE_ROLES } from '../../constants/url-strings';
-import { SYSTEM_MANAGER } from '../../constants/app-string';
+import {
+  SYSTEM_MANAGER,
+  EXCEL_SALES_MANAGER,
+} from '../../constants/app-string';
 import {
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
@@ -15,7 +18,7 @@ import { StorageService } from '../../api/storage/storage.service';
 @Injectable({
   providedIn: 'root',
 })
-export class SystemManagerGuard implements CanActivate {
+export class ExcelSalesManagerGuard implements CanActivate {
   constructor(
     private readonly http: HttpClient,
     private readonly storage: StorageService,
@@ -36,10 +39,14 @@ export class SystemManagerGuard implements CanActivate {
                 res &&
                 res.roles &&
                 res.roles.length &&
-                res.roles.length > 0 &&
-                res.roles.includes(SYSTEM_MANAGER)
+                res.roles.length > 0
               ) {
-                return of(true);
+                if (
+                  res.roles.includes(SYSTEM_MANAGER) ||
+                  res.roles.includes(EXCEL_SALES_MANAGER)
+                ) {
+                  return of(true);
+                }
               }
               return of(false);
             }),

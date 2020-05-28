@@ -18,7 +18,6 @@ class MockPipe implements PipeTransform {
 describe('SalesReturnDetailsPage', () => {
   let component: SalesReturnDetailsPage;
   let fixture: ComponentFixture<SalesReturnDetailsPage>;
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SalesReturnDetailsPage, MockPipe],
@@ -31,7 +30,7 @@ describe('SalesReturnDetailsPage', () => {
         {
           provide: SalesReturnService,
           useValue: {
-            getSalesReturn: (...args) => of({}),
+            getSalesReturn: (...args) => of({ items: [] }),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
