@@ -139,4 +139,62 @@
       </mat-table>
     </ion-card-content>
   </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-text color="primary">
+          Serials
+        </ion-text>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="ion-no-padding">
+      <div class="ion-padding">
+        <mat-form-field class="mat-input-wrapper">
+          <mat-label>Serial Number</mat-label>
+          <input
+            matInput
+            (keyup)="applyFilter($event)"
+            placeholder="Ex.ITEM0001"
+          />
+        </mat-form-field>
+      </div>
+      <mat-table #table [dataSource]="serialDataSource" style="width: 100%;">
+        <ng-container matColumnDef="item_code">
+          <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.item_code }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="item_name">
+          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.item_name }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="serial">
+          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.serial_no }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row
+          *matHeaderRowDef="serialDisplayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row
+          *matRowDef="let row; columns: serialDisplayedColumns"
+        ></mat-row>
+      </mat-table>
+      <mat-paginator
+        [pageSizeOptions]="[10, 50, 100, 500]"
+        showFirstLastButtons
+      ></mat-paginator>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

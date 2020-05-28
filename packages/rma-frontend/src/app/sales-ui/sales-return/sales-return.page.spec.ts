@@ -3,7 +3,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { SalesReturnPage } from './sales-return.page';
 import { MaterialModule } from '../../material/material.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { SalesReturnService } from '../view-sales-invoice/sales-return/sales-return.service';
@@ -28,6 +28,7 @@ describe('SalesReturnPage', () => {
         IonicModule.forRoot(),
         MaterialModule,
         FormsModule,
+        ReactiveFormsModule,
         BrowserAnimationsModule,
         RouterTestingModule,
       ],
