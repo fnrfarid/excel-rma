@@ -1,5 +1,10 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>Sales Return</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -90,18 +95,6 @@
     </ion-card-header>
     <ion-card-content class="ion-no-padding">
       <mat-table #table [dataSource]="dataSource" style="width: 100%;">
-        <ng-container matColumnDef="item_code">
-          <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container *ngIf="row.name">
-              {{ row.item_code }}
-            </ng-container>
-
-            <span class="add-comment" *ngIf="!row.name">
-              Add an item
-            </span>
-          </mat-cell>
-        </ng-container>
         <ng-container matColumnDef="item_name">
           <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
           <mat-cell *matCellDef="let row">
@@ -160,14 +153,6 @@
         </mat-form-field>
       </div>
       <mat-table #table [dataSource]="serialDataSource" style="width: 100%;">
-        <ng-container matColumnDef="item_code">
-          <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            <ng-container>
-              {{ row.item_code }}
-            </ng-container>
-          </mat-cell>
-        </ng-container>
         <ng-container matColumnDef="item_name">
           <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
           <mat-cell *matCellDef="let row">
@@ -177,7 +162,7 @@
           </mat-cell>
         </ng-container>
         <ng-container matColumnDef="serial">
-          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>Serial Number</mat-header-cell>
           <mat-cell *matCellDef="let row">
             <ng-container>
               {{ row.serial_no }}

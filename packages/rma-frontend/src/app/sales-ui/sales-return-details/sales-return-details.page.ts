@@ -8,6 +8,7 @@ import {
 import { AUTH_SERVER_URL } from '../../constants/storage';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { Location } from '@angular/common';
 
 export interface Serials {
   item_code?: string;
@@ -21,8 +22,8 @@ export interface Serials {
 })
 export class SalesReturnDetailsPage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  displayedColumns = ['item_code', 'item_name', 'qty', 'rate', 'amount'];
-  serialDisplayedColumns = ['item_code', 'item_name', 'serial'];
+  displayedColumns = ['item_name', 'qty', 'rate', 'amount'];
+  serialDisplayedColumns = ['item_name', 'serial'];
 
   dataSource: SalesReturnItem[] = [];
   salesReturnDetials: SalesReturnDetails;
@@ -30,10 +31,10 @@ export class SalesReturnDetailsPage implements OnInit {
   salesReturnName: string = '';
   serials: Serials[] = [];
   serialDataSource: MatTableDataSource<Serials>;
-
   constructor(
     private readonly route: ActivatedRoute,
     private readonly salesReturnService: SalesReturnService,
+    private readonly location: Location,
   ) {}
 
   ngOnInit() {
@@ -79,5 +80,9 @@ export class SalesReturnDetailsPage implements OnInit {
       .then(auth_url => {
         this.viewSalesReturnURL = `${auth_url}/desk#Form/Delivery Note/${this.salesReturnName}`;
       });
+  }
+
+  navigateBack() {
+    this.location.back();
   }
 }
