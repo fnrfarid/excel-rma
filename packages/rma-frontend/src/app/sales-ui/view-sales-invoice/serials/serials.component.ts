@@ -103,7 +103,6 @@ export class SerialsComponent implements OnInit {
   ];
   itemDataSource: ItemDataSource;
   serialDisplayedColumns = [
-    'item_code',
     'item_name',
     'qty',
     'warranty_date',

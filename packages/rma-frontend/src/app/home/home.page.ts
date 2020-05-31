@@ -46,9 +46,9 @@ export class HomePage implements OnInit {
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
-        map(event => {
+        map((event: any) => {
           this.spinner = true;
-          this.loadProfile();
+          if (event.url === '/sales') this.loadProfile();
           return event;
         }),
       )

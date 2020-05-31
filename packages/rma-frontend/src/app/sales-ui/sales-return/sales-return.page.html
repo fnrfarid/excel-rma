@@ -35,6 +35,17 @@
               />
             </mat-form-field>
           </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <mat-label>Status</mat-label>
+              <mat-select [(value)]="status" (selectionChange)="setFilter()">
+                <mat-option>--</mat-option>
+                <mat-option *ngFor="let status of statusList" [value]="status">
+                  {{status}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-col>
         </ion-row>
         <ion-row>
           <ion-col class="ion-text-center">
@@ -71,6 +82,11 @@
               <mat-datepicker #toDate disabled="false"></mat-datepicker>
             </mat-form-field>
           </ion-col>
+          <ion-col>
+            <ion-button (click)="clearFilters()" fill="outline">
+              Clear
+            </ion-button>
+          </ion-col>
         </ion-row>
       </ion-grid>
       <table
@@ -82,37 +98,44 @@
       >
         <!-- DN Name Column -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>DN name</th>
-          <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+          <mat-header-cell *matHeaderCellDef>DN name</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <!-- Posting Date Column -->
         <ng-container matColumnDef="posting_date">
-          <th mat-header-cell *matHeaderCellDef>Posting Date</th>
-          <td mat-cell *matCellDef="let row">
+          <mat-header-cell *matHeaderCellDef>Posting Date</mat-header-cell>
+          <mat-cell *matCellDef="let row">
             {{ row.posting_date | date:'dd-MM-yyyy' }}
-          </td>
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <!-- Title Column -->
         <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef>Title</th>
-          <td mat-cell *matCellDef="let row">{{ row.title }}</td>
+          <mat-header-cell *matHeaderCellDef>Title</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.title }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>
+            Total
+          </mat-footer-cell>
         </ng-container>
 
         <!-- Total Column -->
         <ng-container matColumnDef="total">
-          <th mat-header-cell *matHeaderCellDef>Amount</th>
-          <td mat-cell *matCellDef="let row">
+          <mat-header-cell *matHeaderCellDef>Amount</mat-header-cell>
+          <mat-cell *matCellDef="let row">
             {{ 0 - row.total | curFormat | async }}
-          </td>
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef>
+            {{ 0 - total | curFormat | async }}
+          </mat-footer-cell>
         </ng-container>
 
         <!-- Status Column -->
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
-          <td
-            mat-cell
+          <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+          <mat-cell
             *matCellDef="let row"
             [ngStyle]="{
               color:
@@ -124,30 +147,35 @@
             }"
           >
             {{ row.status }}
-          </td>
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <!-- Created By Column -->
         <ng-container matColumnDef="owner">
-          <th mat-header-cell *matHeaderCellDef>Created By</th>
-          <td mat-cell *matCellDef="let row">{{ row.owner }}</td>
+          <mat-header-cell *matHeaderCellDef>Created By</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.owner }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
         <!-- Modified By Column -->
         <ng-container matColumnDef="modified_by">
-          <th mat-header-cell *matHeaderCellDef>Modified By</th>
-          <td mat-cell *matCellDef="let row">{{ row.modified_by }}</td>
+          <mat-header-cell *matHeaderCellDef>Modified By</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.modified_by }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
         </ng-container>
 
-        <tr
-          mat-header-row
+        <mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"
-        ></tr>
-        <tr
-          mat-row
+        ></mat-header-row>
+        <mat-row
           *matRowDef="let row; columns: displayedColumns"
           [routerLink]="['/sales-return/details',row.name]"
-        ></tr>
+        ></mat-row>
+        <mat-footer-row
+          class="footer"
+          *matFooterRowDef="displayedColumns; sticky: true"
+        ></mat-footer-row>
       </table>
 
       <mat-card-actions>
