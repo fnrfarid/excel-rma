@@ -65,16 +65,10 @@ export class ResetCreditLimitService implements OnModuleInit {
       RESET_CUSTOMER_CREDIT_LIMIT,
       { concurrency: 1 },
       async (job: Agenda.Job, done) => {
-        of(job.attrs.data.customer as Customer)
+        const customerWithCredit = job.attrs.data.customer as Customer;
+        of(customerWithCredit)
           .pipe(
             concatMap(customer => {
-              this.customer
-                .updateOne(
-                  { uuid: customer.uuid },
-                  { $unset: { tempCreditLimitPeriod: '' } },
-                )
-                .then(success => {})
-                .catch(error => {});
               return this.settings.find().pipe(
                 concatMap(settings => {
                   return this.clientToken.getServiceAccountApiHeaders().pipe(
@@ -135,6 +129,13 @@ export class ResetCreditLimitService implements OnModuleInit {
           .toPromise()
           .then(success => {
             Logger.log(RESET_CREDIT_LIMIT_SUCCESS, this.constructor.name);
+            this.customer
+              .updateOne(
+                { uuid: customerWithCredit.uuid },
+                { $unset: { tempCreditLimitPeriod: '' } },
+              )
+              .then(updated => {})
+              .catch(error => {});
             done();
             job
               .remove()
