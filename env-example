@@ -11,3 +11,7 @@ SERVER_USER=rma-server
 SERVER_DB_PASSWORD=admin
 SITES=rma.example.com
 LETSENCRYPT_EMAIL=admin@example.com
+
+MYSQL_ROOT_PASSWORD=admin
+MARIADB_HOST=mariadb
+VERSION=v12

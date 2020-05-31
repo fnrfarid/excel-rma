@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Customer Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-text color="primary">
+          Customers
+        </ion-text>
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="ion-no-padding">
+      <div class="ion-padding">
+        <mat-form-field class="mat-input-wrapper">
+          <input
+            matInput
+            placeholder="Customer name"
+            [(ngModel)]="search"
+            (keyup.enter)="setFilter()"
+          />
+          <button mat-button matSuffix (click)="setFilter()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <table
+        mat-table
+        class="full-width-table"
+        [dataSource]="dataSource"
+        matSort
+        style="width: 100%;"
+      >
+        <!-- DN Name Column -->
+        <ng-container matColumnDef="customer">
+          <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </table>
+
+      <mat-card-actions>
+        <mat-paginator
+          #paginator
+          class="mat-paginator-sticky"
+          (page)="getUpdate($event)"
+          [length]="dataSource.length"
+          [pageSizeOptions]="[10, 50, 100, 500]"
+        >
+        </mat-paginator>
+      </mat-card-actions>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

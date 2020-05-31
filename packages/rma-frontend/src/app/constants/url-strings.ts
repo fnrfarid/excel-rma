@@ -107,3 +107,5 @@ export const JOB_QUEUE_RETRY_ENDPOINT = '/api/job_queue/v1/retry';
 export const JOB_QUEUE_RESET_ENDPOINT = '/api/job_queue/v1/reset';
 export const GET_PO_FROM_PI_NUMBER_ENDPOINT =
   '/api/purchase_order/v1/get_po_from_pi_number/';
+export const GET_DOCTYPE_COUNT_METHOD =
+  '/api/command/user/api/method/frappe.client.get_count';

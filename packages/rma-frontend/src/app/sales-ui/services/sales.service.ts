@@ -40,6 +40,8 @@ import {
   RELAY_GET_DELIVERY_NOTE_ENDPOINT,
   VALIDATE_RETURN_SERIALS,
   GET_CUSTOMER_ENDPOINT,
+  CUSTOMER_ENDPOINT,
+  GET_DOCTYPE_COUNT_METHOD,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -332,6 +334,42 @@ export class SalesService {
           headers,
         });
       }),
+    );
+  }
+
+  relayCustomerList(pageIndex = 0, pageSize = 10, filters) {
+    const url = CUSTOMER_ENDPOINT;
+
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: JSON.stringify(filters),
+        limit_page_length: pageSize.toString(),
+        limit_start: pageIndex.toString(),
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers, params });
+      }),
+      map(res => res.data),
+    );
+  }
+
+  getDoctypeCount(doctype: string, filters) {
+    const url = GET_DOCTYPE_COUNT_METHOD;
+    const params = new HttpParams({
+      fromObject: {
+        doctype,
+        filters: JSON.stringify(filters),
+      },
+    });
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers, params });
+      }),
+      map(res => res.message),
     );
   }
 

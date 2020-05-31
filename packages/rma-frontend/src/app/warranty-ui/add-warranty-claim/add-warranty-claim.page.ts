@@ -11,7 +11,16 @@ export class AddWarrantyClaimPage implements OnInit {
 
   ngOnInit() {}
   problem = new FormControl();
-
+  warrantyClaimState = {
+    claim: '',
+    receivedOn: '',
+  };
+  receivedOnFormControl = new FormControl();
+  claimList: string[] = [
+    'Regular Claim',
+    'Non Serial Warranty',
+    'Third Party Warranty',
+  ];
   problemList: string[] = [
     'Problem 1',
     'Problem 2',
@@ -23,4 +32,8 @@ export class AddWarrantyClaimPage implements OnInit {
   navigateBack() {
     this.location.back();
   }
+
+  claimTypeChangeEvent($event) {}
+
+  receivedOnChangeEvent() {}
 }

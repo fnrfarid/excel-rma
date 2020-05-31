@@ -17,7 +17,7 @@ import { ViewSalesInvoiceSubjectService } from '../view-sales-invoice-subject.se
   styleUrls: ['./details.component.scss'],
 })
 export class DetailsComponent implements OnInit {
-  displayedColumns = ['item_code', 'item_name', 'qty', 'rate', 'amount'];
+  displayedColumns = ['item_name', 'qty', 'rate', 'amount'];
   salesInvoiceDetails: SalesInvoiceDetails;
   dataSource: SalesInvoiceItem[];
   invoiceUuid: string;
