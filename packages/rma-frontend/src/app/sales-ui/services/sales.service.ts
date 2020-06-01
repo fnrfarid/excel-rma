@@ -345,7 +345,7 @@ export class SalesService {
         fields: '["*"]',
         filters: JSON.stringify(filters),
         limit_page_length: pageSize.toString(),
-        limit_start: pageIndex.toString(),
+        limit_start: (pageIndex * pageSize).toString(),
       },
     });
     return this.getHeaders().pipe(
