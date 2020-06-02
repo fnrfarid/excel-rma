@@ -61,4 +61,49 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   delivered_by: string;
+
+  @Column()
+  customer: string;
+
+  @Column()
+  customer_contact: string;
+
+  @Column()
+  customer_address: string;
+
+  @Column()
+  serial_no: string;
+
+  @Column()
+  third_party_name: string;
+
+  @Column()
+  third_party_contact: string;
+
+  @Column()
+  third_party_address: string;
+
+  @Column()
+  warranty_end_date: Date;
+
+  @Column()
+  received_on: string;
+
+  @Column()
+  delivery_date: Date;
+
+  @Column()
+  item_name: string;
+
+  @Column()
+  product_brand: string;
+
+  @Column()
+  problem: string;
+
+  @Column()
+  problem_details: string;
+
+  @Column()
+  remarks: string;
 }
