@@ -161,3 +161,8 @@ export const AGENDA_MAX_RETRIES = 1;
 export const AGENDA_DATA_IMPORT_MAX_RETRIES = 3;
 export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert new records';
 export const SYNC_DELIVERY_NOTE_JOB = 'SYNC_DELIVERY_NOTE_JOB';
+export enum WARRANTY_TYPE {
+  WARRANTY = 'Warranty / Non Warranty',
+  NON_SERAIL = 'Non Serial Warranty',
+  THIRD_PARTY = 'Third Party Warranty',
+}

@@ -3,6 +3,18 @@ import { IsOptional, IsString } from 'class-validator';
 export class WarrantyClaimDto {
   @IsOptional()
   @IsString()
+  modifiedOn: Date;
+
+  @IsOptional()
+  @IsString()
+  createdOn: Date;
+
+  @IsOptional()
+  @IsString()
+  serialNo: string;
+
+  @IsOptional()
+  @IsString()
   claim_no: string;
 
   @IsOptional()
@@ -11,11 +23,11 @@ export class WarrantyClaimDto {
 
   @IsOptional()
   @IsString()
-  received_date: string;
+  received_date: Date;
 
   @IsOptional()
   @IsString()
-  deliver_date: string;
+  deliver_date: Date;
 
   @IsOptional()
   @IsString()
@@ -60,4 +72,64 @@ export class WarrantyClaimDto {
   @IsOptional()
   @IsString()
   delivered_by: string;
+
+  @IsOptional()
+  @IsString()
+  customer: string;
+
+  @IsOptional()
+  @IsString()
+  customer_contact: string;
+
+  @IsOptional()
+  @IsString()
+  customer_address: string;
+
+  @IsOptional()
+  @IsString()
+  serial_no: string;
+
+  @IsOptional()
+  @IsString()
+  third_party_name: string;
+
+  @IsOptional()
+  @IsString()
+  third_party_contact: string;
+
+  @IsOptional()
+  @IsString()
+  third_party_address: string;
+
+  @IsOptional()
+  @IsString()
+  warranty_end_date: string;
+
+  @IsOptional()
+  @IsString()
+  received_on: string;
+
+  @IsOptional()
+  @IsString()
+  delivery_date: string;
+
+  @IsOptional()
+  @IsString()
+  item_name: string;
+
+  @IsOptional()
+  @IsString()
+  product_brand: string;
+
+  @IsOptional()
+  @IsString()
+  problem: string;
+
+  @IsOptional()
+  @IsString()
+  problem_details: string;
+
+  @IsOptional()
+  @IsString()
+  remarks: string;
 }
