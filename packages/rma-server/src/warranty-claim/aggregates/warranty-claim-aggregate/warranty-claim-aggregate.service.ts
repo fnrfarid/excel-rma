@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import * as uuidv4 from 'uuid/v4';
@@ -26,6 +27,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { WARRANTY_TYPE } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -46,60 +48,31 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         warrantyClaim.createdOn = new DateTime(settings.timeZone).toJSDate();
         switch (warrantyClaim.claim_type) {
           case WARRANTY_TYPE.WARRANTY:
-            return this.createWarrantyNonWarrantyClaim(
-              warrantyClaimPayload,
-            ).pipe(
-              switchMap(() => {
-                return of({});
-              }),
-            );
+            return this.createWarrantyNonWarrantyClaim(warrantyClaim);
 
           case WARRANTY_TYPE.NON_SERAIL:
-            return this.createWarrantyNonWarrantyClaim(
-              warrantyClaimPayload,
-            ).pipe(
-              switchMap(() => {
-                return of({});
-              }),
-            );
+            return this.createWarrantyNonWarrantyClaim(warrantyClaim);
 
           case WARRANTY_TYPE.THIRD_PARTY:
-            return this.createWarrantyNonWarrantyClaim(
-              warrantyClaimPayload,
-            ).pipe(
-              switchMap(() => {
-                return of({});
-              }),
-            );
+            return this.createWarrantyNonWarrantyClaim(warrantyClaim);
 
           default:
-            return throwError(new NotFoundException());
+            return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
         }
       }),
     );
   }
 
   createWarrantyNonWarrantyClaim(claimsPayload) {
-    return from(this.warrantyClaimService.create(claimsPayload)).pipe(
-      switchMap(() => {
-        return of({});
-      }),
-    );
+    return from(this.warrantyClaimService.create(claimsPayload));
   }
 
   createNonSerialClaim(claimsPayload) {
-    return from(this.warrantyClaimService.create(claimsPayload)).pipe(
-      switchMap(() => {
-        return of({});
-      }),
-    );
+    return from(this.warrantyClaimService.create(claimsPayload));
   }
+
   createThirdPartyClaim(claimsPayload) {
-    return from(this.warrantyClaimService.create(claimsPayload)).pipe(
-      switchMap(() => {
-        return of({});
-      }),
-    );
+    return from(this.warrantyClaimService.create(claimsPayload));
   }
 
   async retrieveWarrantyClaim(uuid: string, req) {

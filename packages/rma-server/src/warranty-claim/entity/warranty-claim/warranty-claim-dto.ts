@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
 
 export class WarrantyClaimDto {
   @IsOptional()
@@ -17,7 +17,7 @@ export class WarrantyClaimDto {
   @IsString()
   claim_no: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   claim_type: string;
 
@@ -57,11 +57,11 @@ export class WarrantyClaimDto {
   @IsString()
   warranty_status: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   receiving_branch: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   delivery_branch: string;
 
@@ -103,33 +103,33 @@ export class WarrantyClaimDto {
 
   @IsOptional()
   @IsString()
-  warranty_end_date: string;
+  warranty_end_date: Date;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   received_on: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  delivery_date: string;
+  delivery_date: Date;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   item_name: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   product_brand: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   problem: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   problem_details: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   remarks: string;
 }

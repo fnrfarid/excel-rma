@@ -84,13 +84,13 @@ export class WarrantyClaim extends BaseEntity {
   third_party_address: string;
 
   @Column()
-  warranty_end_date: string;
+  warranty_end_date: Date;
 
   @Column()
   received_on: string;
 
   @Column()
-  delivery_date: string;
+  delivery_date: Date;
 
   @Column()
   item_name: string;
