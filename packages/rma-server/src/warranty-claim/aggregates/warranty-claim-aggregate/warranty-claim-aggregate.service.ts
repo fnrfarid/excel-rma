@@ -27,11 +27,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { WARRANTY_TYPE } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import {
-  CLAIM_TYPE_INVLAID,
-  INVALID_CUSTOMER,
-} from '../../../constants/messages';
-import { CustomerService } from '../../../customer/entity/customer/customer.service';
+import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -40,7 +36,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     private readonly serialNoAggregateService: SerialNoAggregateService,
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
-    private readonly customerService: CustomerService,
   ) {
     super();
   }
@@ -69,29 +64,23 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   createWarrantyNonWarrantyClaim(claimsPayload) {
-    return from(
-      this.customerService.findOne({ name: claimsPayload.customer }),
-    ).pipe(
-      switchMap(validateCustomer => {
-        if (!validateCustomer) {
-          return throwError(new NotFoundException(INVALID_CUSTOMER));
-        }
-        return from(this.warrantyClaimService.create(claimsPayload));
-      }),
-    );
+    return this.warrantyClaimsPoliciesService
+      .validateCustomer(claimsPayload.customer)
+      .pipe(
+        switchMap(() => {
+          return from(this.warrantyClaimService.create(claimsPayload));
+        }),
+      );
   }
 
   createNonSerialClaim(claimsPayload) {
-    return from(
-      this.customerService.findOne({ name: claimsPayload.customer }),
-    ).pipe(
-      switchMap(validateCustomer => {
-        if (!validateCustomer) {
-          return throwError(new NotFoundException(INVALID_CUSTOMER));
-        }
-        return from(this.warrantyClaimService.create(claimsPayload));
-      }),
-    );
+    return this.warrantyClaimsPoliciesService
+      .validateCustomer(claimsPayload.customer)
+      .pipe(
+        switchMap(() => {
+          return from(this.warrantyClaimService.create(claimsPayload));
+        }),
+      );
   }
 
   createThirdPartyClaim(claimsPayload) {
