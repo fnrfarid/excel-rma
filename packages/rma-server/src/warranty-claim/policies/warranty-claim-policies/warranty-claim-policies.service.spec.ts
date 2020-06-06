@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WarrantyClaimPoliciesService } from './warranty-claim-policies.service';
 import { SupplierService } from '../../../supplier/entity/supplier/supplier.service';
+import { CustomerService } from '../../../customer/entity/customer/customer.service';
 
 describe('WarrantyClaimPoliciesService', () => {
   let service: WarrantyClaimPoliciesService;
@@ -11,6 +12,10 @@ describe('WarrantyClaimPoliciesService', () => {
         WarrantyClaimPoliciesService,
         {
           provide: SupplierService,
+          useValue: {},
+        },
+        {
+          provide: CustomerService,
           useValue: {},
         },
       ],

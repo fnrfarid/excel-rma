@@ -51,10 +51,10 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             return this.createWarrantyNonWarrantyClaim(warrantyClaim);
 
           case WARRANTY_TYPE.NON_SERAIL:
-            return this.createWarrantyNonWarrantyClaim(warrantyClaim);
+            return this.createNonSerialClaim(warrantyClaim);
 
           case WARRANTY_TYPE.THIRD_PARTY:
-            return this.createWarrantyNonWarrantyClaim(warrantyClaim);
+            return this.createThirdPartyClaim(warrantyClaim);
 
           default:
             return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
@@ -64,11 +64,23 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   createWarrantyNonWarrantyClaim(claimsPayload) {
-    return from(this.warrantyClaimService.create(claimsPayload));
+    return this.warrantyClaimsPoliciesService
+      .validateWarrantyCustomer(claimsPayload.customer)
+      .pipe(
+        switchMap(() => {
+          return from(this.warrantyClaimService.create(claimsPayload));
+        }),
+      );
   }
 
   createNonSerialClaim(claimsPayload) {
-    return from(this.warrantyClaimService.create(claimsPayload));
+    return this.warrantyClaimsPoliciesService
+      .validateWarrantyCustomer(claimsPayload.customer)
+      .pipe(
+        switchMap(() => {
+          return from(this.warrantyClaimService.create(claimsPayload));
+        }),
+      );
   }
 
   createThirdPartyClaim(claimsPayload) {

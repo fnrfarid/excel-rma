@@ -8,9 +8,11 @@ import { WarrantyClaimController } from './controllers/warranty-claim/warranty-c
 import { WarrantyClaimPoliciesService } from './policies/warranty-claim-policies/warranty-claim-policies.service';
 import { SerialNoModule } from '../serial-no/serial-no.module';
 import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
+import { CustomerModule } from '../customer/customer.module';
 
 @Module({
   imports: [
+    CustomerModule,
     WarrantyClaimEntitiesModule,
     SerialNoModule,
     SupplierEntitiesModule,

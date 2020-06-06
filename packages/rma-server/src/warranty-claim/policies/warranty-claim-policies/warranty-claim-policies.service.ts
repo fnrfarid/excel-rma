@@ -13,11 +13,16 @@ import { switchMap } from 'rxjs/operators';
 import {
   SUPPLIER_NOT_FOUND,
   INVALID_WARRANTY_CLAIM_AT_POSITION,
+  INVALID_CUSTOMER,
 } from '../../../constants/messages';
+import { CustomerService } from '../../../customer/entity/customer/customer.service';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
-  constructor(private readonly supplierService: SupplierService) {}
+  constructor(
+    private readonly supplierService: SupplierService,
+    private readonly customerService: CustomerService,
+  ) {}
 
   validateBulkWarrantyClaim(warrantyClaim: BulkWarrantyClaimInterface) {
     return this.validateWarrantySupplier(warrantyClaim.supplier).pipe(
@@ -60,5 +65,16 @@ export class WarrantyClaimPoliciesService {
 
   validateWarrantyCompany() {
     // validate company from settings
+  }
+
+  validateWarrantyCustomer(customer_name: string) {
+    return from(this.customerService.findOne({ name: customer_name })).pipe(
+      switchMap(customer => {
+        if (!customer) {
+          return throwError(new NotFoundException(INVALID_CUSTOMER));
+        }
+        return of(true);
+      }),
+    );
   }
 }
