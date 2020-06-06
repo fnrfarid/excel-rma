@@ -81,8 +81,13 @@ export class WarrantyClaimPoliciesService {
     );
   }
 
-  validateWarrantySerailNo(serial_no: string, item_code: string) {
-    return from(this.serialNoService.findOne({ serial_no, item_code })).pipe(
+  validateWarrantySerailNo(claimsPayload) {
+    return from(
+      this.serialNoService.findOne({
+        serial_no: claimsPayload.serial_no,
+        item_code: claimsPayload.item_code,
+      }),
+    ).pipe(
       switchMap(serialNo => {
         if (!serialNo) {
           return throwError(new BadRequestException(INVALID_SERIAL_NO));
