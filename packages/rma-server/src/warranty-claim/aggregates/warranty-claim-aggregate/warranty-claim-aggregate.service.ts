@@ -80,13 +80,21 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             .validateWarrantySerailNo(claimsPayload)
             .pipe(
               switchMap(() => {
-                return this.assignFields(claimsPayload).pipe(
-                  switchMap(warrantyClaimPayload => {
-                    return from(
-                      this.warrantyClaimService.create(warrantyClaimPayload),
-                    );
-                  }),
-                );
+                return this.warrantyClaimsPoliciesService
+                  .validateWarrantyDate(claimsPayload)
+                  .pipe(
+                    switchMap(() => {
+                      return this.assignFields(claimsPayload).pipe(
+                        switchMap(warrantyClaimPayload => {
+                          return from(
+                            this.warrantyClaimService.create(
+                              warrantyClaimPayload,
+                            ),
+                          );
+                        }),
+                      );
+                    }),
+                  );
               }),
             );
         }),
