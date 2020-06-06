@@ -65,7 +65,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
 
   createWarrantyNonWarrantyClaim(claimsPayload) {
     return this.warrantyClaimsPoliciesService
-      .validateCustomer(claimsPayload.customer)
+      .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
           return from(this.warrantyClaimService.create(claimsPayload));
@@ -75,7 +75,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
 
   createNonSerialClaim(claimsPayload) {
     return this.warrantyClaimsPoliciesService
-      .validateCustomer(claimsPayload.customer)
+      .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
           return from(this.warrantyClaimService.create(claimsPayload));

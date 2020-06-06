@@ -67,7 +67,7 @@ export class WarrantyClaimPoliciesService {
     // validate company from settings
   }
 
-  validateCustomer(customer_name: string) {
+  validateWarrantyCustomer(customer_name: string) {
     return from(this.customerService.findOne({ name: customer_name })).pipe(
       switchMap(customer => {
         if (!customer) {
