@@ -18,6 +18,7 @@ import {
 } from '../../../constants/messages';
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
@@ -81,7 +82,7 @@ export class WarrantyClaimPoliciesService {
     );
   }
 
-  validateWarrantySerailNo(claimsPayload) {
+  validateWarrantySerailNo(claimsPayload: WarrantyClaimDto) {
     return from(
       this.serialNoService.findOne({
         serial_no: claimsPayload.serial_no,

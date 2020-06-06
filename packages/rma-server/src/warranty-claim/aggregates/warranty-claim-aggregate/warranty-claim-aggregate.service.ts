@@ -28,6 +28,7 @@ import { WARRANTY_TYPE } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
+import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -39,31 +40,38 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   ) {
     super();
   }
-  addWarrantyClaim(warrantyClaimPayload, clientHttpRequest) {
+  addWarrantyClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
+    switch (warrantyClaimPayload.claim_type) {
+      case WARRANTY_TYPE.WARRANTY:
+        return this.createWarrantyNonWarrantyClaim(warrantyClaimPayload);
+
+      case WARRANTY_TYPE.NON_SERAIL:
+        return this.createNonSerialClaim(warrantyClaimPayload);
+
+      case WARRANTY_TYPE.THIRD_PARTY:
+        return this.createThirdPartyClaim(warrantyClaimPayload);
+
+      default:
+        return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
+    }
+  }
+
+  assignFields(warrantyClaimPayload: WarrantyClaimDto) {
     return this.settingsService.find().pipe(
       switchMap(settings => {
+        if (!settings) {
+          return throwError(new NotImplementedException());
+        }
         const warrantyClaim = new WarrantyClaim();
         Object.assign(warrantyClaim, warrantyClaimPayload);
         warrantyClaim.uuid = uuidv4();
         warrantyClaim.createdOn = new DateTime(settings.timeZone).toJSDate();
-        switch (warrantyClaim.claim_type) {
-          case WARRANTY_TYPE.WARRANTY:
-            return this.createWarrantyNonWarrantyClaim(warrantyClaim);
-
-          case WARRANTY_TYPE.NON_SERAIL:
-            return this.createNonSerialClaim(warrantyClaim);
-
-          case WARRANTY_TYPE.THIRD_PARTY:
-            return this.createThirdPartyClaim(warrantyClaim);
-
-          default:
-            return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
-        }
+        return of(warrantyClaim);
       }),
     );
   }
 
-  createWarrantyNonWarrantyClaim(claimsPayload) {
+  createWarrantyNonWarrantyClaim(claimsPayload: WarrantyClaimDto) {
     return this.warrantyClaimsPoliciesService
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
@@ -72,25 +80,41 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             .validateWarrantySerailNo(claimsPayload)
             .pipe(
               switchMap(() => {
-                return from(this.warrantyClaimService.create(claimsPayload));
+                return this.assignFields(claimsPayload).pipe(
+                  switchMap(warrantyClaimPayload => {
+                    return from(
+                      this.warrantyClaimService.create(warrantyClaimPayload),
+                    );
+                  }),
+                );
               }),
             );
         }),
       );
   }
 
-  createNonSerialClaim(claimsPayload) {
+  createNonSerialClaim(claimsPayload: WarrantyClaimDto) {
     return this.warrantyClaimsPoliciesService
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
-          return from(this.warrantyClaimService.create(claimsPayload));
+          return this.assignFields(claimsPayload).pipe(
+            switchMap(warrantyClaimPayload => {
+              return from(
+                this.warrantyClaimService.create(warrantyClaimPayload),
+              );
+            }),
+          );
         }),
       );
   }
 
-  createThirdPartyClaim(claimsPayload) {
-    return from(this.warrantyClaimService.create(claimsPayload));
+  createThirdPartyClaim(claimsPayload: WarrantyClaimDto) {
+    return this.assignFields(claimsPayload).pipe(
+      switchMap(warrantyClaimPayload => {
+        return from(this.warrantyClaimService.create(warrantyClaimPayload));
+      }),
+    );
   }
 
   async retrieveWarrantyClaim(uuid: string, req) {
