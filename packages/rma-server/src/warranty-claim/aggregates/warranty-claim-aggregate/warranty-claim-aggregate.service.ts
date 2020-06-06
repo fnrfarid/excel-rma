@@ -68,7 +68,16 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
-          return from(this.warrantyClaimService.create(claimsPayload));
+          return this.warrantyClaimsPoliciesService
+            .validateWarrantySerailNo(
+              claimsPayload.serial_no,
+              claimsPayload.item_code,
+            )
+            .pipe(
+              switchMap(() => {
+                return from(this.warrantyClaimService.create(claimsPayload));
+              }),
+            );
         }),
       );
   }

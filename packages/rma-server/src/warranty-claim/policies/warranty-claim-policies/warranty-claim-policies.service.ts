@@ -14,14 +14,17 @@ import {
   SUPPLIER_NOT_FOUND,
   INVALID_WARRANTY_CLAIM_AT_POSITION,
   INVALID_CUSTOMER,
+  INVALID_SERIAL_NO,
 } from '../../../constants/messages';
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
   constructor(
     private readonly supplierService: SupplierService,
     private readonly customerService: CustomerService,
+    private readonly serialNoService: SerialNoService,
   ) {}
 
   validateBulkWarrantyClaim(warrantyClaim: BulkWarrantyClaimInterface) {
@@ -72,6 +75,17 @@ export class WarrantyClaimPoliciesService {
       switchMap(customer => {
         if (!customer) {
           return throwError(new NotFoundException(INVALID_CUSTOMER));
+        }
+        return of(true);
+      }),
+    );
+  }
+
+  validateWarrantySerailNo(serial_no: string, item_code: string) {
+    return from(this.serialNoService.findOne({ serial_no, item_code })).pipe(
+      switchMap(serialNo => {
+        if (!serialNo) {
+          return throwError(new BadRequestException(INVALID_SERIAL_NO));
         }
         return of(true);
       }),
