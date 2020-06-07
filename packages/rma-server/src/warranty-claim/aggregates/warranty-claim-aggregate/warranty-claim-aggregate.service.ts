@@ -76,27 +76,15 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
-          return this.warrantyClaimsPoliciesService
-            .validateWarrantySerailNo(claimsPayload)
-            .pipe(
-              switchMap(() => {
-                return this.warrantyClaimsPoliciesService
-                  .validateWarrantyDate(claimsPayload)
-                  .pipe(
-                    switchMap(() => {
-                      return this.assignFields(claimsPayload).pipe(
-                        switchMap(warrantyClaimPayload => {
-                          return from(
-                            this.warrantyClaimService.create(
-                              warrantyClaimPayload,
-                            ),
-                          );
-                        }),
-                      );
-                    }),
-                  );
-              }),
-            );
+          return this.warrantyClaimsPoliciesService.validateWarrantySerailNo(
+            claimsPayload,
+          );
+        }),
+        switchMap((payload: WarrantyClaimDto) => {
+          return this.assignFields(payload);
+        }),
+        switchMap((warrantyClaimPayload: WarrantyClaim) => {
+          return from(this.warrantyClaimService.create(warrantyClaimPayload));
         }),
       );
   }
@@ -106,13 +94,10 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
-          return this.assignFields(claimsPayload).pipe(
-            switchMap(warrantyClaimPayload => {
-              return from(
-                this.warrantyClaimService.create(warrantyClaimPayload),
-              );
-            }),
-          );
+          return this.assignFields(claimsPayload);
+        }),
+        switchMap((warrantyClaimPayload: WarrantyClaim) => {
+          return from(this.warrantyClaimService.create(warrantyClaimPayload));
         }),
       );
   }

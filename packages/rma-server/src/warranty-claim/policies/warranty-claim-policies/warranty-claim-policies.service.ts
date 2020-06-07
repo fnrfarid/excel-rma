@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  NotImplementedException,
 } from '@nestjs/common';
 import { SupplierService } from '../../../supplier/entity/supplier/supplier.service';
 import {
@@ -20,8 +19,7 @@ import {
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { DateTime } from 'luxon';
+import { WARRANTY_STATUS } from '../../../constants/app-strings';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
@@ -29,7 +27,6 @@ export class WarrantyClaimPoliciesService {
     private readonly supplierService: SupplierService,
     private readonly customerService: CustomerService,
     private readonly serialNoService: SerialNoService,
-    private readonly settingsService: SettingsService,
   ) {}
 
   validateBulkWarrantyClaim(warrantyClaim: BulkWarrantyClaimInterface) {
@@ -97,34 +94,17 @@ export class WarrantyClaimPoliciesService {
         if (!serialNo) {
           return throwError(new BadRequestException(INVALID_SERIAL_NO));
         }
-        return of(true);
+        return this.validateWarrantyDate(serialNo, claimsPayload);
       }),
     );
   }
 
-  validateWarrantyDate(claimsPayload: WarrantyClaimDto) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        if (!settings) {
-          return throwError(new NotImplementedException());
-        }
-        const date = new DateTime(settings.timeZone).toISODate();
-        return from(
-          this.serialNoService.findOne({
-            serial_no: claimsPayload.serial_no,
-            'warranty.salesWarrantyDate': { $lt: date },
-          }),
-        ).pipe(
-          switchMap(serial_no => {
-            if (!serial_no) {
-              return throwError(
-                new BadRequestException('Check the sales Warranty Date'),
-              );
-            }
-            return of(true);
-          }),
-        );
-      }),
-    );
+  validateWarrantyDate(serial, claimsPayload: WarrantyClaimDto) {
+    if (serial.warranty.salesWarrantyDate > claimsPayload.warranty_end_date) {
+      claimsPayload.warranty_status = WARRANTY_STATUS.VALID;
+      return of(claimsPayload);
+    }
+    claimsPayload.warranty_status = WARRANTY_STATUS.EXPIRED;
+    return of(claimsPayload);
   }
 }

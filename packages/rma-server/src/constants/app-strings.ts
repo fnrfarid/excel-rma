@@ -166,3 +166,7 @@ export enum WARRANTY_TYPE {
   NON_SERAIL = 'Non Serial Warranty',
   THIRD_PARTY = 'Third Party Warranty',
 }
+export enum WARRANTY_STATUS {
+  VALID = 'Valid',
+  EXPIRED = 'Expired',
+}
