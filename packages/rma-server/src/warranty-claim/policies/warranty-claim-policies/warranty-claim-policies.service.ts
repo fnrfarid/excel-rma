@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { SupplierService } from '../../../supplier/entity/supplier/supplier.service';
 import {
@@ -20,6 +21,9 @@ import { CustomerService } from '../../../customer/entity/customer/customer.serv
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
 import { WARRANTY_STATUS } from '../../../constants/app-strings';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { SerialNo } from '../../../serial-no/entity/serial-no/serial-no.entity';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
@@ -27,6 +31,7 @@ export class WarrantyClaimPoliciesService {
     private readonly supplierService: SupplierService,
     private readonly customerService: CustomerService,
     private readonly serialNoService: SerialNoService,
+    private readonly settings: SettingsService,
   ) {}
 
   validateBulkWarrantyClaim(warrantyClaim: BulkWarrantyClaimInterface) {
@@ -99,12 +104,26 @@ export class WarrantyClaimPoliciesService {
     );
   }
 
-  validateWarrantyDate(serial, claimsPayload: WarrantyClaimDto) {
-    if (serial.warranty.salesWarrantyDate > claimsPayload.warranty_end_date) {
-      claimsPayload.warranty_status = WARRANTY_STATUS.VALID;
-      return of(claimsPayload);
-    }
-    claimsPayload.warranty_status = WARRANTY_STATUS.EXPIRED;
-    return of(claimsPayload);
+  validateWarrantyDate(serial: SerialNo, claimsPayload: WarrantyClaimDto) {
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        if (!settings) {
+          settings.timeZone;
+          return throwError(new NotImplementedException());
+        }
+        const salesWarrantyDate = DateTime.fromISO(
+          serial.warranty.salesWarrantyDate,
+        ).setZone(settings.timeZone);
+        const warrantyEndDate = DateTime.fromISO(
+          claimsPayload.warranty_end_date,
+        ).setZone(settings.timeZone);
+        if (salesWarrantyDate > warrantyEndDate) {
+          claimsPayload.warranty_status = WARRANTY_STATUS.VALID;
+          return of(claimsPayload);
+        }
+        claimsPayload.warranty_status = WARRANTY_STATUS.EXPIRED;
+        return of(claimsPayload);
+      }),
+    );
   }
 }
