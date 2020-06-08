@@ -111,13 +111,13 @@ export class WarrantyClaimPoliciesService {
           settings.timeZone;
           return throwError(new NotImplementedException());
         }
-        const salesWarrantyDate = DateTime.fromISO(
+        const warrantyEndDate = DateTime.fromISO(
           serial.warranty.salesWarrantyDate,
         ).setZone(settings.timeZone);
-        const warrantyEndDate = DateTime.fromISO(
-          claimsPayload.warranty_end_date,
+        const warrantyClaimDate = DateTime.fromISO(
+          claimsPayload.warranty_claim_date,
         ).setZone(settings.timeZone);
-        if (salesWarrantyDate > warrantyEndDate) {
+        if (warrantyEndDate > warrantyClaimDate) {
           claimsPayload.warranty_status = WARRANTY_STATUS.VALID;
           return of(claimsPayload);
         }
