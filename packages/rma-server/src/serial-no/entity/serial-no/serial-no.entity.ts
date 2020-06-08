@@ -9,7 +9,7 @@ import {
 
 export class Warranty {
   purchaseWarrantyDate: string;
-  salesWarrantyDate: string;
+  salesWarrantyDate: Date;
   purchasedOn: Date;
   soldOn: Date;
 }

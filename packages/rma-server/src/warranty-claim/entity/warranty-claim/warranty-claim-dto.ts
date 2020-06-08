@@ -103,6 +103,10 @@ export class WarrantyClaimDto {
 
   @IsOptional()
   @IsString()
+  warranty_claim_date: Date;
+
+  @IsOptional()
+  @IsString()
   warranty_end_date: Date;
 
   @IsNotEmpty()
