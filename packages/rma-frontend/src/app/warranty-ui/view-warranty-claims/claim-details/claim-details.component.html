@@ -1,4 +1,124 @@
 <ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Warranty Details
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+
+  <ion-card-content>
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Warranty End Date</ion-label>
+            <ion-input placeholder="Warranty End Date" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Receive Date & Time</ion-label>
+            <ion-input
+              placeholder="Receive Date & Time"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.received_date
+                  ? warrantyClaimsDetails.received_date
+                  : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Receiving Branch</ion-label>
+            <ion-input
+              placeholder="Delivery Branch"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.receiving_branch
+                  ? warrantyClaimsDetails.receiving_branch
+                  : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Received By</ion-label>
+            <ion-input placeholder="Received By" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Deliver Date & Time</ion-label>
+            <ion-input
+              placeholder="Receive Date & Time"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.deliver_date
+                  ? warrantyClaimsDetails.deliver_date
+                  : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Delivery Branch</ion-label>
+            <ion-input
+              placeholder="Delivery Branch"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.delivery_branch
+                  ? warrantyClaimsDetails.delivery_branch
+                  : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Delivered By</ion-label>
+            <ion-input placeholder="Delivered By" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Product Details
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+
   <ion-card-content>
     <ion-grid class="ion-no-padding">
       <ion-row>
@@ -34,8 +154,8 @@
         </ion-col>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Warranty End Date</ion-label>
-            <ion-input placeholder="Warranty End Date" type="text"></ion-input>
+            <ion-label position="floating">Product Name</ion-label>
+            <ion-input placeholder="Product Name" type="text"></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -43,18 +163,56 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Product Name</ion-label>
-            <ion-input placeholder="Product Name" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
             <ion-label position="floating">Product Brand</ion-label>
             <ion-input placeholder="Product Brand" type="text"></ion-input>
           </ion-item>
         </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Problem</ion-label>
+            <ion-input placeholder="Problem" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
       </ion-row>
 
+      <ion-row>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating">Problem Details</ion-label>
+            <ion-input placeholder="Problem Details" type="text"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
+            <ion-label position="floating"
+              >Additional Receive/Remarks</ion-label
+            >
+            <ion-input
+              placeholder="Additional Receive/Remarks"
+              type="text"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<ion-card>
+  <ion-card-header>
+    <ion-row>
+      <ion-col class="ion-text-left">
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Customer Details
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-header>
+
+  <ion-card-content>
+    <ion-grid class="ion-no-padding">
       <ion-row>
         <ion-col>
           <ion-item lines="none">
@@ -110,272 +268,6 @@
           </ion-item>
         </ion-col>
       </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Receive Date & Time</ion-label>
-            <ion-input
-              placeholder="Receive Date & Time"
-              readonly="true"
-              type="text"
-              value="{{
-                warrantyClaimsDetails?.received_date
-                  ? warrantyClaimsDetails.received_date
-                  : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Deliver Date & Time</ion-label>
-            <ion-input
-              placeholder="Receive Date & Time"
-              readonly="true"
-              type="text"
-              value="{{
-                warrantyClaimsDetails?.deliver_date
-                  ? warrantyClaimsDetails.deliver_date
-                  : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Receiving Branch</ion-label>
-            <ion-input
-              placeholder="Delivery Branch"
-              readonly="true"
-              type="text"
-              value="{{
-                warrantyClaimsDetails?.receiving_branch
-                  ? warrantyClaimsDetails.receiving_branch
-                  : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Problem</ion-label>
-            <ion-input placeholder="Problem" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Delivery Branch</ion-label>
-            <ion-input
-              placeholder="Delivery Branch"
-              readonly="true"
-              type="text"
-              value="{{
-                warrantyClaimsDetails?.delivery_branch
-                  ? warrantyClaimsDetails.delivery_branch
-                  : ''
-              }}"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Problem Details</ion-label>
-            <ion-input placeholder="Problem Details" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating"
-              >Additional Receive/Remarks</ion-label
-            >
-            <ion-input
-              placeholder="Additional Receive/Remarks"
-              type="text"
-            ></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Delivered By</ion-label>
-            <ion-input placeholder="Delivered By" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Received By</ion-label>
-            <ion-input placeholder="Received By" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col> </ion-col>
-      </ion-row>
     </ion-grid>
-  </ion-card-content>
-</ion-card>
-
-<ion-card>
-  <ion-card-header>
-    <ion-row>
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Servicing Status Details
-          </ion-text>
-        </ion-card-title>
-      </ion-col>
-    </ion-row>
-  </ion-card-header>
-
-  <ion-card-content class="ion-no-padding">
-    <mat-table #table style="width: 100%;">
-      <ng-container matColumnDef="warranty_status">
-        <mat-header-cell *matHeaderCellDef>Warranty Status</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container *ngIf="row.warranty_status">
-            {{ row.warranty_status }}
-          </ng-container>
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="replaced_product">
-        <mat-header-cell *matHeaderCellDef>Replaced Product</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.replaced_product }}
-          </ng-container>
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="status_date">
-        <mat-header-cell *matHeaderCellDef>Status Date</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.status_date }}
-          </ng-container>
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="replaced_serial">
-        <mat-header-cell *matHeaderCellDef>Replaced Serial</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.replaced_serial }}
-          </ng-container>
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="status_given_by">
-        <mat-header-cell *matHeaderCellDef>Status Given By</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          <ng-container>
-            {{ row.status_given_by }}
-          </ng-container>
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="replaced_voucher_no">
-        <mat-header-cell *matHeaderCellDef>Replaced Voucher No</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.replaced_voucher_no }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="claim_status">
-        <mat-header-cell *matHeaderCellDef>Claim Status</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.claim_status }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="damaged_voucher_no">
-        <mat-header-cell *matHeaderCellDef>Damaged Voucher No</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.damaged_voucher_no }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="spareparts_consumption">
-        <mat-header-cell *matHeaderCellDef
-          >Spareparts Consumption</mat-header-cell
-        >
-        <mat-cell *matCellDef="let row">
-          {{ row.spareparts_consumption }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="replacement_item_warehouse">
-        <mat-header-cell *matHeaderCellDef
-          >Replacement Item Warehouse</mat-header-cell
-        >
-        <mat-cell *matCellDef="let row">
-          {{ row.replacement_item_warehouse }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="current_status">
-        <mat-header-cell *matHeaderCellDef>Current Status</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.current_status }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="damaged_item_warehouse">
-        <mat-header-cell *matHeaderCellDef
-          >Damaged Item Warehouse</mat-header-cell
-        >
-        <mat-cell *matCellDef="let row">
-          {{ row.damaged_item_warehouse }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="service_invoice_no">
-        <mat-header-cell *matHeaderCellDef>Service Invoice No</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.service_invoice_no }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-      servicing_amount
-      <ng-container matColumnDef="servicing_amount">
-        <mat-header-cell *matHeaderCellDef>Servicing Amount</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.servicing_amount }}
-        </mat-cell>
-        <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-      </ng-container>
-
-      <mat-header-row
-        *matHeaderRowDef="displayedColumns; sticky: true"
-      ></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-      <mat-footer-row
-        class="footer"
-        *matFooterRowDef="displayedColumns; sticky: true"
-      ></mat-footer-row>
-    </mat-table>
   </ion-card-content>
 </ion-card>
