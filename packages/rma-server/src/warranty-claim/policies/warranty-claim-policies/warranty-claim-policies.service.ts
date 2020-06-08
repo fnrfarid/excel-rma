@@ -111,6 +111,7 @@ export class WarrantyClaimPoliciesService {
           settings.timeZone;
           return throwError(new NotImplementedException());
         }
+        claimsPayload.warranty_end_date = serial.warranty.salesWarrantyDate;
         const warrantyEndDate = DateTime.fromISO(
           serial.warranty.salesWarrantyDate,
         ).setZone(settings.timeZone);

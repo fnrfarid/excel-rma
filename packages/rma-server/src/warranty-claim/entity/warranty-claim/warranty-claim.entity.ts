@@ -87,6 +87,9 @@ export class WarrantyClaim extends BaseEntity {
   warranty_claim_date: Date;
 
   @Column()
+  warranty_end_date: Date;
+
+  @Column()
   received_on: string;
 
   @Column()
