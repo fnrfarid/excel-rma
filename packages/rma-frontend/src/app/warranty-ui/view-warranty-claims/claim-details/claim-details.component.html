@@ -17,7 +17,15 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Warranty End Date</ion-label>
-            <ion-input placeholder="Warranty End Date" type="text"></ion-input>
+            <ion-input
+              placeholder="Warranty End Date"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.warranty_end_date
+                  ? warrantyClaimsDetails.warranty_end_date
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -28,8 +36,8 @@
               readonly="true"
               type="text"
               value="{{
-                warrantyClaimsDetails?.received_date
-                  ? warrantyClaimsDetails.received_date
+                warrantyClaimsDetails?.received_on
+                  ? warrantyClaimsDetails.received_on
                   : ''
               }}"
             ></ion-input>
@@ -56,7 +64,15 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Received By</ion-label>
-            <ion-input placeholder="Received By" type="text"></ion-input>
+            <ion-input
+              placeholder="Received By"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.received_by
+                  ? warrantyClaimsDetails.received_by
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -70,8 +86,8 @@
               readonly="true"
               type="text"
               value="{{
-                warrantyClaimsDetails?.deliver_date
-                  ? warrantyClaimsDetails.deliver_date
+                warrantyClaimsDetails?.delivery_date
+                  ? warrantyClaimsDetails.delivery_date
                   : ''
               }}"
             ></ion-input>
@@ -98,7 +114,15 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Delivered By</ion-label>
-            <ion-input placeholder="Delivered By" type="text"></ion-input>
+            <ion-input
+              placeholder="Delivered By"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.delivered_by
+                  ? warrantyClaimsDetails.delivered_by
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -125,7 +149,16 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Serial Number</ion-label>
-            <ion-input placeholder="Serial Number" readonly="true"></ion-input>
+            <ion-input
+              placeholder="Serial Number"
+              readonly="true"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.serial_no
+                  ? warrantyClaimsDetails.serial_no
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -149,13 +182,29 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">INV No</ion-label>
-            <ion-input placeholder="INV No" type="text"></ion-input>
+            <ion-input
+              placeholder="INV No"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.invoice_no
+                  ? warrantyClaimsDetails.invoice_no
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Product Name</ion-label>
-            <ion-input placeholder="Product Name" type="text"></ion-input>
+            <ion-input
+              placeholder="Product Name"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.item_name
+                  ? warrantyClaimsDetails.item_name
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -164,13 +213,29 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Product Brand</ion-label>
-            <ion-input placeholder="Product Brand" type="text"></ion-input>
+            <ion-input
+              placeholder="Product Brand"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.product_brand
+                  ? warrantyClaimsDetails.product_brand
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Problem</ion-label>
-            <ion-input placeholder="Problem" type="text"></ion-input>
+            <ion-input
+              placeholder="Problem"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.problem
+                  ? warrantyClaimsDetails.problem
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -179,7 +244,15 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Problem Details</ion-label>
-            <ion-input placeholder="Problem Details" type="text"></ion-input>
+            <ion-input
+              placeholder="Problem Details"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.problem_details
+                  ? warrantyClaimsDetails.problem_details
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -190,6 +263,11 @@
             <ion-input
               placeholder="Additional Receive/Remarks"
               type="text"
+              value="{{
+                warrantyClaimsDetails?.remarks
+                  ? warrantyClaimsDetails.remarks
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -217,13 +295,29 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Customer Name</ion-label>
-            <ion-input placeholder="Customer Name" type="text"></ion-input>
+            <ion-input
+              placeholder="Customer Name"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.customer
+                  ? warrantyClaimsDetails.customer
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Third Pary Name</ion-label>
-            <ion-input placeholder="Third Pary Name" type="text"></ion-input>
+            <ion-input
+              placeholder="Third Pary Name"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.third_party_name
+                  ? warrantyClaimsDetails.third_party_name
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -232,7 +326,15 @@
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Customer Contact</ion-label>
-            <ion-input placeholder="Customer Contact" type="Number"></ion-input>
+            <ion-input
+              placeholder="Customer Contact"
+              type="Number"
+              value="{{
+                warrantyClaimsDetails?.customer_contact
+                  ? warrantyClaimsDetails.customer_contact
+                  : ''
+              }}"
+            ></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -241,6 +343,11 @@
             <ion-input
               placeholder="Third Party Contact"
               type="Number"
+              value="{{
+                warrantyClaimsDetails?.third_party_contact
+                  ? warrantyClaimsDetails.third_party_contact
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -255,6 +362,11 @@
             <ion-input
               placeholder="Customer Contact and Address"
               type="text"
+              value="{{
+                warrantyClaimsDetails?.customer_address
+                  ? warrantyClaimsDetails.customer_address
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
@@ -264,6 +376,11 @@
             <ion-input
               placeholder="Third Party Address"
               type="text"
+              value="{{
+                warrantyClaimsDetails?.third_party_address
+                  ? warrantyClaimsDetails.third_party_address
+                  : ''
+              }}"
             ></ion-input>
           </ion-item>
         </ion-col>
