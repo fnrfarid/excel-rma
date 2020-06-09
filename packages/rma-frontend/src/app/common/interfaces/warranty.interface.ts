@@ -56,11 +56,26 @@ export interface SerialNo {
 }
 
 export interface WarrantyClaimsDetails {
+  warranty_end_date: Date;
   claim_type: string;
-  received_date: Date;
-  deliver_date: Date;
+  received_on: Date;
+  delivery_date: Date;
   receiving_branch: string;
   delivery_branch: string;
-  serial_no: string;
   address_display: string;
+  received_by: string;
+  delivered_by: string;
+  serial_no: string;
+  invoice_no: string;
+  item_name: string;
+  product_brand: string;
+  problem: string;
+  problem_details: string;
+  remarks: string;
+  customer: string;
+  customer_contact: string;
+  customer_address: string;
+  third_party_name: string;
+  third_party_contact: string;
+  third_party_address: string;
 }
