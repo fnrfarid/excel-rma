@@ -155,6 +155,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           .validateCustomer(salesInvoice)
           .pipe(
             switchMap(() => {
+              return this.validateSalesInvoicePolicy.validateCustomerCreditLimit(
+                salesInvoice,
+              );
+            }),
+            switchMap(() => {
               return this.validateSalesInvoicePolicy
                 .validateSubmittedState(salesInvoice)
                 .pipe(

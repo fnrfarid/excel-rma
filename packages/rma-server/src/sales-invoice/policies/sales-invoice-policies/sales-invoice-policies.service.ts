@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpService,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { from, throwError, of, forkJoin } from 'rxjs';
 import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
@@ -9,6 +14,7 @@ import {
   DELIVERY_NOTE_IN_QUEUE,
   ITEMS_SHOULD_BE_UNIQUE,
   INVALID_ITEM_TOTAL,
+  CREDIT_LIMIT_ERROR,
 } from '../../../constants/messages';
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
@@ -103,6 +109,56 @@ export class SalesInvoicePoliciesService {
       }),
     );
   }
+
+  validateCustomerCreditLimit(salesInvoicePayload: {
+    customer: string;
+    contact_email: string;
+  }) {
+    return forkJoin({
+      customer: from(
+        this.customerService.findOne({
+          name: salesInvoicePayload.customer,
+          owner: salesInvoicePayload.contact_email,
+        }),
+      ),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ customer, settings }) => {
+        if (!customer) {
+          return throwError(
+            new BadRequestException(CUSTOMER_AND_CONTACT_INVALID),
+          );
+        }
+
+        // Get customer credit limit for default company.
+        let credit_limits = [];
+        if (customer.credit_limits && customer.credit_limits.length > 0) {
+          credit_limits = customer.credit_limits.filter(limit => {
+            if (limit.company === settings.defaultCompany) {
+              return limit;
+            }
+          });
+        }
+
+        // Check if fields exist
+        if (
+          credit_limits.length > 0 &&
+          customer.baseCreditLimitAmount &&
+          customer.tempCreditLimitPeriod
+        ) {
+          // Check if credit limit has failed to reset
+          if (
+            credit_limits[0].credit_limit > customer.baseCreditLimitAmount &&
+            customer.tempCreditLimitPeriod < new Date()
+          ) {
+            return throwError(new UnauthorizedException(CREDIT_LIMIT_ERROR));
+          }
+        }
+        return of(true);
+      }),
+    );
+  }
+
   validateSubmittedState(salesInvoicePayload: { uuid: string }) {
     return from(
       this.salesInvoiceService.findOne({ uuid: salesInvoicePayload.uuid }),
