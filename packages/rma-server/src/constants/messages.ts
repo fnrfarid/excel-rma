@@ -60,3 +60,5 @@ export const CLAIM_TYPE_INVLAID =
   'Claim type invalid, valid type:["Warranty / Non Warranty","Non Serial Warranty","Third Party Warranty"]';
 export const INVALID_CUSTOMER = 'Provided customer is invalid';
 export const INVALID_SERIAL_NO = 'Invalid Serial number';
+export const CREDIT_LIMIT_ERROR =
+  'Credit Limit Mismatch, please check credit limit for the selected Customer';
