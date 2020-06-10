@@ -193,6 +193,13 @@ const routes: Routes = [
         m => m.CustomerProfilePageModule,
       ),
   },
+  {
+    path: 'warranty/service-invoice/:name',
+    loadChildren: () =>
+      import(
+        './warranty-ui/view-warranty-claims/service-invoices/add-service-invoice/add-service-invoice.module'
+      ).then(m => m.AddServiceInvoicePageModule),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
