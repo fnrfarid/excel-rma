@@ -8,6 +8,173 @@
     <ion-title>Add Service Invoice</ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <h1 style="justify-content: center;">Coming Soon ...</h1>
+<ion-content class="page-background">
+  <ion-fab
+    class="ion-margin-end"
+    slot="fixed"
+    vertical="top"
+    color="light"
+    horizontal="end"
+  >
+    <ion-fab-button class="fab-position" (click)="submitDraft()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <form [formGroup]="serviceInvoiceForm">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary">
+          Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  placeholder="Naming Series"
+                  readonly
+                  value="Claim INV-####"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  [matDatepicker]="postingDate"
+                  placeholder="Posting Date"
+                  formControlName="postingDate"
+                  (dateChange)="selectedPostingDate($event)"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="postingDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #postingDate disabled="false"></mat-datepicker>
+                <mat-error *ngIf="f.postingDate.hasError('required')">
+                  Posting Date is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Customer Name"
+                  formControlName="customerName"
+                />
+                <mat-error *ngIf="f.customerName.hasError('required')">
+                  Customer Name is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Customer Address"
+                  formControlName="customerAddress"
+                />
+                <mat-error *ngIf="f.customerAddress.hasError('required')">
+                  Customer Address is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Customer Contact"
+                  formControlName="customerContact"
+                />
+                <mat-error *ngIf="f.customerContact.hasError('required')">
+                  Customer Contact is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Third Party Name"
+                  formControlName="thirdPartyName"
+                />
+                <mat-error *ngIf="f.thirdPartyName.hasError('required')">
+                  Third Party Name is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Third Party Address"
+                  formControlName="thirdPartyAddress"
+                />
+                <mat-error *ngIf="f.thirdPartyAddress.hasError('required')">
+                  Third Party Address is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Third Party Contact"
+                  formControlName="thirdPartyContact"
+                />
+                <mat-error *ngIf="f.thirdPartyContact.hasError('required')">
+                  Third Party Contact is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Account"
+                  formControlName="account"
+                />
+                <mat-error *ngIf="f.account.hasError('required')">
+                  Account is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  placeholder="Branch"
+                  formControlName="branch"
+                />
+                <mat-error *ngIf="f.branch.hasError('required')">
+                  Branch is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </form>
 </ion-content>
