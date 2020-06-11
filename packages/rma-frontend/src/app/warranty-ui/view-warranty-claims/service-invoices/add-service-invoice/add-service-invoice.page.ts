@@ -3,6 +3,14 @@ import { Location } from '@angular/common';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { TimeService } from '../../../../api/time/time.service';
 
+export interface Item {
+  itemGroup: string;
+  unit: number;
+  itemName: string;
+  quantity: number;
+  total: number;
+}
+
 @Component({
   selector: 'app-add-service-invoice',
   templateUrl: './add-service-invoice.page.html',
@@ -11,6 +19,29 @@ import { TimeService } from '../../../../api/time/time.service';
 export class AddServiceInvoicePage implements OnInit {
   postingDate: { date: string; time: string };
   serviceInvoiceForm: FormGroup;
+  displayedColumns: string[] = [
+    'item group',
+    'item name',
+    'quantity',
+    'unit',
+    'total',
+  ];
+  item: Item[] = [
+    {
+      itemGroup: 'Service charge',
+      itemName: 'Reapir Charge',
+      unit: 3,
+      quantity: 1,
+      total: 3,
+    },
+    {
+      itemGroup: 'Service charge',
+      itemName: 'Reapir Charge',
+      unit: 3,
+      quantity: 1,
+      total: 3,
+    },
+  ];
   get f() {
     return this.serviceInvoiceForm.controls;
   }
@@ -37,7 +68,9 @@ export class AddServiceInvoicePage implements OnInit {
       branch: new FormControl('', [Validators.required]),
     });
   }
-
+  getTotalCost() {
+    return this.item.map(t => t.unit).reduce((acc, value) => acc + value, 0);
+  }
   navigateBack() {
     this.location.back();
   }
@@ -45,6 +78,7 @@ export class AddServiceInvoicePage implements OnInit {
   async selectedPostingDate($event) {
     this.postingDate = await this.time.getDateAndTime($event.value);
   }
-
   submitDraft() {}
+
+  addItem() {}
 }
