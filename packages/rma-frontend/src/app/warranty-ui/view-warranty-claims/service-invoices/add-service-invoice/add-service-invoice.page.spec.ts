@@ -7,6 +7,7 @@ import { MaterialModule } from '../../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { TimeService } from '../../../../api/time/time.service';
 
 describe('AddServiceInvoicePage', () => {
   let component: AddServiceInvoicePage;
@@ -23,6 +24,12 @@ describe('AddServiceInvoicePage', () => {
         ReactiveFormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
+      ],
+      providers: [
+        {
+          provide: TimeService,
+          useValue: {},
+        },
       ],
     }).compileComponents();
 
