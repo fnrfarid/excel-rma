@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { TimeService } from '../../../../api/time/time.service';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -8,12 +9,15 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrls: ['./add-service-invoice.page.scss'],
 })
 export class AddServiceInvoicePage implements OnInit {
-  postingDate: string;
+  postingDate: { date: string; time: string };
   serviceInvoiceForm: FormGroup;
   get f() {
     return this.serviceInvoiceForm.controls;
   }
-  constructor(private readonly location: Location) {}
+  constructor(
+    private readonly location: Location,
+    private readonly time: TimeService,
+  ) {}
 
   ngOnInit() {
     this.createFormGroup();
@@ -38,18 +42,8 @@ export class AddServiceInvoicePage implements OnInit {
     this.location.back();
   }
 
-  selectedPostingDate($event) {
-    this.postingDate = this.getParsedDate($event.value);
-  }
-
-  getParsedDate(value) {
-    const date = new Date(value);
-    return [
-      date.getFullYear(),
-      date.getMonth() + 1,
-      // +1 as index of months start's from 0
-      date.getDate(),
-    ].join('-');
+  async selectedPostingDate($event) {
+    this.postingDate = await this.time.getDateAndTime($event.value);
   }
 
   submitDraft() {}
