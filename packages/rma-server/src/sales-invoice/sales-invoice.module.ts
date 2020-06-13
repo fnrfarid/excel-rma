@@ -12,7 +12,6 @@ import { SerialNoModule } from '../serial-no/serial-no.module';
 import { SalesInvoiceWebhookController } from './controllers/sales-invoice-webhook/sales-invoice-webhook.controller';
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 import { DirectModule } from '../direct/direct.module';
-import { SyncModule } from '../sync/sync.module';
 import { ItemEntitiesModule } from '../item/entity/item-entity.module';
 
 @Module({
@@ -24,7 +23,6 @@ import { ItemEntitiesModule } from '../item/entity/item-entity.module';
     ErrorLogModule,
     DirectModule,
     ItemEntitiesModule,
-    SyncModule,
   ],
   controllers: [SalesInvoiceController, SalesInvoiceWebhookController],
   providers: [

@@ -4,17 +4,17 @@ import { DirectService } from '../../../direct/aggregates/direct/direct.service'
 import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntryJobService } from './stock-entry-sync.service';
+import { StockEntrySyncService } from './stock-entry-sync.service';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
-import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
+import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 
 describe('StockEntryJobService', () => {
-  let service: StockEntryJobService;
+  let service: StockEntrySyncService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        StockEntryJobService,
+        StockEntrySyncService,
         { provide: AGENDA_TOKEN, useValue: {} },
         {
           provide: DirectService,
@@ -43,7 +43,7 @@ describe('StockEntryJobService', () => {
       ],
     }).compile();
 
-    service = module.get<StockEntryJobService>(StockEntryJobService);
+    service = module.get<StockEntrySyncService>(StockEntrySyncService);
   });
 
   it('should be defined', () => {

@@ -11,7 +11,6 @@ import { PurchaseReceipt } from './entity/purchase-receipt.entity';
 import { DirectModule } from '../direct/direct.module';
 import { PurchaseReceiptSchedularManager } from './schedular';
 import { PurchaseOrderEntitiesModule } from '../purchase-order/entity/entity.module';
-import { JobQueueModule } from '../job-queue/job-queue.module';
 
 @Module({
   imports: [
@@ -20,7 +19,6 @@ import { JobQueueModule } from '../job-queue/job-queue.module';
     DirectModule,
     ErrorLogModule,
     PurchaseOrderEntitiesModule,
-    JobQueueModule,
     TypeOrmModule.forFeature([PurchaseReceipt]),
   ],
   controllers: [PurchaseReceiptController],

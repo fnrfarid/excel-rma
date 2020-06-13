@@ -8,10 +8,10 @@ import {
 } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
-import { StockEntryJobService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
+import { StockEntrySyncService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 import { AcceptStockEntryJobService } from '../../../stock-entry/schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
-import { AgendaJob } from '../../../job-queue/entities/agenda-job/agenda-job.entity';
+import { AgendaJob } from '../../entities/agenda-job/agenda-job.entity';
 
 @Injectable()
 export class FrappeJobService implements OnModuleInit {
@@ -19,7 +19,7 @@ export class FrappeJobService implements OnModuleInit {
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
     public readonly CREATE_PURCHASE_RECEIPT_JOB: PurchaseReceiptSyncService,
-    public readonly CREATE_STOCK_ENTRY_JOB: StockEntryJobService,
+    public readonly CREATE_STOCK_ENTRY_JOB: StockEntrySyncService,
     public readonly CREATE_DELIVERY_NOTE_JOB: DeliveryNoteJobService,
     public readonly ACCEPT_STOCK_ENTRY_JOB: AcceptStockEntryJobService,
   ) {}
