@@ -10,6 +10,8 @@ import {
   DELIVERY_NOTE_DOCTYPE,
   SYNC_DELIVERY_NOTE_JOB,
   SERIAL_WAREHOUSE_STATUS,
+  DEFAULT_NAMING_SERIES,
+  DEFAULT_CURRENCY,
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
@@ -129,10 +131,10 @@ export class DeliveryNoteJobService {
   setCsvDefaults(payload, settings: ServerSettings) {
     payload.naming_series = payload.naming_series
       ? payload.naming_series
-      : 'SDR-';
+      : DEFAULT_NAMING_SERIES.delivery_note;
     payload.price_list_currency = payload.price_list_currency
       ? payload.price_list_currency
-      : 'BDT';
+      : DEFAULT_CURRENCY;
     payload.selling_price_list = payload.selling_price_list
       ? payload.selling_price_list
       : settings.sellingPriceList;

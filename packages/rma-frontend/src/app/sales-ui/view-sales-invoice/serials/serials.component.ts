@@ -619,6 +619,11 @@ export class SerialsComponent implements OnInit {
   }
 
   async fileChangedEvent($event) {
+    if (!this.warehouseFormControl.value) {
+      this.getMessage('Please select a warehouse to validate serials.');
+      return;
+    }
+
     const loading = await this.loadingController.create({
       message: 'Fetching And validating serials for Purchase Receipt...!',
     });
@@ -642,12 +647,6 @@ export class SerialsComponent implements OnInit {
               const item_names = [];
               item_names.push(...Object.keys(hashMap));
               if (this.validateJson(hashMap)) {
-                if (!this.warehouseFormControl.value) {
-                  this.getMessage(
-                    'Please select a warehouse to validate serials.',
-                  );
-                  return;
-                }
                 return this.csvService
                   .validateSerials(
                     item_names,
@@ -698,7 +697,7 @@ export class SerialsComponent implements OnInit {
   addSerialsFromCsvJson(csvJsonObj: CsvJsonObj | any) {
     const data = this.itemDataSource.data();
     data.some(element => {
-      if (csvJsonObj[element.item_name]) {
+      if (csvJsonObj[element.item_code]) {
         if (!element.has_serial_no) {
           this.snackBar.open(
             `${element.item_name} is a non-serial item.`,
@@ -709,7 +708,7 @@ export class SerialsComponent implements OnInit {
         }
         this.assignRangeSerial(
           element,
-          csvJsonObj[element.item_name].serial_no,
+          csvJsonObj[element.item_code].serial_no,
         );
         return false;
       }
@@ -738,6 +737,8 @@ export class SerialsComponent implements OnInit {
           isValid = false;
           break;
         }
+        json[value.item_code] = json[value.item_name];
+        delete json[value.item_name];
       }
     }
     return isValid;

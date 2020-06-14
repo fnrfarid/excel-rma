@@ -179,3 +179,8 @@ export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 1000;
 export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
 export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
+export const DEFAULT_CURRENCY = 'BDT';
+export const DEFAULT_NAMING_SERIES = {
+  purchase_receipt: 'PD-',
+  delivery_note: 'SDR-',
+};
