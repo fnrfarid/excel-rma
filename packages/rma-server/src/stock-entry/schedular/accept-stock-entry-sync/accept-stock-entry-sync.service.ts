@@ -17,9 +17,8 @@ export class AcceptStockEntryJobService {
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
     private readonly serialNoService: SerialNoService,
-    private readonly stockEntryService: StockEntryService,
-  ) // private readonly jobService: AgendaJobService,
-  {}
+    private readonly stockEntryService: StockEntryService, // private readonly jobService: AgendaJobService,
+  ) {}
 
   execute(job) {
     return this.AcceptStockEntry(job.attrs.data);
