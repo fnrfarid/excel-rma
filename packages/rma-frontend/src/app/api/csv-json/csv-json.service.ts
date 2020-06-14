@@ -194,6 +194,7 @@ export class CsvJsonService {
               item_code: key,
               serials: serialBatch,
               validateFor,
+              warehouse,
             });
           }),
           switchMap((data: { notFoundSerials: string[] }) => {

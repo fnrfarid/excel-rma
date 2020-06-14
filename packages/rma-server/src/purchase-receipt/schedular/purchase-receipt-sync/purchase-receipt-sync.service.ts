@@ -15,6 +15,8 @@ import {
   FRAPPE_QUEUE_JOB,
   AGENDA_JOB_STATUS,
   SYNC_PURCHASE_RECEIPT_JOB,
+  DEFAULT_CURRENCY,
+  DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
@@ -182,8 +184,8 @@ export class PurchaseReceiptSyncService {
   setCsvDefaults(payload: PurchaseReceiptDto[], settings: ServerSettings) {
     const purchase_receipt = payload[0];
 
-    purchase_receipt.naming_series = 'PD-';
-    purchase_receipt.currency = 'BDT';
+    purchase_receipt.naming_series = DEFAULT_NAMING_SERIES.purchase_receipt;
+    purchase_receipt.currency = DEFAULT_CURRENCY;
     purchase_receipt.selling_price_list = purchase_receipt.selling_price_list
       ? purchase_receipt.selling_price_list
       : settings.sellingPriceList;
