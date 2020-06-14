@@ -8,14 +8,10 @@ import { TokenCacheService } from './entities/token-cache/token-cache.service';
 import { TokenCache } from './entities/token-cache/token-cache.entity';
 import { TOKEN_CACHE_CONNECTION } from '../constants/typeorm.connection';
 import { AuthSchedulers } from './schedulers';
-import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Global()
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([TokenCache], TOKEN_CACHE_CONNECTION),
-    ErrorLogModule,
-  ],
+  imports: [TypeOrmModule.forFeature([TokenCache], TOKEN_CACHE_CONNECTION)],
   providers: [
     TokenCacheService,
     RoleGuard,

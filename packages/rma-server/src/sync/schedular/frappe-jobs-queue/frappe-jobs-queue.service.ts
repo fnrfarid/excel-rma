@@ -8,10 +8,10 @@ import {
 } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
-import { StockEntrySyncService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 import { AcceptStockEntryJobService } from '../../../stock-entry/schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
 import { AgendaJob } from '../../entities/agenda-job/agenda-job.entity';
+import { StockEntrySyncService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
 
 @Injectable()
 export class FrappeJobService implements OnModuleInit {
@@ -34,14 +34,18 @@ export class FrappeJobService implements OnModuleInit {
           .execute(job)
           .toPromise()
           .then(success => {
-            job.attrs.data.status = AGENDA_JOB_STATUS.exported;
+            if (
+              job.attrs.data.type === 'CREATE_DELIVERY_NOTE_JOB' ||
+              job.attrs.data.type === 'CREATE_PURCHASE_RECEIPT_JOB'
+            ) {
+              job.attrs.data.status = AGENDA_JOB_STATUS.exported;
+            } else {
+              job.attrs.data.status = AGENDA_JOB_STATUS.success;
+            }
             return done();
           })
           .catch(err => {
-            if (job.attrs.data.type === this.CREATE_DELIVERY_NOTE_JOB) {
-              job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
-            }
-            job.attrs.data.status = AGENDA_JOB_STATUS.success;
+            job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
             return done(this.getPureError(err));
           });
       },

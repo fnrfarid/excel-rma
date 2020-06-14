@@ -5,10 +5,9 @@ import { DirectService } from './aggregates/direct/direct.service';
 import { DEFAULT } from '../constants/typeorm.connection';
 import { RequestState } from './entities/request-state/request-state.entity';
 import { RequestStateService } from './entities/request-state/request-state.service';
-import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RequestState], DEFAULT), ErrorLogModule],
+  imports: [TypeOrmModule.forFeature([RequestState], DEFAULT)],
   controllers: [DirectController],
   providers: [DirectService, RequestStateService],
   exports: [DirectService, RequestStateService],

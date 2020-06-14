@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, of, throwError } from 'rxjs';
 import {
   TOKEN,
   ACCESS_TOKEN,
@@ -18,6 +18,7 @@ import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
 import { SYSTEM_MANAGER, PURCHASE_USER } from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
+import { switchMap, retry, delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -121,32 +122,48 @@ export class AppComponent implements OnInit {
   }
 
   checkRoles(token: string) {
-    this.settingService.checkUserProfile(token).subscribe({
-      next: res => {
-        this.loggedIn = true;
-        if (
-          res &&
-          res.roles &&
-          res.roles.length > 0 &&
-          res.roles.includes(SYSTEM_MANAGER)
-        ) {
-          this.showSettings = true;
-        }
+    this.settingService
+      .checkUserProfile(token)
+      .pipe(
+        switchMap((data: { roles?: string[] }) => {
+          if (data && data.roles && data.roles.length === 0) {
+            return of({}).pipe(
+              delay(1000),
+              switchMap(obj => {
+                return throwError(data);
+              }),
+            );
+          }
+          return of(data);
+        }),
+        retry(3),
+      )
+      .subscribe({
+        next: res => {
+          this.loggedIn = true;
+          if (
+            res &&
+            res.roles &&
+            res.roles.length > 0 &&
+            res.roles.includes(SYSTEM_MANAGER)
+          ) {
+            this.showSettings = true;
+          }
 
-        if (
-          res &&
-          res.roles &&
-          res.roles.length > 0 &&
-          res.roles.includes(PURCHASE_USER)
-        ) {
-          this.showPurchase = true;
-        }
-      },
-      error: error => {
-        this.showSettings = false;
-        this.showPurchase = false;
-      },
-    });
+          if (
+            res &&
+            res.roles &&
+            res.roles.length > 0 &&
+            res.roles.includes(PURCHASE_USER)
+          ) {
+            this.showPurchase = true;
+          }
+        },
+        error: error => {
+          this.showSettings = false;
+          this.showPurchase = false;
+        },
+      });
   }
 
   getRnDUrls() {

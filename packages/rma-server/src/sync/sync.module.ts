@@ -6,12 +6,15 @@ import { FrappeJobService } from './schedular/frappe-jobs-queue/frappe-jobs-queu
 import { FrappeSyncDataImportJobService } from './schedular/frappe-sync-data-import-jobs-queue/frappe-sync-data-import-jobs-queue.service';
 import { JobQueueController } from './controllers/job-queue/job-queue.controller';
 import { SyncAggregateManager } from './aggregates';
+import { DirectModule } from '../direct/direct.module';
+import { SettingsService } from '../system-settings/aggregates/settings/settings.service';
 
 @Module({
   imports: [
     HttpModule,
     PurchaseReceiptModule,
     StockEntryModule,
+    DirectModule,
     DeliveryNoteModule,
   ],
   controllers: [JobQueueController],
@@ -19,6 +22,7 @@ import { SyncAggregateManager } from './aggregates';
     FrappeJobService,
     FrappeSyncDataImportJobService,
     ...SyncAggregateManager,
+    SettingsService,
   ],
   exports: [
     FrappeJobService,

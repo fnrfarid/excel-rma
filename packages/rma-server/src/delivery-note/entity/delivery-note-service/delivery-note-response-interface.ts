@@ -1,8 +1,3 @@
-export interface DeliveryNoteResponseInterface {
-  name: string;
-  items: DeliveryNoteResponseItemInterface[];
-}
-
 export interface DeliveryNoteResponseItemInterface {
   item_code: string;
   item_name: string;
