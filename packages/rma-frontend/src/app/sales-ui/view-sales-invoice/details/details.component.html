@@ -223,6 +223,7 @@
             {{ row.item_name }}
           </ng-container>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef>Total :</mat-footer-cell>
       </ng-container>
       <ng-container matColumnDef="qty">
         <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
@@ -231,6 +232,7 @@
             {{ row.qty }}
           </ng-container>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef>{{ total_qty }}</mat-footer-cell>
       </ng-container>
       <ng-container matColumnDef="rate">
         <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
@@ -239,17 +241,25 @@
             {{ row.rate | curFormat | async }}
           </ng-container>
         </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
       </ng-container>
       <ng-container matColumnDef="amount">
         <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
         <mat-cell *matCellDef="let row">{{
           row.rate * row.qty | curFormat | async
         }}</mat-cell>
+        <mat-footer-cell *matFooterCellDef>
+          {{ total | curFormat | async }}
+        </mat-footer-cell>
       </ng-container>
       <mat-header-row
         *matHeaderRowDef="displayedColumns; sticky: true"
       ></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      <mat-footer-row
+        class="footer"
+        *matFooterRowDef="displayedColumns; sticky: true"
+      ></mat-footer-row>
     </mat-table>
   </ion-card-content>
 </ion-card>
