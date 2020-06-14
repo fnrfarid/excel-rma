@@ -37,10 +37,10 @@ export class DirectService {
 
   constructor(
     private readonly requestStateService: RequestStateService,
-    private readonly settingService: SettingsService,
     private readonly tokenCacheService: TokenCacheService,
     private readonly http: HttpService,
     private readonly errorLogService: ErrorLogService,
+    private readonly settingService: SettingsService,
   ) {}
 
   connectClientForUser(redirect: string, token: TokenCache) {

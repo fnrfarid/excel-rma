@@ -27,6 +27,11 @@ export class PurchaseReceiptItemDto {
   warranty_date: string;
 
   purchase_order?: string;
+  base_total: number;
+
+  uom: string;
+  stock_uom: string;
+  conversion_factor: number;
 
   @IsOptional()
   @IsNumber()
@@ -78,6 +83,11 @@ export class PurchaseReceiptDto {
   docstatus?: number;
 
   is_return?: number;
+
+  currency: string;
+  selling_price_list: string;
+  conversion_rate: number;
+  status: string;
 
   @IsNotEmpty()
   @IsNumber()

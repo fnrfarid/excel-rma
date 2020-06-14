@@ -4,9 +4,11 @@ import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider
 import {
   FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB,
   AGENDA_JOB_STATUS,
+  AGENDA_DATA_IMPORT_MAX_RETRIES,
 } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
+import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 
 @Injectable()
 export class FrappeSyncDataImportJobService implements OnModuleInit {
@@ -14,6 +16,7 @@ export class FrappeSyncDataImportJobService implements OnModuleInit {
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
     public readonly SYNC_DELIVERY_NOTE_JOB: DeliveryNoteJobService,
+    public readonly SYNC_PURCHASE_RECEIPT_JOB: PurchaseReceiptSyncService,
   ) {}
 
   async onModuleInit() {
@@ -42,7 +45,10 @@ export class FrappeSyncDataImportJobService implements OnModuleInit {
 
   async onJobFailure(error: any, job: Agenda.Job<any>) {
     const retryCount = job.attrs.failCount - 1;
-    if (!(error && error.log_details)) {
+    if (
+      !(error && error.log_details) &&
+      retryCount <= AGENDA_DATA_IMPORT_MAX_RETRIES
+    ) {
       job.attrs.data.status = AGENDA_JOB_STATUS.retrying;
       job.attrs.nextRunAt = this.getBackOff(
         retryCount,

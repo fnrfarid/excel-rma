@@ -2,11 +2,17 @@ import { Injectable, HttpService } from '@nestjs/common';
 import {
   DATA_IMPORT_API_ENDPOINT,
   FRAPPE_FILE_ATTACH_API_ENDPOINT,
-  FRAPPE_START_DATA_IMPORT_API_ENDPOINT,
 } from '../../../constants/routes';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
-import { switchMap, map } from 'rxjs/operators';
+import {
+  switchMap,
+  map,
+  delay,
+  retry,
+  catchError,
+  mergeMap,
+} from 'rxjs/operators';
 import {
   DataImportSuccessResponseInterface,
   FileUploadSuccessResponseInterface,
@@ -17,12 +23,23 @@ import {
   BEARER_HEADER_VALUE_PREFIX,
   ACCEPT,
   APPLICATION_JSON_CONTENT_TYPE,
+  ONE_MINUTE_IN_MILLISECONDS,
+  AGENDA_JOB_STATUS,
+  VALIDATE_AUTH_STRING,
 } from '../../../constants/app-strings';
-import { of } from 'rxjs';
+import { of, throwError, forkJoin, Observable, from } from 'rxjs';
+import { FRAPPE_START_DATA_IMPORT_API_ENDPOINT } from '../../../constants/routes';
+import { DirectService } from '../../../direct/aggregates/direct/direct.service';
+import { AgendaJobService } from '../../entities/agenda-job/agenda-job.service';
+import { DataImportSuccessResponse } from '../../entities/agenda-job/agenda-job.entity';
 
 @Injectable()
 export class DataImportService {
-  constructor(private readonly http: HttpService) {}
+  constructor(
+    private readonly http: HttpService,
+    private readonly tokenService: DirectService,
+    private readonly jobService: AgendaJobService,
+  ) {}
 
   addDataImport(
     reference_doctype: string,
@@ -67,18 +84,137 @@ export class DataImportService {
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
-        map(data => data.data.data),
-        switchMap(submitted_doc => {
-          return this.http.post(
-            settings.authServerURL + FRAPPE_START_DATA_IMPORT_API_ENDPOINT,
-            { data_import: submitted_doc.name },
-            { headers: this.getAuthorizationHeaders(token) },
-          );
-        }),
         switchMap(done => {
           return of(response);
         }),
       );
+  }
+
+  syncImport(
+    job: {
+      payload: DataImportSuccessResponse;
+      uuid: string;
+      type: string;
+      settings: ServerSettings;
+      token: TokenCache;
+      exported?: boolean;
+      status?: string;
+      lastError?: any;
+    },
+    doctype: string,
+  ): Observable<any> {
+    const state: any = {};
+    let headers;
+    return of({}).pipe(
+      switchMap(child => {
+        headers = this.getAuthorizationHeaders(job.token);
+        if (job.status === AGENDA_JOB_STATUS.fail) {
+          return throwError(job.lastError);
+        }
+        if (job.exported) {
+          return of({});
+        }
+        return this.http
+          .post(
+            job.settings.authServerURL + FRAPPE_START_DATA_IMPORT_API_ENDPOINT,
+            { data_import: job.payload.dataImportName },
+            { headers },
+          )
+          .pipe(
+            delay(ONE_MINUTE_IN_MILLISECONDS),
+            switchMap(success => {
+              job.exported = true;
+              return of({});
+            }),
+          );
+      }),
+      switchMap(done => {
+        return this.http.get(
+          job.settings.authServerURL +
+            DATA_IMPORT_API_ENDPOINT +
+            `/${job.payload.dataImportName}`,
+          { headers },
+        );
+      }),
+      map(data => data.data.data),
+      switchMap((response: DataImportSuccessResponseInterface) => {
+        if (response.import_status === 'Successful') {
+          const parsed_response = JSON.parse(response.log_details);
+          const link = parsed_response.messages[0].link.split('/');
+          const doctype_name = link[link.length - 1];
+          this.jobService
+            .updateMany(
+              { 'data.uuid': job.uuid },
+              { $set: { 'data.status': AGENDA_JOB_STATUS.success } },
+            )
+            .then(success => {})
+            .catch(err => {});
+          return of(doctype_name);
+        }
+        if (
+          response.import_status === 'Pending' ||
+          response.import_status === 'In Progress'
+        ) {
+          return of({}).pipe(
+            delay(ONE_MINUTE_IN_MILLISECONDS),
+            switchMap(done => throwError('Delivery Note is in queue')),
+          );
+        }
+        if (response.import_status === AGENDA_JOB_STATUS.fail) {
+          job.lastError = response;
+          job.status = AGENDA_JOB_STATUS.fail;
+        }
+        return throwError(response);
+      }),
+      switchMap(doctype_name => {
+        return this.http.get(
+          job.settings.authServerURL +
+            `/api/resource/${doctype}/${doctype_name}`,
+          { headers },
+        );
+      }),
+      map(data => data.data.data),
+      switchMap((single_doctype: SingleDoctypeResponseInterface) => {
+        state.doc = single_doctype;
+        return forkJoin({
+          parent_job: from(
+            this.jobService.findOneAndUpdate(
+              { 'data.uuid': job.uuid },
+              { $set: { 'data.status': AGENDA_JOB_STATUS.success } },
+            ),
+          ),
+          state: of(state),
+        });
+      }),
+      catchError(err => {
+        if (
+          (err && err.response && err.response.status === 403) ||
+          (err &&
+            err.response &&
+            err.response.data &&
+            err.response.data.exc &&
+            err.response.data.exc.includes(VALIDATE_AUTH_STRING))
+        ) {
+          return this.tokenService.getUserAccessToken(job.token.email).pipe(
+            mergeMap((token: TokenCache) => {
+              this.jobService.updateJobTokens(
+                job.token.accessToken,
+                token.accessToken,
+              );
+              job.token.accessToken = token.accessToken;
+              return throwError(err);
+            }),
+            catchError(error => {
+              return throwError(
+                'User token is expired, please ask the user to login and retry the job.',
+              );
+            }),
+          );
+        }
+        return throwError(err);
+      }),
+      retry(8),
+    );
   }
 
   getAuthorizationHeaders(token: TokenCache) {
@@ -89,8 +225,7 @@ export class DataImportService {
   }
 }
 
-export class DataImportSuccessResponse {
-  dataImportName?: string;
-  file_name?: string;
-  file_url?: string;
+export interface SingleDoctypeResponseInterface {
+  name: string;
+  items: any[];
 }

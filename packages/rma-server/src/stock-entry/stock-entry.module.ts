@@ -1,4 +1,3 @@
-import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 import { StockEntryAggregateService } from './aggregates/stock-entry-aggregate/stock-entry-aggregate.service';
 import { StockEntryPoliciesService } from './policies/stock-entry-policies/stock-entry-policies.service';
 import { StockEntryController } from './controller/stock-entry.controller';
@@ -14,7 +13,6 @@ import { AcceptStockEntryJobService } from './schedular/accept-stock-entry-sync/
 
 @Module({
   imports: [
-    ErrorLogModule,
     TypeOrmModule.forFeature([StockEntry]),
     SerialNoEntitiesModule,
     DirectModule,
