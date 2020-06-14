@@ -14,7 +14,6 @@ import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.modul
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 import { DirectModule } from '../direct/direct.module';
-import { SyncModule } from '../sync/sync.module';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { SyncModule } from '../sync/sync.module';
     SalesInvoiceEntitiesModule,
     ErrorLogModule,
     DeliveryNoteModule,
-    SyncModule,
     DirectModule,
   ],
   controllers: [SerialNoController, SerialNoWebhookController],
@@ -35,7 +33,6 @@ import { SyncModule } from '../sync/sync.module';
     ...SerialNoCommandManager,
     SerialNoPoliciesService,
     AssignSerialNoPoliciesService,
-    // SerialNoSyncService,
   ],
   exports: [
     SerialNoEntitiesModule,

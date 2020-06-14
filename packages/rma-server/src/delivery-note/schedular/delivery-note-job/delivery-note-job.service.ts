@@ -22,20 +22,20 @@ import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice
 import { FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
 import Agenda = require('agenda');
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
+import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { DeliveryNoteJobHelperService } from '../delivery-note-job-helper/delivery-note-job-helper.service';
-import { JsonToCsvParserService } from '../../../sync/service/data-import/json-to-csv-parser.service';
+import { JsonToCsvParserService } from '../../../sync/entities/agenda-job/json-to-csv-parser.service';
 import {
   DataImportService,
   DataImportSuccessResponse,
-} from '../../../sync/service/data-import/data-import.service';
+} from '../../../sync/aggregates/data-import/data-import.service';
 import * as uuid from 'uuid/v4';
 import {
   DATA_IMPORT_API_ENDPOINT,
   LIST_DELIVERY_NOTE_ENDPOINT,
 } from '../../../constants/routes';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
-import { DataImportSuccessResponseInterface } from '../../../sync/service/data-import/data-import.interface';
+import { DataImportSuccessResponseInterface } from '../../../sync/aggregates/data-import/data-import.interface';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()

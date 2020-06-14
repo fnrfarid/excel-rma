@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/common';
 import { JobQueueController } from './job-queue.controller';
-import { JobQueueAggregateService } from '../../../job-queue/aggregates/job-queue-aggregate/job-queue-aggregate.service';
+import { JobQueueAggregateService } from '../../aggregates/job-queue-aggregate/job-queue-aggregate.service';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 

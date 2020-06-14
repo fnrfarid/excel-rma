@@ -26,7 +26,7 @@ import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchas
 import { PurchaseReceiptResponseInterface } from '../../entity/purchase-receipt-response-interface';
 import { PurchaseReceiptMetaData } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.entity';
 import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
-import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
+import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { PurchaseReceiptPoliciesService } from '../../purchase-receipt-policies/purchase-receipt-policies.service';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';

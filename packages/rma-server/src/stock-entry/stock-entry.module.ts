@@ -8,10 +8,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StockEntryService } from './stock-entry/stock-entry.service';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { DirectModule } from '../direct/direct.module';
-import { StockEntryJobService } from './schedular/stock-entry-sync/stock-entry-sync.service';
+import { StockEntrySyncService } from './schedular/stock-entry-sync/stock-entry-sync.service';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 import { AcceptStockEntryJobService } from './schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
-import { JobQueueModule } from '../job-queue/job-queue.module';
 
 @Module({
   imports: [
@@ -19,17 +18,16 @@ import { JobQueueModule } from '../job-queue/job-queue.module';
     TypeOrmModule.forFeature([StockEntry]),
     SerialNoEntitiesModule,
     DirectModule,
-    JobQueueModule,
   ],
   controllers: [StockEntryController],
   providers: [
     StockEntryAggregateService,
     StockEntryPoliciesService,
     StockEntryService,
-    StockEntryJobService,
+    StockEntrySyncService,
     AcceptStockEntryJobService,
     SerialBatchService,
   ],
-  exports: [StockEntryJobService, AcceptStockEntryJobService],
+  exports: [StockEntrySyncService, AcceptStockEntryJobService],
 })
 export class StockEntryModule {}

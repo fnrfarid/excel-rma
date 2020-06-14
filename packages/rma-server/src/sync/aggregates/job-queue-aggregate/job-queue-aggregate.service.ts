@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import { AGENDA_JOB_STATUS } from '../../../constants/app-strings';
 import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { FrappeJobService } from '../../../sync/schedular/frappe-jobs-queue/frappe-jobs-queue.service';
+import { FrappeJobService } from '../../schedular/frappe-jobs-queue/frappe-jobs-queue.service';
 import { CREATE_PURCHASE_RECEIPT_JOB } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 
 @Injectable()
