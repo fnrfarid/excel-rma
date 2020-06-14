@@ -26,7 +26,7 @@ import { FRAPPE_API_GET_DOCTYPE_COUNT } from '../../../constants/routes';
 import {
   COMPLETED_STATUS,
   PURCHASE_RECEIPT_SERIALS_BATCH_SIZE,
-  FRAPPE_INSERT_MANY_BATCH_COUNT,
+  PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT,
   PURCHASE_RECEIPT_DOCTYPE_NAME,
   SERIAL_NO_DOCTYPE_NAME,
   MONGO_INSERT_MANY_BATCH_NUMBER,
@@ -361,7 +361,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
               data.owner = clientHttpRequest.token.email;
               return of(data);
             }),
-            bufferCount(FRAPPE_INSERT_MANY_BATCH_COUNT),
+            bufferCount(PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT),
             concatMap(receipt => {
               this.prSyncService.addToQueueNow({
                 payload: receipt,

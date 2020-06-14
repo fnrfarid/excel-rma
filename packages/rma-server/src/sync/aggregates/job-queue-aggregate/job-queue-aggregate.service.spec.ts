@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JobQueueAggregateService } from './job-queue-aggregate.service';
 import { AgendaJobService } from '../../entities/agenda-job/agenda-job.service';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import { FrappeJobService } from '../../../sync/schedular/frappe-jobs-queue/frappe-jobs-queue.service';
+import { FrappeJobService } from '../../schedular/frappe-jobs-queue/frappe-jobs-queue.service';
 
 describe('JobQueueAggregateService', () => {
   let service: JobQueueAggregateService;

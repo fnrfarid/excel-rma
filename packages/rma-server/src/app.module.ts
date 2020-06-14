@@ -32,7 +32,7 @@ import { PurchaseOrderModule } from './purchase-order/purchase-order.module';
 import { SyncModule } from './sync/sync.module';
 import { StockEntryModule } from './stock-entry/stock-entry.module';
 import { ProblemModule } from './problem/problem.module';
-import { JobQueueModule } from './job-queue/job-queue.module';
+import { SyncEntitiesModule } from './sync/entities/sync-entity.module';
 
 @Module({
   imports: [
@@ -53,6 +53,7 @@ import { JobQueueModule } from './job-queue/job-queue.module';
     AuthModule,
     SystemSettingsModule,
     DirectModule,
+    SyncModule,
     CommandModule,
     CustomerModule,
     DeliveryNoteEntitiesModule,
@@ -61,6 +62,7 @@ import { JobQueueModule } from './job-queue/job-queue.module';
     ErrorLogModule,
     PurchaseReceiptModule,
     PurchaseInvoiceModule,
+    SyncEntitiesModule,
     SupplierModule,
     CreditNoteModule,
     SalesInvoiceModule,
@@ -69,9 +71,7 @@ import { JobQueueModule } from './job-queue/job-queue.module';
     WarrantyClaimModule,
     DeliveryNoteModule,
     PurchaseOrderModule,
-    SyncModule,
     ProblemModule,
-    JobQueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],

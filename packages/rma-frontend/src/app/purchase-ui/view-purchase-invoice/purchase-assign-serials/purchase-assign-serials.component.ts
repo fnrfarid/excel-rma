@@ -638,10 +638,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   getParsedDate(value) {
     const date = new Date(value);
     return [
-      date.getFullYear(),
+      date.getDate(),
       date.getMonth() + 1,
       // +1 as index of months start's from 0
-      date.getDate(),
+      date.getFullYear(),
     ].join('-');
   }
 

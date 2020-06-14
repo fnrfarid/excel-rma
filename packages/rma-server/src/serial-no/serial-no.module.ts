@@ -12,9 +12,7 @@ import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
 import { AssignSerialNoPoliciesService } from './policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
-import { ErrorLogModule } from '../error-log/error-logs-invoice.module';
 import { DirectModule } from '../direct/direct.module';
-import { SyncModule } from '../sync/sync.module';
 
 @Module({
   imports: [
@@ -22,9 +20,7 @@ import { SyncModule } from '../sync/sync.module';
     ItemEntitiesModule,
     SupplierEntitiesModule,
     SalesInvoiceEntitiesModule,
-    ErrorLogModule,
     DeliveryNoteModule,
-    SyncModule,
     DirectModule,
   ],
   controllers: [SerialNoController, SerialNoWebhookController],
@@ -35,7 +31,6 @@ import { SyncModule } from '../sync/sync.module';
     ...SerialNoCommandManager,
     SerialNoPoliciesService,
     AssignSerialNoPoliciesService,
-    // SerialNoSyncService,
   ],
   exports: [
     SerialNoEntitiesModule,

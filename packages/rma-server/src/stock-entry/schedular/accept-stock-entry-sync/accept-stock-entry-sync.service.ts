@@ -8,7 +8,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { of, throwError, from } from 'rxjs';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
-import { AgendaJobService } from '../../../job-queue/entities/agenda-job/agenda-job.service';
+// import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 
 @Injectable()
 export class AcceptStockEntryJobService {
@@ -17,8 +17,7 @@ export class AcceptStockEntryJobService {
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
     private readonly serialNoService: SerialNoService,
-    private readonly stockEntryService: StockEntryService,
-    private readonly jobService: AgendaJobService,
+    private readonly stockEntryService: StockEntryService, // private readonly jobService: AgendaJobService,
   ) {}
 
   execute(job) {
@@ -69,10 +68,10 @@ export class AcceptStockEntryJobService {
         ) {
           return this.tokenService.getUserAccessToken(job.token.email).pipe(
             mergeMap(token => {
-              this.jobService.updateJobTokens(
-                job.token.accessToken,
-                token.accessToken,
-              );
+              // this.jobService.updateJobTokens(
+              //   job.token.accessToken,
+              //   token.accessToken,
+              // );
               job.token.accessToken = token.accessToken;
               return throwError(err);
             }),

@@ -2,12 +2,11 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import * as uuidv4 from 'uuid/v4';
-import { WarrantyClaimDto } from '../../entity/warranty-claim/warranty-claim-dto';
 import { WarrantyClaim } from '../../entity/warranty-claim/warranty-claim.entity';
-import { WarrantyClaimAddedEvent } from '../../event/warranty-claim-added/warranty-claim-added.event';
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/warranty-claim-removed.event';
 import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/warranty-claim-updated.event';
@@ -25,7 +24,11 @@ import { SerialNoAggregateService } from '../../../serial-no/aggregates/serial-n
 import { SerialNoDto } from '../../../serial-no/entity/serial-no/serial-no-dto';
 import { BulkWarrantyClaimsCreatedEvent } from '../../event/bulk-warranty-claims-created/bulk-warranty-claims.event';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-
+import { WARRANTY_TYPE } from '../../../constants/app-strings';
+import { DateTime } from 'luxon';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
+import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -33,16 +36,78 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     private readonly warrantyClaimsPoliciesService: WarrantyClaimPoliciesService,
     private readonly serialNoAggregateService: SerialNoAggregateService,
     private readonly serialNoService: SerialNoService,
+    private readonly settingsService: SettingsService,
   ) {
     super();
   }
-
   addWarrantyClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
-    const warrantyClaim = new WarrantyClaim();
-    Object.assign(warrantyClaim, warrantyClaimPayload);
-    warrantyClaim.uuid = uuidv4();
-    warrantyClaim.createdOn = new Date();
-    this.apply(new WarrantyClaimAddedEvent(warrantyClaim, clientHttpRequest));
+    switch (warrantyClaimPayload.claim_type) {
+      case WARRANTY_TYPE.WARRANTY:
+        return this.createWarrantyNonWarrantyClaim(warrantyClaimPayload);
+
+      case WARRANTY_TYPE.NON_SERAIL:
+        return this.createNonSerialClaim(warrantyClaimPayload);
+
+      case WARRANTY_TYPE.THIRD_PARTY:
+        return this.createThirdPartyClaim(warrantyClaimPayload);
+
+      default:
+        return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
+    }
+  }
+
+  assignFields(warrantyClaimPayload: WarrantyClaimDto) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        if (!settings) {
+          return throwError(new NotImplementedException());
+        }
+        const warrantyClaim = new WarrantyClaim();
+        Object.assign(warrantyClaim, warrantyClaimPayload);
+        warrantyClaim.uuid = uuidv4();
+        warrantyClaim.createdOn = new DateTime(settings.timeZone).toJSDate();
+        return of(warrantyClaim);
+      }),
+    );
+  }
+
+  createWarrantyNonWarrantyClaim(claimsPayload: WarrantyClaimDto) {
+    return this.warrantyClaimsPoliciesService
+      .validateWarrantyCustomer(claimsPayload.customer)
+      .pipe(
+        switchMap(() => {
+          return this.warrantyClaimsPoliciesService.validateWarrantySerailNo(
+            claimsPayload,
+          );
+        }),
+        switchMap((payload: WarrantyClaimDto) => {
+          return this.assignFields(payload);
+        }),
+        switchMap((warrantyClaimPayload: WarrantyClaim) => {
+          return from(this.warrantyClaimService.create(warrantyClaimPayload));
+        }),
+      );
+  }
+
+  createNonSerialClaim(claimsPayload: WarrantyClaimDto) {
+    return this.warrantyClaimsPoliciesService
+      .validateWarrantyCustomer(claimsPayload.customer)
+      .pipe(
+        switchMap(() => {
+          return this.assignFields(claimsPayload);
+        }),
+        switchMap((warrantyClaimPayload: WarrantyClaim) => {
+          return from(this.warrantyClaimService.create(warrantyClaimPayload));
+        }),
+      );
+  }
+
+  createThirdPartyClaim(claimsPayload: WarrantyClaimDto) {
+    return this.assignFields(claimsPayload).pipe(
+      switchMap(warrantyClaimPayload => {
+        return from(this.warrantyClaimService.create(warrantyClaimPayload));
+      }),
+    );
   }
 
   async retrieveWarrantyClaim(uuid: string, req) {

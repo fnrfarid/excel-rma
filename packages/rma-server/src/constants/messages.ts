@@ -56,3 +56,9 @@ export const RESET_CREDIT_LIMIT_ERROR = 'Error during Credit Limit Reset';
 export const INVALID_ITEM_NAME_QUERY =
   'Invalid Query, please provide an array item_names : [ "name1"...]';
 export const INVALID_SERVICE_ACCOUNT = 'Invalid Service Account Token';
+export const CLAIM_TYPE_INVLAID =
+  'Claim type invalid, valid type:["Warranty / Non Warranty","Non Serial Warranty","Third Party Warranty"]';
+export const INVALID_CUSTOMER = 'Provided customer is invalid';
+export const INVALID_SERIAL_NO = 'Invalid Serial number';
+export const CREDIT_LIMIT_ERROR =
+  'Credit Limit Mismatch, please check credit limit for the selected Customer';

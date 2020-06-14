@@ -4,6 +4,7 @@ import { WarrantyClaimService } from '../../../warranty-claim/entity/warranty-cl
 import { WarrantyClaimPoliciesService } from '../../policies/warranty-claim-policies/warranty-claim-policies.service';
 import { SerialNoAggregateService } from '../../../serial-no/aggregates/serial-no-aggregate/serial-no-aggregate.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
 describe('warrantyClaimAggregateService', () => {
   let service: WarrantyClaimAggregateService;
@@ -26,6 +27,10 @@ describe('warrantyClaimAggregateService', () => {
         },
         {
           provide: SerialNoService,
+          useValue: {},
+        },
+        {
+          provide: SettingsService,
           useValue: {},
         },
       ],

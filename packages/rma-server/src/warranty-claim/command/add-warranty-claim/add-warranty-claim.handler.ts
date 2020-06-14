@@ -15,7 +15,9 @@ export class AddWarrantyClaimCommandHandler
       clientHttpRequest,
     } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await aggregate.addWarrantyClaim(warrantyclaimPayload, clientHttpRequest);
+    await aggregate
+      .addWarrantyClaim(warrantyclaimPayload, clientHttpRequest)
+      .toPromise();
     aggregate.commit();
   }
 }

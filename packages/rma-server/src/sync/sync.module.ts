@@ -1,39 +1,32 @@
 import { Module, HttpModule } from '@nestjs/common';
-import { SyncAggregateService } from './aggregates/sync-aggregate/sync-aggregate.service';
-import { AuthModule } from '../auth/auth.module';
-import { SystemSettingsModule } from '../system-settings/system-settings.module';
 import { PurchaseReceiptModule } from '../purchase-receipt/purchase-receipt.module';
 import { StockEntryModule } from '../stock-entry/stock-entry.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { FrappeJobService } from './schedular/frappe-jobs-queue/frappe-jobs-queue.service';
-import { SerialBatchService } from './aggregates/serial-batch/serial-batch.service';
-import { DataImportService } from './service/data-import/data-import.service';
-import { JsonToCsvParserService } from './service/data-import/json-to-csv-parser.service';
 import { FrappeSyncDataImportJobService } from './schedular/frappe-sync-data-import-jobs-queue/frappe-sync-data-import-jobs-queue.service';
+import { JobQueueController } from './controllers/job-queue/job-queue.controller';
+import { SyncAggregateManager } from './aggregates';
+import { DirectModule } from '../direct/direct.module';
+import { SettingsService } from '../system-settings/aggregates/settings/settings.service';
 
 @Module({
   imports: [
-    AuthModule,
-    SystemSettingsModule,
     HttpModule,
     PurchaseReceiptModule,
     StockEntryModule,
+    DirectModule,
     DeliveryNoteModule,
   ],
+  controllers: [JobQueueController],
   providers: [
-    SyncAggregateService,
     FrappeJobService,
-    SerialBatchService,
-    DataImportService,
-    JsonToCsvParserService,
     FrappeSyncDataImportJobService,
+    ...SyncAggregateManager,
+    SettingsService,
   ],
   exports: [
-    SyncAggregateService,
     FrappeJobService,
-    SerialBatchService,
-    DataImportService,
-    JsonToCsvParserService,
+    ...SyncAggregateManager,
     FrappeSyncDataImportJobService,
   ],
 })
