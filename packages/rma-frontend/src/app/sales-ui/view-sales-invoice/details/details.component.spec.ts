@@ -35,7 +35,7 @@ describe('DetailsComponent', () => {
           provide: SalesService,
           useValue: {
             createSalesInvoice: (...args) => of({}),
-            getSalesInvoice: (...args) => of({}),
+            getSalesInvoice: (...args) => of({ items: [] }),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

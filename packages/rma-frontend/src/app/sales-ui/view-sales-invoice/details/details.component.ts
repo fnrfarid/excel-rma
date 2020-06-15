@@ -31,7 +31,8 @@ export class DetailsComponent implements OnInit {
     Submitted: '#4d2500',
     Canceled: 'red',
   };
-
+  total = 0;
+  total_qty = 0;
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -67,6 +68,11 @@ export class DetailsComponent implements OnInit {
           ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
           : undefined;
         this.dataSource = success.items;
+        this.total = this.total_qty = 0;
+        this.dataSource.forEach(item => {
+          this.total_qty += item.qty;
+          this.total += item.amount;
+        });
         this.salesService
           .getStore()
           .getItem(AUTH_SERVER_URL)
