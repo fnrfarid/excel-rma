@@ -1,15 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { TimeService } from '../../../../api/time/time.service';
-
-export interface Item {
-  itemGroup: string;
-  unit: number;
-  itemName: string;
-  quantity: number;
-  total: number;
-}
+import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-datasource';
+import { Item } from '../../../../common/interfaces/warranty.interface';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -19,28 +13,15 @@ export interface Item {
 export class AddServiceInvoicePage implements OnInit {
   postingDate: { date: string; time: string };
   serviceInvoiceForm: FormGroup;
+  dataSource: ItemsDataSource;
+  itemsControl: FormArray;
   displayedColumns: string[] = [
-    'item group',
-    'item name',
+    'item_group',
+    'item_name',
     'quantity',
-    'unit',
+    'rate',
     'total',
-  ];
-  item: Item[] = [
-    {
-      itemGroup: 'Service charge',
-      itemName: 'Reapir Charge',
-      unit: 3,
-      quantity: 1,
-      total: 3,
-    },
-    {
-      itemGroup: 'Service charge',
-      itemName: 'Reapir Charge',
-      unit: 3,
-      quantity: 1,
-      total: 3,
-    },
+    'delete',
   ];
   get f() {
     return this.serviceInvoiceForm.controls;
@@ -52,6 +33,7 @@ export class AddServiceInvoicePage implements OnInit {
 
   ngOnInit() {
     this.createFormGroup();
+    this.dataSource = new ItemsDataSource();
   }
   createFormGroup() {
     this.serviceInvoiceForm = new FormGroup({
@@ -66,11 +48,12 @@ export class AddServiceInvoicePage implements OnInit {
       account: new FormControl('', [Validators.required]),
       postingDate: new FormControl('', [Validators.required]),
       branch: new FormControl('', [Validators.required]),
+      items: new FormArray([], this.itemValidator),
+      total: new FormControl(0),
     });
+    this.itemsControl = this.serviceInvoiceForm.get('items') as FormArray;
   }
-  getTotalCost() {
-    return this.item.map(t => t.unit).reduce((acc, value) => acc + value, 0);
-  }
+
   navigateBack() {
     this.location.back();
   }
@@ -78,7 +61,86 @@ export class AddServiceInvoicePage implements OnInit {
   async selectedPostingDate($event) {
     this.postingDate = await this.time.getDateAndTime($event.value);
   }
+
   submitDraft() {}
 
-  addItem() {}
+  addItem() {
+    const data = this.dataSource.data();
+    const item = {} as Item;
+    item.item_code = '';
+    item.item_name = '';
+    item.qty = 0;
+    item.rate = 0;
+    item.minimumPrice = 0;
+    data.push(item);
+    this.itemsControl.push(new FormControl(item));
+    this.dataSource.update(data);
+  }
+
+  updateItem(row: Item, index: number, item: Item) {
+    if (item == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    Object.assign(row, item);
+    row.item_group = item.item_group;
+    row.qty = 1;
+    row.rate = item.rate;
+    this.calculateTotal(this.dataSource.data().slice());
+    this.dataSource.update(copy);
+    this.itemsControl.controls[index].setValue(item);
+  }
+
+  updateQuantity(row: Item, quantity: number) {
+    if (quantity == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    row.qty = quantity;
+    this.calculateTotal(this.dataSource.data().slice());
+    this.dataSource.update(copy);
+  }
+
+  itemValidator(items: FormArray) {
+    if (items.length === 0) {
+      return { items: true };
+    } else {
+      const itemList = items
+        .getRawValue()
+        .filter(item => item.item_name !== '');
+      if (itemList.length !== items.length) {
+        return { items: true };
+      } else return null;
+    }
+  }
+
+  updateRate(row: Item, rate: number) {
+    if (rate == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    if (row.minimumPrice && row.minimumPrice > rate) {
+      row.rate = row.minimumPrice;
+    } else {
+      row.rate = rate;
+    }
+    this.calculateTotal(this.dataSource.data().slice());
+
+    this.dataSource.update(copy);
+  }
+
+  calculateTotal(itemList: Item[]) {
+    let sum = 0;
+    itemList.forEach(item => {
+      sum += item.qty * item.rate;
+    });
+    this.serviceInvoiceForm.get('total').setValue(sum);
+  }
+
+  deleteRow(i: number) {
+    this.dataSource.data().splice(i, 1);
+    this.itemsControl.removeAt(i);
+    this.calculateTotal(this.dataSource.data().slice());
+    this.dataSource.update(this.dataSource.data());
+  }
 }
