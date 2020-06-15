@@ -29,6 +29,7 @@ export class Item {
   stock?: any;
   assigned?: number;
   remaining?: number;
+  item_group?: string;
 }
 
 export class APIResponse {
