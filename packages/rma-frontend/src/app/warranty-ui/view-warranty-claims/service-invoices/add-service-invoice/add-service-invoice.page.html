@@ -69,7 +69,21 @@
                   required
                   placeholder="Customer Name"
                   formControlName="customerName"
+                  [matAutocomplete]="auto"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #auto="matAutocomplete"
+                  [displayWith]="getOptionText"
+                  (optionSelected)="customerChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredCustomerList | async"
+                    [value]="option"
+                  >
+                    {{ option.customer_name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.customerName.hasError('required')">
                   Customer Name is <strong>required</strong>
                 </mat-error>

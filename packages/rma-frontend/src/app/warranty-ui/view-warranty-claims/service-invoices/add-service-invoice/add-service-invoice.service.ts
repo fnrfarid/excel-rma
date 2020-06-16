@@ -4,6 +4,9 @@ import {
   LIST_ITEMS_ENDPOINT,
   API_ITEM_GET_BY_CODE,
   RELAY_GET_ITEMPRICE_ENDPOINT,
+  LIST_CUSTOMER_ENDPOINT,
+  RELAY_GET_FULL_ADDRESS_ENDPOINT,
+  RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -109,6 +112,57 @@ export class AddServiceInvoiceService {
         return this.http.get<Item>(API_ITEM_GET_BY_CODE + '/' + code, {
           headers,
         });
+      }),
+    );
+  }
+
+  getCustomerList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_CUSTOMER_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
+  getAddress(name: string) {
+    const getAddressNameURL = RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT;
+
+    const params = new HttpParams()
+      .set('doctype', 'Customer')
+      .set('name', name);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http
+          .get<any>(getAddressNameURL, { params, headers })
+          .pipe(
+            map(res => res.message),
+            switchMap(address => {
+              if (address) {
+                const getFullAddressURL =
+                  RELAY_GET_FULL_ADDRESS_ENDPOINT + address;
+                return this.http
+                  .get<any>(getFullAddressURL, { headers })
+                  .pipe(map(res => res.data));
+              }
+              return of({});
+            }),
+          );
       }),
     );
   }

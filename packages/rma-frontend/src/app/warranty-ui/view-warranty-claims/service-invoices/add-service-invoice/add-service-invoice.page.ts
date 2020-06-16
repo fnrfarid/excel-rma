@@ -4,6 +4,9 @@ import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { TimeService } from '../../../../api/time/time.service';
 import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-datasource';
 import { Item } from '../../../../common/interfaces/warranty.interface';
+import { AddServiceInvoiceService } from './add-service-invoice.service';
+import { Observable } from 'rxjs';
+import { startWith, switchMap, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -23,17 +26,31 @@ export class AddServiceInvoicePage implements OnInit {
     'total',
     'delete',
   ];
+  filteredCustomerList: Observable<any[]>;
+  address = {} as any;
   get f() {
     return this.serviceInvoiceForm.controls;
   }
   constructor(
     private readonly location: Location,
     private readonly time: TimeService,
+    private readonly serviceInvoiceService: AddServiceInvoiceService,
   ) {}
 
   ngOnInit() {
     this.createFormGroup();
     this.dataSource = new ItemsDataSource();
+
+    this.filteredCustomerList = this.serviceInvoiceForm
+      .get('customerName')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.serviceInvoiceService
+            .getCustomerList(value)
+            .pipe(map(res => res.docs));
+        }),
+      );
   }
   createFormGroup() {
     this.serviceInvoiceForm = new FormGroup({
@@ -142,5 +159,17 @@ export class AddServiceInvoicePage implements OnInit {
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
+  }
+
+  getOptionText(option) {
+    if (option) return option.customer_name;
+  }
+
+  customerChanged(customer) {
+    this.serviceInvoiceService.getAddress(customer.name).subscribe({
+      next: res => {
+        this.address = res;
+      },
+    });
   }
 }
