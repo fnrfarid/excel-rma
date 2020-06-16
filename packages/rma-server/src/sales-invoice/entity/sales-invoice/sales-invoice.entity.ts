@@ -15,6 +15,9 @@ export class SalesInvoice extends BaseEntity {
   name: string;
 
   @Column()
+  naming_series: string;
+
+  @Column()
   outstanding_amount: string;
 
   @Column()
@@ -88,6 +91,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   delivery_note_items: any[] = [];
+
+  @Column()
+  delivery_note_names: string[] = [];
 
   @Column()
   returned_items: any[] = [];

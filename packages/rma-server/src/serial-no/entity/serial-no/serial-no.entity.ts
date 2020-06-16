@@ -56,6 +56,9 @@ export class SerialNo extends BaseEntity {
   idx: number;
 
   @Column()
+  sales_invoice_name: string;
+
+  @Column()
   docstatus: number;
 
   @Column()
