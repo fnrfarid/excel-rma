@@ -9,7 +9,6 @@ import {
   FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB,
   DELIVERY_NOTE_DOCTYPE,
   SYNC_DELIVERY_NOTE_JOB,
-  SERIAL_WAREHOUSE_STATUS,
   DEFAULT_NAMING_SERIES,
   DEFAULT_CURRENCY,
 } from '../../../constants/app-strings';
@@ -202,10 +201,11 @@ export class DeliveryNoteJobService {
             },
             {
               $set: {
+                sales_invoice_name,
                 'warranty.salesWarrantyDate': item.warranty_date,
                 'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
                 delivery_note: response.name,
-                warehouse: SERIAL_WAREHOUSE_STATUS.sold,
+                warehouse: payload.set_warehouse,
               },
               $unset: {
                 'queue_state.delivery_note': null,
@@ -246,7 +246,10 @@ export class DeliveryNoteJobService {
       .updateOne(
         { name: sales_invoice_name },
         {
-          $push: { delivery_note_items: { $each: items } },
+          $push: {
+            delivery_note_items: { $each: items },
+            delivery_note_names: response.name,
+          },
         },
       )
       .then(success => {})

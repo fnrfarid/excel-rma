@@ -121,7 +121,7 @@ export class DataImportService {
             { headers },
           )
           .pipe(
-            delay(ONE_MINUTE_IN_MILLISECONDS),
+            delay(ONE_MINUTE_IN_MILLISECONDS / 4),
             switchMap(success => {
               job.exported = true;
               return of({});
@@ -156,7 +156,7 @@ export class DataImportService {
           response.import_status === 'In Progress'
         ) {
           return of({}).pipe(
-            delay(ONE_MINUTE_IN_MILLISECONDS),
+            delay(ONE_MINUTE_IN_MILLISECONDS / 4),
             switchMap(done => throwError('Delivery Note is in queue')),
           );
         }
@@ -213,7 +213,7 @@ export class DataImportService {
         }
         return throwError(err);
       }),
-      retry(8),
+      retry(15),
     );
   }
 

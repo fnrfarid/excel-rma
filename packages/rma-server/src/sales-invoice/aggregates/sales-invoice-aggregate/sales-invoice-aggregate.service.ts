@@ -25,6 +25,7 @@ import {
   CONTENT_TYPE,
   APPLICATION_JSON_CONTENT_TYPE,
   DRAFT_STATUS,
+  DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -171,6 +172,8 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                 )
                 .pipe(
                   switchMap(isValid => {
+                    salesInvoice.naming_series =
+                      DEFAULT_NAMING_SERIES.sales_invoice;
                     return from(
                       this.salesInvoiceService.updateOne(
                         { uuid: salesInvoice.uuid },
@@ -329,6 +332,8 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             delete createReturnPayload.delivery_note_names;
             const deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
+            deliveryNote.naming_series = DEFAULT_NAMING_SERIES.sale_return;
+
             return this.http
               .post(
                 settings.authServerURL + POST_DELIVERY_NOTE_ENDPOINT,
@@ -358,11 +363,16 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                     response.name,
                     clientHttpRequest.token,
                     salesInvoice.name,
+                    response.set_warehouse,
                   );
-                  this.salesInvoiceService.updateOne(
-                    { uuid: salesInvoice.uuid },
-                    { $set: { returned_items_map } },
-                  );
+
+                  this.salesInvoiceService
+                    .updateOne(
+                      { uuid: salesInvoice.uuid },
+                      { $set: { returned_items_map } },
+                    )
+                    .then(success => {})
+                    .catch(error => {});
                   return of({});
                 }),
                 catchError(err => {
@@ -386,6 +396,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     sales_return_name: string,
     token: any,
     sales_invoice_name: string,
+    warehouse,
   ) {
     const serials = [];
 
@@ -398,10 +409,19 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       item.sales_return_name = sales_return_name;
       return item;
     });
+
     this.serialNoService
       .updateMany(
         { serial_no: { $in: serials } },
-        { $set: { sales_return_name } },
+        {
+          $set: { sales_return_name, warehouse },
+          $unset: {
+            'warranty.salesWarrantyDate': undefined,
+            'warranty.soldOn': undefined,
+            delivery_note: undefined,
+            sales_invoice_name: undefined,
+          },
+        },
       )
       .then(success => {})
       .catch(error => {});
