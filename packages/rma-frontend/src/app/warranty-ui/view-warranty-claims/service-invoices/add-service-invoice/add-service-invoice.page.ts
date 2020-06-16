@@ -6,7 +6,7 @@ import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-da
 import { Item } from '../../../../common/interfaces/warranty.interface';
 import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { Observable } from 'rxjs';
-import { startWith, switchMap, map } from 'rxjs/operators';
+import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -44,6 +44,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customerName')
       .valueChanges.pipe(
+        debounceTime(500),
         startWith(''),
         switchMap(value => {
           return this.serviceInvoiceService

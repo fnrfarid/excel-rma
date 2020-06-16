@@ -146,24 +146,21 @@ export class AddServiceInvoiceService {
       .set('doctype', 'Customer')
       .set('name', name);
 
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http
-          .get<any>(getAddressNameURL, { params, headers })
-          .pipe(
-            map(res => res.message),
-            switchMap(address => {
-              if (address) {
-                const getFullAddressURL =
-                  RELAY_GET_FULL_ADDRESS_ENDPOINT + address;
-                return this.http
-                  .get<any>(getFullAddressURL, { headers })
-                  .pipe(map(res => res.data));
-              }
-              return of({});
-            }),
-          );
-      }),
-    );
+    const headers: any = this.getHeaders();
+
+    return this.http
+      .get<any>(getAddressNameURL, { params, headers })
+      .pipe(
+        map(res => res.message),
+        switchMap(address => {
+          if (address) {
+            const getFullAddressURL = RELAY_GET_FULL_ADDRESS_ENDPOINT + address;
+            return this.http
+              .get<any>(getFullAddressURL, { headers })
+              .pipe(map(res => res.data));
+          }
+          return of({});
+        }),
+      );
   }
 }
