@@ -70,17 +70,19 @@ export class SerialNoService {
     }
 
     $and.push(serialNoQuery);
-    return this.aggregateList($and, skip, take);
+    const sort = { $sort: { 'warranty.purchasedOn': -1 } };
+    return this.aggregateList($and, skip, take, sort);
   }
 
-  aggregateList(and, skip, take) {
+  aggregateList(and, skip, take, sort?) {
+    sort = sort ? sort : { $sort: { _id: -1 } };
     return this.asyncAggregate([
       {
         $match: { $and: and },
       },
       {
         $facet: {
-          docs: [{ $skip: skip }, { $limit: take }],
+          docs: [sort, { $skip: skip }, { $limit: take }],
           length: [{ $count: 'total' }],
         },
       },
@@ -113,7 +115,8 @@ export class SerialNoService {
     }
 
     $and.push(serialNoQuery);
-    return this.aggregateList($and, skip, take);
+    const sort = { $sort: { 'warranty.soldOn': -1 } };
+    return this.aggregateList($and, skip, take, sort);
   }
 
   async deleteOne(query, options?) {

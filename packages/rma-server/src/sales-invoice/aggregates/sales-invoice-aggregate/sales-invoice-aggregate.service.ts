@@ -309,6 +309,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     createReturnPayload: CreateSalesReturnDto,
     clientHttpRequest,
   ) {
+    // pretty bad code. will need cleanup. could be done when this is changed to queue.
     return this.settingsService.find().pipe(
       switchMap(settings => {
         if (!settings) {
@@ -387,6 +388,12 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               );
           }),
         );
+      }),
+      catchError(err => {
+        if (err && err.response && err.response.data && err.response.data.exc) {
+          return throwError(err.response.data.exc);
+        }
+        return throwError(err);
       }),
     );
   }

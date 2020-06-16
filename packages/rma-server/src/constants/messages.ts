@@ -29,9 +29,9 @@ export const INVALID_COMPANY = 'Provided Company is invalid';
 export const THERE_SHOULD_BE_ONLY_ONE_DEFAULT_COMPANY =
   'There should be just 1 default company';
 export const SERIAL_SHOULD_BE_EQUAL_TO_QUANTITY =
-  'Quantity and provided serial_no should be equal';
+  'Quantity and provided serial_no should be equal, please make sure there are no duplicate entries.';
 export const ITEMS_SHOULD_BE_EQUAL_TO_QUANTITY =
-  'Quantity and provided Item should be equal';
+  'Quantity and provided Item should be equal, please make sure there are no duplicate entries.';
 export const ITEMS_SHOULD_BE_UNIQUE =
   'Item should be unique, found duplicate entries';
 export const SERIAL_NO_NOT_FOUND = 'Serial no not found';
