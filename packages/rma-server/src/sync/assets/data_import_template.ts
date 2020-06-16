@@ -1,14 +1,14 @@
 /* eslint-disable */
 export const CSV_TEMPLATE = {
-  delivery_note: `Data Import Template,,,,,,,,,,,,,,,,,,,,,,,,,
-  Table:,Delivery Note,,,,,,,,,,,,,,,,,,,,,,,,
-  DocType:,Delivery Note,,,,,,,,,,,,~,Delivery Note Item,items,,,,,~,~,~,~,Sales Team,sales_team
-  Column Labels:,Series,Customer,Company,Date,Posting Time,Status,Set Source Warehouse,Total Quantity,Total,Price List,Price List Currency,Price List Exchange Rate,,Item Code,Item Name,Quantity,Amount,Against Sales Invoice,Serial No,,,,,Sales Person,
-  Column Name:,naming_series,customer,company,posting_date,posting_time,status,set_warehouse,total_qty,total,selling_price_list,price_list_currency,plc_conversion_rate,~,item_code,item_name,qty,amount,against_sales_invoice,serial_no,~,~,~,~,sales_person,~
-  Mandatory:,Yes,Yes,Yes,Yes,Yes,Yes,No,No,No,Yes,Yes,Yes,,Yes,Yes,Yes,No,No,No,,,,,Yes,
-  Type:,Select,Link,Link,Date,Time,Select,Link,Float,Float,Link,Link,Float,,Link,Data,Float,Currency,Link,Text,,,,,Link,
-  Info:,"One of: DN-, DN-RET-",Valid Customer,Valid Company,dd-mm-yyyy,,"One of: Draft, To Bill, Completed, Cancelled, Closed",Valid Warehouse,,,Valid Price List,Valid Currency,,,Valid Item,,,,Valid Sales Invoice,,,,,,Valid Sales Person,
-  Start entering data below this line,,,,,,,,,,,,,,,,,,,,,,,,,
+  delivery_note: `Data Import Template,,,,,,,,,,,,,,,,,,,,,,,,,,
+  Table:,Delivery Note,,,,,,,,,,,,,,,,,,,,,,,,,
+  DocType:,Delivery Note,,,,,,,,,,,,~,Delivery Note Item,items,,,,,,~,~,~,~,Sales Team,sales_team
+  Column Labels:,Series,Customer,Company,Date,Posting Time,Status,Set Source Warehouse,Total Quantity,Total,Price List,Price List Currency,Price List Exchange Rate,,Item Code,Item Name,Quantity,Amount,Against Sales Invoice,Serial No,Rate,,,,,Sales Person,
+  Column Name:,naming_series,customer,company,posting_date,posting_time,status,set_warehouse,total_qty,total,selling_price_list,price_list_currency,plc_conversion_rate,~,item_code,item_name,qty,amount,against_sales_invoice,serial_no,rate,~,~,~,~,sales_person,~
+  Mandatory:,Yes,Yes,Yes,Yes,Yes,Yes,No,No,No,Yes,Yes,Yes,,Yes,Yes,Yes,No,No,No,No,,,,,Yes,
+  Type:,Select,Link,Link,Date,Time,Select,Link,Float,Float,Link,Link,Float,,Link,Data,Float,Currency,Link,Text,Float,,,,,Link,
+  Info:,"One of: DN-, DN-RET-",Valid Customer,Valid Company,dd-mm-yyyy,,"One of: Draft, To Bill, Completed, Cancelled, Closed",Valid Warehouse,,,Valid Price List,Valid Currency,,,Valid Item,,,,Valid Sales Invoice,,,,,,,Valid Sales Person,
+  Start entering data below this line,,,,,,,,,,,,,,,,,,,,,,,,,,
   `,
 
   purchase_receipt: `Data Import Template,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -56,6 +56,7 @@ export const CSV_TEMPLATE_HEADERS = {
     ['items', '0', 'amount'],
     ['items', '0', 'against_sales_invoice'],
     ['items', '0', 'serial_no'],
+    ['items', '0', 'rate'],
     '~',
     '~',
     '~',

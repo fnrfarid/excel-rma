@@ -211,7 +211,9 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     const serials = [];
     assignPayload.items.forEach(item => {
       incrementMap[`delivered_items_map.${item.item_code}`] = item.qty;
-      serials.push(item.serial_no);
+      if (item.has_serial_no) {
+        serials.push(...item.serial_no);
+      }
     });
 
     this.salesInvoiceService

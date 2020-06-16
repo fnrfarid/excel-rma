@@ -502,7 +502,13 @@ export class AddSalesReturnPage implements OnInit {
         loading.dismiss();
         if (err.status === 400) {
           this.snackBar.open(
-            `Invalid Serials ${err.error.invalidSerials}...`,
+            `Invalid Serials ${
+              err.error.invalidSerials
+                ? err.error.invalidSerials
+                : err.error && err.error.message
+                ? err.error.message
+                : err
+            }...`,
             CLOSE,
             { duration: 2500 },
           );

@@ -121,3 +121,14 @@ export class DeliveredSerial {
   purchase_document_no?: string;
   warehouse?: string;
 }
+
+export interface DeliveryNoteItemInterface {
+  item_code?: string;
+  qty?: number;
+  rate?: number;
+  has_serial_no?: number;
+  against_sales_invoice?: string;
+  warranty_date?: string;
+  amount?: number;
+  serial_no: any;
+}
