@@ -9,6 +9,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TimeService } from '../../../../api/time/time.service';
 import { Pipe, PipeTransform, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { AddServiceInvoiceService } from './add-service-invoice.service';
+import { of } from 'rxjs';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -38,6 +40,17 @@ describe('AddServiceInvoicePage', () => {
         {
           provide: TimeService,
           useValue: {},
+        },
+        {
+          provide: AddServiceInvoiceService,
+          useValue: {
+            getAddress: (...args) => of({}),
+            getCustomerList: (...args) => of([]),
+            getStore: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
+            }),
+          },
         },
       ],
     }).compileComponents();
