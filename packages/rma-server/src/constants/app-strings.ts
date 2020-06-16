@@ -182,5 +182,11 @@ export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
 export const DEFAULT_CURRENCY = 'BDT';
 export const DEFAULT_NAMING_SERIES = {
   purchase_receipt: 'PD-',
-  delivery_note: 'SDR-',
+  delivery_note: 'SD-',
+  purchase_order: 'PO-',
+  purchase_invoice: 'PINV-',
+  sales_invoice: 'SINV-',
+  sale_return: 'RINV-',
+  stock_send: 'TROUT-',
+  stock_receive: 'TRIN-',
 };

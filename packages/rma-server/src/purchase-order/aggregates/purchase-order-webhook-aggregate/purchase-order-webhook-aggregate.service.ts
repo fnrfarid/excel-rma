@@ -13,6 +13,7 @@ import {
   APPLICATION_JSON_CONTENT_TYPE,
   ACCEPT,
   CONTENT_TYPE,
+  DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
@@ -25,6 +26,7 @@ import {
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+
 @Injectable()
 export class PurchaseOrderWebhookAggregateService {
   constructor(
@@ -128,6 +130,7 @@ export class PurchaseOrderWebhookAggregateService {
                     {
                       ...invoice.message,
                       owner: order.owner,
+                      naming_series: DEFAULT_NAMING_SERIES.purchase_invoice,
                     },
                     { headers },
                   )

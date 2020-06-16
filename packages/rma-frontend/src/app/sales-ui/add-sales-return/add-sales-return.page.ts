@@ -36,6 +36,7 @@ import {
 } from '../view-sales-invoice/serials/serials.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
+import { LoadingController } from '@ionic/angular';
 @Component({
   selector: 'app-add-sales-return',
   templateUrl: './add-sales-return.page.html',
@@ -100,6 +101,7 @@ export class AddSalesReturnPage implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
+    private readonly loadingController: LoadingController,
     public dialog: MatDialog,
     private readonly csvService: CsvJsonService,
   ) {
@@ -439,8 +441,15 @@ export class AddSalesReturnPage implements OnInit {
     });
   }
 
-  submitSalesReturn() {
-    if (!this.validateState()) return;
+  async submitSalesReturn() {
+    const loading = await this.loadingController.create({
+      message: 'Creating Delivery Note..',
+    });
+    await loading.present();
+    if (!this.validateState()) {
+      loading.dismiss();
+      return;
+    }
 
     const salesReturn = {} as SalesReturn;
     salesReturn.company = this.salesInvoiceDetails.company;
@@ -486,9 +495,11 @@ export class AddSalesReturnPage implements OnInit {
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
         this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 2500 });
+        loading.dismiss();
         this.location.back();
       },
       error: err => {
+        loading.dismiss();
         if (err.status === 400) {
           this.snackBar.open(
             `Invalid Serials ${err.error.invalidSerials}...`,

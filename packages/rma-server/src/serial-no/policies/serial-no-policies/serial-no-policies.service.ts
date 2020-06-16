@@ -102,15 +102,17 @@ export class SerialNoPoliciesService {
                 $and: [
                   {
                     delivery_note: { $in: payload.delivery_note_names },
-                  },
-                  {
                     serial_no: { $in: payload.serials },
-                  },
-                  {
                     item_code: item.item_code,
                   },
                   {
-                    warehouse: payload.warehouse,
+                    $or: [
+                      { warehouse: payload.warehouse },
+                      {
+                        'queue_state.delivery_note.warehouse':
+                          payload.warehouse,
+                      },
+                    ],
                   },
                 ],
               },
@@ -166,6 +168,7 @@ export class SerialNoPoliciesService {
             { warehouse: payload.warehouse },
             { 'queue_state.purchase_receipt.warehouse': payload.warehouse },
           ],
+          'warranty.soldOn': { $exists: false },
         },
       },
       {
