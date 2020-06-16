@@ -75,3 +75,5 @@ export const FRAPPE_START_DATA_IMPORT_API_ENDPOINT =
   '/api/method/frappe.core.doctype.data_import.data_import.import_data';
 export const FRAPPE_FILE_ATTACH_API_ENDPOINT =
   '/api/method/frappe.client.attach_file';
+export const PURCHASE_RECEIPT_ON_CANCEL_ENDPOINT =
+  '/api/purchase_receipt/webhook/v1/cancel';
