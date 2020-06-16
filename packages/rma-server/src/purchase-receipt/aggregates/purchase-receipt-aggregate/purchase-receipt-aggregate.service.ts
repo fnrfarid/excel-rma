@@ -652,9 +652,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
     if (purchaseReceipt) {
       const serials = purchaseReceipt.serial_no || [];
-      for (const serial of serials) {
-        await this.serialNoService.deleteOne({ name: serial });
-      }
+      await this.serialNoService.deleteMany({ serial_no: { $in: serials } });
     }
   }
 }
