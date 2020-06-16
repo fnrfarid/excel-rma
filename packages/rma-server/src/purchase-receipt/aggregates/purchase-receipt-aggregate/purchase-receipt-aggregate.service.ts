@@ -644,6 +644,19 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
   async getPurchaseInvoiceList(offset, limit, sort, search, clientHttpRequest) {
     return;
   }
+
+  async purchaseReceiptCancelled(payload) {
+    const purchaseReceipt = await this.purchaseReceiptService.findOne({
+      name: payload.name,
+    });
+
+    if (purchaseReceipt) {
+      const serials = purchaseReceipt.serial_no || [];
+      for (const serial of serials) {
+        await this.serialNoService.deleteOne({ name: serial });
+      }
+    }
+  }
 }
 
 export class SerialMapResponseInterface {
