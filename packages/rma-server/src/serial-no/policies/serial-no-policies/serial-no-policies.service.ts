@@ -169,6 +169,7 @@ export class SerialNoPoliciesService {
             { 'queue_state.purchase_receipt.warehouse': payload.warehouse },
           ],
           'warranty.soldOn': { $exists: false },
+          'queue_state.delivery_note': { $exists: false },
         },
       },
       {

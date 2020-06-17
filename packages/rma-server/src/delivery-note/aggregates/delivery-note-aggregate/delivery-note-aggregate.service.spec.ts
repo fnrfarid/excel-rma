@@ -8,6 +8,7 @@ import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice
 import { DeliveryNoteService } from '../../entity/delivery-note-service/delivery-note.service';
 import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delivery-note-job.service';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
+import { DeliveryNotePoliciesService } from '../../../delivery-note/policies/delivery-note-policies/delivery-note-policies.service';
 
 describe('DeliveryNoteAggregateService', () => {
   let service: DeliveryNoteAggregateService;
@@ -24,6 +25,7 @@ describe('DeliveryNoteAggregateService', () => {
         { provide: DeliveryNoteService, useValue: {} },
         { provide: DeliveryNoteJobService, useValue: {} },
         { provide: SerialBatchService, useValue: {} },
+        { provide: DeliveryNotePoliciesService, useValue: {} },
       ],
     }).compile();
 

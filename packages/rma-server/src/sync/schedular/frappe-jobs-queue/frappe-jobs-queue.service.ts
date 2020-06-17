@@ -34,10 +34,7 @@ export class FrappeJobService implements OnModuleInit {
           .execute(job)
           .toPromise()
           .then(success => {
-            if (
-              job.attrs.data.type === 'CREATE_DELIVERY_NOTE_JOB' ||
-              job.attrs.data.type === 'CREATE_PURCHASE_RECEIPT_JOB'
-            ) {
+            if (EXPORT_BASED_DATA_IMPORT_JOBS.includes(job.attrs.data.type)) {
               job.attrs.data.status = AGENDA_JOB_STATUS.exported;
             } else {
               job.attrs.data.status = AGENDA_JOB_STATUS.success;
@@ -104,3 +101,8 @@ export class FrappeJobService implements OnModuleInit {
     }
   }
 }
+
+export const EXPORT_BASED_DATA_IMPORT_JOBS = [
+  'CREATE_DELIVERY_NOTE_JOB',
+  'CREATE_PURCHASE_RECEIPT_JOB',
+];
