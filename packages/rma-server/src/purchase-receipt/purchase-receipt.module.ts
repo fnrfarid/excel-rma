@@ -10,6 +10,7 @@ import { PurchaseReceipt } from './entity/purchase-receipt.entity';
 import { DirectModule } from '../direct/direct.module';
 import { PurchaseReceiptSchedularManager } from './schedular';
 import { PurchaseOrderEntitiesModule } from '../purchase-order/entity/entity.module';
+import { PurchaseReceiptWebhookController } from './controllers/purchase-receipt-webhook/purchase-receipt-webhook.controller';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { PurchaseOrderEntitiesModule } from '../purchase-order/entity/entity.mod
     PurchaseOrderEntitiesModule,
     TypeOrmModule.forFeature([PurchaseReceipt]),
   ],
-  controllers: [PurchaseReceiptController],
+  controllers: [PurchaseReceiptController, PurchaseReceiptWebhookController],
   providers: [
     ...PurchaseReceiptAggregatesManager,
     ...PurchaseReceiptSchedularManager,

@@ -19,7 +19,8 @@ export class CreditLimitPage implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: CreditLimitDataSource;
   displayedColumns = [
-    'customer',
+    'name',
+    'customer_name',
     'credit_limits',
     'extended_credit_limit',
     'expiry_date',
