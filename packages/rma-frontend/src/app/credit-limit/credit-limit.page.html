@@ -47,17 +47,32 @@
         style="width: 100%;"
       >
         <!-- Customer -->
-        <ng-container matColumnDef="customer">
+        <ng-container matColumnDef="name">
           <th
             mat-header-cell
             *matHeaderCellDef
-            mat-sort-header="customer"
+            mat-sort-header="name"
             (click)="setFilter()"
           >
-            Customer
+            Customer ID
           </th>
           <td mat-cell *matCellDef="let row">
             {{row.name}}
+          </td>
+        </ng-container>
+
+        <!-- Customer -->
+        <ng-container matColumnDef="customer_name">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header="customer_name"
+            (click)="setFilter()"
+          >
+            Customer Name
+          </th>
+          <td mat-cell *matCellDef="let row">
+            {{row.customer_name}}
           </td>
         </ng-container>
 

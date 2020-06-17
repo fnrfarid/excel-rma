@@ -93,7 +93,7 @@ export class AddSalesInvoicePage implements OnInit {
         next: (res: SalesInvoiceDetails) => {
           this.salesInvoiceForm.get('company').setValue(res.company);
           this.salesInvoiceForm.get('customer').setValue({
-            customer_name: res.customer,
+            name: res.customer,
             owner: res.contact_email,
           });
           this.salesInvoiceForm
@@ -353,7 +353,7 @@ export class AddSalesInvoicePage implements OnInit {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
       salesInvoiceDetails.customer = this.salesInvoiceForm.get(
         'customer',
-      ).value.customer_name;
+      ).value.name;
       salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
         'campaign',
       ).value;
@@ -430,7 +430,7 @@ export class AddSalesInvoicePage implements OnInit {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
       salesInvoiceDetails.customer = this.salesInvoiceForm.get(
         'customer',
-      ).value.customer_name;
+      ).value.name;
       salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
         'campaign',
       ).value;
@@ -531,7 +531,7 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   getOptionText(option) {
-    if (option) return option.customer_name;
+    if (option) return option.name;
   }
 
   getApiInfo() {
@@ -585,7 +585,7 @@ export class AddSalesInvoicePage implements OnInit {
             debtorAccount,
             time,
             'Customer',
-            this.salesInvoiceForm.get('customer').value.customer_name,
+            this.salesInvoiceForm.get('customer').value.name,
             this.salesInvoiceForm.get('company').value,
             headers,
           );
