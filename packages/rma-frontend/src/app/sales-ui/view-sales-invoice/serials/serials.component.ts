@@ -35,11 +35,9 @@ import {
   SerialDataSource,
   ItemDataSource,
   DeliveredSerialsDataSource,
+  DeliveryNoteItemInterface,
 } from './serials-datasource';
-import {
-  SerialAssign,
-  SerialNo,
-} from '../../../common/interfaces/sales.interface';
+import { SerialAssign } from '../../../common/interfaces/sales.interface';
 import { Location } from '@angular/common';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { LoadingController } from '@ionic/angular';
@@ -529,79 +527,71 @@ export class SerialsComponent implements OnInit {
     assignSerial.total_qty = 0;
     assignSerial.items = [];
 
-    const filteredItemCodeList = [
-      ...new Set(this.serialDataSource.data().map(item => item.item_code)),
-    ];
+    const item_hash: { [key: string]: DeliveryNoteItemInterface } = {};
 
-    filteredItemCodeList.forEach(item_code => {
-      const serialItem = {} as SerialItem;
-      serialItem.serial_no = [];
-      serialItem.qty = 0;
-      serialItem.amount = 0;
-      serialItem.rate = 0;
-      serialItem.item_code = item_code;
-      this.serialDataSource.data().forEach(item => {
-        if (item_code === item.item_code && item.serial_no) {
-          serialItem.rate = item.rate;
-          serialItem.qty += item.qty;
-          serialItem.has_serial_no = item.has_serial_no;
-          serialItem.amount += item.qty * item.rate;
-          serialItem.warranty_date = item.warranty_date;
-          serialItem.serial_no.push(...item.serial_no);
-          serialItem.against_sales_invoice = this.salesInvoiceDetails.name;
+    this.salesInvoiceDetails.items.forEach(item => {
+      if (!item_hash[item.item_code]) {
+        item_hash[item.item_code] = { serial_no: [] };
+      }
+      item_hash[item.item_code].item_code = item.item_code;
+      item_hash[item.item_code].rate = item.rate;
+      item_hash[item.item_code].qty = 0;
+      item_hash[item.item_code].amount = 0;
+    });
+
+    this.serialDataSource.data().forEach(serial => {
+      const existing_qty = item_hash[serial.item_code].qty;
+      const existing_rate = item_hash[serial.item_code].rate;
+      const existing_serials = item_hash[serial.item_code].serial_no;
+
+      assignSerial.total_qty += serial.qty;
+      assignSerial.total += serial.qty * existing_rate;
+
+      Object.assign(item_hash[serial.item_code], serial);
+
+      item_hash[serial.item_code].qty += existing_qty;
+      item_hash[serial.item_code].rate = existing_rate;
+      item_hash[serial.item_code].amount =
+        item_hash[serial.item_code].qty * item_hash[serial.item_code].rate;
+      item_hash[serial.item_code].serial_no.push(...existing_serials);
+      item_hash[
+        serial.item_code
+      ].against_sales_invoice = this.salesInvoiceDetails.name;
+    });
+
+    Object.keys(item_hash).forEach(key => {
+      if (item_hash[key].qty) {
+        assignSerial.items.push(item_hash[key]);
+      }
+    });
+
+    this.salesService.assignSerials(assignSerial).subscribe({
+      next: success => {
+        loading.dismiss();
+        this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
+          duration: 2500,
+        });
+        this.location.back();
+      },
+      error: err => {
+        loading.dismiss();
+        if (err.status === 406) {
+          const errMessage = err.error.message.split('\\n');
+          this.snackBar.open(
+            errMessage[errMessage.length - 2].split(':')[1],
+            CLOSE,
+            {
+              duration: 2500,
+            },
+          );
+          return;
         }
-      });
-
-      assignSerial.total += serialItem.amount;
-      assignSerial.total_qty += serialItem.qty;
-      assignSerial.items.push(serialItem);
+        this.snackBar.open(err.error.message, CLOSE, {
+          duration: 2500,
+        });
+      },
     });
-
-    if (this.validateSerials(assignSerial.items)) {
-      this.salesService.assignSerials(assignSerial).subscribe({
-        next: success => {
-          loading.dismiss();
-          this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
-            duration: 2500,
-          });
-          this.location.back();
-        },
-        error: err => {
-          loading.dismiss();
-          if (err.status === 406) {
-            const errMessage = err.error.message.split('\\n');
-            this.snackBar.open(
-              errMessage[errMessage.length - 2].split(':')[1],
-              CLOSE,
-              {
-                duration: 2500,
-              },
-            );
-            return;
-          }
-          this.snackBar.open(err.error.message, CLOSE, {
-            duration: 2500,
-          });
-        },
-      });
-    } else {
-      loading.dismiss();
-      this.snackBar.open('Error : Duplicate Serial number assigned.', CLOSE, {
-        duration: 2500,
-      });
-    }
-  }
-
-  validateSerials(itemList: SerialNo[]) {
-    const serials = [];
-    itemList.forEach(item => {
-      item.serial_no.forEach(serial => {
-        serials.push(serial);
-      });
-    });
-    const filteredSerials = [...new Set(serials)];
-    if (filteredSerials.length === serials.length) return true;
-    return false;
+    loading.dismiss();
   }
 
   resetRangeState() {

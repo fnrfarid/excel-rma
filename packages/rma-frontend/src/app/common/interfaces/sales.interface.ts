@@ -51,9 +51,9 @@ export interface SerialAssign {
 }
 
 export interface SerialNo {
-  item_code: string;
-  qty: number;
-  rate: number;
-  amount: number;
-  serial_no: string[];
+  item_code?: string;
+  qty?: number;
+  rate?: number;
+  amount?: number;
+  serial_no?: string[];
 }
