@@ -181,12 +181,15 @@ export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
 export const DEFAULT_CURRENCY = 'BDT';
 export const DEFAULT_NAMING_SERIES = {
-  purchase_receipt: 'PD-',
+  sales_order: 'SO-',
+  sales_invoice: 'SINV-',
   delivery_note: 'SD-',
+  sales_return: 'RINV-',
+  delivery_return: 'SDR-',
   purchase_order: 'PO-',
   purchase_invoice: 'PINV-',
-  sales_invoice: 'SINV-',
-  sale_return: 'RINV-',
+  purchase_receipt: 'PD-',
   stock_send: 'TROUT-',
   stock_receive: 'TRIN-',
 };
+export const MAX_SERIAL_BODY_COUNT = 100000;

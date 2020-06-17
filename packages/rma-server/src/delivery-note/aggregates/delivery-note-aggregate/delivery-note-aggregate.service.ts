@@ -47,6 +47,7 @@ import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delive
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { DeliveryNotePoliciesService } from '../../policies/delivery-note-policies/delivery-note-policies.service';
 
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
@@ -59,6 +60,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     private readonly serialBatchService: SerialBatchService,
     private readonly deliveryNoteJobService: DeliveryNoteJobService,
     private readonly serialNoService: SerialNoService,
+    private readonly deliveryNotePolicyService: DeliveryNotePoliciesService,
   ) {
     super();
   }
@@ -173,37 +175,49 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
   }
 
   createDeliveryNote(assignPayload: AssignSerialDto, clientHttpRequest) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        if (!settings) {
-          return throwError(new NotImplementedException(PLEASE_RUN_SETUP));
-        }
-        this.salesInvoiceService
-          .updateOne(
-            { name: assignPayload.sales_invoice_name },
-            { $set: { delivery_warehouse: assignPayload.set_warehouse } },
-          )
-          .then(success => {})
-          .catch(error => {});
-        const deliveryNoteBody = this.mapCreateDeliveryNote(assignPayload);
-        this.batchDeliveryNoteItems(
-          deliveryNoteBody,
-          assignPayload.sales_invoice_name,
-          settings,
-          clientHttpRequest.token,
-        );
-        return of({});
-      }),
-      switchMap((response: any) => {
-        this.updateDeliveryNoteState(assignPayload);
-        return of();
-      }),
-      catchError(err => {
-        return throwError(
-          new BadRequestException(err.response ? err.response.data.exc : err),
-        );
-      }),
-    );
+    return this.deliveryNotePolicyService
+      .validateDeliveryNote(assignPayload, clientHttpRequest)
+      .pipe(
+        switchMap(valid => {
+          return this.settingsService.find().pipe(
+            switchMap(settings => {
+              if (!settings) {
+                return throwError(
+                  new NotImplementedException(PLEASE_RUN_SETUP),
+                );
+              }
+              this.salesInvoiceService
+                .updateOne(
+                  { name: assignPayload.sales_invoice_name },
+                  { $set: { delivery_warehouse: assignPayload.set_warehouse } },
+                )
+                .then(success => {})
+                .catch(error => {});
+              const deliveryNoteBody = this.mapCreateDeliveryNote(
+                assignPayload,
+              );
+              this.batchDeliveryNoteItems(
+                deliveryNoteBody,
+                assignPayload.sales_invoice_name,
+                settings,
+                clientHttpRequest.token,
+              );
+              return of({});
+            }),
+            switchMap((response: any) => {
+              this.updateDeliveryNoteState(assignPayload);
+              return of();
+            }),
+            catchError(err => {
+              return throwError(
+                new BadRequestException(
+                  err.response ? err.response.data.exc : err,
+                ),
+              );
+            }),
+          );
+        }),
+      );
   }
 
   updateDeliveryNoteState(assignPayload: AssignSerialDto) {

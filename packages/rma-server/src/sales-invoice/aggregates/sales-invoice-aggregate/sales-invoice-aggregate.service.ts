@@ -333,7 +333,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             delete createReturnPayload.delivery_note_names;
             const deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
-            deliveryNote.naming_series = DEFAULT_NAMING_SERIES.sale_return;
+            deliveryNote.naming_series = DEFAULT_NAMING_SERIES.delivery_return;
 
             return this.http
               .post(
@@ -526,6 +526,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     // cleanup math calculations after DTO validations are added
     return {
       docstatus: 1,
+      naming_series: DEFAULT_NAMING_SERIES.sales_return,
       customer: assignPayload.customer,
       is_return: 1,
       company: assignPayload.company,

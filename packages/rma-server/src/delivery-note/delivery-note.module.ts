@@ -13,6 +13,10 @@ import { DeliveryNoteJobService } from './schedular/delivery-note-job/delivery-n
 import { DirectModule } from '../direct/direct.module';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 import { DeliveryNoteJobHelperService } from './schedular/delivery-note-job-helper/delivery-note-job-helper.service';
+import { DeliveryNOtePoliciesManager } from './policies';
+import { SerialNoPoliciesService } from '../serial-no/policies/serial-no-policies/serial-no-policies.service';
+import { ItemEntitiesModule } from '../item/entity/item-entity.module';
+import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
 
 @Module({
   imports: [
@@ -20,6 +24,8 @@ import { DeliveryNoteJobHelperService } from './schedular/delivery-note-job-help
     SerialNoEntitiesModule,
     SalesInvoiceEntitiesModule,
     DirectModule,
+    SupplierEntitiesModule,
+    ItemEntitiesModule,
   ],
   controllers: [DeliveryNoteController, DeliveryNoteWebhookController],
   providers: [
@@ -28,6 +34,8 @@ import { DeliveryNoteJobHelperService } from './schedular/delivery-note-job-help
     ...DeliveryNoteQueryManager,
     ...DeliveryNoteCommandManager,
     ...DeliveryNoteEventManager,
+    ...DeliveryNOtePoliciesManager,
+    SerialNoPoliciesService,
     DeliveryNoteJobService,
     SerialBatchService,
     DeliveryNoteJobHelperService,
