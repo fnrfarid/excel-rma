@@ -33,6 +33,7 @@ import { SyncModule } from './sync/sync.module';
 import { StockEntryModule } from './stock-entry/stock-entry.module';
 import { ProblemModule } from './problem/problem.module';
 import { SyncEntitiesModule } from './sync/entities/sync-entity.module';
+import { ServiceInvoiceModule } from './service-invoice/service-invoice.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { SyncEntitiesModule } from './sync/entities/sync-entity.module';
     DeliveryNoteModule,
     PurchaseOrderModule,
     ProblemModule,
+    ServiceInvoiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
