@@ -7,6 +7,7 @@ import {
   LIST_CUSTOMER_ENDPOINT,
   RELAY_GET_FULL_ADDRESS_ENDPOINT,
   RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
+  LIST_TERRITORIES_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -29,6 +30,29 @@ export class AddServiceInvoiceService {
   itemList: Array<Item>;
 
   constructor(private http: HttpClient, private storage: StorageService) {}
+
+  getWarehouseList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_TERRITORIES_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
 
   getItemList(
     filter = {},
