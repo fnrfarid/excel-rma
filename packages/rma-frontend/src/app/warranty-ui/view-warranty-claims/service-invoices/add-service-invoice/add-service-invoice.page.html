@@ -180,7 +180,20 @@
                   required
                   placeholder="Branch"
                   formControlName="branch"
+                  [matAutocomplete]="autoone"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #autoone="matAutocomplete"
+                  [displayWith]="getWarehouseOptionText"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredWarehouseList | async"
+                    [value]="option"
+                  >
+                    {{ option.warehouse }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.branch.hasError('required')">
                   Branch is <strong>required</strong>
                 </mat-error>

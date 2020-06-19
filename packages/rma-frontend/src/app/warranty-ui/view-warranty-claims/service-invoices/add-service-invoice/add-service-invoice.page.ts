@@ -27,6 +27,7 @@ export class AddServiceInvoicePage implements OnInit {
     'delete',
   ];
   filteredCustomerList: Observable<any[]>;
+  filteredWarehouseList: Observable<any[]>;
   address = {} as any;
   get f() {
     return this.serviceInvoiceForm.controls;
@@ -41,6 +42,17 @@ export class AddServiceInvoicePage implements OnInit {
     this.createFormGroup();
     this.dataSource = new ItemsDataSource();
 
+    this.filteredWarehouseList = this.serviceInvoiceForm
+      .get('branch')
+      .valueChanges.pipe(
+        debounceTime(500),
+        startWith(''),
+        switchMap(value => {
+          return this.serviceInvoiceService
+            .getWarehouseList(value)
+            .pipe(map(res => res.docs));
+        }),
+      );
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customerName')
       .valueChanges.pipe(
@@ -164,6 +176,10 @@ export class AddServiceInvoicePage implements OnInit {
 
   getOptionText(option) {
     if (option) return option.customer_name;
+  }
+
+  getWarehouseOptionText(option) {
+    if (option) return option.warehouse;
   }
 
   customerChanged(customer) {

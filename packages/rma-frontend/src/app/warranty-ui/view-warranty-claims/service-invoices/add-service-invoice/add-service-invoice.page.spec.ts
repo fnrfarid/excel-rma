@@ -46,6 +46,7 @@ describe('AddServiceInvoicePage', () => {
           useValue: {
             getAddress: (...args) => of({}),
             getCustomerList: (...args) => of([]),
+            getWarehouseList: (...args) => of([]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
