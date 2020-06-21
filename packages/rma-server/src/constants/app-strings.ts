@@ -180,6 +180,7 @@ export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
 export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
 export const DEFAULT_CURRENCY = 'BDT';
+// export const DEFAULT_CURRENCY = 'INR' console.log('Comment IT');
 export const DEFAULT_NAMING_SERIES = {
   sales_order: 'SO-',
   sales_invoice: 'SINV-',

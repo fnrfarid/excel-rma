@@ -128,6 +128,9 @@ export class PurchaseInvoice extends BaseEntity {
   isSynced: boolean;
 
   @Column()
+  deliveredBy: string[];
+
+  @Column()
   purchase_receipt_names: string[];
 
   @Column()

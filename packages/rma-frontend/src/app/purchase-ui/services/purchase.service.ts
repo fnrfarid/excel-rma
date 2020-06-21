@@ -91,24 +91,24 @@ export class PurchaseService {
     );
   }
 
-  getDeliveredSerials(purchase_receipt_names, search, offset, limit) {
+  getDeliveredSerials(purchase_invoice_name, search, offset, limit) {
     const url = GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT;
     const params = new HttpParams()
       .set('limit', limit.toString())
       .set('offset', (offset * limit).toString())
-      .set('search', search);
-    const blob = new Blob([JSON.stringify(purchase_receipt_names)], {
-      type: 'application/json',
-    });
-    const uploadData = new FormData();
-    uploadData.append('file', blob, 'purchase_receipts');
+      .set('search', search)
+      .set('purchase_invoice_name', purchase_invoice_name);
 
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(url, uploadData, {
-          params,
-          headers,
-        });
+        return this.http.post(
+          url,
+          {},
+          {
+            params,
+            headers,
+          },
+        );
       }),
     );
   }
