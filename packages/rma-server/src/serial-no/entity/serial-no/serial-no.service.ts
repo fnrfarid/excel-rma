@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { SerialNo } from './serial-no.entity';
 import { of } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class SerialNoService {
@@ -54,69 +54,52 @@ export class SerialNoService {
     };
   }
 
-  listPurchasedSerial(purchase_receipt_names, skip, take, search = '') {
-    const serialNoQuery = {
-      purchase_document_no: { $in: purchase_receipt_names },
-    };
-
-    let searchQuery = {};
-    const $and: any[] = [];
+  async listPurchasedSerial(purchase_invoice_name, skip, take, search = '') {
+    const searchQuery: any = { purchase_invoice_name };
 
     if (search && search !== '') {
-      searchQuery = {
-        serial_no: { $regex: search.toUpperCase() },
-      };
-      $and.push(searchQuery);
+      searchQuery.serial_no = { $regex: search.toUpperCase() };
     }
 
-    $and.push(serialNoQuery);
-    const sort = { $sort: { 'warranty.purchasedOn': -1 } };
-    return this.aggregateList($and, skip, take, sort);
+    const sort = { 'warranty.purchasedOn': -1 };
+
+    return {
+      docs: await this.aggregateList(skip, take, searchQuery, sort).toPromise(),
+      length: await this.serialNoRepository.count(searchQuery),
+      offset: skip,
+    };
   }
 
-  aggregateList(and, skip, take, sort?) {
-    sort = sort ? sort : { $sort: { _id: -1 } };
+  aggregateList(skip = 0, limit = 10, query, sort) {
     return this.asyncAggregate([
-      {
-        $match: { $and: and },
-      },
-      {
-        $facet: {
-          docs: [sort, { $skip: skip }, { $limit: take }],
-          length: [{ $count: 'total' }],
-        },
-      },
-    ]).pipe(
-      map(data => data[0]),
-      switchMap((data: AggregatePaginationResponse) => {
-        return of({
-          docs: data.docs,
-          length:
-            data.length[0] && data.length[0].total ? data.length[0].total : 0,
-          offset: skip,
-        });
-      }),
-    );
+      { $match: query },
+      { $skip: skip },
+      { $limit: limit },
+      { $sort: sort },
+    ]);
   }
 
   async listDeliveredSerial(delivery_note_names, search, skip = 0, take = 10) {
-    const serialNoQuery = {
+    const serialNoQuery: any = {
       delivery_note: { $in: delivery_note_names },
     };
 
-    let searchQuery = {};
-    const $and: any[] = [];
-
     if (search && search !== '') {
-      searchQuery = {
-        serial_no: { $regex: search.toUpperCase() },
-      };
-      $and.push(searchQuery);
+      serialNoQuery.serial_no = { $regex: search.toUpperCase() };
     }
 
-    $and.push(serialNoQuery);
-    const sort = { $sort: { 'warranty.soldOn': -1 } };
-    return this.aggregateList($and, skip, take, sort);
+    const sort = { 'warranty.soldOn': -1 };
+
+    return {
+      docs: await this.aggregateList(
+        skip,
+        take,
+        serialNoQuery,
+        sort,
+      ).toPromise(),
+      length: await this.serialNoRepository.count(serialNoQuery),
+      offset: skip,
+    };
   }
 
   async deleteOne(query, options?) {

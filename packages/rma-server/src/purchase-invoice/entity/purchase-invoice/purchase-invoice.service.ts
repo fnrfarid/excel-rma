@@ -30,28 +30,8 @@ export class PurchaseInvoiceService {
     return await this.purchaseInvoiceRepository.findOne(param, options);
   }
 
-  aggregateList($skip = 0, $limit = 10, $match, $sort, $group) {
-    return this.asyncAggregate([
-      { $match },
-      {
-        $lookup: {
-          from: 'purchase_receipt',
-          localField: 'purchase_receipt_names',
-          foreignField: 'name',
-          as: 'purchase_receipt',
-        },
-      },
-      {
-        $unwind: {
-          path: '$purchase_receipt',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      { $group },
-      { $sort },
-      { $skip },
-      { $limit },
-    ]);
+  aggregateList($skip = 0, $limit = 10, $match, $sort) {
+    return this.asyncAggregate([{ $match }, { $sort }, { $skip }, { $limit }]);
   }
 
   asyncAggregate(query) {
@@ -100,7 +80,6 @@ export class PurchaseInvoiceService {
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
     ];
-    const $group = this.getKeys();
 
     const where: { $and: any } = { $and };
 
@@ -109,7 +88,6 @@ export class PurchaseInvoiceService {
       take,
       where,
       sortQuery,
-      $group,
     ).toPromise();
 
     return {
@@ -135,24 +113,6 @@ export class PurchaseInvoiceService {
       }
     });
     return query;
-  }
-
-  getKeys() {
-    const group: any = {};
-    const keys = this.purchaseInvoiceRepository.manager.connection
-      .getMetadata(PurchaseInvoice)
-      .ownColumns.map(column => column.propertyName);
-    keys.splice(keys.indexOf('_id'), 1);
-    keys.splice(keys.indexOf('purchase_receipt_names'), 1);
-
-    group._id = '$' + '_id';
-    group.delivered_by = { $addToSet: '$purchase_receipt.deliveredBy' };
-    keys.forEach(key => {
-      group[key] = {
-        $first: '$' + key,
-      };
-    });
-    return group;
   }
 
   async deleteOne(query, options?) {

@@ -202,7 +202,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   getDeliveredSerials() {
     this.purchasedSerialsDataSource.loadItems(
-      this.purchaseInvoiceDetails.purchase_receipt_names,
+      this.purchaseInvoiceDetails.name,
       this.deliveredSerialsSearch,
       this.index,
       this.size,
