@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'service-invoices',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./service-invoices.component.scss'],
 })
 export class ServiceInvoicesComponent implements OnInit {
+  invoiceUuid: string;
+
   displayedColumns = [
     'invoice_no',
     'status',
@@ -18,7 +21,9 @@ export class ServiceInvoicesComponent implements OnInit {
     'created_by',
     'submitted_by',
   ];
-  constructor() {}
+  constructor(private readonly router: ActivatedRoute) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.invoiceUuid = this.router.snapshot.params.uuid;
+  }
 }
