@@ -47,52 +47,31 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
   }
 
   addServiceInvoice(serviceInvoice: ServiceInvoiceDto, clientHttpRequest) {
-    return this.settings
-      .find()
-      .pipe(
-        switchMap(settings => {
-          if (!settings) {
-            return throwError(new NotImplementedException());
-          }
-          const URL = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}`;
-          const body = this.mapValues(serviceInvoice);
-          return this.http.post(URL, JSON.stringify(body), {
-            headers: {
-              [AUTHORIZATION]:
-                BEARER_HEADER_VALUE_PREFIX +
-                clientHttpRequest.token.accessToken,
-              [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
-              [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
-            },
-          });
-        }),
-      )
-      .pipe(map(data => data.data.data))
-      .pipe(
-        switchMap(res => {
-          Object.assign(res, serviceInvoice);
-          return this.assignServiceInvoiceFields(res, clientHttpRequest);
-        }),
-        switchMap(data => {
-          return from(this.serviceInvoiceService.create(data));
-        }),
-      );
-  }
-
-  mapValues(serviceInvoicePayload: ServiceInvoiceDto) {
-    const serviceInvoice = {} as ServiceInvoiceDto;
-    serviceInvoice.customer = serviceInvoicePayload.customer;
-    serviceInvoice.customer_contact = serviceInvoicePayload.customer_contact;
-    serviceInvoice.total_qty = serviceInvoicePayload.total_qty;
-    serviceInvoice.total = serviceInvoicePayload.total;
-    serviceInvoice.status = serviceInvoicePayload.status;
-    serviceInvoice.contact_email = serviceInvoicePayload.contact_email;
-    serviceInvoice.due_date = serviceInvoicePayload.due_date;
-    serviceInvoice.remarks = serviceInvoicePayload.remarks;
-    serviceInvoice.delivery_warehouse =
-      serviceInvoicePayload.delivery_warehouse;
-    serviceInvoice.items = serviceInvoicePayload.items;
-    return serviceInvoice;
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        if (!settings) {
+          return throwError(new NotImplementedException());
+        }
+        const URL = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}`;
+        const body = serviceInvoice;
+        return this.http.post(URL, JSON.stringify(body), {
+          headers: {
+            [AUTHORIZATION]:
+              BEARER_HEADER_VALUE_PREFIX + clientHttpRequest.token.accessToken,
+            [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
+            [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
+          },
+        });
+      }),
+      map(data => data.data.data),
+      switchMap((res: ServiceInvoiceDto) => {
+        Object.assign(res, serviceInvoice);
+        return this.assignServiceInvoiceFields(res, clientHttpRequest);
+      }),
+      switchMap(data => {
+        return from(this.serviceInvoiceService.create(data));
+      }),
+    );
   }
 
   async retrieveServiceInvoice(uuid: string, req) {
