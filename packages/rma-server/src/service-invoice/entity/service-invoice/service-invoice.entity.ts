@@ -68,4 +68,19 @@ export class ServiceInvoice extends BaseEntity {
 
   @Column()
   items: Item[];
+
+  @Column()
+  customer: string;
+
+  @Column()
+  total_qty: number;
+
+  @Column()
+  contact_email: string;
+
+  @Column()
+  due_date: Date;
+
+  @Column()
+  delivery_warehouse: string;
 }
