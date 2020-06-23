@@ -12,7 +12,9 @@ export class AddServiceInvoiceCommandHandler
   async execute(command: AddServiceInvoiceCommand) {
     const { serviceInvoicePayload, clientHttpRequest } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await aggregate.addServiceInvoice(serviceInvoicePayload, clientHttpRequest);
+    await aggregate
+      .addServiceInvoice(serviceInvoicePayload, clientHttpRequest)
+      .toPromise();
     aggregate.commit();
   }
 }

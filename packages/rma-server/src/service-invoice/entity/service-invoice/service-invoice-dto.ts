@@ -1,72 +1,97 @@
-import {
-  IsString,
-  IsDate,
-  IsNumber,
-  IsOptional,
-  IsNotEmpty,
-} from 'class-validator';
-import { Item } from '../../../item/entity/item/item.entity';
+import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
+import { Item } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 
 export class ServiceInvoiceDto {
   @IsString()
   @IsNotEmpty()
+  customer: string;
+
+  @IsString()
+  @IsOptional()
+  customer_contact: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  total_qty: number;
+
+  @IsNumber()
+  @IsOptional()
+  total: number;
+
+  @IsString()
+  @IsOptional()
+  status: string;
+
+  @IsString()
+  @IsOptional()
+  contact_email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  due_date: string;
+
+  @IsString()
+  @IsNotEmpty()
+  remarks: string;
+
+  @IsString()
+  @IsOptional()
+  delivery_warehouse: string;
+
+  @IsNotEmpty()
+  items: Item[];
+
+  @IsString()
+  @IsOptional()
   uuid: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   invoice_no: string;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  date: Date;
+  date: string;
 
   @IsString()
   @IsNotEmpty()
   customer_third_party: string;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   invoice_amount: number;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   claim_no: string;
 
   @IsString()
   @IsOptional()
-  remarks: string;
-
-  @IsString()
-  @IsNotEmpty()
   branch: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   created_by: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   submitted_by: string;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  posting_date: Date;
+  posting_date: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   customer_name: string;
 
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   customer_address: string;
-
-  @IsString()
-  @IsOptional()
-  customer_contact: string;
 
   @IsString()
   @IsOptional()
@@ -79,12 +104,4 @@ export class ServiceInvoiceDto {
   @IsString()
   @IsOptional()
   third_party_contact: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  total: number;
-
-  @IsString()
-  @IsNotEmpty()
-  items: Item[];
 }
