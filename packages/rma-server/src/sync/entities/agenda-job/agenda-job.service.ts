@@ -7,7 +7,6 @@ import {
   SYSTEM_MANAGER,
   FRAPPE_JOB_SELECT_FIELDS,
   AGENDA_JOB_STATUS,
-  FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB,
 } from '../../../constants/app-strings';
 
 @Injectable()
@@ -21,8 +20,8 @@ export class AgendaJobService {
     return await this.agendaJobRepository.find();
   }
 
-  async findOne(query) {
-    return await this.agendaJobRepository.findOne(query);
+  async findOne(query, options?) {
+    return await this.agendaJobRepository.findOne(query, options);
   }
 
   async updateMany(query, params) {
@@ -56,7 +55,7 @@ export class AgendaJobService {
     // }
 
     const jobFilter = {
-      name: { $in: [FRAPPE_QUEUE_JOB, FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB] },
+      name: { $in: [FRAPPE_QUEUE_JOB] },
     };
 
     if (!token.roles.includes(SYSTEM_MANAGER)) {

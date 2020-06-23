@@ -6,7 +6,8 @@ import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { ViewSingleJobPage } from '../view-single-job/view-single-job.page';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-jobs',
@@ -28,21 +29,47 @@ export class JobsPage implements OnInit {
   size: number = 10;
   parent: string;
   status: string = 'Failed';
-  jobStatus = ['Successful', 'Failed', 'In Queue', 'Reset', 'All', 'Retrying'];
+  jobStatus = [
+    'Successful',
+    'Failed',
+    'Exported',
+    'In Queue',
+    'Reset',
+    'All',
+    'Retrying',
+  ];
+  openJobDetails = ['Failed', 'Exported'];
   constructor(
     private readonly jobsService: JobsService,
     private location: Location,
+    private router: Router,
     private route: ActivatedRoute,
     public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
-    if (this.route.snapshot.queryParams.parent) {
-      this.parent = this.route.snapshot.queryParams.parent.toUpperCase();
-      this.status = 'All';
-    }
     this.dataSource = new JobsDataSource(this.jobsService);
-    this.setFilter();
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map((event: any) => {
+          if (event.url.includes('/jobs')) {
+            return event;
+          }
+          return false;
+        }),
+      )
+      .subscribe({
+        next: res => {
+          if (res) {
+            this.parent = this.route.snapshot.queryParams.parent;
+            this.parent = this.parent ? this.parent.toUpperCase() : this.parent;
+            this.status = 'All';
+            this.setFilter();
+          }
+        },
+        error: err => {},
+      });
   }
   getUpdate(event) {
     this.index = event.pageIndex;
@@ -55,11 +82,7 @@ export class JobsPage implements OnInit {
   }
 
   async viewSingleJob(row) {
-    if (
-      row.data.status === 'Failed' ||
-      row.data.status === 'Retrying' ||
-      row.data.status === 'In Queue'
-    ) {
+    if (this.openJobDetails.includes(row.data.status)) {
       const dialogRef = this.dialog.open(ViewSingleJobPage, {
         width: '50%',
         height: '50%',
@@ -135,8 +158,7 @@ export class JobsPage implements OnInit {
       }
     }
 
-    sortQuery =
-      Object.keys(sortQuery).length === 0 ? { created_on: 'DESC' } : sortQuery;
+    sortQuery = Object.keys(sortQuery).length === 0 ? undefined : sortQuery;
 
     this.dataSource.loadItems(
       sortQuery,

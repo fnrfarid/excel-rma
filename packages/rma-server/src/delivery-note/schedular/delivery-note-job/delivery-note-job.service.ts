@@ -58,13 +58,56 @@ export class DeliveryNoteJobService {
   }
 
   resetState(job: {
-    payload: CreateDeliveryNoteInterface;
-    token: any;
-    settings: ServerSettings;
-    sales_invoice_name: string;
-    parent: string;
-  }) {
-    return;
+    data: {
+      payload: CreateDeliveryNoteInterface;
+      token: any;
+      settings: ServerSettings;
+      sales_invoice_name: string;
+      parent: string;
+    };
+  }): Observable<boolean> {
+    const serials = [];
+    const query: { [key: string]: number } = {};
+
+    job.data.payload.items.forEach(item => {
+      if (query[item.item_code]) {
+        query[item.item_code] += item.qty;
+      } else {
+        query[item.item_code] = item.qty;
+      }
+
+      if (item.has_serial_no) {
+        if (typeof item.serial_no === 'string') {
+          serials.push(...item.serial_no.split('\n'));
+        } else {
+          serials.push(...item.serial_no);
+        }
+      }
+    });
+
+    Object.keys(query).forEach(key => {
+      query[`delivered_items_map.${key}`] = 0 - query[key];
+      delete query[key];
+    });
+
+    this.salesInvoiceService
+      .updateOne({ name: job.data.sales_invoice_name }, { $inc: query })
+      .then(success => {})
+      .catch(err => {});
+
+    this.serialNoService
+      .updateMany(
+        { serial_no: { $in: serials } },
+        {
+          $unset: {
+            'queue_state.delivery_note': null,
+          },
+        },
+      )
+      .then(success => {})
+      .catch(err => {});
+
+    return of(true);
   }
 
   createDeliveryNote(job: {

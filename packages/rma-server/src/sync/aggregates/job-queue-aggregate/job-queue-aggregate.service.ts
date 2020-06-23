@@ -3,7 +3,13 @@ import * as Agenda from 'agenda';
 import { AgendaJobService } from '../../entities/agenda-job/agenda-job.service';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { ObjectId } from 'mongodb';
-import { AGENDA_JOB_STATUS } from '../../../constants/app-strings';
+import {
+  AGENDA_JOB_STATUS,
+  SYNC_DELIVERY_NOTE_JOB,
+  SYNC_PURCHASE_RECEIPT_JOB,
+  FRAPPE_JOB_SELECT_FIELDS,
+  CREATE_DELIVERY_NOTE_JOB,
+} from '../../../constants/app-strings';
 import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { FrappeJobService } from '../../schedular/frappe-jobs-queue/frappe-jobs-queue.service';
@@ -11,6 +17,7 @@ import { CREATE_PURCHASE_RECEIPT_JOB } from '../../../purchase-receipt/schedular
 
 @Injectable()
 export class JobQueueAggregateService {
+  resetJobs: string[] = [CREATE_PURCHASE_RECEIPT_JOB, CREATE_DELIVERY_NOTE_JOB];
   constructor(
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
@@ -45,25 +52,28 @@ export class JobQueueAggregateService {
           );
         }
         // remove after new feature added
-        if (job.data.type !== CREATE_PURCHASE_RECEIPT_JOB) {
+        if (!this.resetJobs.includes(job.data.type)) {
           return throwError(
             new BadRequestException(
-              `Reset State currently available for purchase jobs, coming soon for ${job.data.type
-                .replace('_', ' ')
-                .toLocaleLowerCase()}`,
+              `Reset State currently available for
+              ${this.resetJobs
+                .filter(elem => elem.replace('_', ' ').toLocaleLowerCase())
+                .join(', ')}, coming soon for
+              ${job.data.type.replace('_', ' ').toLocaleLowerCase()}`,
             ),
           );
         }
+
         return this.frappeQueueService.resetState(job).pipe(
           switchMap(success => {
+            const $or: any[] = [{ _id: new ObjectId(jobId) }];
+            if (job.data && job.data.uuid) {
+              $or.push({ 'data.uuid': job.data.uuid });
+            }
             this.jobService
               .updateOne(
-                { _id: new ObjectId(jobId) },
-                {
-                  $set: {
-                    'data.status': AGENDA_JOB_STATUS.reset,
-                  },
-                },
+                { $or },
+                { $set: { 'data.status': AGENDA_JOB_STATUS.reset } },
               )
               .catch(err => {})
               .then(done => {});
@@ -95,9 +105,21 @@ export class JobQueueAggregateService {
     return newJob;
   }
 
-  async retrieveOne(_id: string) {
-    const id = new ObjectId(_id);
-    const job = await this.jobService.findOne({ _id: id });
+  async getOneDataImportJob(uuid: string) {
+    const job = await this.jobService.findOne({
+      where: {
+        'data.type': {
+          $in: [SYNC_DELIVERY_NOTE_JOB, SYNC_PURCHASE_RECEIPT_JOB],
+        },
+        'data.uuid': uuid,
+      },
+      select: FRAPPE_JOB_SELECT_FIELDS,
+    });
+
+    if (!job) {
+      return throwError(new BadRequestException('Export job dose not exists.'));
+    }
+
     return job;
   }
 }
