@@ -14,6 +14,7 @@ export class JobData {
   type: string;
   parent: string;
   token: TokenCache;
+  uuid: string;
   exported?: boolean;
   status?: string;
   lastError?: any;

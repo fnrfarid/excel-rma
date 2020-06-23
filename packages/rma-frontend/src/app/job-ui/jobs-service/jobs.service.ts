@@ -5,6 +5,7 @@ import {
   JOB_QUEUE_LIST_ENDPOINT,
   JOB_QUEUE_RETRY_ENDPOINT,
   JOB_QUEUE_RESET_ENDPOINT,
+  GET_EXPORTED_JOB_ENDPOINT,
 } from '../../constants/url-strings';
 import { switchMap, map } from 'rxjs/operators';
 import {
@@ -13,6 +14,7 @@ import {
   ACCESS_TOKEN,
 } from '../../constants/storage';
 import { from } from 'rxjs';
+import { JobInterface } from '../view-single-job/view-single-job.page';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +34,7 @@ export class JobsService {
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch (error) {
-      sortOrder = JSON.stringify({ created_on: 'desc' });
+      sortOrder = JSON.stringify({ _id: 'desc' });
     }
 
     const url = JOB_QUEUE_LIST_ENDPOINT;
@@ -66,6 +68,15 @@ export class JobsService {
     );
   }
 
+  getExportedJob(job: JobInterface) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(GET_EXPORTED_JOB_ENDPOINT + job.data.uuid, {
+          headers,
+        });
+      }),
+    );
+  }
   resetJob(jobId) {
     return this.getHeaders().pipe(
       switchMap(headers => {

@@ -136,7 +136,7 @@ export class AppComponent implements OnInit {
           }
           return of(data);
         }),
-        retry(3),
+        retry(5),
       )
       .subscribe({
         next: res => {
