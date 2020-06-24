@@ -116,20 +116,15 @@ export class SerialNoController {
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
     @Query('search') search = '',
-    @UploadedFile('file') file,
+    @Query('purchase_invoice_name') purchase_invoice_name,
     @Req() clientHttpRequest,
   ) {
-    if (
-      !file ||
-      !file.buffer ||
-      file.buffer.toString() === '' ||
-      file.buffer.toString() === 'undefined'
-    ) {
-      throw new BadRequestException('Invalid File');
+    if (!purchase_invoice_name) {
+      throw new BadRequestException('Purchase Invoice Name is mandatory.');
     }
 
     return await this.serialAggregateService.getPurchaseInvoiceDeliveredSerials(
-      JSON.parse(file.buffer),
+      purchase_invoice_name,
       search,
       +offset,
       +limit,

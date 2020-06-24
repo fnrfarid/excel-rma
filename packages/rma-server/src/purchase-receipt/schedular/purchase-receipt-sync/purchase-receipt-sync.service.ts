@@ -280,7 +280,10 @@ export class PurchaseReceiptSyncService {
           return from(
             this.purchaseInvoiceService.updateOne(
               { name: parent },
-              { $push: { purchase_receipt_names: doc.name } },
+              {
+                $push: { purchase_receipt_names: doc.name },
+                $addToSet: { deliveredBy: token.fullName },
+              },
             ),
           );
         }),

@@ -34,16 +34,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  placeholder="Naming Series"
-                  readonly
-                  value="Claim INV-####"
-                />
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
                   required
                   [matDatepicker]="postingDate"
                   placeholder="Posting Date"
@@ -60,35 +50,22 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
                   matInput
+                  type="text"
                   required
                   placeholder="Customer Name"
                   formControlName="customerName"
-                  [matAutocomplete]="auto"
                 />
-                <mat-autocomplete
-                  autoActiveFirstOption
-                  #auto="matAutocomplete"
-                  [displayWith]="getOptionText"
-                  (optionSelected)="customerChanged($event.option.value)"
-                >
-                  <mat-option
-                    *ngFor="let option of filteredCustomerList | async"
-                    [value]="option"
-                  >
-                    {{ option.customer_name }}
-                  </mat-option>
-                </mat-autocomplete>
                 <mat-error *ngIf="f.customerName.hasError('required')">
                   Customer Name is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
+          </ion-row>
+          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -102,8 +79,6 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -117,6 +92,8 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+          </ion-row>
+          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -130,8 +107,6 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -145,6 +120,8 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+          </ion-row>
+          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -158,8 +135,6 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -173,6 +148,8 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+          </ion-row>
+          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -186,6 +163,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+            <ion-col> </ion-col>
           </ion-row>
         </ion-grid>
       </ion-card-content>

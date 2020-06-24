@@ -25,10 +25,10 @@ export class PurchasedSerialsDataSource extends DataSource<DeliveredSerial> {
     this.loadingSubject.complete();
   }
 
-  loadItems(purchase_receipt_names, search?, pageIndex = 0, pageSize = 10) {
+  loadItems(purchase_invoice_name, search?, pageIndex = 0, pageSize = 10) {
     this.loadingSubject.next(true);
     this.purchaseService
-      .getDeliveredSerials(purchase_receipt_names, search, pageIndex, pageSize)
+      .getDeliveredSerials(purchase_invoice_name, search, pageIndex, pageSize)
       .pipe(
         map((res: APIResponse) => {
           this.data = res.docs;

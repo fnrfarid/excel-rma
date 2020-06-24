@@ -194,7 +194,7 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'warranty/service-invoice/:name',
+    path: 'warranty/service-invoice/:name/:uuid',
     loadChildren: () =>
       import(
         './warranty-ui/view-warranty-claims/service-invoices/add-service-invoice/add-service-invoice.module'

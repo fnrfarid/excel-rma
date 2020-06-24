@@ -14,21 +14,66 @@ export class ViewSingleJobPage {
     retry: false,
     reset: false,
   };
+  exportedJob: any;
+  message: string;
+
   constructor(
     public dialogRef: MatDialogRef<ViewSingleJobPage>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private readonly jobService: JobsService,
     private readonly snackBar: MatSnackBar,
   ) {
-    data.failReason = JSON.stringify(data.failReason);
-    data && data.data ? this.activateState() : null;
+    if (
+      data &&
+      data.data &&
+      data.data.status &&
+      data.data.status === 'Exported' &&
+      data.data.uuid
+    ) {
+      this.getExportedJob(data);
+    }
   }
 
   activateState() {
-    if (this.data.data.status === 'Failed') {
+    if (this.exportedJob.data.status === 'Failed') {
       this.state.retry = true;
+      this.state.reset = true;
     }
-    this.state.reset = true;
+  }
+
+  getExportedJob(data: JobInterface) {
+    this.jobService.getExportedJob(data).subscribe({
+      next: (response: { data: any }) => {
+        this.exportedJob = response;
+        this.getMessage();
+        this.activateState();
+      },
+      error: err => {
+        this.snackBar.open(
+          err && err.error && err.error.message
+            ? err.error.message
+            : 'Failed to fetch exported JOB',
+          CLOSE,
+          { duration: 3500 },
+        );
+      },
+    });
+  }
+
+  getMessage() {
+    if (this.exportedJob.data.status !== 'Failed') {
+      this.message = `<p>Following job is: ${
+        this.exportedJob.data.status || 'In Progress'
+      }, it will be synced once successful, you can check the progress here.</p>`;
+      return;
+    }
+
+    try {
+      const log_details = this.exportedJob.failReason.log_details;
+      this.message = JSON.parse(log_details).messages[0].message;
+    } catch {
+      return this.exportedJob.failReason.log_details;
+    }
   }
 
   resetJob() {
@@ -49,19 +94,6 @@ export class ViewSingleJobPage {
     this.dialogRef.close();
   }
 
-  getParsedDate(value) {
-    if (this.data && this.data.data && this.data.data.status === 'In Queue') {
-      return 'In Queue';
-    }
-    const date = new Date(value);
-    return [
-      date.getFullYear(),
-      date.getMonth() + 1,
-      // +1 as index of months start's from 0
-      date.getDate(),
-    ].join('-');
-  }
-
   retryJob() {
     this.jobService.retryJob(this.data._id).subscribe({
       next: success => {
@@ -75,4 +107,22 @@ export class ViewSingleJobPage {
       },
     });
   }
+}
+
+export class JobInterface {
+  name: string;
+  failedAt: string;
+  failCount: string;
+  failReason: string;
+  data: {
+    status: string;
+    parent: string;
+    payload: any;
+    token: {
+      fullName: string;
+    };
+    sales_invoice_name: string;
+    uuid: string;
+    type: string;
+  };
 }

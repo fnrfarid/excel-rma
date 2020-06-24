@@ -238,7 +238,7 @@
             Delivered By
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.delivered_by ? row?.delivered_by[0] : '' }}
+            {{ (row.deliveredBy && row.deliveredBy[0]) ? row.deliveredBy[0] : ''  }}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>

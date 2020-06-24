@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ServiceInvoiceAggregateService } from './service-invoice-aggregate.service';
 import { ServiceInvoiceService } from '../../entity/service-invoice/service-invoice.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { HttpService } from '@nestjs/common';
 
 describe('ServiceInvoiceAggregateService', () => {
   let service: ServiceInvoiceAggregateService;
@@ -11,6 +13,14 @@ describe('ServiceInvoiceAggregateService', () => {
         ServiceInvoiceAggregateService,
         {
           provide: ServiceInvoiceService,
+          useValue: {},
+        },
+        {
+          provide: SettingsService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
           useValue: {},
         },
       ],

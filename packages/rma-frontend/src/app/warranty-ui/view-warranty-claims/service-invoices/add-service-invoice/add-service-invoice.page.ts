@@ -3,10 +3,14 @@ import { Location } from '@angular/common';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { TimeService } from '../../../../api/time/time.service';
 import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-datasource';
-import { Item } from '../../../../common/interfaces/warranty.interface';
+import {
+  Item,
+  WarrantyClaimsDetails,
+} from '../../../../common/interfaces/warranty.interface';
 import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { Observable } from 'rxjs';
 import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -27,7 +31,7 @@ export class AddServiceInvoicePage implements OnInit {
     'delete',
   ];
   filteredCustomerList: Observable<any[]>;
-  address = {} as any;
+  filteredWarehouseList: Observable<any[]>;
   get f() {
     return this.serviceInvoiceForm.controls;
   }
@@ -35,12 +39,24 @@ export class AddServiceInvoicePage implements OnInit {
     private readonly location: Location,
     private readonly time: TimeService,
     private readonly serviceInvoiceService: AddServiceInvoiceService,
+    private readonly router: ActivatedRoute,
   ) {}
 
   ngOnInit() {
     this.createFormGroup();
     this.dataSource = new ItemsDataSource();
 
+    this.filteredWarehouseList = this.serviceInvoiceForm
+      .get('branch')
+      .valueChanges.pipe(
+        debounceTime(500),
+        startWith(''),
+        switchMap(value => {
+          return this.serviceInvoiceService
+            .getWarehouseList(value)
+            .pipe(map(res => res.docs));
+        }),
+      );
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customerName')
       .valueChanges.pipe(
@@ -52,7 +68,33 @@ export class AddServiceInvoicePage implements OnInit {
             .pipe(map(res => res.docs));
         }),
       );
+    this.serviceInvoiceService
+      .getWarrantyDetail(this.router.snapshot.params.uuid)
+      .subscribe({
+        next: (res: WarrantyClaimsDetails) => {
+          this.serviceInvoiceForm.get('customerName').setValue(res.customer);
+          this.serviceInvoiceForm
+            .get('customerContact')
+            .setValue(res.customer_contact);
+          this.serviceInvoiceForm
+            .get('customerAddress')
+            .setValue(res.customer_address);
+          this.serviceInvoiceForm
+            .get('thirdPartyName')
+            .setValue(res.third_party_name);
+          this.serviceInvoiceForm
+            .get('thirdPartyContact')
+            .setValue(res.third_party_contact);
+          this.serviceInvoiceForm
+            .get('thirdPartyAddress')
+            .setValue(res.third_party_address);
+          this.serviceInvoiceForm.get('postingDate').setValue(new Date());
+          this.serviceInvoiceForm.get('branch').setValue(res.receiving_branch);
+        },
+        error: err => {},
+      });
   }
+
   createFormGroup() {
     this.serviceInvoiceForm = new FormGroup({
       warehouse: new FormControl('', [Validators.required]),
@@ -160,17 +202,5 @@ export class AddServiceInvoicePage implements OnInit {
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
-  }
-
-  getOptionText(option) {
-    if (option) return option.customer_name;
-  }
-
-  customerChanged(customer) {
-    this.serviceInvoiceService.getAddress(customer.name).subscribe({
-      next: res => {
-        this.address = res;
-      },
-    });
   }
 }

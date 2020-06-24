@@ -5,8 +5,8 @@ import {
   API_ITEM_GET_BY_CODE,
   RELAY_GET_ITEMPRICE_ENDPOINT,
   LIST_CUSTOMER_ENDPOINT,
-  RELAY_GET_FULL_ADDRESS_ENDPOINT,
-  RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
+  LIST_TERRITORIES_ENDPOINT,
+  WARRANTY_CLAIM_GET_ONE_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -29,6 +29,29 @@ export class AddServiceInvoiceService {
   itemList: Array<Item>;
 
   constructor(private http: HttpClient, private storage: StorageService) {}
+
+  getWarehouseList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_TERRITORIES_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
 
   getItemList(
     filter = {},
@@ -139,29 +162,16 @@ export class AddServiceInvoiceService {
     );
   }
 
-  getAddress(name: string) {
-    const getAddressNameURL = RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT;
-
-    const params = new HttpParams()
-      .set('doctype', 'Customer')
-      .set('name', name);
-
-    const state: any = {};
+  getWarrantyDetail(uuid: string) {
+    const getWarrantyURL = `${WARRANTY_CLAIM_GET_ONE_ENDPOINT}${uuid}`;
+    const params = new HttpParams();
 
     return this.getHeaders().pipe(
       switchMap(headers => {
-        state.headers = headers;
-        return this.http.get<any>(getAddressNameURL, { params, headers });
-      }),
-      map(res => res.message),
-      switchMap(address => {
-        if (address) {
-          const getFullAddressURL = RELAY_GET_FULL_ADDRESS_ENDPOINT + address;
-          return this.http
-            .get<any>(getFullAddressURL, { headers: state.headers })
-            .pipe(map(res => res.data));
-        }
-        return of({});
+        return this.http.get<any>(getWarrantyURL, {
+          params,
+          headers,
+        });
       }),
     );
   }

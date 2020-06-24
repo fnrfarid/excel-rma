@@ -275,14 +275,14 @@ export class SerialNoAggregateService extends AggregateRoot {
   }
 
   getPurchaseInvoiceDeliveredSerials(
-    purchase_receipt_names,
+    purchase_invoice_name,
     search,
     skip = 0,
     take = 10,
     clientHttpRequest,
   ) {
     return this.serialNoService.listPurchasedSerial(
-      purchase_receipt_names,
+      purchase_invoice_name,
       skip,
       take,
       search,

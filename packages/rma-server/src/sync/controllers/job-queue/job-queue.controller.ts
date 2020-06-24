@@ -34,10 +34,10 @@ export class JobQueueController {
     return this.aggregate.resetJob(jobId);
   }
 
-  @Get('v1/retrieve/:jobId')
+  @Get('v1/get_exported_job/:jobId')
   @UseGuards(TokenGuard)
   async retrieve(@Param('jobId') jobId: string) {
-    return await this.aggregate.retrieveOne(jobId);
+    return await this.aggregate.getOneDataImportJob(jobId);
   }
 
   @Get('v1/list')
