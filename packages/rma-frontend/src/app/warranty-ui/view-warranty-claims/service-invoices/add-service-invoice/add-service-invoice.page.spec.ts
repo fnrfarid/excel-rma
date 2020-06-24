@@ -5,12 +5,16 @@ import { AddServiceInvoicePage } from './add-service-invoice.page';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MaterialModule } from '../../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  NoopAnimationsModule,
+  BrowserAnimationsModule,
+} from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { TimeService } from '../../../../api/time/time.service';
 import { Pipe, PipeTransform, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { of } from 'rxjs';
+import { TimeService } from '../../../../api/time/time.service';
+import { STORAGE_TOKEN } from '../../../../api/storage/storage.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -28,6 +32,7 @@ describe('AddServiceInvoicePage', () => {
       declarations: [AddServiceInvoicePage, MockPipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
+        BrowserAnimationsModule,
         IonicModule.forRoot(),
         HttpClientTestingModule,
         MaterialModule,
@@ -39,11 +44,14 @@ describe('AddServiceInvoicePage', () => {
       providers: [
         {
           provide: TimeService,
-          useValue: {},
+          useValue: {
+            getDateAndTime: (...args) => Promise.resolve({}),
+          },
         },
         {
           provide: AddServiceInvoiceService,
           useValue: {
+            createServiceInvoice: (...args) => of({}),
             getWarrantyDetail: (...args) => of([]),
             getCustomerList: (...args) => of([]),
             getWarehouseList: (...args) => of([]),
@@ -52,6 +60,10 @@ describe('AddServiceInvoicePage', () => {
               getItems: (...args) => Promise.resolve({}),
             }),
           },
+        },
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {},
         },
       ],
     }).compileComponents();

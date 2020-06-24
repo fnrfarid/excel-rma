@@ -110,3 +110,4 @@ export const GET_PO_FROM_PI_NUMBER_ENDPOINT =
   '/api/purchase_order/v1/get_po_from_pi_number/';
 export const GET_DOCTYPE_COUNT_METHOD =
   '/api/command/user/api/method/frappe.client.get_count';
+export const CREATE_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/create';

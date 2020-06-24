@@ -10,7 +10,15 @@ import {
 import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { Observable } from 'rxjs';
 import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ServiceInvoiceDetails } from './service-invoice-interface';
+import {
+  SUBMITTED,
+  UPDATE_ERROR,
+  DURATION,
+  CLOSE,
+} from '../../../../constants/app-string';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -32,18 +40,28 @@ export class AddServiceInvoicePage implements OnInit {
   ];
   filteredCustomerList: Observable<any[]>;
   filteredWarehouseList: Observable<any[]>;
+  warrantyDetails: WarrantyClaimsDetails;
+  date: Date;
   get f() {
     return this.serviceInvoiceForm.controls;
+  }
+  async getCurrentDate() {
+    const date = new Date();
+    const DateTime = await this.time.getDateAndTime(date);
+    this.date = DateTime.date;
   }
   constructor(
     private readonly location: Location,
     private readonly time: TimeService,
     private readonly serviceInvoiceService: AddServiceInvoiceService,
-    private readonly router: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    private readonly snackbar: MatSnackBar,
   ) {}
 
   ngOnInit() {
     this.createFormGroup();
+    this.getCurrentDate();
     this.dataSource = new ItemsDataSource();
 
     this.filteredWarehouseList = this.serviceInvoiceForm
@@ -69,7 +87,7 @@ export class AddServiceInvoicePage implements OnInit {
         }),
       );
     this.serviceInvoiceService
-      .getWarrantyDetail(this.router.snapshot.params.uuid)
+      .getWarrantyDetail(this.activatedRoute.snapshot.params.uuid)
       .subscribe({
         next: (res: WarrantyClaimsDetails) => {
           this.serviceInvoiceForm.get('customerName').setValue(res.customer);
@@ -88,8 +106,9 @@ export class AddServiceInvoicePage implements OnInit {
           this.serviceInvoiceForm
             .get('thirdPartyAddress')
             .setValue(res.third_party_address);
-          this.serviceInvoiceForm.get('postingDate').setValue(new Date());
+          this.serviceInvoiceForm.get('postingDate').setValue(this.date);
           this.serviceInvoiceForm.get('branch').setValue(res.receiving_branch);
+          this.warrantyDetails = res;
         },
         error: err => {},
       });
@@ -97,14 +116,12 @@ export class AddServiceInvoicePage implements OnInit {
 
   createFormGroup() {
     this.serviceInvoiceForm = new FormGroup({
-      warehouse: new FormControl('', [Validators.required]),
       customerName: new FormControl('', [Validators.required]),
       customerContact: new FormControl('', [Validators.required]),
       customerAddress: new FormControl('', [Validators.required]),
       thirdPartyName: new FormControl('', [Validators.required]),
       thirdPartyContact: new FormControl('', [Validators.required]),
       thirdPartyAddress: new FormControl('', [Validators.required]),
-      date: new FormControl('', [Validators.required]),
       account: new FormControl('', [Validators.required]),
       postingDate: new FormControl('', [Validators.required]),
       branch: new FormControl('', [Validators.required]),
@@ -122,7 +139,84 @@ export class AddServiceInvoicePage implements OnInit {
     this.postingDate = await this.time.getDateAndTime($event.value);
   }
 
-  submitDraft() {}
+  submitDraft() {
+    const isValid = this.serviceInvoiceService.validateItemList(
+      this.dataSource.data().map(item => item.item_code),
+    );
+    if (isValid) {
+      const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
+      serviceInvoiceDetails.customer = this.serviceInvoiceForm.get(
+        'customerName',
+      ).value;
+      serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.get(
+        'customerContact',
+      ).value;
+      serviceInvoiceDetails.total_qty = 0;
+      serviceInvoiceDetails.total = 0;
+      serviceInvoiceDetails.status = SUBMITTED;
+      serviceInvoiceDetails.due_date = this.serviceInvoiceForm.get(
+        'postingDate',
+      ).value;
+      serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
+      serviceInvoiceDetails.date = this.serviceInvoiceForm.get(
+        'postingDate',
+      ).value;
+      serviceInvoiceDetails.customer_third_party = this.warrantyDetails.claim_type;
+      serviceInvoiceDetails.branch = this.serviceInvoiceForm.get(
+        'branch',
+      ).value;
+      serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.get(
+        'postingDate',
+      ).value;
+      serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.get(
+        'customerName',
+      ).value;
+      serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.get(
+        'customerAddress',
+      ).value;
+      serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.get(
+        'thirdPartyName',
+      ).value;
+      serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.get(
+        'thirdPartyAddress',
+      ).value;
+      serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.get(
+        'thirdPartyContact',
+      ).value;
+      serviceInvoiceDetails.docstatus = 1;
+
+      const itemList = this.dataSource.data().filter(item => {
+        if (item.item_name !== '') {
+          item.amount = item.qty * item.rate;
+          serviceInvoiceDetails.total_qty += item.qty;
+          serviceInvoiceDetails.total += item.amount;
+          return item;
+        }
+      });
+      serviceInvoiceDetails.items = itemList;
+
+      return this.serviceInvoiceService
+        .createServiceInvoice(serviceInvoiceDetails)
+        .subscribe({
+          next: () => {
+            this.router.navigate([
+              '/warranty/view-warranty-claims',
+              this.activatedRoute.snapshot.params.uuid,
+            ]);
+          },
+          error: ({ message }) => {
+            if (!message) message = UPDATE_ERROR;
+            this.snackbar.open(message, 'Close', {
+              duration: DURATION,
+            });
+          },
+        });
+    } else {
+      this.snackbar.open('Error : Duplicate Items added.', CLOSE, {
+        duration: DURATION,
+      });
+    }
+  }
 
   addItem() {
     const data = this.dataSource.data();
