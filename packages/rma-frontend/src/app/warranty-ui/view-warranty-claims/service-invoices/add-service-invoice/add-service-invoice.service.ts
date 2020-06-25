@@ -7,6 +7,7 @@ import {
   LIST_CUSTOMER_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
+  CREATE_SERVICE_INVOICE_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -21,6 +22,7 @@ import {
   DEFAULT_SELLING_PRICE_LIST,
 } from '../../../../constants/storage';
 import { StorageService } from '../../../../api/storage/storage.service';
+import { ServiceInvoiceDetails } from './service-invoice-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -172,6 +174,27 @@ export class AddServiceInvoiceService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  validateItemList(itemCodeList: string[]) {
+    const filteredList = [...new Set(itemCodeList)];
+    if (filteredList.length === itemCodeList.length) return true;
+    return false;
+  }
+
+  createServiceInvoice(serviceInvoiceDetails: ServiceInvoiceDetails) {
+    const url = CREATE_SERVICE_INVOICE_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<ServiceInvoiceDetails>(
+          url,
+          serviceInvoiceDetails,
+          {
+            headers,
+          },
+        );
       }),
     );
   }

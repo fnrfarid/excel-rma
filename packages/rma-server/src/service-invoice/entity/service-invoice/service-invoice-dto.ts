@@ -104,4 +104,8 @@ export class ServiceInvoiceDto {
   @IsString()
   @IsOptional()
   third_party_contact: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  docstatus: number;
 }

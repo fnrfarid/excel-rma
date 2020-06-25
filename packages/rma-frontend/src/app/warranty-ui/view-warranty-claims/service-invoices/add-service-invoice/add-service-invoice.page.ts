@@ -10,7 +10,16 @@ import {
 import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { Observable } from 'rxjs';
 import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ServiceInvoiceDetails } from './service-invoice-interface';
+import {
+  UPDATE_ERROR,
+  DURATION,
+  CLOSE,
+  SERVICE_INVOICE_STATUS,
+} from '../../../../constants/app-string';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -18,7 +27,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./add-service-invoice.page.scss'],
 })
 export class AddServiceInvoicePage implements OnInit {
-  postingDate: { date: string; time: string };
+  posting_date: { date: string; time: string };
   serviceInvoiceForm: FormGroup;
   dataSource: ItemsDataSource;
   itemsControl: FormArray;
@@ -32,20 +41,32 @@ export class AddServiceInvoicePage implements OnInit {
   ];
   filteredCustomerList: Observable<any[]>;
   filteredWarehouseList: Observable<any[]>;
+  warrantyDetails: WarrantyClaimsDetails;
   get f() {
     return this.serviceInvoiceForm.controls;
+  }
+  async getCurrentDate() {
+    const date = new Date();
+    const DateTime = await this.time.getDateAndTime(date);
+    return DateTime.date;
   }
   constructor(
     private readonly location: Location,
     private readonly time: TimeService,
     private readonly serviceInvoiceService: AddServiceInvoiceService,
-    private readonly router: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    private readonly snackbar: MatSnackBar,
+    private readonly loadingController: LoadingController,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.createFormGroup();
+    this.getCurrentDate();
     this.dataSource = new ItemsDataSource();
-
+    this.serviceInvoiceForm.controls.posting_date.setValue(
+      await this.getCurrentDate(),
+    );
     this.filteredWarehouseList = this.serviceInvoiceForm
       .get('branch')
       .valueChanges.pipe(
@@ -58,7 +79,7 @@ export class AddServiceInvoicePage implements OnInit {
         }),
       );
     this.filteredCustomerList = this.serviceInvoiceForm
-      .get('customerName')
+      .get('customer_name')
       .valueChanges.pipe(
         debounceTime(500),
         startWith(''),
@@ -69,27 +90,30 @@ export class AddServiceInvoicePage implements OnInit {
         }),
       );
     this.serviceInvoiceService
-      .getWarrantyDetail(this.router.snapshot.params.uuid)
+      .getWarrantyDetail(this.activatedRoute.snapshot.params.uuid)
       .subscribe({
         next: (res: WarrantyClaimsDetails) => {
-          this.serviceInvoiceForm.get('customerName').setValue(res.customer);
-          this.serviceInvoiceForm
-            .get('customerContact')
-            .setValue(res.customer_contact);
-          this.serviceInvoiceForm
-            .get('customerAddress')
-            .setValue(res.customer_address);
-          this.serviceInvoiceForm
-            .get('thirdPartyName')
-            .setValue(res.third_party_name);
-          this.serviceInvoiceForm
-            .get('thirdPartyContact')
-            .setValue(res.third_party_contact);
-          this.serviceInvoiceForm
-            .get('thirdPartyAddress')
-            .setValue(res.third_party_address);
-          this.serviceInvoiceForm.get('postingDate').setValue(new Date());
-          this.serviceInvoiceForm.get('branch').setValue(res.receiving_branch);
+          this.serviceInvoiceForm.controls.customer_name.setValue(res.customer);
+          this.serviceInvoiceForm.controls.customer_name.setValue(res.customer);
+          this.serviceInvoiceForm.controls.customer_contact.setValue(
+            res.customer_contact,
+          );
+          this.serviceInvoiceForm.controls.customer_address.setValue(
+            res.customer_address,
+          );
+          this.serviceInvoiceForm.controls.third_party_name.setValue(
+            res.third_party_name,
+          );
+          this.serviceInvoiceForm.controls.third_party_contact.setValue(
+            res.third_party_contact,
+          );
+          this.serviceInvoiceForm.controls.third_party_address.setValue(
+            res.third_party_address,
+          );
+          this.serviceInvoiceForm.controls.branch.setValue(
+            res.receiving_branch,
+          );
+          this.warrantyDetails = res;
         },
         error: err => {},
       });
@@ -97,16 +121,14 @@ export class AddServiceInvoicePage implements OnInit {
 
   createFormGroup() {
     this.serviceInvoiceForm = new FormGroup({
-      warehouse: new FormControl('', [Validators.required]),
-      customerName: new FormControl('', [Validators.required]),
-      customerContact: new FormControl('', [Validators.required]),
-      customerAddress: new FormControl('', [Validators.required]),
-      thirdPartyName: new FormControl('', [Validators.required]),
-      thirdPartyContact: new FormControl('', [Validators.required]),
-      thirdPartyAddress: new FormControl('', [Validators.required]),
-      date: new FormControl('', [Validators.required]),
+      customer_name: new FormControl('', [Validators.required]),
+      customer_contact: new FormControl('', [Validators.required]),
+      customer_address: new FormControl('', [Validators.required]),
+      third_party_name: new FormControl('', [Validators.required]),
+      third_party_contact: new FormControl('', [Validators.required]),
+      third_party_address: new FormControl('', [Validators.required]),
       account: new FormControl('', [Validators.required]),
-      postingDate: new FormControl('', [Validators.required]),
+      posting_date: new FormControl('', [Validators.required]),
       branch: new FormControl('', [Validators.required]),
       items: new FormArray([], this.itemValidator),
       total: new FormControl(0),
@@ -119,10 +141,68 @@ export class AddServiceInvoicePage implements OnInit {
   }
 
   async selectedPostingDate($event) {
-    this.postingDate = await this.time.getDateAndTime($event.value);
+    this.posting_date = await this.time.getDateAndTime($event.value);
   }
 
-  submitDraft() {}
+  async submitDraft() {
+    const isValid = this.serviceInvoiceService.validateItemList(
+      this.dataSource.data().map(item => item.item_code),
+    );
+    if (isValid) {
+      const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
+      serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value;
+      serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
+      serviceInvoiceDetails.total_qty = 0;
+      serviceInvoiceDetails.total = 0;
+      serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.SUBMITTED;
+      serviceInvoiceDetails.due_date = this.serviceInvoiceForm.controls.posting_date.value;
+      serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
+      serviceInvoiceDetails.date = this.serviceInvoiceForm.controls.posting_date.value;
+      serviceInvoiceDetails.customer_third_party = this.warrantyDetails.claim_type;
+      serviceInvoiceDetails.branch = this.serviceInvoiceForm.controls.branch.value;
+      serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.controls.posting_date.value;
+      serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value;
+      serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value;
+      serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
+      serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
+      serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
+      serviceInvoiceDetails.docstatus = 1;
+
+      const itemList = this.dataSource.data().filter(item => {
+        if (item.item_name !== '') {
+          item.amount = item.qty * item.rate;
+          serviceInvoiceDetails.total_qty += item.qty;
+          serviceInvoiceDetails.total += item.amount;
+          return item;
+        }
+      });
+      serviceInvoiceDetails.items = itemList;
+      const loading = await this.loadingController.create();
+      await loading.present();
+      this.serviceInvoiceService
+        .createServiceInvoice(serviceInvoiceDetails)
+        .subscribe({
+          next: () => {
+            loading.dismiss();
+            this.router.navigate([
+              '/warranty/view-warranty-claims',
+              this.activatedRoute.snapshot.params.uuid,
+            ]);
+          },
+          error: ({ message }) => {
+            loading.dismiss();
+            if (!message) message = UPDATE_ERROR;
+            this.snackbar.open(message, 'Close', {
+              duration: DURATION,
+            });
+          },
+        });
+    } else {
+      this.snackbar.open('Error : Duplicate Items added.', CLOSE, {
+        duration: DURATION,
+      });
+    }
+  }
 
   addItem() {
     const data = this.dataSource.data();
