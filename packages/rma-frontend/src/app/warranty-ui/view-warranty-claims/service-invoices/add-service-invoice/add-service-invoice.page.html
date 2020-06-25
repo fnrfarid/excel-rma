@@ -39,17 +39,17 @@
                 <input
                   matInput
                   required
-                  [matDatepicker]="postingDate"
+                  [matDatepicker]="posting_date"
                   placeholder="Posting Date"
-                  formControlName="postingDate"
+                  formControlName="posting_date"
                   (dateChange)="selectedPostingDate($event)"
                 />
                 <mat-datepicker-toggle
                   matSuffix
-                  [for]="postingDate"
+                  [for]="posting_date"
                 ></mat-datepicker-toggle>
-                <mat-datepicker #postingDate disabled="false"></mat-datepicker>
-                <mat-error *ngIf="f.postingDate.hasError('required')">
+                <mat-datepicker #posting_date disabled="false"></mat-datepicker>
+                <mat-error *ngIf="f.posting_date.hasError('required')">
                   Posting Date is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -61,9 +61,9 @@
                   type="text"
                   required
                   placeholder="Customer Name"
-                  formControlName="customerName"
+                  formControlName="customer_name"
                 />
-                <mat-error *ngIf="f.customerName.hasError('required')">
+                <mat-error *ngIf="f.customer_name.hasError('required')">
                   Customer Name is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -76,9 +76,9 @@
                   matInput
                   required
                   placeholder="Customer Address"
-                  formControlName="customerAddress"
+                  formControlName="customer_address"
                 />
-                <mat-error *ngIf="f.customerAddress.hasError('required')">
+                <mat-error *ngIf="f.customer_address.hasError('required')">
                   Customer Address is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -89,9 +89,9 @@
                   matInput
                   required
                   placeholder="Customer Contact"
-                  formControlName="customerContact"
+                  formControlName="customer_contact"
                 />
-                <mat-error *ngIf="f.customerContact.hasError('required')">
+                <mat-error *ngIf="f.customer_contact.hasError('required')">
                   Customer Contact is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -104,9 +104,9 @@
                   matInput
                   required
                   placeholder="Third Party Name"
-                  formControlName="thirdPartyName"
+                  formControlName="third_party_name"
                 />
-                <mat-error *ngIf="f.thirdPartyName.hasError('required')">
+                <mat-error *ngIf="f.third_party_name.hasError('required')">
                   Third Party Name is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -117,9 +117,9 @@
                   matInput
                   required
                   placeholder="Third Party Address"
-                  formControlName="thirdPartyAddress"
+                  formControlName="third_party_address"
                 />
-                <mat-error *ngIf="f.thirdPartyAddress.hasError('required')">
+                <mat-error *ngIf="f.third_party_address.hasError('required')">
                   Third Party Address is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -132,9 +132,9 @@
                   matInput
                   required
                   placeholder="Third Party Contact"
-                  formControlName="thirdPartyContact"
+                  formControlName="third_party_contact"
                 />
-                <mat-error *ngIf="f.thirdPartyContact.hasError('required')">
+                <mat-error *ngIf="f.third_party_contact.hasError('required')">
                   Third Party Contact is <strong>required</strong>
                 </mat-error>
               </mat-form-field>

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   NotImplementedException,
   HttpService,
+  BadRequestException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import * as uuidv4 from 'uuid/v4';
@@ -13,7 +14,7 @@ import { ServiceInvoiceRemovedEvent } from '../../event/service-invoice-removed/
 import { ServiceInvoiceUpdatedEvent } from '../../event/service-invoice-updated/service-invoice-updated.event';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, catchError } from 'rxjs/operators';
 import { throwError, of, from } from 'rxjs';
 import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
 import {
@@ -70,6 +71,9 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
       }),
       switchMap(data => {
         return from(this.serviceInvoiceService.create(data));
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
       }),
     );
   }
