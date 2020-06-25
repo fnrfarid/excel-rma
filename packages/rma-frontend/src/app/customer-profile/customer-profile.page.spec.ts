@@ -9,6 +9,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { SalesService } from '../sales-ui/services/sales.service';
 import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ItemPriceService } from '../sales-ui/services/item-price.service';
+import { TimeService } from '../api/time/time.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 describe('CustomerProfilePage', () => {
   let component: CustomerProfilePage;
@@ -36,7 +39,20 @@ describe('CustomerProfilePage', () => {
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
             }),
+            getApiInfo: (...args) => of(),
           },
+        },
+        {
+          provide: ItemPriceService,
+          useValue: {},
+        },
+        {
+          provide: TimeService,
+          useValue: {},
+        },
+        {
+          provide: MatSnackBar,
+          useValue: {},
         },
       ],
     }).compileComponents();

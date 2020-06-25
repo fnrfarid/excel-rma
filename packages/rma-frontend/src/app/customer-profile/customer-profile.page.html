@@ -39,10 +39,44 @@
         matSort
         style="width: 100%;"
       >
-        <!-- DN Name Column -->
+        <!-- Custoemr Name Column -->
         <ng-container matColumnDef="customer">
           <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
           <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
+        </ng-container>
+
+
+        <ng-container matColumnDef="customer_type">
+          <mat-header-cell *matHeaderCellDef>Customer Type</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.customer_type }}</mat-cell>
+        </ng-container>
+
+
+        <ng-container matColumnDef="territory">
+          <mat-header-cell *matHeaderCellDef>Territory name</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.territory }}</mat-cell>
+        </ng-container>
+
+
+        <ng-container matColumnDef="remaining_balance">
+          <mat-header-cell *matHeaderCellDef>Remaining Balance</mat-header-cell>
+
+          <mat-cell
+          class="ion-text-center"
+          mat-cell
+          *matCellDef="let row; let i = index"
+            >
+            <ion-text *ngIf="row.remaining_balance">
+              {{row.remaining_balance | curFormat | async}}
+            </ion-text>
+            <ion-button
+              *ngIf="!row.remaining_balance"
+              (click)="loadPrice(row, i)"
+              fill="clear"
+            >
+              <ion-icon slot="icon-only" name="refresh"></ion-icon>
+            </ion-button>
+          </mat-cell>
         </ng-container>
 
         <mat-header-row

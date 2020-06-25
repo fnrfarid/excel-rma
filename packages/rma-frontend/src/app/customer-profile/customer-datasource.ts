@@ -6,6 +6,8 @@ import { map, catchError, finalize } from 'rxjs/operators';
 export interface ListingData {
   uuid: string;
   customer_name: string;
+  territory: string;
+  remaining_balance: number;
 }
 
 export interface ItemListResponse {
