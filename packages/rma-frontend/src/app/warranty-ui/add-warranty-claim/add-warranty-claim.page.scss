@@ -1,9 +1,46 @@
-.example-additional-selection {
-  opacity: 0.75;
-  font-size: 0.75em;
+.add-comment {
+  opacity: 0.4;
 }
 
-.full-width {
+.fab-position {
+  position: absolute;
+  top: -35px;
+  right: 0;
+}
+
+.example-full-width {
   width: 100%;
   color: black;
+}
+
+.footer {
+  font-weight: bold;
+}
+
+.mat-column-delete {
+  flex: 0 0 5%;
+}
+
+mat-header-cell {
+  display: flex;
+  justify-content: center;
+}
+
+mat-footer-cell {
+  display: flex;
+  justify-content: center;
+}
+
+mat-header-row {
+  display: flex;
+  justify-content: center;
+}
+mat-footer-row {
+  display: flex;
+  justify-content: center;
+}
+
+mat-cell {
+  display: flex;
+  justify-content: center;
 }
