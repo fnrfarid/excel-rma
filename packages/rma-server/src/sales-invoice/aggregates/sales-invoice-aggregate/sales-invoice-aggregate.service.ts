@@ -423,6 +423,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         {
           $set: { sales_return_name, warehouse },
           $unset: {
+            customer : undefined,
             'warranty.salesWarrantyDate': undefined,
             'warranty.soldOn': undefined,
             delivery_note: undefined,
