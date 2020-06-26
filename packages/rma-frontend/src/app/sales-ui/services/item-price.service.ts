@@ -115,7 +115,11 @@ export class ItemPriceService {
 
     return this.http
       .get<{ message: any }>(GET_BALANCE_ON_ENDPOINT, { params, headers })
-      .pipe(map(res => res.message));
+      .pipe(
+        map(res => {
+          return res.message;
+        }),
+      );
   }
 
   getCompany(company: string) {

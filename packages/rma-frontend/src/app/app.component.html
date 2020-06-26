@@ -57,18 +57,6 @@
             </ion-item>
           </ion-menu-toggle>
 
-          <ion-menu-toggle auto-hide="false">
-            <ion-item
-              *ngIf="loggedIn"
-              routerLink="/customer-profile"
-              lines="none"
-              routerLinkActive="active"
-            >
-              <ion-icon slot="start" name="people-outline"></ion-icon>
-              <ion-label>Customer Profile</ion-label>
-            </ion-item>
-          </ion-menu-toggle>
-
           <ion-item
             *ngIf="loggedIn"
             (click)="isSalesMenuVisible = !isSalesMenuVisible"
@@ -110,26 +98,26 @@
                 <ion-icon slot="start" name="list-outline"></ion-icon>
                 <ion-label>Sales Return</ion-label>
               </ion-item>
+              <ion-item
+                *ngIf="loggedIn"
+                (click)="isRnDMenuVisible = !isRnDMenuVisible"
+                lines="none"
+              >
+                <ion-icon slot="start" name="flask-outline"></ion-icon>
+                <ion-icon
+                  name="chevron-down-outline"
+                  *ngIf="!isRnDMenuVisible"
+                  slot="end"
+                ></ion-icon>
+                <ion-icon
+                  name="chevron-up-outline"
+                  *ngIf="isRnDMenuVisible"
+                  slot="end"
+                ></ion-icon>
+                <ion-label>R&D Products</ion-label>
+              </ion-item>
             </ion-list>
           </ion-menu-toggle>
-          <ion-item
-            *ngIf="loggedIn"
-            (click)="isRnDMenuVisible = !isRnDMenuVisible"
-            lines="none"
-          >
-            <ion-icon slot="start" name="flask-outline"></ion-icon>
-            <ion-icon
-              name="chevron-down-outline"
-              *ngIf="!isRnDMenuVisible"
-              slot="end"
-            ></ion-icon>
-            <ion-icon
-              name="chevron-up-outline"
-              *ngIf="isRnDMenuVisible"
-              slot="end"
-            ></ion-icon>
-            <ion-label>R&D Products</ion-label>
-          </ion-item>
           <ion-menu-toggle auto-hide="false">
             <ion-list
               *ngIf="isRnDMenuVisible"
@@ -177,7 +165,38 @@
               <ion-label>Warranty</ion-label>
             </ion-item>
           </ion-menu-toggle>
+          <ion-item
+          *ngIf="loggedIn"
+          (click)="isStockMenuVisible = !isStockMenuVisible"
+          lines="none"
+        >
+          <ion-icon slot="start" name="layers-outline"></ion-icon>
+          <ion-icon
+            name="chevron-down-outline"
+            *ngIf="!isStockMenuVisible"
+            slot="end"
+          ></ion-icon>
+          <ion-icon
+            name="chevron-up-outline"
+            *ngIf="isStockMenuVisible"
+            slot="end"
+          ></ion-icon>
+          <ion-label>Stock</ion-label>
+        </ion-item>
           <ion-menu-toggle auto-hide="false">
+            <ion-list
+              *ngIf="isStockMenuVisible"
+              class="ion-margin-start ion-no-padding"
+            >
+            <ion-item
+              *ngIf="loggedIn"
+              routerLink="/stock-entry"
+              lines="none"
+              routerLinkActive="active"
+              >
+              <ion-icon slot="start" name="git-compare-outline"></ion-icon>
+              <ion-label>Stock Entry</ion-label>
+            </ion-item>
             <ion-item
               *ngIf="loggedIn"
               lines="none"
@@ -190,17 +209,7 @@
               ></ion-icon>
               <ion-label>Stock Availability</ion-label>
             </ion-item>
-          </ion-menu-toggle>
-          <ion-menu-toggle auto-hide="false">
-            <ion-item
-              *ngIf="loggedIn"
-              routerLink="/stock-entry"
-              lines="none"
-              routerLinkActive="active"
-            >
-              <ion-icon slot="start" name="git-compare-outline"></ion-icon>
-              <ion-label>Stock Entry</ion-label>
-            </ion-item>
+            </ion-list>
           </ion-menu-toggle>
           <ion-menu-toggle auto-hide="false">
             <ion-item
@@ -216,6 +225,41 @@
               <ion-label>Jobs</ion-label>
             </ion-item>
           </ion-menu-toggle>
+          <ion-item
+          *ngIf="loggedIn"
+          (click)="isRelayMenuVisible = !isRelayMenuVisible"
+          lines="none"
+          >
+            <ion-icon slot="start" name="options-outline"></ion-icon>
+            <ion-icon
+              name="chevron-down-outline"
+              *ngIf="!isRelayMenuVisible"
+              slot="end"
+            ></ion-icon>
+            <ion-icon
+              name="chevron-up-outline"
+              *ngIf="isRelayMenuVisible"
+              slot="end"
+            ></ion-icon>
+            <ion-label>Relay</ion-label>
+          </ion-item>
+          <ion-menu-toggle auto-hide="false">
+            <ion-list
+            *ngIf="isRelayMenuVisible"
+            class="ion-margin-start ion-no-padding"
+          >
+              <ion-item
+                *ngIf="loggedIn"
+                routerLink="/customer-profile"
+                lines="none"
+                routerLinkActive="active"
+              >
+                <ion-icon slot="start" name="people-outline"></ion-icon>
+                <ion-label>Customer Profile</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-menu-toggle>
+
           <ion-item
             *ngIf="loggedIn && showSettings"
             (click)="isSettingMenuVisible = !isSettingMenuVisible"

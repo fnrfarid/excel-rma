@@ -32,6 +32,8 @@ export class AppComponent implements OnInit {
   isSettingMenuVisible: boolean = false;
   isSalesMenuVisible: boolean = false;
   isRnDMenuVisible: boolean = false;
+  isStockMenuVisible: boolean = false;
+  isRelayMenuVisible: boolean = false;
   newDNUrl: string = '';
   listRnDURL: string = '';
   binListURL: string = '';

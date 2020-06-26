@@ -8,6 +8,7 @@ import { CustomerProfilePageRoutingModule } from './customer-profile-routing.mod
 
 import { CustomerProfilePage } from './customer-profile.page';
 import { MaterialModule } from '../material/material.module';
+import { AppCommonModule } from '../common/app-common.module';
 
 @NgModule({
   imports: [
@@ -15,6 +16,7 @@ import { MaterialModule } from '../material/material.module';
     FormsModule,
     IonicModule,
     CustomerProfilePageRoutingModule,
+    AppCommonModule,
     MaterialModule,
     ReactiveFormsModule,
   ],
