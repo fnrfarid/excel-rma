@@ -69,7 +69,6 @@
                   placeholder="Serial no"
                   formControlName="serial_no"
                   (keyup.enter)="serialChanged($event.target.value)"
-                  [disabled]="warrantyState.serial_no.disabled"
                 />
                 <mat-error *ngIf="f.serial_no.hasError('required')">
                   Serial no is <strong>required</strong>
@@ -84,7 +83,6 @@
                   matInput
                   type="text"
                   required
-                  [disabled]="true"
                   placeholder="Invoice number"
                   formControlName="invoice_no"
                 />
@@ -101,7 +99,6 @@
                   [matDatepicker]="warranty_end_date"
                   placeholder="Warranty End Date"
                   formControlName="warranty_end_date"
-                  [disabled]="warrantyState.warranty_end_date.disabled"
                 />
                 <mat-datepicker-toggle
                   matSuffix
@@ -126,7 +123,6 @@
                   required
                   placeholder="Product Name"
                   formControlName="product_name"
-                  [disabled]="warrantyState.product_name.disabled"
                 />
                 <mat-error *ngIf="f.product_name.hasError('required')">
                   Product Name is <strong>required</strong>
@@ -141,7 +137,6 @@
                   required
                   placeholder="Product Brand"
                   formControlName="product_brand"
-                  [disabled]="warrantyState.product_brand.disabled"
                 />
                 <mat-error *ngIf="f.product_brand.hasError('required')">
                   Product Brand is <strong>required</strong>
@@ -165,7 +160,6 @@
                   #auto="matAutocomplete"
                   [displayWith]="getOptionText"
                   (optionSelected)="customerChanged($event.option.value)"
-                  [disabled]="warrantyState.customer_name.disabled"
                 >
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async"
@@ -206,7 +200,6 @@
                   required
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
-                  [disabled]="warrantyState.customer_contact.disabled"
                 />
                 <mat-error *ngIf="f.customer_contact.hasError('required')">
                   Customer Contact is <strong>required</strong>
@@ -237,7 +230,6 @@
                   required
                   placeholder="Customer Address"
                   formControlName="customer_address"
-                  [disabled]="warrantyState.customer_address.disabled"
                 />
                 <mat-error *ngIf="f.customer_address.hasError('required')">
                   Customer Address is <strong>required</strong>

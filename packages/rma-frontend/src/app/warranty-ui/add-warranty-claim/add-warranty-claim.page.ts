@@ -64,43 +64,54 @@ export class AddWarrantyClaimPage implements OnInit {
     switch (state) {
       case 'Non Serial Warranty':
         this.warrantyState = {
-          serial_no: { disabled: false, active: false },
-          invoice_no: { disabled: false, active: false },
-          warranty_end_date: { disabled: false, active: false },
-          customer_contact: { disabled: true, active: true },
-          customer_address: { disabled: true, active: true },
-          product_name: { disabled: false, active: true },
-          customer_name: { disabled: false, active: true },
-          product_brand: { disabled: true, active: true },
+          serial_no: { disabled: true, active: false },
+          invoice_no: { disabled: true, active: false },
+          warranty_end_date: { disabled: true, active: false },
+          customer_contact: { disabled: false, active: true },
+          customer_address: { disabled: false, active: true },
+          product_name: { disabled: true, active: true },
+          customer_name: { disabled: true, active: true },
+          product_brand: { disabled: false, active: true },
         };
+        this.isDisabled();
         break;
 
       case 'Third Party Warranty':
         this.warrantyState = {
-          serial_no: { disabled: false, active: true },
-          invoice_no: { disabled: true, active: false },
-          warranty_end_date: { disabled: false, active: false },
-          customer_contact: { disabled: false, active: true },
-          customer_address: { disabled: false, active: true },
-          product_name: { disabled: false, active: true },
-          customer_name: { disabled: false, active: true },
-          product_brand: { disabled: false, active: true },
-        };
-        break;
-
-      default:
-        this.warrantyState = {
-          serial_no: { disabled: false, active: true },
-          invoice_no: { disabled: false, active: true },
-          warranty_end_date: { disabled: false, active: true },
+          serial_no: { disabled: true, active: true },
+          invoice_no: { disabled: false, active: false },
+          warranty_end_date: { disabled: true, active: false },
           customer_contact: { disabled: true, active: true },
           customer_address: { disabled: true, active: true },
           product_name: { disabled: true, active: true },
           customer_name: { disabled: true, active: true },
           product_brand: { disabled: true, active: true },
         };
+        this.isDisabled();
+        break;
+
+      default:
+        this.warrantyState = {
+          serial_no: { disabled: true, active: true },
+          invoice_no: { disabled: false, active: true },
+          warranty_end_date: { disabled: false, active: true },
+          customer_contact: { disabled: false, active: true },
+          customer_address: { disabled: false, active: true },
+          product_name: { disabled: false, active: true },
+          customer_name: { disabled: false, active: true },
+          product_brand: { disabled: false, active: true },
+        };
+        this.isDisabled();
         break;
     }
+  }
+
+  isDisabled() {
+    Object.keys(this.warrantyState).forEach(key => {
+      this.warrantyState[key].disabled
+        ? this.warrantyClaimForm.controls[key].enable()
+        : this.warrantyClaimForm.controls[key].disable();
+    });
   }
 
   async getDateTime(date: Date) {
