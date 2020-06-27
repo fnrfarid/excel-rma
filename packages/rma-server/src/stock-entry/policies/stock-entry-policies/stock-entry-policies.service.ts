@@ -34,11 +34,19 @@ export class StockEntryPoliciesService {
   ) {
     return from(items).pipe(
       mergeMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
         return from(
           this.serialNoService.count({
             serial_no: { $in: item.serial_no },
-            warehouse: item.s_warehouse,
             item_code: item.item_code,
+            $or: [
+              { warehouse: item.s_warehouse },
+              { 'queue_state.purchase_receipt.warehouse': item.s_warehouse },
+            ],
+            'warranty.soldOn': { $exists: false },
+            'queue_state.delivery_note': { $exists: false },
           }),
         ).pipe(
           mergeMap(count => {
