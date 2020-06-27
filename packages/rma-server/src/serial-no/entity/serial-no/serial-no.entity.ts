@@ -34,8 +34,13 @@ export class SerialNo extends BaseEntity {
   @ObjectIdColumn()
   _id: ObjectID;
 
-  @Column()
   uuid: string;
+
+  isSynced: boolean;
+
+  warranty_expiry_date: string;
+
+  modified: boolean;
 
   @Column()
   name: string;
@@ -47,19 +52,7 @@ export class SerialNo extends BaseEntity {
   creation: string;
 
   @Column()
-  modified: string;
-
-  @Column()
-  modified_by: string;
-
-  @Column()
-  idx: number;
-
-  @Column()
   sales_invoice_name: string;
-
-  @Column()
-  docstatus: number;
 
   @Column()
   @Index({ unique: true })
@@ -87,37 +80,10 @@ export class SerialNo extends BaseEntity {
   supplier: string;
 
   @Column()
-  supplier_name: string;
-
-  @Column()
-  asset_status: string;
-
-  @Column()
-  delivery_time: string;
-
-  @Column()
-  is_cancelled: string;
-
-  @Column()
   customer: string;
 
   @Column()
-  customer_name: string;
-
-  @Column()
-  warranty_expiry_date: string;
-
-  @Column()
-  maintenance_status: string;
-
-  @Column()
-  warranty_period: number;
-
-  @Column()
   warehouse: string;
-
-  @Column()
-  serial_no_details: string;
 
   @Column()
   delivery_note: string;
@@ -136,12 +102,6 @@ export class SerialNo extends BaseEntity {
 
   @Column()
   warranty: Warranty;
-
-  @Column()
-  doctype: string;
-
-  @Column()
-  isSynced: boolean;
 
   @Column()
   purchase_date: string;
