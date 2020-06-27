@@ -28,14 +28,19 @@ export class AddWarrantyClaimPage implements OnInit {
 
   async ngOnInit() {
     this.claimList = [
-      { warranty: 'Warranty / Non Warranty' },
-      { warranty: 'Non Serial Warranty' },
-      { warranty: 'Third Party Warranty' },
+      'Warranty / Non Warranty',
+      'Non Serial Warranty',
+      'Third Party Warranty',
     ];
     this.warrantyState = {
-      serial_no: { disabled: false, active: false },
-      invoice_no: { disabled: false, active: false },
-      warranty_end_date: { disabled: false, active: false },
+      serial_no: { disabled: false, active: true },
+      invoice_no: { disabled: false, active: true },
+      warranty_end_date: { disabled: false, active: true },
+      customer_contact: { disabled: true, active: true },
+      customer_address: { disabled: true, active: true },
+      product_name: { disabled: true, active: true },
+      customer_name: { disabled: true, active: true },
+      product_brand: { disabled: true, active: true },
     };
     this.createForm();
     this.warrantyClaimForm.controls.received_on.setValue(
@@ -49,48 +54,52 @@ export class AddWarrantyClaimPage implements OnInit {
       debounceTime(500),
       startWith(''),
       switchMap(value => {
-        return this.warrantyService
-          .getCustomerList(value)
-          .pipe(map(res => res.docs));
+        return this.warrantyService.getCustomerList(value);
       }),
+      map(res => res.docs),
     );
   }
 
   getFormState(state) {
-    if (state.warranty === 'Non Serial Warranty') {
-      this.warrantyState = {
-        serial_no: { disabled: false, active: false },
-        invoice_no: { disabled: false, active: false },
-        warranty_end_date: { disabled: false, active: false },
-      };
-    } else if (state.warranty === 'Third Party Warranty') {
-      this.warrantyState = {
-        serial_no: { disabled: true, active: true },
-        invoice_no: { disabled: true, active: false },
-        warranty_end_date: { disabled: true, active: false },
-      };
-      this.warrantyClaimForm.addControl(
-        'serial_no',
-        new FormControl('', Validators.required),
-      );
-    } else {
-      this.warrantyState = {
-        serial_no: { disabled: true, active: true },
-        invoice_no: { disabled: true, active: true },
-        warranty_end_date: { disabled: true, active: true },
-      };
-      this.warrantyClaimForm.addControl(
-        'warranty_end_date',
-        new FormControl('', Validators.required),
-      );
-      this.warrantyClaimForm.addControl(
-        'serial_no',
-        new FormControl('', Validators.required),
-      );
-      this.warrantyClaimForm.addControl(
-        'invoice_no',
-        new FormControl('', Validators.required),
-      );
+    switch (state) {
+      case 'Non Serial Warranty':
+        this.warrantyState = {
+          serial_no: { disabled: false, active: false },
+          invoice_no: { disabled: false, active: false },
+          warranty_end_date: { disabled: false, active: false },
+          customer_contact: { disabled: true, active: true },
+          customer_address: { disabled: true, active: true },
+          product_name: { disabled: false, active: true },
+          customer_name: { disabled: false, active: true },
+          product_brand: { disabled: true, active: true },
+        };
+        break;
+
+      case 'Third Party Warranty':
+        this.warrantyState = {
+          serial_no: { disabled: false, active: true },
+          invoice_no: { disabled: true, active: false },
+          warranty_end_date: { disabled: false, active: false },
+          customer_contact: { disabled: false, active: true },
+          customer_address: { disabled: false, active: true },
+          product_name: { disabled: false, active: true },
+          customer_name: { disabled: false, active: true },
+          product_brand: { disabled: false, active: true },
+        };
+        break;
+
+      default:
+        this.warrantyState = {
+          serial_no: { disabled: false, active: true },
+          invoice_no: { disabled: false, active: true },
+          warranty_end_date: { disabled: false, active: true },
+          customer_contact: { disabled: true, active: true },
+          customer_address: { disabled: true, active: true },
+          product_name: { disabled: true, active: true },
+          customer_name: { disabled: true, active: true },
+          product_brand: { disabled: true, active: true },
+        };
+        break;
     }
   }
 
@@ -116,6 +125,7 @@ export class AddWarrantyClaimPage implements OnInit {
 
   createForm() {
     this.warrantyClaimForm = new FormGroup({
+      warranty_end_date: new FormControl('', [Validators.required]),
       claim_type: new FormControl('', [Validators.required]),
       received_on: new FormControl('', [Validators.required]),
       delivery_date: new FormControl('', [Validators.required]),
@@ -132,6 +142,8 @@ export class AddWarrantyClaimPage implements OnInit {
       third_party_address: new FormControl('', [Validators.required]),
       product_name: new FormControl('', [Validators.required]),
       customer_name: new FormControl('', [Validators.required]),
+      serial_no: new FormControl('', [Validators.required]),
+      invoice_no: new FormControl('', [Validators.required]),
     });
   }
 
@@ -156,7 +168,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   getOption(option) {
-    if (option) return option.warranty;
+    if (option) return option;
   }
 
   serialChanged(name) {}

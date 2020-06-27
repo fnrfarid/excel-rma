@@ -35,21 +35,6 @@
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.serial_no.active">
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  required
-                  placeholder="Serial no"
-                  formControlName="serial_no"
-                  (keyup.enter)="serialChanged($event.target.value)"
-                />
-                <mat-error *ngIf="f.serial_no.hasError('required')">
-                  Serial no is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -67,7 +52,7 @@
                   (optionSelected)="getFormState($event.option.value)"
                 >
                   <mat-option *ngFor="let option of claimList" [value]="option">
-                    {{ option.warranty }}
+                    {{ option }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.claim_type.hasError('required')">
@@ -75,17 +60,31 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
-            <ion-col>
-              <mat-form-field
-                class="example-full-width"
-                *ngIf="warrantyState.invoice_no.active"
-              >
+            <ion-col *ngIf="warrantyState.serial_no.active">
+              <mat-form-field class="example-full-width">
                 <input
                   matInput
                   type="text"
                   required
+                  placeholder="Serial no"
+                  formControlName="serial_no"
+                  (keyup.enter)="serialChanged($event.target.value)"
+                  [disabled]="warrantyState.serial_no.disabled"
+                />
+                <mat-error *ngIf="f.serial_no.hasError('required')">
+                  Serial no is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col *ngIf="warrantyState.invoice_no.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  [disabled]="true"
                   placeholder="Invoice number"
                   formControlName="invoice_no"
                 />
@@ -94,17 +93,15 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
-              <mat-form-field
-                class="example-full-width"
-                *ngIf="warrantyState.warranty_end_date.active"
-              >
+            <ion-col *ngIf="warrantyState.warranty_end_date.active">
+              <mat-form-field class="example-full-width">
                 <input
                   matInput
                   required
                   [matDatepicker]="warranty_end_date"
                   placeholder="Warranty End Date"
                   formControlName="warranty_end_date"
+                  [disabled]="warrantyState.warranty_end_date.disabled"
                 />
                 <mat-datepicker-toggle
                   matSuffix
@@ -112,7 +109,7 @@
                 ></mat-datepicker-toggle>
                 <mat-datepicker
                   #warranty_end_date
-                  disabled="false"
+                  [disabled]="false"
                 ></mat-datepicker>
                 <mat-error *ngIf="f.warranty_end_date.hasError('required')">
                   Warranty End Date is <strong>required</strong>
@@ -121,7 +118,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col>
+            <ion-col *ngIf="warrantyState.product_name.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -129,13 +126,14 @@
                   required
                   placeholder="Product Name"
                   formControlName="product_name"
+                  [disabled]="warrantyState.product_name.disabled"
                 />
                 <mat-error *ngIf="f.product_name.hasError('required')">
                   Product Name is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
+            <ion-col *ngIf="warrantyState.product_brand.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -143,6 +141,7 @@
                   required
                   placeholder="Product Brand"
                   formControlName="product_brand"
+                  [disabled]="warrantyState.product_brand.disabled"
                 />
                 <mat-error *ngIf="f.product_brand.hasError('required')">
                   Product Brand is <strong>required</strong>
@@ -151,7 +150,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col>
+            <ion-col *ngIf="warrantyState.customer_name.active">
               <mat-form-field class="example-full-width">
                 <input
                   required
@@ -166,6 +165,7 @@
                   #auto="matAutocomplete"
                   [displayWith]="getOptionText"
                   (optionSelected)="customerChanged($event.option.value)"
+                  [disabled]="warrantyState.customer_name.disabled"
                 >
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async"
@@ -198,7 +198,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col>
+            <ion-col *ngIf="warrantyState.customer_contact.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -206,6 +206,7 @@
                   required
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
+                  [disabled]="warrantyState.customer_contact.disabled"
                 />
                 <mat-error *ngIf="f.customer_contact.hasError('required')">
                   Customer Contact is <strong>required</strong>
@@ -228,7 +229,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col>
+            <ion-col *ngIf="warrantyState.customer_address.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -236,6 +237,7 @@
                   required
                   placeholder="Customer Address"
                   formControlName="customer_address"
+                  [disabled]="warrantyState.customer_address.disabled"
                 />
                 <mat-error *ngIf="f.customer_address.hasError('required')">
                   Customer Address is <strong>required</strong>
