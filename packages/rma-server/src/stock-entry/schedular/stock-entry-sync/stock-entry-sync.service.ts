@@ -35,12 +35,13 @@ export class StockEntrySyncService {
     return;
   }
 
-  createStockEntry(job: { payload: StockEntry; token: any }) {
+  createStockEntry(job: { payload: StockEntry; token: any; settings: any }) {
     const payload = job.payload;
     return of({}).pipe(
       mergeMap(object => {
         return this.settingsService.find().pipe(
           switchMap(settings => {
+            job.settings = settings;
             payload.items.filter((item: any) => {
               item.t_warehouse = item.transferWarehouse;
               if (typeof item.serial_no === 'object') {
