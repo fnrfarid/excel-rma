@@ -17,7 +17,11 @@
     color="light"
     horizontal="end"
   >
-    <ion-fab-button class="fab-position" (click)="submitDraft()">
+    <ion-fab-button
+      class="fab-position"
+      (click)="submitDraft()"
+      [disabled]="warrantyClaimForm.invalid"
+    >
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -31,7 +35,7 @@
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col>
+            <ion-col *ngIf="warrantyState.serial_no.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -39,6 +43,7 @@
                   required
                   placeholder="Serial no"
                   formControlName="serial_no"
+                  (keyup.enter)="serialChanged($event.target.value)"
                 />
                 <mat-error *ngIf="f.serial_no.hasError('required')">
                   Serial no is <strong>required</strong>
@@ -53,7 +58,18 @@
                   required
                   placeholder="Claim Type"
                   formControlName="claim_type"
+                  [matAutocomplete]="claimType"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #claimType="matAutocomplete"
+                  [displayWith]="getOption"
+                  (optionSelected)="getFormState($event.option.value)"
+                >
+                  <mat-option *ngFor="let option of claimList" [value]="option">
+                    {{ option.warranty }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.claim_type.hasError('required')">
                   Claim Type is <strong>required</strong>
                 </mat-error>
@@ -62,7 +78,10 @@
           </ion-row>
           <ion-row class="align">
             <ion-col>
-              <mat-form-field class="example-full-width">
+              <mat-form-field
+                class="example-full-width"
+                *ngIf="warrantyState.invoice_no.active"
+              >
                 <input
                   matInput
                   type="text"
@@ -76,7 +95,10 @@
               </mat-form-field>
             </ion-col>
             <ion-col>
-              <mat-form-field class="example-full-width">
+              <mat-form-field
+                class="example-full-width"
+                *ngIf="warrantyState.warranty_end_date.active"
+              >
                 <input
                   matInput
                   required
@@ -132,14 +154,31 @@
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
-                  matInput
-                  type="text"
                   required
-                  placeholder="Customer Name"
+                  type="text"
+                  placeholder="Select Customer"
+                  matInput
                   formControlName="customer_name"
+                  [matAutocomplete]="auto"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #auto="matAutocomplete"
+                  [displayWith]="getOptionText"
+                  (optionSelected)="customerChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredCustomerList | async"
+                    [value]="option"
+                  >
+                    {{ option.customer_name }}
+                    <small class="text-muted">
+                      {{ option.name}}
+                    </small>
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('required')">
-                  Customer Name is <strong>required</strong>
+                  Customer is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>

@@ -9,6 +9,8 @@ import { MaterialModule } from '../../material/material.module';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { AddWarrantyService } from './add-warranty.service';
+import { of } from 'rxjs';
 
 describe('AddWarrantyClaimPage', () => {
   let component: AddWarrantyClaimPage;
@@ -36,6 +38,12 @@ describe('AddWarrantyClaimPage', () => {
           provide: TimeService,
           useValue: {
             getDateAndTime: (...args) => Promise.resolve({}),
+          },
+        },
+        {
+          provide: AddWarrantyService,
+          useValue: {
+            getCustomerList: (...args) => of([]),
           },
         },
       ],
