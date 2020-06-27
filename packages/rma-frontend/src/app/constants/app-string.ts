@@ -19,3 +19,8 @@ export const EXCEL_SALES_USER = 'Excel Sales User';
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
 };
+export const WARRANTY_TYPE = {
+  WARRANTY: 'Warranty / Non Warranty',
+  NON_SERAIL: 'Non Serial Warranty',
+  THIRD_PARTY: 'Third Party Warranty',
+};

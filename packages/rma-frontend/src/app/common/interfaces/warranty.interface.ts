@@ -80,3 +80,14 @@ export interface WarrantyClaimsDetails {
   third_party_contact: string;
   third_party_address: string;
 }
+
+export class WarrantyState {
+  serial_no: { disabled: boolean; active: boolean };
+  invoice_no: { disabled: boolean; active: boolean };
+  warranty_end_date: { disabled: boolean; active: boolean };
+  customer_contact: { disabled: boolean; active: boolean };
+  customer_address: { disabled: boolean; active: boolean };
+  product_name: { disabled: boolean; active: boolean };
+  customer_name: { disabled: boolean; active: boolean };
+  product_brand: { disabled: boolean; active: boolean };
+}
