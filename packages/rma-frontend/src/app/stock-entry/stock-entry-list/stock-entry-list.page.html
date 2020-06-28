@@ -66,28 +66,7 @@
           >
           <mat-cell *matCellDef="let row">
             <ion-text
-              [ngStyle]="{
-              color: 'green'
-            }"
-              *ngIf="row.status === 'Delivered'"
-            >
-              {{row.status}}
-            </ion-text>
-
-            <ion-text
-              [ngStyle]="{
-              color: 'blue'
-            }"
-              *ngIf="row.status === 'In transit'"
-            >
-              {{row.status}}
-            </ion-text>
-
-            <ion-text
-              *ngIf="row.status === 'Canceled'"
-              [ngStyle]="{
-              color: 'red'
-            }"
+            [ngStyle]="{'color': (row.status === 'Delivered') ? 'green' : (row.status === 'Returned') ? 'red' : 'blue' }"
             >
               {{row.status}}
             </ion-text>

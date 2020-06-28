@@ -73,4 +73,10 @@ export class StockEntryController {
   acceptStockEntry(@Param('uuid') uuid, @Req() req) {
     return this.aggregate.acceptStockEntry(uuid, req);
   }
+
+  @Post('v1/reject_transfer/:uuid')
+  @UseGuards(TokenGuard)
+  rejectStockEntry(@Param('uuid') uuid, @Req() req) {
+    return this.aggregate.rejectStockEntry(uuid, req);
+  }
 }

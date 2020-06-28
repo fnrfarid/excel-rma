@@ -93,9 +93,9 @@ export const REJECTED_STATUS = 'Rejected';
 export const SUBMITTED_STATUS = 'Submitted';
 export const COMPLETED_STATUS = 'Completed';
 export const STOCK_ENTRY_STATUS = {
-  in_transit: 'In transit',
+  in_transit: 'In Transit',
   delivered: 'Delivered',
-  canceled: 'Canceled',
+  returned: 'Returned',
 };
 export const CANCELED_STATUS = 'Canceled';
 export const SALES_USER = 'Sales User';
