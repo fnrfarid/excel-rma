@@ -337,4 +337,8 @@ export class SerialNoAggregateService extends AggregateRoot {
         }),
       );
   }
+
+  async retrieveDirectSerialNo(serial_no: string) {
+    return await this.serialNoService.findOne({ serial_no });
+  }
 }
