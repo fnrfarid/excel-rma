@@ -36,6 +36,7 @@ import {
 } from '../../../constants/app-strings';
 import { SerialNoAggregateService } from '../../aggregates/serial-no-aggregate/serial-no-aggregate.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { RetrieveDirectSerialNoQuery } from '../../../serial-no/query/get-direct-serial-no /retrieve-direct-serial-no.query';
 
 @Controller('serial_no')
 export class SerialNoController {
@@ -181,5 +182,13 @@ export class SerialNoController {
         .toPromise();
     }
     return this.serialAggregateService.validateReturnSerials(body).toPromise();
+  }
+
+  @Get('v1/get_direct_serial/:serial_no')
+  @UseGuards(TokenGuard)
+  async getDirectSerialNo(@Param('serial_no') serial_no) {
+    return await this.queryBus.execute(
+      new RetrieveDirectSerialNoQuery(serial_no),
+    );
   }
 }
