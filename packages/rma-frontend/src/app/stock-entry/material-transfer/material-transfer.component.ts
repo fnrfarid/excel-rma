@@ -180,7 +180,19 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   rejectTransfer() {
-    this.getMessage('Coming Soon.');
+    this.stockEntryService.rejectMaterialTransfer(this.uuid).subscribe({
+      next: success => {
+        this.router.navigateByUrl('stock-entry');
+        this.getMessage('Stock entry returned successfully');
+      },
+      error: err => {
+        this.getMessage(
+          err.error && err.error.message
+            ? err.error.message
+            : 'Error occurred while returning stock transfer',
+        );
+      },
+    });
   }
 
   onFromRange(value) {

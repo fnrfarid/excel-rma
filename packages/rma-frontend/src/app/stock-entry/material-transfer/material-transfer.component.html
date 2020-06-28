@@ -38,24 +38,24 @@
               Submit Transfer
             </ion-button>
             <ion-button
-              *ngIf="readonly && status === 'In transit'"
+              *ngIf="readonly && status === 'In Transit'"
               color="tertiary"
               (click)="acceptTransfer()"
             >
               Accept Transfer
             </ion-button>
             <ion-button
-              *ngIf="readonly && status === 'In transit'"
+              *ngIf="readonly && status === 'In Transit'"
               color="danger"
               (click)="rejectTransfer()"
             >
-              Reject Transfer
+              Return Transfer
             </ion-button>
             <ion-text
-              *ngIf="readonly && status !== 'In transit'"
-              color="success"
+              *ngIf="readonly && status !== 'In Transit'"
+              [ngStyle]="{'color': status === 'Returned' ? 'red' : 'green' }"
             >
-              <h1>Stock Transfer Completed</h1>
+              <h1>Stock Transfer {{ status }}</h1>
             </ion-text>
           </ion-col>
         </ion-row>
