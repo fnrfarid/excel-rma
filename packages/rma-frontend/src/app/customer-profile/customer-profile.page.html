@@ -9,6 +9,13 @@
   </ion-toolbar>
 </ion-header>
 
+<div class="loading-shade" *ngIf="dataSource.loading$ | async">
+  <mat-progress-bar
+    *ngIf="dataSource.loading$ | async"
+    mode="indeterminate"
+  ></mat-progress-bar>
+</div>
+
 <ion-content color="light">
   <ion-card>
     <ion-card-header>
@@ -45,12 +52,15 @@
           <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
         </ng-container>
 
-
-        <ng-container matColumnDef="customer_type">
-          <mat-header-cell *matHeaderCellDef>Customer Type</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ row.customer_type }}</mat-cell>
+        <ng-container matColumnDef="credit_limit">
+          <mat-header-cell *matHeaderCellDef>Credit Limit</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ row.credit_limit | curFormat | async }}</mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="remaining_credit">
+          <mat-header-cell *matHeaderCellDef>Remaining Credit</mat-header-cell>
+          <mat-cell *matCellDef="let row">{{ getRemainingCredit(row) | curFormat | async }}</mat-cell>
+        </ng-container>
 
         <ng-container matColumnDef="territory">
           <mat-header-cell *matHeaderCellDef>Territory name</mat-header-cell>
@@ -59,7 +69,7 @@
 
 
         <ng-container matColumnDef="remaining_balance">
-          <mat-header-cell *matHeaderCellDef>Remaining Balance</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef>Current Outstanding</mat-header-cell>
 
           <mat-cell
           class="ion-text-center"
