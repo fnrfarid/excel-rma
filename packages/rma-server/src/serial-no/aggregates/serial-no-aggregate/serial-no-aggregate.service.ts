@@ -41,6 +41,7 @@ import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
+import { SERIAL_NO_NOT_FOUND } from '../../../constants/messages';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -338,7 +339,14 @@ export class SerialNoAggregateService extends AggregateRoot {
       );
   }
 
-  async retrieveDirectSerialNo(serial_no: string) {
-    return await this.serialNoService.findOne({ serial_no });
+  retrieveDirectSerialNo(serial_no: string) {
+    return from(this.serialNoService.findOne({ serial_no })).pipe(
+      switchMap(serial => {
+        if (!serial) {
+          return throwError(new NotFoundException(SERIAL_NO_NOT_FOUND));
+        }
+        return of(serial);
+      }),
+    );
   }
 }

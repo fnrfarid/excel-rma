@@ -9,6 +9,6 @@ export class RetrieveDirectSerialNoHandler
 
   async execute(query: RetrieveDirectSerialNoQuery) {
     const { serial_no } = query;
-    return this.manager.retrieveDirectSerialNo(serial_no);
+    return this.manager.retrieveDirectSerialNo(serial_no).toPromise();
   }
 }
