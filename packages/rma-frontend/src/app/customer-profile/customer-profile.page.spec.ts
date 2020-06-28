@@ -5,7 +5,7 @@ import { CustomerProfilePage } from './customer-profile.page';
 import { MaterialModule } from '../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { SalesService } from '../sales-ui/services/sales.service';
 import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -13,13 +13,20 @@ import { ItemPriceService } from '../sales-ui/services/item-price.service';
 import { TimeService } from '../api/time/time.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+@Pipe({ name: 'curFormat' })
+class MockPipe implements PipeTransform {
+  transform(value: string) {
+    return value;
+  }
+}
+
 describe('CustomerProfilePage', () => {
   let component: CustomerProfilePage;
   let fixture: ComponentFixture<CustomerProfilePage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [CustomerProfilePage],
+      declarations: [CustomerProfilePage, MockPipe],
       imports: [
         IonicModule.forRoot(),
         MaterialModule,

@@ -356,6 +356,16 @@ export class SalesService {
     );
   }
 
+  relayCustomer(name: string) {
+    const url = `${CUSTOMER_ENDPOINT}/${name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
+  }
+
   getDoctypeCount(doctype: string, filters) {
     const url = GET_DOCTYPE_COUNT_METHOD;
     const params = new HttpParams({

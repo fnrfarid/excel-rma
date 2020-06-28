@@ -28,9 +28,10 @@ export class CustomerProfilePage implements OnInit {
   defaultCompany: string;
   displayedColumns = [
     'customer',
-    'customer_type',
     'territory',
+    'credit_limit',
     'remaining_balance',
+    'remaining_credit',
   ];
   search: string = '';
   filters: any = [];
@@ -77,6 +78,7 @@ export class CustomerProfilePage implements OnInit {
 
   loadPrice(row, index) {
     const data = this.dataSource.getData();
+    this.dataSource.loadingSubject.next(true);
     if (data.length !== 1) {
       data[index] = { ...row };
       forkJoin({
@@ -85,12 +87,21 @@ export class CustomerProfilePage implements OnInit {
         debtorAccount: this.salesService
           .getApiInfo()
           .pipe(map(res => res.debtorAccount)),
+        customer: this.salesService.relayCustomer(data[index].name),
       })
         .pipe(
-          switchMap(({ token, time, debtorAccount }) => {
+          switchMap(({ token, time, debtorAccount, customer }) => {
             if (!debtorAccount) {
               return throwError({
                 message: 'Please select Debtor Account in settings',
+              });
+            }
+
+            if (customer) {
+              customer.credit_limits.forEach(limit => {
+                if (limit.company === this.defaultCompany) {
+                  data[index].credit_limit = limit.credit_limit;
+                }
               });
             }
             const headers = {
@@ -108,9 +119,11 @@ export class CustomerProfilePage implements OnInit {
         )
         .subscribe({
           next: balance => {
+            this.dataSource.loadingSubject.next(false);
             data[index].remaining_balance = balance || '0.00';
           },
           error: err => {
+            this.dataSource.loadingSubject.next(false);
             this.snackBar.open(
               'Error Occurred in fetching customer balance',
               CLOSE,
@@ -120,6 +133,13 @@ export class CustomerProfilePage implements OnInit {
         });
     }
     this.dataSource.update(data);
+  }
+
+  getRemainingCredit(row) {
+    if (row && row.credit_limit && row.remaining_balance) {
+      return row.credit_limit - row.remaining_balance;
+    }
+    return;
   }
 
   setDefaultCompany() {

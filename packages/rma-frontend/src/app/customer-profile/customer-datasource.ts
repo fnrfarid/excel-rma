@@ -8,6 +8,8 @@ export interface ListingData {
   customer_name: string;
   territory: string;
   remaining_balance: number;
+  name: string;
+  credit_limit: string;
 }
 
 export interface ItemListResponse {
