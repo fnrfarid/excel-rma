@@ -68,6 +68,10 @@ export class SerialNoDto {
   @IsNotEmpty()
   @IsString()
   deliver_date: Date;
+
+  @IsOptional()
+  @IsString()
+  brand: string;
 }
 
 export class ValidateSerialsDto {

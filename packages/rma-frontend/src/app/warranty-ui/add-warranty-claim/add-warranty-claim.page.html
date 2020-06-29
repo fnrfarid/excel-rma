@@ -29,7 +29,7 @@
     <ion-card>
       <ion-card-header>
         <ion-card-title color="tertiary">
-          Details
+          Product Details
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
@@ -123,7 +123,21 @@
                   required
                   placeholder="Product Name"
                   formControlName="product_name"
+                  [matAutocomplete]="productName"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #productName="matAutocomplete"
+                  [displayWith]="getItemOption"
+                  (optionSelected)="itemOptionChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of productList |async"
+                    [value]="option"
+                  >
+                    {{ option.item_name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.product_name.hasError('required')">
                   Product Name is <strong>required</strong>
                 </mat-error>
@@ -144,6 +158,64 @@
               </mat-form-field>
             </ion-col>
           </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Problem"
+                  formControlName="problem"
+                />
+                <mat-error *ngIf="f.problem.hasError('required')">
+                  Problem is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Problem Details"
+                  formControlName="problem_details"
+                />
+                <mat-error *ngIf="f.problem_details.hasError('required')">
+                  Problem Details is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Additional Remarks"
+                  formControlName="remarks"
+                />
+                <mat-error *ngIf="f.remarks.hasError('required')">
+                  Additional remarks is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col> </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary">
+          Customer Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
           <ion-row class="align">
             <ion-col *ngIf="warrantyState.customer_name.active">
               <mat-form-field class="example-full-width">
@@ -251,6 +323,17 @@
               </mat-form-field>
             </ion-col>
           </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary">
+          Company Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
           <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
@@ -303,7 +386,21 @@
                   required
                   placeholder="Recieving Branch"
                   formControlName="receiving_branch"
+                  [matAutocomplete]="recievingBranch"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #recievingBranch="matAutocomplete"
+                  [displayWith]="getBranchOption"
+                  (optionSelected)="branchOptionChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of territoryList |async"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.receiving_branch.hasError('required')">
                   Recieving Branch is <strong>required</strong>
                 </mat-error>
@@ -317,59 +414,26 @@
                   required
                   placeholder="Delivery Branch"
                   formControlName="delivery_branch"
+                  [matAutocomplete]="deliveryBranch"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #deliveryBranch="matAutocomplete"
+                  [displayWith]="getBranchOption"
+                  (optionSelected)="branchOptionChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of territoryList |async"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.delivery_branch.hasError('required')">
                   Delivery Branch is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  required
-                  placeholder="Problem"
-                  formControlName="problem"
-                />
-                <mat-error *ngIf="f.problem.hasError('required')">
-                  Problem is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  required
-                  placeholder="Problem Details"
-                  formControlName="problem_details"
-                />
-                <mat-error *ngIf="f.problem_details.hasError('required')">
-                  Problem Details is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-          </ion-row>
-          <ion-row class="align">
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  required
-                  placeholder="Additional Remarks"
-                  formControlName="remarks"
-                />
-                <mat-error *ngIf="f.remarks.hasError('required')">
-                  Additional remarks is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-            <ion-col> </ion-col>
           </ion-row>
         </ion-grid>
       </ion-card-content>

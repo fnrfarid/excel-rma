@@ -130,4 +130,7 @@ export class Item extends BaseEntity {
 
   @Column()
   salesWarrantyMonths: number;
+
+  @Column()
+  brand: string;
 }
