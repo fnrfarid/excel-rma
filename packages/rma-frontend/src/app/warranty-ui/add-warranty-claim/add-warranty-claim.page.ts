@@ -5,7 +5,21 @@ import { TimeService } from '../../api/time/time.service';
 import { AddWarrantyService } from './add-warranty.service';
 import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
 import { LoadingController } from '@ionic/angular';
-import { WarrantyState } from '../../common/interfaces/warranty.interface';
+import {
+  WarrantyState,
+  SerialNoDetails,
+  Item,
+  WarrantyClaimsDetails,
+} from '../../common/interfaces/warranty.interface';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DURATION } from './../../constants/app-string';
+import {
+  SOMETHING_WENT_WRONG,
+  ITEM_FETCH_ERROR,
+  SERIAL_FETCH_ERROR,
+} from '../../constants/messages';
+import { of } from 'rxjs';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
@@ -16,14 +30,19 @@ export class AddWarrantyClaimPage implements OnInit {
   address = {} as any;
   filteredCustomerList: any;
   claimList: any;
-  getSerialData: any;
+  getSerialData: SerialNoDetails;
   warrantyState: WarrantyState;
+  productList: any;
+  territoryList: any;
+  itemDetail: any;
 
   constructor(
     private location: Location,
     private readonly time: TimeService,
     private readonly warrantyService: AddWarrantyService,
     private readonly loadingController: LoadingController,
+    private readonly snackbar: MatSnackBar,
+    private readonly router: Router,
   ) {}
 
   async ngOnInit() {
@@ -58,6 +77,24 @@ export class AddWarrantyClaimPage implements OnInit {
       }),
       map(res => res.docs),
     );
+
+    this.productList = this.warrantyClaimForm.controls.product_name.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.warrantyService.getItemList(value);
+      }),
+      map(res => res.docs),
+    );
+
+    this.territoryList = this.warrantyClaimForm.controls.receiving_branch.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.warrantyService.getTerritoryList(value);
+      }),
+      map(res => res.docs),
+    );
   }
 
   getFormState(state) {
@@ -74,6 +111,13 @@ export class AddWarrantyClaimPage implements OnInit {
           product_brand: { disabled: false, active: true },
         };
         this.isDisabled();
+        this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
+        this.warrantyClaimForm.controls.warranty_end_date.updateValueAndValidity();
+        this.warrantyClaimForm.controls.serial_no.clearValidators();
+        this.warrantyClaimForm.controls.serial_no.updateValueAndValidity();
+        this.warrantyClaimForm.controls.invoice_no.clearValidators();
+        this.warrantyClaimForm.controls.invoice_no.updateValueAndValidity();
+
         break;
 
       case 'Third Party Warranty':
@@ -88,6 +132,8 @@ export class AddWarrantyClaimPage implements OnInit {
           product_brand: { disabled: true, active: true },
         };
         this.isDisabled();
+        this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
+        this.warrantyClaimForm.controls.warranty_end_date.updateValueAndValidity();
         break;
 
       default:
@@ -132,7 +178,66 @@ export class AddWarrantyClaimPage implements OnInit {
     this.location.back();
   }
 
-  submitDraft() {}
+  async submitDraft() {
+    const loading = await this.loadingController.create();
+    await loading.present();
+    this.assignFields()
+      .pipe(
+        switchMap(warrantyClaimDetail => {
+          return this.warrantyService.createWarrantyClaim(warrantyClaimDetail);
+        }),
+      )
+      .subscribe({
+        next: () => {
+          loading.dismiss();
+          this.router.navigate(['/warranty']);
+        },
+        error: ({ message }) => {
+          loading.dismiss();
+          if (!message) message = SOMETHING_WENT_WRONG;
+          this.snackbar.open(message, 'Close', {
+            duration: DURATION,
+          });
+        },
+      });
+  }
+
+  assignFields() {
+    const warrantyClaimDetails = {} as WarrantyClaimsDetails;
+    warrantyClaimDetails.claim_type = this.warrantyClaimForm.controls.claim_type.value;
+    warrantyClaimDetails.received_on = this.warrantyClaimForm.controls.received_on.value;
+    warrantyClaimDetails.delivery_date = this.warrantyClaimForm.controls.delivery_date.value;
+    warrantyClaimDetails.receiving_branch = this.warrantyClaimForm.controls.receiving_branch.value.name;
+    warrantyClaimDetails.delivery_branch = this.warrantyClaimForm.controls.delivery_branch.value.name;
+    warrantyClaimDetails.product_brand = this.warrantyClaimForm.controls.product_brand.value;
+    warrantyClaimDetails.problem = this.warrantyClaimForm.controls.problem.value;
+    warrantyClaimDetails.problem_details = this.warrantyClaimForm.controls.problem_details.value;
+    warrantyClaimDetails.remarks = this.warrantyClaimForm.controls.remarks.value;
+    warrantyClaimDetails.customer_contact = this.warrantyClaimForm.controls.customer_contact.value;
+    warrantyClaimDetails.customer_address = this.warrantyClaimForm.controls.customer_address.value;
+    warrantyClaimDetails.third_party_name = this.warrantyClaimForm.controls.third_party_name.value;
+    warrantyClaimDetails.third_party_contact = this.warrantyClaimForm.controls.third_party_contact.value;
+    warrantyClaimDetails.third_party_address = this.warrantyClaimForm.controls.third_party_address.value;
+    warrantyClaimDetails.item_name = this.warrantyClaimForm.controls.product_name.value.item_name;
+    warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.name;
+    warrantyClaimDetails.item_code = this.itemDetail.item_code;
+    warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
+
+    switch (warrantyClaimDetails.claim_type) {
+      case 'Warranty / Non Warranty':
+        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
+        warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
+        warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
+        break;
+      case 'Third Party Warranty':
+        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
+        break;
+
+      default:
+        break;
+    }
+    return of(warrantyClaimDetails);
+  }
 
   createForm() {
     this.warrantyClaimForm = new FormGroup({
@@ -182,5 +287,56 @@ export class AddWarrantyClaimPage implements OnInit {
     if (option) return option;
   }
 
-  serialChanged(name) {}
+  getItemOption(option) {
+    if (option) return option.item_name;
+  }
+
+  getBranchOption(option) {
+    if (option) return option.name;
+  }
+
+  serialChanged(name) {
+    this.warrantyService.getSerial(name).subscribe({
+      next: (res: SerialNoDetails) => {
+        this.getSerialData = res;
+        this.warrantyClaimForm.controls.invoice_no.setValue(
+          res.sales_invoice_name,
+        );
+        this.warrantyClaimForm.controls.warranty_end_date.setValue(
+          new Date(res.warranty.salesWarrantyDate),
+        );
+        this.warrantyClaimForm.controls.product_name.setValue({
+          item_name: res.item_name,
+        });
+        this.warrantyClaimForm.controls.customer_name.setValue({
+          name: res.customer,
+        });
+        this.itemOptionChanged({ item_code: res.item_code });
+        this.customerChanged({ name: res.customer });
+      },
+      error: ({ message }) => {
+        if (!message) message = `${SOMETHING_WENT_WRONG}${SERIAL_FETCH_ERROR}`;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
+  }
+
+  itemOptionChanged(option) {
+    this.warrantyService.getItem(option.item_code).subscribe({
+      next: (res: Item) => {
+        this.itemDetail = res;
+        this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
+      },
+      error: ({ message }) => {
+        if (!message) message = `${SOMETHING_WENT_WRONG}${ITEM_FETCH_ERROR}`;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
+  }
+
+  branchOptionChanged(option) {}
 }

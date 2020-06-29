@@ -28,6 +28,7 @@ export class Item {
   assigned?: number;
   remaining?: number;
   item_group?: string;
+  brand?: string;
 }
 
 export class APIResponse {
@@ -79,6 +80,8 @@ export interface WarrantyClaimsDetails {
   third_party_name: string;
   third_party_contact: string;
   third_party_address: string;
+  item_code: string;
+  warranty_claim_date: Date;
 }
 
 export class WarrantyState {
@@ -90,4 +93,57 @@ export class WarrantyState {
   product_name: { disabled: boolean; active: boolean };
   customer_name: { disabled: boolean; active: boolean };
   product_brand: { disabled: boolean; active: boolean };
+}
+
+export class Warranty {
+  purchaseWarrantyDate: string;
+  salesWarrantyDate: Date;
+  purchasedOn: Date;
+  soldOn: Date;
+}
+export class QueueState {
+  purchase_receipt: {
+    parent: string;
+    warehouse: string;
+  };
+  delivery_note: {
+    parent: string;
+    warehouse: string;
+  };
+  stock_entry: {
+    parent: string;
+    source_warehouse: string;
+    target_warehouse: string;
+  };
+}
+
+export class SerialNoDetails {
+  uuid?: string;
+  isSynced?: boolean;
+  warranty_expiry_date?: string;
+  modified?: boolean;
+  name?: string;
+  owner?: string;
+  creation?: string;
+  sales_invoice_name?: string;
+  serial_no?: string;
+  item_code?: string;
+  item_name?: string;
+  description?: string;
+  item_group?: string;
+  purchase_time?: string;
+  purchase_rate?: number;
+  supplier?: string;
+  customer?: string;
+  warehouse?: string;
+  delivery_note?: string;
+  purchase_document_no?: string;
+  sales_return_name?: string;
+  purchase_document_type?: string;
+  company?: string;
+  warranty?: Warranty;
+  purchase_date?: string;
+  queue_state?: QueueState;
+  purchase_invoice_name?: string;
+  brand?: string;
 }

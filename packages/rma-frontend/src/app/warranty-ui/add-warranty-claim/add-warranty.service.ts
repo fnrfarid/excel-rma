@@ -5,6 +5,11 @@ import {
   RELAY_GET_FULL_ADDRESS_ENDPOINT,
   RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
   LIST_CUSTOMER_ENDPOINT,
+  GET_DIRECT_SERIAL_ENDPOINT,
+  LIST_ITEMS_ENDPOINT,
+  GET_ITEM_BY_ITEM_CODE_ENDPOINT,
+  LIST_TERRITORIES_ENDPOINT,
+  CREATE_WARRANTY_CLAIM_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -14,6 +19,7 @@ import {
 } from '../../constants/storage';
 import { StorageService } from '../../api/storage/storage.service';
 import { APIResponse } from '../../common/interfaces/sales.interface';
+import { WarrantyClaimsDetails } from '../../common/interfaces/warranty.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -84,5 +90,87 @@ export class AddWarrantyService {
     );
   }
 
-  getSerial(name: string) {}
+  getSerial(name: string) {
+    const URL = `${GET_DIRECT_SERIAL_ENDPOINT}/${name}`;
+    const params = new HttpParams().set('serial_no', name);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(URL, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
+  getItemList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+    const url = LIST_ITEMS_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
+  getItem(item_code: string) {
+    const URL = `${GET_ITEM_BY_ITEM_CODE_ENDPOINT}/${item_code}`;
+    const params = new HttpParams().set('item_code', item_code);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(URL, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
+  getTerritoryList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_TERRITORIES_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
+  }
+
+  createWarrantyClaim(warrantyClaimDetails: WarrantyClaimsDetails) {
+    const url = CREATE_WARRANTY_CLAIM_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<WarrantyClaimsDetails>(
+          url,
+          warrantyClaimDetails,
+          {
+            headers,
+          },
+        );
+      }),
+    );
+  }
 }
