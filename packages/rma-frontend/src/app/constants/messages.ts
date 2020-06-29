@@ -9,3 +9,6 @@ export const ERROR_FETCHING_WARRANTY_CLAIM =
   'Error fetching Warranty claim - Code ';
 export const ERROR_FETCHING_PURCHASE_ORDER =
   'Error fetching Purchase Order - Code ';
+export const SOMETHING_WENT_WRONG = 'Something went wrong.';
+export const ITEM_FETCH_ERROR = 'Could not fetch item.';
+export const SERIAL_FETCH_ERROR = 'Could not fetch serial_no data.';

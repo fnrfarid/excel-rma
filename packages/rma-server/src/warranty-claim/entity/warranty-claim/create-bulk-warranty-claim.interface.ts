@@ -25,4 +25,5 @@ export interface BulkWarrantyClaim {
   delivered_by: string;
   received_date: Date;
   deliver_date: Date;
+  brand: string;
 }

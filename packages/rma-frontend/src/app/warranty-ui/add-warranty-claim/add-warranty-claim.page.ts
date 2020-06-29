@@ -5,7 +5,18 @@ import { TimeService } from '../../api/time/time.service';
 import { AddWarrantyService } from './add-warranty.service';
 import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
 import { LoadingController } from '@ionic/angular';
-import { WarrantyState } from '../../common/interfaces/warranty.interface';
+import {
+  WarrantyState,
+  SerialNoDetails,
+  Item,
+} from '../../common/interfaces/warranty.interface';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DURATION } from './../../constants/app-string';
+import {
+  SOMETHING_WENT_WRONG,
+  ITEM_FETCH_ERROR,
+  SERIAL_FETCH_ERROR,
+} from '../../constants/messages';
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
@@ -16,14 +27,17 @@ export class AddWarrantyClaimPage implements OnInit {
   address = {} as any;
   filteredCustomerList: any;
   claimList: any;
-  getSerialData: any;
+  getSerialData: SerialNoDetails;
   warrantyState: WarrantyState;
+  productList: any;
+  territoryList: any;
 
   constructor(
     private location: Location,
     private readonly time: TimeService,
     private readonly warrantyService: AddWarrantyService,
     private readonly loadingController: LoadingController,
+    private readonly snackbar: MatSnackBar,
   ) {}
 
   async ngOnInit() {
@@ -55,6 +69,24 @@ export class AddWarrantyClaimPage implements OnInit {
       startWith(''),
       switchMap(value => {
         return this.warrantyService.getCustomerList(value);
+      }),
+      map(res => res.docs),
+    );
+
+    this.productList = this.warrantyClaimForm.controls.product_name.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.warrantyService.getItemList(value);
+      }),
+      map(res => res.docs),
+    );
+
+    this.territoryList = this.warrantyClaimForm.controls.receiving_branch.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.warrantyService.getTerritoryList(value);
       }),
       map(res => res.docs),
     );
@@ -182,5 +214,55 @@ export class AddWarrantyClaimPage implements OnInit {
     if (option) return option;
   }
 
-  serialChanged(name) {}
+  getItemOption(option) {
+    if (option) return option.item_name;
+  }
+
+  getBranchOption(option) {
+    if (option) return option.name;
+  }
+
+  serialChanged(name) {
+    this.warrantyService.getSerial(name).subscribe({
+      next: (res: SerialNoDetails) => {
+        this.getSerialData = res;
+        this.warrantyClaimForm.controls.invoice_no.setValue(
+          res.sales_invoice_name,
+        );
+        this.warrantyClaimForm.controls.warranty_end_date.setValue(
+          new Date(res.warranty.salesWarrantyDate),
+        );
+        this.warrantyClaimForm.controls.product_name.setValue({
+          item_name: res.item_name,
+        });
+        this.warrantyClaimForm.controls.customer_name.setValue({
+          name: res.customer,
+        });
+        this.itemOptionChanged({ item_code: res.item_code });
+        this.customerChanged({ name: res.customer });
+      },
+      error: ({ message }) => {
+        if (!message) message = `${SOMETHING_WENT_WRONG}${SERIAL_FETCH_ERROR}`;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
+  }
+
+  itemOptionChanged(option) {
+    this.warrantyService.getItem(option.item_code).subscribe({
+      next: (res: Item) => {
+        this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
+      },
+      error: ({ message }) => {
+        if (!message) message = `${SOMETHING_WENT_WRONG}${ITEM_FETCH_ERROR}`;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
+  }
+
+  branchOptionChanged(option) {}
 }

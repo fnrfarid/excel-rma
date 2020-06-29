@@ -189,6 +189,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         delivered_by: claim.delivered_by,
         received_date: new Date(),
         deliver_date: new Date(),
+        brand: claim.brand,
       };
       return this.serialNoAggregateService
         .validateNewSerialNo(serialNo, clientHttpRequest)
