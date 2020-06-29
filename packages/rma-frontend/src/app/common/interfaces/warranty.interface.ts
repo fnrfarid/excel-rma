@@ -80,6 +80,8 @@ export interface WarrantyClaimsDetails {
   third_party_name: string;
   third_party_contact: string;
   third_party_address: string;
+  item_code: string;
+  warranty_claim_date: Date;
 }
 
 export class WarrantyState {
