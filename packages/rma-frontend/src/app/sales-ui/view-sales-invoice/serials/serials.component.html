@@ -357,9 +357,9 @@
       </ng-container>
 
       <ng-container matColumnDef="sales_warranty_period">
-        <mat-header-cell *matHeaderCellDef
-          >Sales Warranty Period [Months]</mat-header-cell
-        >
+        <mat-header-cell *matHeaderCellDef>
+          Sales Warranty Period [Months]
+        </mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
             {{ itemMap[row.item_code]?.salesWarrantyMonths }}

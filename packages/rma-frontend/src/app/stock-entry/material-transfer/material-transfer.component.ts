@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Inject,
+} from '@angular/core';
 import { Subject, Observable, of, from } from 'rxjs';
 import { Location } from '@angular/common';
 import {
@@ -11,7 +17,11 @@ import {
   catchError,
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE, MATERIAL_TRANSFER } from '../../constants/app-string';
+import {
+  CLOSE,
+  MATERIAL_TRANSFER,
+  DELIVERY_NOTE,
+} from '../../constants/app-string';
 import * as _ from 'lodash';
 import { FormControl } from '@angular/forms';
 import { SalesService } from '../../sales-ui/services/sales.service';
@@ -24,9 +34,20 @@ import { DEFAULT_COMPANY, TRANSFER_WAREHOUSE } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { SerialsService } from '../../common/helpers/serials/serials.service';
-import { CsvJsonObj } from '../../sales-ui/view-sales-invoice/serials/serials.component';
+import {
+  CsvJsonObj,
+  AssignSerialsDialog,
+  AssignNonSerialsItemDialog,
+} from '../../sales-ui/view-sales-invoice/serials/serials.component';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { StockItemsDataSource } from './items-datasource';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+} from '@angular/material/dialog';
+import { Item } from 'src/app/common/interfaces/sales.interface';
 
 @Component({
   selector: 'app-material-transfer',
@@ -66,6 +87,14 @@ export class MaterialTransferComponent implements OnInit {
     'serial_no',
     'delete',
   ];
+  itemDataSource: StockItemsDataSource;
+  itemDisplayedColumns = [
+    'item_name',
+    'assigned',
+    'has_serial_no',
+    'add_serial',
+    'delete',
+  ];
 
   popWarehouse = switchMap((warehouses: any[]) => {
     return from(warehouses).pipe(
@@ -89,22 +118,25 @@ export class MaterialTransferComponent implements OnInit {
     private readonly location: Location,
     private readonly salesService: SalesService,
     private readonly timeService: TimeService,
+    public dialog: MatDialog,
     private readonly stockEntryService: StockEntryService,
     private readonly serialService: SerialsService,
     private readonly csvService: CsvJsonService,
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
   ) {
     this.onFromRange(this.value);
     this.onToRange(this.value);
   }
 
   async ngOnInit() {
+    this.itemDataSource = new StockItemsDataSource();
     this.transferWarehouse = await this.salesService
       .getStore()
       .getItem(TRANSFER_WAREHOUSE);
     this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
     this.materialTransferDataSource = new MaterialTransferDataSource();
-    this.uuid = this.route.snapshot.params.uuid;
+    this.uuid = this.activatedRoute.snapshot.params.uuid;
 
     if (this.uuid) {
       this.readonly = true;
@@ -148,7 +180,19 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   rejectTransfer() {
-    this.getMessage('Coming Soon.');
+    this.stockEntryService.rejectMaterialTransfer(this.uuid).subscribe({
+      next: success => {
+        this.router.navigateByUrl('stock-entry');
+        this.getMessage('Stock entry returned successfully');
+      },
+      error: err => {
+        this.getMessage(
+          err.error && err.error.message
+            ? err.error.message
+            : 'Error occurred while returning stock transfer',
+        );
+      },
+    });
   }
 
   onFromRange(value) {
@@ -167,6 +211,32 @@ export class MaterialTransferComponent implements OnInit {
       });
   }
 
+  async addItems() {
+    const dialogRef = this.dialog.open(AddItemDialog, {
+      width: '250px',
+      data: { item: undefined },
+    });
+    const item = await dialogRef.afterClosed().toPromise();
+
+    if (item) {
+      const data = this.itemDataSource.data();
+      data.push({
+        item_code: item.item_code,
+        item_name: item.name,
+        assigned: 0,
+        has_serial_no: item.has_serial_no,
+      });
+      this.itemDataSource.update(data);
+    }
+  }
+
+  deleteItemRow(row, i) {
+    let serialData = this.itemDataSource.data();
+    serialData.length === 1 ? (serialData = []) : serialData.splice(i, 1);
+
+    this.itemDataSource.update(serialData);
+  }
+
   generateSerials(fromRange?, toRange?) {
     this.rangePickerState.serials =
       this.serialService.getSerialsFromRange(
@@ -181,31 +251,164 @@ export class MaterialTransferComponent implements OnInit {
       ? (materialTransferData = [])
       : materialTransferData.splice(i, 1);
     this.materialTransferDataSource.update(materialTransferData);
+    this.updateProductState(row.item_code, -row.qty);
   }
 
-  addRow() {
-    if (!this.validateMaterialTransferData()) return;
-    this.salesService
-      .getSerial(this.rangePickerState.serials[0])
-      .pipe(
-        switchMap((success: { item: ItemInterface }[]) => {
-          return this.salesService.getItemByItemNames([
-            success[0].item.item_name,
-          ]);
-        }),
-      )
-      .subscribe({
-        next: (success: ItemInterface[]) => {
-          this.assignSerials(this.rangePickerState.serials, success[0]);
-        },
-        error: err => {
-          this.getMessage("Provided serial doesn't exist.");
-        },
-      });
+  async assignSingularSerials(row: Item) {
+    const dialogRef = this.dialog.open(AssignSerialsDialog, {
+      width: '250px',
+      data: { serials: row.remaining || 0 },
+    });
+
+    const serials = await dialogRef.afterClosed().toPromise();
+
+    if (serials) {
+      this.addSingularSerials(row, serials);
+      this.resetRangeState();
+      this.updateProductState(row, serials);
+      return;
+    }
+
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
   }
+
+  updateProductState(item_code, assigned) {
+    const itemState = this.itemDataSource.data();
+    itemState.filter(product => {
+      if (product.item_code === item_code) {
+        product.assigned = product.assigned + assigned;
+      }
+      return product;
+    });
+    this.itemDataSource.update(itemState);
+  }
+
+  addSingularSerials(row: Item, serialCount) {
+    this.updateProductState(row.item_code, serialCount);
+    const serials = this.materialTransferDataSource.data();
+    Array.from({ length: serialCount }, async (x, i) => {
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: 1,
+        transferWarehouse: this.transferWarehouse,
+        s_warehouse: this.warehouseState.s_warehouse.value,
+        t_warehouse: this.warehouseState.t_warehouse.value,
+        has_serial_no: row.has_serial_no,
+        serial_no: [''],
+      });
+      this.materialTransferDataSource.update(serials);
+    });
+  }
+
+  addRow(itemRow) {
+    if (!this.validateWarehouseState()) return;
+    if (!itemRow.has_serial_no) {
+      this.addNonSerialItem(itemRow);
+      return;
+    }
+    if (
+      !this.rangePickerState.serials.length ||
+      this.rangePickerState.serials.length === 1
+    ) {
+      this.assignSingularSerials(itemRow);
+      return;
+    }
+    if (itemRow.remaining < this.rangePickerState.serials.length) {
+      this.snackBar.open(
+        `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
+        CLOSE,
+        { duration: 2500 },
+      );
+      return;
+    }
+    this.validateSerial(
+      { item_code: itemRow.item_code, serials: this.rangePickerState.serials },
+      itemRow,
+    );
+  }
+
+  validateSerial(
+    item: {
+      item_code: string;
+      serials: string[];
+      warehouse?: string;
+      validateFor?: string;
+    },
+    row: Item,
+  ) {
+    item.warehouse = this.warehouseState.s_warehouse.value;
+    item.validateFor = DELIVERY_NOTE;
+    this.salesService.validateSerials(item).subscribe({
+      next: (success: { notFoundSerials: string[] }) => {
+        if (success.notFoundSerials && success.notFoundSerials.length) {
+          this.snackBar.open(
+            `Found ${success.notFoundSerials.length} Invalid Serials for
+              item: ${item.item_code} at
+              warehouse: ${item.warehouse},
+              ${success.notFoundSerials.splice(0, 5).join(', ')}...`,
+            CLOSE,
+            { duration: 5500 },
+          );
+          return;
+        }
+        this.assignRangeSerial(row, this.rangePickerState.serials);
+      },
+      error: err => {},
+    });
+  }
+
+  async assignRangeSerial(row: Item, serials: string[]) {
+    const data = this.materialTransferDataSource.data();
+    data.push({
+      item_code: row.item_code,
+      item_name: row.item_name,
+      qty: serials.length,
+      has_serial_no: row.has_serial_no,
+      transferWarehouse: this.transferWarehouse,
+      s_warehouse: this.warehouseState.s_warehouse.value,
+      t_warehouse: this.warehouseState.t_warehouse.value,
+      serial_no: serials,
+    });
+    this.updateProductState(row.item_code, serials.length);
+    this.materialTransferDataSource.update(data);
+    this.resetRangeState();
+  }
+
+  async addNonSerialItem(row: Item) {
+    const dialogRef = this.dialog.open(AssignNonSerialsItemDialog, {
+      width: '250px',
+      data: { qty: row.remaining || 0, remaining: row.remaining },
+    });
+    const assignValue = await dialogRef.afterClosed().toPromise();
+
+    if (assignValue) {
+      const serials = this.materialTransferDataSource.data();
+      serials.push({
+        item_code: row.item_code,
+        item_name: row.item_name,
+        qty: assignValue,
+        has_serial_no: row.has_serial_no,
+        transferWarehouse: this.transferWarehouse,
+        s_warehouse: this.warehouseState.s_warehouse.value,
+        t_warehouse: this.warehouseState.t_warehouse.value,
+        serial_no: ['Non Serial Item'],
+      });
+      this.materialTransferDataSource.update(serials);
+      this.updateProductState(row.item_code, assignValue);
+      return;
+    }
+    this.snackBar.open('Please select a valid number of rows.', CLOSE, {
+      duration: 2500,
+    });
+  }
+
   acceptTransfer() {
     this.stockEntryService.acceptMaterialTransfer(this.uuid).subscribe({
       next: success => {
+        this.router.navigateByUrl('stock-entry');
         this.getMessage('Stock entry accepted successfully');
       },
       error: err => {
@@ -270,24 +473,12 @@ export class MaterialTransferComponent implements OnInit {
         this.getMessage('Stock Entry Created');
         this.resetRangeState();
         this.materialTransferDataSource.update([]);
+        this.router.navigateByUrl('stock-entry');
       },
       error: err => {
         this.getMessage(err.error.message);
       },
     });
-  }
-
-  validateMaterialTransferData() {
-    return this.validateWarehouseState() && this.validateRangePickerState()
-      ? true
-      : false;
-  }
-  validateRangePickerState() {
-    if (!this.rangePickerState.serials[0]) {
-      this.getMessage('Please select a serial range.');
-      return false;
-    }
-    return true;
   }
 
   validateWarehouseState() {
@@ -400,4 +591,38 @@ export class ItemInterface {
   item_code: string;
   item_name: string;
   has_serial_no: number;
+}
+
+@Component({
+  selector: 'add-item-dialog',
+  templateUrl: 'add-item-dialog.html',
+})
+export class AddItemDialog {
+  filteredItemList: Observable<any[]>;
+  itemFormControl = new FormControl();
+
+  constructor(
+    public dialogRef: MatDialogRef<AddItemDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private salesService: SalesService,
+  ) {
+    this.getItemList();
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close(this.itemFormControl.value);
+  }
+
+  getItemList() {
+    this.filteredItemList = this.itemFormControl.valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getItemList(value);
+      }),
+    );
+  }
+
+  getOptionText(option) {
+    return option && option.item_name ? option.item_name : '';
+  }
 }

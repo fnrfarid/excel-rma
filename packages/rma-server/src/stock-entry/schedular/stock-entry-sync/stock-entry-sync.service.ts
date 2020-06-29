@@ -12,6 +12,7 @@ import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.s
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 export const ACCEPT_STOCK_ENTRY_JOB = 'ACCEPT_STOCK_ENTRY_JOB';
+export const REJECT_STOCK_ENTRY_JOB = 'REJECT_STOCK_ENTRY_JOB';
 @Injectable()
 export class StockEntrySyncService {
   constructor(
@@ -35,14 +36,29 @@ export class StockEntrySyncService {
     return;
   }
 
-  createStockEntry(job: { payload: StockEntry; token: any }) {
+  createStockEntry(job: {
+    payload: StockEntry;
+    token: any;
+    settings: any;
+    type: string;
+  }) {
     const payload = job.payload;
     return of({}).pipe(
       mergeMap(object => {
         return this.settingsService.find().pipe(
           switchMap(settings => {
+            job.settings = settings;
             payload.items.filter((item: any) => {
-              item.t_warehouse = item.transferWarehouse;
+              if (job.type === CREATE_STOCK_ENTRY_JOB) {
+                item.t_warehouse = item.transferWarehouse;
+              }
+              if (job.type === ACCEPT_STOCK_ENTRY_JOB) {
+                item.s_warehouse = item.transferWarehouse;
+              }
+              if (job.type === REJECT_STOCK_ENTRY_JOB) {
+                item.t_warehouse = item.s_warehouse;
+                item.s_warehouse = item.transferWarehouse;
+              }
               if (typeof item.serial_no === 'object') {
                 item.serial_no = item.serial_no.join('\n');
               }

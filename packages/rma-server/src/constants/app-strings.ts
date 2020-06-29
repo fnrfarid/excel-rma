@@ -93,9 +93,9 @@ export const REJECTED_STATUS = 'Rejected';
 export const SUBMITTED_STATUS = 'Submitted';
 export const COMPLETED_STATUS = 'Completed';
 export const STOCK_ENTRY_STATUS = {
-  in_transit: 'In transit',
+  in_transit: 'In Transit',
   delivered: 'Delivered',
-  canceled: 'Canceled',
+  returned: 'Returned',
 };
 export const CANCELED_STATUS = 'Canceled';
 export const SALES_USER = 'Sales User';
@@ -109,7 +109,7 @@ export const SALES_INVOICE_STATUS_ENUM = [
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
 export const DELIVERY_NOTE_DOCTYPE = 'Delivery Note';
-export const STOCK_ENTRY_SERIALS_BATCH_SIZE = 20;
+export const STOCK_ENTRY_SERIALS_BATCH_SIZE = 1000;
 export const DELIVERY_NOTE_SERIAL_BATCH_SIZE = 1000;
 export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
 export const FRAPPE_INSERT_MANY_BATCH_COUNT = 2;

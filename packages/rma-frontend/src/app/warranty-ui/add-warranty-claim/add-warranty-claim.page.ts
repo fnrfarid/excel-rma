@@ -1,39 +1,186 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { TimeService } from '../../api/time/time.service';
+import { AddWarrantyService } from './add-warranty.service';
+import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
+import { LoadingController } from '@ionic/angular';
+import { WarrantyState } from '../../common/interfaces/warranty.interface';
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
   styleUrls: ['./add-warranty-claim.page.scss'],
 })
 export class AddWarrantyClaimPage implements OnInit {
-  constructor(private location: Location) {}
+  warrantyClaimForm: FormGroup;
+  address = {} as any;
+  filteredCustomerList: any;
+  claimList: any;
+  getSerialData: any;
+  warrantyState: WarrantyState;
 
-  ngOnInit() {}
-  problem = new FormControl();
-  warrantyClaimState = {
-    claim: '',
-    receivedOn: '',
-  };
-  receivedOnFormControl = new FormControl();
-  claimList: string[] = [
-    'Regular Claim',
-    'Non Serial Warranty',
-    'Third Party Warranty',
-  ];
-  problemList: string[] = [
-    'Problem 1',
-    'Problem 2',
-    'Problem 3',
-    'Problem 4',
-    'Problem 5',
-    'Problem 6',
-  ];
+  constructor(
+    private location: Location,
+    private readonly time: TimeService,
+    private readonly warrantyService: AddWarrantyService,
+    private readonly loadingController: LoadingController,
+  ) {}
+
+  async ngOnInit() {
+    this.claimList = [
+      'Warranty / Non Warranty',
+      'Non Serial Warranty',
+      'Third Party Warranty',
+    ];
+    this.warrantyState = {
+      serial_no: { disabled: false, active: true },
+      invoice_no: { disabled: false, active: true },
+      warranty_end_date: { disabled: false, active: true },
+      customer_contact: { disabled: true, active: true },
+      customer_address: { disabled: true, active: true },
+      product_name: { disabled: true, active: true },
+      customer_name: { disabled: true, active: true },
+      product_brand: { disabled: true, active: true },
+    };
+    this.createForm();
+    this.warrantyClaimForm.controls.received_on.setValue(
+      await this.getDateTime(new Date()),
+    );
+    this.warrantyClaimForm.controls.delivery_date.setValue(
+      await this.getDeliveryDate(new Date()),
+    );
+
+    this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.warrantyService.getCustomerList(value);
+      }),
+      map(res => res.docs),
+    );
+  }
+
+  getFormState(state) {
+    switch (state) {
+      case 'Non Serial Warranty':
+        this.warrantyState = {
+          serial_no: { disabled: true, active: false },
+          invoice_no: { disabled: true, active: false },
+          warranty_end_date: { disabled: true, active: false },
+          customer_contact: { disabled: false, active: true },
+          customer_address: { disabled: false, active: true },
+          product_name: { disabled: true, active: true },
+          customer_name: { disabled: true, active: true },
+          product_brand: { disabled: false, active: true },
+        };
+        this.isDisabled();
+        break;
+
+      case 'Third Party Warranty':
+        this.warrantyState = {
+          serial_no: { disabled: true, active: true },
+          invoice_no: { disabled: false, active: false },
+          warranty_end_date: { disabled: true, active: false },
+          customer_contact: { disabled: true, active: true },
+          customer_address: { disabled: true, active: true },
+          product_name: { disabled: true, active: true },
+          customer_name: { disabled: true, active: true },
+          product_brand: { disabled: true, active: true },
+        };
+        this.isDisabled();
+        break;
+
+      default:
+        this.warrantyState = {
+          serial_no: { disabled: true, active: true },
+          invoice_no: { disabled: false, active: true },
+          warranty_end_date: { disabled: false, active: true },
+          customer_contact: { disabled: false, active: true },
+          customer_address: { disabled: false, active: true },
+          product_name: { disabled: false, active: true },
+          customer_name: { disabled: false, active: true },
+          product_brand: { disabled: false, active: true },
+        };
+        this.isDisabled();
+        break;
+    }
+  }
+
+  isDisabled() {
+    Object.keys(this.warrantyState).forEach(key => {
+      this.warrantyState[key].disabled
+        ? this.warrantyClaimForm.controls[key].enable()
+        : this.warrantyClaimForm.controls[key].disable();
+    });
+  }
+
+  async getDateTime(date: Date) {
+    const DateTime = await this.time.getDateAndTime(date);
+    return DateTime.date;
+  }
+
+  async getDeliveryDate(date: Date) {
+    date.setDate(date.getDate() + 3);
+    return this.getDateTime(date);
+  }
+
+  get f() {
+    return this.warrantyClaimForm.controls;
+  }
+
   navigateBack() {
     this.location.back();
   }
 
-  claimTypeChangeEvent($event) {}
+  submitDraft() {}
 
-  receivedOnChangeEvent() {}
+  createForm() {
+    this.warrantyClaimForm = new FormGroup({
+      warranty_end_date: new FormControl('', [Validators.required]),
+      claim_type: new FormControl('', [Validators.required]),
+      received_on: new FormControl('', [Validators.required]),
+      delivery_date: new FormControl('', [Validators.required]),
+      receiving_branch: new FormControl('', [Validators.required]),
+      delivery_branch: new FormControl('', [Validators.required]),
+      product_brand: new FormControl('', [Validators.required]),
+      problem: new FormControl('', [Validators.required]),
+      problem_details: new FormControl('', [Validators.required]),
+      remarks: new FormControl('', [Validators.required]),
+      customer_contact: new FormControl('', [Validators.required]),
+      customer_address: new FormControl('', [Validators.required]),
+      third_party_name: new FormControl('', [Validators.required]),
+      third_party_contact: new FormControl('', [Validators.required]),
+      third_party_address: new FormControl('', [Validators.required]),
+      product_name: new FormControl('', [Validators.required]),
+      customer_name: new FormControl('', [Validators.required]),
+      serial_no: new FormControl('', [Validators.required]),
+      invoice_no: new FormControl('', [Validators.required]),
+    });
+  }
+
+  async customerChanged(customer) {
+    const loading = await this.loadingController.create();
+    await loading.present();
+    this.warrantyService.getAddress(customer.name).subscribe({
+      next: res => {
+        loading.dismiss();
+        this.address = res;
+        this.warrantyClaimForm.controls.customer_address.setValue(
+          this.address.name,
+        );
+        this.warrantyClaimForm.controls.customer_contact.setValue(
+          this.address.phone,
+        );
+      },
+    });
+  }
+  getOptionText(option) {
+    if (option) return option.name;
+  }
+
+  getOption(option) {
+    if (option) return option;
+  }
+
+  serialChanged(name) {}
 }

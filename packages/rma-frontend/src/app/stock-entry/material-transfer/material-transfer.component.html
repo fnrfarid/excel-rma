@@ -38,24 +38,24 @@
               Submit Transfer
             </ion-button>
             <ion-button
-              *ngIf="readonly && status === 'In transit'"
+              *ngIf="readonly && status === 'In Transit'"
               color="tertiary"
               (click)="acceptTransfer()"
             >
               Accept Transfer
             </ion-button>
             <ion-button
-              *ngIf="readonly && status === 'In transit'"
+              *ngIf="readonly && status === 'In Transit'"
               color="danger"
               (click)="rejectTransfer()"
             >
-              Reject Transfer
+              Return Transfer
             </ion-button>
             <ion-text
-              *ngIf="readonly && status !== 'In transit'"
-              color="success"
+              *ngIf="readonly && status !== 'In Transit'"
+              [ngStyle]="{'color': status === 'Returned' ? 'red' : 'green' }"
             >
-              <h1>Stock Transfer Completed</h1>
+              <h1>Stock Transfer {{ status }}</h1>
             </ion-text>
           </ion-col>
         </ion-row>
@@ -72,11 +72,6 @@
               Serial Range
             </ion-text>
           </ion-card-title>
-        </ion-col>
-        <ion-col class="ion-text-right">
-          <ion-button [disabled]="readonly" color="tertiary" (click)="addRow()">
-            Add
-          </ion-button>
         </ion-col>
       </ion-row>
     </ion-card-header>
@@ -166,6 +161,87 @@
     </ion-card-content>
   </ion-card>
 
+  <ion-card >
+    <ion-card-header>
+      <ion-row class="align">
+        <ion-col>
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Items
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+        <ion-col class="ion-text-right">
+          <ion-button [disabled]="readonly" color="tertiary" (click)="addItems()">
+            Add Item
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-card-header>
+
+    <ion-card-content class="ion-no-padding">
+      <mat-table #table [dataSource]="itemDataSource" style="width: 100%;">
+
+        <ng-container matColumnDef="item_name">
+          <mat-header-cell *matHeaderCellDef>Item Name</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.item_name }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="delete">
+          <mat-header-cell *matHeaderCellDef>Delete Item</mat-header-cell>
+          <mat-cell *matCellDef="let row; let i = index">
+            <ion-button color="danger" fill="clear" (click)="deleteItemRow(row, i)">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="assigned">
+          <mat-header-cell *matHeaderCellDef>Assigned</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.assigned || 0 }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="has_serial_no">
+          <mat-header-cell *matHeaderCellDef>Has Serial</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <mat-checkbox
+              class="example-margin"
+              [(ngModel)]="row.has_serial_no"
+              [disabled]="true"
+            >
+            </mat-checkbox>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="add_serial">
+          <mat-header-cell *matHeaderCellDef>Add Serials</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ion-button
+              fill="outline"
+              (click)="addRow(row)"
+            >
+              <ion-icon name="Add"></ion-icon>
+            </ion-button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="itemDisplayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: itemDisplayedColumns"></mat-row>
+      </mat-table>
+    </ion-card-content>
+  </ion-card>
+
+
   <ion-card>
     <ion-card-header>
       <ion-row class="align">
@@ -221,16 +297,17 @@
           </mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="serial_no">
+        <ng-container matColumnDef="serial_no" >
           <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
-          <mat-cell appearance="outline" *matCellDef="let row">
+          <mat-cell *matCellDef="let row">
             <input
               matInput
-              *ngIf="row.serial_no?.length === 1 ? true : false"
-              [(ngModel)]="row.serial_no[0]"
               oninput="this.value = this.value.toUpperCase()"
+              *ngIf="!row.serial_no[1]"
+              [disabled]="row.serial_no[0] === 'Non Serial Item' ? true : false"
+              [(ngModel)]="row.serial_no[0]"
             />
-            <p *ngIf="row.serial_no?.length === 1 ? false : true">
+            <p *ngIf="row.serial_no.length === 1 ? false : true">
               {{ getSerialsInputValue(row) }}
             </p>
           </mat-cell>

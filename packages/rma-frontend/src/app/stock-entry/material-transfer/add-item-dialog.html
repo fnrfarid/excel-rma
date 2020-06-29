@@ -1,0 +1,27 @@
+<div mat-dialog-content>
+    <p>Please Select a Item?</p>
+    <mat-form-field>
+        <input
+      type="text"
+      placeholder="Select Item"
+      matInput
+      [formControl]="itemFormControl"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete
+      autoActiveFirstOption
+      #auto="matAutocomplete"
+      [displayWith]="getOptionText"
+    >
+      <mat-option
+        *ngFor="let option of filteredItemList | async"
+        [value]="option"
+      >
+        {{ option.item_name }} ( {{ option.item_code }} )
+      </mat-option>
+    </mat-autocomplete>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Done</button>
+</div>

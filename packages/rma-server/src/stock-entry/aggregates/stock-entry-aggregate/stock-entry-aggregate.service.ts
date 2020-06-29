@@ -17,6 +17,7 @@ import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider
 import {
   CREATE_STOCK_ENTRY_JOB,
   ACCEPT_STOCK_ENTRY_JOB,
+  REJECT_STOCK_ENTRY_JOB,
 } from '../../schedular/stock-entry-sync/stock-entry-sync.service';
 import {
   INVALID_FILE,
@@ -153,6 +154,39 @@ export class StockEntryAggregateService {
           return item;
         });
         return of(data);
+      }),
+    );
+  }
+
+  rejectStockEntry(uuid: string, req) {
+    return from(this.stockEntryService.findOne({ uuid })).pipe(
+      mergeMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry not found.'));
+        }
+        const payload: any = stockEntry;
+        this.stockEntryService
+          .updateOne(
+            { uuid },
+            { $set: { status: STOCK_ENTRY_STATUS.returned } },
+          )
+          .catch(err => {})
+          .then(success => {});
+        return this.serialBatchService
+          .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
+          .pipe(
+            switchMap((itemBatch: any) => {
+              payload.items = [itemBatch];
+              this.batchAddToQueue(
+                itemBatch,
+                payload,
+                req,
+                REJECT_STOCK_ENTRY_JOB,
+                stockEntry.uuid,
+              );
+              return of({});
+            }),
+          );
       }),
     );
   }
