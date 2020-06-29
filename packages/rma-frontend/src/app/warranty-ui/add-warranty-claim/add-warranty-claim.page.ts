@@ -11,7 +11,12 @@ import {
   Item,
 } from '../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { UPDATE_ERROR, DURATION } from './../../constants/app-string';
+import { DURATION } from './../../constants/app-string';
+import {
+  SOMETHING_WENT_WRONG,
+  ITEM_FETCH_ERROR,
+  SERIAL_FETCH_ERROR,
+} from '../../constants/messages';
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
@@ -237,7 +242,7 @@ export class AddWarrantyClaimPage implements OnInit {
         this.customerChanged({ name: res.customer });
       },
       error: ({ message }) => {
-        if (!message) message = UPDATE_ERROR;
+        if (!message) message = `${SOMETHING_WENT_WRONG}${SERIAL_FETCH_ERROR}`;
         this.snackbar.open(message, 'Close', {
           duration: DURATION,
         });
@@ -249,6 +254,12 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyService.getItem(option.item_code).subscribe({
       next: (res: Item) => {
         this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
+      },
+      error: ({ message }) => {
+        if (!message) message = `${SOMETHING_WENT_WRONG}${ITEM_FETCH_ERROR}`;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
       },
     });
   }
