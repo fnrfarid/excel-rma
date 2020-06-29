@@ -43,6 +43,7 @@ describe('AddWarrantyClaimPage', () => {
         {
           provide: AddWarrantyService,
           useValue: {
+            createWarrantyClaim: (...args) => of({}),
             getCustomerList: (...args) => of([]),
             getItemList: (...args) => of([]),
             getTerritoryList: (...args) => of([]),

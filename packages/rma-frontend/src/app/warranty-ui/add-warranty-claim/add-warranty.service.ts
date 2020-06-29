@@ -9,6 +9,7 @@ import {
   LIST_ITEMS_ENDPOINT,
   GET_ITEM_BY_ITEM_CODE_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
+  CREATE_WARRANTY_CLAIM_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -18,6 +19,7 @@ import {
 } from '../../constants/storage';
 import { StorageService } from '../../api/storage/storage.service';
 import { APIResponse } from '../../common/interfaces/sales.interface';
+import { WarrantyClaimsDetails } from '../../common/interfaces/warranty.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -153,6 +155,21 @@ export class AddWarrantyService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  createWarrantyClaim(warrantyClaimDetails: WarrantyClaimsDetails) {
+    const url = CREATE_WARRANTY_CLAIM_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<WarrantyClaimsDetails>(
+          url,
+          warrantyClaimDetails,
+          {
+            headers,
+          },
+        );
       }),
     );
   }
