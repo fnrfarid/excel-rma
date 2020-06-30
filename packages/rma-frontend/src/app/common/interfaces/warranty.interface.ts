@@ -1,3 +1,5 @@
+import { Time } from '@angular/common';
+
 export class WarrantyClaims {
   uuid: string;
   customer: string;
@@ -82,6 +84,8 @@ export interface WarrantyClaimsDetails {
   third_party_address: string;
   item_code: string;
   warranty_claim_date: Date;
+  status_history?: StatusHistoryDetails[];
+  posting_time: Date;
 }
 
 export class WarrantyState {
@@ -146,4 +150,15 @@ export class SerialNoDetails {
   queue_state?: QueueState;
   purchase_invoice_name?: string;
   brand?: string;
+}
+
+export class StatusHistoryDetails {
+  posting_date?: Date;
+  time?: Time;
+  status_from?: string;
+  transfer_branch?: string;
+  verdict?: string;
+  description?: string;
+  delivery_status?: string;
+  status?: string;
 }
