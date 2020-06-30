@@ -217,16 +217,9 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.name;
     warrantyClaimDetails.item_code = this.itemDetail.item_code;
     warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
-    warrantyClaimDetails.status_history = [];
-    warrantyClaimDetails.status_history.push({
-      posting_date: this.warrantyClaimForm.controls.received_on.value.date,
-      time: (await this.getDateTime(new Date())).time,
-      verdict: 'Received from Customer',
-      status_from: this.warrantyClaimForm.controls.receiving_branch.value.name,
-      transfer_branch: '',
-      description: '',
-      delivery_status: '',
-    });
+    warrantyClaimDetails.posting_time = await (
+      await this.getDateTime(new Date())
+    ).time;
     switch (warrantyClaimDetails.claim_type) {
       case 'Warranty / Non Warranty':
         warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;

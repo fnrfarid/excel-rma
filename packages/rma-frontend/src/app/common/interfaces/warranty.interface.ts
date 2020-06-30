@@ -84,7 +84,8 @@ export interface WarrantyClaimsDetails {
   third_party_address: string;
   item_code: string;
   warranty_claim_date: Date;
-  status_history: StatusHistoryDetails[];
+  status_history?: StatusHistoryDetails[];
+  posting_time: Date;
 }
 
 export class WarrantyState {

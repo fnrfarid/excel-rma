@@ -14,7 +14,7 @@ import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warra
 import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { INVALID_FILE } from '../../../constants/app-strings';
+import { INVALID_FILE, VERDICT } from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
   BulkWarrantyClaim,
@@ -41,8 +41,18 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     super();
   }
   addWarrantyClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
-    warrantyClaimPayload.status_history.forEach(key => {
-      key.status = clientHttpRequest.token.fullName;
+    warrantyClaimPayload.status_history = [];
+    warrantyClaimPayload.status_history.push({
+      status: clientHttpRequest.token.fullName,
+      posting_date: warrantyClaimPayload.received_on,
+      time: warrantyClaimPayload.posting_time,
+      verdict: VERDICT.RECEIVED_FROM_CUSTOMER,
+      status_from: warrantyClaimPayload.receiving_branch,
+      transfer_branch: '',
+      description: '',
+      delivery_status: '',
+      created_by_email: clientHttpRequest.token.email,
+      created_by: clientHttpRequest.token.fullName,
     });
     switch (warrantyClaimPayload.claim_type) {
       case WARRANTY_TYPE.WARRANTY:

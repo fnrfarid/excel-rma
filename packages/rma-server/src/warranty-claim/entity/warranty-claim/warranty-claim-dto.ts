@@ -112,7 +112,7 @@ export class WarrantyClaimDto {
 
   @IsNotEmpty()
   @IsString()
-  received_on: string;
+  received_on: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -138,6 +138,9 @@ export class WarrantyClaimDto {
   @IsString()
   remarks: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   status_history: StatusHistory[];
+
+  @IsNotEmpty()
+  posting_time: Date;
 }

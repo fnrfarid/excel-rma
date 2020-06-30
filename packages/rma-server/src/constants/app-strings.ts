@@ -195,3 +195,13 @@ export const DEFAULT_NAMING_SERIES = {
   stock_receive: 'TRIN-',
 };
 export const MAX_SERIAL_BODY_COUNT = 100000;
+export enum VERDICT {
+  RECEIVED_FROM_CUSTOMER = 'Received from Customer',
+  TRANSFERRED = 'Transferred',
+  RECEIVED_FROM_BRANCH = 'Received from Branch',
+  SOLVED = 'Solved',
+  UNSOLVED = 'Unsolved',
+  REJECTED = 'Rejected',
+  TO_REPLACE = 'To Replace',
+  WORK_IN_PROGRESS = 'Work in Progress',
+}

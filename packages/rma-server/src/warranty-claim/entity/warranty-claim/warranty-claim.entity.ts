@@ -123,4 +123,6 @@ export class StatusHistory {
   description: string;
   delivery_status: string;
   status: string;
+  created_by_email: string;
+  created_by: string;
 }
