@@ -41,6 +41,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     super();
   }
   addWarrantyClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
+    warrantyClaimPayload.status_history.forEach(key => {
+      key.status = clientHttpRequest.token.fullName;
+    });
     switch (warrantyClaimPayload.claim_type) {
       case WARRANTY_TYPE.WARRANTY:
         return this.createWarrantyNonWarrantyClaim(warrantyClaimPayload);

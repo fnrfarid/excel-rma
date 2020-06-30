@@ -18,7 +18,6 @@ import {
   ITEM_FETCH_ERROR,
   SERIAL_FETCH_ERROR,
 } from '../../constants/messages';
-import { of } from 'rxjs';
 import { Router } from '@angular/router';
 @Component({
   selector: 'app-add-warranty-claim',
@@ -63,7 +62,7 @@ export class AddWarrantyClaimPage implements OnInit {
     };
     this.createForm();
     this.warrantyClaimForm.controls.received_on.setValue(
-      await this.getDateTime(new Date()),
+      await (await this.getDateTime(new Date())).date,
     );
     this.warrantyClaimForm.controls.delivery_date.setValue(
       await this.getDeliveryDate(new Date()),
@@ -162,12 +161,12 @@ export class AddWarrantyClaimPage implements OnInit {
 
   async getDateTime(date: Date) {
     const DateTime = await this.time.getDateAndTime(date);
-    return DateTime.date;
+    return { date: DateTime.date, time: DateTime.time };
   }
 
   async getDeliveryDate(date: Date) {
     date.setDate(date.getDate() + 3);
-    return this.getDateTime(date);
+    return (await this.getDateTime(date)).date;
   }
 
   get f() {
@@ -181,28 +180,24 @@ export class AddWarrantyClaimPage implements OnInit {
   async submitDraft() {
     const loading = await this.loadingController.create();
     await loading.present();
-    this.assignFields()
-      .pipe(
-        switchMap(warrantyClaimDetail => {
-          return this.warrantyService.createWarrantyClaim(warrantyClaimDetail);
-        }),
-      )
-      .subscribe({
-        next: () => {
-          loading.dismiss();
-          this.router.navigate(['/warranty']);
-        },
-        error: ({ message }) => {
-          loading.dismiss();
-          if (!message) message = SOMETHING_WENT_WRONG;
-          this.snackbar.open(message, 'Close', {
-            duration: DURATION,
-          });
-        },
-      });
+    const detail = await this.assignFields();
+
+    return this.warrantyService.createWarrantyClaim(detail).subscribe({
+      next: () => {
+        loading.dismiss();
+        this.router.navigate(['/warranty']);
+      },
+      error: ({ message }) => {
+        loading.dismiss();
+        if (!message) message = SOMETHING_WENT_WRONG;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
   }
 
-  assignFields() {
+  async assignFields() {
     const warrantyClaimDetails = {} as WarrantyClaimsDetails;
     warrantyClaimDetails.claim_type = this.warrantyClaimForm.controls.claim_type.value;
     warrantyClaimDetails.received_on = this.warrantyClaimForm.controls.received_on.value;
@@ -222,7 +217,16 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.name;
     warrantyClaimDetails.item_code = this.itemDetail.item_code;
     warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
-
+    warrantyClaimDetails.status_history = [];
+    warrantyClaimDetails.status_history.push({
+      posting_date: this.warrantyClaimForm.controls.received_on.value.date,
+      time: (await this.getDateTime(new Date())).time,
+      verdict: 'Received from Customer',
+      status_from: this.warrantyClaimForm.controls.receiving_branch.value.name,
+      transfer_branch: '',
+      description: '',
+      delivery_status: '',
+    });
     switch (warrantyClaimDetails.claim_type) {
       case 'Warranty / Non Warranty':
         warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
@@ -236,7 +240,7 @@ export class AddWarrantyClaimPage implements OnInit {
       default:
         break;
     }
-    return of(warrantyClaimDetails);
+    return warrantyClaimDetails;
   }
 
   createForm() {
