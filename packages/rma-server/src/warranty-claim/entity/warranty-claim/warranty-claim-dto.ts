@@ -1,4 +1,5 @@
 import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
+import { StatusHistory } from './warranty-claim.entity';
 
 export class WarrantyClaimDto {
   @IsOptional()
@@ -111,7 +112,7 @@ export class WarrantyClaimDto {
 
   @IsNotEmpty()
   @IsString()
-  received_on: string;
+  received_on: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -136,4 +137,10 @@ export class WarrantyClaimDto {
   @IsNotEmpty()
   @IsString()
   remarks: string;
+
+  @IsOptional()
+  status_history: StatusHistory[];
+
+  @IsNotEmpty()
+  posting_time: Date;
 }

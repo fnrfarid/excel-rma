@@ -15,22 +15,26 @@
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
-    <mat-table #table style="width: 100%;">
-      <ng-container matColumnDef="date">
+    <mat-table
+      #table
+      style="width: 100%;"
+      [dataSource]="warrantyObject?.status_history"
+    >
+      <ng-container matColumnDef="posting_date">
         <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          <ng-container *ngIf="row.date">
-            {{ row.date }}
+          <ng-container *ngIf="row.posting_date">
+            {{ row.posting_date }}
           </ng-container>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
       </ng-container>
 
-      <ng-container matColumnDef="posting_time">
+      <ng-container matColumnDef="time">
         <mat-header-cell *matHeaderCellDef>Posting Time</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.posting_time }}
+            {{ row.time }}
           </ng-container>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
@@ -56,13 +60,13 @@
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
       </ng-container>
 
-      <ng-container matColumnDef="current_status_verdict">
+      <ng-container matColumnDef="verdict">
         <mat-header-cell *matHeaderCellDef
           >Current Status / Verdict</mat-header-cell
         >
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.current_status_verdict }}
+            {{ row.verdict }}
           </ng-container>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
@@ -77,26 +81,33 @@
       </ng-container>
 
       <!-- colume name not maintion in excel sheet -->
-      <ng-container matColumnDef="repaired">
-        <mat-header-cell *matHeaderCellDef>Repaired</mat-header-cell>
+      <ng-container matColumnDef="delivery_status">
+        <mat-header-cell *matHeaderCellDef>Delivery Status</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          {{ row.repaired }}
+          {{ row.delivery_status }}
         </mat-cell>
         <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
       </ng-container>
 
-      <ng-container matColumnDef="status_by">
+      <ng-container matColumnDef="status">
         <mat-header-cell *matHeaderCellDef>Status By</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          {{ row.status_by }}
+          {{ row.status }}
         </mat-cell>
         <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
       </ng-container>
 
       <ng-container matColumnDef="rollback">
         <mat-header-cell *matHeaderCellDef>Rollback</mat-header-cell>
-        <mat-cell *matCellDef="let row">
-          {{ row.rollback }}
+        <mat-cell *matCellDef="let row; let i = index">
+          <ion-button
+            fill="clear"
+            class="ion-no-padding"
+            color="danger"
+            *ngIf="i + 1 === warrantyObject?.status_history.length"
+          >
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-button>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
       </ng-container>
