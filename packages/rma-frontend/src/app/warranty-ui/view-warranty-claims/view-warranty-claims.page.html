@@ -35,7 +35,8 @@
   <div [ngSwitch]="selectedSegment">
     <claim-details *ngSwitchCase="0"> </claim-details>
     <service-invoices *ngSwitchCase="1"> </service-invoices>
-    <status-history *ngSwitchCase="2"> </status-history>
+    <status-history *ngSwitchCase="2" [warrantyObject]="warrantyDetail">
+    </status-history>
     <stock-entry *ngSwitchCase="3"> </stock-entry>
   </div>
 </ion-content>

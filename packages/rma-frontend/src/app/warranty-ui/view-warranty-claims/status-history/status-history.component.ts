@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
 
 @Component({
   selector: 'status-history',
@@ -6,15 +7,18 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./status-history.component.scss'],
 })
 export class StatusHistoryComponent implements OnInit {
+  @Input()
+  warrantyObject: WarrantyClaimsDetails;
+
   displayedColumns = [
-    'date',
-    'posting_time',
+    'posting_date',
+    'time',
     'status_from',
     'transfer_branch',
-    'current_status_verdict',
+    'verdict',
     'description',
-    'repaired',
-    'status_by',
+    'delivery_status',
+    'status',
     'rollback',
   ];
   constructor() {}
