@@ -246,26 +246,28 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   addStatusHistory(statusHistoryPayload: StatusHistoryDto, clientHttpRequest) {
+    const statusHistoryDetails = this.mapStatusHistory(
+      statusHistoryPayload,
+      clientHttpRequest,
+    );
     return from(
       this.warrantyClaimService.updateOne(
         { uuid: statusHistoryPayload.uuid },
         {
           $push: {
-            status_history: {
-              posting_date: statusHistoryPayload.posting_date,
-              time: statusHistoryPayload.time,
-              status_from: statusHistoryPayload.status_from,
-              transfer_branch: statusHistoryPayload.transfer_branch,
-              verdict: statusHistoryPayload.verdict,
-              description: statusHistoryPayload.description,
-              delivery_status: statusHistoryPayload.delivery_status,
-              status: clientHttpRequest.token.fullName,
-              created: clientHttpRequest.token.fullName,
-              created_by_email: clientHttpRequest.token.email,
-            },
+            status_history: statusHistoryDetails,
           },
         },
       ),
     );
+  }
+
+  mapStatusHistory(statusHistoryPayload: StatusHistoryDto, clientHttpRequest) {
+    const statusHistory: any = {};
+    Object.assign(statusHistory, statusHistoryPayload);
+    statusHistory.status = clientHttpRequest.token.fullName;
+    statusHistory.created = clientHttpRequest.token.fullName;
+    statusHistory.created_by_email = clientHttpRequest.token.email;
+    return statusHistory;
   }
 }
