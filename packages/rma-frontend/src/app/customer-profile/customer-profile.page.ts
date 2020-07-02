@@ -3,10 +3,10 @@ import { Location } from '@angular/common';
 import { CustomerDataSource } from './customer-datasource';
 import { SalesService } from '../sales-ui/services/sales.service';
 import { MatPaginator } from '@angular/material/paginator';
-import { forkJoin, from, throwError } from 'rxjs';
+import { forkJoin, from, throwError, of } from 'rxjs';
 import { ItemPriceService } from '../sales-ui/services/item-price.service';
 import { TimeService } from '../api/time/time.service';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, retry } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
@@ -79,17 +79,20 @@ export class CustomerProfilePage implements OnInit {
   loadPrice(row, index) {
     const data = this.dataSource.getData();
     this.dataSource.loadingSubject.next(true);
-    if (data.length !== 1) {
+    if (data && data.length) {
       data[index] = { ...row };
-      forkJoin({
-        time: from(this.time.getDateTime(new Date())),
-        token: from(this.salesService.getStore().getItem(ACCESS_TOKEN)),
-        debtorAccount: this.salesService
-          .getApiInfo()
-          .pipe(map(res => res.debtorAccount)),
-        customer: this.salesService.relayCustomer(data[index].name),
-      })
+      of({})
         .pipe(
+          switchMap(obj => {
+            return forkJoin({
+              time: from(this.time.getDateTime(new Date())),
+              token: from(this.salesService.getStore().getItem(ACCESS_TOKEN)),
+              debtorAccount: this.salesService
+                .getApiInfo()
+                .pipe(map(res => res.debtorAccount)),
+              customer: this.salesService.relayCustomer(data[index].name),
+            });
+          }),
           switchMap(({ token, time, debtorAccount, customer }) => {
             if (!debtorAccount) {
               return throwError({
@@ -116,6 +119,7 @@ export class CustomerProfilePage implements OnInit {
               headers,
             );
           }),
+          retry(3),
         )
         .subscribe({
           next: balance => {
@@ -131,6 +135,8 @@ export class CustomerProfilePage implements OnInit {
             );
           },
         });
+    } else {
+      this.dataSource.loadingSubject.next(false);
     }
     this.dataSource.update(data);
   }
