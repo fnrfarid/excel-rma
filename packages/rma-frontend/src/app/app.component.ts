@@ -16,13 +16,11 @@ import {
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
-import {
-  SYSTEM_MANAGER,
-  PURCHASE_USER,
-  USER_ROLE,
-} from './constants/app-string';
+import { USER_ROLE } from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
 import { switchMap, retry, delay } from 'rxjs/operators';
+import { PermissionManager } from './api/permission/permission.service';
+import { PERMISSION_STATE } from './constants/permission-roles';
 
 @Component({
   selector: 'app-root',
@@ -31,23 +29,24 @@ import { switchMap, retry, delay } from 'rxjs/operators';
 export class AppComponent implements OnInit {
   loggedIn: boolean = false;
   hideAuthButtons: boolean = false;
+  permissionState: any = PERMISSION_STATE;
   subscription: Subscription;
-  showSettings: boolean = false;
   isSettingMenuVisible: boolean = false;
   isSalesMenuVisible: boolean = false;
   isRnDMenuVisible: boolean = false;
   isStockMenuVisible: boolean = false;
   isRelayMenuVisible: boolean = false;
+
   newDNUrl: string = '';
   listRnDURL: string = '';
   binListURL: string = '';
   fullName: string = '';
   imageURL: string = '';
-  showPurchase: boolean = false;
   constructor(
     private readonly appService: AppService,
     private readonly loginService: LoginService,
     private readonly settingService: SettingsService,
+    private readonly permissionManager: PermissionManager,
   ) {}
 
   @HostListener('window:message', ['$event'])
@@ -76,6 +75,7 @@ export class AppComponent implements OnInit {
     this.setUserSession();
     this.setupSilentRefresh();
     this.appService.getGlobalDefault();
+    this.permissionManager.setupPermissions();
   }
 
   setUserSession() {
@@ -134,7 +134,7 @@ export class AppComponent implements OnInit {
         switchMap((data: { roles?: string[] }) => {
           if (data && data.roles && data.roles.length === 0) {
             return of({}).pipe(
-              delay(1000),
+              delay(500),
               switchMap(obj => {
                 return throwError(data);
               }),
@@ -142,7 +142,7 @@ export class AppComponent implements OnInit {
           }
           return of(data);
         }),
-        retry(5),
+        retry(6),
       )
       .subscribe({
         next: res => {
@@ -150,28 +150,8 @@ export class AppComponent implements OnInit {
           if (res && res.roles) {
             this.appService.getStorage().setItem(USER_ROLE, res.roles);
           }
-          if (
-            res &&
-            res.roles &&
-            res.roles.length > 0 &&
-            res.roles.includes(SYSTEM_MANAGER)
-          ) {
-            this.showSettings = true;
-          }
-
-          if (
-            res &&
-            res.roles &&
-            res.roles.length > 0 &&
-            res.roles.includes(PURCHASE_USER)
-          ) {
-            this.showPurchase = true;
-          }
         },
-        error: error => {
-          this.showSettings = false;
-          this.showPurchase = false;
-        },
+        error: error => {},
       });
   }
 
