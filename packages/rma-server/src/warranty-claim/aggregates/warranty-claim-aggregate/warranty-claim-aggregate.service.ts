@@ -29,6 +29,7 @@ import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
+import { StatusHistoryDto } from '../../entity/warranty-claim/status-history-dto';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -242,5 +243,31 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       mappedClaims.push(warrantyClaim);
     });
     return mappedClaims;
+  }
+
+  addStatusHistory(statusHistoryPayload: StatusHistoryDto, clientHttpRequest) {
+    const statusHistoryDetails = this.mapStatusHistory(
+      statusHistoryPayload,
+      clientHttpRequest,
+    );
+    return from(
+      this.warrantyClaimService.updateOne(
+        { uuid: statusHistoryPayload.uuid },
+        {
+          $push: {
+            status_history: statusHistoryDetails,
+          },
+        },
+      ),
+    );
+  }
+
+  mapStatusHistory(statusHistoryPayload: StatusHistoryDto, clientHttpRequest) {
+    const statusHistory: any = {};
+    Object.assign(statusHistory, statusHistoryPayload);
+    statusHistory.status = clientHttpRequest.token.fullName;
+    statusHistory.created = clientHttpRequest.token.fullName;
+    statusHistory.created_by_email = clientHttpRequest.token.email;
+    return statusHistory;
   }
 }
