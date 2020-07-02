@@ -16,7 +16,11 @@ import {
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
-import { SYSTEM_MANAGER, PURCHASE_USER } from './constants/app-string';
+import {
+  SYSTEM_MANAGER,
+  PURCHASE_USER,
+  USER_ROLE,
+} from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
 import { switchMap, retry, delay } from 'rxjs/operators';
 
@@ -143,6 +147,9 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: res => {
           this.loggedIn = true;
+          if (res && res.roles) {
+            this.appService.getStorage().setItem(USER_ROLE, res.roles);
+          }
           if (
             res &&
             res.roles &&

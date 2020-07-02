@@ -27,6 +27,8 @@ import { APPLICATION_JSON_CONTENT_TYPE } from '../../../constants/app-strings';
 import { FILE_NOT_FOUND, INVALID_FILE } from '../../../constants/app-strings';
 import { CreateBulkClaimsCommand } from '../../command/create-bulk-claims/create-bulk-claims.command';
 import { WarrantyClaimsListQueryDto } from '../../../constants/listing-dto/warranty-claims-list-query';
+import { StatusHistoryDto } from '../../entity/warranty-claim/status-history-dto';
+import { AddStatusHistoryCommand } from '../../command/add-status-history/add-status-history.command';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
@@ -92,5 +94,17 @@ export class WarrantyClaimController {
       throw new BadRequestException(INVALID_FILE);
     }
     return this.commandBus.execute(new CreateBulkClaimsCommand(file, req));
+  }
+
+  @Post('v1/add_status_history')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  addStatusHistory(
+    @Body() statusHistoryPayload: StatusHistoryDto,
+    @Req() clientHttpRequest,
+  ) {
+    return this.commandBus.execute(
+      new AddStatusHistoryCommand(statusHistoryPayload, clientHttpRequest),
+    );
   }
 }

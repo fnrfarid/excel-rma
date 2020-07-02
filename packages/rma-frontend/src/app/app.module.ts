@@ -27,6 +27,7 @@ import { ProblemUiModule } from './problem-ui/problem-ui.module';
 import { JobUIModule } from './job-ui/job-ui.module';
 import { ExcelSalesManagerGuard } from './common/guards/excel-sales-manager.guard';
 import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
+import { PermissionManager } from './api/permission/permission.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -56,6 +57,7 @@ import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
     SplashScreen,
     SystemManagerGuard,
     ExcelSalesManagerGuard,
+    PermissionManager,
     ExcelSalesUserGuard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     LoginService,

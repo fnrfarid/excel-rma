@@ -4,6 +4,7 @@ export const DURATION = 1000;
 export const UPDATE_SUCCESSFUL = 'Update Successful';
 export const UPDATE_ERROR = 'Update Error';
 export const SYSTEM_MANAGER = 'System Manager';
+export const USER_ROLE = 'user_roles';
 export const DRAFT = 'Draft';
 export const REJECTED = 'Rejected';
 export const ACCEPT = 'Accept';
