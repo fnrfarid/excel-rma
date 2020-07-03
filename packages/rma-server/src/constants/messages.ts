@@ -62,3 +62,4 @@ export const INVALID_CUSTOMER = 'Provided customer is invalid';
 export const INVALID_SERIAL_NO = 'Invalid Serial number';
 export const CREDIT_LIMIT_ERROR =
   'Credit Limit Mismatch, please check credit limit for the selected Customer';
+export const ITEM_BRAND_NOT_FOUND = 'Item brand not found';

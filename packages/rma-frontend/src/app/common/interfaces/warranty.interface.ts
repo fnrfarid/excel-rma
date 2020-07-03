@@ -97,6 +97,9 @@ export class WarrantyState {
   product_name: { disabled: boolean; active: boolean };
   customer_name: { disabled: boolean; active: boolean };
   product_brand: { disabled: boolean; active: boolean };
+  third_party_name: { disabled: boolean; active: boolean };
+  third_party_contact: { disabled: boolean; active: boolean };
+  third_party_address: { disabled: boolean; active: boolean };
 }
 
 export class Warranty {

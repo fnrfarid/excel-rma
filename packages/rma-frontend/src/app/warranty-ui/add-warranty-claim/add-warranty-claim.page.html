@@ -248,7 +248,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
+            <ion-col *ngIf="warrantyState.third_party_name.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -278,7 +278,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
+            <ion-col *ngIf="warrantyState.third_party_contact.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -308,7 +308,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
+            <ion-col *ngIf="warrantyState.third_party_address.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput

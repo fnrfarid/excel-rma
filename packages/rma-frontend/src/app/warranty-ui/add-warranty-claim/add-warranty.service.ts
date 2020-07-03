@@ -7,9 +7,10 @@ import {
   LIST_CUSTOMER_ENDPOINT,
   GET_DIRECT_SERIAL_ENDPOINT,
   LIST_ITEMS_ENDPOINT,
-  GET_ITEM_BY_ITEM_CODE_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
   CREATE_WARRANTY_CLAIM_ENDPOINT,
+  GET_ITEM_BY_ITEM_CODE_ENDPOINT,
+  RELAY_GET_FULL_ITEM_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -122,6 +123,21 @@ export class AddWarrantyService {
     );
   }
 
+  getItemBrandFromERP(item_code: string) {
+    const url = `${RELAY_GET_FULL_ITEM_ENDPOINT}${item_code}`;
+    const params = new HttpParams();
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { params, headers });
+      }),
+      map(res => res.data),
+      switchMap(res => {
+        return of(res);
+      }),
+    );
+  }
+
   getItem(item_code: string) {
     const URL = `${GET_ITEM_BY_ITEM_CODE_ENDPOINT}/${item_code}`;
     const params = new HttpParams().set('item_code', item_code);
@@ -172,5 +188,8 @@ export class AddWarrantyService {
         );
       }),
     );
+  }
+  getStorage() {
+    return this.storage;
   }
 }
