@@ -30,7 +30,7 @@ export class StockEntryService {
       sortQuery = JSON.parse(sort);
     } catch (error) {
       sortQuery = {
-        posting_date: 'desc',
+        _id: 'DESC',
       };
     }
 

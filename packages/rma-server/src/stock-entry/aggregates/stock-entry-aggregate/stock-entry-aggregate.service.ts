@@ -42,6 +42,7 @@ export class StockEntryAggregateService {
         return from(this.stockEntryService.create(stockEntry)).pipe(
           switchMap(success => {
             payload.docstatus = 1;
+            payload.uuid = stockEntry.uuid;
             this.batchQueueStockEntry(payload, req, stockEntry.uuid);
             return of({});
           }),
@@ -164,7 +165,7 @@ export class StockEntryAggregateService {
         if (!stockEntry) {
           return throwError(new BadRequestException('Stock Entry not found.'));
         }
-        const payload: any = stockEntry;
+        const payload: any = this.removeStockEntryFields(stockEntry);
         this.stockEntryService
           .updateOne(
             { uuid },
@@ -191,13 +192,18 @@ export class StockEntryAggregateService {
     );
   }
 
+  removeStockEntryFields(stockEntry: StockEntry) {
+    delete stockEntry.names;
+    return stockEntry;
+  }
+
   acceptStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
       mergeMap(stockEntry => {
         if (!stockEntry) {
           return throwError(new BadRequestException('Stock Entry not found.'));
         }
-        const payload: any = stockEntry;
+        const payload: any = this.removeStockEntryFields(stockEntry);
         this.stockEntryService
           .updateOne(
             { uuid },
