@@ -354,8 +354,7 @@ export class AddWarrantyClaimPage implements OnInit {
     });
   }
 
-  async getItemBrandFromERP(item_code: string) {
-    const erpItemURL = await this.openERPItem(item_code);
+  getItemBrandFromERP(item_code: string) {
     this.warrantyService.getItemBrandFromERP(item_code).subscribe({
       next: res => {
         if (!res.brand) {
@@ -369,7 +368,7 @@ export class AddWarrantyClaimPage implements OnInit {
             })
             .onAction()
             .subscribe(() => {
-              window.open(erpItemURL, '_blank');
+              this.openERPItem(item_code);
             });
           this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
         }
@@ -385,7 +384,7 @@ export class AddWarrantyClaimPage implements OnInit {
       .getStorage()
       .getItem(AUTH_SERVER_URL)
       .then(auth_url => {
-        return `${auth_url}/desk#Form/Item/${item_code}`;
+        window.open(`${auth_url}/desk#Form/Item/${item_code}`, '_blank');
       });
   }
 
