@@ -10,5 +10,8 @@ export const ERROR_FETCHING_WARRANTY_CLAIM =
 export const ERROR_FETCHING_PURCHASE_ORDER =
   'Error fetching Purchase Order - Code ';
 export const SOMETHING_WENT_WRONG = 'Something went wrong.';
-export const ITEM_FETCH_ERROR = 'Could not fetch item.';
+export const ITEM_BRAND_FETCH_ERROR = 'Brand not set for this item.';
 export const SERIAL_FETCH_ERROR = 'Could not fetch serial_no data.';
+export const ITEM_NOT_FOUND = 'Item not found';
+export const USER_SAVE_ITEM_SUGGESTION =
+  'please save the item in main app to sync new data';
