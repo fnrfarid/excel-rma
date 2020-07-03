@@ -127,6 +127,7 @@
                 #from_warehouse="matAutocomplete"
               >
                 <mat-option
+                (onSelectionChange)="updateItemStock($event.source.value)"
                   *ngFor="let s_warehouse of filteredWarehouseList1 | async"
                   [value]="s_warehouse.name"
                 >
@@ -161,7 +162,11 @@
     </ion-card-content>
   </ion-card>
 
+
   <ion-card >
+    <div class="loading-shade" *ngIf="itemDataSource.loading$ | async">
+      <mat-progress-bar *ngIf="itemDataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+    </div>
     <ion-card-header>
       <ion-row class="align">
         <ion-col>
@@ -205,6 +210,15 @@
           <mat-cell *matCellDef="let row">
             <ng-container>
               {{ row.assigned || 0 }}
+            </ng-container>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="available_stock">
+          <mat-header-cell *matHeaderCellDef>Available Stock</mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            <ng-container>
+              {{ row.available_stock || 0 }}
             </ng-container>
           </mat-cell>
         </ng-container>

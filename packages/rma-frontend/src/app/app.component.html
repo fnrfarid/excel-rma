@@ -156,7 +156,7 @@
           </ion-menu-toggle>
           <ion-menu-toggle auto-hide="false">
             <ion-item
-              *ngIf="loggedIn && permissionState?.warranty_claim?.active"
+              *ngIf="loggedIn"
               routerLink="/warranty"
               lines="none"
               routerLinkActive="active"
@@ -295,7 +295,7 @@
                 <ion-label>Server</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn && permissionState?.settings?.active"
+                *ngIf="loggedIn && permissionState?.item_price?.read"
                 routerLink="/settings/item-price"
                 lines="none"
                 routerLinkActive="active"

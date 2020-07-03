@@ -42,6 +42,7 @@ import {
   GET_CUSTOMER_ENDPOINT,
   CUSTOMER_ENDPOINT,
   GET_DOCTYPE_COUNT_METHOD,
+  RELAY_GET_ITEM_STOCK_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -301,6 +302,21 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
+  getItemStock(item_names: string[], warehouse: string) {
+    const url = RELAY_GET_ITEM_STOCK_ENDPOINT;
+    const params = new HttpParams({
+      fromObject: {
+        fields: `["actual_qty","item_code"]`,
+        filters: `[["warehouse","=","${warehouse}"],["item_code","in","${item_names.join()}"]]`,
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, { headers, params });
       }),
     );
   }

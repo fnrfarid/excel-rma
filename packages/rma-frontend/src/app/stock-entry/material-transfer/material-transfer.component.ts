@@ -91,6 +91,7 @@ export class MaterialTransferComponent implements OnInit {
   itemDisplayedColumns = [
     'item_name',
     'assigned',
+    'available_stock',
     'has_serial_no',
     'add_serial',
     'delete',
@@ -166,7 +167,7 @@ export class MaterialTransferComponent implements OnInit {
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        const filter = `[["name","like","%${value}%"],["company","=","${this.company}"]]`;
+        const filter = `[["name","like","%${value}%"]]`;
         return this.salesService
           .getWarehouseList(value, filter)
           .pipe(this.popWarehouse);
@@ -227,6 +228,7 @@ export class MaterialTransferComponent implements OnInit {
         has_serial_no: item.has_serial_no,
       });
       this.itemDataSource.update(data);
+      this.updateItemStock();
     }
   }
 
@@ -271,6 +273,47 @@ export class MaterialTransferComponent implements OnInit {
 
     this.snackBar.open('Please select a valid number of rows.', CLOSE, {
       duration: 2500,
+    });
+  }
+
+  updateItemStock(warehouse?) {
+    this.itemDataSource.loadingSubject.next(true);
+    warehouse = warehouse ? warehouse : this.warehouseState.s_warehouse.value;
+    if (!warehouse) {
+      this.getMessage(
+        'Please select a source warehouse to get available stock',
+      );
+      this.itemDataSource.loadingSubject.next(false);
+      return;
+    }
+    const items = [];
+    this.itemDataSource.data().forEach(item => items.push(item.item_code));
+
+    if (!items.length) {
+      this.itemDataSource.loadingSubject.next(false);
+      return;
+    }
+
+    this.salesService.getItemStock(items, warehouse).subscribe({
+      next: (res: any) => {
+        this.itemDataSource.loadingSubject.next(false);
+        const existing_items = this.itemDataSource.data();
+        if (res && res.data) {
+          res.data.forEach(element => {
+            existing_items.filter(item => {
+              if (item.item_code === element.item_code) {
+                item.available_stock = element.actual_qty;
+              }
+              return item;
+            });
+            this.itemDataSource.update(existing_items);
+          });
+        }
+      },
+      error: err => {
+        this.itemDataSource.loadingSubject.next(false);
+        this.getMessage('Error occurred in fetching stock for items');
+      },
     });
   }
 
