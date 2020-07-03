@@ -21,6 +21,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'app-sales',
@@ -41,6 +42,7 @@ export class SalesPage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: SalesInvoiceDataSource;
+  permissionState = PERMISSION_STATE;
   displayedColumns = [
     'sr_no',
     'name',

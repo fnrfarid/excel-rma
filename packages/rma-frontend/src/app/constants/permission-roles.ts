@@ -2,43 +2,189 @@ import { PermissionStateInterface } from '../api/permission/permission.service';
 
 export const PermissionRoles = {
   sales_invoice: {
-    create: [],
-    read: [],
-    update: [],
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    create: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'General Admin',
+    ],
+    update: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'General Admin',
+    ],
+    submit: [
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'General Admin',
+    ],
     delete: [],
-    submit: [],
+  },
+  sales_return: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    create: ['Branch Sales Return User', 'General Admin'],
+    update: ['Branch Sales Return User', 'General Admin'],
+    delete: [],
+  },
+
+  purchase_invoice: {
+    read: ['Branch Purchase User', 'Branch Purchase Manager', 'General Admin'],
+    submit: ['Branch Purchase Manager', 'General Admin'],
+    delete: [],
   },
 
   delivery_note: {
-    create: [],
-    read: [],
-    update: [],
+    read: [
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    create: [
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    update: [
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    submit: [
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
     delete: [],
   },
 
-  sales_return: {
-    create: [],
-    read: [],
-    update: [],
+  stock_entry: {
+    read: [
+      'Branch Sales Manager',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    submit: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
     delete: [],
   },
 
+  customer_profile: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+  },
   rd_products: {
     read: [],
     create: [],
   },
-
-  credit_note: {
-    read: [],
+  stock_history: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
   },
 
-  purchase_invoice: {
-    read: [],
+  credit_limit: {
+    create: ['Credit Limit Manager', 'General Admin'],
+    read: ['Credit Limit Manager', 'General Admin'],
+    update: ['Credit Limit Manager', 'General Admin'],
+    delete: ['Credit Limit Manager', 'General Admin'],
+  },
+
+  item_price: {
+    create: ['Item Price Manager', 'General Admin'],
+    read: ['Item Price Manager', 'General Admin'],
+    update: ['Item Price Manager', 'General Admin'],
+    delete: ['Item Price Manager', 'General Admin'],
+  },
+
+  jobs: {
+    read: ['General Admin'],
+    update: ['General Admin'],
+  },
+
+  settings: {
+    read: ['General Admin'],
+    update: ['General Admin'],
+  },
+
+  credit_note: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales User',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
   },
 
   purchase_receipt: {
-    create: [],
-    read: [],
+    read: ['Branch Purchase User', 'Branch Purchase Manager', 'General Admin'],
+    create: ['Branch Purchase Manager', 'General Admin'],
+    update: ['Branch Purchase Manager', 'General Admin'],
+    submit: ['Branch Purchase Manager', 'General Admin'],
+    delete: [],
   },
 
   warranty_claim: {
@@ -59,30 +205,6 @@ export const PermissionRoles = {
     update: [],
     delete: [],
   },
-
-  stock_history: {
-    create: [],
-    read: [],
-  },
-
-  stock_entry: {
-    create: [],
-    read: [],
-  },
-
-  jobs: {
-    read: [],
-    update: [],
-  },
-
-  customer_profile: {
-    read: [],
-  },
-
-  settings: {
-    read: [],
-    update: [],
-  },
 };
 
 export const PERMISSION_STATE: PermissionStateInterface = {
@@ -101,6 +223,12 @@ export const PERMISSION_STATE: PermissionStateInterface = {
     active: false,
     update: false,
     delete: false,
+  },
+  item_price: {
+    create: false,
+    read: false,
+    active: false,
+    update: false,
   },
 
   sales_return: {
