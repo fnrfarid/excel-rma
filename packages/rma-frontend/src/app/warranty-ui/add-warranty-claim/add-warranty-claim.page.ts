@@ -380,7 +380,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   openERPItem(item_code: string) {
-    return this.warrantyService
+    this.warrantyService
       .getStorage()
       .getItem(AUTH_SERVER_URL)
       .then(auth_url => {
