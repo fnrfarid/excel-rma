@@ -81,7 +81,7 @@
               class="ion-margin-start ion-no-padding"
             >
               <ion-item
-                *ngIf="loggedIn"
+                *ngIf="loggedIn && permissionState?.sales_invoice?.active"
                 routerLink="/sales"
                 lines="none"
                 routerLinkActive="active"
@@ -90,7 +90,7 @@
                 <ion-label>Sales Invoice</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn"
+                *ngIf="loggedIn && permissionState?.sales_return?.active"
                 routerLink="/sales-return"
                 lines="none"
                 routerLinkActive="active"
@@ -99,7 +99,7 @@
                 <ion-label>Sales Return</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn"
+                *ngIf="loggedIn && permissionState?.rd_products?.active"
                 (click)="isRnDMenuVisible = !isRnDMenuVisible"
                 lines="none"
               >
@@ -124,7 +124,7 @@
               class="ion-margin-start ion-no-padding"
             >
               <ion-item
-                *ngIf="loggedIn"
+                *ngIf="loggedIn && permissionState?.rd_products?.create"
                 lines="none"
                 [href]="newDNUrl"
                 target="_blank"
@@ -133,7 +133,7 @@
                 <ion-label>New Delivery Note</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn"
+                *ngIf="loggedIn && permissionState?.rd_products?.read"
                 lines="none"
                 [href]="listRnDURL"
                 target="_blank"
@@ -145,7 +145,7 @@
           </ion-menu-toggle>
           <ion-menu-toggle auto-hide="false">
             <ion-item
-              *ngIf="loggedIn && showPurchase"
+              *ngIf="loggedIn && permissionState?.purchase_invoice?.active"
               routerLink="/purchase"
               lines="none"
               routerLinkActive="active"
@@ -166,7 +166,7 @@
             </ion-item>
           </ion-menu-toggle>
           <ion-item
-          *ngIf="loggedIn"
+          *ngIf="loggedIn && permissionState?.stock_entry?.active"
           (click)="isStockMenuVisible = !isStockMenuVisible"
           lines="none"
         >
@@ -189,7 +189,7 @@
               class="ion-margin-start ion-no-padding"
             >
             <ion-item
-              *ngIf="loggedIn"
+              *ngIf="loggedIn && permissionState?.stock_entry?.read"
               routerLink="/stock-entry"
               lines="none"
               routerLinkActive="active"
@@ -198,7 +198,7 @@
               <ion-label>Stock Entry</ion-label>
             </ion-item>
             <ion-item
-              *ngIf="loggedIn"
+              *ngIf="loggedIn && permissionState?.stock_entry?.read"
               lines="none"
               [href]="binListURL"
               target="_blank"
@@ -213,7 +213,7 @@
           </ion-menu-toggle>
           <ion-menu-toggle auto-hide="false">
             <ion-item
-              *ngIf="loggedIn"
+              *ngIf="loggedIn && permissionState?.job?.active"
               routerLink="/jobs"
               lines="none"
               routerLinkActive="active"
@@ -249,7 +249,7 @@
             class="ion-margin-start ion-no-padding"
           >
               <ion-item
-                *ngIf="loggedIn"
+                *ngIf="loggedIn && permissionState?.customer_profile?.read"
                 routerLink="/customer-profile"
                 lines="none"
                 routerLinkActive="active"
@@ -261,7 +261,7 @@
           </ion-menu-toggle>
 
           <ion-item
-            *ngIf="loggedIn && showSettings"
+            *ngIf="loggedIn && permissionState?.settings?.active"
             (click)="isSettingMenuVisible = !isSettingMenuVisible"
             lines="none"
           >
@@ -284,7 +284,7 @@
               class="ion-margin-start ion-no-padding"
             >
               <ion-item
-                *ngIf="loggedIn && showSettings"
+                *ngIf="loggedIn && permissionState?.settings?.active"
                 routerLink="/settings"
                 lines="none"
                 routerLinkActive="active"
@@ -295,7 +295,7 @@
                 <ion-label>Server</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn && showSettings"
+                *ngIf="loggedIn && permissionState?.item_price?.read"
                 routerLink="/settings/item-price"
                 lines="none"
                 routerLinkActive="active"
@@ -305,7 +305,7 @@
                 <ion-label> Item Price</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn && showSettings"
+                *ngIf="loggedIn && permissionState?.settings?.active"
                 routerLink="/settings/credit-limit"
                 lines="none"
                 routerLinkActive="active"
@@ -314,7 +314,7 @@
                 <ion-label>Credit Limit</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn && showSettings"
+                *ngIf="loggedIn && permissionState?.settings?.active"
                 routerLink="/settings/problem"
                 lines="none"
                 routerLinkActive="active"
