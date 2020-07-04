@@ -15,10 +15,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DURATION } from './../../constants/app-string';
 import {
   SOMETHING_WENT_WRONG,
-  ITEM_FETCH_ERROR,
+  ITEM_BRAND_FETCH_ERROR,
   SERIAL_FETCH_ERROR,
+  USER_SAVE_ITEM_SUGGESTION,
+  ITEM_NOT_FOUND,
 } from '../../constants/messages';
 import { Router } from '@angular/router';
+import { AUTH_SERVER_URL } from '../../constants/storage';
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
@@ -59,6 +62,9 @@ export class AddWarrantyClaimPage implements OnInit {
       product_name: { disabled: true, active: true },
       customer_name: { disabled: true, active: true },
       product_brand: { disabled: true, active: true },
+      third_party_name: { disabled: true, active: true },
+      third_party_contact: { disabled: true, active: true },
+      third_party_address: { disabled: true, active: true },
     };
     this.createForm();
     this.warrantyClaimForm.controls.received_on.setValue(
@@ -108,6 +114,9 @@ export class AddWarrantyClaimPage implements OnInit {
           product_name: { disabled: true, active: true },
           customer_name: { disabled: true, active: true },
           product_brand: { disabled: false, active: true },
+          third_party_name: { disabled: false, active: false },
+          third_party_contact: { disabled: false, active: false },
+          third_party_address: { disabled: false, active: false },
         };
         this.isDisabled();
         this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
@@ -129,6 +138,9 @@ export class AddWarrantyClaimPage implements OnInit {
           product_name: { disabled: true, active: true },
           customer_name: { disabled: true, active: true },
           product_brand: { disabled: true, active: true },
+          third_party_name: { disabled: true, active: true },
+          third_party_contact: { disabled: true, active: true },
+          third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
         this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
@@ -145,6 +157,9 @@ export class AddWarrantyClaimPage implements OnInit {
           product_name: { disabled: false, active: true },
           customer_name: { disabled: false, active: true },
           product_brand: { disabled: false, active: true },
+          third_party_name: { disabled: false, active: false },
+          third_party_contact: { disabled: false, active: false },
+          third_party_address: { disabled: false, active: false },
         };
         this.isDisabled();
         break;
@@ -244,15 +259,15 @@ export class AddWarrantyClaimPage implements OnInit {
       delivery_date: new FormControl('', [Validators.required]),
       receiving_branch: new FormControl('', [Validators.required]),
       delivery_branch: new FormControl('', [Validators.required]),
-      product_brand: new FormControl('', [Validators.required]),
+      product_brand: new FormControl(),
       problem: new FormControl('', [Validators.required]),
       problem_details: new FormControl('', [Validators.required]),
       remarks: new FormControl('', [Validators.required]),
-      customer_contact: new FormControl('', [Validators.required]),
-      customer_address: new FormControl('', [Validators.required]),
+      customer_contact: new FormControl(),
+      customer_address: new FormControl(),
       third_party_name: new FormControl('', [Validators.required]),
-      third_party_contact: new FormControl('', [Validators.required]),
-      third_party_address: new FormControl('', [Validators.required]),
+      third_party_contact: new FormControl(),
+      third_party_address: new FormControl(),
       product_name: new FormControl('', [Validators.required]),
       customer_name: new FormControl('', [Validators.required]),
       serial_no: new FormControl('', [Validators.required]),
@@ -324,15 +339,53 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyService.getItem(option.item_code).subscribe({
       next: (res: Item) => {
         this.itemDetail = res;
+        if (!res.brand) {
+          this.getItemBrandFromERP(res.item_code);
+        }
         this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
       },
       error: ({ message }) => {
-        if (!message) message = `${SOMETHING_WENT_WRONG}${ITEM_FETCH_ERROR}`;
+        this.openERPItem(option.item_code);
+        if (!message) message = `${ITEM_NOT_FOUND}`;
         this.snackbar.open(message, 'Close', {
           duration: DURATION,
         });
       },
     });
+  }
+
+  getItemBrandFromERP(item_code: string) {
+    this.warrantyService.getItemBrandFromERP(item_code).subscribe({
+      next: res => {
+        if (!res.brand) {
+          this.snackbar.open(ITEM_BRAND_FETCH_ERROR, 'Close', {
+            duration: DURATION,
+          });
+        } else {
+          this.snackbar
+            .open(USER_SAVE_ITEM_SUGGESTION, 'open item', {
+              duration: 5500,
+            })
+            .onAction()
+            .subscribe(() => {
+              this.openERPItem(item_code);
+            });
+          this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
+        }
+      },
+      error: err => {
+        this.snackbar.open(ITEM_NOT_FOUND, 'Close', { duration: DURATION });
+      },
+    });
+  }
+
+  openERPItem(item_code: string) {
+    this.warrantyService
+      .getStorage()
+      .getItem(AUTH_SERVER_URL)
+      .then(auth_url => {
+        window.open(`${auth_url}/desk#Form/Item/${item_code}`, '_blank');
+      });
   }
 
   branchOptionChanged(option) {}
