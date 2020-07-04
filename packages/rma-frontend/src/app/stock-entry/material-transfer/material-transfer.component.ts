@@ -161,7 +161,7 @@ export class MaterialTransferComponent implements OnInit {
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        const filter = `[["name","like","%${value}%"]]`;
+        const filter = `[["name","like","%${value}%"],["is_group","=",0]]`;
         return this.salesService
           .getWarehouseList(value, filter)
           .pipe(this.popWarehouse);
@@ -173,7 +173,7 @@ export class MaterialTransferComponent implements OnInit {
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        const filter = `[["name","like","%${value}%"]]`;
+        const filter = `[["name","like","%${value}%"],["is_group","=",0]]`;
         return this.salesService
           .getWarehouseList(value, filter)
           .pipe(this.popWarehouse);
