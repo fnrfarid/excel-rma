@@ -11,7 +11,7 @@ import { Type } from 'class-transformer';
 
 export class StockEntryDto {
   docstatus?: 1;
-
+  uuid?: string;
   @IsNotEmpty()
   @IsString()
   stock_entry_type: string;

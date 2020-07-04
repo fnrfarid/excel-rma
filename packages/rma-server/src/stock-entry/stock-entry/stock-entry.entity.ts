@@ -12,6 +12,9 @@ export class StockEntry extends BaseEntity {
   docstatus?: 1;
 
   @Column()
+  names: string[];
+
+  @Column()
   createdOn: string;
 
   @Column()

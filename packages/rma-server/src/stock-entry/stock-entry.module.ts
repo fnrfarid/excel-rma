@@ -9,7 +9,6 @@ import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { DirectModule } from '../direct/direct.module';
 import { StockEntrySyncService } from './schedular/stock-entry-sync/stock-entry-sync.service';
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
-import { AcceptStockEntryJobService } from './schedular/accept-stock-entry-sync/accept-stock-entry-sync.service';
 
 @Module({
   imports: [
@@ -23,9 +22,8 @@ import { AcceptStockEntryJobService } from './schedular/accept-stock-entry-sync/
     StockEntryPoliciesService,
     StockEntryService,
     StockEntrySyncService,
-    AcceptStockEntryJobService,
     SerialBatchService,
   ],
-  exports: [StockEntrySyncService, AcceptStockEntryJobService],
+  exports: [StockEntrySyncService],
 })
 export class StockEntryModule {}

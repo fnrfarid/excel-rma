@@ -50,7 +50,7 @@ export class StockEntryController {
     const { offset, limit, sort, filter_query } = query;
     let filter;
     try {
-      filter = JSON.parse('filter_query');
+      filter = JSON.parse(filter_query);
     } catch {
       filter;
     }

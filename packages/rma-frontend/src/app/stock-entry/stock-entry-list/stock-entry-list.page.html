@@ -114,6 +114,16 @@
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef>
+            Name
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{ (row.names && row.names.length) ? row.names[0] : '' }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
         <ng-container matColumnDef="s_warehouse">
           <mat-header-cell *matHeaderCellDef>
             From Warehouse
