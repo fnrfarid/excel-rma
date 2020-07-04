@@ -1,5 +1,5 @@
 import { Injectable, HttpService } from '@nestjs/common';
-import { switchMap, mergeMap, catchError, retry } from 'rxjs/operators';
+import { switchMap, mergeMap, catchError, retry, map } from 'rxjs/operators';
 import { VALIDATE_AUTH_STRING } from '../../../constants/app-strings';
 import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
@@ -40,6 +40,7 @@ export class StockEntrySyncService {
     payload: StockEntry;
     token: any;
     settings: any;
+    parent: string;
     type: string;
   }) {
     const payload = job.payload;
@@ -103,8 +104,13 @@ export class StockEntrySyncService {
         return throwError(err);
       }),
       retry(3),
-      switchMap(success => {
+      map(data => data.data.data),
+      switchMap(response => {
         this.updateSerials(payload);
+        this.stockEntryService
+          .updateOne({ uuid: job.parent }, { $push: { names: response.name } })
+          .then(success => {})
+          .catch(err => {});
         return of({});
       }),
     );

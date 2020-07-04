@@ -38,6 +38,7 @@ export class StockEntryListPage implements OnInit {
   dataSource: StockEntryListDataSource;
   displayedColumns = [
     'sr_no',
+    'name',
     's_warehouse',
     't_warehouse',
     'status',
@@ -94,7 +95,7 @@ export class StockEntryListPage implements OnInit {
       }
     }
 
-    sortQuery = { created_on: 'DESC' };
+    sortQuery = { _id: -1 };
 
     this.dataSource.loadItems(
       sortQuery,

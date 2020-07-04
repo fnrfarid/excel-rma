@@ -30,7 +30,11 @@ import {
   StockEntryRow,
   MaterialTransferDto,
 } from './material-transfer.datasource';
-import { DEFAULT_COMPANY, TRANSFER_WAREHOUSE } from '../../constants/storage';
+import {
+  DEFAULT_COMPANY,
+  TRANSFER_WAREHOUSE,
+  AUTH_SERVER_URL,
+} from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { SerialsService } from '../../common/helpers/serials/serials.service';
@@ -62,6 +66,7 @@ export class MaterialTransferComponent implements OnInit {
     toRange: '',
     serials: [],
   };
+  stock_receipt_names = [];
   readonly: boolean = false;
   company: string;
   status: string;
@@ -143,6 +148,7 @@ export class MaterialTransferComponent implements OnInit {
       this.readonly = true;
       this.stockEntryService.getStockEntry(this.uuid).subscribe({
         next: (success: any) => {
+          this.stock_receipt_names = success.names || [];
           this.status = success.status;
           this.materialTransferDataSource.update(success.items);
         },
@@ -155,7 +161,7 @@ export class MaterialTransferComponent implements OnInit {
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        const filter = `[["name","like","%${value}%"],["company","=","${this.company}"]]`;
+        const filter = `[["name","like","%${value}%"]]`;
         return this.salesService
           .getWarehouseList(value, filter)
           .pipe(this.popWarehouse);
@@ -627,6 +633,16 @@ export class MaterialTransferComponent implements OnInit {
         );
       }
     });
+  }
+
+  openStockEntries() {
+    this.salesService
+      .getStore()
+      .getItem(AUTH_SERVER_URL)
+      .then(url => {
+        const filter = `name=["in","${this.stock_receipt_names.join()}"]`;
+        window.open(`${url}/desk#List/Stock Entry/List?${filter}`, '_blank');
+      });
   }
 }
 
