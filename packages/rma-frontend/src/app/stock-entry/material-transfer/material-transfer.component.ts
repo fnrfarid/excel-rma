@@ -538,6 +538,16 @@ export class MaterialTransferComponent implements OnInit {
       this.getMessage('Please select source and target warehouse.');
       return false;
     }
+
+    if (
+      this.warehouseState.s_warehouse.value ===
+      this.warehouseState.t_warehouse.value
+    ) {
+      this.getMessage(
+        'Source warehouse and target warehouse should be unique.',
+      );
+      return false;
+    }
     return true;
   }
 
