@@ -4,6 +4,7 @@ import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
 describe('StockEntryAggregateService', () => {
   let service: StockEntryAggregateService;
@@ -22,6 +23,10 @@ describe('StockEntryAggregateService', () => {
         },
         {
           provide: SerialBatchService,
+          useValue: {},
+        },
+        {
+          provide: SettingsService,
           useValue: {},
         },
         { provide: AGENDA_TOKEN, useValue: {} },

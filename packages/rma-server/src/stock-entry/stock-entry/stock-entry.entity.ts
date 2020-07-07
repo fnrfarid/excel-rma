@@ -33,6 +33,9 @@ export class StockEntry extends BaseEntity {
   status: string;
 
   @Column()
+  createdAt: Date;
+
+  @Column()
   company: string;
 
   @Column()

@@ -58,7 +58,7 @@ export class StockEntryController {
       Number(offset) || 0,
       Number(limit) || 10,
       sort,
-      filter_query,
+      filter,
     );
   }
 

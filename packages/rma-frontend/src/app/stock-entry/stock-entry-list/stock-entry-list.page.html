@@ -35,8 +35,127 @@
         <ion-row>
           <ion-col>
             <mat-form-field class="full-width">
-              <input matInput placeholder="Search" [(ngModel)]="search" (keyup.enter)="setFilter()" />
+              <input
+                matInput
+                placeholder="Stock ID"
+                [(ngModel)]="filterState.names"
+                (keyup.enter)="setFilter()"
+              />
             </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <mat-label>Status</mat-label>
+              <mat-select
+                [(value)]="filterState.status"
+                (selectionChange)="statusChange($event.value)"
+              >
+                <mat-option
+                  *ngFor="let status of invoiceStatus"
+                  [value]="status"
+                >
+                  {{status}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <mat-label>From Warehouse</mat-label>
+              <mat-select
+                [(value)]="filterState.from_warehouse"
+                (selectionChange)="fromWarehouseChange($event.value)"
+              >
+                <mat-option
+                  *ngFor="let f_warehouse of warehouses"
+                  [value]="f_warehouse"
+                >
+                  {{f_warehouse}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-col>
+          <ion-col>
+            <mat-form-field class="full-width">
+              <mat-label>To Warehouse</mat-label>
+              <mat-select
+                [(value)]="filterState.to_warehouse"
+                (selectionChange)="toWarehouseChange($event.value)"
+              >
+                <mat-option
+                  *ngFor="let t_warehouse of warehouses"
+                  [value]="t_warehouse"
+                >
+                  {{t_warehouse}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <ion-text color="medium" class="date-filter-text">
+              Range Date
+            </ion-text>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="fromDate"
+                placeholder="From Date"
+                readonly
+                [formControl]="fromDateFormControl"
+                (dateChange)="dateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="fromDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #fromDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="toDate"
+                placeholder="To Date"
+                readonly
+                [formControl]="toDateFormControl"
+                (dateChange)="dateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="toDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #toDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-text color="medium" class="date-filter-text">
+              Single Date
+            </ion-text>
+            <mat-form-field class="full-width">
+              <input
+                matInput
+                [matDatepicker]="singleDate"
+                placeholder="Select Date"
+                readonly
+                [formControl]="singleDateFormControl"
+                (dateChange)="singleDateFilter()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="singleDate"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #singleDate disabled="false"></mat-datepicker>
+            </mat-form-field>
+            <ion-button
+              color="tertiary"
+              (click)="clearFilters()"
+              fill="outline"
+            >
+              Clear
+            </ion-button>
           </ion-col>
         </ion-row>
       </ion-grid>

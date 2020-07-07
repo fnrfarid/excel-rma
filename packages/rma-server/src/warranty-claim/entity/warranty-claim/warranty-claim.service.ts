@@ -7,19 +7,19 @@ import { MongoRepository } from 'typeorm';
 export class WarrantyClaimService {
   constructor(
     @InjectRepository(WarrantyClaim)
-    private readonly warrantyclaimRepository: MongoRepository<WarrantyClaim>,
+    private readonly warrantyClaimRepository: MongoRepository<WarrantyClaim>,
   ) {}
 
   async find(query?) {
-    return await this.warrantyclaimRepository.find(query);
+    return await this.warrantyClaimRepository.find(query);
   }
 
   async create(warrantyclaim: WarrantyClaim) {
-    return await this.warrantyclaimRepository.insertOne(warrantyclaim);
+    return await this.warrantyClaimRepository.insertOne(warrantyclaim);
   }
 
   async findOne(param, options?) {
-    return await this.warrantyclaimRepository.findOne(param, options);
+    return await this.warrantyClaimRepository.findOne(param, options);
   }
 
   async list(skip, take, sort, filter_query?) {
@@ -59,7 +59,7 @@ export class WarrantyClaimService {
 
     const where: { $and: any } = { $and };
 
-    const results = await this.warrantyclaimRepository.findAndCount({
+    const results = await this.warrantyClaimRepository.findAndCount({
       skip,
       take,
       where,
@@ -90,14 +90,14 @@ export class WarrantyClaimService {
   }
 
   async deleteOne(query, options?) {
-    return await this.warrantyclaimRepository.deleteOne(query, options);
+    return await this.warrantyClaimRepository.deleteOne(query, options);
   }
 
   async updateOne(query, options?) {
-    return await this.warrantyclaimRepository.updateOne(query, options);
+    return await this.warrantyClaimRepository.updateOne(query, options);
   }
 
   async insertMany(query, options?) {
-    return await this.warrantyclaimRepository.insertMany(query, options);
+    return await this.warrantyClaimRepository.insertMany(query, options);
   }
 }
