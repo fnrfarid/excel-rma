@@ -245,6 +245,16 @@
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
+        <ng-container matColumnDef="posting_time">
+          <mat-header-cell mat-sort-header="posting_time" *matHeaderCellDef>
+            time
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{( row.posting_time )}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
         <ng-container matColumnDef="remarks">
           <mat-header-cell *matHeaderCellDef>
             Remarks

@@ -51,7 +51,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
-import { Item } from 'src/app/common/interfaces/sales.interface';
+import { Item } from '../../common/interfaces/sales.interface';
 
 @Component({
   selector: 'app-material-transfer',

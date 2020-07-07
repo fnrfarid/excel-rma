@@ -25,6 +25,7 @@ export class StockEntryService {
 
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
+    let dateQuery = {};
 
     try {
       sortQuery = JSON.parse(sort);
@@ -35,18 +36,34 @@ export class StockEntryService {
     }
 
     for (const key of Object.keys(sortQuery)) {
-      sortQuery[key] = sortQuery[key].toUpperCase();
       if (!sortQuery[key]) {
         delete sortQuery[key];
+      } else {
+        sortQuery[key] = sortQuery[key].toUpperCase();
       }
     }
 
-    const $and: any[] = [filter_query ? this.getFilterQuery(filter_query) : {}];
+    if (filter_query?.fromDate && filter_query?.toDate) {
+      dateQuery = {
+        createdAt: {
+          $gte: new Date(filter_query.fromDate),
+          $lte: new Date(filter_query.toDate),
+        },
+      };
+      delete filter_query.fromDate;
+      delete filter_query.toDate;
+    }
+
+    const $and: any[] = [
+      filter_query ? this.getFilterQuery(filter_query) : {},
+      dateQuery,
+    ];
 
     const where: { $and: any } = { $and };
 
     const select: string[] = this.getSelectKeys();
 
+    // this is to override the type or typeorm select, it dose not support child objects in query builder.
     const db: any = this.stockEntryRepository;
 
     const results = await db.find({
@@ -59,7 +76,7 @@ export class StockEntryService {
 
     return {
       docs: results || [],
-      length: await this.stockEntryRepository.count(where),
+      length: await db.count(where),
       offset: skip,
     };
   }

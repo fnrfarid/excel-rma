@@ -24,6 +24,9 @@ import {
   AGENDA_JOB_STATUS,
 } from '../../../constants/app-strings';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
+import { DateTime } from 'luxon';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 
 @Injectable()
 export class StockEntryAggregateService {
@@ -33,12 +36,16 @@ export class StockEntryAggregateService {
     private readonly stockEntryService: StockEntryService,
     private readonly stockEntryPolicies: StockEntryPoliciesService,
     private readonly serialBatchService: SerialBatchService,
+    private readonly settingService: SettingsService,
   ) {}
 
   createStockEntry(payload: StockEntryDto, req) {
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
-        const stockEntry = this.setStockEntryDefaults(payload, req);
+        return this.settingService.find();
+      }),
+      switchMap(settings => {
+        const stockEntry = this.setStockEntryDefaults(payload, req, settings);
         return from(this.stockEntryService.create(stockEntry)).pipe(
           switchMap(success => {
             payload.docstatus = 1;
@@ -93,12 +100,17 @@ export class StockEntryAggregateService {
       });
   }
 
-  setStockEntryDefaults(payload: StockEntryDto, clientHttpRequest): StockEntry {
+  setStockEntryDefaults(
+    payload: StockEntryDto,
+    clientHttpRequest,
+    settings: ServerSettings,
+  ): StockEntry {
     const stockEntry = new StockEntry();
     Object.assign(stockEntry, payload);
     stockEntry.uuid = uuidv4();
     stockEntry.doctype = STOCK_ENTRY;
     stockEntry.createdOn = payload.posting_date;
+    stockEntry.createdAt = new DateTime(settings.timeZone).toJSDate();
     stockEntry.createdByEmail = clientHttpRequest.token.email;
     stockEntry.createdBy = clientHttpRequest.token.fullName;
     stockEntry.status = STOCK_ENTRY_STATUS.in_transit;
@@ -194,6 +206,7 @@ export class StockEntryAggregateService {
 
   removeStockEntryFields(stockEntry: StockEntry) {
     delete stockEntry.names;
+    delete stockEntry.createdAt;
     return stockEntry;
   }
 
