@@ -45,12 +45,13 @@ export class TerritoryAggregateService {
     return territory;
   }
 
-  async getTerritoryList(offset, limit, search, sort) {
+  async getTerritoryList(offset, limit, search, sort, group) {
     return await this.territory.list(
       Number(offset),
       Number(limit),
       search,
       sort,
+      group,
     );
   }
 
@@ -124,10 +125,9 @@ export class TerritoryAggregateService {
           switchMap(localTerritory => {
             if (localTerritory) {
               return throwError(
-                new BadRequestException({
-                  territoryExists: true,
-                  localTerritory,
-                }),
+                new BadRequestException(
+                  'Provided warehouse already exists in territory',
+                ),
               );
             }
             return of(true);

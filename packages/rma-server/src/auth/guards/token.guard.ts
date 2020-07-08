@@ -40,40 +40,42 @@ export class TokenGuard implements CanActivate {
     const httpContext = context.switchToHttp();
     const req = httpContext.getRequest();
     const accessToken = this.getAccessToken(req);
-
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        return from(this.connectService.findCachedToken({ accessToken })).pipe(
-          switchMap((cachedToken: TokenCache) => {
-            if (Math.floor(new Date().getTime() / 1000) < cachedToken.exp) {
-              req[TOKEN] = cachedToken;
-              return of(true);
-            } else if (!cachedToken.refreshToken) {
-              from(
-                this.tokenCacheService.deleteMany({
-                  accessToken: cachedToken.accessToken,
-                }),
-              ).subscribe({
-                next: removed => {},
-                error: error => {},
-              });
-              return of(false);
-            }
-            return of(false);
-          }),
-        );
+    return of({}).pipe(
+      switchMap(obj => {
+        return from(this.connectService.findCachedToken({ accessToken }));
       }),
-      retryWhen(errors =>
-        errors.pipe(
-          delay(200),
+      switchMap((cachedToken: TokenCache) => {
+        if (Math.floor(new Date().getTime() / 1000) < cachedToken.exp) {
+          req[TOKEN] = cachedToken;
+          return of(true);
+        } else if (!cachedToken.refreshToken) {
+          from(
+            this.tokenCacheService.deleteMany({
+              accessToken: cachedToken.accessToken,
+            }),
+          ).subscribe({
+            next: removed => {},
+            error: error => {},
+          });
+          return of(false);
+        }
+        return of(false);
+      }),
+      retryWhen(errors => {
+        return errors.pipe(
+          delay(this.randomInteger(100, 300)),
           take(3),
           concat(throwError(new NotFoundException())),
-        ),
-      ),
+        );
+      }),
       catchError(err => {
         return this.getFrappeToken(accessToken, req);
       }),
     );
+  }
+
+  randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   getFrappeToken(accessToken: string, req: Express.Request) {

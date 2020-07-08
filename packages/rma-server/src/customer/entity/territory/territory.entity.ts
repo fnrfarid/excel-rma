@@ -1,11 +1,4 @@
-import {
-  Column,
-  ObjectIdColumn,
-  BaseEntity,
-  ObjectID,
-  Entity,
-  Index,
-} from 'typeorm';
+import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
 
 @Entity()
 export class Territory extends BaseEntity {
@@ -16,7 +9,6 @@ export class Territory extends BaseEntity {
   uuid: string;
 
   @Column()
-  @Index({ unique: true })
   name: string;
 
   @Column()

@@ -36,10 +36,16 @@ export class TerritoryDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+  loadItems(
+    filter = '',
+    sortOrder = 'asc',
+    pageIndex = 0,
+    pageSize = 10,
+    group?,
+  ) {
     this.loadingSubject.next(true);
     this.settings
-      .findTerritories(filter, sortOrder, pageIndex, pageSize)
+      .findTerritories(filter, sortOrder, pageIndex, pageSize, group)
       .pipe(
         map((res: TerritoryListResponse) => {
           this.data = res.docs;

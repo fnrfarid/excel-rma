@@ -24,6 +24,7 @@ import { MapTerritoryComponent } from './map-territory/map-territory.component';
 export class SettingsPage implements OnInit {
   hideSASecret: boolean = true;
   hideSAApiSecret: boolean = true;
+  group: boolean = false;
 
   companySettingsForm = new FormGroup({
     authServerURL: new FormControl(),
@@ -141,7 +142,13 @@ export class SettingsPage implements OnInit {
     });
 
     this.territoryDataSource = new TerritoryDataSource(this.service);
-    this.territoryDataSource.loadItems();
+    this.territoryDataSource.loadItems(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      this.group,
+    );
   }
 
   navigateBack() {
@@ -194,25 +201,51 @@ export class SettingsPage implements OnInit {
       this.sort.direction,
       event.pageIndex,
       event.pageSize,
+      this.group,
     );
   }
 
-  setFilter() {
+  setFilter(value?) {
     this.territoryDataSource.loadItems(
       this.search,
       this.sort.direction,
       this.paginator.pageIndex,
       this.paginator.pageSize,
+      value !== undefined ? value : this.group,
     );
   }
 
+  getChips(warehouse) {
+    if (typeof warehouse === 'string') {
+      return [warehouse];
+    }
+    return warehouse;
+  }
+
   async mapTerritory(uuid?: string, territory?: string, warehouse?: string) {
+    if (this.group) {
+      this.toastController
+        .create({
+          message:
+            'Territory cannot be edited as group, please deselect group.',
+          duration: SHORT_DURATION,
+          buttons: [{ text: CLOSE }],
+        })
+        .then(toast => toast.present());
+      return;
+    }
     const popover = await this.popoverController.create({
       component: MapTerritoryComponent,
       componentProps: { uuid, territory, warehouse },
     });
     popover.onDidDismiss().then(() => {
-      this.territoryDataSource.loadItems();
+      this.territoryDataSource.loadItems(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        this.group,
+      );
     });
     return await popover.present();
   }
