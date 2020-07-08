@@ -11,7 +11,7 @@ import * as uuidv4 from 'uuid/v4';
 import { ClientTokenManagerService } from '../client-token-manager/client-token-manager.service';
 import { switchMap, map, mergeMap } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { throwError, of } from 'rxjs';
+import { throwError, of, from } from 'rxjs';
 import { PLEASE_RUN_SETUP } from '../../../constants/messages';
 import {
   FRAPPE_API_GET_USER_INFO_ENDPOINT,
@@ -28,6 +28,7 @@ import {
 import { HUNDRED_NUMBERSTRING } from '../../../constants/app-strings';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
+import { TerritoryService } from '../../../customer/entity/territory/territory.service';
 
 @Injectable()
 export class ConnectService {
@@ -37,6 +38,7 @@ export class ConnectService {
     private readonly http: HttpService,
     private readonly settingService: SettingsService,
     private readonly errorLogService: ErrorLogService,
+    private readonly territoryService: TerritoryService,
   ) {}
 
   async createFrappeBearerToken(
@@ -239,19 +241,46 @@ export class ConnectService {
       })
       .pipe(
         map(data => data.data.data),
-        mergeMap((userTerritory: { for_value: string }[]) => {
+        switchMap((userTerritory: { for_value: string }[]) => {
           const territory = this.mapUserTerritory(userTerritory);
-          this.tokenCacheService
-            .updateMany(
-              { email: frappeToken.user },
-              {
-                $set: { territory },
-              },
-            )
-            .then(success => {})
-            .catch(error => {});
-          return of({});
+          return this.getTerritoryWarehouse(territory).pipe(
+            switchMap((warehouses: string[]) => {
+              this.tokenCacheService
+                .updateMany(
+                  { email: frappeToken.user },
+                  {
+                    $set: { territory, warehouses },
+                  },
+                )
+                .then(success => {})
+                .catch(error => {});
+              return of({});
+            }),
+          );
         }),
       );
+  }
+
+  getTerritoryWarehouse(userTerritory: string[]) {
+    return from(
+      this.territoryService.asyncAggregate([
+        {
+          $match: { name: { $in: userTerritory } },
+        },
+        {
+          $group: {
+            _id: null,
+            warehouse: { $push: '$warehouse' },
+          },
+        },
+      ]),
+    ).pipe(
+      switchMap((data: { _id: null; warehouse: string[] }[]) => {
+        if (data && data.length) {
+          return of(data[0].warehouse);
+        }
+        return of([]);
+      }),
+    );
   }
 }

@@ -5,6 +5,7 @@ import { ClientTokenManagerService } from '../client-token-manager/client-token-
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
+import { TerritoryService } from '../../../customer/entity/territory/territory.service';
 
 describe('ConnectService', () => {
   let service: ConnectService;
@@ -31,6 +32,10 @@ describe('ConnectService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: TerritoryService,
           useValue: {},
         },
       ],

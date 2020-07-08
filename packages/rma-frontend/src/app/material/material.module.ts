@@ -23,6 +23,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import { SatPopoverModule } from '@ncstate/sat-popover';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [],
@@ -33,6 +34,7 @@ import { SatPopoverModule } from '@ncstate/sat-popover';
     SatPopoverModule,
     MatSortModule,
     MatPaginatorModule,
+    MatChipsModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
     MatToolbarModule,
@@ -58,6 +60,7 @@ import { SatPopoverModule } from '@ncstate/sat-popover';
     MatTableModule,
     SatPopoverModule,
     MatSortModule,
+    MatChipsModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,

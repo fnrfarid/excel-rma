@@ -156,12 +156,14 @@ export class SettingsService {
     sortOrder: string,
     pageIndex: number,
     pageSize: number,
+    group?: boolean,
   ) {
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageIndex * pageSize).toString())
       .set('search', filter)
-      .set('sort', sortOrder);
+      .set('sort', sortOrder)
+      .set('group', `${group}`);
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get(LIST_TERRITORIES_ENDPOINT, {
