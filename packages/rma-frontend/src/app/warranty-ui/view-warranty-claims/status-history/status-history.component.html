@@ -313,12 +313,23 @@
   </ion-card-content>
 </ion-card>
 
-<ion-card *ngIf="status?.length > 0">
+<ion-card
+  *ngIf="
+    (warrantyObject?.status_history)[warrantyObject?.status_history.length - 1]
+      .delivery_status.length > 0
+  "
+>
   <ion-card-header>
     <ion-row>
       <ion-col class="ion-text-left">
         <ion-card-title>
-          <ion-text color="tertiary"> Delivery Status:{{ status }} </ion-text>
+          <ion-text color="tertiary">
+            Delivery Status:{{
+              (warrantyObject?.status_history)[
+                warrantyObject?.status_history.length - 1
+              ].delivery_status
+            }}
+          </ion-text>
         </ion-card-title>
       </ion-col>
     </ion-row>
@@ -326,12 +337,26 @@
   <ion-card-content>
     <ion-grid
       class="ion-no-padding"
-      *ngIf="status === 'Upgraded' || status === 'Replaced'"
+      *ngIf="
+        (warrantyObject?.status_history)[
+          warrantyObject?.status_history.length - 1
+        ].delivery_status === 'Upgraded' ||
+        (warrantyObject?.status_history)[
+          warrantyObject?.status_history.length - 1
+        ].delivery_status === 'Replaced'
+      "
     >
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">{{ status }} Warehouse</ion-label>
+            <ion-label position="floating"
+              >{{
+                (warrantyObject?.status_history)[
+                  warrantyObject?.status_history.length - 1
+                ].delivery_status
+              }}
+              Warehouse</ion-label
+            >
             <ion-input placeholder="Upgrade Warehouse" type="text"></ion-input>
           </ion-item>
         </ion-col>

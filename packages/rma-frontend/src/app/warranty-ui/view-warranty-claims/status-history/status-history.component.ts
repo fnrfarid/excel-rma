@@ -31,7 +31,6 @@ export class StatusHistoryComponent implements OnInit {
   currentStatus: any = [];
   deliveryStatus: any = [];
   posting_date: { date: string; time: string };
-  status: any;
 
   displayedColumns = [
     'posting_date',
@@ -57,7 +56,6 @@ export class StatusHistoryComponent implements OnInit {
   ngOnInit() {
     this.createFormGroup();
     this.getTerritoryList();
-    this.updateStatus();
     Object.keys(CURRENT_STATUS_VERDICT).forEach(verdict =>
       this.currentStatus.push(CURRENT_STATUS_VERDICT[verdict]),
     );
@@ -142,7 +140,6 @@ export class StatusHistoryComponent implements OnInit {
     this.statusHistoryService.getWarrantyDetail(uuid).subscribe({
       next: res => {
         this.warrantyObject = res;
-        this.updateStatus();
       },
     });
   }
@@ -153,7 +150,6 @@ export class StatusHistoryComponent implements OnInit {
       .subscribe({
         next: () => {
           this.resetWarrantyDetail(this.warrantyObject.uuid);
-          this.updateStatus();
         },
         error: ({ message }) => {
           if (!message) message = STATUS_HISTORY_REMOVE_FAILURE;
@@ -162,11 +158,5 @@ export class StatusHistoryComponent implements OnInit {
           });
         },
       });
-  }
-
-  updateStatus() {
-    this.status = this.warrantyObject?.status_history
-      .slice(-1)
-      .pop().delivery_status;
   }
 }
