@@ -313,108 +313,25 @@
   </ion-card-content>
 </ion-card>
 
-<!-- 2.If status "Repaired" is selected this table appears -->
-<ion-card>
+<ion-card *ngIf="status?.length > 0">
   <ion-card-header>
     <ion-row>
       <ion-col class="ion-text-left">
         <ion-card-title>
-          <ion-text color="tertiary">
-            Delivery Status: Repaired
-          </ion-text>
-        </ion-card-title>
-      </ion-col>
-    </ion-row>
-  </ion-card-header>
-  <ion-card-content> </ion-card-content>
-</ion-card>
-<!--  -->
-<!-- 3.If status "Repaired" is selected this table appears and submitting it will create two stock entry vouchers for replaced and damaged product -->
-<ion-card>
-  <ion-card-header>
-    <ion-row>
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Delivery Status: Replaced
-          </ion-text>
+          <ion-text color="tertiary"> Delivery Status:{{ status }} </ion-text>
         </ion-card-title>
       </ion-col>
     </ion-row>
   </ion-card-header>
   <ion-card-content>
-    <ion-grid class="ion-no-padding">
+    <ion-grid
+      class="ion-no-padding"
+      *ngIf="status === 'Upgraded' || status === 'Replaced'"
+    >
       <ion-row>
         <ion-col>
           <ion-item lines="none">
-            <ion-label position="floating">Replace Warehouse</ion-label>
-            <ion-input placeholder="Replace Warehouse" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Damaged Warehouse</ion-label>
-            <ion-input placeholder="Damaged Warehouse" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Replace Product</ion-label>
-            <ion-input placeholder="Replace Product" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Damaged Product</ion-label>
-            <ion-input placeholder="Damaged Product" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Replace Serial</ion-label>
-            <ion-input placeholder="Replace Serial" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col> </ion-col>
-      </ion-row>
-
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Remarks</ion-label>
-            <ion-input placeholder="Remarks" type="text"></ion-input>
-          </ion-item>
-        </ion-col>
-        <ion-col> </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-card-content>
-</ion-card>
-<!-- 4.If status "Upgraded" is selected this child table appears and submitting it will create two stock entry vouchers for replaced and damaged product. -->
-<ion-card>
-  <ion-card-header>
-    <ion-row>
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Delivery Status: Upgraded
-          </ion-text>
-        </ion-card-title>
-      </ion-col>
-    </ion-row>
-  </ion-card-header>
-  <ion-card-content>
-    <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Upgrade Warehouse</ion-label>
+            <ion-label position="floating">{{ status }} Warehouse</ion-label>
             <ion-input placeholder="Upgrade Warehouse" type="text"></ion-input>
           </ion-item>
         </ion-col>
@@ -450,7 +367,6 @@
         </ion-col>
         <ion-col> </ion-col>
       </ion-row>
-
       <ion-row>
         <ion-col>
           <ion-item lines="none">
@@ -462,19 +378,4 @@
       </ion-row>
     </ion-grid>
   </ion-card-content>
-</ion-card>
-<!-- 5.If status "Rejected" is selected this child table appears -->
-<ion-card>
-  <ion-card-header>
-    <ion-row>
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Delivery Status: Rejected
-          </ion-text>
-        </ion-card-title>
-      </ion-col>
-    </ion-row>
-  </ion-card-header>
-  <ion-card-content> </ion-card-content>
 </ion-card>
