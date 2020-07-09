@@ -12,9 +12,11 @@ import {
   DELIVERY_STATUS,
   DURATION,
 } from '../../../constants/app-string';
-// import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { STATUS_HISTORY_ADD_FAILURE } from '../../../constants/messages';
+import {
+  STATUS_HISTORY_ADD_FAILURE,
+  STATUS_HISTORY_REMOVE_FAILURE,
+} from '../../../constants/messages';
 
 @Component({
   selector: 'status-history',
@@ -25,7 +27,7 @@ export class StatusHistoryComponent implements OnInit {
   @Input()
   warrantyObject: WarrantyClaimsDetails;
   statusHistoryForm: FormGroup;
-  territoryList: any;
+  territoryList: any = [];
   currentStatus: any = [];
   deliveryStatus: any = [];
   posting_date: { date: string; time: string };
@@ -44,7 +46,6 @@ export class StatusHistoryComponent implements OnInit {
   constructor(
     private readonly statusHistoryService: StatusHistoryService,
     private readonly time: TimeService,
-    // private readonly router: Router,
     private readonly snackbar: MatSnackBar,
   ) {}
 
@@ -54,14 +55,7 @@ export class StatusHistoryComponent implements OnInit {
 
   ngOnInit() {
     this.createFormGroup();
-    this.territoryList = this.statusHistoryForm.controls.status_from.valueChanges.pipe(
-      debounceTime(500),
-      startWith(''),
-      switchMap(value => {
-        return this.statusHistoryService.getTerritoryList(value);
-      }),
-      map(res => res.docs),
-    );
+    this.getTerritoryList();
     Object.keys(CURRENT_STATUS_VERDICT).forEach(verdict =>
       this.currentStatus.push(CURRENT_STATUS_VERDICT[verdict]),
     );
@@ -80,6 +74,17 @@ export class StatusHistoryComponent implements OnInit {
       description: new FormControl('', [Validators.required]),
       delivery_status: new FormControl('', [Validators.required]),
     });
+  }
+
+  getTerritoryList() {
+    this.territoryList = this.statusHistoryForm.controls.status_from.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.statusHistoryService.getTerritoryList(value);
+      }),
+      map(res => res.docs),
+    );
   }
 
   branchOptionChanged(option) {}
@@ -114,7 +119,8 @@ export class StatusHistoryComponent implements OnInit {
     statusHistoryDetails.delivery_status = this.statusHistoryForm.controls.delivery_status.value;
     this.statusHistoryService.addStatusHistory(statusHistoryDetails).subscribe({
       next: () => {
-        this.setWarrantyDetail(this.warrantyObject.uuid);
+        this.resetWarrantyDetail(this.warrantyObject.uuid);
+        this.setInitialFormValue();
       },
       error: ({ message }) => {
         if (!message) message = STATUS_HISTORY_ADD_FAILURE;
@@ -125,12 +131,32 @@ export class StatusHistoryComponent implements OnInit {
     });
   }
 
-  setWarrantyDetail(uuid: string) {
+  setInitialFormValue() {
+    this.statusHistoryForm.reset();
+    this.getTerritoryList();
+  }
+
+  resetWarrantyDetail(uuid: string) {
     this.statusHistoryService.getWarrantyDetail(uuid).subscribe({
       next: res => {
         this.warrantyObject = res;
       },
     });
-    this.statusHistoryForm.reset();
+  }
+
+  removeRow() {
+    this.statusHistoryService
+      .removeStatusHistory(this.warrantyObject.uuid)
+      .subscribe({
+        next: () => {
+          this.resetWarrantyDetail(this.warrantyObject.uuid);
+        },
+        error: ({ message }) => {
+          if (!message) message = STATUS_HISTORY_REMOVE_FAILURE;
+          this.snackbar.open(message, 'Close', {
+            duration: DURATION,
+          });
+        },
+      });
   }
 }

@@ -3,6 +3,7 @@ import {
   LIST_TERRITORIES_ENDPOINT,
   ADD_STATUS_HISTORY_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
+  REMOVE_STATUS_HISTORY_ENDPOINT,
 } from '../../../constants/url-strings';
 import { switchMap, map } from 'rxjs/operators';
 import { APIResponse } from '../../../common/interfaces/sales.interface';
@@ -77,6 +78,15 @@ export class StatusHistoryService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  removeStatusHistory(uuid: string) {
+    const URL = REMOVE_STATUS_HISTORY_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(URL, uuid, { headers });
       }),
     );
   }

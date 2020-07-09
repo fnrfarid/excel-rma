@@ -289,7 +289,11 @@
             fill="clear"
             class="ion-no-padding"
             color="danger"
-            *ngIf="i + 1 === warrantyObject?.status_history.length"
+            *ngIf="
+              warrantyObject?.status_history.length > 1 &&
+              warrantyObject?.status_history.length === i + 1
+            "
+            (click)="removeRow()"
           >
             <ion-icon slot="icon-only" name="trash"></ion-icon>
           </ion-button>
