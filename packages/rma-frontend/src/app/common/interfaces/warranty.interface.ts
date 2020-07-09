@@ -86,6 +86,7 @@ export interface WarrantyClaimsDetails {
   warranty_claim_date: Date;
   status_history?: StatusHistoryDetails[];
   posting_time: Date;
+  uuid?: string;
 }
 
 export class WarrantyState {
@@ -156,6 +157,7 @@ export class SerialNoDetails {
 }
 
 export class StatusHistoryDetails {
+  uuid?: string;
   posting_date?: Date;
   time?: Time;
   status_from?: string;
