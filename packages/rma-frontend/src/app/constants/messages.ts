@@ -16,3 +16,4 @@ export const ITEM_NOT_FOUND = 'Item not found';
 export const USER_SAVE_ITEM_SUGGESTION =
   'please save the item in main app to sync new data';
 export const STATUS_HISTORY_ADD_FAILURE = 'Failed to add Status history';
+export const STATUS_HISTORY_REMOVE_FAILURE = 'Failed to remove Status history';

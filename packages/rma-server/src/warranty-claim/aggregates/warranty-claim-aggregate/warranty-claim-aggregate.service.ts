@@ -270,4 +270,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     statusHistory.created_by_email = clientHttpRequest.token.email;
     return statusHistory;
   }
+
+  removeStatusHistory(uuid) {
+    return from(
+      this.warrantyClaimService.updateOne(uuid, {
+        $pop: {
+          status_history: 1,
+        },
+      }),
+    );
+  }
 }

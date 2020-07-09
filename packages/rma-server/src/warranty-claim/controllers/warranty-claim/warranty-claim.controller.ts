@@ -29,6 +29,7 @@ import { CreateBulkClaimsCommand } from '../../command/create-bulk-claims/create
 import { WarrantyClaimsListQueryDto } from '../../../constants/listing-dto/warranty-claims-list-query';
 import { StatusHistoryDto } from '../../entity/warranty-claim/status-history-dto';
 import { AddStatusHistoryCommand } from '../../command/add-status-history/add-status-history.command';
+import { RemoveStatusHistoryCommand } from '../../command/remove-status-history/remove-status-history.command';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
@@ -106,5 +107,12 @@ export class WarrantyClaimController {
     return this.commandBus.execute(
       new AddStatusHistoryCommand(statusHistoryPayload, clientHttpRequest),
     );
+  }
+
+  @Post('v1/remove_status_history')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  removeStatusHistory(@Body() uuid: string) {
+    return this.commandBus.execute(new RemoveStatusHistoryCommand(uuid));
   }
 }
