@@ -60,6 +60,7 @@ export class SalesInvoiceService {
         },
       };
     }
+
     const customerQuery =
       territories && territories.length !== 0
         ? { territory: { $in: territories } }

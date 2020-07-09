@@ -22,6 +22,8 @@ services:
       - SERVER_DB=${SERVER_DB}
       - SERVER_USER=${SERVER_USER}
       - SERVER_DB_PASSWORD=${SERVER_DB_PASSWORD}
+    ports:
+      - "27017:27017"
     volumes:
       - mongo-vol:/bitnami
       - ./files/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d

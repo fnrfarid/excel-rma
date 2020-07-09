@@ -4,6 +4,8 @@ import { MapTerritoryService } from './map-territory.service';
 import { Observable } from 'rxjs';
 import { debounceTime, startWith } from 'rxjs/operators';
 import { PopoverController, NavParams } from '@ionic/angular';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { CLOSE } from 'src/app/constants/app-string';
 
 @Component({
   selector: 'app-map-territory',
@@ -40,6 +42,7 @@ export class MapTerritoryComponent implements OnInit {
     private readonly mapTerritory: MapTerritoryService,
     private readonly popoverCtrl: PopoverController,
     private readonly navParams: NavParams,
+    private readonly snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -67,7 +70,15 @@ export class MapTerritoryComponent implements OnInit {
         next: res => {
           this.popoverCtrl.dismiss().then(dismissed => {});
         },
-        error: error => {},
+        error: error => {
+          this.snackBar.open(
+            error && error.error && error.error.message
+              ? error.error.message
+              : error,
+            CLOSE,
+            { duration: 2500 },
+          );
+        },
       });
   }
 
@@ -81,7 +92,15 @@ export class MapTerritoryComponent implements OnInit {
         next: res => {
           this.popoverCtrl.dismiss().then(dismissed => {});
         },
-        error: error => {},
+        error: error => {
+          this.snackBar.open(
+            error && error.error && error.error.message
+              ? error.error.message
+              : error,
+            CLOSE,
+            { duration: 2500 },
+          );
+        },
       });
   }
 
@@ -90,7 +109,15 @@ export class MapTerritoryComponent implements OnInit {
       next: res => {
         this.popoverCtrl.dismiss().then(dismissed => {});
       },
-      error: error => {},
+      error: error => {
+        this.snackBar.open(
+          error && error.error && error.error.message
+            ? error.error.message
+            : error,
+          CLOSE,
+          { duration: 2500 },
+        );
+      },
     });
   }
 }

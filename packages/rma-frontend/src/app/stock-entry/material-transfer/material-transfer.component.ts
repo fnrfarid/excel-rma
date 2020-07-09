@@ -51,7 +51,7 @@ import {
   MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
-import { Item } from 'src/app/common/interfaces/sales.interface';
+import { Item } from '../../common/interfaces/sales.interface';
 
 @Component({
   selector: 'app-material-transfer',
@@ -536,6 +536,16 @@ export class MaterialTransferComponent implements OnInit {
       !this.warehouseState.t_warehouse.value
     ) {
       this.getMessage('Please select source and target warehouse.');
+      return false;
+    }
+
+    if (
+      this.warehouseState.s_warehouse.value ===
+      this.warehouseState.t_warehouse.value
+    ) {
+      this.getMessage(
+        'Source warehouse and target warehouse should be unique.',
+      );
       return false;
     }
     return true;

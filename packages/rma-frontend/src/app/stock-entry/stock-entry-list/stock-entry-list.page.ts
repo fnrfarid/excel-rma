@@ -16,6 +16,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-stock-entry-list',
@@ -48,7 +49,12 @@ export class StockEntryListPage implements OnInit {
     'posting_date',
     'posting_time',
   ];
-  invoiceStatus: string[] = ['Completed', 'Canceled', 'Submitted', 'All'];
+  warehouses = ['coming_soon'];
+  fromDateFormControl = new FormControl();
+  toDateFormControl = new FormControl();
+  singleDateFormControl = new FormControl();
+  filterState: any = {};
+  invoiceStatus: string[] = ['Delivered', 'Returned', 'Rejected', 'All'];
   search: string = '';
   constructor(
     private location: Location,
@@ -72,8 +78,51 @@ export class StockEntryListPage implements OnInit {
       });
   }
 
+  statusChange(status) {
+    if (status === 'All') {
+      delete this.filterState.status;
+      this.dataSource.loadItems();
+    } else {
+      this.filterState.status = status;
+      this.setFilter();
+    }
+  }
+
+  dateFilter() {
+    this.singleDateFormControl.setValue('');
+    this.setFilter();
+  }
+
   getUpdate(event) {
-    const query: any = {};
+    const query: any = this.filterState;
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
     if (this.search) query.search = this.search;
     this.dataSource.loadItems(
       undefined,
@@ -83,10 +132,63 @@ export class StockEntryListPage implements OnInit {
     );
   }
 
+  fromWarehouseChange(value) {
+    this.filterState.s_warehouse = value;
+  }
+
+  toWarehouseChange(value) {
+    this.filterState.t_warehouse = value;
+  }
+
+  singleDateFilter() {
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.setFilter();
+  }
+
+  clearFilters() {
+    this.filterState = {};
+    this.fromDateFormControl.setValue('');
+    this.toDateFormControl.setValue('');
+    this.singleDateFormControl.setValue('');
+    this.dataSource.loadItems();
+  }
+
   setFilter(event?) {
-    const query: any = {};
-    if (this.search) query.search = this.search;
+    const query: any = this.filterState;
     let sortQuery = {};
+
+    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
+      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+    if (this.singleDateFormControl.value) {
+      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+
+    sortQuery = { _id: -1 };
+
     if (event) {
       for (const key of Object.keys(event)) {
         if (key === 'active' && event.direction !== '') {
@@ -94,8 +196,6 @@ export class StockEntryListPage implements OnInit {
         }
       }
     }
-
-    sortQuery = { _id: -1 };
 
     this.dataSource.loadItems(
       sortQuery,

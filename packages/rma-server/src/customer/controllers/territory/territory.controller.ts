@@ -49,11 +49,23 @@ export class TerritoryController {
     @Query('limit') limit = 10,
     @Query('search') search = '',
     @Query('sort') sort,
+    @Query('group') group,
   ) {
     if (sort !== 'ASC') {
       sort = 'DESC';
     }
-    return await this.territory.getTerritoryList(offset, limit, search, sort);
+    try {
+      group = JSON.parse(group);
+    } catch {
+      group = false;
+    }
+    return await this.territory.getTerritoryList(
+      offset,
+      limit,
+      search,
+      sort,
+      group,
+    );
   }
 
   @Post('v1/update')

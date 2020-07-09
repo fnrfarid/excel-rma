@@ -13,21 +13,25 @@
 
 <ion-content class="page-background">
   <ion-card>
-    <ion-card-header>
+    <ion-card-header *ngIf="!readonly">
       File Upload
     </ion-card-header>
     <ion-card-content>
       <ion-grid class="ion-no-padding">
         <ion-row>
-          <ion-col>
+          <ion-col *ngIf="!readonly">
             <input
-              [disabled]="readonly"
               #csvFileInput
               type="file"
               id="txtFileUpload"
               (change)="fileChangedEvent($event)"
               accept=".csv"
             />
+          </ion-col>
+          <ion-col *ngIf="readonly">
+            <ion-button [disabled]="!stock_receipt_names[0]" (click)="openStockEntries()" fill="clear" shape="round">
+              Open All Entries
+            </ion-button>
           </ion-col>
           <ion-col class="ion-text-right">
             <ion-button
@@ -265,11 +269,6 @@
               Transfer Serials
             </ion-text>
           </ion-card-title>
-        </ion-col>
-        <ion-col class="ion-text-right">
-          <ion-button *ngIf="readonly" [disabled]="!stock_receipt_names[0]" (click)="openStockEntries()" fill="clear" shape="round">
-            Open All Entries
-          </ion-button>
         </ion-col>
       </ion-row>
     </ion-card-header>

@@ -24,6 +24,8 @@ export class TokenCache extends BaseEntity {
   @Column()
   territory: string[];
   @Column()
+  warehouses: string[];
+  @Column()
   clientId: string;
   @Column()
   refreshToken: string;
