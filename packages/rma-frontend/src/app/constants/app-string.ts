@@ -25,3 +25,21 @@ export const WARRANTY_TYPE = {
   NON_SERAIL: 'Non Serial Warranty',
   THIRD_PARTY: 'Third Party Warranty',
 };
+
+export const CURRENT_STATUS_VERDICT = {
+  RECEIVED_FROM_CUSTOMER: 'Received from Customer',
+  TRANSFERRED: 'Transferred',
+  RECEIVED_FROM_BRANCH: 'Received from Branch',
+  SOLVED: 'Solved ',
+  UNSOLVED: 'Unsolved',
+  REJECTED: 'Rejected',
+  TO_REPLACE: 'To Replace',
+  WORK_IN_PROGRESS: 'Work in Progress',
+};
+
+export const DELIVERY_STATUS = {
+  REPAIRED: 'Repaired',
+  REPLACED: 'Replaced',
+  UPGRADED: 'Upgraded',
+  REJECTED: 'Rejected',
+};
