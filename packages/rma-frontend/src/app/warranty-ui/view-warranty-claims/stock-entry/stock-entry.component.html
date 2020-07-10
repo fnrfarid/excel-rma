@@ -1,14 +1,24 @@
 <ion-card>
   <ion-card-header>
-    <ion-row>
-      <ion-col class="ion-text-left">
-        <ion-card-title>
-          <ion-text color="tertiary">
-            Stock Entry
-          </ion-text>
-        </ion-card-title>
-      </ion-col>
-    </ion-row>
+    <ion-grid>
+      <ion-row>
+        <ion-col class="ion-text-left">
+          <ion-card-title>
+            <ion-text color="tertiary">
+              Stock Entry
+            </ion-text>
+          </ion-card-title>
+        </ion-col>
+        <ion-col class="ion-text-right">
+          <ion-button
+            color="tertiary"
+            [routerLink]="['/warranty/stock-entry', 'new']"
+          >
+            Add
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
