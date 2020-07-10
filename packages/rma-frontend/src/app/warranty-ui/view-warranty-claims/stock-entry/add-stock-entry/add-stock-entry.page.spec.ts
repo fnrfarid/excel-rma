@@ -1,23 +1,23 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { StockEntryComponent } from './stock-entry.component';
-import { RouterTestingModule } from '@angular/router/testing';
+import { AddStockEntryPage } from './add-stock-entry.page';
 import {
-  NoopAnimationsModule,
   BrowserAnimationsModule,
+  NoopAnimationsModule,
 } from '@angular/platform-browser/animations';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MaterialModule } from 'src/app/material/material.module';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MaterialModule } from 'src/app/material/material.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
-describe('StockEntryComponent', () => {
-  let component: StockEntryComponent;
-  let fixture: ComponentFixture<StockEntryComponent>;
+describe('AddStockEntryPage', () => {
+  let component: AddStockEntryPage;
+  let fixture: ComponentFixture<AddStockEntryPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [StockEntryComponent],
+      declarations: [AddStockEntryPage],
       imports: [
         IonicModule.forRoot(),
         BrowserAnimationsModule,
@@ -30,7 +30,7 @@ describe('StockEntryComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(StockEntryComponent);
+    fixture = TestBed.createComponent(AddStockEntryPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
