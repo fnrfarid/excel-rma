@@ -229,7 +229,7 @@ export class MaterialTransferComponent implements OnInit {
       const data = this.itemDataSource.data();
       data.push({
         item_code: item.item_code,
-        item_name: item.name,
+        item_name: item.item_name,
         assigned: 0,
         has_serial_no: item.has_serial_no,
       });
@@ -516,6 +516,7 @@ export class MaterialTransferComponent implements OnInit {
       item.transferWarehouse = this.transferWarehouse;
       return item;
     });
+    body.items = this.mergeItems(body.items);
 
     this.stockEntryService.createMaterialTransfer(body).subscribe({
       next: response => {
@@ -528,6 +529,25 @@ export class MaterialTransferComponent implements OnInit {
         this.getMessage(err.error.message);
       },
     });
+  }
+
+  mergeItems(items: Item[]) {
+    const hash = {};
+    const merged_items = [];
+    items.forEach(item => {
+      if (hash[item.item_code]) {
+        hash[item.item_code].qty += item.qty;
+        if (item.has_serial_no) {
+          hash[item.item_code].serial_no.push(...item.serial_no);
+        }
+        return;
+      }
+      hash[item.item_code] = item;
+    });
+    Object.keys(hash).forEach(key => {
+      merged_items.push(hash[key]);
+    });
+    return merged_items;
   }
 
   validateWarehouseState() {
