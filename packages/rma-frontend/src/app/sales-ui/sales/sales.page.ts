@@ -201,6 +201,18 @@ export class SalesPage implements OnInit {
     this.setFilter();
   }
 
+  getStringTime(stringTime: string) {
+    const newDate = new Date();
+
+    const [hours, minutes, seconds] = stringTime.split(':');
+
+    newDate.setHours(+hours);
+    newDate.setMinutes(Number(minutes));
+    newDate.setSeconds(Number(seconds));
+
+    return newDate;
+  }
+
   clearFilters() {
     this.customer = '';
     this.status = 'All';

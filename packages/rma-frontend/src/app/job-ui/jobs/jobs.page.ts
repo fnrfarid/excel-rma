@@ -38,7 +38,7 @@ export class JobsPage implements OnInit {
     'All',
     'Retrying',
   ];
-  openJobDetails = ['Failed', 'Exported'];
+  openJobDetails = ['Failed', 'Exported', 'In Queue'];
   constructor(
     private readonly jobsService: JobsService,
     private location: Location,

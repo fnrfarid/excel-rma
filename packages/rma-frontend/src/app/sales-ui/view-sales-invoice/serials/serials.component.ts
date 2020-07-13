@@ -534,6 +534,7 @@ export class SerialsComponent implements OnInit {
         item_hash[item.item_code] = { serial_no: [] };
       }
       item_hash[item.item_code].item_code = item.item_code;
+      item_hash[item.item_code].item_name = item.item_name;
       item_hash[item.item_code].rate = item.rate;
       item_hash[item.item_code].qty = 0;
       item_hash[item.item_code].amount = 0;

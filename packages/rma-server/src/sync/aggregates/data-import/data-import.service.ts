@@ -52,7 +52,11 @@ export class DataImportService {
     return this.http
       .post(
         settings.authServerURL + DATA_IMPORT_API_ENDPOINT,
-        { reference_doctype, action: FRAPPE_DATA_IMPORT_INSERT_ACTION },
+        {
+          reference_doctype,
+          import_type: FRAPPE_DATA_IMPORT_INSERT_ACTION,
+          submit_after_import: 1,
+        },
         { headers: this.getAuthorizationHeaders(token) },
       )
       .pipe(
@@ -80,7 +84,7 @@ export class DataImportService {
             settings.authServerURL +
               DATA_IMPORT_API_ENDPOINT +
               `/${success.attached_to_name}`,
-            { import_file: success.file_url, submit_after_import: 1 },
+            { import_file: success.file_url },
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
@@ -138,10 +142,9 @@ export class DataImportService {
       }),
       map(data => data.data.data),
       switchMap((response: DataImportSuccessResponseInterface) => {
-        if (response.import_status === 'Successful') {
-          const parsed_response = JSON.parse(response.log_details);
-          const link = parsed_response.messages[0].link.split('/');
-          const doctype_name = link[link.length - 1];
+        if (response.status === 'Success') {
+          const parsed_response = JSON.parse(response.import_log);
+          const doctype_name = parsed_response[0].docname;
           this.jobService
             .updateMany(
               { 'data.uuid': job.uuid },
@@ -151,16 +154,13 @@ export class DataImportService {
             .catch(err => {});
           return of(doctype_name);
         }
-        if (
-          response.import_status === 'Pending' ||
-          response.import_status === 'In Progress'
-        ) {
+        if (!response.import_log && response.status === 'Pending') {
           return of({}).pipe(
             delay(ONE_MINUTE_IN_MILLISECONDS / 4),
             switchMap(done => throwError('Delivery Note is in queue')),
           );
         }
-        if (response.import_status === AGENDA_JOB_STATUS.fail) {
+        if (response.import_log) {
           job.lastError = response;
           job.status = AGENDA_JOB_STATUS.fail;
         }

@@ -200,6 +200,10 @@ export class PurchaseReceiptSyncService {
     purchase_receipt.items[0].uom = purchase_receipt.items[0].uom
       ? purchase_receipt.items[0].uom
       : 'Nos';
+    purchase_receipt.items[0].description = purchase_receipt.items[0]
+      .description
+      ? purchase_receipt.items[0].description
+      : purchase_receipt.items[0].item_name;
     purchase_receipt.items[0].stock_uom = purchase_receipt.items[0].stock_uom
       ? purchase_receipt.items[0].stock_uom
       : 'Nos';
