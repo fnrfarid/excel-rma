@@ -52,6 +52,10 @@ export class DeliveryNoteItemDto {
   item_code: string;
 
   @IsNotEmpty()
+  @IsString()
+  item_name: string;
+
+  @IsNotEmpty()
   @IsNumber()
   qty: number;
 

@@ -7,12 +7,12 @@
           <ion-col size="6">
             <ion-row>
               <ion-col size="12">
-                Status : <ion-text color="primary"> {{ exportedJob?.data?.status }} </ion-text>
+                Status : <ion-text color="primary"> {{ exportedJob?.data?.status || data?.data?.status }} </ion-text>
               </ion-col>
             </ion-row>
             <ion-row>
               <ion-col size="12">
-                Parent : <ion-text color="primary"> {{ exportedJob?.data?.parent }} </ion-text>
+                Parent : <ion-text color="primary"> {{ exportedJob?.data?.parent || data?.data?.parent}} </ion-text>
               </ion-col>
             </ion-row>
           </ion-col>

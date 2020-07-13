@@ -184,6 +184,16 @@ export class DeliveryNoteJobService {
       ? payload.plc_conversion_rate
       : 1;
     payload.status = payload.status ? payload.status : 'To Bill';
+    payload.items[0].uom = payload.items[0].uom ? payload.items[0].uom : 'Nos';
+    payload.items[0].description = payload.items[0].description
+      ? payload.items[0].description
+      : payload.items[0].item_name;
+    payload.items[0].stock_uom = payload.items[0].stock_uom
+      ? payload.items[0].stock_uom
+      : 'Nos';
+    payload.items[0].conversion_factor = payload.items[0].conversion_factor
+      ? payload.items[0].conversion_factor
+      : 1;
     return payload;
   }
 

@@ -16,6 +16,7 @@ export class ViewSingleJobPage {
   };
   exportedJob: any;
   message: string;
+  failedJobStatus = ['Failed', 'Retrying'];
 
   constructor(
     public dialogRef: MatDialogRef<ViewSingleJobPage>,
@@ -24,21 +25,21 @@ export class ViewSingleJobPage {
     private readonly snackBar: MatSnackBar,
   ) {
     if (
-      data &&
-      data.data &&
-      data.data.status &&
-      data.data.status === 'Exported' &&
-      data.data.uuid
+      this.data &&
+      this.data.data &&
+      this.data.data.status &&
+      this.data.data.status === 'Exported' &&
+      this.data.data.uuid
     ) {
       this.getExportedJob(data);
+    } else {
+      this.getMessage();
     }
   }
 
   activateState() {
-    if (this.exportedJob.data.status === 'Failed') {
-      this.state.retry = true;
-      this.state.reset = true;
-    }
+    this.state.retry = true;
+    this.state.reset = true;
   }
 
   getExportedJob(data: JobInterface) {
@@ -61,7 +62,15 @@ export class ViewSingleJobPage {
   }
 
   getMessage() {
-    if (this.exportedJob.data.status !== 'Failed') {
+    if (!this.exportedJob) {
+      this.message = this.data.failReason;
+      this.activateState();
+    }
+
+    if (
+      this.exportedJob &&
+      !this.failedJobStatus.includes(this.exportedJob.data.status)
+    ) {
       this.message = `<p>Following job is: ${
         this.exportedJob.data.status || 'In Progress'
       }, it will be synced once successful, you can check the progress here.</p>`;
@@ -69,11 +78,33 @@ export class ViewSingleJobPage {
     }
 
     try {
-      const log_details = this.exportedJob.failReason.log_details;
-      this.message = JSON.parse(log_details).messages[0].message;
+      const import_log = this.exportedJob.failReason.import_log;
+      this.message = JSON.parse(import_log).messages[0].message;
     } catch {
-      return this.exportedJob.failReason.log_details;
+      if (this.exportedJob && this.exportedJob.failReason.import_log) {
+        this.message = this.exportedJob.failReason.import_log;
+        return;
+      }
+      this.setParentJob();
+      return;
     }
+  }
+
+  setParentJob() {
+    if (this.exportedJob && this.exportedJob.data.status === 'Retrying') {
+      this.message = `<p>Following job is: ${
+        this.exportedJob.data.status || 'In Progress'
+      }, it will be synced once successful, you can check the progress here.</p>`;
+      return;
+    }
+    if (!this.exportedJob && this.data.status === 'In Queue') {
+      this.message = 'Following job in queue..';
+      return;
+    }
+    this.message =
+      this.data && this.data.failReason
+        ? JSON.stringify(this.data.failReason)
+        : 'Unexpected error occurred while executing job.';
   }
 
   resetJob() {
