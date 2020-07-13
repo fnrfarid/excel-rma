@@ -1,11 +1,11 @@
 export class DataImportSuccessResponseInterface {
   name: string;
   reference_doctype: string;
-  action: string;
+  import_type: string;
   doctype: string;
-  import_status: string;
+  status: string;
   insert_new: number;
-  log_details: string;
+  import_log: string;
 }
 
 export class FileUploadSuccessResponseInterface {

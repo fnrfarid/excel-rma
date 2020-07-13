@@ -200,6 +200,13 @@ const routes: Routes = [
         './warranty-ui/view-warranty-claims/service-invoices/add-service-invoice/add-service-invoice.module'
       ).then(m => m.AddServiceInvoicePageModule),
   },
+  {
+    path: 'warranty/stock-entry/:name',
+    loadChildren: () =>
+      import(
+        './warranty-ui/view-warranty-claims/stock-entry/add-stock-entry/add-stock-entry.module'
+      ).then(m => m.AddStockEntryPageModule),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];

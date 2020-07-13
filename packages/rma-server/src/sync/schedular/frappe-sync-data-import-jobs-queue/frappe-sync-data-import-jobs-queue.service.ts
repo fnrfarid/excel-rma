@@ -46,7 +46,7 @@ export class FrappeSyncDataImportJobService implements OnModuleInit {
   async onJobFailure(error: any, job: Agenda.Job<any>) {
     const retryCount = job.attrs.failCount - 1;
     if (
-      !(error && error.log_details) &&
+      !(error && error.import_log) &&
       retryCount <= AGENDA_DATA_IMPORT_MAX_RETRIES
     ) {
       job.attrs.data.status = AGENDA_JOB_STATUS.retrying;

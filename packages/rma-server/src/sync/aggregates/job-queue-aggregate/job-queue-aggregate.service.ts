@@ -73,7 +73,14 @@ export class JobQueueAggregateService {
             this.jobService
               .updateOne(
                 { $or },
-                { $set: { 'data.status': AGENDA_JOB_STATUS.reset } },
+                {
+                  $set: { 'data.status': AGENDA_JOB_STATUS.reset },
+                  $unset: {
+                    nextRunAt: undefined,
+                    lockedAt: undefined,
+                    lastRunAt: undefined,
+                  },
+                },
               )
               .catch(err => {})
               .then(done => {});

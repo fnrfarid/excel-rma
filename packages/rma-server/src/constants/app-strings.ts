@@ -161,8 +161,8 @@ export const SERIAL_WAREHOUSE_STATUS = {
   sold: 'Sold to customer.',
 };
 export const AGENDA_MAX_RETRIES = 1;
-export const AGENDA_DATA_IMPORT_MAX_RETRIES = 3;
-export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert new records';
+export const AGENDA_DATA_IMPORT_MAX_RETRIES = 2;
+export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert New Records';
 export const SYNC_DELIVERY_NOTE_JOB = 'SYNC_DELIVERY_NOTE_JOB';
 export enum WARRANTY_TYPE {
   WARRANTY = 'Warranty / Non Warranty',
@@ -181,7 +181,8 @@ export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
 export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
 export const DEFAULT_CURRENCY = 'BDT';
-// export const DEFAULT_CURRENCY = 'INR'; console.log('unComment IT local testing');
+// export const DEFAULT_CURRENCY = 'INR';
+// console.log('unComment IT local testing');
 export const DEFAULT_NAMING_SERIES = {
   sales_order: 'SO-',
   sales_invoice: 'SINV-',

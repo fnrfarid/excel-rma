@@ -124,6 +124,7 @@ export class DeliveredSerial {
 
 export interface DeliveryNoteItemInterface {
   item_code?: string;
+  item_name?: string;
   qty?: number;
   rate?: number;
   has_serial_no?: number;

@@ -32,6 +32,7 @@ export class PurchaseReceiptItemDto {
   uom: string;
   stock_uom: string;
   conversion_factor: number;
+  description?: string;
 
   @IsOptional()
   @IsNumber()

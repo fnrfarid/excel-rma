@@ -118,3 +118,7 @@ export const RELAY_GET_FULL_ITEM_ENDPOINT =
   '/api/command/user/api/resource/Item/';
 export const RELAY_GET_ITEM_STOCK_ENDPOINT =
   '/api/command/user/api/resource/Bin';
+export const ADD_STATUS_HISTORY_ENDPOINT =
+  '/api/warranty_claim/v1/add_status_history';
+export const REMOVE_STATUS_HISTORY_ENDPOINT =
+  '/api/warranty_claim/v1/remove_status_history';

@@ -26,6 +26,7 @@ import {
   APPLICATION_JSON_CONTENT_TYPE,
   DRAFT_STATUS,
   DEFAULT_NAMING_SERIES,
+  SYSTEM_MANAGER,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -46,6 +47,7 @@ import { ErrorLogService } from '../../../error-log/error-log-service/error-log.
 import { DateTime } from 'luxon';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -111,14 +113,18 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     limit,
     sort,
     filter_query,
-    clientHttpRequest: any,
+    clientHttpRequest: { token: TokenCache },
   ) {
+    let territory = clientHttpRequest.token.territory;
+    if (clientHttpRequest.token.roles.includes(SYSTEM_MANAGER)) {
+      territory = [];
+    }
     return await this.salesInvoiceService.list(
       offset || 0,
       limit || 10,
       sort,
       filter_query,
-      clientHttpRequest.token.territory,
+      territory,
     );
   }
 

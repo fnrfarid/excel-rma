@@ -11,6 +11,9 @@ import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { TimeService } from '../../../api/time/time.service';
+import { StatusHistoryService } from './status-history.service';
+import { of } from 'rxjs';
 
 describe('StatusHistoryComponent', () => {
   let component: StatusHistoryComponent;
@@ -29,6 +32,21 @@ describe('StatusHistoryComponent', () => {
         ReactiveFormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
+      ],
+      providers: [
+        {
+          provide: TimeService,
+          useValue: {
+            getDateAndTime: (...args) => Promise.resolve({}),
+          },
+        },
+        {
+          provide: StatusHistoryService,
+          useValue: {
+            getTerritoryList: (...args) => of([]),
+            getWarrantyDetail: (...args) => of({}),
+          },
+        },
       ],
     }).compileComponents();
 
