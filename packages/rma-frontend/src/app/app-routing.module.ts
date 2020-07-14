@@ -201,7 +201,7 @@ const routes: Routes = [
       ).then(m => m.AddServiceInvoicePageModule),
   },
   {
-    path: 'warranty/stock-entry/:name',
+    path: 'warranty/stock-entry/:name/:uuid',
     loadChildren: () =>
       import(
         './warranty-ui/view-warranty-claims/stock-entry/add-stock-entry/add-stock-entry.module'

@@ -31,8 +31,17 @@ export class Item {
   remaining?: number;
   item_group?: string;
   brand?: string;
+  item_defaults?: ItemDefaults;
+  source_warehouse?: string;
+  target_warehouse?: string;
 }
 
+export class ItemDefaults {
+  name: string;
+  owner: string;
+  company: string;
+  default_warehouse: string;
+}
 export class APIResponse {
   docs: any[];
   length: number;

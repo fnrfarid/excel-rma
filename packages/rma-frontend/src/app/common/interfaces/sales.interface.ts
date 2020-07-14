@@ -30,6 +30,16 @@ export class Item {
   assigned?: number;
   remaining?: number;
   item_group?: string;
+  item_defaults?: ItemDefaults;
+  source_warehouse?: string;
+  target_warehouse?: string;
+}
+
+export class ItemDefaults {
+  name: string;
+  owner: string;
+  company: string;
+  default_warehouse: string;
 }
 
 export class APIResponse {
