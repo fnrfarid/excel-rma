@@ -184,16 +184,16 @@ export const DEFAULT_CURRENCY = 'BDT';
 // export const DEFAULT_CURRENCY = 'INR';
 // console.log('unComment IT local testing');
 export const DEFAULT_NAMING_SERIES = {
-  sales_order: 'SO-.YYYY.',
-  sales_invoice: 'SINV-.YYYY.',
-  delivery_note: 'SD-.YYYY.',
-  sales_return: 'RINV-.YYYY.',
-  delivery_return: 'SDR-.YYYY.',
-  purchase_order: 'PO-.YYYY.',
-  purchase_invoice: 'PINV-.YYYY.',
-  purchase_receipt: 'PD-.YYYY.',
-  stock_send: 'TROUT-.YYYY.',
-  stock_receive: 'TRIN-.YYYY.',
+  sales_order: 'SO-.YYYY.-',
+  sales_invoice: 'SINV-.YYYY.-',
+  delivery_note: 'SD-.YYYY.-',
+  sales_return: 'RINV-.YYYY.-',
+  delivery_return: 'SDR-.YYYY.-',
+  purchase_order: 'PO-.YYYY.-',
+  purchase_invoice: 'PINV-.YYYY.-',
+  purchase_receipt: 'PD-.YYYY.-',
+  stock_send: 'TROUT-.YYYY.-',
+  stock_receive: 'TRIN-.YYYY.-',
   stock_transfer_internal: 'TRO-.YYYY.-',
 };
 export const MAX_SERIAL_BODY_COUNT = 100000;
