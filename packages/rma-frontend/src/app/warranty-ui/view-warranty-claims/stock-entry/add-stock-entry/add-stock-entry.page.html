@@ -133,13 +133,7 @@
         <mat-table #table [dataSource]="dataSource" style="width: 100%;">
           <ng-container matColumnDef="serial_no">
             <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
-            <mat-cell
-              *matCellDef="let row;let i = index"
-              [satPopoverAnchor]="p"
-              tabindex="0"
-              (keyup.enter)="p.open()"
-              (click)="p.open()"
-            >
+            <mat-cell *matCellDef="let row;let i = index">
               <ng-container *ngIf="row.serial_no">
                 {{row.serial_no}}
               </ng-container>

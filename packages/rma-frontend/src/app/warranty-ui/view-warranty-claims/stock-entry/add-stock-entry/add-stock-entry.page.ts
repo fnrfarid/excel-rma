@@ -47,9 +47,9 @@ export class AddStockEntryPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    Object.keys(STOCK_ENTRY_STATUS).map(key => {
-      this.type.push(STOCK_ENTRY_STATUS[key]);
-    });
+    this.type = Object.keys(STOCK_ENTRY_STATUS).map(
+      key => STOCK_ENTRY_STATUS[key],
+    );
     this.dataSource = new ItemsDataSource();
     this.createFormGroup();
     this.setDateTime(new Date());
