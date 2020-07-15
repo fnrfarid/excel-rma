@@ -1,4 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
+import { from, of, throwError } from 'rxjs';
+import { switchMap, retry, catchError, delay } from 'rxjs/operators';
 export const STORAGE_TOKEN = 'StorageObject';
 
 @Injectable({
@@ -31,5 +33,26 @@ export class StorageService {
       }
     }
     return data;
+  }
+
+  getItemAsync(key: string) {
+    return (
+      of({}).pipe(
+        switchMap(obj => {
+          return from(this.getItem(key)).pipe(
+            switchMap(item => {
+              if (item) {
+                return of(item);
+              }
+              return throwError('Item Not Found').pipe(delay(400));
+            }),
+          );
+        }),
+        retry(9),
+      ),
+      catchError(err => {
+        return of(undefined);
+      })
+    );
   }
 }
