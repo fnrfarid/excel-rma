@@ -56,7 +56,7 @@
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.type.hasError('required')">
+                <mat-error *ngIf="formControl.type.hasError('required')">
                   Type is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -76,7 +76,7 @@
                   [for]="date"
                 ></mat-datepicker-toggle>
                 <mat-datepicker #date disabled="false"></mat-datepicker>
-                <mat-error *ngIf="f.date.hasError('required')">
+                <mat-error *ngIf="formControl.date.hasError('required')">
                   Date is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -91,7 +91,7 @@
                   placeholder="Description"
                   formControlName="description"
                 />
-                <mat-error *ngIf="f.description.hasError('required')">
+                <mat-error *ngIf="formControl.description.hasError('required')">
                   Description is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
@@ -310,7 +310,7 @@
               >{{row.rate * row.qty | curFormat | async}}</mat-cell
             >
             <mat-footer-cell *matFooterCellDef
-              >{{f.total.value | curFormat | async }}</mat-footer-cell
+              >{{formControl.total.value | curFormat | async }}</mat-footer-cell
             >
           </ng-container>
           <ng-container matColumnDef="delete">

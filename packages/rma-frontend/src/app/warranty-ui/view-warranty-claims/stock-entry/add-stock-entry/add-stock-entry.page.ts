@@ -23,7 +23,7 @@ export class AddStockEntryPage implements OnInit {
 
   dataSource: ItemsDataSource;
   stockEntryForm: FormGroup;
-  type: any;
+  type: Array<any> = [];
   itemsControl: FormArray;
   displayedColumns: string[] = [
     'serial_no',
@@ -36,10 +36,9 @@ export class AddStockEntryPage implements OnInit {
     'delete',
   ];
 
-  get f() {
+  get formControl() {
     return this.stockEntryForm.controls;
   }
-
   constructor(
     private readonly location: Location,
     private readonly time: TimeService,
@@ -48,8 +47,10 @@ export class AddStockEntryPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    Object.keys(STOCK_ENTRY_STATUS).map(key => {
+      this.type.push(STOCK_ENTRY_STATUS[key]);
+    });
     this.dataSource = new ItemsDataSource();
-    this.type = [STOCK_ENTRY_STATUS.REPLACE, STOCK_ENTRY_STATUS.UPGRADE];
     this.createFormGroup();
     this.setDateTime(new Date());
     this.addServiceInvoiceService
