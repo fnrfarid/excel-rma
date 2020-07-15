@@ -43,3 +43,18 @@ export const DELIVERY_STATUS = {
   UPGRADED: 'Upgraded',
   REJECTED: 'Rejected',
 };
+
+export const ITEM_COLUMN = {
+  SERIAL_NO: 'serial_no',
+  ITEM: 'item',
+  ITEM_NAME: 'item_name',
+  ITEM_CODE: 'item_code',
+  QUANTITY: 'quantity',
+  RATE: 'rate',
+  WAREHOUSE: 'warehouse',
+};
+
+export const STOCK_ENTRY_STATUS = {
+  REPLACE: 'Replace',
+  UPGRADE: 'Upgrade',
+};
