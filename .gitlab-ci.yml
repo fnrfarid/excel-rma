@@ -129,17 +129,28 @@ pack_rma_frontend:
     - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend
 
-deploy_staging:
-  image: dtzar/helm-kubectl:latest
+deploy_staging_frontend:
+  image: alpine:latest
+  stage: deploy
   only:
     refs:
       - master
-  stage: deploy
-  variables:
-    KUBECONFIG: /etc/deploy/config
+    changes:
+      - packages/rma-frontend/**/*
   before_script:
-    - mkdir -p /etc/deploy
-    - echo ${kube_config} | base64 -d > ${KUBECONFIG}
-    - kubectl config use-context staging
+    - apk add curl bash
   script:
-    - helm upgrade stg-rma -n staging helm-chart/rma-portal --reuse-values
+    - curl -Ss -X POST $FRONTEND_UPDATE_KEY
+
+deploy_staging_server:
+  image: alpine:latest
+  stage: deploy
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-server/**/*
+  before_script:
+    - apk add curl bash
+  script:
+    - curl -Ss -X POST $BACKEND_UPDATE_KEY
