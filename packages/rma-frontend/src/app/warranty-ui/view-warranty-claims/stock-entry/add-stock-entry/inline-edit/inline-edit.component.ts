@@ -4,7 +4,8 @@ import { filter, switchMap, startWith, map } from 'rxjs/operators';
 import { FormControl, Validators } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable } from 'rxjs';
-import { StockEntryService } from '../stock-entry.service';
+import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
+import { ITEM_COLUMN } from '../../../../../constants/app-string';
 
 @Component({
   selector: 'inline-edit',
@@ -51,7 +52,7 @@ export class InlineEditComponent {
 
   constructor(
     @Optional() @Host() public popover: SatPopover,
-    private stockEntryService: StockEntryService,
+    private addServiceInvoiceService: AddServiceInvoiceService,
   ) {}
 
   ngOnInit() {
@@ -68,7 +69,7 @@ export class InlineEditComponent {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.stockEntryService.getItemList(value);
+        return this.addServiceInvoiceService.getItemList(value);
       }),
     );
   }
@@ -87,7 +88,7 @@ export class InlineEditComponent {
     this.warehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.stockEntryService.getWarehouseList(value);
+        return this.addServiceInvoiceService.getWarehouseList(value);
       }),
       map(res => res.docs),
     );
@@ -95,50 +96,59 @@ export class InlineEditComponent {
 
   onSubmit() {
     if (this.popover) {
-      if (this.column === 'item') {
-        this.stockEntryService
-          .getItemPrice(this.itemFormControl.value.item_code)
-          .pipe(
-            switchMap(priceListArray => {
-              return this.stockEntryService
-                .getItemFromRMAServer(this.itemFormControl.value.item_code)
-                .pipe(
-                  map(item => {
-                    return {
-                      priceListArray,
-                      item,
-                    };
-                  }),
-                );
-            }),
-          )
-          .subscribe({
-            next: res => {
-              const selectedItem = {} as Item;
-              selectedItem.uuid = res.item.uuid;
-              selectedItem.minimumPrice = res.item.minimumPrice;
-              selectedItem.item_code = this.itemFormControl.value.item_code;
-              selectedItem.item_name = this.itemFormControl.value.item_name;
-              selectedItem.item_group = this.itemFormControl.value.item_group;
-              selectedItem.source_warehouse =
-                res.item.item_defaults[0].default_warehouse;
-              selectedItem.name = this.itemFormControl.value.name;
-              selectedItem.owner = this.itemFormControl.value.owner;
-              selectedItem.rate = 0;
-              selectedItem.has_serial_no = res.item.has_serial_no;
-              if (res.priceListArray.length > 0) {
-                selectedItem.rate = res.priceListArray[0].price_list_rate;
-              }
-              this.popover.close(selectedItem);
-            },
-          });
-      } else if (this.column === 'quantity') this.popover.close(this.quantity);
-      else if (this.column === 'warehouse') {
-        this.popover.close(this.warehouseFormControl.value.name);
-      } else {
-        if (this.rateFormControl.value < this.minimumPrice) {
-          this.rateFormControl.setErrors({ min: false });
-        } else this.popover.close(this.rateFormControl.value);
+      switch (this.column) {
+        case ITEM_COLUMN.ITEM:
+          this.addServiceInvoiceService
+            .getItemPrice(this.itemFormControl.value.item_code)
+            .pipe(
+              switchMap(priceListArray => {
+                return this.addServiceInvoiceService
+                  .getItemFromRMAServer(this.itemFormControl.value.item_code)
+                  .pipe(
+                    map(item => {
+                      return {
+                        priceListArray,
+                        item,
+                      };
+                    }),
+                  );
+              }),
+            )
+            .subscribe({
+              next: res => {
+                const selectedItem = {} as Item;
+                selectedItem.uuid = res.item.uuid;
+                selectedItem.minimumPrice = res.item.minimumPrice;
+                selectedItem.item_code = this.itemFormControl.value.item_code;
+                selectedItem.item_name = this.itemFormControl.value.item_name;
+                selectedItem.item_group = this.itemFormControl.value.item_group;
+                selectedItem.source_warehouse =
+                  res.item.item_defaults[0].default_warehouse;
+                selectedItem.name = this.itemFormControl.value.name;
+                selectedItem.owner = this.itemFormControl.value.owner;
+                selectedItem.rate = 0;
+                selectedItem.has_serial_no = res.item.has_serial_no;
+                if (res.priceListArray.length > 0) {
+                  selectedItem.rate = res.priceListArray[0].price_list_rate;
+                }
+                this.popover.close(selectedItem);
+              },
+            });
+          break;
+
+        case ITEM_COLUMN.QUANTITY:
+          this.popover.close(this.quantity);
+          break;
+
+        case ITEM_COLUMN.WAREHOUSE:
+          this.popover.close(this.warehouseFormControl.value.name);
+          break;
+
+        default:
+          if (this.rateFormControl.value < this.minimumPrice) {
+            this.rateFormControl.setErrors({ min: false });
+          } else this.popover.close(this.rateFormControl.value);
+          break;
       }
     }
   }

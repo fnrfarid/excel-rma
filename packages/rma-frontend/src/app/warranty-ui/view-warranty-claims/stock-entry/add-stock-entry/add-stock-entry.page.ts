@@ -5,9 +5,12 @@ import { TimeService } from '../../../../api/time/time.service';
 import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-datasource';
 import { Item } from '../../../../common/interfaces/sales.interface';
 import { WarrantyClaimsDetails } from '../../../../common/interfaces/warranty.interface';
-import { StockEntryService } from './stock-entry.service';
 import { ActivatedRoute } from '@angular/router';
-import { WARRANTY_TYPE } from '../../../../constants/app-string';
+import {
+  WARRANTY_TYPE,
+  STOCK_ENTRY_STATUS,
+} from '../../../../constants/app-string';
+import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
 
 @Component({
   selector: 'app-add-stock-entry',
@@ -40,16 +43,16 @@ export class AddStockEntryPage implements OnInit {
   constructor(
     private readonly location: Location,
     private readonly time: TimeService,
-    private readonly stockEntryService: StockEntryService,
+    private readonly addServiceInvoiceService: AddServiceInvoiceService,
     private readonly router: ActivatedRoute,
   ) {}
 
   ngOnInit() {
     this.dataSource = new ItemsDataSource();
-    this.type = ['Replace', 'Upgrade'];
+    this.type = [STOCK_ENTRY_STATUS.REPLACE, STOCK_ENTRY_STATUS.UPGRADE];
     this.createFormGroup();
     this.setDateTime(new Date());
-    this.stockEntryService
+    this.addServiceInvoiceService
       .getWarrantyDetail(this.router.snapshot.params.uuid)
       .subscribe({
         next: res => {
@@ -101,9 +104,9 @@ export class AddStockEntryPage implements OnInit {
 
   getFormState(state) {
     this.trimRow();
-    if (state === 'Replace') {
+    if (state === STOCK_ENTRY_STATUS.REPLACE) {
       if (this.warrantyObject.claim_type === WARRANTY_TYPE.NON_SERAIL) {
-        this.stockEntryService
+        this.addServiceInvoiceService
           .getItemFromRMAServer(this.warrantyObject.item_code)
           .subscribe({
             next: res => {
@@ -111,7 +114,7 @@ export class AddStockEntryPage implements OnInit {
             },
           });
       } else {
-        this.stockEntryService
+        this.addServiceInvoiceService
           .getSerial(this.warrantyObject.serial_no)
           .subscribe({
             next: res => {
@@ -132,9 +135,9 @@ export class AddStockEntryPage implements OnInit {
   }
 
   AddItem(item: Item) {
-    const copy = this.dataSource.data();
+    const itemDataSource = this.dataSource.data();
     if (!item.serial_no) {
-      copy.push({
+      itemDataSource.push({
         item_code: item.item_code,
         item_name: item.item_name,
         qty: 1,
@@ -143,7 +146,7 @@ export class AddStockEntryPage implements OnInit {
         target_warehouse: '',
       });
     } else {
-      copy.push({
+      itemDataSource.push({
         item_code: item.item_code,
         item_name: item.item_name,
         qty: 1,
@@ -154,7 +157,7 @@ export class AddStockEntryPage implements OnInit {
       });
     }
     this.calculateTotal(this.dataSource.data().slice());
-    this.dataSource.update(copy);
+    this.dataSource.update(itemDataSource);
     this.addItem();
   }
 
@@ -162,12 +165,12 @@ export class AddStockEntryPage implements OnInit {
     if (item == null) {
       return;
     }
-    const copy = this.dataSource.data().slice();
+    const itemDataSource = this.dataSource.data().slice();
     Object.assign(row, item);
     row.source_warehouse = item.source_warehouse;
     row.qty = 1;
     this.calculateTotal(this.dataSource.data().slice());
-    this.dataSource.update(copy);
+    this.dataSource.update(itemDataSource);
     this.itemsControl.controls[index].setValue(item);
   }
 
@@ -191,25 +194,24 @@ export class AddStockEntryPage implements OnInit {
     if (quantity == null) {
       return;
     }
-    const copy = this.dataSource.data().slice();
+    const itemDataSource = this.dataSource.data().slice();
     row.qty = quantity;
     this.calculateTotal(this.dataSource.data().slice());
-    this.dataSource.update(copy);
+    this.dataSource.update(itemDataSource);
   }
 
   updateRate(row: Item, rate: number) {
     if (rate == null) {
       return;
     }
-    const copy = this.dataSource.data().slice();
+    const itemDataSource = this.dataSource.data().slice();
     if (row.minimumPrice && row.minimumPrice > rate) {
       row.rate = row.minimumPrice;
     } else {
       row.rate = rate;
     }
     this.calculateTotal(this.dataSource.data().slice());
-
-    this.dataSource.update(copy);
+    this.dataSource.update(itemDataSource);
   }
 
   calculateTotal(itemList: Item[]) {
@@ -228,19 +230,19 @@ export class AddStockEntryPage implements OnInit {
   }
 
   updateSWarehouse(row: Item, index: number, source_warehouse: string) {
-    if (source_warehouse === '') {
+    if (!source_warehouse) {
       return;
     }
-    const copy = this.dataSource.data().slice();
+    const itemDataSource = this.dataSource.data().slice();
     row.source_warehouse = source_warehouse;
-    this.dataSource.update(copy);
+    this.dataSource.update(itemDataSource);
   }
   updateTWarehouse(row: Item, index: number, target_warehouse: string) {
-    if (target_warehouse === '') {
+    if (!target_warehouse) {
       return;
     }
-    const copy = this.dataSource.data().slice();
+    const itemDataSource = this.dataSource.data().slice();
     row.target_warehouse = target_warehouse;
-    this.dataSource.update(copy);
+    this.dataSource.update(itemDataSource);
   }
 }

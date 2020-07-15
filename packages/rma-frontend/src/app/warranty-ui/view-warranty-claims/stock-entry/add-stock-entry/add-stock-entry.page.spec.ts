@@ -12,10 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, PipeTransform, Pipe } from '@angular/core';
 import { TimeService } from '../../../../api/time/time.service';
-import { StockEntryService } from '../../../../stock-entry/services/stock-entry/stock-entry.service';
 import { of } from 'rxjs';
 import { StorageService } from '../../../../api/storage/storage.service';
 import { Location } from '@angular/common';
+import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -54,7 +54,7 @@ describe('AddStockEntryPage', () => {
           },
         },
         {
-          provide: StockEntryService,
+          provide: AddServiceInvoiceService,
           useValue: {
             getItemList: (...args) => of([]),
             getWarrantyDetail: (...args) => of([]),

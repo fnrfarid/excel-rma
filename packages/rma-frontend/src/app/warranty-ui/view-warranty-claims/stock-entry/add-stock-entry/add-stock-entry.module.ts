@@ -11,7 +11,6 @@ import { MaterialModule } from '../../../../material/material.module';
 import { RouterModule, Routes } from '@angular/router';
 import { AppCommonModule } from '../../../../common/app-common.module';
 import { InlineEditComponent } from './inline-edit/inline-edit.component';
-import { KeyDownDetectorDirective } from '../../stock-entry/add-stock-entry/on-key-down-directive';
 
 const routes: Routes = [
   {
@@ -30,10 +29,6 @@ const routes: Routes = [
     IonicModule,
     AddStockEntryPageRoutingModule,
   ],
-  declarations: [
-    InlineEditComponent,
-    KeyDownDetectorDirective,
-    AddStockEntryPage,
-  ],
+  declarations: [InlineEditComponent, AddStockEntryPage],
 })
 export class AddStockEntryPageModule {}
