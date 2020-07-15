@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
 
 @Component({
   selector: 'stock-entry',
@@ -6,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./stock-entry.component.scss'],
 })
 export class StockEntryComponent implements OnInit {
+  @Input()
+  warrantyObject: WarrantyClaimsDetails;
+  uuid: string = '';
   displayedColumns = [
     'stock_voucher_number',
     'claim_no',
@@ -16,5 +20,7 @@ export class StockEntryComponent implements OnInit {
   ];
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.uuid = this.warrantyObject?.uuid;
+  }
 }

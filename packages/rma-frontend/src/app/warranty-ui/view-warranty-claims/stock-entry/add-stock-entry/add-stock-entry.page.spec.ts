@@ -7,9 +7,22 @@ import {
   NoopAnimationsModule,
 } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, PipeTransform, Pipe } from '@angular/core';
+import { TimeService } from '../../../../api/time/time.service';
+import { of } from 'rxjs';
+import { StorageService } from '../../../../api/storage/storage.service';
+import { Location } from '@angular/common';
+import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
+
+@Pipe({ name: 'curFormat' })
+class MockPipe implements PipeTransform {
+  transform(value: string) {
+    return value;
+  }
+}
 
 describe('AddStockEntryPage', () => {
   let component: AddStockEntryPage;
@@ -17,7 +30,8 @@ describe('AddStockEntryPage', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AddStockEntryPage],
+      declarations: [AddStockEntryPage, MockPipe],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
       imports: [
         IonicModule.forRoot(),
         BrowserAnimationsModule,
@@ -27,6 +41,34 @@ describe('AddStockEntryPage', () => {
         ReactiveFormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
+      ],
+      providers: [
+        {
+          provide: Location,
+          useValue: {},
+        },
+        {
+          provide: TimeService,
+          useValue: {
+            getDateAndTime: (...args) => Promise.resolve({}),
+          },
+        },
+        {
+          provide: AddServiceInvoiceService,
+          useValue: {
+            getItemList: (...args) => of([]),
+            getWarrantyDetail: (...args) => of([]),
+            getItemFromRMAServer: (...args) => of({}),
+            getSerial: (...args) => of({}),
+          },
+        },
+        {
+          provide: StorageService,
+          useValue: {
+            getItem: (...args) => Promise.resolve('Item'),
+            getItems: (...args) => Promise.resolve({}),
+          },
+        },
       ],
     }).compileComponents();
 
