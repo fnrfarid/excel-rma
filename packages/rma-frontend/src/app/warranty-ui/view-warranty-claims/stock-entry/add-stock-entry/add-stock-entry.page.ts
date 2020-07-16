@@ -6,10 +6,7 @@ import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-da
 import { Item } from '../../../../common/interfaces/sales.interface';
 import { WarrantyClaimsDetails } from '../../../../common/interfaces/warranty.interface';
 import { ActivatedRoute } from '@angular/router';
-import {
-  WARRANTY_TYPE,
-  STOCK_ENTRY_STATUS,
-} from '../../../../constants/app-string';
+import { STOCK_ENTRY_STATUS } from '../../../../constants/app-string';
 import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
 
 @Component({
@@ -106,23 +103,23 @@ export class AddStockEntryPage implements OnInit {
   getFormState(state) {
     this.trimRow();
     if (state === STOCK_ENTRY_STATUS.REPLACE) {
-      if (this.warrantyObject.claim_type === WARRANTY_TYPE.NON_SERAIL) {
-        this.addServiceInvoiceService
-          .getItemFromRMAServer(this.warrantyObject.item_code)
-          .subscribe({
-            next: res => {
-              this.AddItem(res);
-            },
-          });
-      } else {
-        this.addServiceInvoiceService
-          .getSerial(this.warrantyObject.serial_no)
-          .subscribe({
-            next: res => {
-              this.AddItem(res);
-            },
-          });
-      }
+      this.addServiceInvoiceService
+        .getItemFromRMAServer(this.warrantyObject.item_code)
+        .subscribe({
+          next: serialItem => {
+            if (serialItem.has_serial_no) {
+              this.AddNonSerialItem(serialItem);
+            } else {
+              this.addServiceInvoiceService
+                .getSerial(this.warrantyObject.serial_no)
+                .subscribe({
+                  next: item => {
+                    this.AddSerialItem(item);
+                  },
+                });
+            }
+          },
+        });
     }
   }
 
@@ -135,28 +132,31 @@ export class AddStockEntryPage implements OnInit {
     }
   }
 
-  AddItem(item: Item) {
+  AddNonSerialItem(serialItem: any) {
     const itemDataSource = this.dataSource.data();
-    if (!item.serial_no) {
-      itemDataSource.push({
-        item_code: item.item_code,
-        item_name: item.item_name,
-        qty: 1,
-        rate: 0,
-        source_warehouse: item.item_defaults[0].default_warehouse,
-        target_warehouse: '',
-      });
-    } else {
-      itemDataSource.push({
-        item_code: item.item_code,
-        item_name: item.item_name,
-        qty: 1,
-        rate: 0,
-        source_warehouse: item.item_defaults[0].default_warehouse,
-        target_warehouse: '',
-        serial_no: item.serial_no,
-      });
-    }
+    itemDataSource.push({
+      item_code: serialItem.item_code,
+      item_name: serialItem.item_name,
+      qty: 1,
+      rate: 0,
+      serial_no: 'Non Serial Item',
+    });
+    this.calculateTotal(this.dataSource.data().slice());
+    this.dataSource.update(itemDataSource);
+    this.addItem();
+  }
+
+  AddSerialItem(serialItem: any) {
+    const itemDataSource = this.dataSource.data();
+    itemDataSource.push({
+      item_code: serialItem.item_code,
+      item_name: serialItem.item_name,
+      qty: 1,
+      rate: 0,
+      source_warehouse: serialItem.warehouse,
+      target_warehouse: '',
+      serial_no: serialItem.serial_no,
+    });
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(itemDataSource);
     this.addItem();
@@ -244,6 +244,18 @@ export class AddStockEntryPage implements OnInit {
     }
     const itemDataSource = this.dataSource.data().slice();
     row.target_warehouse = target_warehouse;
+    this.dataSource.update(itemDataSource);
+  }
+
+  updateSerial(row: Item, index: number, serial_no: any) {
+    if (!serial_no) {
+      return;
+    }
+    const itemDataSource = this.dataSource.data().slice();
+    row.serial_no = serial_no.serial_no;
+    row.item_name = serial_no.item_name;
+    row.source_warehouse = serial_no.source_warehouse;
+    row.qty = serial_no.qty;
     this.dataSource.update(itemDataSource);
   }
 }

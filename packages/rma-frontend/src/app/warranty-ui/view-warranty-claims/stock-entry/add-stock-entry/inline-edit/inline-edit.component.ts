@@ -21,9 +21,8 @@ export class InlineEditComponent {
   set value(x) {
     this.itemFormControl.setValue({ item_name: x });
     this.quantity = x;
-    this.warehouse = x;
+    this.serial_no = x;
     this.warehouseFormControl.setValue({ name: x });
-    this.serialFormControl.setValue(x);
     this.rateFormControl.setValue(x);
     this._value = x;
   }
@@ -39,7 +38,6 @@ export class InlineEditComponent {
   itemFormControl = new FormControl();
   rateFormControl = new FormControl('', [Validators.min(this.minimumPrice)]);
   warehouseFormControl = new FormControl();
-  serialFormControl = new FormControl();
 
   itemList: Array<Item>;
   filteredItemList: Observable<any[]>;
@@ -48,7 +46,7 @@ export class InlineEditComponent {
   /** Form model for the input. */
   comment = '';
   quantity: number = null;
-  warehouse: any = '';
+  serial_no: string = '';
 
   constructor(
     @Optional() @Host() public popover: SatPopover,
@@ -98,14 +96,17 @@ export class InlineEditComponent {
     if (this.popover) {
       switch (this.column) {
         case ITEM_COLUMN.ITEM:
+          this.popover.close(this.itemFormControl.value);
+          break;
+        case ITEM_COLUMN.SERIAL_NO:
           this.addServiceInvoiceService
-            .getItemPrice(this.itemFormControl.value.item_code)
+            .getSerial(this.serial_no)
             .pipe(
-              switchMap(priceListArray => {
+              switchMap(item => {
                 return this.addServiceInvoiceService
-                  .getItemFromRMAServer(this.itemFormControl.value.item_code)
+                  .getItemPrice(item.item_code)
                   .pipe(
-                    map(item => {
+                    map(priceListArray => {
                       return {
                         priceListArray,
                         item,
@@ -116,17 +117,16 @@ export class InlineEditComponent {
             )
             .subscribe({
               next: res => {
-                const selectedItem = {} as Item;
+                const selectedItem = {} as any;
                 selectedItem.uuid = res.item.uuid;
+                selectedItem.serial_no = res.item.serial_no;
                 selectedItem.minimumPrice = res.item.minimumPrice;
-                selectedItem.item_code = this.itemFormControl.value.item_code;
-                selectedItem.item_name = this.itemFormControl.value.item_name;
-                selectedItem.item_group = this.itemFormControl.value.item_group;
-                selectedItem.source_warehouse =
-                  res.item.item_defaults[0].default_warehouse;
-                selectedItem.name = this.itemFormControl.value.name;
-                selectedItem.owner = this.itemFormControl.value.owner;
+                selectedItem.item_code = res.item.item_code;
+                selectedItem.item_name = res.item.item_name;
+                selectedItem.item_group = res.item.item_group;
+                selectedItem.source_warehouse = res.item.warehouse;
                 selectedItem.rate = 0;
+                selectedItem.qty = 1;
                 selectedItem.has_serial_no = res.item.has_serial_no;
                 if (res.priceListArray.length > 0) {
                   selectedItem.rate = res.priceListArray[0].price_list_rate;
