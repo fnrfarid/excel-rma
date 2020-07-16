@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  fix-mongodb-permissions:
+    image: busybox
+    user: root
+    command: chown -R 1001:1001 /bitnami
+    volumes:
+      - mongo-vol:/bitnami
+
+  mongodb:
+    image: bitnami/mongodb:latest
+    restart: on-failure
+    environment:
+      - MONGODB_USERNAME=rma-server
+      - MONGODB_PASSWORD=admin
+      - MONGODB_DATABASE=rma-server
+      - MONGODB_ROOT_PASSWORD=admin
+      - CACHE_DB=cache-db
+      - CACHE_USER=cache-db
+      - CACHE_DB_PASSWORD=admin
+    volumes:
+      - mongo-vol:/bitnami
+      - ./createdatabases.sh:/docker-entrypoint-initdb.d/createdatabases.sh
+    depends_on:
+      - fix-mongodb-permissions
+
+  development:
+    build: .
+    volumes:
+      - /var/run/docker.sock:/var/run/docker-host.sock
+      - ..:/workspace
+    working_dir: /workspace
+    ports:
+      - '4700:4700'
+      - '8800:8800'
+
+volumes:
+  mongo-vol:
