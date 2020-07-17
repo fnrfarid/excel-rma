@@ -36,7 +36,7 @@ import {
 } from '../../../constants/app-strings';
 import { SerialNoAggregateService } from '../../aggregates/serial-no-aggregate/serial-no-aggregate.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { RetrieveDirectSerialNoQuery } from '../../../serial-no/query/get-direct-serial-no /retrieve-direct-serial-no.query';
+import { RetrieveDirectSerialNoQuery } from '../../../serial-no/query/get-direct-serial-no/retrieve-direct-serial-no.query';
 
 @Controller('serial_no')
 export class SerialNoController {
