@@ -135,10 +135,10 @@
             <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
             <mat-cell
               *matCellDef="let row;let i = index"
-              [satPopoverAnchor]="p"
+              [satPopoverAnchor]="popover"
               tabindex="0"
-              (keyup.enter)="p.open()"
-              (click)="p.open()"
+              (keyup.enter)="popover.open()"
+              (click)="popover.open()"
             >
               <ng-container *ngIf="row.serial_no">
                 {{row.serial_no}}
@@ -147,7 +147,7 @@
                 Non Serial Item
               </span>
               <sat-popover
-                #p
+                #popover
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
