@@ -133,13 +133,33 @@
         <mat-table #table [dataSource]="dataSource" style="width: 100%;">
           <ng-container matColumnDef="serial_no">
             <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
-            <mat-cell *matCellDef="let row;let i = index">
+            <mat-cell
+              *matCellDef="let row;let i = index"
+              [satPopoverAnchor]="popover"
+              tabindex="0"
+              (keyup.enter)="popover.open()"
+              (click)="popover.open()"
+            >
               <ng-container *ngIf="row.serial_no">
                 {{row.serial_no}}
               </ng-container>
               <span class="add-comment" *ngIf="!row.serial_no">
                 Non Serial Item
               </span>
+              <sat-popover
+                #popover
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateSerial(row,i,$event)"
+              >
+                <inline-edit
+                  style="width: 400px !important;"
+                  [value]="row.serial_no"
+                  column="serial_no"
+                  [minimumPrice]="row.minimumPrice"
+                ></inline-edit>
+              </sat-popover>
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
