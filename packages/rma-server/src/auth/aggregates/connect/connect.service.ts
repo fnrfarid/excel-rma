@@ -9,13 +9,14 @@ import { FrappeBearerTokenWebhookInterface } from '../../entities/token-cache/fr
 import { TokenCache } from '../../entities/token-cache/token-cache.entity';
 import * as uuidv4 from 'uuid/v4';
 import { ClientTokenManagerService } from '../client-token-manager/client-token-manager.service';
-import { switchMap, map, mergeMap } from 'rxjs/operators';
+import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { throwError, of, from } from 'rxjs';
 import { PLEASE_RUN_SETUP } from '../../../constants/messages';
 import {
   FRAPPE_API_GET_USER_INFO_ENDPOINT,
   FRAPPE_API_GET_USER_PERMISSION_ENDPOINT,
+  ERPNEXT_API_WAREHOUSE_ENDPOINT,
 } from '../../../constants/routes';
 import {
   FrappeUserInfoInterface,
@@ -245,6 +246,12 @@ export class ConnectService {
           const territory = this.mapUserTerritory(userTerritory);
           return this.getTerritoryWarehouse(territory).pipe(
             switchMap((warehouses: string[]) => {
+              if (!warehouses || !warehouses.length) {
+                return this.getAllWarehouses(settings.authServerURL, headers);
+              }
+              return of(warehouses);
+            }),
+            switchMap(warehouses => {
               this.tokenCacheService
                 .updateMany(
                   { email: frappeToken.user },
@@ -258,6 +265,25 @@ export class ConnectService {
             }),
           );
         }),
+      );
+  }
+
+  getAllWarehouses(authServerURL, headers) {
+    return this.http
+      .get(
+        authServerURL +
+          `${ERPNEXT_API_WAREHOUSE_ENDPOINT}?limit_page_length=${HUNDRED_NUMBERSTRING}`,
+        { headers },
+      )
+      .pipe(
+        map(data => data.data.data),
+        mergeMap(warehouses => {
+          return from(warehouses);
+        }),
+        mergeMap((warehouse: { name: string }) => {
+          return of(warehouse.name);
+        }),
+        toArray(),
       );
   }
 

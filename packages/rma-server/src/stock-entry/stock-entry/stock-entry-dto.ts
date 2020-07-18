@@ -20,6 +20,10 @@ export class StockEntryDto {
   @IsString()
   company: string;
 
+  @IsOptional()
+  @IsString()
+  remarks: string;
+
   @IsNotEmpty()
   @IsString()
   posting_date: string;

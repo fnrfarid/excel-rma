@@ -16,7 +16,7 @@ import {
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
-import { USER_ROLE } from './constants/app-string';
+import { USER_ROLE, TERRITORY, WAREHOUSES } from './constants/app-string';
 import { SettingsService } from './settings/settings.service';
 import { switchMap, retry, delay } from 'rxjs/operators';
 import { PermissionManager } from './api/permission/permission.service';
@@ -128,10 +128,8 @@ export class AppComponent implements OnInit {
   }
 
   checkRoles(token: string) {
-    this.settingService
-      .checkUserProfile(token)
-      .pipe(
-        switchMap((data: { roles?: string[] }) => {
+    this.settingService.checkUserProfile(token).pipe(
+        switchMap((data: any) => {
           if (data && data.roles && data.roles.length === 0) {
             return of({}).pipe(
               delay(500),
@@ -145,10 +143,12 @@ export class AppComponent implements OnInit {
         retry(6),
       )
       .subscribe({
-        next: res => {
+        next: (res : {roles?: string[];warehouses : string[]; territory: string[] }) => {
           this.loggedIn = true;
-          if (res && res.roles) {
-            this.appService.getStorage().setItem(USER_ROLE, res.roles);
+          if (res) {
+            this.appService.getStorage().setItem(USER_ROLE, res.roles  || []);
+            this.appService.getStorage().setItem(TERRITORY, res.territory || []);
+            this.appService.getStorage().setItem(WAREHOUSES, res.warehouses || []);
           }
         },
         error: error => {},

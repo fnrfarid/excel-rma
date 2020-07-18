@@ -43,6 +43,8 @@ export class MaterialTransferDto {
   stock_entry_type: string;
 
   company: string;
+  territory: string;
+  remarks: string;
 
   posting_date: string;
 

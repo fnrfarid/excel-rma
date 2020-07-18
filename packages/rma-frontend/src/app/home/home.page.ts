@@ -48,8 +48,10 @@ export class HomePage implements OnInit {
         filter(event => event instanceof NavigationEnd),
         map((event: any) => {
           this.spinner = true;
-          if (event.url === '/sales') this.loadProfile();
-          return event;
+          if (event.url === '/home'){
+            this.loadProfile()
+            return event;
+          }
         }),
       )
       .subscribe({
@@ -81,6 +83,10 @@ export class HomePage implements OnInit {
   }
 
   loadProfile() {
+    if(this.email && this.fullName){
+      this.spinner = false;
+      return;
+    }
     from(this.storage.getItem(ACCESS_TOKEN))
       .pipe(
         delay(DURATION),
