@@ -95,6 +95,7 @@ export class AddSalesInvoicePage implements OnInit {
           this.salesInvoiceForm.get('customer').setValue({
             name: res.customer,
             owner: res.contact_email,
+            customer_name: res.customer_name
           });
           this.salesInvoiceForm
             .get('postingDate')
@@ -332,7 +333,6 @@ export class AddSalesInvoicePage implements OnInit {
       date.setDate(date.getDate() + customer.credit_days);
       this.salesInvoiceForm.get('dueDate').setValue(date);
     } else this.salesInvoiceForm.get('dueDate').setValue('');
-
     this.salesService.getAddress(customer.name).subscribe({
       next: res => {
         this.address = res;
@@ -373,6 +373,9 @@ export class AddSalesInvoicePage implements OnInit {
       salesInvoiceDetails.contact_email = this.salesInvoiceForm.get(
         'customer',
       ).value.owner;
+      salesInvoiceDetails.customer_name = this.salesInvoiceForm.get(
+        'customer',
+      ).value.customer_name;
       salesInvoiceDetails.status = DRAFT;
       salesInvoiceDetails.remarks = this.salesInvoiceForm.get('remarks').value;
       salesInvoiceDetails.delivery_warehouse = this.salesInvoiceForm.get(
@@ -400,7 +403,7 @@ export class AddSalesInvoicePage implements OnInit {
       }
       this.validateStock(itemList)
         .pipe(
-          switchMap(info => {
+          switchMap(info => {            
             return this.salesService.createSalesInvoice(salesInvoiceDetails);
           }),
         )
@@ -408,7 +411,8 @@ export class AddSalesInvoicePage implements OnInit {
           next: success => {
             this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
-          error: ({ message }) => {
+          error: (err) => {
+            let message = err
             if (!message) message = UPDATE_ERROR;
             this.snackbar.open(message, 'Close', {
               duration: DURATION,
@@ -531,7 +535,12 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   getOptionText(option) {
-    if (option) return option.name;
+    if (option) {
+      if(option.customer_name){
+        return `${option.customer_name} (${option.name})`
+      }
+      return option.name;
+    }
   }
 
   getApiInfo() {
