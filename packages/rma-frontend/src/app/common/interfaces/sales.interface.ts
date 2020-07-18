@@ -20,7 +20,7 @@ export class Item {
   amount?: number;
   minimumPrice?: number;
   description?: string;
-  serial_no?: string;
+  serial_no?: string[];
   delivery_note?: string;
   has_serial_no?: number;
   salesWarrantyMonths?: number;
@@ -31,8 +31,9 @@ export class Item {
   remaining?: number;
   item_group?: string;
   item_defaults?: ItemDefaults;
-  source_warehouse?: string;
-  target_warehouse?: string;
+  s_warehouse?: string;
+  t_warehouse?: string;
+  transferWarehouse?: string;
 }
 
 export class ItemDefaults {
