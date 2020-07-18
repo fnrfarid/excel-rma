@@ -54,8 +54,8 @@
             <mat-form-field class="full-width">
               <input
                 matInput
-                placeholder="Customer"
-                [(ngModel)]="customer"
+                placeholder="Customer Name"
+                [(ngModel)]="customer_name"
                 (keyup.enter)="setFilter()"
               />
             </mat-form-field>
@@ -193,13 +193,13 @@
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
-        <!-- customer Column -->
-        <ng-container matColumnDef="customer">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="customer">
-            Customer
+        <!-- customer_name Column -->
+        <ng-container matColumnDef="customer_name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="customer_name">
+            Customer Name
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.customer}}
+            {{ row.customer_name || row.customer }}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef>Total</mat-footer-cell>
         </ng-container>

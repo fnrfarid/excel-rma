@@ -200,6 +200,7 @@ export class SalesInvoiceDetails {
   customer_email: string;
   due_date: string;
   address_display: string;
+  customer_name: string;
   contact_display: string;
   status: string;
   submitted?: string;
