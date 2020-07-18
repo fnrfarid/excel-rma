@@ -70,8 +70,8 @@ export class MaterialTransferComponent implements OnInit {
   readonly: boolean = false;
   company: string;
   status: string;
-  territory : string ;
-  remarks : string;
+  territory: string;
+  remarks: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
   transferWarehouse: string;

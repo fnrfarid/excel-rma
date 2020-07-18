@@ -95,7 +95,7 @@ export class AddSalesInvoicePage implements OnInit {
           this.salesInvoiceForm.get('customer').setValue({
             name: res.customer,
             owner: res.contact_email,
-            customer_name: res.customer_name
+            customer_name: res.customer_name,
           });
           this.salesInvoiceForm
             .get('postingDate')
@@ -403,7 +403,7 @@ export class AddSalesInvoicePage implements OnInit {
       }
       this.validateStock(itemList)
         .pipe(
-          switchMap(info => {            
+          switchMap(info => {
             return this.salesService.createSalesInvoice(salesInvoiceDetails);
           }),
         )
@@ -411,8 +411,8 @@ export class AddSalesInvoicePage implements OnInit {
           next: success => {
             this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
-          error: (err) => {
-            let message = err
+          error: err => {
+            let message = err;
             if (!message) message = UPDATE_ERROR;
             this.snackbar.open(message, 'Close', {
               duration: DURATION,
@@ -536,8 +536,8 @@ export class AddSalesInvoicePage implements OnInit {
 
   getOptionText(option) {
     if (option) {
-      if(option.customer_name){
-        return `${option.customer_name} (${option.name})`
+      if (option.customer_name) {
+        return `${option.customer_name} (${option.name})`;
       }
       return option.name;
     }

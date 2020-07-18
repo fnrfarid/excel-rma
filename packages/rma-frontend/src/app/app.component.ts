@@ -128,7 +128,9 @@ export class AppComponent implements OnInit {
   }
 
   checkRoles(token: string) {
-    this.settingService.checkUserProfile(token).pipe(
+    this.settingService
+      .checkUserProfile(token)
+      .pipe(
         switchMap((data: any) => {
           if (data && data.roles && data.roles.length === 0) {
             return of({}).pipe(
@@ -143,12 +145,20 @@ export class AppComponent implements OnInit {
         retry(6),
       )
       .subscribe({
-        next: (res : {roles?: string[];warehouses : string[]; territory: string[] }) => {
+        next: (res: {
+          roles?: string[];
+          warehouses: string[];
+          territory: string[];
+        }) => {
           this.loggedIn = true;
           if (res) {
-            this.appService.getStorage().setItem(USER_ROLE, res.roles  || []);
-            this.appService.getStorage().setItem(TERRITORY, res.territory || []);
-            this.appService.getStorage().setItem(WAREHOUSES, res.warehouses || []);
+            this.appService.getStorage().setItem(USER_ROLE, res.roles || []);
+            this.appService
+              .getStorage()
+              .setItem(TERRITORY, res.territory || []);
+            this.appService
+              .getStorage()
+              .setItem(WAREHOUSES, res.warehouses || []);
           }
         },
         error: error => {},
