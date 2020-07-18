@@ -91,17 +91,22 @@ export class ResetCreditLimitService implements OnModuleInit {
 
                             for (const limit of creditLimits) {
                               if (limit.company === settings.defaultCompany) {
-                                return this.http.put(
-                                  settings.authServerURL +
-                                    ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT +
-                                    '/' +
-                                    limit.name,
-                                  {
-                                    credit_limit:
-                                      customer.baseCreditLimitAmount,
-                                  },
-                                  { headers },
-                                );
+                                this.http
+                                  .put(
+                                    settings.authServerURL +
+                                      ERPNEXT_CUSTOMER_CREDIT_LIMIT_ENDPOINT +
+                                      '/' +
+                                      limit.name,
+                                    {
+                                      credit_limit:
+                                        customer.baseCreditLimitAmount,
+                                    },
+                                    { headers },
+                                  )
+                                  .subscribe({
+                                    next: success => {},
+                                    error: error => {},
+                                  });
                               }
                             }
 
@@ -109,14 +114,27 @@ export class ResetCreditLimitService implements OnModuleInit {
                               credit_limit: customer.baseCreditLimitAmount,
                               company: settings.defaultCompany,
                             });
-                            return this.http.put(
-                              settings.authServerURL +
-                                FRAPPE_API_GET_CUSTOMER_ENDPOINT +
-                                '/' +
-                                customer.name,
-                              { credit_limits: creditLimits },
-                              { headers },
-                            );
+                            return this.http
+                              .put(
+                                settings.authServerURL +
+                                  FRAPPE_API_GET_CUSTOMER_ENDPOINT +
+                                  '/' +
+                                  customer.name,
+                                { credit_limits: creditLimits },
+                                { headers },
+                              )
+                              .pipe(
+                                map(data => {
+                                  this.customer
+                                    .updateOne(
+                                      { uuid: customerWithCredit.uuid },
+                                      { $unset: { tempCreditLimitPeriod: '' } },
+                                    )
+                                    .then(updated => {})
+                                    .catch(error => {});
+                                  return data;
+                                }),
+                              );
                           }),
                         );
                     }),
@@ -129,13 +147,6 @@ export class ResetCreditLimitService implements OnModuleInit {
           .toPromise()
           .then(success => {
             Logger.log(RESET_CREDIT_LIMIT_SUCCESS, this.constructor.name);
-            this.customer
-              .updateOne(
-                { uuid: customerWithCredit.uuid },
-                { $unset: { tempCreditLimitPeriod: '' } },
-              )
-              .then(updated => {})
-              .catch(error => {});
             done();
             job
               .remove()
