@@ -18,6 +18,9 @@ export class SalesInvoice extends BaseEntity {
   naming_series: string;
 
   @Column()
+  customer_name: string;
+
+  @Column()
   outstanding_amount: string;
 
   @Column()

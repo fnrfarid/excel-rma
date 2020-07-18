@@ -49,7 +49,7 @@ export class SalesPage implements OnInit {
     'status',
     'posting_date',
     'posting_time',
-    'customer',
+    'customer_name',
     'total',
     'due_amount',
     'remarks',
@@ -67,7 +67,7 @@ export class SalesPage implements OnInit {
     'All',
   ];
   campaignStatus: string[] = ['Yes', 'No', 'All'];
-  customer: string = '';
+  customer_name: string = '';
   status: string = 'All';
   name: string = '';
   branch: string = '';
@@ -142,7 +142,7 @@ export class SalesPage implements OnInit {
 
   getUpdate(event) {
     const query: any = {};
-    if (this.customer) query.customer = this.customer;
+    if (this.customer_name) query.customer_name = this.customer_name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.campaign) {
@@ -214,7 +214,7 @@ export class SalesPage implements OnInit {
   }
 
   clearFilters() {
-    this.customer = '';
+    this.customer_name = '';
     this.status = 'All';
     this.name = '';
     this.branch = '';
@@ -227,7 +227,7 @@ export class SalesPage implements OnInit {
 
   setFilter(event?) {
     const query: any = {};
-    if (this.customer) query.customer = this.customer;
+    if (this.customer_name) query.customer_name = this.customer_name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.branch) query.territory = this.branch;

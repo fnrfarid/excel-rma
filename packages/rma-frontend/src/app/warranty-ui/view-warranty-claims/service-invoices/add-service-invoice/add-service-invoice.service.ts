@@ -8,7 +8,7 @@ import {
   LIST_TERRITORIES_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   CREATE_SERVICE_INVOICE_ENDPOINT,
-  GET_SERIAL_ENDPOINT,
+  GET_DIRECT_SERIAL_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -201,7 +201,7 @@ export class AddServiceInvoiceService {
   }
 
   getSerial(serial_no) {
-    const url = `${GET_SERIAL_ENDPOINT}/${serial_no}`;
+    const url = `${GET_DIRECT_SERIAL_ENDPOINT}/${serial_no}`;
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get<any>(url, { headers });

@@ -53,9 +53,9 @@
               readonly="true"
               type="string"
               value="{{
-                salesInvoiceDetails?.customer
-                  ? salesInvoiceDetails.customer
-                  : ''
+                salesInvoiceDetails?.customer_name
+                  ? salesInvoiceDetails?.customer_name + ' (' + salesInvoiceDetails?.customer + ')'
+                  : salesInvoiceDetails?.customer
               }}"
             ></ion-input>
           </ion-item>

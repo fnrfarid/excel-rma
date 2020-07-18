@@ -16,6 +16,10 @@ export class SalesInvoiceDto {
 
   @IsNotEmpty()
   @IsString()
+  customer_name: string;
+
+  @IsNotEmpty()
+  @IsString()
   company: string;
 
   @IsNotEmpty()

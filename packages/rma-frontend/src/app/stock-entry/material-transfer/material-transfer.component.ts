@@ -70,6 +70,8 @@ export class MaterialTransferComponent implements OnInit {
   readonly: boolean = false;
   company: string;
   status: string;
+  territory: string;
+  remarks: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
   transferWarehouse: string;
@@ -509,6 +511,7 @@ export class MaterialTransferComponent implements OnInit {
     const body = new MaterialTransferDto();
     const date = await this.timeService.getDateAndTime(new Date());
     body.company = this.company;
+    body.remarks = this.remarks;
     body.posting_date = date.date;
     body.posting_time = date.time;
     body.stock_entry_type = MATERIAL_TRANSFER;
