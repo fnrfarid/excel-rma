@@ -3,12 +3,20 @@ import { TestBed } from '@angular/core/testing';
 import { SalesService } from './sales.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { STORAGE_TOKEN } from '../../api/storage/storage.service';
+import { of } from 'rxjs';
 
 describe('SalesService', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{ provide: STORAGE_TOKEN, useValue: {} }],
+      providers: [
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItemAsync: (...args) => of({}),
+          },
+        },
+      ],
     }),
   );
 

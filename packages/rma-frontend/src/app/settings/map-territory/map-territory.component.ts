@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { debounceTime, startWith } from 'rxjs/operators';
 import { PopoverController, NavParams } from '@ionic/angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE } from 'src/app/constants/app-string';
+import { CLOSE } from '../../constants/app-string';
 
 @Component({
   selector: 'app-map-territory',
