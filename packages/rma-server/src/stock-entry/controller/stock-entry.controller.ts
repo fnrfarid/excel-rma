@@ -20,15 +20,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { throwError } from 'rxjs';
 import { INVALID_FILE } from '../../constants/app-strings';
 import { PurchaseInvoiceListQueryDto } from '../../constants/listing-dto/purchase-invoice-list-query';
-import { WarrantyStockEntryAggregateService } from '../aggregates/warranty-stock-entry-aggregate/warranty-stock-entry-aggregate.service';
-import { WarrantyStockEntryDto } from '../stock-entry/warranty-stock-entry-dto';
 
 @Controller('stock_entry')
 export class StockEntryController {
-  constructor(
-    private readonly aggregate: StockEntryAggregateService,
-    private readonly warrantyStockAggregate: WarrantyStockEntryAggregateService,
-  ) {}
+  constructor(private readonly aggregate: StockEntryAggregateService) {}
 
   @Post('v1/create')
   @UseGuards(TokenGuard)
@@ -83,12 +78,5 @@ export class StockEntryController {
   @UseGuards(TokenGuard)
   rejectStockEntry(@Param('uuid') uuid, @Req() req) {
     return this.aggregate.rejectStockEntry(uuid, req);
-  }
-
-  @Post('v1/create_warranty_stock')
-  @UseGuards(TokenGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  createWarrantyStock(@Body() body: WarrantyStockEntryDto, @Req() req) {
-    return this.warrantyStockAggregate.createStockEntry(body, req);
   }
 }

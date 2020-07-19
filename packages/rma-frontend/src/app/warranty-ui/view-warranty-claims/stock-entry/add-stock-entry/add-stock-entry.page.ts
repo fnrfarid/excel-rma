@@ -4,25 +4,10 @@ import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { TimeService } from '../../../../api/time/time.service';
 import { ItemsDataSource } from '../../../../sales-ui/add-sales-invoice/items-datasource';
 import { Item } from '../../../../common/interfaces/sales.interface';
-import {
-  WarrantyClaimsDetails,
-  StockEntryDetails,
-} from '../../../../common/interfaces/warranty.interface';
-import { ActivatedRoute, Router } from '@angular/router';
-import {
-  STOCK_ENTRY_STATUS,
-  MATERIAL_TRANSFER,
-  DURATION,
-} from '../../../../constants/app-string';
+import { WarrantyClaimsDetails } from '../../../../common/interfaces/warranty.interface';
+import { ActivatedRoute } from '@angular/router';
+import { STOCK_ENTRY_STATUS } from '../../../../constants/app-string';
 import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
-import { DEFAULT_COMPANY } from '../../../../constants/storage';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  DUPLICATE_SERIAL,
-  SAME_WAREHOUSE_ERROR,
-  STOCK_ENTRY_CREATED,
-  STOCK_ENTRY_CREATE_FAILURE,
-} from '../../../../constants/messages';
 
 @Component({
   selector: 'app-add-stock-entry',
@@ -32,7 +17,7 @@ import {
 export class AddStockEntryPage implements OnInit {
   @Input()
   warrantyObject: WarrantyClaimsDetails;
-  company: string;
+
   dataSource: ItemsDataSource;
   stockEntryForm: FormGroup;
   type: Array<any> = [];
@@ -43,6 +28,8 @@ export class AddStockEntryPage implements OnInit {
     'source_warehouse',
     'target_warehouse',
     'quantity',
+    'rate',
+    'total',
     'delete',
   ];
 
@@ -53,27 +40,18 @@ export class AddStockEntryPage implements OnInit {
     private readonly location: Location,
     private readonly time: TimeService,
     private readonly addServiceInvoiceService: AddServiceInvoiceService,
-    private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router,
-    private readonly snackbar: MatSnackBar,
+    private readonly router: ActivatedRoute,
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     this.type = Object.keys(STOCK_ENTRY_STATUS).map(
       key => STOCK_ENTRY_STATUS[key],
     );
     this.dataSource = new ItemsDataSource();
     this.createFormGroup();
     this.setDateTime(new Date());
-    this.company = await this.addServiceInvoiceService
-      .getStore()
-      .getItem(DEFAULT_COMPANY);
-    this.getWarrantyDetail();
-  }
-
-  getWarrantyDetail() {
     this.addServiceInvoiceService
-      .getWarrantyDetail(this.activatedRoute.snapshot.params.uuid)
+      .getWarrantyDetail(this.router.snapshot.params.uuid)
       .subscribe({
         next: res => {
           this.warrantyObject = res;
@@ -85,39 +63,15 @@ export class AddStockEntryPage implements OnInit {
     this.location.back();
   }
 
-  submitDraft() {
-    const selectedItem = {} as StockEntryDetails;
-    selectedItem.company = this.company;
-    selectedItem.warrantyObjectUuid = this.warrantyObject.uuid;
-    selectedItem.stock_entry_type = MATERIAL_TRANSFER;
-    selectedItem.posting_date = this.stockEntryForm.controls.date.value;
-    selectedItem.type = this.stockEntryForm.controls.type.value;
-    selectedItem.items = this.dataSource.data();
-    this.addServiceInvoiceService.createStockEntry(selectedItem).subscribe({
-      next: res => {
-        this.snackbar.open(STOCK_ENTRY_CREATED, 'Close', {
-          duration: DURATION,
-        });
-        this.router.navigate([
-          '/warranty/view-warranty-claims',
-          this.activatedRoute.snapshot.params.uuid,
-        ]);
-      },
-      error: ({ message }) => {
-        if (!message) message = STOCK_ENTRY_CREATE_FAILURE;
-        this.snackbar.open(message, 'Close', {
-          duration: DURATION,
-        });
-      },
-    });
-  }
+  submitDraft() {}
 
   createFormGroup() {
     this.stockEntryForm = new FormGroup({
       type: new FormControl('', [Validators.required]),
       date: new FormControl('', Validators.required),
       description: new FormControl('', Validators.required),
-      items: new FormArray([]),
+      items: new FormArray([], this.itemValidator),
+      total: new FormControl(0),
     });
     this.itemsControl = this.stockEntryForm.controls.items as FormArray;
   }
@@ -146,9 +100,9 @@ export class AddStockEntryPage implements OnInit {
     }
   }
 
-  setStockEntryType(type) {
+  getFormState(state) {
     this.trimRow();
-    if (type === STOCK_ENTRY_STATUS.REPLACE) {
+    if (state === STOCK_ENTRY_STATUS.REPLACE) {
       this.addServiceInvoiceService
         .getItemFromRMAServer(this.warrantyObject.item_code)
         .subscribe({
@@ -173,6 +127,7 @@ export class AddStockEntryPage implements OnInit {
     for (let index = 0; index <= this.dataSource.data().length; index++) {
       this.dataSource.data().splice(0, 1);
       this.itemsControl.removeAt(0);
+      this.calculateTotal(this.dataSource.data().slice());
       this.dataSource.update(this.dataSource.data());
     }
   }
@@ -184,8 +139,9 @@ export class AddStockEntryPage implements OnInit {
       item_name: serialItem.item_name,
       qty: 1,
       rate: 0,
-      serial_no: ['Non Serial Item'],
+      serial_no: 'Non Serial Item',
     });
+    this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(itemDataSource);
     this.addItem();
   }
@@ -197,10 +153,11 @@ export class AddStockEntryPage implements OnInit {
       item_name: serialItem.item_name,
       qty: 1,
       rate: 0,
-      s_warehouse: serialItem.warehouse,
-      t_warehouse: '',
-      serial_no: [serialItem.serial_no],
+      source_warehouse: serialItem.warehouse,
+      target_warehouse: '',
+      serial_no: serialItem.serial_no,
     });
+    this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(itemDataSource);
     this.addItem();
   }
@@ -211,8 +168,9 @@ export class AddStockEntryPage implements OnInit {
     }
     const itemDataSource = this.dataSource.data().slice();
     Object.assign(row, item);
-    row.s_warehouse = item.s_warehouse;
+    row.source_warehouse = item.source_warehouse;
     row.qty = 1;
+    this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(itemDataSource);
     this.itemsControl.controls[index].setValue(item);
   }
@@ -223,10 +181,11 @@ export class AddStockEntryPage implements OnInit {
     item.item_code = '';
     item.item_name = '';
     item.qty = 0;
+    item.rate = 0;
     item.minimumPrice = 0;
-    item.serial_no = [];
-    item.s_warehouse = '';
-    item.t_warehouse = '';
+    item.serial_no = '';
+    item.source_warehouse = '';
+    item.target_warehouse = '';
     data.push(item);
     this.itemsControl.push(new FormControl(item));
     this.dataSource.update(data);
@@ -238,66 +197,65 @@ export class AddStockEntryPage implements OnInit {
     }
     const itemDataSource = this.dataSource.data().slice();
     row.qty = quantity;
+    this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(itemDataSource);
+  }
+
+  updateRate(row: Item, rate: number) {
+    if (rate == null) {
+      return;
+    }
+    const itemDataSource = this.dataSource.data().slice();
+    if (row.minimumPrice && row.minimumPrice > rate) {
+      row.rate = row.minimumPrice;
+    } else {
+      row.rate = rate;
+    }
+    this.calculateTotal(this.dataSource.data().slice());
+    this.dataSource.update(itemDataSource);
+  }
+
+  calculateTotal(itemList: Item[]) {
+    let sum = 0;
+    itemList.forEach(item => {
+      sum += item.qty * item.rate;
+    });
+    this.stockEntryForm.controls.total.setValue(sum);
   }
 
   deleteRow(i: number) {
     this.dataSource.data().splice(i, 1);
     this.itemsControl.removeAt(i);
+    this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
   }
 
-  updateSWarehouse(row: Item, source_warehouse: string) {
+  updateSWarehouse(row: Item, index: number, source_warehouse: string) {
     if (!source_warehouse) {
       return;
     }
     const itemDataSource = this.dataSource.data().slice();
-    if (row.t_warehouse === source_warehouse) {
-      this.snackbar.open(SAME_WAREHOUSE_ERROR, 'Close', { duration: DURATION });
-    } else {
-      row.s_warehouse = source_warehouse;
-      row.transferWarehouse = source_warehouse;
-    }
+    row.source_warehouse = source_warehouse;
     this.dataSource.update(itemDataSource);
   }
-
-  updateTWarehouse(row: Item, target_warehouse: string) {
+  updateTWarehouse(row: Item, index: number, target_warehouse: string) {
     if (!target_warehouse) {
       return;
     }
     const itemDataSource = this.dataSource.data().slice();
-    if (row.s_warehouse === target_warehouse) {
-      this.snackbar.open(SAME_WAREHOUSE_ERROR, 'Close', { duration: DURATION });
-    } else {
-      row.t_warehouse = target_warehouse;
-    }
+    row.target_warehouse = target_warehouse;
     this.dataSource.update(itemDataSource);
   }
 
-  updateSerial(row: Item, serial_no: any) {
+  updateSerial(row: Item, index: number, serial_no: any) {
     if (!serial_no) {
       return;
     }
-    if (this.checkDuplicateSerial(serial_no)) {
-      const itemDataSource = this.dataSource.data().slice();
-      row.serial_no[0] = serial_no.serial_no[0];
-      row.item_name = serial_no.item_name;
-      row.s_warehouse = serial_no.source_warehouse;
-      row.qty = serial_no.qty;
-      row.item_code = serial_no.item_code;
-      this.dataSource.update(itemDataSource);
-    }
-  }
-
-  checkDuplicateSerial(serial) {
-    let result: boolean = true;
-    for (const iterator of this.dataSource.data()) {
-      if (iterator.serial_no[0] === serial.serial_no[0]) {
-        this.snackbar.open(DUPLICATE_SERIAL, 'Close', { duration: DURATION });
-        result = false;
-        break;
-      }
-    }
-    return result;
+    const itemDataSource = this.dataSource.data().slice();
+    row.serial_no = serial_no.serial_no;
+    row.item_name = serial_no.item_name;
+    row.source_warehouse = serial_no.source_warehouse;
+    row.qty = serial_no.qty;
+    this.dataSource.update(itemDataSource);
   }
 }

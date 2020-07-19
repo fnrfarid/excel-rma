@@ -9,7 +9,6 @@ import {
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   CREATE_SERVICE_INVOICE_ENDPOINT,
   GET_DIRECT_SERIAL_ENDPOINT,
-  CREATE_WARRANTY_STOCK_ENTRY,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -25,7 +24,6 @@ import {
 } from '../../../../constants/storage';
 import { StorageService } from '../../../../api/storage/storage.service';
 import { ServiceInvoiceDetails } from './service-invoice-interface';
-import { StockEntryDetails } from '../../../../common/interfaces/warranty.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -209,20 +207,5 @@ export class AddServiceInvoiceService {
         return this.http.get<any>(url, { headers });
       }),
     );
-  }
-
-  createStockEntry(warrantyStockPayload) {
-    const url = CREATE_WARRANTY_STOCK_ENTRY;
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.post<StockEntryDetails>(url, warrantyStockPayload, {
-          headers,
-        });
-      }),
-    );
-  }
-
-  getStore() {
-    return this.storage;
   }
 }
