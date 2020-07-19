@@ -54,15 +54,6 @@ export class StockEntry extends BaseEntity {
   isSynced: boolean;
 
   @Column()
-  description: string;
-
-  @Column()
-  type: string;
-
-  @Column()
-  warrantyClaimUuid: string;
-
-  @Column()
   items: StockEntryItem[];
 }
 
