@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { ALL_TERRITORIES } from '../../../constants/app-strings';
 
 @Injectable()
 export class SalesInvoiceService {
@@ -62,7 +63,9 @@ export class SalesInvoiceService {
     }
 
     const customerQuery =
-      territories && territories.length !== 0
+      territories &&
+      territories.length !== 0 &&
+      !territories.includes(ALL_TERRITORIES)
         ? { territory: { $in: territories } }
         : {};
 

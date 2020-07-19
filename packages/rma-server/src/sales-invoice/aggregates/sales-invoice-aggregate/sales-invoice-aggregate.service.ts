@@ -79,10 +79,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               salesInvoice.createdByEmail = clientHttpRequest.token.email;
               salesInvoice.createdBy = clientHttpRequest.token.fullName;
               salesInvoice.uuid = uuidv4();
-              salesInvoice.territory =
-                clientHttpRequest.token.territory.length !== 0
-                  ? clientHttpRequest.token.territory[0]
-                  : salesInvoice.territory;
               salesInvoice.created_on = new DateTime(
                 settings.timeZone,
               ).toJSDate();
@@ -116,7 +112,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     clientHttpRequest: { token: TokenCache },
   ) {
     let territory = clientHttpRequest.token.territory;
-    if (clientHttpRequest.token.roles.includes(SYSTEM_MANAGER)) {
+    if (clientHttpRequest.token.roles.includes(SYSTEM_MANAGER + '!')) {
       territory = [];
     }
     return await this.salesInvoiceService.list(

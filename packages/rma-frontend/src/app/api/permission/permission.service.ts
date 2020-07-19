@@ -58,11 +58,12 @@ export class PermissionManager {
   }
 
   validateRoles(user_roles: string[], module: string, state: string) {
-    const roles = [SYSTEM_MANAGER];
+    const roles = [];
     if (state === 'active') {
       roles.push(...this.getActiveRoles(module, state));
     } else {
       try {
+        roles.push(SYSTEM_MANAGER);
         roles.push(...PermissionRoles[module][state]);
       } catch {
         return throwError('Module and state dose not exist.');

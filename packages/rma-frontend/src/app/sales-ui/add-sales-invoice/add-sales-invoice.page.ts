@@ -26,6 +26,8 @@ import {
   DURATION,
   UPDATE_ERROR,
   SHORT_DURATION,
+  TERRITORY,
+  WAREHOUSES,
 } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ItemPriceService } from '../services/item-price.service';
@@ -63,6 +65,7 @@ export class AddSalesInvoicePage implements OnInit {
   address = {} as any;
   displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
   filteredWarehouseList: Observable<any[]>;
+  territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
   salesInvoiceForm: FormGroup;
   itemsControl: FormArray;
@@ -92,6 +95,7 @@ export class AddSalesInvoicePage implements OnInit {
       this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
         next: (res: SalesInvoiceDetails) => {
           this.salesInvoiceForm.get('company').setValue(res.company);
+          this.salesInvoiceForm.get('territory').setValue(res.territory);
           this.salesInvoiceForm.get('customer').setValue({
             name: res.customer,
             owner: res.contact_email,
@@ -132,7 +136,28 @@ export class AddSalesInvoicePage implements OnInit {
       .valueChanges.pipe(
         startWith(''),
         switchMap(value => {
-          return this.salesService.getWarehouseList(value);
+          return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
+        }),
+        switchMap(data => {
+          if (data && data.length) {
+            return of(data);
+          }
+          return of([]);
+        }),
+      );
+
+    this.territoryList = this.salesInvoiceForm
+      .get('territory')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getStore().getItemAsync(TERRITORY, value);
+        }),
+        switchMap(data => {
+          if (data && data.length) {
+            return of(data);
+          }
+          return of([]);
         }),
       );
 
@@ -173,6 +198,7 @@ export class AddSalesInvoicePage implements OnInit {
         customer: new FormControl('', [Validators.required]),
         postingDate: new FormControl('', [Validators.required]),
         dueDate: new FormControl('', [Validators.required]),
+        territory: new FormControl('', [Validators.required]),
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
@@ -366,7 +392,9 @@ export class AddSalesInvoicePage implements OnInit {
       salesInvoiceDetails.due_date = this.getParsedDate(
         this.salesInvoiceForm.get('dueDate').value,
       );
-      salesInvoiceDetails.territory = 'All Territories';
+      salesInvoiceDetails.territory = this.salesInvoiceForm.get(
+        'territory',
+      ).value;
       salesInvoiceDetails.update_stock = 0;
       salesInvoiceDetails.total_qty = 0;
       salesInvoiceDetails.total = 0;
@@ -437,6 +465,9 @@ export class AddSalesInvoicePage implements OnInit {
       ).value.name;
       salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
         'campaign',
+      ).value;
+      salesInvoiceDetails.territory = this.salesInvoiceForm.get(
+        'territory',
       ).value;
       salesInvoiceDetails.company = this.salesInvoiceForm.get('company').value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
