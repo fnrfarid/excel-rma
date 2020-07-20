@@ -20,6 +20,10 @@ export class SalesInvoiceUpdateDto {
 
   @IsOptional()
   @IsString()
+  delivery_warehouse: string;
+
+  @IsOptional()
+  @IsString()
   customer_name: string;
 
   @IsOptional()

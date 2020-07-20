@@ -144,10 +144,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         provider.status + SALES_INVOICE_CANNOT_BE_UPDATED,
       );
     }
-    updatePayload.territory =
-      clientHttpRequest.token.territory.length !== 0
-        ? clientHttpRequest.token.territory[0]
-        : updatePayload.territory;
     this.apply(new SalesInvoiceUpdatedEvent(updatePayload));
   }
 
