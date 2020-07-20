@@ -41,7 +41,7 @@
                   matInput
                   type="text"
                   required
-                  placeholder="Type"
+                  placeholder="Stock Entry Type"
                   formControlName="type"
                   [matAutocomplete]="Type"
                 />
@@ -49,8 +49,8 @@
                   autoActiveFirstOption
                   #Type="matAutocomplete"
                   [displayWith]="getOption"
-                  (keyup.enter)="getFormState($event.option.value)"
-                  (optionSelected)="getFormState($event.option.value)"
+                  (keyup.enter)="setStockEntryType($event.option.value)"
+                  (optionSelected)="setStockEntryType($event.option.value)"
                 >
                   <mat-option *ngFor="let option of type" [value]="option">
                     {{ option }}
@@ -140,22 +140,22 @@
               (keyup.enter)="popover.open()"
               (click)="popover.open()"
             >
-              <ng-container *ngIf="row.serial_no">
-                {{row.serial_no}}
+              <ng-container *ngIf="row.serial_no[0]">
+                {{row.serial_no[0]}}
               </ng-container>
-              <span class="add-comment" *ngIf="!row.serial_no">
-                Non Serial Item
+              <span class="add-comment" *ngIf="!row.serial_no[0]">
+                Add Serial No
               </span>
               <sat-popover
                 #popover
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateSerial(row,i,$event)"
+                (closed)="updateSerial(row,$event)"
               >
                 <inline-edit
                   style="width: 400px !important;"
-                  [value]="row.serial_no"
+                  [value]="row.serial_no[0]"
                   column="serial_no"
                   [minimumPrice]="row.minimumPrice"
                 ></inline-edit>
@@ -206,10 +206,10 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container *ngIf="row.source_warehouse">
-                {{row.source_warehouse}}
+              <ng-container *ngIf="row.s_warehouse">
+                {{row.s_warehouse}}
               </ng-container>
-              <span class="add-comment" *ngIf="!row.source_warehouse">
+              <span class="add-comment" *ngIf="!row.s_warehouse">
                 Add a Warehouse
               </span>
               <sat-popover
@@ -217,11 +217,11 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateSWarehouse(row,i,$event)"
+                (closed)="updateSWarehouse(row,$event)"
               >
                 <inline-edit
                   style="width: 400px !important;"
-                  [value]="row.source_warehouse"
+                  [value]="row.s_warehouse"
                   column="warehouse"
                 ></inline-edit>
               </sat-popover>
@@ -239,10 +239,10 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container *ngIf="row.target_warehouse">
-                {{row.target_warehouse}}
+              <ng-container *ngIf="row.t_warehouse">
+                {{row.t_warehouse}}
               </ng-container>
-              <span class="add-comment" *ngIf="!row.target_warehouse">
+              <span class="add-comment" *ngIf="!row.t_warehouse">
                 Add a Warehouse
               </span>
               <sat-popover
@@ -250,7 +250,7 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateTWarehouse(row,i,$event)"
+                (closed)="updateTWarehouse(row,$event)"
               >
                 <inline-edit
                   style="width: 400px !important;"
@@ -289,43 +289,6 @@
               </sat-popover>
             </mat-cell>
             <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="rate">
-            <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
-            <mat-cell
-              *matCellDef="let row"
-              [satPopoverAnchor]="p"
-              tabindex="0"
-              (keyup.enter)="p.open()"
-              (click)="p.open()"
-            >
-              <ng-container>
-                {{row.rate}}
-              </ng-container>
-              <sat-popover
-                #p
-                hasBackdrop
-                xAlign="start"
-                yAlign="start"
-                (closed)="updateRate(row, $event)"
-              >
-                <inline-edit
-                  [value]="row.rate"
-                  column="rate"
-                  [minimumPrice]="row.minimumPrice"
-                ></inline-edit>
-              </sat-popover>
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef>Total </mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="total">
-            <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
-            <mat-cell *matCellDef="let row"
-              >{{row.rate * row.qty | curFormat | async}}</mat-cell
-            >
-            <mat-footer-cell *matFooterCellDef
-              >{{formControl.total.value | curFormat | async }}</mat-footer-cell
-            >
           </ng-container>
           <ng-container matColumnDef="delete">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
