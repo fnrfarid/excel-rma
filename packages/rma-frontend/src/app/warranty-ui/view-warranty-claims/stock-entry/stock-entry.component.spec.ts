@@ -8,7 +8,7 @@ import {
   BrowserAnimationsModule,
 } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../../material/material.module';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('StockEntryComponent', () => {

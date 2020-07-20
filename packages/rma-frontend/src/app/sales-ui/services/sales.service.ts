@@ -29,7 +29,6 @@ import {
   GET_SERIAL_ENDPOINT,
   API_INFO_ENDPOINT,
   API_ITEM_GET_BY_CODE,
-  GET_USER_PROFILE_ROLES,
   CREATE_SALES_RETURN_ENDPOINT,
   API_TERRITORY_GET_WAREHOUSES,
   RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT,
@@ -47,7 +46,7 @@ import {
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
 import { SalesReturn } from '../../common/interfaces/sales-return.interface';
-import { JSON_BODY_MAX_SIZE } from '../../constants/app-string';
+import { JSON_BODY_MAX_SIZE, TERRITORY } from '../../constants/app-string';
 
 @Injectable({
   providedIn: 'root',
@@ -444,14 +443,13 @@ export class SalesService {
     });
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http
-          .get<{ territory: string[] }>(GET_USER_PROFILE_ROLES, { headers })
+        return this.getStore()
+          .getItemAsync(TERRITORY)
           .pipe(
-            switchMap(profile => {
-              if (profile.territory && profile.territory.length > 0) {
-                const territories = profile.territory;
+            switchMap((terretory: string[]) => {
+              if (terretory && terretory.length > 0) {
                 let httpParams = new HttpParams();
-                territories.forEach(territory => {
+                terretory.forEach(territory => {
                   httpParams = httpParams.append('territories[]', territory);
                 });
 

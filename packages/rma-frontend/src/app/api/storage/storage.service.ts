@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { from, of, throwError } from 'rxjs';
+import { from, of, throwError, Observable } from 'rxjs';
 import { switchMap, retry, catchError, delay } from 'rxjs/operators';
 export const STORAGE_TOKEN = 'StorageObject';
 
@@ -35,24 +35,28 @@ export class StorageService {
     return data;
   }
 
-  getItemAsync(key: string) {
-    return (
-      of({}).pipe(
-        switchMap(obj => {
-          return from(this.getItem(key)).pipe(
-            switchMap(item => {
-              if (item) {
-                return of(item);
-              }
-              return throwError('Item Not Found').pipe(delay(400));
-            }),
-          );
-        }),
-        retry(9),
-      ),
+  getItemAsync(key: string, filter?: string): Observable<any> {
+    return of({}).pipe(
+      switchMap(obj => {
+        return from(this.getItem(key)).pipe(
+          switchMap(item => {
+            if (item) {
+              return filter ? of(this._filter(filter, item)) : of(item);
+            }
+            return throwError('Item Not Found').pipe(delay(400));
+          }),
+        );
+      }),
+      retry(9),
       catchError(err => {
         return of(undefined);
-      })
+      }),
     );
+  }
+
+  _filter(value: string, state: string[]): string[] {
+    const filterValue = value.toLowerCase();
+
+    return state.filter(option => option.toLowerCase().includes(filterValue));
   }
 }
