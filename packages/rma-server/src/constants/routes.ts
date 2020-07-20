@@ -77,3 +77,4 @@ export const FRAPPE_FILE_ATTACH_API_ENDPOINT =
   '/api/method/frappe.client.attach_file';
 export const PURCHASE_RECEIPT_ON_CANCEL_ENDPOINT =
   '/api/purchase_receipt/webhook/v1/cancel';
+export const ERPNEXT_STOCK_ENTRY_ENDPOINT = '/api/resource/Stock%20Entry';
