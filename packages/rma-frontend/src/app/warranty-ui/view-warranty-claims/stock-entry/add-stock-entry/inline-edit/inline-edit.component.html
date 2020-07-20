@@ -46,7 +46,7 @@
       [displayWith]="getWarehouseOptionText"
     >
       <mat-option *ngFor="let option of warehouseList | async" [value]="option">
-        {{ option.name }}
+        {{ option.warehouse }}
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
@@ -59,20 +59,6 @@
       name="quantity"
       [(ngModel)]="quantity"
     />
-  </mat-form-field>
-
-  <mat-form-field *ngIf="column === 'rate'">
-    <input
-      matInput
-      type="number"
-      maxLength="140"
-      name="rate"
-      [formControl]="rateFormControl"
-    />
-
-    <mat-error *ngIf="rateFormControl.errors">
-      This rate is not accepted!
-    </mat-error>
   </mat-form-field>
 
   <div class="actions">

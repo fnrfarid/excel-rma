@@ -32,8 +32,8 @@ export class Item {
   item_group?: string;
   brand?: string;
   item_defaults?: ItemDefaults;
-  source_warehouse?: string;
-  target_warehouse?: string;
+  s_warehouse?: string;
+  t_warehouse?: string;
 }
 
 export class ItemDefaults {
@@ -175,4 +175,53 @@ export class StatusHistoryDetails {
   description?: string;
   delivery_status?: string;
   status?: string;
+}
+
+export class StockEntryDetails {
+  company?: string;
+  warrantyObjectUuid?: string;
+  stock_entry_type?: string;
+  posting_date?: string;
+  posting_time?: string;
+  doctype?: string;
+  type?: string;
+  description?: string;
+  items?: StockItem[];
+}
+
+export class StockItem {
+  s_warehouse?: string;
+  t_warehouse?: string;
+  transferWarehouse?: string;
+  item_code?: string;
+  item_name?: string;
+  qty?: number;
+  serial_no?: string[];
+}
+
+export class StockEntryItems {
+  uuid?: string;
+  name?: string;
+  owner?: string;
+  item_code: string;
+  item_name: string;
+  qty: number;
+  rate?: number;
+  amount?: number;
+  minimumPrice?: number;
+  description?: string;
+  serial_no?: string[];
+  delivery_note?: string;
+  has_serial_no?: number;
+  salesWarrantyMonths?: number;
+  purchaseWarrantyMonths?: number;
+  against_sales_invoice?: string;
+  stock?: any;
+  assigned?: number;
+  remaining?: number;
+  item_group?: string;
+  item_defaults?: ItemDefaults;
+  s_warehouse?: string;
+  t_warehouse?: string;
+  transferWarehouse?: string;
 }

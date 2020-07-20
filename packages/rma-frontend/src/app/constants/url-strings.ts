@@ -122,3 +122,5 @@ export const ADD_STATUS_HISTORY_ENDPOINT =
   '/api/warranty_claim/v1/add_status_history';
 export const REMOVE_STATUS_HISTORY_ENDPOINT =
   '/api/warranty_claim/v1/remove_status_history';
+export const CREATE_WARRANTY_STOCK_ENTRY =
+  '/api/stock_entry/v1/create_warranty_stock';
