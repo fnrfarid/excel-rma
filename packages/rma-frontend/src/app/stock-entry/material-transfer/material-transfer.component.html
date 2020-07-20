@@ -51,9 +51,29 @@
             </mat-form-field>
           </ion-col>
           <ion-col>
-            <mat-form-field class="example-full-width">
-              <input  matInput placeholder="Territory" type="text"  [(ngModel)]="territory"/>
-            </mat-form-field>
+            <form [formGroup]="form">
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select territory"
+                  matInput
+                  formControlName="territory"
+                  [matAutocomplete]="territory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #territory="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let territory of territoryList | async"
+                    [value]="territory"
+                  >
+                    {{ territory }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </form>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -100,8 +120,8 @@
                 [matAutocomplete]="from_warehouse" />
               <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
                 <mat-option (onSelectionChange)="updateItemStock($event.source.value)"
-                  *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse.name">
-                  {{ s_warehouse.name }}
+                  *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse">
+                  {{ s_warehouse }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>

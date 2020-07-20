@@ -46,10 +46,8 @@ export class CustomerController {
 
   @Get('v1/get/:customer_name')
   @UseGuards(TokenGuard)
-  async getCustomer(@Param('customer_name') customer_name, @Req() req) {
-    return await this.queryBus.execute(
-      new RetrieveCustomerQuery(customer_name, req),
-    );
+  async getCustomer(@Param('customer_name') name, @Req() req) {
+    return await this.queryBus.execute(new RetrieveCustomerQuery(name, req));
   }
 
   @Get('v1/list')

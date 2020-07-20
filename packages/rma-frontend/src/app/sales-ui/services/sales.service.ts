@@ -431,7 +431,7 @@ export class SalesService {
     );
   }
 
-  getWarehouseList(value: string, filter?) {
+  getWarehouseList(value: string, filter?, skip_territory_filter?: boolean) {
     const url = LIST_WAREHOUSE_ENDPOINT;
     const params = new HttpParams({
       fromObject: {
@@ -447,7 +447,7 @@ export class SalesService {
           .getItemAsync(TERRITORY)
           .pipe(
             switchMap((terretory: string[]) => {
-              if (terretory && terretory.length > 0) {
+              if (terretory && terretory.length > 0 && !skip_territory_filter) {
                 let httpParams = new HttpParams();
                 terretory.forEach(territory => {
                   httpParams = httpParams.append('territories[]', territory);
