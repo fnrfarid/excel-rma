@@ -63,6 +63,9 @@ export class StockEntry extends BaseEntity {
   warrantyClaimUuid: string;
 
   @Column()
+  stock_voucher_number: string;
+
+  @Column()
   items: StockEntryItem[];
 }
 

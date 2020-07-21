@@ -7,6 +7,9 @@ import { MaterialModule } from '../../../material/material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
+import { STORAGE_TOKEN } from '../../../api/storage/storage.service';
+import { of } from 'rxjs';
 
 describe('ServiceInvoicesComponent', () => {
   let component: ServiceInvoicesComponent;
@@ -23,6 +26,18 @@ describe('ServiceInvoicesComponent', () => {
         ReactiveFormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
+      ],
+      providers: [
+        {
+          provide: AddServiceInvoiceService,
+          useValue: {
+            getServiceInvoiceList: (...args) => of([{}]),
+          },
+        },
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {},
+        },
       ],
     }).compileComponents();
 
