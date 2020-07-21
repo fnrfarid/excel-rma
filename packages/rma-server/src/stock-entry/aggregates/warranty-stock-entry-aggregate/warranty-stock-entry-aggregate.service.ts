@@ -60,6 +60,12 @@ export class WarrantyStockEntryAggregateService {
         });
       }),
       map(res => res.data.data),
+      switchMap(res => {
+        return this.stockEntryService.updateOne(
+          { uuid: payload.uuid },
+          { $set: { stock_voucher_number: res.name } },
+        );
+      }),
       catchError(err => {
         if (err.response && err.response.data) {
           return throwError(new BadRequestException(err.response.data.exc));

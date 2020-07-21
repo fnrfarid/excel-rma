@@ -10,6 +10,9 @@ export class ServiceInvoice extends BaseEntity {
   uuid: string;
 
   @Column()
+  warrantyClaimUuid: string;
+
+  @Column()
   name: string;
 
   @Column()

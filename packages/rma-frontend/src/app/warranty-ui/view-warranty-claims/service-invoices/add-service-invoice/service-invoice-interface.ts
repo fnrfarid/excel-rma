@@ -26,4 +26,5 @@ export class ServiceInvoiceDetails {
   third_party_address?: string;
   third_party_contact?: string;
   docstatus: number;
+  warrantyClaimUuid: string;
 }

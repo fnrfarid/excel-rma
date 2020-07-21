@@ -10,6 +10,9 @@ import {
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../material/material.module';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StockEntryService } from '../../../stock-entry/services/stock-entry/stock-entry.service';
+import { STORAGE_TOKEN } from '../../../api/storage/storage.service';
+import { of } from 'rxjs';
 
 describe('StockEntryComponent', () => {
   let component: StockEntryComponent;
@@ -27,6 +30,18 @@ describe('StockEntryComponent', () => {
         ReactiveFormsModule,
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
+      ],
+      providers: [
+        {
+          provide: StockEntryService,
+          useValue: {
+            getStockEntryList: (...args) => of([{}]),
+          },
+        },
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {},
+        },
       ],
     }).compileComponents();
 

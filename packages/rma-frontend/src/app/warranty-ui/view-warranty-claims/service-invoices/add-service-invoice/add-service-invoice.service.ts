@@ -10,6 +10,7 @@ import {
   CREATE_SERVICE_INVOICE_ENDPOINT,
   GET_DIRECT_SERIAL_ENDPOINT,
   CREATE_WARRANTY_STOCK_ENTRY,
+  LIST_SERVICE_INVOICE_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -224,5 +225,32 @@ export class AddServiceInvoiceService {
 
   getStore() {
     return this.storage;
+  }
+
+  getServiceInvoiceList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 10,
+  ) {
+    const url = LIST_SERVICE_INVOICE_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+      map(res => res.docs),
+      switchMap(res => {
+        return of(res);
+      }),
+    );
   }
 }
