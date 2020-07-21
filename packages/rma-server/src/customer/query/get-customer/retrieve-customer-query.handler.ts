@@ -8,7 +8,7 @@ export class RetrieveCustomerHandler
   constructor(private readonly manager: CustomerAggregateService) {}
 
   async execute(query: RetrieveCustomerQuery) {
-    const { req, customer_name } = query;
-    return this.manager.retrieveCustomer({ customer_name }, req);
+    const { req, name } = query;
+    return this.manager.retrieveCustomer({ name }, req);
   }
 }

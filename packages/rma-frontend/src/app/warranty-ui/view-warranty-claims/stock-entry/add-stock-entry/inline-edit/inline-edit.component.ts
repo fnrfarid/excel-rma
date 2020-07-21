@@ -1,7 +1,7 @@
 import { Component, Input, Optional, Host } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
 import { filter, switchMap, startWith, map } from 'rxjs/operators';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable } from 'rxjs';
 import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
@@ -23,7 +23,6 @@ export class InlineEditComponent {
     this.quantity = x;
     this.serial_no = x;
     this.warehouseFormControl.setValue({ name: x });
-    this.rateFormControl.setValue(x);
     this._value = x;
   }
 
@@ -36,7 +35,6 @@ export class InlineEditComponent {
   private _value = '';
 
   itemFormControl = new FormControl();
-  rateFormControl = new FormControl('', [Validators.min(this.minimumPrice)]);
   warehouseFormControl = new FormControl();
 
   itemList: Array<Item>;
@@ -77,10 +75,8 @@ export class InlineEditComponent {
   }
 
   getWarehouseOptionText(option) {
-    if (option) return option.name;
+    if (option) return option.warehouse;
   }
-
-  selectedState(option) {}
 
   getWarehouseList() {
     this.warehouseList = this.warehouseFormControl.valueChanges.pipe(
@@ -119,18 +115,18 @@ export class InlineEditComponent {
               next: res => {
                 const selectedItem = {} as any;
                 selectedItem.uuid = res.item.uuid;
-                selectedItem.serial_no = res.item.serial_no;
+                selectedItem.serial_no = [res.item.serial_no];
                 selectedItem.minimumPrice = res.item.minimumPrice;
                 selectedItem.item_code = res.item.item_code;
                 selectedItem.item_name = res.item.item_name;
                 selectedItem.item_group = res.item.item_group;
                 selectedItem.source_warehouse = res.item.warehouse;
-                selectedItem.rate = 0;
                 selectedItem.qty = 1;
                 selectedItem.has_serial_no = res.item.has_serial_no;
                 if (res.priceListArray.length > 0) {
                   selectedItem.rate = res.priceListArray[0].price_list_rate;
                 }
+
                 this.popover.close(selectedItem);
               },
             });
@@ -141,13 +137,10 @@ export class InlineEditComponent {
           break;
 
         case ITEM_COLUMN.WAREHOUSE:
-          this.popover.close(this.warehouseFormControl.value.name);
+          this.popover.close(this.warehouseFormControl.value.warehouse);
           break;
 
         default:
-          if (this.rateFormControl.value < this.minimumPrice) {
-            this.rateFormControl.setErrors({ min: false });
-          } else this.popover.close(this.rateFormControl.value);
           break;
       }
     }

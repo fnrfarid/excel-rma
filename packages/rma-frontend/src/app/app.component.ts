@@ -13,6 +13,7 @@ import {
   TWENTY_MINUTES_IN_SECONDS,
   LOGGED_IN,
   AUTH_SERVER_URL,
+  ALL_TERRITORIES,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
@@ -155,10 +156,13 @@ export class AppComponent implements OnInit {
             this.appService.getStorage().setItem(USER_ROLE, res.roles || []);
             this.appService
               .getStorage()
-              .setItem(TERRITORY, res.territory || []);
+              .setItem(WAREHOUSES, res.warehouses || []);
+            const filtered_territory = res?.territory?.filter(
+              territory => territory !== ALL_TERRITORIES,
+            );
             this.appService
               .getStorage()
-              .setItem(WAREHOUSES, res.warehouses || []);
+              .setItem(TERRITORY, filtered_territory || []);
           }
         },
         error: error => {},
