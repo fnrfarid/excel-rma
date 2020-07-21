@@ -22,7 +22,7 @@
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
-    <mat-table #table style="width: 100%;">
+    <mat-table #table [dataSource]="dataSource" style="width: 100%;">
       <ng-container matColumnDef="stock_voucher_number">
         <mat-header-cell *matHeaderCellDef
           >Stock Voucher Number</mat-header-cell
@@ -59,7 +59,7 @@
         <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
           <ng-container>
-            {{ row.date }}
+            {{ row.posting_date }}
           </ng-container>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
@@ -78,7 +78,7 @@
       <ng-container matColumnDef="completed_by">
         <mat-header-cell *matHeaderCellDef>Completed By</mat-header-cell>
         <mat-cell *matCellDef="let row">
-          {{ row.completed_by }}
+          {{ row.createdBy }}
         </mat-cell>
         <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
       </ng-container>
@@ -92,5 +92,15 @@
         *matFooterRowDef="displayedColumns; sticky: true"
       ></mat-footer-row>
     </mat-table>
+    <mat-card-actions>
+      <mat-paginator
+        #paginator
+        class="mat-paginator-sticky"
+        (page)="getUpdate($event)"
+        [length]="dataSource.length"
+        [pageSizeOptions]="[10, 50, 100, 500]"
+      >
+      </mat-paginator>
+    </mat-card-actions>
   </ion-card-content>
 </ion-card>

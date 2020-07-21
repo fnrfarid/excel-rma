@@ -150,6 +150,7 @@ export class AddServiceInvoicePage implements OnInit {
     );
     if (isValid) {
       const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
+      serviceInvoiceDetails.warrantyClaimUuid = this.activatedRoute.snapshot.params.uuid;
       serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value;
       serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
       serviceInvoiceDetails.total_qty = 0;

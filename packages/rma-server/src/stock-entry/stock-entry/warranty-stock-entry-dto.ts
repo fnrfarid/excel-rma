@@ -19,7 +19,7 @@ export class WarrantyStockEntryDto {
 
   @IsNotEmpty()
   @IsString()
-  warrantyObjectUuid: string;
+  warrantyClaimUuid: string;
 
   @IsNotEmpty()
   @IsString()

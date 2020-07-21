@@ -88,10 +88,11 @@ export class AddStockEntryPage implements OnInit {
   submitDraft() {
     const selectedItem = {} as StockEntryDetails;
     selectedItem.company = this.company;
-    selectedItem.warrantyObjectUuid = this.warrantyObject.uuid;
+    selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
     selectedItem.stock_entry_type = MATERIAL_TRANSFER;
     selectedItem.posting_date = this.stockEntryForm.controls.date.value;
     selectedItem.type = this.stockEntryForm.controls.type.value;
+    selectedItem.description = this.stockEntryForm.controls.description.value;
     selectedItem.items = this.dataSource.data();
     this.addServiceInvoiceService.createStockEntry(selectedItem).subscribe({
       next: res => {

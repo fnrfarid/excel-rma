@@ -179,7 +179,7 @@ export class StatusHistoryDetails {
 
 export class StockEntryDetails {
   company?: string;
-  warrantyObjectUuid?: string;
+  warrantyClaimUuid?: string;
   stock_entry_type?: string;
   posting_date?: string;
   posting_time?: string;
