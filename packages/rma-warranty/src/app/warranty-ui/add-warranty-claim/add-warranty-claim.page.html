@@ -1,0 +1,442 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title color="tertiary">Warranty Claim Creation Form</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-background">
+  <ion-fab
+    class="ion-margin-end"
+    slot="fixed"
+    vertical="top"
+    color="light"
+    horizontal="end"
+  >
+    <ion-fab-button
+      class="fab-position"
+      (click)="submitDraft()"
+      [disabled]="warrantyClaimForm.invalid"
+    >
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <form [formGroup]="warrantyClaimForm">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary">
+          Product Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Claim Type"
+                  formControlName="claim_type"
+                  [matAutocomplete]="claimType"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #claimType="matAutocomplete"
+                  [displayWith]="getOption"
+                  (optionSelected)="getFormState($event.option.value)"
+                >
+                  <mat-option *ngFor="let option of claimList" [value]="option">
+                    {{ option }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.claim_type.hasError('required')">
+                  Claim Type is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col *ngIf="warrantyState.serial_no.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Serial no"
+                  formControlName="serial_no"
+                  (keyup.enter)="serialChanged($event.target.value)"
+                />
+                <mat-error *ngIf="f.serial_no.hasError('required')">
+                  Serial no is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col *ngIf="warrantyState.invoice_no.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Invoice number"
+                  formControlName="invoice_no"
+                />
+                <mat-error *ngIf="f.invoice_no.hasError('required')">
+                  Invoice number is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col *ngIf="warrantyState.warranty_end_date.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  [matDatepicker]="warranty_end_date"
+                  placeholder="Warranty End Date"
+                  formControlName="warranty_end_date"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="warranty_end_date"
+                ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #warranty_end_date
+                  [disabled]="false"
+                ></mat-datepicker>
+                <mat-error *ngIf="f.warranty_end_date.hasError('required')">
+                  Warranty End Date is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col *ngIf="warrantyState.product_name.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Product Name"
+                  formControlName="product_name"
+                  [matAutocomplete]="productName"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #productName="matAutocomplete"
+                  [displayWith]="getItemOption"
+                  (optionSelected)="itemOptionChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of productList |async"
+                    [value]="option"
+                  >
+                    {{ option.item_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.product_name.hasError('required')">
+                  Product Name is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col *ngIf="warrantyState.product_brand.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Product Brand"
+                  formControlName="product_brand"
+                />
+                <mat-error *ngIf="f.product_brand.hasError('required')">
+                  Product Brand is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Problem"
+                  formControlName="problem"
+                />
+                <mat-error *ngIf="f.problem.hasError('required')">
+                  Problem is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Problem Details"
+                  formControlName="problem_details"
+                />
+                <mat-error *ngIf="f.problem_details.hasError('required')">
+                  Problem Details is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Additional Remarks"
+                  formControlName="remarks"
+                />
+                <mat-error *ngIf="f.remarks.hasError('required')">
+                  Additional remarks is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col> </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary">
+          Customer Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
+          <ion-row class="align">
+            <ion-col *ngIf="warrantyState.customer_name.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select Customer"
+                  matInput
+                  formControlName="customer_name"
+                  [matAutocomplete]="auto"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #auto="matAutocomplete"
+                  [displayWith]="getOptionText"
+                  (optionSelected)="customerChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredCustomerList | async"
+                    [value]="option"
+                  >
+                    {{ option.customer_name }}
+                    <small class="text-muted">
+                      {{ option.name}}
+                    </small>
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.customer_name.hasError('required')">
+                  Customer is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col *ngIf="warrantyState.third_party_name.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Third Party Name"
+                  formControlName="third_party_name"
+                />
+                <mat-error *ngIf="f.third_party_name.hasError('required')">
+                  Third Party Name is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col *ngIf="warrantyState.customer_contact.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Customer Contact"
+                  formControlName="customer_contact"
+                />
+                <mat-error *ngIf="f.customer_contact.hasError('required')">
+                  Customer Contact is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col *ngIf="warrantyState.third_party_contact.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Third Party Contact"
+                  formControlName="third_party_contact"
+                />
+                <mat-error *ngIf="f.third_party_contact.hasError('required')">
+                  Third Party Contact is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col *ngIf="warrantyState.customer_address.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Customer Address"
+                  formControlName="customer_address"
+                />
+                <mat-error *ngIf="f.customer_address.hasError('required')">
+                  Customer Address is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col *ngIf="warrantyState.third_party_address.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Third Party Address"
+                  formControlName="third_party_address"
+                />
+                <mat-error *ngIf="f.third_party_address.hasError('required')">
+                  Third Party Address is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary">
+          Company Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  [matDatepicker]="received_on"
+                  placeholder="Received Date"
+                  formControlName="received_on"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="received_on"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #received_on disabled="false"></mat-datepicker>
+                <mat-error *ngIf="f.received_on.hasError('required')">
+                  Recieving Date is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  required
+                  [matDatepicker]="delivery_date"
+                  placeholder="Deliver Date"
+                  formControlName="delivery_date"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="delivery_date"
+                ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #delivery_date
+                  disabled="false"
+                ></mat-datepicker>
+                <mat-error *ngIf="f.delivery_date.hasError('required')">
+                  Deliver Date is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Recieving Branch"
+                  formControlName="receiving_branch"
+                  [matAutocomplete]="recievingBranch"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #recievingBranch="matAutocomplete"
+                  [displayWith]="getBranchOption"
+                  (optionSelected)="branchOptionChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of territoryList |async"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.receiving_branch.hasError('required')">
+                  Recieving Branch is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  required
+                  placeholder="Delivery Branch"
+                  formControlName="delivery_branch"
+                  [matAutocomplete]="deliveryBranch"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #deliveryBranch="matAutocomplete"
+                  [displayWith]="getBranchOption"
+                  (optionSelected)="branchOptionChanged($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of territoryList |async"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.delivery_branch.hasError('required')">
+                  Delivery Branch is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </form>
+</ion-content>

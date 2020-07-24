@@ -14,6 +14,9 @@ export class ServerSettings extends BaseEntity {
   appURL: string;
 
   @Column()
+  warrantyAppURL: string;
+
+  @Column()
   authServerURL: string;
 
   @Column()
