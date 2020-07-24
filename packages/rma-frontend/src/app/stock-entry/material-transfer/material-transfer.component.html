@@ -47,7 +47,7 @@
           <ion-col>
             <mat-form-field class="example-full-width">
               <mat-label>Remarks</mat-label>
-              <textarea matInput [(ngModel)]="remarks"></textarea>
+              <textarea matInput [disabled]="readonly" [(ngModel)]="remarks"></textarea>
             </mat-form-field>
           </ion-col>
           <ion-col>
@@ -56,6 +56,7 @@
                 <input
                   required
                   type="text"
+                  autocomplete="off"
                   placeholder="Select territory"
                   matInput
                   formControlName="territory"
@@ -116,7 +117,7 @@
 
           <ion-col>
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Source Warehouse" matInput [formControl]="warehouseState.s_warehouse"
+              <input type="text" placeholder="Source Warehouse" [disabled]="readonly" matInput [formControl]="warehouseState.s_warehouse"
                 [matAutocomplete]="from_warehouse" />
               <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
                 <mat-option (onSelectionChange)="updateItemStock($event.source.value)"
@@ -127,7 +128,7 @@
             </mat-form-field>
 
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Target Warehouse" matInput [formControl]="warehouseState.t_warehouse"
+              <input type="text" placeholder="Target Warehouse" matInput [disabled]="readonly" [formControl]="warehouseState.t_warehouse"
                 [matAutocomplete]="warehouse" />
               <mat-autocomplete autoActiveFirstOption #warehouse="matAutocomplete">
                 <mat-option *ngFor="let warehouse of filteredWarehouseList2 | async" [value]="warehouse.name">

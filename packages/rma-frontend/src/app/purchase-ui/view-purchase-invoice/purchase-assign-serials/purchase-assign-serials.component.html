@@ -28,8 +28,8 @@
             <input [formControl]="warehouseFormControl" type="text" placeholder="Select Warehouse" matInput
               [matAutocomplete]="auto" required />
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="getOptionText">
-              <mat-option *ngFor="let option of filteredWarehouseList | async" [value]="option.name">
-                {{ option.name }}
+              <mat-option *ngFor="let option of filteredWarehouseList | async" [value]="option">
+                {{ option }}
               </mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="warehouseFormControl.hasError('required')">

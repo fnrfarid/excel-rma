@@ -34,6 +34,10 @@ export class StockEntryDto {
 
   @IsNotEmpty()
   @IsString()
+  territory: string;
+
+  @IsNotEmpty()
+  @IsString()
   doctype: string = STOCK_ENTRY;
 
   @IsNotEmpty()
