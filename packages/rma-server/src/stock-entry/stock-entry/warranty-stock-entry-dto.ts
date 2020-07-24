@@ -43,6 +43,14 @@ export class WarrantyStockEntryDto {
 
   @IsOptional()
   @IsString()
+  remark: string;
+
+  @IsOptional()
+  @IsString()
+  territory: string;
+
+  @IsOptional()
+  @IsString()
   posting_time: string;
 
   @IsNotEmpty()

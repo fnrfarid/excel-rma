@@ -43,9 +43,9 @@ export class StockEntryListPage implements OnInit {
     's_warehouse',
     't_warehouse',
     'status',
-    'createdByEmail',
     'createdBy',
-    'company',
+    'remarks',
+    'territory',
     'posting_date',
     'posting_time',
   ];

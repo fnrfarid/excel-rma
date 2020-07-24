@@ -60,6 +60,12 @@ export class StockEntry extends BaseEntity {
   type: string;
 
   @Column()
+  remarks: string;
+
+  @Column()
+  territory: string;
+
+  @Column()
   warrantyClaimUuid: string;
 
   @Column()
