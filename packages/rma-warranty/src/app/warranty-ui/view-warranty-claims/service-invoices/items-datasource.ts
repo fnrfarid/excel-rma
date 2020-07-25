@@ -1,5 +1,5 @@
 import { DataSource } from '@angular/cdk/table';
-import { Item } from '../../../../../../rma-frontend/src/app/common/interfaces/sales.interface';
+import { Item } from '../../../common/interfaces/sales.interface';
 import { BehaviorSubject } from 'rxjs';
 // import { SalesService } from '../services/sales.service';
 

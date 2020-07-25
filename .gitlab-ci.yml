@@ -213,4 +213,4 @@ deploy_staging_warranty:
   before_script:
     - apk add curl bash
   script:
-    - curl -Ss -X POST $FRONTEND_UPDATE_KEY
+    - curl -Ss -X POST $WARRANTY_UPDATE_KEY
