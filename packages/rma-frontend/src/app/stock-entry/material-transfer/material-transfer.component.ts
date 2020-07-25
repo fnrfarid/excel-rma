@@ -21,9 +21,11 @@ import {
   CLOSE,
   MATERIAL_TRANSFER,
   DELIVERY_NOTE,
+  WAREHOUSES,
+  TERRITORY,
 } from '../../constants/app-string';
 import * as _ from 'lodash';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { SalesService } from '../../sales-ui/services/sales.service';
 import {
   MaterialTransferDataSource,
@@ -70,7 +72,6 @@ export class MaterialTransferComponent implements OnInit {
   readonly: boolean = false;
   company: string;
   status: string;
-  territory: string;
   remarks: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
@@ -86,6 +87,12 @@ export class MaterialTransferComponent implements OnInit {
   materialTransferDataSource: MaterialTransferDataSource;
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
+  territoryList: Observable<any[]>;
+  initial: { [key: string]: number } = {
+    s_warehouse: 0,
+    territory: 0,
+  };
+  form: FormGroup;
   materialTransferDisplayedColumns = [
     's_warehouse',
     't_warehouse',
@@ -107,7 +114,10 @@ export class MaterialTransferComponent implements OnInit {
   popWarehouse = switchMap((warehouses: any[]) => {
     return from(warehouses).pipe(
       mergeMap(warehouse => {
-        if (warehouse.name === this.transferWarehouse) {
+        if (
+          warehouse.name === this.transferWarehouse ||
+          warehouse === this.transferWarehouse
+        ) {
           return of();
         }
         return of(warehouse);
@@ -138,6 +148,9 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.form = new FormGroup({
+      territory: new FormControl('', [Validators.required]),
+    });
     this.itemDataSource = new StockItemsDataSource();
     this.transferWarehouse = await this.salesService
       .getStore()
@@ -152,6 +165,9 @@ export class MaterialTransferComponent implements OnInit {
         next: (success: any) => {
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
+          this.remarks = success.remarks;
+          this.form.get('territory').setValue(success.territory);
+          this.form.get('territory').disable();
           this.materialTransferDataSource.update(success.items);
         },
         error: err => {},
@@ -163,10 +179,20 @@ export class MaterialTransferComponent implements OnInit {
       startWith(''),
       debounceTime(300),
       switchMap(value => {
-        const filter = `[["name","like","%${value}%"],["is_group","=",0]]`;
         return this.salesService
-          .getWarehouseList(value, filter)
+          .getStore()
+          .getItemAsync(WAREHOUSES, value)
           .pipe(this.popWarehouse);
+      }),
+      switchMap(data => {
+        if (data && data.length) {
+          this.initial.s_warehouse
+            ? null
+            : (this.warehouseState.s_warehouse.setValue(data[0]),
+              this.initial.s_warehouse++);
+          return of(data);
+        }
+        return of([]);
       }),
       this.CATCH_ERROR,
     );
@@ -177,10 +203,27 @@ export class MaterialTransferComponent implements OnInit {
       switchMap(value => {
         const filter = `[["name","like","%${value}%"],["is_group","=",0]]`;
         return this.salesService
-          .getWarehouseList(value, filter)
+          .getWarehouseList(value, filter, true)
           .pipe(this.popWarehouse);
       }),
       this.CATCH_ERROR,
+    );
+
+    this.territoryList = this.form.get('territory').valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getStore().getItemAsync(TERRITORY, value);
+      }),
+      switchMap(data => {
+        if (data && data.length) {
+          this.initial.territory
+            ? null
+            : (this.form.get('territory').setValue(data[0]),
+              this.initial.territory++);
+          return of(data);
+        }
+        return of([]);
+      }),
     );
   }
 
@@ -511,6 +554,7 @@ export class MaterialTransferComponent implements OnInit {
     const body = new MaterialTransferDto();
     const date = await this.timeService.getDateAndTime(new Date());
     body.company = this.company;
+    body.territory = this.form.get('territory').value;
     body.remarks = this.remarks;
     body.posting_date = date.date;
     body.posting_time = date.time;

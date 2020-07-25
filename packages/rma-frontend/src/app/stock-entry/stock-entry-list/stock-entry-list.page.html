@@ -205,7 +205,7 @@
 
         <ng-container matColumnDef="createdBy">
           <mat-header-cell *matHeaderCellDef mat-sort-header="supplier">
-            Name
+            Created By
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
             {{row.createdBy}}
@@ -213,12 +213,22 @@
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
-        <ng-container matColumnDef="company">
+        <ng-container matColumnDef="remarks">
           <mat-header-cell *matHeaderCellDef>
-            Company
+            Remarks
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{ row.company }}
+            {{ row.remarks }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="territory">
+          <mat-header-cell *matHeaderCellDef>
+            Territory
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{ row.territory }}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>

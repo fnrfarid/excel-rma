@@ -108,4 +108,8 @@ export class ServiceInvoiceDto {
   @IsNumber()
   @IsNotEmpty()
   docstatus: number;
+
+  @IsString()
+  @IsNotEmpty()
+  warrantyClaimUuid: string;
 }

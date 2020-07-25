@@ -54,6 +54,24 @@ export class StockEntry extends BaseEntity {
   isSynced: boolean;
 
   @Column()
+  description: string;
+
+  @Column()
+  type: string;
+
+  @Column()
+  remarks: string;
+
+  @Column()
+  territory: string;
+
+  @Column()
+  warrantyClaimUuid: string;
+
+  @Column()
+  stock_voucher_number: string;
+
+  @Column()
   items: StockEntryItem[];
 }
 

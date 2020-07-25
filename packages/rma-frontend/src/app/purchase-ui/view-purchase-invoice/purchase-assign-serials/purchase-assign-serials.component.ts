@@ -18,7 +18,11 @@ import {
   toArray,
 } from 'rxjs/operators';
 import { SalesService } from '../../../sales-ui/services/sales.service';
-import { CLOSE, PURCHASE_RECEIPT } from '../../../constants/app-string';
+import {
+  CLOSE,
+  PURCHASE_RECEIPT,
+  WAREHOUSES,
+} from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
 import {
   PurchaseReceipt,
@@ -121,6 +125,9 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   index: number = 0;
   size: number = 10;
   itemMap: any = {};
+  initial: { [key: string]: number } = {
+    warehouse: 0,
+  };
 
   constructor(
     private readonly snackBar: MatSnackBar,
@@ -148,7 +155,17 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getWarehouseList(value);
+        return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
+      }),
+      switchMap(data => {
+        if (data && data.length) {
+          this.initial.warehouse
+            ? null
+            : (this.warehouseFormControl.setValue(data[0]),
+              this.initial.warehouse++);
+          return of(data);
+        }
+        return of([]);
       }),
     );
   }

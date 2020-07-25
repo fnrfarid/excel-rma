@@ -144,9 +144,9 @@
                 >
                   <mat-option
                     *ngFor="let warehouse of filteredWarehouseList | async"
-                    [value]="warehouse.name"
+                    [value]="warehouse"
                   >
-                    {{ warehouse.name }}
+                    {{ warehouse }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.warehouse.hasError('required')">
@@ -214,6 +214,29 @@
               <mat-form-field class="example-full-width">
                 <mat-label>Remarks</mat-label>
                 <textarea matInput formControlName="remarks"></textarea>
+              </mat-form-field>
+            </ion-col>
+            <ion-col size-md="6">
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select territory"
+                  matInput
+                  formControlName="territory"
+                  [matAutocomplete]="territory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #territory="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let territory of territoryList | async"
+                    [value]="territory"
+                  >
+                    {{ territory }}
+                  </mat-option>
+                </mat-autocomplete>
               </mat-form-field>
             </ion-col>
           </ion-row>

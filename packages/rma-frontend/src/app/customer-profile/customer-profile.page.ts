@@ -100,12 +100,18 @@ export class CustomerProfilePage implements OnInit {
               });
             }
 
-            if (customer) {
+            if (
+              customer &&
+              customer.credit_limits &&
+              customer.credit_limits.length
+            ) {
               customer.credit_limits.forEach(limit => {
                 if (limit.company === this.defaultCompany) {
                   data[index].credit_limit = limit.credit_limit;
                 }
               });
+            } else {
+              data[index].credit_limit = '0.00';
             }
             const headers = {
               [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
@@ -114,7 +120,7 @@ export class CustomerProfilePage implements OnInit {
               debtorAccount,
               time,
               'Customer',
-              data[index].customer_name,
+              data[index].name,
               this.defaultCompany,
               headers,
             );

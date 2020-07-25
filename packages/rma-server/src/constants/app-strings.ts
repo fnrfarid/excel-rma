@@ -207,3 +207,4 @@ export enum VERDICT {
   TO_REPLACE = 'To Replace',
   WORK_IN_PROGRESS = 'Work in Progress',
 }
+export const ALL_TERRITORIES = 'All Territories';

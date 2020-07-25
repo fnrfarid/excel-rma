@@ -51,6 +51,7 @@ describe('AddSalesInvoicePage', () => {
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
+              getItemAsync: (...args) => of({}),
             }),
           },
         },
