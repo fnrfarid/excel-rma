@@ -39,4 +39,3 @@ export const TRANSFER_WAREHOUSE = 'transferWarehouse';
 export const DEFAULT_SELLING_PRICE_LIST = 'default_selling_price_list';
 export const VALIDATE_SERIAL_BUFFER_COUNT = 50000;
 export const ALL_TERRITORIES = 'All Territories';
-export const WARRANTY_APP_URL = 'warranty_app_url';
