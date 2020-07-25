@@ -23,6 +23,7 @@ import {
   TRANSFER_WAREHOUSE,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
+  WARRANTY_APP_URL,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -61,6 +62,9 @@ export class AppService {
       .then(() => this.storage.setItem(LOGIN_URL, response.authorizationURL))
       .then(() => this.storage.setItem(ISSUER_URL, response.authServerURL))
       .then(() => this.storage.setItem(APP_URL, response.appURL))
+      .then(() =>
+        this.storage.setItem(WARRANTY_APP_URL, response.warrantyAppURL),
+      )
       .then(() => this.storage.setItem(AUTH_SERVER_URL, response.authServerURL))
       .then(() => this.storage.setItem(LOGGED_IN, false))
       .then(() =>

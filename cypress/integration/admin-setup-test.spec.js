@@ -2,6 +2,7 @@ describe("The application loads", () => {
   it("run /api/setup", () => {
     cy.request("POST", "http://rma.localhost:4700/api/setup", {
       appURL: "http://rma.localhost:4700",
+      warrantyAppURL: "http://warranty.localhost:4800",
       authServerURL: "http://erpnext.localhost",
       frontendClientId: "fa581cd534",
       backendClientId: "1f59172706",
