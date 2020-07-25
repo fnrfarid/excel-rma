@@ -18,7 +18,7 @@ export class SetupService {
   constructor(
     protected readonly settingsService: SettingsService,
     protected readonly http: HttpService,
-  ) { }
+  ) {}
 
   async setup(params) {
     if (await this.settingsService.find().toPromise()) {
@@ -51,7 +51,7 @@ export class SetupService {
       info._id = undefined;
       info.serviceAccountUser = undefined;
       info.serviceAccountSecret = undefined;
-      info.serviceAccountApiSecret = undefined
+      info.serviceAccountApiSecret = undefined;
       info.webhookApiKey = undefined;
     }
     return info;
