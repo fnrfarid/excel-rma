@@ -21,7 +21,6 @@ import { StorageService, STORAGE_TOKEN } from './api/storage/storage.service';
 import { SERVICE_NAME } from './constants/storage';
 import { AppCommonModule } from './common/app-common.module';
 import { TimeService } from './api/time/time.service';
-import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
 import { CsvJsonService } from './api/csv-json/csv-json.service';
 import { ProblemUiModule } from './problem-ui/problem-ui.module';
 import { JobUIModule } from './job-ui/job-ui.module';
@@ -44,7 +43,6 @@ import { PermissionManager } from './api/permission/permission.service';
     PurchaseUiModule,
     BrowserAnimationsModule,
     AppCommonModule,
-    WarrantyUiModule,
     ProblemUiModule,
   ],
   providers: [

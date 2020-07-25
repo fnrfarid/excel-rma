@@ -65,6 +65,35 @@ test_rma_mobile:
   tags:
     - docker
 
+test_rma_warranty:
+  image: registry.gitlab.com/castlecraft/docker-craft/node-latest-headless-chrome:latest
+  stage: tests
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+    paths:
+      - packages/rma-warranty/node_modules/
+  only:
+    changes:
+      - packages/rma-warranty/**/*
+    refs:
+      - merge_requests
+  before_script:
+    - cd packages/rma-warranty
+    - npm install
+  script:
+    # set env variable for test
+    - export NODE_ENV=test
+    # Check Code Quality
+    - npm run lint
+    - npm run format:check
+    # Test backend unit tests
+    - npm run test
+    # Test backend e2e
+    - npm run e2e
+    - npm run build -- --prod
+  tags:
+    - docker
+
 test_rma_server:
   image: node:latest
   stage: tests
@@ -129,6 +158,24 @@ pack_rma_frontend:
     - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend
 
+pack_rma_warranty:
+  image: docker
+  stage: pack
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-warranty/**/*
+  before_script:
+    - apk add git
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - export VERSION=$(git tag --list "rma-warranty@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-warranty packages/rma-warranty
+    # - docker tag rma-warranty $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:$VERSION
+    - docker tag rma-warranty $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:latest
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty
+
 deploy_staging_frontend:
   image: alpine:latest
   stage: deploy
@@ -154,3 +201,16 @@ deploy_staging_server:
     - apk add curl bash
   script:
     - curl -Ss -X POST $BACKEND_UPDATE_KEY
+
+deploy_staging_warranty:
+  image: alpine:latest
+  stage: deploy
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-warranty/**/*
+  before_script:
+    - apk add curl bash
+  script:
+    - curl -Ss -X POST $FRONTEND_UPDATE_KEY
