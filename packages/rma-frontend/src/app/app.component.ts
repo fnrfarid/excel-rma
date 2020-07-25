@@ -14,6 +14,7 @@ import {
   LOGGED_IN,
   AUTH_SERVER_URL,
   ALL_TERRITORIES,
+  WARRANTY_APP_URL,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
@@ -267,6 +268,15 @@ export class AppComponent implements OnInit {
             error: error => {},
           });
         }
+      });
+  }
+
+  openWarrantyApp() {
+    this.appService
+      .getStorage()
+      .getItem(WARRANTY_APP_URL)
+      .then(warrantyUrl => {
+        window.open(warrantyUrl, '_blank');
       });
   }
 

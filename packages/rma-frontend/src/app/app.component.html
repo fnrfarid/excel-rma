@@ -157,7 +157,7 @@
           <ion-menu-toggle auto-hide="false">
             <ion-item
               *ngIf="loggedIn"
-              [href]=""
+              (click)="openWarrantyApp()"
               lines="none"
               routerLinkActive="active"
             >
