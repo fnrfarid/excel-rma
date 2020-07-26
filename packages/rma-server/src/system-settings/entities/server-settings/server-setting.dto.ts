@@ -16,6 +16,15 @@ export class ServerSettingsDto {
   @IsNotEmpty()
   @IsUrl()
   @ApiProperty({
+    description: 'The URL of the warranty-server.',
+    type: 'string',
+    required: true,
+  })
+  warrantyAppURL: string;
+
+  @IsNotEmpty()
+  @IsUrl()
+  @ApiProperty({
     description: 'The URL of the frappe-server.',
     type: 'string',
     required: true,

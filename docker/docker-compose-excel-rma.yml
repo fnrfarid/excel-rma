@@ -15,6 +15,20 @@ services:
     links:
       - rma-server
 
+rma-warranty:
+    image: registry.gitlab.com/castlecraft/excel-rma/rma-warranty:latest
+    restart: on-failure
+    environment:
+      - API_HOST=rma-server
+      - API_PORT=8800
+      - LETSENCRYPT_HOST=${SITES}
+      - VIRTUAL_HOST=${SITES}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    depends_on:
+      - rma-server
+    links:
+      - rma-server
+
   rma-server:
     image: registry.gitlab.com/castlecraft/excel-rma/rma-server:latest
     restart: on-failure

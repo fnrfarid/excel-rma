@@ -1,8 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PurchaseReceiptDto } from '../entity/purchase-receipt-dto';
+import {
+  PurchaseReceiptDto,
+  PurchaseReceiptItemDto,
+} from '../entity/purchase-receipt-dto';
 import { SerialNoService } from '../../serial-no/entity/serial-no/serial-no.service';
 import { from, throwError, of, forkJoin } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, mergeMap, toArray } from 'rxjs/operators';
 import { PurchaseInvoiceService } from '../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PURCHASE_INVOICE_NOT_FOUND } from '../../constants/messages';
 import { PurchaseOrderService } from '../../purchase-order/entity/purchase-order/purchase-order.service';
@@ -16,8 +19,11 @@ export class PurchaseReceiptPoliciesService {
 
   validatePurchaseReceipt(purchaseReceiptPayload: PurchaseReceiptDto) {
     return this.validatePurchaseInvoice(purchaseReceiptPayload).pipe(
-      switchMap(valid => {
-        const serials = this.getSerials(purchaseReceiptPayload);
+      mergeMap(valid => {
+        return from(purchaseReceiptPayload.items);
+      }),
+      switchMap(items => this.getSerials(items)),
+      switchMap(serials => {
         const where = {
           serial_no: { $in: serials },
           $or: [
@@ -38,6 +44,8 @@ export class PurchaseReceiptPoliciesService {
         }
         return of(true);
       }),
+      toArray(),
+      switchMap(valid => of(true)),
     );
   }
 
@@ -53,14 +61,20 @@ export class PurchaseReceiptPoliciesService {
       .join(', ')}..`;
   }
 
-  getSerials(purchaseReceiptPayload: PurchaseReceiptDto) {
-    const serials = [];
-    for (const item of purchaseReceiptPayload.items) {
-      for (const serial_no of item.serial_no) {
-        serials.push(serial_no);
-      }
+  getSerials(item: PurchaseReceiptItemDto) {
+    const serialNoSet = new Set();
+    for (const serial of item.serial_no) {
+      serialNoSet.add(serial);
     }
-    return serials;
+    const serials = Array.from(serialNoSet);
+    if (serials.length !== item.serial_no.length) {
+      return throwError(
+        new BadRequestException(
+          `Duplicate serial no provided for item: ${item.item_name}`,
+        ),
+      );
+    }
+    return of(serials);
   }
 
   validatePurchaseInvoice(purchaseReceiptPayload: PurchaseReceiptDto) {

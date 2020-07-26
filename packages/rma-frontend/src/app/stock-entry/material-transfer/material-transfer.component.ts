@@ -165,6 +165,9 @@ export class MaterialTransferComponent implements OnInit {
         next: (success: any) => {
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
+          this.remarks = success.remarks;
+          this.form.get('territory').setValue(success.territory);
+          this.form.get('territory').disable();
           this.materialTransferDataSource.update(success.items);
         },
         error: err => {},
@@ -551,6 +554,7 @@ export class MaterialTransferComponent implements OnInit {
     const body = new MaterialTransferDto();
     const date = await this.timeService.getDateAndTime(new Date());
     body.company = this.company;
+    body.territory = this.form.get('territory').value;
     body.remarks = this.remarks;
     body.posting_date = date.date;
     body.posting_time = date.time;
