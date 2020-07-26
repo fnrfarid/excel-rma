@@ -90,4 +90,8 @@ export class WarrantyService {
       }),
     );
   }
+
+  getStorage() {
+    return this.storage;
+  }
 }

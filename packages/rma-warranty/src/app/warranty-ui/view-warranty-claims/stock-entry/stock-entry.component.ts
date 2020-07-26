@@ -11,7 +11,7 @@ import { StockEntryListDataSource } from './stock-entry-datasource';
 export class StockEntryComponent implements OnInit {
   @Input()
   warrantyObject: WarrantyClaimsDetails;
-  uuid: string = '';
+  warrantyClaimUuid: string = '';
   dataSource: StockEntryListDataSource;
   displayedColumns = [
     'stock_voucher_number',
@@ -24,14 +24,16 @@ export class StockEntryComponent implements OnInit {
   constructor(private readonly stockEntryService: StockEntryService) {}
 
   ngOnInit() {
-    this.uuid = this.warrantyObject?.uuid;
+    this.warrantyClaimUuid = this.warrantyObject?.uuid;
     this.dataSource = new StockEntryListDataSource(this.stockEntryService);
-    this.dataSource.loadItems('asc', 0, 10, { warrantyClaimUuid: this.uuid });
+    this.dataSource.loadItems('asc', 0, 10, {
+      warrantyClaimUuid: this.warrantyClaimUuid,
+    });
   }
 
   getUpdate(event) {
     this.dataSource.loadItems('asc', event.pageIndex, event.pageSize, {
-      warrantyClaimUuid: this.uuid,
+      warrantyClaimUuid: this.warrantyClaimUuid,
     });
   }
 }
