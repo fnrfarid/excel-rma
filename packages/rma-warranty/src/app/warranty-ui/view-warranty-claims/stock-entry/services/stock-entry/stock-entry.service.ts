@@ -15,14 +15,6 @@ import { map, switchMap } from 'rxjs/operators';
 export class StockEntryService {
   constructor(private http: HttpClient, private storage: StorageService) {}
 
-  getStockEntry(uuid: string) {
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get('/api/stock_entry/v1/get/' + uuid, { headers });
-      }),
-    );
-  }
-
   getStockEntryList(sortOrder, pageNumber = 0, pageSize = 10, query) {
     if (!query) query = {};
 

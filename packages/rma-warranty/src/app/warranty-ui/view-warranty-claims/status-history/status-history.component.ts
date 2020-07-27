@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import {
   WarrantyClaimsDetails,
   StatusHistoryDetails,
+  StockEntryItems,
 } from '../../../common/interfaces/warranty.interface';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { debounceTime, startWith, switchMap, map } from 'rxjs/operators';
@@ -16,6 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   STATUS_HISTORY_ADD_FAILURE,
   STATUS_HISTORY_REMOVE_FAILURE,
+  ERROR_FETCHING_DETAILS,
 } from '../../../constants/messages';
 
 @Component({
@@ -31,6 +33,7 @@ export class StatusHistoryComponent implements OnInit {
   currentStatus: any = [];
   deliveryStatus: any = [];
   posting_date: { date: string; time: string };
+  stockEntry: StockEntryItems;
 
   displayedColumns = [
     'posting_date',
@@ -62,6 +65,7 @@ export class StatusHistoryComponent implements OnInit {
     Object.keys(DELIVERY_STATUS).forEach(status =>
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
+    this.setStockEntryStatusFields();
   }
 
   createFormGroup() {
@@ -121,6 +125,7 @@ export class StatusHistoryComponent implements OnInit {
       next: () => {
         this.resetWarrantyDetail(this.warrantyObject.uuid);
         this.setInitialFormValue();
+        this.setStockEntryStatusFields();
       },
       error: ({ message }) => {
         if (!message) message = STATUS_HISTORY_ADD_FAILURE;
@@ -153,6 +158,22 @@ export class StatusHistoryComponent implements OnInit {
         },
         error: ({ message }) => {
           if (!message) message = STATUS_HISTORY_REMOVE_FAILURE;
+          this.snackbar.open(message, 'Close', {
+            duration: DURATION,
+          });
+        },
+      });
+  }
+
+  setStockEntryStatusFields() {
+    this.statusHistoryService
+      .getStockEntry(this.warrantyObject?.uuid)
+      .subscribe({
+        next: (res: any) => {
+          this.stockEntry = res;
+        },
+        error: ({ message }) => {
+          if (!message) message = ERROR_FETCHING_DETAILS;
           this.snackbar.open(message, 'Close', {
             duration: DURATION,
           });

@@ -4,6 +4,7 @@ import {
   ADD_STATUS_HISTORY_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   REMOVE_STATUS_HISTORY_ENDPOINT,
+  GET_WARRANTY_STOCK_ENTRY,
 } from '../../../constants/url-strings';
 import { switchMap, map } from 'rxjs/operators';
 import { APIResponse } from '../../../common/interfaces/sales.interface';
@@ -87,6 +88,16 @@ export class StatusHistoryService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(URL, uuid, { headers });
+      }),
+    );
+  }
+
+  getStockEntry(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(`${GET_WARRANTY_STOCK_ENTRY}/${uuid}`, {
+          headers,
+        });
       }),
     );
   }
