@@ -1,26 +1,27 @@
 import {
-  MicroserviceHealthIndicator,
   HealthIndicatorFunction,
+  TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { Injectable } from '@nestjs/common';
-import { Transport } from '@nestjs/microservices';
-import { ConfigService, DB_HOST } from '../../../config/config.service';
+import { Connection } from 'typeorm';
+import { InjectConnection } from '@nestjs/typeorm';
+import { DEFAULT } from '../../../constants/typeorm.connection';
 
 export const HEALTH_ENDPOINT = '/api/healthz';
 
 @Injectable()
 export class HealthCheckAggregateService {
   constructor(
-    private readonly microservice: MicroserviceHealthIndicator,
-    private readonly config: ConfigService,
+    @InjectConnection(DEFAULT)
+    private readonly typeormConnection: Connection,
+    private readonly database: TypeOrmHealthIndicator,
   ) {}
 
   createTerminusOptions(): HealthIndicatorFunction[] {
     const healthEndpoint: HealthIndicatorFunction[] = [
       async () =>
-        this.microservice.pingCheck('database', {
-          transport: Transport.TCP,
-          options: { host: this.config.get(DB_HOST), port: 27017 },
+        this.database.pingCheck('database', {
+          connection: this.typeormConnection,
         }),
     ];
     return healthEndpoint;
