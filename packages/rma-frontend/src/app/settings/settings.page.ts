@@ -29,6 +29,7 @@ export class SettingsPage implements OnInit {
   companySettingsForm = new FormGroup({
     authServerURL: new FormControl(),
     appURL: new FormControl(),
+    warrantyAppURL: new FormControl(),
     defaultCompany: new FormControl(),
     frontendClientId: new FormControl(),
     backendClientId: new FormControl(),
@@ -138,6 +139,9 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm
           .get('serviceAccountApiSecret')
           .setValue(res.serviceAccountApiSecret);
+        this.companySettingsForm
+          .get('warrantyAppURL')
+          .setValue(res.warrantyAppURL);
       },
     });
 
@@ -172,6 +176,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('transferWarehouse').value,
         this.companySettingsForm.get('serviceAccountApiKey').value,
         this.companySettingsForm.get('serviceAccountApiSecret').value,
+        this.companySettingsForm.get('warrantyAppURL').value,
       )
       .subscribe({
         next: success => {
