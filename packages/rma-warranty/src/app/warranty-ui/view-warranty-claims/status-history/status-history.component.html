@@ -348,58 +348,100 @@
     >
       <ion-row>
         <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating"
-              >{{
-                (warrantyObject?.status_history)[
-                  warrantyObject?.status_history.length - 1
-                ].delivery_status
-              }}
-              Warehouse</ion-label
-            >
-            <ion-input placeholder="Upgrade Warehouse" type="text"></ion-input>
-          </ion-item>
+          <mat-form-field
+            class="example-full-width"
+            *ngIf="
+              (warrantyObject?.status_history)[
+                warrantyObject?.status_history.length - 1
+              ].delivery_status === 'Upgraded'
+            "
+          >
+            <input
+              matInput
+              type="text"
+              placeholder="Upgrade Warehouse"
+              disabled
+              [value]="(stockEntry?.items)[0].s_warehouse"
+            />
+          </mat-form-field>
+          <mat-form-field
+            class="example-full-width"
+            *ngIf="
+              (warrantyObject?.status_history)[
+                warrantyObject?.status_history.length - 1
+              ].delivery_status === 'Replaced'
+            "
+          >
+            <input
+              [value]="(stockEntry?.items)[0].s_warehouse"
+              matInput
+              type="text"
+              disabled
+              placeholder="Replace Warehouse"
+            />
+          </mat-form-field>
         </ion-col>
         <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Damaged Warehouse</ion-label>
-            <ion-input placeholder="Damaged Warehouse" type="text"></ion-input>
-          </ion-item>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [value]="warrantyObject?.recieving_branch"
+              type="text"
+              disabled
+              placeholder="Damaged Warehouse"
+            />
+          </mat-form-field>
         </ion-col>
       </ion-row>
 
       <ion-row>
         <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Replace Product</ion-label>
-            <ion-input placeholder="Replace Product" type="text"></ion-input>
-          </ion-item>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [value]="(stockEntry?.items)[0].item_name"
+              type="text"
+              disabled
+              placeholder="Replaced Product"
+            />
+          </mat-form-field>
         </ion-col>
         <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Damaged Product</ion-label>
-            <ion-input placeholder="Damaged Product" type="text"></ion-input>
-          </ion-item>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [value]="warrantyObject?.item_name"
+              type="text"
+              disabled
+              placeholder="Damaged Product"
+            />
+          </mat-form-field>
         </ion-col>
       </ion-row>
 
       <ion-row>
         <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Replace Serial</ion-label>
-            <ion-input placeholder="Replace Serial" type="text"></ion-input>
-          </ion-item>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [value]="(stockEntry?.items)[0].serial_no[0]"
+              type="text"
+              disabled
+              placeholder="Replace Serial"
+            />
+          </mat-form-field>
         </ion-col>
-        <ion-col> </ion-col>
-      </ion-row>
-      <ion-row>
         <ion-col>
-          <ion-item lines="none">
-            <ion-label position="floating">Remarks</ion-label>
-            <ion-input placeholder="Remarks" type="text"></ion-input>
-          </ion-item>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              [value]="warrantyObject?.remarks"
+              type="text"
+              placeholder="Remarks"
+              disabled
+            />
+          </mat-form-field>
         </ion-col>
-        <ion-col> </ion-col>
       </ion-row>
     </ion-grid>
   </ion-card-content>

@@ -101,4 +101,8 @@ export class WarrantyStockEntryAggregateService {
     stockEntry.docstatus = 1;
     return stockEntry;
   }
+
+  retrieveStockEntry(warrantyClaimUuid: string) {
+    return from(this.stockEntryService.findOne(warrantyClaimUuid));
+  }
 }
