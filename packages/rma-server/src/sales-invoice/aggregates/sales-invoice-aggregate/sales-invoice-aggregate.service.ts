@@ -352,10 +352,10 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                 switchMap((response: DeliveryNoteWebhookDto) => {
                   const items = this.mapSerialsFromItem(response.items);
 
-                  const returned_items_map = this.getReturnedItemsMap(
-                    items,
-                    salesInvoice,
-                  );
+                  const {
+                    returned_items_map,
+                    delivered_items_map,
+                  } = this.getReturnedItemsMap(items, salesInvoice);
 
                   this.linkSalesReturn(
                     items,
@@ -368,7 +368,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   this.salesInvoiceService
                     .updateOne(
                       { uuid: salesInvoice.uuid },
-                      { $set: { returned_items_map } },
+                      { $set: { returned_items_map, delivered_items_map } },
                     )
                     .then(success => {})
                     .catch(error => {});
@@ -590,12 +590,16 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       returnItemsMap[item.item_code] = item.qty;
     });
     for (const key of Object.keys(returnItemsMap)) {
+      sales_invoice.delivered_items_map[key] += returnItemsMap[key];
       if (sales_invoice.returned_items_map[key]) {
         sales_invoice.returned_items_map[key] += returnItemsMap[key];
       } else {
         sales_invoice.returned_items_map[key] = returnItemsMap[key];
       }
     }
-    return sales_invoice.returned_items_map;
+    return {
+      returned_items_map: sales_invoice.returned_items_map,
+      delivered_items_map: sales_invoice.delivered_items_map,
+    };
   }
 }

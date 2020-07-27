@@ -22,3 +22,4 @@ export const SAME_WAREHOUSE_ERROR =
   'Source and Target warehouse cannot be same';
 export const DUPLICATE_SERIAL = 'Serial Already exists';
 export const STOCK_ENTRY_CREATED = 'stock entry created succesfully';
+export const ERROR_FETCHING_DETAILS = 'Failed to fetch product details';

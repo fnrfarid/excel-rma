@@ -43,6 +43,7 @@ describe('StatusHistoryComponent', () => {
         {
           provide: StatusHistoryService,
           useValue: {
+            getStockEntry: (...args) => of({}),
             getTerritoryList: (...args) => of([]),
             getWarrantyDetail: (...args) => of({}),
           },
