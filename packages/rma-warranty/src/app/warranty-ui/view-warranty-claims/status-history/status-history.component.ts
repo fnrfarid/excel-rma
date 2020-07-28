@@ -94,7 +94,7 @@ export class StatusHistoryComponent implements OnInit {
   branchOptionChanged(option) {}
 
   getBranchOption(option) {
-    if (option) return option.name;
+    if (option) return option.warehouse;
   }
 
   getCurrentStatus(option) {
