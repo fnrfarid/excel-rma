@@ -48,7 +48,7 @@
                   *ngFor="let option of territoryList | async"
                   [value]="option"
                 >
-                  {{ option.name }}
+                  {{ option.warehouse }}
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="f.status_from.hasError('required')">
@@ -76,7 +76,7 @@
                   *ngFor="let option of territoryList | async"
                   [value]="option"
                 >
-                  {{ option.name }}
+                  {{ option.warehouse }}
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="f.transfer_branch.hasError('required')">

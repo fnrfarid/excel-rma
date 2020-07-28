@@ -15,7 +15,6 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { Router, NavigationEnd } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
-import { WAREHOUSES } from '../../constants/app-string';
 
 @Component({
   selector: 'app-warranty',
@@ -85,24 +84,13 @@ export class WarrantyPage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map((event: any) => {
-          if (event.url === '/warranty') this.getWarrantyClaimList();
+          if (event.url === '/warranty') this.dataSource.loadItems();
           return event;
         }),
       )
       .subscribe({
         next: res => {},
         error: err => {},
-      });
-  }
-
-  getWarrantyClaimList() {
-    this.warrantyService
-      .getStorage()
-      .getItem(WAREHOUSES)
-      .then(warehouses => {
-        this.dataSource.loadItems(undefined, undefined, undefined, {
-          warehouses,
-        });
       });
   }
 
