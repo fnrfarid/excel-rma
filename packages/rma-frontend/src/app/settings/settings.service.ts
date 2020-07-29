@@ -124,6 +124,7 @@ export class SettingsService {
     transferWarehouse: string,
     serviceAccountApiKey: string,
     serviceAccountApiSecret: string,
+    warrantyAppURL: string,
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -144,6 +145,7 @@ export class SettingsService {
             transferWarehouse,
             serviceAccountApiKey,
             serviceAccountApiSecret,
+            warrantyAppURL,
           },
           { headers },
         );

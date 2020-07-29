@@ -304,7 +304,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   getBranchOption(option) {
-    if (option) return option.name;
+    if (option) return option.warehouse;
   }
 
   serialChanged(name) {
