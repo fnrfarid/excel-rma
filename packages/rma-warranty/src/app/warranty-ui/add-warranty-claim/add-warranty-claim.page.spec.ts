@@ -49,7 +49,7 @@ describe('AddWarrantyClaimPage', () => {
             getTerritoryList: (...args) => of([]),
             getItem: (...args) => of({}),
             getSerial: (...args) => of({}),
-            getStore: () => ({
+            getStorage: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
             }),

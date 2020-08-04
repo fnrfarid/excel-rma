@@ -57,20 +57,35 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     });
     switch (warrantyClaimPayload.claim_type) {
       case WARRANTY_TYPE.WARRANTY:
-        return this.createWarrantyNonWarrantyClaim(warrantyClaimPayload);
+        return this.createWarrantyNonWarrantyClaim(
+          warrantyClaimPayload,
+          clientHttpRequest,
+        );
+
+      case WARRANTY_TYPE.NON_WARRANTY:
+        return this.createWarrantyNonWarrantyClaim(
+          warrantyClaimPayload,
+          clientHttpRequest,
+        );
 
       case WARRANTY_TYPE.NON_SERAIL:
-        return this.createNonSerialClaim(warrantyClaimPayload);
+        return this.createNonSerialClaim(
+          warrantyClaimPayload,
+          clientHttpRequest,
+        );
 
       case WARRANTY_TYPE.THIRD_PARTY:
-        return this.createThirdPartyClaim(warrantyClaimPayload);
+        return this.createThirdPartyClaim(
+          warrantyClaimPayload,
+          clientHttpRequest,
+        );
 
       default:
         return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
     }
   }
 
-  assignFields(warrantyClaimPayload: WarrantyClaimDto) {
+  assignFields(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
     return this.settingsService.find().pipe(
       switchMap(settings => {
         if (!settings) {
@@ -79,13 +94,17 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         const warrantyClaim = new WarrantyClaim();
         Object.assign(warrantyClaim, warrantyClaimPayload);
         warrantyClaim.uuid = uuidv4();
+        warrantyClaim.received_by = clientHttpRequest.token.fullName;
         warrantyClaim.createdOn = new DateTime(settings.timeZone).toJSDate();
         return of(warrantyClaim);
       }),
     );
   }
 
-  createWarrantyNonWarrantyClaim(claimsPayload: WarrantyClaimDto) {
+  createWarrantyNonWarrantyClaim(
+    claimsPayload: WarrantyClaimDto,
+    clientHttpRequest,
+  ) {
     return this.warrantyClaimsPoliciesService
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
@@ -95,7 +114,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           );
         }),
         switchMap((payload: WarrantyClaimDto) => {
-          return this.assignFields(payload);
+          return this.assignFields(payload, clientHttpRequest);
         }),
         switchMap((warrantyClaimPayload: WarrantyClaim) => {
           return from(this.warrantyClaimService.create(warrantyClaimPayload));
@@ -103,12 +122,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       );
   }
 
-  createNonSerialClaim(claimsPayload: WarrantyClaimDto) {
+  createNonSerialClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
     return this.warrantyClaimsPoliciesService
       .validateWarrantyCustomer(claimsPayload.customer)
       .pipe(
         switchMap(() => {
-          return this.assignFields(claimsPayload);
+          return this.assignFields(claimsPayload, clientHttpRequest);
         }),
         switchMap((warrantyClaimPayload: WarrantyClaim) => {
           return from(this.warrantyClaimService.create(warrantyClaimPayload));
@@ -116,8 +135,8 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       );
   }
 
-  createThirdPartyClaim(claimsPayload: WarrantyClaimDto) {
-    return this.assignFields(claimsPayload).pipe(
+  createThirdPartyClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
+    return this.assignFields(claimsPayload, clientHttpRequest).pipe(
       switchMap(warrantyClaimPayload => {
         return from(this.warrantyClaimService.create(warrantyClaimPayload));
       }),
