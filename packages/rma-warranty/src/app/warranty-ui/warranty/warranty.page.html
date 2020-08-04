@@ -236,7 +236,7 @@
             Received Date
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.received_date }}
+            {{row.received_on }}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
@@ -246,7 +246,7 @@
             Deliver Date
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.deliver_date }}
+            {{row.delivery_date }}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
@@ -276,7 +276,7 @@
             Claimed Serial
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
-            {{row.claimed_serial}}
+            {{row.serial_no}}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
