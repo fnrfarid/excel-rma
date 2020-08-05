@@ -127,3 +127,7 @@ export const CREATE_WARRANTY_STOCK_ENTRY =
 export const LIST_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/list';
 export const GET_WARRANTY_STOCK_ENTRY =
   '/api/stock_entry/v1/get_warranty_stock';
+export const RELAY_LIST_ACCOUNT_ENDPOINT =
+  '/api/command/user/api/resource/Account';
+export const RELAY_LIST_ADDRESS_ENDPOINT =
+  '/api/command/user/api/resource/Address';

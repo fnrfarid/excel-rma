@@ -12,10 +12,10 @@ import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceInvoiceDetails } from './service-invoice-interface';
 import {
-  UPDATE_ERROR,
   DURATION,
   CLOSE,
   SERVICE_INVOICE_STATUS,
+  UPDATE_ERROR,
 } from '../../../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadingController } from '@ionic/angular';
@@ -40,8 +40,10 @@ export class AddServiceInvoicePage implements OnInit {
     'delete',
   ];
   filteredCustomerList: Observable<any[]>;
-  filteredWarehouseList: Observable<any[]>;
+  territoryList: Observable<any[]>;
   warrantyDetails: WarrantyClaimsDetails;
+  accountList: Observable<any[]>;
+  addressList: Observable<any[]>;
   get f() {
     return this.serviceInvoiceForm.controls;
   }
@@ -67,7 +69,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.serviceInvoiceForm.controls.posting_date.setValue(
       await this.getCurrentDate(),
     );
-    this.filteredWarehouseList = this.serviceInvoiceForm
+    this.territoryList = this.serviceInvoiceForm
       .get('branch')
       .valueChanges.pipe(
         debounceTime(500),
@@ -78,6 +80,25 @@ export class AddServiceInvoicePage implements OnInit {
             .pipe(map(res => res.docs));
         }),
       );
+    this.serviceInvoiceService.getAccountList().subscribe({
+      next: response => {
+        this.accountList = response;
+      },
+      error: error => {},
+    });
+
+    this.serviceInvoiceService.getCashAccount().subscribe({
+      next: response => {
+        this.serviceInvoiceForm.controls.account.setValue(response[0]);
+      },
+    });
+
+    this.serviceInvoiceService.getAddressList().subscribe({
+      next: response => {
+        this.addressList = response;
+      },
+      error: error => {},
+    });
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customer_name')
       .valueChanges.pipe(
@@ -93,14 +114,15 @@ export class AddServiceInvoicePage implements OnInit {
       .getWarrantyDetail(this.activatedRoute.snapshot.params.uuid)
       .subscribe({
         next: (res: WarrantyClaimsDetails) => {
-          this.serviceInvoiceForm.controls.customer_name.setValue(res.customer);
-          this.serviceInvoiceForm.controls.customer_name.setValue(res.customer);
+          this.serviceInvoiceForm.controls.customer_name.setValue({
+            name: res.customer,
+          });
           this.serviceInvoiceForm.controls.customer_contact.setValue(
             res.customer_contact,
           );
-          this.serviceInvoiceForm.controls.customer_address.setValue(
-            res.customer_address,
-          );
+          this.serviceInvoiceForm.controls.customer_address.setValue({
+            name: res.customer_address,
+          });
           this.serviceInvoiceForm.controls.third_party_name.setValue(
             res.third_party_name,
           );
@@ -110,9 +132,9 @@ export class AddServiceInvoicePage implements OnInit {
           this.serviceInvoiceForm.controls.third_party_address.setValue(
             res.third_party_address,
           );
-          this.serviceInvoiceForm.controls.branch.setValue(
-            res.receiving_branch,
-          );
+          this.serviceInvoiceForm.controls.branch.setValue({
+            name: res.receiving_branch,
+          });
           this.warrantyDetails = res;
         },
         error: err => {},
@@ -151,7 +173,7 @@ export class AddServiceInvoicePage implements OnInit {
     if (isValid) {
       const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
       serviceInvoiceDetails.warrantyClaimUuid = this.activatedRoute.snapshot.params.uuid;
-      serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value;
+      serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value.name;
       serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
       serviceInvoiceDetails.total_qty = 0;
       serviceInvoiceDetails.total = 0;
@@ -160,10 +182,10 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
       serviceInvoiceDetails.date = this.serviceInvoiceForm.controls.posting_date.value;
       serviceInvoiceDetails.customer_third_party = this.warrantyDetails.claim_type;
-      serviceInvoiceDetails.branch = this.serviceInvoiceForm.controls.branch.value;
+      serviceInvoiceDetails.branch = this.serviceInvoiceForm.controls.branch.value.name;
       serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.controls.posting_date.value;
-      serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value;
-      serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value;
+      serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value.name;
+      serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value.name;
       serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
       serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
       serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
@@ -284,4 +306,10 @@ export class AddServiceInvoicePage implements OnInit {
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
   }
+
+  getOption(option) {
+    if (option) return option.name;
+  }
+
+  getSelectedOption(option) {}
 }

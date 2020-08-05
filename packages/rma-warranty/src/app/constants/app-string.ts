@@ -30,10 +30,9 @@ export const WARRANTY_TYPE = {
 };
 
 export const CURRENT_STATUS_VERDICT = {
-  RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   TRANSFERRED: 'Transferred',
   RECEIVED_FROM_BRANCH: 'Received from Branch',
-  SOLVED: 'Solved ',
+  SOLVED: 'Solved',
   UNSOLVED: 'Unsolved',
   REJECTED: 'Rejected',
   TO_REPLACE: 'To Replace',
