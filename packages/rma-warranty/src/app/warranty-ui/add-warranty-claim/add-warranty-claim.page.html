@@ -40,7 +40,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Claim Type"
                   formControlName="claim_type"
                   [matAutocomplete]="claimType"
@@ -65,7 +64,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Serial no"
                   formControlName="serial_no"
                   (keyup.enter)="serialChanged($event.target.value)"
@@ -82,7 +80,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Invoice number"
                   formControlName="invoice_no"
                 />
@@ -95,7 +92,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   [matDatepicker]="warranty_end_date"
                   placeholder="Warranty End Date"
                   formControlName="warranty_end_date"
@@ -120,7 +116,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Product Name"
                   formControlName="product_name"
                   [matAutocomplete]="productName"
@@ -148,7 +143,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Product Brand"
                   formControlName="product_brand"
                 />
@@ -164,7 +158,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Problem"
                   formControlName="problem"
                 />
@@ -178,7 +171,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Problem Details"
                   formControlName="problem_details"
                 />
@@ -194,7 +186,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Additional Remarks"
                   formControlName="remarks"
                 />
@@ -220,7 +211,6 @@
             <ion-col *ngIf="warrantyState.customer_name.active">
               <mat-form-field class="example-full-width">
                 <input
-                  required
                   type="text"
                   placeholder="Select Customer"
                   matInput
@@ -253,7 +243,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Third Party Name"
                   formControlName="third_party_name"
                 />
@@ -269,7 +258,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
                 />
@@ -283,7 +271,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Third Party Contact"
                   formControlName="third_party_contact"
                 />
@@ -299,7 +286,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Customer Address"
                   formControlName="customer_address"
                 />
@@ -313,7 +299,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Third Party Address"
                   formControlName="third_party_address"
                 />
@@ -339,7 +324,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   [matDatepicker]="received_on"
                   placeholder="Received Date"
                   formControlName="received_on"
@@ -358,7 +342,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   [matDatepicker]="delivery_date"
                   placeholder="Deliver Date"
                   formControlName="delivery_date"
@@ -383,7 +366,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Recieving Branch"
                   formControlName="receiving_branch"
                   [matAutocomplete]="recievingBranch"
@@ -411,7 +393,6 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Delivery Branch"
                   formControlName="delivery_branch"
                   [matAutocomplete]="deliveryBranch"

@@ -128,13 +128,7 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
-        this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
-        this.warrantyClaimForm.controls.warranty_end_date.updateValueAndValidity();
-        this.warrantyClaimForm.controls.serial_no.clearValidators();
-        this.warrantyClaimForm.controls.serial_no.updateValueAndValidity();
-        this.warrantyClaimForm.controls.invoice_no.clearValidators();
-        this.warrantyClaimForm.controls.invoice_no.updateValueAndValidity();
-
+        this.clearAllValidators('Non Serial Warranty');
         break;
 
       case 'Third Party Warranty':
@@ -152,8 +146,7 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
-        this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
-        this.warrantyClaimForm.controls.warranty_end_date.updateValueAndValidity();
+        this.clearAllValidators('Third Party Warranty');
         break;
 
       default:
@@ -171,8 +164,44 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
+        this.clearAllValidators('Warranty');
+
         break;
     }
+  }
+
+  setValidators(type: string) {
+    const obj = {
+      Warranty: ['serial_no', 'invoice_no', 'customer_name'],
+      'Non Serial Warranty': ['customer_name'],
+      'Third Party Warranty': ['third_party_name'],
+    };
+    obj[type].forEach(element => {
+      this.warrantyClaimForm.get(element).setValidators(Validators.required);
+      this.warrantyClaimForm.get(element).updateValueAndValidity();
+    });
+  }
+
+  clearAllValidators(type: string) {
+    const common_control = [
+      'product_brand',
+      'problem',
+      'problem_details',
+      'remarks',
+      'claim_type',
+      'received_on',
+      'delivery_date',
+      'receiving_branch',
+    ];
+    Object.keys(this.warrantyClaimForm.controls).forEach(element => {
+      this.warrantyClaimForm.get(element).clearValidators();
+      this.warrantyClaimForm.get(element).updateValueAndValidity();
+    });
+    common_control.forEach(element => {
+      this.warrantyClaimForm.get(element).setValidators(Validators.required);
+      this.warrantyClaimForm.get(element).updateValueAndValidity();
+    });
+    this.setValidators(type);
   }
 
   isDisabled() {
@@ -267,25 +296,25 @@ export class AddWarrantyClaimPage implements OnInit {
 
   createForm() {
     this.warrantyClaimForm = new FormGroup({
-      warranty_end_date: new FormControl('', [Validators.required]),
+      warranty_end_date: new FormControl(''),
       claim_type: new FormControl('', [Validators.required]),
-      received_on: new FormControl('', [Validators.required]),
-      delivery_date: new FormControl('', [Validators.required]),
-      receiving_branch: new FormControl('', [Validators.required]),
-      delivery_branch: new FormControl('', [Validators.required]),
-      product_brand: new FormControl(),
-      problem: new FormControl('', [Validators.required]),
-      problem_details: new FormControl('', [Validators.required]),
-      remarks: new FormControl('', [Validators.required]),
+      received_on: new FormControl(''),
+      delivery_date: new FormControl(''),
+      receiving_branch: new FormControl(''),
+      delivery_branch: new FormControl(''),
+      product_brand: new FormControl(''),
+      problem: new FormControl(''),
+      problem_details: new FormControl(''),
+      remarks: new FormControl(''),
       customer_contact: new FormControl(),
       customer_address: new FormControl(),
-      third_party_name: new FormControl('', [Validators.required]),
-      third_party_contact: new FormControl(),
-      third_party_address: new FormControl(),
-      product_name: new FormControl('', [Validators.required]),
-      customer_name: new FormControl('', [Validators.required]),
-      serial_no: new FormControl('', [Validators.required]),
-      invoice_no: new FormControl('', [Validators.required]),
+      third_party_name: new FormControl(''),
+      third_party_contact: new FormControl(''),
+      third_party_address: new FormControl(''),
+      product_name: new FormControl(''),
+      customer_name: new FormControl(''),
+      serial_no: new FormControl(''),
+      invoice_no: new FormControl(''),
     });
   }
 
