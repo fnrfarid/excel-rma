@@ -3,7 +3,7 @@ import { SatPopover } from '@ncstate/sat-popover';
 import { filter, switchMap, startWith, map } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
 import { ITEM_COLUMN } from '../../../../../constants/app-string';
 
@@ -39,6 +39,7 @@ export class InlineEditComponent {
 
   itemList: Array<Item>;
   filteredItemList: Observable<any[]>;
+  item: any;
 
   warehouseList: Observable<any[]>;
   /** Form model for the input. */
@@ -74,6 +75,16 @@ export class InlineEditComponent {
     return option.item_name;
   }
 
+  ItemSelected(option) {
+    return this.addServiceInvoiceService
+      .getItemFromRMAServer(option.item_code)
+      .pipe(
+        switchMap(item => {
+          this.item = item;
+          return of({});
+        }),
+      );
+  }
   getWarehouseOptionText(option) {
     if (option) return option.warehouse;
   }
@@ -92,7 +103,23 @@ export class InlineEditComponent {
     if (this.popover) {
       switch (this.column) {
         case ITEM_COLUMN.ITEM:
-          this.popover.close(this.itemFormControl.value);
+          this.addServiceInvoiceService
+            .getItemFromRMAServer(this.itemFormControl.value.item_code)
+            .pipe(
+              switchMap(item => {
+                return of(item);
+              }),
+            )
+            .subscribe({
+              next: res => {
+                const selectedItem = {} as any;
+                selectedItem.item_name = this.itemFormControl.value.item_name;
+                selectedItem.item_code = this.itemFormControl.value.item_code;
+                selectedItem.has_serial_no = res.has_serial_no;
+                this.popover.close(selectedItem);
+              },
+              error: err => {},
+            });
           break;
         case ITEM_COLUMN.SERIAL_NO:
           this.addServiceInvoiceService

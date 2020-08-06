@@ -8,7 +8,7 @@ import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { switchMap, map, catchError } from 'rxjs/operators';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
-import { from, throwError } from 'rxjs';
+import { from, throwError, of } from 'rxjs';
 import {
   STOCK_ENTRY,
   STOCK_ENTRY_STATUS,
@@ -19,6 +19,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { ERPNEXT_STOCK_ENTRY_ENDPOINT } from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -26,6 +27,7 @@ export class WarrantyStockEntryAggregateService {
     private readonly stockEntryService: StockEntryService,
     private readonly stockEntryPolicies: StockEntryPoliciesService,
     private readonly settingService: SettingsService,
+    private readonly serialService: SerialNoService,
     private readonly http: HttpService,
   ) {}
 
@@ -61,9 +63,15 @@ export class WarrantyStockEntryAggregateService {
       }),
       map(res => res.data.data),
       switchMap(res => {
+        this.updateSerialItem(res.items);
         return this.stockEntryService.updateOne(
           { uuid: payload.uuid },
-          { $set: { stock_voucher_number: res.name } },
+          {
+            $set: {
+              stock_voucher_number: res.name,
+              status: STOCK_ENTRY_STATUS.delivered,
+            },
+          },
         );
       }),
       catchError(err => {
@@ -75,6 +83,15 @@ export class WarrantyStockEntryAggregateService {
     );
   }
 
+  updateSerialItem(items: any[]) {
+    items.forEach(item => {
+      this.serialService.updateOne(
+        { serial_no: item.serial_no },
+        { $set: { warehouse: '' } },
+      );
+    });
+    return of().subscribe({ next: nxt => {} });
+  }
   mapWarrantyStock(payload) {
     payload.items.forEach(item => {
       item.serial_no = item.serial_no[0];
