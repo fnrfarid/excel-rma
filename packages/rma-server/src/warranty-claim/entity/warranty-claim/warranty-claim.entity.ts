@@ -111,6 +111,12 @@ export class WarrantyClaim extends BaseEntity {
   remarks: string;
 
   @Column()
+  created_by_email: string;
+
+  @Column()
+  created_by: string;
+
+  @Column()
   status_history: StatusHistory[];
 }
 

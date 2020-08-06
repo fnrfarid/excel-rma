@@ -154,6 +154,7 @@
                 (closed)="updateSerial(row,$event)"
               >
                 <inline-edit
+                  *ngIf="serialActive"
                   style="width: 400px !important;"
                   [value]="row.serial_no[0]"
                   column="serial_no"
@@ -222,39 +223,6 @@
                 <inline-edit
                   style="width: 400px !important;"
                   [value]="row.s_warehouse"
-                  column="warehouse"
-                ></inline-edit>
-              </sat-popover>
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="target_warehouse">
-            <mat-header-cell *matHeaderCellDef
-              >Target Warehouse</mat-header-cell
-            >
-            <mat-cell
-              *matCellDef="let row;let i = index"
-              [satPopoverAnchor]="p"
-              tabindex="0"
-              (keyup.enter)="p.open()"
-              (click)="p.open()"
-            >
-              <ng-container *ngIf="row.t_warehouse">
-                {{row.t_warehouse}}
-              </ng-container>
-              <span class="add-comment" *ngIf="!row.t_warehouse">
-                Add a Warehouse
-              </span>
-              <sat-popover
-                #p
-                hasBackdrop
-                xAlign="start"
-                yAlign="start"
-                (closed)="updateTWarehouse(row,$event)"
-              >
-                <inline-edit
-                  style="width: 400px !important;"
-                  [value]="row.target_warehouse"
                   column="warehouse"
                 ></inline-edit>
               </sat-popover>

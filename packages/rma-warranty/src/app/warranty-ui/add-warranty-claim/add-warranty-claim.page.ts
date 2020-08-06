@@ -12,7 +12,7 @@ import {
   WarrantyClaimsDetails,
 } from '../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DURATION } from './../../constants/app-string';
+import { DURATION, WARRANTY_TYPE } from './../../constants/app-string';
 import {
   SOMETHING_WENT_WRONG,
   ITEM_BRAND_FETCH_ERROR,
@@ -49,7 +49,8 @@ export class AddWarrantyClaimPage implements OnInit {
 
   async ngOnInit() {
     this.claimList = [
-      'Warranty / Non Warranty',
+      'Warranty',
+      'Non Warranty',
       'Non Serial Warranty',
       'Third Party Warranty',
     ];
@@ -100,6 +101,14 @@ export class AddWarrantyClaimPage implements OnInit {
       }),
       map(res => res.docs),
     );
+    this.warrantyService
+      .getStorage()
+      .getItem('warehouses')
+      .then(warehouse => {
+        this.warrantyClaimForm.controls.receiving_branch.setValue({
+          name: warehouse[0],
+        });
+      });
   }
 
   getFormState(state) {
@@ -114,18 +123,12 @@ export class AddWarrantyClaimPage implements OnInit {
           product_name: { disabled: true, active: true },
           customer_name: { disabled: true, active: true },
           product_brand: { disabled: false, active: true },
-          third_party_name: { disabled: false, active: false },
-          third_party_contact: { disabled: false, active: false },
-          third_party_address: { disabled: false, active: false },
+          third_party_name: { disabled: true, active: true },
+          third_party_contact: { disabled: true, active: true },
+          third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
-        this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
-        this.warrantyClaimForm.controls.warranty_end_date.updateValueAndValidity();
-        this.warrantyClaimForm.controls.serial_no.clearValidators();
-        this.warrantyClaimForm.controls.serial_no.updateValueAndValidity();
-        this.warrantyClaimForm.controls.invoice_no.clearValidators();
-        this.warrantyClaimForm.controls.invoice_no.updateValueAndValidity();
-
+        this.clearAllValidators('Non Serial Warranty');
         break;
 
       case 'Third Party Warranty':
@@ -143,8 +146,7 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
-        this.warrantyClaimForm.controls.warranty_end_date.clearValidators();
-        this.warrantyClaimForm.controls.warranty_end_date.updateValueAndValidity();
+        this.clearAllValidators('Third Party Warranty');
         break;
 
       default:
@@ -157,13 +159,49 @@ export class AddWarrantyClaimPage implements OnInit {
           product_name: { disabled: false, active: true },
           customer_name: { disabled: false, active: true },
           product_brand: { disabled: false, active: true },
-          third_party_name: { disabled: false, active: false },
-          third_party_contact: { disabled: false, active: false },
-          third_party_address: { disabled: false, active: false },
+          third_party_name: { disabled: true, active: true },
+          third_party_contact: { disabled: true, active: true },
+          third_party_address: { disabled: true, active: true },
         };
         this.isDisabled();
+        this.clearAllValidators('Warranty');
+
         break;
     }
+  }
+
+  setValidators(type: string) {
+    const obj = {
+      Warranty: ['serial_no', 'invoice_no', 'customer_name'],
+      'Non Serial Warranty': ['customer_name'],
+      'Third Party Warranty': ['third_party_name'],
+    };
+    obj[type].forEach(element => {
+      this.warrantyClaimForm.get(element).setValidators(Validators.required);
+      this.warrantyClaimForm.get(element).updateValueAndValidity();
+    });
+  }
+
+  clearAllValidators(type: string) {
+    const common_control = [
+      'product_brand',
+      'problem',
+      'problem_details',
+      'remarks',
+      'claim_type',
+      'received_on',
+      'delivery_date',
+      'receiving_branch',
+    ];
+    Object.keys(this.warrantyClaimForm.controls).forEach(element => {
+      this.warrantyClaimForm.get(element).clearValidators();
+      this.warrantyClaimForm.get(element).updateValueAndValidity();
+    });
+    common_control.forEach(element => {
+      this.warrantyClaimForm.get(element).setValidators(Validators.required);
+      this.warrantyClaimForm.get(element).updateValueAndValidity();
+    });
+    this.setValidators(type);
   }
 
   isDisabled() {
@@ -236,7 +274,12 @@ export class AddWarrantyClaimPage implements OnInit {
       await this.getDateTime(new Date())
     ).time;
     switch (warrantyClaimDetails.claim_type) {
-      case 'Warranty / Non Warranty':
+      case 'Warranty':
+        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
+        warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
+        warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
+        break;
+      case 'Non Warranty':
         warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
         warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
         warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
@@ -253,25 +296,25 @@ export class AddWarrantyClaimPage implements OnInit {
 
   createForm() {
     this.warrantyClaimForm = new FormGroup({
-      warranty_end_date: new FormControl('', [Validators.required]),
+      warranty_end_date: new FormControl(''),
       claim_type: new FormControl('', [Validators.required]),
-      received_on: new FormControl('', [Validators.required]),
-      delivery_date: new FormControl('', [Validators.required]),
-      receiving_branch: new FormControl('', [Validators.required]),
-      delivery_branch: new FormControl('', [Validators.required]),
-      product_brand: new FormControl(),
-      problem: new FormControl('', [Validators.required]),
-      problem_details: new FormControl('', [Validators.required]),
-      remarks: new FormControl('', [Validators.required]),
+      received_on: new FormControl(''),
+      delivery_date: new FormControl(''),
+      receiving_branch: new FormControl(''),
+      delivery_branch: new FormControl(''),
+      product_brand: new FormControl(''),
+      problem: new FormControl(''),
+      problem_details: new FormControl(''),
+      remarks: new FormControl(''),
       customer_contact: new FormControl(),
       customer_address: new FormControl(),
-      third_party_name: new FormControl('', [Validators.required]),
-      third_party_contact: new FormControl(),
-      third_party_address: new FormControl(),
-      product_name: new FormControl('', [Validators.required]),
-      customer_name: new FormControl('', [Validators.required]),
-      serial_no: new FormControl('', [Validators.required]),
-      invoice_no: new FormControl('', [Validators.required]),
+      third_party_name: new FormControl(''),
+      third_party_contact: new FormControl(''),
+      third_party_address: new FormControl(''),
+      product_name: new FormControl(''),
+      customer_name: new FormControl(''),
+      serial_no: new FormControl(''),
+      invoice_no: new FormControl(''),
     });
   }
 
@@ -304,13 +347,28 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   getBranchOption(option) {
-    if (option) return option.warehouse;
+    if (option) return option.name;
   }
 
   serialChanged(name) {
     this.warrantyService.getSerial(name).subscribe({
       next: (res: SerialNoDetails) => {
         this.getSerialData = res;
+        if (
+          this.warrantyClaimForm.controls.received_on.value >
+          this.getSerialData.warranty.salesWarrantyDate
+        ) {
+          this.warrantyClaimForm.controls.claim_type.setValue(
+            WARRANTY_TYPE.WARRANTY,
+          );
+        } else {
+          this.warrantyClaimForm.controls.claim_type.setValue(
+            WARRANTY_TYPE.NON_WARRANTY,
+          );
+        }
+        this.warrantyClaimForm.controls.warranty_end_date.setValue(
+          res.warranty.salesWarrantyDate,
+        );
         this.warrantyClaimForm.controls.invoice_no.setValue(
           res.sales_invoice_name,
         );

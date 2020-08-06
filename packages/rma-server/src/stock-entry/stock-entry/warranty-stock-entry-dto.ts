@@ -68,7 +68,7 @@ export class WarrantyStockEntryItemDto {
   @IsString()
   s_warehouse: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   t_warehouse: string;
 
@@ -92,7 +92,7 @@ export class WarrantyStockEntryItemDto {
   @IsNumber()
   qty: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   serial_no: string[];
 }

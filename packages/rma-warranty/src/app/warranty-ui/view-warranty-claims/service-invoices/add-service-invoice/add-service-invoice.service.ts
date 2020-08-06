@@ -11,6 +11,8 @@ import {
   GET_DIRECT_SERIAL_ENDPOINT,
   CREATE_WARRANTY_STOCK_ENTRY,
   LIST_SERVICE_INVOICE_ENDPOINT,
+  RELAY_LIST_ACCOUNT_ENDPOINT,
+  RELAY_LIST_ADDRESS_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -251,6 +253,41 @@ export class AddServiceInvoiceService {
       switchMap(res => {
         return of(res);
       }),
+    );
+  }
+
+  getAccountList() {
+    const url = RELAY_LIST_ACCOUNT_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
+  }
+
+  getCashAccount() {
+    const url = RELAY_LIST_ACCOUNT_ENDPOINT;
+    const params = new HttpParams({
+      fromObject: {
+        filters: `[["account_type","=","Cash"]]`,
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { params, headers });
+      }),
+      map(res => res.data),
+    );
+  }
+
+  getAddressList() {
+    const url = RELAY_LIST_ADDRESS_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
     );
   }
 }
