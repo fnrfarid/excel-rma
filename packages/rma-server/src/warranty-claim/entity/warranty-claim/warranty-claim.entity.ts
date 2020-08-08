@@ -17,7 +17,7 @@ export class WarrantyClaim extends BaseEntity {
   @ObjectIdColumn()
   _id: ObjectID;
 
-  @Column()
+  @Column({ unique: true })
   claim_no: string;
 
   @Column()

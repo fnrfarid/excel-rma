@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WarrantyClaim } from './warranty-claim.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
+import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
 
 @Injectable()
 export class WarrantyClaimService {
@@ -15,6 +16,7 @@ export class WarrantyClaimService {
   }
 
   async create(warrantyclaim: WarrantyClaim) {
+    warrantyclaim.claim_no = await this.generateNamingSeries();
     return await this.warrantyClaimRepository.insertOne(warrantyclaim);
   }
 
@@ -103,5 +105,11 @@ export class WarrantyClaimService {
 
   async count() {
     return await this.warrantyClaimRepository.count();
+  }
+
+  async generateNamingSeries() {
+    let res = await this.count();
+    res = res + 1;
+    return DEFAULT_NAMING_SERIES.warranty_claim + res;
   }
 }
