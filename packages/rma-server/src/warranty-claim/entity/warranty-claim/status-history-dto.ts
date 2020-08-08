@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class StatusHistoryDto {
   @IsNotEmpty()
@@ -17,7 +17,7 @@ export class StatusHistoryDto {
   @IsString()
   status_from: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   transfer_branch: string;
 

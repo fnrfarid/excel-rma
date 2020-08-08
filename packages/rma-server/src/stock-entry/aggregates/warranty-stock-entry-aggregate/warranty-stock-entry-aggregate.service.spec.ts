@@ -4,6 +4,7 @@ import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 describe('WarrantyStockEntryAggregateService', () => {
   let service: WarrantyStockEntryAggregateService;
@@ -26,6 +27,10 @@ describe('WarrantyStockEntryAggregateService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: SerialNoService,
           useValue: {},
         },
       ],

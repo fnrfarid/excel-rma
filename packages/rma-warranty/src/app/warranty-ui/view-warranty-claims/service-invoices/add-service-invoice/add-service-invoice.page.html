@@ -38,7 +38,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   [matDatepicker]="posting_date"
                   placeholder="Posting Date"
                   formControlName="posting_date"
@@ -59,10 +58,23 @@
                 <input
                   matInput
                   type="text"
-                  required
                   placeholder="Customer Name"
                   formControlName="customer_name"
+                  [matAutocomplete]="customer"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #customer="matAutocomplete"
+                  [displayWith]="getOption"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredCustomerList | async"
+                    [value]="option"
+                  >
+                    {{ option.customer_name }}
+                    <small>({{ option.name }})</small>
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('required')">
                   Customer Name is <strong>required</strong>
                 </mat-error>
@@ -74,10 +86,23 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Customer Address"
                   formControlName="customer_address"
+                  [matAutocomplete]="address"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #address="matAutocomplete"
+                  [displayWith]="getOption"
+                  (optionSelected)="getSelectedOption($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of addressList"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.customer_address.hasError('required')">
                   Customer Address is <strong>required</strong>
                 </mat-error>
@@ -87,7 +112,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
                 />
@@ -102,7 +126,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Third Party Name"
                   formControlName="third_party_name"
                 />
@@ -115,7 +138,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Third Party Address"
                   formControlName="third_party_address"
                 />
@@ -130,7 +152,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Third Party Contact"
                   formControlName="third_party_contact"
                 />
@@ -143,10 +164,23 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Account"
                   formControlName="account"
+                  [matAutocomplete]="account"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #account="matAutocomplete"
+                  [displayWith]="getOption"
+                  (optionSelected)="getSelectedOption($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of accountList"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.account.hasError('required')">
                   Account is <strong>required</strong>
                 </mat-error>
@@ -158,10 +192,22 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Branch"
                   formControlName="branch"
+                  [matAutocomplete]="deliveryBranch"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #deliveryBranch="matAutocomplete"
+                  [displayWith]="getOption"
+                >
+                  <mat-option
+                    *ngFor="let option of territoryList | async"
+                    [value]="option"
+                  >
+                    {{ option.name }} <small>({{ option.warehouse }})</small>
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.branch.hasError('required')">
                   Branch is <strong>required</strong>
                 </mat-error>

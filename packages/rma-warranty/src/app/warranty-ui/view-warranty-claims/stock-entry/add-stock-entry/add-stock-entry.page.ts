@@ -11,15 +11,14 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   STOCK_ENTRY_STATUS,
-  MATERIAL_TRANSFER,
   DURATION,
+  MATERIAL_ISSUE,
 } from '../../../../constants/app-string';
 import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
 import { DEFAULT_COMPANY } from '../../../../constants/storage';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   DUPLICATE_SERIAL,
-  SAME_WAREHOUSE_ERROR,
   STOCK_ENTRY_CREATED,
   STOCK_ENTRY_CREATE_FAILURE,
 } from '../../../../constants/messages';
@@ -37,11 +36,11 @@ export class AddStockEntryPage implements OnInit {
   stockEntryForm: FormGroup;
   type: Array<any> = [];
   itemsControl: FormArray;
+  serialActive: boolean;
   displayedColumns: string[] = [
     'serial_no',
     'item_name',
     'source_warehouse',
-    'target_warehouse',
     'quantity',
     'delete',
   ];
@@ -59,6 +58,7 @@ export class AddStockEntryPage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.serialActive = false;
     this.type = Object.keys(STOCK_ENTRY_STATUS).map(
       key => STOCK_ENTRY_STATUS[key],
     );
@@ -89,7 +89,7 @@ export class AddStockEntryPage implements OnInit {
     const selectedItem = {} as StockEntryDetails;
     selectedItem.company = this.company;
     selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
-    selectedItem.stock_entry_type = MATERIAL_TRANSFER;
+    selectedItem.stock_entry_type = MATERIAL_ISSUE;
     selectedItem.posting_date = this.stockEntryForm.controls.date.value;
     selectedItem.type = this.stockEntryForm.controls.type.value;
     selectedItem.description = this.stockEntryForm.controls.description.value;
@@ -155,8 +155,6 @@ export class AddStockEntryPage implements OnInit {
         .subscribe({
           next: serialItem => {
             if (serialItem.has_serial_no) {
-              this.AddNonSerialItem(serialItem);
-            } else {
               this.addServiceInvoiceService
                 .getSerial(this.warrantyObject.serial_no)
                 .subscribe({
@@ -164,6 +162,8 @@ export class AddStockEntryPage implements OnInit {
                     this.AddSerialItem(item);
                   },
                 });
+            } else {
+              this.AddNonSerialItem(serialItem);
             }
           },
         });
@@ -179,19 +179,21 @@ export class AddStockEntryPage implements OnInit {
   }
 
   AddNonSerialItem(serialItem: any) {
+    this.serialActive = false;
     const itemDataSource = this.dataSource.data();
     itemDataSource.push({
       item_code: serialItem.item_code,
       item_name: serialItem.item_name,
       qty: 1,
       rate: 0,
-      serial_no: ['Non Serial Item'],
+      serial_no: [''],
     });
     this.dataSource.update(itemDataSource);
     this.addItem();
   }
 
   AddSerialItem(serialItem: any) {
+    this.serialActive = true;
     const itemDataSource = this.dataSource.data();
     itemDataSource.push({
       item_code: serialItem.item_code,
@@ -199,7 +201,6 @@ export class AddStockEntryPage implements OnInit {
       qty: 1,
       rate: 0,
       s_warehouse: serialItem.warehouse,
-      t_warehouse: '',
       serial_no: [serialItem.serial_no],
     });
     this.dataSource.update(itemDataSource);
@@ -214,11 +215,17 @@ export class AddStockEntryPage implements OnInit {
     Object.assign(row, item);
     row.s_warehouse = item.s_warehouse;
     row.qty = 1;
+    if (item.has_serial_no) {
+      this.serialActive = true;
+    } else {
+      this.serialActive = false;
+    }
     this.dataSource.update(itemDataSource);
     this.itemsControl.controls[index].setValue(item);
   }
 
   addItem() {
+    this.serialActive = false;
     const data = this.dataSource.data();
     const item = {} as StockEntryItems;
     item.item_code = '';
@@ -227,7 +234,6 @@ export class AddStockEntryPage implements OnInit {
     item.minimumPrice = 0;
     item.serial_no = [];
     item.s_warehouse = '';
-    item.t_warehouse = '';
     data.push(item);
     this.itemsControl.push(new FormControl(item));
     this.dataSource.update(data);
@@ -253,25 +259,7 @@ export class AddStockEntryPage implements OnInit {
       return;
     }
     const itemDataSource = this.dataSource.data().slice();
-    if (row.t_warehouse === source_warehouse) {
-      this.snackbar.open(SAME_WAREHOUSE_ERROR, 'Close', { duration: DURATION });
-    } else {
-      row.s_warehouse = source_warehouse;
-      row.transferWarehouse = source_warehouse;
-    }
-    this.dataSource.update(itemDataSource);
-  }
-
-  updateTWarehouse(row: StockEntryItems, target_warehouse: string) {
-    if (!target_warehouse) {
-      return;
-    }
-    const itemDataSource = this.dataSource.data().slice();
-    if (row.s_warehouse === target_warehouse) {
-      this.snackbar.open(SAME_WAREHOUSE_ERROR, 'Close', { duration: DURATION });
-    } else {
-      row.t_warehouse = target_warehouse;
-    }
+    row.s_warehouse = source_warehouse;
     this.dataSource.update(itemDataSource);
   }
 
@@ -293,7 +281,7 @@ export class AddStockEntryPage implements OnInit {
   checkDuplicateSerial(serial) {
     let result: boolean = true;
     for (const iterator of this.dataSource.data()) {
-      if (iterator.serial_no[0] === serial.serial_no[0]) {
+      if (iterator?.serial_no[0] === serial?.serial_no[0]) {
         this.snackbar.open(DUPLICATE_SERIAL, 'Close', { duration: DURATION });
         result = false;
         break;

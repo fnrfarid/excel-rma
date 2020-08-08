@@ -91,4 +91,11 @@ export class StockEntryController {
   createWarrantyStock(@Body() body: WarrantyStockEntryDto, @Req() req) {
     return this.warrantyStockAggregate.createStockEntry(body, req);
   }
+
+  @Get('v1/get_warranty_stock/:warrantyClaimUuid')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  retrieveWarrantyStock(@Param() warrantyClaimUuid: string) {
+    return this.warrantyStockAggregate.retrieveStockEntry(warrantyClaimUuid);
+  }
 }

@@ -18,7 +18,6 @@ export const USER_SAVE_ITEM_SUGGESTION =
 export const STATUS_HISTORY_ADD_FAILURE = 'Failed to add Status history';
 export const STATUS_HISTORY_REMOVE_FAILURE = 'Failed to remove Status history';
 export const STOCK_ENTRY_CREATE_FAILURE = 'Failed to create Stock Entry';
-export const SAME_WAREHOUSE_ERROR =
-  'Source and Target warehouse cannot be same';
 export const DUPLICATE_SERIAL = 'Serial Already exists';
 export const STOCK_ENTRY_CREATED = 'stock entry created succesfully';
+export const ERROR_FETCHING_DETAILS = 'Failed to fetch product details';

@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import {
   WarrantyClaimsDetails,
   StatusHistoryDetails,
+  StockEntryItems,
 } from '../../../common/interfaces/warranty.interface';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { debounceTime, startWith, switchMap, map } from 'rxjs/operators';
@@ -16,6 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   STATUS_HISTORY_ADD_FAILURE,
   STATUS_HISTORY_REMOVE_FAILURE,
+  ERROR_FETCHING_DETAILS,
 } from '../../../constants/messages';
 
 @Component({
@@ -31,6 +33,7 @@ export class StatusHistoryComponent implements OnInit {
   currentStatus: any = [];
   deliveryStatus: any = [];
   posting_date: { date: string; time: string };
+  stockEntry: StockEntryItems;
 
   displayedColumns = [
     'posting_date',
@@ -62,6 +65,7 @@ export class StatusHistoryComponent implements OnInit {
     Object.keys(DELIVERY_STATUS).forEach(status =>
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
+    this.setStockEntryStatusFields();
   }
 
   createFormGroup() {
@@ -69,7 +73,7 @@ export class StatusHistoryComponent implements OnInit {
       posting_time: new FormControl('', [Validators.required]),
       posting_date: new FormControl('', [Validators.required]),
       status_from: new FormControl('', [Validators.required]),
-      transfer_branch: new FormControl('', [Validators.required]),
+      transfer_branch: new FormControl(''),
       current_status_verdict: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
       delivery_status: new FormControl('', [Validators.required]),
@@ -113,14 +117,20 @@ export class StatusHistoryComponent implements OnInit {
     statusHistoryDetails.time = this.statusHistoryForm.controls.posting_time.value;
     statusHistoryDetails.posting_date = this.statusHistoryForm.controls.posting_date.value;
     statusHistoryDetails.status_from = this.statusHistoryForm.controls.status_from.value.name;
-    statusHistoryDetails.transfer_branch = this.statusHistoryForm.controls.transfer_branch.value.name;
     statusHistoryDetails.verdict = this.statusHistoryForm.controls.current_status_verdict.value;
     statusHistoryDetails.description = this.statusHistoryForm.controls.description.value;
     statusHistoryDetails.delivery_status = this.statusHistoryForm.controls.delivery_status.value;
+    if (
+      this.statusHistoryForm.controls.current_status_verdict.value ===
+      CURRENT_STATUS_VERDICT.TRANSFERRED
+    ) {
+      statusHistoryDetails.transfer_branch = this.statusHistoryForm.controls.transfer_branch.value.name;
+    }
     this.statusHistoryService.addStatusHistory(statusHistoryDetails).subscribe({
       next: () => {
         this.resetWarrantyDetail(this.warrantyObject.uuid);
         this.setInitialFormValue();
+        this.setStockEntryStatusFields();
       },
       error: ({ message }) => {
         if (!message) message = STATUS_HISTORY_ADD_FAILURE;
@@ -158,5 +168,36 @@ export class StatusHistoryComponent implements OnInit {
           });
         },
       });
+  }
+
+  setStockEntryStatusFields() {
+    this.statusHistoryService
+      .getStockEntry(this.warrantyObject?.uuid)
+      .subscribe({
+        next: (res: any) => {
+          this.stockEntry = res;
+        },
+        error: ({ message }) => {
+          if (!message) message = ERROR_FETCHING_DETAILS;
+          this.snackbar.open(message, 'Close', {
+            duration: DURATION,
+          });
+        },
+      });
+  }
+
+  selectedCurrentStatus(option) {
+    switch (option) {
+      case CURRENT_STATUS_VERDICT.TRANSFERRED:
+        this.statusHistoryForm.controls.transfer_branch.setValidators(
+          Validators.required,
+        );
+        this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
+        break;
+      default:
+        this.statusHistoryForm.controls.transfer_branch.clearValidators();
+        this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
+        break;
+    }
   }
 }

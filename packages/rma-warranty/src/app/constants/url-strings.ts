@@ -125,3 +125,11 @@ export const REMOVE_STATUS_HISTORY_ENDPOINT =
 export const CREATE_WARRANTY_STOCK_ENTRY =
   '/api/stock_entry/v1/create_warranty_stock';
 export const LIST_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/list';
+export const GET_WARRANTY_STOCK_ENTRY =
+  '/api/stock_entry/v1/get_warranty_stock';
+export const RELAY_LIST_ACCOUNT_ENDPOINT =
+  '/api/command/user/api/resource/Account';
+export const RELAY_LIST_ADDRESS_ENDPOINT =
+  '/api/command/user/api/resource/Address';
+export const GET_TERRITORY_BY_WAREHOUSE_ENDPOINT =
+  '/api/territory/v1/get_territory_by_warehouse';

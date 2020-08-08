@@ -169,4 +169,15 @@ export class TerritoryAggregateService {
       })),
     );
   }
+
+  findTerritoryByWarehouse(warehouse: string) {
+    return from(this.territory.findOne({ warehouse })).pipe(
+      switchMap(territory => {
+        if (!territory) {
+          return throwError(new NotFoundException('Territory not found'));
+        }
+        return of(territory);
+      }),
+    );
+  }
 }
