@@ -11,6 +11,7 @@ import {
   CREATE_WARRANTY_CLAIM_ENDPOINT,
   GET_ITEM_BY_ITEM_CODE_ENDPOINT,
   RELAY_GET_FULL_ITEM_ENDPOINT,
+  GET_TERRITORY_BY_WAREHOUSE_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -189,6 +190,16 @@ export class AddWarrantyService {
       }),
     );
   }
+
+  getTerritoryByWarehouse(warehouse: string) {
+    const url = `${GET_TERRITORY_BY_WAREHOUSE_ENDPOINT}/${warehouse}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, { headers });
+      }),
+    );
+  }
+
   getStorage() {
     return this.storage;
   }
