@@ -175,7 +175,7 @@ export enum WARRANTY_STATUS {
   EXPIRED = 'Expired',
 }
 
-export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 1000;
+export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 300;
 // changing PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT would require change's in data import,
 // make sure to handle them before changing this.
 export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
