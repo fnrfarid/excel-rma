@@ -100,4 +100,8 @@ export class WarrantyClaimService {
   async insertMany(query, options?) {
     return await this.warrantyClaimRepository.insertMany(query, options);
   }
+
+  async count() {
+    return await this.warrantyClaimRepository.count();
+  }
 }

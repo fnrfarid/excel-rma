@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
+import { WarrantyClaimsDetails } from 'src/app/common/interfaces/warranty.interface';
 
 @Component({
   selector: 'service-invoices',
@@ -9,6 +10,8 @@ import { ServiceInvoiceDataSource } from './service-invoice-datasource';
   styleUrls: ['./service-invoices.component.scss'],
 })
 export class ServiceInvoicesComponent implements OnInit {
+  @Input()
+  warrantyObject: WarrantyClaimsDetails;
   invoiceUuid: string;
   dataSource: ServiceInvoiceDataSource;
   displayedColumns = [

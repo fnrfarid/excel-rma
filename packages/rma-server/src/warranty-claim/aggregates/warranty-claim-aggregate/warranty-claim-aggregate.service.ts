@@ -14,7 +14,11 @@ import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warra
 import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { INVALID_FILE, VERDICT } from '../../../constants/app-strings';
+import {
+  INVALID_FILE,
+  VERDICT,
+  DEFAULT_NAMING_SERIES,
+} from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
   BulkWarrantyClaim,
@@ -86,17 +90,34 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   assignFields(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
+    let settingsPayload: any = {};
     return this.settingsService.find().pipe(
       switchMap(settings => {
         if (!settings) {
           return throwError(new NotImplementedException());
         }
+        settingsPayload = settings;
+        return this.generateNamingSeries();
+      }),
+      switchMap(res => {
         const warrantyClaim = new WarrantyClaim();
         Object.assign(warrantyClaim, warrantyClaimPayload);
         warrantyClaim.uuid = uuidv4();
+        warrantyClaim.claim_no = res;
         warrantyClaim.received_by = clientHttpRequest.token.fullName;
-        warrantyClaim.createdOn = new DateTime(settings.timeZone).toJSDate();
+        warrantyClaim.createdOn = new DateTime(
+          settingsPayload.timeZone,
+        ).toJSDate();
         return of(warrantyClaim);
+      }),
+    );
+  }
+
+  generateNamingSeries() {
+    return from(this.warrantyClaimService.count()).pipe(
+      switchMap(res => {
+        res = res + 1;
+        return of(DEFAULT_NAMING_SERIES.warranty_claim + res);
       }),
     );
   }
