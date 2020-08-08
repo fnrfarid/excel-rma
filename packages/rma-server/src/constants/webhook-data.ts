@@ -2000,3 +2000,32 @@ export function purchaseReceiptOnCancelWebhookData(
     webhook_data: [{ fieldname: 'name', key: 'name' }],
   };
 }
+
+export function excelBackgroundAfterInsertWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Excel Background Log',
+    webhook_docevent: 'after_insert',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      { fieldname: 'name', key: 'name' },
+      { fieldname: 'uuid', key: 'uuid' },
+      { fieldname: 'error_log', key: 'error_log' },
+      { fieldname: 'success_log', key: 'success_log' },
+    ],
+  };
+}
