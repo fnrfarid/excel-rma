@@ -81,4 +81,10 @@ export class TerritoryController {
   getWarehousesForTerritories(@Query('territories') territories: string[]) {
     return this.territory.getWarehousesForTerritories(territories);
   }
+
+  @Get('v1/get_territory_by_warehouse/:warehouse')
+  @UseGuards(TokenGuard)
+  getTerritoriesByWarehouse(@Param('warehouse') warehouse: string) {
+    return this.territory.findTerritoryByWarehouse(warehouse);
+  }
 }

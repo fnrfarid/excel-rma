@@ -105,8 +105,13 @@ export class AddWarrantyClaimPage implements OnInit {
       .getStorage()
       .getItem('warehouses')
       .then(warehouse => {
-        this.warrantyClaimForm.controls.receiving_branch.setValue({
-          name: warehouse[0],
+        this.warrantyService.getTerritoryByWarehouse(warehouse[0]).subscribe({
+          next: (response: any) => {
+            this.warrantyClaimForm.controls.receiving_branch.setValue({
+              name: response.name,
+            });
+          },
+          error: err => {},
         });
       });
   }
