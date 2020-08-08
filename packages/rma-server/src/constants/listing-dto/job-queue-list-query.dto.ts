@@ -16,3 +16,14 @@ export class JobQueueListQueryDto {
   @IsOptional()
   filter_query: string;
 }
+
+export class ExcelDataImportWebhookDto {
+  @IsOptional()
+  uuid: string;
+
+  @IsOptional()
+  success_log: string;
+
+  @IsOptional()
+  error_log: string;
+}

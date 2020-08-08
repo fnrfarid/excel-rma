@@ -9,8 +9,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
-import { JobQueueListQueryDto } from '../../../constants/listing-dto/job-queue-list-query.dto';
+import {
+  JobQueueListQueryDto,
+  ExcelDataImportWebhookDto,
+} from '../../../constants/listing-dto/job-queue-list-query.dto';
 import { JobQueueAggregateService } from '../../aggregates/job-queue-aggregate/job-queue-aggregate.service';
+import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 
 @Controller('job_queue')
 export class JobQueueController {
@@ -38,6 +42,12 @@ export class JobQueueController {
   @UseGuards(TokenGuard)
   async retrieve(@Param('jobId') jobId: string) {
     return await this.aggregate.getOneDataImportJob(jobId);
+  }
+
+  @Post('v1/webhook')
+  @UseGuards(FrappeWebhookGuard)
+  async jobUpdated(@Body() jobPayload: ExcelDataImportWebhookDto) {
+    return await this.aggregate.jobUpdated(jobPayload);
   }
 
   @Get('v1/list')

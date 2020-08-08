@@ -14,7 +14,6 @@ import {
   VALIDATE_AUTH_STRING,
   FRAPPE_QUEUE_JOB,
   AGENDA_JOB_STATUS,
-  SYNC_PURCHASE_RECEIPT_JOB,
   DEFAULT_CURRENCY,
   DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
@@ -24,22 +23,15 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
-import { FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB } from '../../../constants/app-strings';
 import * as uuid from 'uuid/v4';
 import { PURCHASE_RECEIPT_DOCTYPE_NAME } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { PurchaseReceipt } from '../../entity/purchase-receipt.entity';
-import { JsonToCSVParserService } from '../../../sync/entities/agenda-job/json-to-csv-parser.service';
 import {
   DataImportService,
   SingleDoctypeResponseInterface,
 } from '../../../sync/aggregates/data-import/data-import.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
-import {
-  CSV_TEMPLATE_HEADERS,
-  CSV_TEMPLATE,
-} from '../../../sync/assets/data_import_template';
-import { DataImportSuccessResponse } from '../../../sync/entities/agenda-job/agenda-job.entity';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
 @Injectable()
@@ -48,7 +40,6 @@ export class PurchaseReceiptSyncService {
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
     private readonly tokenService: DirectService,
-    private readonly csvService: JsonToCSVParserService,
     private readonly importData: DataImportService,
     private readonly serialNoService: SerialNoService,
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
@@ -133,17 +124,16 @@ export class PurchaseReceiptSyncService {
   }) {
     return of({}).pipe(
       mergeMap(object => {
-        const payload = this.setCsvDefaults(job.payload, job.settings);
-        const csvPayload = this.csvService.mapJsonToCsv(
-          payload,
-          CSV_TEMPLATE_HEADERS.purchase_receipt,
-          CSV_TEMPLATE.purchase_receipt,
+        const payload = this.setPurchaseReceiptDefaults(
+          job.payload,
+          job.settings,
         );
-        return this.importData.addDataImport(
-          PURCHASE_RECEIPT_DOCTYPE_NAME,
-          csvPayload,
+        job.uuid = uuid();
+        return this.importData.addToCustomImportFunction(
+          payload,
           job.settings,
           job.token,
+          job.uuid,
         );
       }),
       catchError(err => {
@@ -172,16 +162,16 @@ export class PurchaseReceiptSyncService {
         return throwError(err);
       }),
       retry(3),
-      switchMap((success: DataImportSuccessResponse) => {
-        job.dataImport = success;
-        job.uuid = uuid();
-        this.addToExportedQueue(job);
+      switchMap(success => {
         return of(true);
       }),
     );
   }
 
-  setCsvDefaults(payload: PurchaseReceiptDto[], settings: ServerSettings) {
+  setPurchaseReceiptDefaults(
+    payload: PurchaseReceiptDto[],
+    settings: ServerSettings,
+  ) {
     const purchase_receipt = payload[0];
 
     purchase_receipt.naming_series = DEFAULT_NAMING_SERIES.purchase_receipt;
@@ -195,7 +185,6 @@ export class PurchaseReceiptSyncService {
     purchase_receipt.status = purchase_receipt.status
       ? purchase_receipt.status
       : 'To Bill';
-
     purchase_receipt.items[0].base_total = purchase_receipt.items[0].amount;
     purchase_receipt.items[0].uom = purchase_receipt.items[0].uom
       ? purchase_receipt.items[0].uom
@@ -211,7 +200,6 @@ export class PurchaseReceiptSyncService {
       .conversion_factor
       ? purchase_receipt.items[0].conversion_factor
       : 1;
-
     return purchase_receipt;
   }
 
@@ -258,44 +246,39 @@ export class PurchaseReceiptSyncService {
       .then(success => {})
       .catch(err => {});
 
-    return from(Object.keys(hash_map))
-      .pipe(
-        switchMap(key => {
-          return from(
-            this.serialNoService.updateMany(
-              { serial_no: { $in: hash_map[key].serials } },
-              {
-                $set: {
-                  purchase_invoice_name: parent,
-                  warehouse: hash_map[key].warehouse,
-                  purchase_document_type: PURCHASE_RECEIPT_DOCTYPE_NAME,
-                  purchase_document_no: doc.name,
-                  'warranty.purchaseWarrantyDate': hash_map[key].warranty_date,
-                  'warranty.purchasedOn': new DateTime(
-                    settings.timeZone,
-                  ).toJSDate(),
-                },
-                $unset: { 'queue_state.purchase_receipt': undefined },
+    return from(Object.keys(hash_map)).pipe(
+      switchMap(key => {
+        return from(
+          this.serialNoService.updateMany(
+            { serial_no: { $in: hash_map[key].serials } },
+            {
+              $set: {
+                purchase_invoice_name: parent,
+                warehouse: hash_map[key].warehouse,
+                purchase_document_type: PURCHASE_RECEIPT_DOCTYPE_NAME,
+                purchase_document_no: doc.name,
+                'warranty.purchaseWarrantyDate': hash_map[key].warranty_date,
+                'warranty.purchasedOn': new DateTime(
+                  settings.timeZone,
+                ).toJSDate(),
               },
-            ),
-          );
-        }),
-        switchMap(done => {
-          return from(
-            this.purchaseInvoiceService.updateOne(
-              { name: parent },
-              {
-                $push: { purchase_receipt_names: doc.name },
-                $addToSet: { deliveredBy: token.fullName },
-              },
-            ),
-          );
-        }),
-      )
-      .subscribe({
-        next: success => {},
-        error: err => {},
-      });
+              $unset: { 'queue_state.purchase_receipt': undefined },
+            },
+          ),
+        );
+      }),
+      switchMap(done => {
+        return from(
+          this.purchaseInvoiceService.updateOne(
+            { name: parent },
+            {
+              $push: { purchase_receipt_names: doc.name },
+              $addToSet: { deliveredBy: token.fullName },
+            },
+          ),
+        );
+      }),
+    );
   }
 
   addToQueueNow(data: {
@@ -350,44 +333,5 @@ export class PurchaseReceiptSyncService {
       purchase_receipt_list.push(purchase_receipt);
     });
     return purchase_receipt_list;
-  }
-
-  syncImport(job) {
-    return this.importData.syncImport(job, PURCHASE_RECEIPT_DOCTYPE_NAME).pipe(
-      switchMap(
-        (response: {
-          parent_job: { value: { data: any } };
-          state: { doc: any };
-        }) => {
-          const parent_data = response.parent_job.value.data;
-          this.linkPurchaseWarranty(
-            parent_data.payload,
-            response.state.doc,
-            parent_data.token,
-            job.settings,
-            parent_data.parent,
-          );
-          return of();
-        },
-      ),
-    );
-  }
-
-  addToExportedQueue(job: {
-    dataImport: DataImportSuccessResponse;
-    uuid: string;
-    settings: ServerSettings;
-    parent: string;
-    token: any;
-  }) {
-    const job_data = {
-      payload: job.dataImport,
-      uuid: job.uuid,
-      type: SYNC_PURCHASE_RECEIPT_JOB,
-      settings: job.settings,
-      token: job.token,
-      parent: job.parent,
-    };
-    return this.agenda.now(FRAPPE_SYNC_DATA_IMPORT_QUEUE_JOB, job_data);
   }
 }

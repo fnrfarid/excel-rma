@@ -94,6 +94,28 @@ export class DataImportService {
       );
   }
 
+  addToCustomImportFunction(
+    payload: any,
+    settings: ServerSettings,
+    token: TokenCache,
+    uuid,
+  ) {
+    const base64Buffer = Buffer.from(JSON.stringify(payload));
+    const headers = this.getAuthorizationHeaders(token);
+
+    return this.http.post(
+      settings.authServerURL +
+        '/api/method/excel_erpnext.services.purchase.receipt',
+      {
+        filedata: base64Buffer.toString('base64'),
+        uuid,
+      },
+      {
+        headers,
+      },
+    );
+  }
+
   syncImport(
     job: {
       payload: DataImportSuccessResponse;
@@ -157,7 +179,7 @@ export class DataImportService {
         if (!response.import_log && response.status === 'Pending') {
           return of({}).pipe(
             delay(ONE_MINUTE_IN_MILLISECONDS / 4),
-            switchMap(done => throwError('Delivery Note is in queue')),
+            switchMap(done => throwError('Data Import is in queue')),
           );
         }
         if (response.import_log) {
@@ -227,5 +249,5 @@ export class DataImportService {
 
 export interface SingleDoctypeResponseInterface {
   name: string;
-  items: any[];
+  items?: any[];
 }
