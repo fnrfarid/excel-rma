@@ -103,13 +103,13 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.insertMany(query, options);
   }
 
-  async count() {
-    return await this.warrantyClaimRepository.count();
+  async count(query) {
+    return await this.warrantyClaimRepository.count(query);
   }
 
   async generateNamingSeries() {
-    let res = await this.count();
-    res = res + 1;
+    let res = await this.count({});
+    res += 1;
     return DEFAULT_NAMING_SERIES.warranty_claim + res;
   }
 }
