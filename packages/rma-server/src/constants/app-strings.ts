@@ -208,3 +208,4 @@ export enum VERDICT {
   WORK_IN_PROGRESS = 'Work in Progress',
 }
 export const ALL_TERRITORIES = 'All Territories';
+export const MULTIPART_FORM_DATA = 'multipart/form-data';

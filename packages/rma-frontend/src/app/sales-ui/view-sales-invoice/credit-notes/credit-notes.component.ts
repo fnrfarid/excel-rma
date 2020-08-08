@@ -23,10 +23,7 @@ export class CreditNotesComponent implements OnInit {
     'customer_name',
     'owner',
     'modified_by',
-    'company',
-    'due_date',
     'return_against',
-    'contact_email',
   ];
   search: string = '';
 

@@ -81,15 +81,6 @@ export class PurchaseReceiptDto {
   @IsString()
   company: string;
 
-  docstatus?: number;
-
-  is_return?: number;
-
-  currency: string;
-  selling_price_list: string;
-  conversion_rate: number;
-  status: string;
-
   @IsNotEmpty()
   @IsNumber()
   total_qty: number;
@@ -103,4 +94,11 @@ export class PurchaseReceiptDto {
   @ValidateNested()
   @Type(() => PurchaseReceiptItemDto)
   items: PurchaseReceiptItemDto[];
+
+  docstatus?: number;
+  is_return?: number;
+  currency: string;
+  selling_price_list: string;
+  conversion_rate: number;
+  status: string;
 }

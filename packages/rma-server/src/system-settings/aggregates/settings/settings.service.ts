@@ -48,6 +48,7 @@ import {
   purchaseOrderOnSubmitWebhookData,
   purchaseInvoiceOnCancelWebhookData,
   purchaseReceiptOnCancelWebhookData,
+  excelBackgroundAfterInsertWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
@@ -75,6 +76,7 @@ import {
   PURCHASE_ORDER_ON_SUBMIT_ENDPOINT,
   PURCHASE_INVOICE_ON_CANCEL_ENDPOINT,
   PURCHASE_RECEIPT_ON_CANCEL_ENDPOINT,
+  EXCEL_BACKGROUND_AFTER_INSERT_ENDPOINT,
 } from '../../../constants/routes';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import {
@@ -386,6 +388,17 @@ export class SettingsService extends AggregateRoot {
               serverSettings.authServerURL + '/api/resource/Webhook',
               purchaseReceiptOnCancelWebhookData(
                 serverSettings.appURL + PURCHASE_RECEIPT_ON_CANCEL_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              excelBackgroundAfterInsertWebhookData(
+                serverSettings.appURL + EXCEL_BACKGROUND_AFTER_INSERT_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },
