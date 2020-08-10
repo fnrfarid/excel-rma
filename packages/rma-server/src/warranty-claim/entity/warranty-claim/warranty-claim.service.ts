@@ -53,9 +53,18 @@ export class WarrantyClaimService {
         delete sortQuery[key];
       }
     }
+    const $or: any[] = [
+      { 'status_history.transfer_branch': { $in: filter_query.warehouses } },
+      { 'status_history.status_from': { $in: filter_query.warehouses } },
+    ];
 
     const $and: any[] = [
-      filter_query ? this.getFilterQuery(filter_query) : {},
+      { $or },
+      filter_query
+        ? filter_query.warehouses
+          ? {}
+          : this.getFilterQuery(filter_query)
+        : {},
       dateQuery,
     ];
 

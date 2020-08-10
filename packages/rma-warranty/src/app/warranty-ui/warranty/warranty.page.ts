@@ -15,6 +15,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { Router, NavigationEnd } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
+import { WAREHOUSES } from '../../constants/app-string';
 
 @Component({
   selector: 'app-warranty',
@@ -84,7 +85,7 @@ export class WarrantyPage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map((event: any) => {
-          if (event.url === '/warranty') this.dataSource.loadItems();
+          if (event.url === '/warranty') this.getWarrantyClaimList();
           return event;
         }),
       )
@@ -92,6 +93,29 @@ export class WarrantyPage implements OnInit {
         next: res => {},
         error: err => {},
       });
+  }
+
+  getWarrantyClaimList() {
+    this.warrantyService
+      .getStorage()
+      .getItem(WAREHOUSES)
+      .then(warehouses => {
+        this.filterWarrantyClaimList(warehouses);
+      });
+  }
+
+  filterWarrantyClaimList(warehouses: string[]) {
+    this.warrantyService.getTerritoryList(warehouses).subscribe({
+      next: territories => {
+        warehouses = [];
+        territories.forEach(territory => {
+          warehouses.push(territory.name);
+        });
+        this.dataSource.loadItems(undefined, undefined, undefined, {
+          warehouses,
+        });
+      },
+    });
   }
 
   getUpdate(event) {

@@ -13,6 +13,10 @@ export class TerritoryService {
   ) {}
 
   async find(query?) {
+    const $in: any[] = JSON.parse(query);
+    query = {
+      warehouse: { $in },
+    };
     return await this.territoryRepository.find(query);
   }
 
