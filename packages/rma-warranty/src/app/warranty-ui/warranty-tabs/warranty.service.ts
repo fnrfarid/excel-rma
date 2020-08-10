@@ -5,7 +5,7 @@ import {
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
 } from '../../constants/storage';
-import { from, of } from 'rxjs';
+import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
 import {
@@ -93,18 +93,5 @@ export class WarrantyService {
 
   getStorage() {
     return this.storage;
-  }
-
-  getTerritoryList(query: string[]) {
-    const url = '/api/territory/v1/list_territory';
-    const params = new HttpParams().set('query', JSON.stringify(query));
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get(url, { headers, params });
-      }),
-      switchMap((res: any) => {
-        return of(res);
-      }),
-    );
   }
 }

@@ -64,7 +64,10 @@ export class WarrantyClaimController {
   @Get('v1/list')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ forbidNonWhitelisted: true }))
-  getWarrantyClaimsList(@Query() query: WarrantyClaimsListQueryDto) {
+  getWarrantyClaimsList(
+    @Query() query: WarrantyClaimsListQueryDto,
+    @Req() req,
+  ) {
     const { offset, limit, sort, filter_query } = query;
     let filter;
     try {
@@ -73,7 +76,7 @@ export class WarrantyClaimController {
       filter;
     }
     return this.queryBus.execute(
-      new RetrieveWarrantyClaimListQuery(offset, limit, sort, filter),
+      new RetrieveWarrantyClaimListQuery(offset, limit, sort, filter, req),
     );
   }
 

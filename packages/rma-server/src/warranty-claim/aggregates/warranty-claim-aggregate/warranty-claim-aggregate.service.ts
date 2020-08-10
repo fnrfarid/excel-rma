@@ -149,12 +149,13 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return provider;
   }
 
-  async getWarrantyClaimList(offset, limit, sort, filter_query?) {
+  async getWarrantyClaimList(offset, limit, sort, filter_query?, req?) {
     return await this.warrantyClaimService.list(
       offset,
       limit,
       sort,
       filter_query,
+      req,
     );
   }
 

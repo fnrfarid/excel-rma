@@ -180,8 +180,4 @@ export class TerritoryAggregateService {
       }),
     );
   }
-
-  listFilteredTerritories(query) {
-    return from(this.territory.find(query));
-  }
 }
