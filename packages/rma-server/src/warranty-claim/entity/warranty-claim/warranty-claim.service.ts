@@ -24,7 +24,7 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.findOne(param, options);
   }
 
-  async list(skip, take, sort, filter_query?) {
+  async list(skip, take, sort, filter_query?, clientHttpRequest?) {
     let sortQuery;
     let dateQuery = {};
 
@@ -53,9 +53,26 @@ export class WarrantyClaimService {
         delete sortQuery[key];
       }
     }
+    const $or: any[] = [
+      {
+        'status_history.transfer_branch': {
+          $in: clientHttpRequest.token.territory,
+        },
+      },
+      {
+        'status_history.status_from': {
+          $in: clientHttpRequest.token.territory,
+        },
+      },
+    ];
 
     const $and: any[] = [
-      filter_query ? this.getFilterQuery(filter_query) : {},
+      { $or },
+      filter_query
+        ? filter_query.warehouses
+          ? {}
+          : this.getFilterQuery(filter_query)
+        : {},
       dateQuery,
     ];
 
