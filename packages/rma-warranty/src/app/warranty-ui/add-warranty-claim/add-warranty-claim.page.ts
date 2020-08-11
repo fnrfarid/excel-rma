@@ -29,7 +29,7 @@ import { AUTH_SERVER_URL } from '../../constants/storage';
 })
 export class AddWarrantyClaimPage implements OnInit {
   warrantyClaimForm: FormGroup;
-  address = {} as any;
+  contact = {} as any;
   filteredCustomerList: any;
   claimList: any;
   getSerialData: SerialNoDetails;
@@ -92,27 +92,12 @@ export class AddWarrantyClaimPage implements OnInit {
       }),
       map(res => res.docs),
     );
-
-    this.territoryList = this.warrantyClaimForm.controls.receiving_branch.valueChanges.pipe(
-      debounceTime(500),
-      startWith(''),
-      switchMap(value => {
-        return this.warrantyService.getTerritoryList(value);
-      }),
-      map(res => res.docs),
-    );
     this.warrantyService
       .getStorage()
-      .getItem('warehouses')
-      .then(warehouse => {
-        this.warrantyService.getTerritoryByWarehouse(warehouse[0]).subscribe({
-          next: (response: any) => {
-            this.warrantyClaimForm.controls.receiving_branch.setValue({
-              name: response.name,
-            });
-          },
-          error: err => {},
-        });
+      .getItem('territory')
+      .then(territory => {
+        this.territoryList = territory;
+        this.warrantyClaimForm.controls.receiving_branch.setValue(territory[0]);
       });
   }
 
@@ -329,13 +314,39 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyService.getAddress(customer.name).subscribe({
       next: res => {
         loading.dismiss();
-        this.address = res;
-        this.warrantyClaimForm.controls.customer_address.setValue(
-          this.address.name,
-        );
-        this.warrantyClaimForm.controls.customer_contact.setValue(
-          this.address.phone,
-        );
+        this.contact = res;
+        if (!res.customer_primary_address) {
+          if (!res.mobile_no) {
+            this.snackbar.open(
+              'Customer Address and Contact Not found',
+              'Close',
+              {
+                duration: DURATION,
+              },
+            );
+          } else {
+            this.snackbar.open('Address Not found', 'Close', {
+              duration: DURATION,
+            });
+            this.warrantyClaimForm.controls.customer_contact.setValue(
+              this.contact.mobile_no,
+            );
+          }
+        } else if (!res.mobile_no) {
+          this.snackbar.open('Customer Contact Not found', 'Close', {
+            duration: DURATION,
+          });
+          this.warrantyClaimForm.controls.customer_address.setValue(
+            this.contact.customer_primary_address,
+          );
+        } else {
+          this.warrantyClaimForm.controls.customer_contact.setValue(
+            this.contact.mobile_no,
+          );
+          this.warrantyClaimForm.controls.customer_address.setValue(
+            this.contact.customer_primary_address,
+          );
+        }
       },
     });
   }
@@ -352,7 +363,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   getBranchOption(option) {
-    if (option) return option.name;
+    if (option) return option;
   }
 
   serialChanged(name) {

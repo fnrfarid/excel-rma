@@ -46,6 +46,10 @@ describe('StatusHistoryComponent', () => {
             getStockEntry: (...args) => of({}),
             getTerritoryList: (...args) => of([]),
             getWarrantyDetail: (...args) => of({}),
+            getStorage: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItems: (...args) => Promise.resolve({}),
+            }),
           },
         },
       ],

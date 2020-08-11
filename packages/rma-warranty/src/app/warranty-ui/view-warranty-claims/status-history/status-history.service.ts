@@ -101,4 +101,8 @@ export class StatusHistoryService {
       }),
     );
   }
+
+  getStorage() {
+    return this.storage;
+  }
 }
