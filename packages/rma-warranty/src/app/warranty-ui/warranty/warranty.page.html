@@ -240,23 +240,30 @@
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
-
-        <ng-container matColumnDef="deliver_date">
-          <mat-header-cell *matHeaderCellDef>
-            Deliver Date
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.delivery_date }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-
         <ng-container matColumnDef="customer_third_party">
           <mat-header-cell *matHeaderCellDef>
             Customer Third Party
           </mat-header-cell>
           <mat-cell *matCellDef="let row">
             {{row.customer_third_party}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="customer_name">
+          <mat-header-cell *matHeaderCellDef>
+            Customer name
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.customer}}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+        <ng-container matColumnDef="third_party_name">
+          <mat-header-cell *matHeaderCellDef>
+            Third Party Customer Name
+          </mat-header-cell>
+          <mat-cell *matCellDef="let row">
+            {{row.third_party_name}}
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
@@ -281,26 +288,6 @@
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
-        <ng-container matColumnDef="invoice_no">
-          <mat-header-cell *matHeaderCellDef>
-            Invoice No
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.invoice_no}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="service_charge">
-          <mat-header-cell *matHeaderCellDef>
-            Service Charge
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.service_charge}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-
         <ng-container matColumnDef="claim_status">
           <mat-header-cell *matHeaderCellDef>
             Claim Status
@@ -310,17 +297,6 @@
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
-
-        <ng-container matColumnDef="warranty_status">
-          <mat-header-cell *matHeaderCellDef>
-            Warranty Status
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.warranty_status}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-
         <ng-container matColumnDef="receiving_branch">
           <mat-header-cell *matHeaderCellDef>
             Receiving Branch

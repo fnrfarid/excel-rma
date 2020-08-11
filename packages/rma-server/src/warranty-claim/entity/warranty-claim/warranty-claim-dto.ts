@@ -62,7 +62,7 @@ export class WarrantyClaimDto {
   @IsString()
   receiving_branch: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   delivery_branch: string;
 

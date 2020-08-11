@@ -46,7 +46,6 @@ describe('AddWarrantyClaimPage', () => {
             createWarrantyClaim: (...args) => of({}),
             getCustomerList: (...args) => of([]),
             getItemList: (...args) => of([]),
-            getTerritoryList: (...args) => of([]),
             getItem: (...args) => of({}),
             getSerial: (...args) => of({}),
             getTerritoryByWarehouse: (...args) => of({}),

@@ -69,17 +69,12 @@ export class AddServiceInvoicePage implements OnInit {
     this.serviceInvoiceForm.controls.posting_date.setValue(
       await this.getCurrentDate(),
     );
-    this.territoryList = this.serviceInvoiceForm
-      .get('branch')
-      .valueChanges.pipe(
-        debounceTime(500),
-        startWith(''),
-        switchMap(value => {
-          return this.serviceInvoiceService
-            .getWarehouseList(value)
-            .pipe(map(res => res.docs));
-        }),
-      );
+    this.serviceInvoiceService
+      .getStore()
+      .getItem('territory')
+      .then(territory => {
+        this.territoryList = territory;
+      });
     this.serviceInvoiceService.getAccountList().subscribe({
       next: response => {
         this.accountList = response;
@@ -132,9 +127,9 @@ export class AddServiceInvoicePage implements OnInit {
           this.serviceInvoiceForm.controls.third_party_address.setValue(
             res.third_party_address,
           );
-          this.serviceInvoiceForm.controls.branch.setValue({
-            name: res.receiving_branch,
-          });
+          this.serviceInvoiceForm.controls.branch.setValue(
+            res.receiving_branch,
+          );
           this.warrantyDetails = res;
         },
         error: err => {},
@@ -309,6 +304,10 @@ export class AddServiceInvoicePage implements OnInit {
 
   getOption(option) {
     if (option) return option.name;
+  }
+
+  getBranchOption(option) {
+    if (option) return option;
   }
 
   getSelectedOption(option) {}

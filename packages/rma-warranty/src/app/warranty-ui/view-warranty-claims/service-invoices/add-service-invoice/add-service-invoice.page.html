@@ -199,13 +199,13 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #deliveryBranch="matAutocomplete"
-                  [displayWith]="getOption"
+                  [displayWith]="getBranchOption"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList | async"
+                    *ngFor="let option of territoryList"
                     [value]="option"
                   >
-                    {{ option.name }} <small>({{ option.warehouse }})</small>
+                    {{ option}}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.branch.hasError('required')">

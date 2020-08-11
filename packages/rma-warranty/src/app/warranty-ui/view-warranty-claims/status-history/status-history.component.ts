@@ -30,6 +30,7 @@ export class StatusHistoryComponent implements OnInit {
   warrantyObject: WarrantyClaimsDetails;
   statusHistoryForm: FormGroup;
   territoryList: any = [];
+  territory: any = [];
   currentStatus: any = [];
   deliveryStatus: any = [];
   posting_date: { date: string; time: string };
@@ -81,7 +82,7 @@ export class StatusHistoryComponent implements OnInit {
   }
 
   getTerritoryList() {
-    this.territoryList = this.statusHistoryForm.controls.status_from.valueChanges.pipe(
+    this.territoryList = this.statusHistoryForm.controls.transfer_branch.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
       switchMap(value => {
@@ -89,6 +90,14 @@ export class StatusHistoryComponent implements OnInit {
       }),
       map(res => res.docs),
     );
+
+    this.statusHistoryService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        this.territory = territory;
+        this.statusHistoryForm.controls.status_from.setValue(territory[0]);
+      });
   }
 
   branchOptionChanged(option) {}
