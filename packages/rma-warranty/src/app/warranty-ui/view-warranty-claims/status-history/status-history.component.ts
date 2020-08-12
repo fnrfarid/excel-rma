@@ -77,7 +77,7 @@ export class StatusHistoryComponent implements OnInit {
       transfer_branch: new FormControl(''),
       current_status_verdict: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
-      delivery_status: new FormControl('', [Validators.required]),
+      delivery_status: new FormControl(''),
     });
   }
 
@@ -125,10 +125,19 @@ export class StatusHistoryComponent implements OnInit {
     statusHistoryDetails.uuid = this.warrantyObject.uuid;
     statusHistoryDetails.time = this.statusHistoryForm.controls.posting_time.value;
     statusHistoryDetails.posting_date = this.statusHistoryForm.controls.posting_date.value;
-    statusHistoryDetails.status_from = this.statusHistoryForm.controls.status_from.value.name;
+    statusHistoryDetails.status_from = this.statusHistoryForm.controls.status_from.value;
     statusHistoryDetails.verdict = this.statusHistoryForm.controls.current_status_verdict.value;
     statusHistoryDetails.description = this.statusHistoryForm.controls.description.value;
     statusHistoryDetails.delivery_status = this.statusHistoryForm.controls.delivery_status.value;
+    this.time.getDateAndTime(new Date()).then(dateTime => {
+      statusHistoryDetails.date = dateTime.date;
+    });
+    this.statusHistoryService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        statusHistoryDetails.delivery_branch = territory[0];
+      });
     if (
       this.statusHistoryForm.controls.current_status_verdict.value ===
       CURRENT_STATUS_VERDICT.TRANSFERRED

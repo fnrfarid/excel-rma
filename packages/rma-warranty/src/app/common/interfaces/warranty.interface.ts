@@ -175,6 +175,8 @@ export class StatusHistoryDetails {
   description?: string;
   delivery_status?: string;
   status?: string;
+  delivery_branch?: string;
+  date: Date;
 }
 
 export class StockEntryDetails {

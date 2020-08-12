@@ -279,6 +279,23 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           },
         },
       ),
+    ).pipe(
+      switchMap(history => {
+        if (!statusHistoryPayload.delivery_status) {
+          return of({});
+        }
+        return from(
+          this.warrantyClaimService.updateOne(
+            { uuid: statusHistoryPayload.uuid },
+            {
+              $set: {
+                delivery_date: statusHistoryPayload.date,
+                delivery_branch: statusHistoryPayload.delivery_branch,
+              },
+            },
+          ),
+        );
+      }),
     );
   }
 
@@ -294,6 +311,10 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   removeStatusHistory(uuid) {
     return from(
       this.warrantyClaimService.updateOne(uuid, {
+        $set: {
+          delivery_branch: '',
+          delivery_date: '',
+        },
         $pop: {
           status_history: 1,
         },

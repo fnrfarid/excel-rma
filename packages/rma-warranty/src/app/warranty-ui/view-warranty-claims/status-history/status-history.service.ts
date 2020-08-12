@@ -85,9 +85,10 @@ export class StatusHistoryService {
 
   removeStatusHistory(uuid: string) {
     const URL = REMOVE_STATUS_HISTORY_ENDPOINT;
+    const body = { uuid };
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(URL, uuid, { headers });
+        return this.http.post(URL, body, { headers });
       }),
     );
   }

@@ -56,12 +56,12 @@ export class WarrantyClaimService {
     const $or: any[] = [
       {
         'status_history.transfer_branch': {
-          $in: clientHttpRequest.token.territory,
+          $in: filter_query.territory,
         },
       },
       {
         'status_history.status_from': {
-          $in: clientHttpRequest.token.territory,
+          $in: filter_query.territory,
         },
       },
     ];
@@ -69,7 +69,7 @@ export class WarrantyClaimService {
     const $and: any[] = [
       { $or },
       filter_query
-        ? filter_query.warehouses
+        ? filter_query.territory
           ? {}
           : this.getFilterQuery(filter_query)
         : {},

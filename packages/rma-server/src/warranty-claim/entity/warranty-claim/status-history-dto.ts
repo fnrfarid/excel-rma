@@ -29,7 +29,15 @@ export class StatusHistoryDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   delivery_status: string;
+
+  @IsOptional()
+  @IsString()
+  delivery_branch: string;
+
+  @IsNotEmpty()
+  @IsString()
+  date: string;
 }
