@@ -95,6 +95,7 @@
                   [matDatepicker]="warranty_end_date"
                   placeholder="Warranty End Date"
                   formControlName="warranty_end_date"
+                  (dateChange)="dateChanges($event.value)"
                 />
                 <mat-datepicker-toggle
                   matSuffix
