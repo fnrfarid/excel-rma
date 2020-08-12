@@ -82,13 +82,24 @@ export class WarrantyPage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map((event: any) => {
-          if (event.url === '/warranty') this.dataSource.loadItems();
+          if (event.url === '/warranty') this.getTerritory();
           return event;
         }),
       )
       .subscribe({
         next: res => {},
         error: err => {},
+      });
+  }
+
+  getTerritory() {
+    this.warrantyService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        this.dataSource.loadItems(undefined, undefined, undefined, {
+          territory,
+        });
       });
   }
 
