@@ -222,4 +222,5 @@ export class StockEntryItems {
   item_group?: string;
   item_defaults?: ItemDefaults;
   s_warehouse?: string;
+  t_warehouse?: string;
 }
