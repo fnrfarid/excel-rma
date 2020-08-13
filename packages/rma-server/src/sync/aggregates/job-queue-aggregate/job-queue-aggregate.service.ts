@@ -149,24 +149,31 @@ export class JobQueueAggregateService {
   }
 
   jobUpdated(payload: ExcelDataImportWebhookDto) {
-    this.syncUpdatedJob(payload);
+    if(!payload || !payload.import_status){
+      return of(true)
+    }
+    if(payload.import_status=== AGENDA_JOB_STATUS.success){
+      const parsed_response = JSON.parse(payload.log_details);
+      const link = parsed_response.messages[0].link.split('/');
+      const doctype_name = link[link.length - 1];
+      this.syncUpdatedJob(payload, doctype_name);
+      return of(true);
+    }
     return from(
       this.jobService.updateOne(
-        { 'data.uuid': payload.uuid },
+        { 'data.dataImport.dataImportName': payload.name },
         {
           $set: {
-            'data.status': payload.error_log
-              ? AGENDA_JOB_STATUS.fail
-              : AGENDA_JOB_STATUS.success,
-            failReason: payload.error_log ? payload.error_log : '',
+            'data.status': payload.import_status === AGENDA_JOB_STATUS.fail,
+            failReason : payload,
           },
         },
       ),
     );
   }
 
-  syncUpdatedJob(payload: ExcelDataImportWebhookDto) {
-    from(this.jobService.findOne({ 'data.uuid': payload.uuid }))
+  syncUpdatedJob(payload: ExcelDataImportWebhookDto, doctype_name:string) {
+    from(this.jobService.findOne({ 'data.dataImport.dataImportName': payload.name}))
       .pipe(
         switchMap(job => {
           if (!job) {
@@ -180,7 +187,7 @@ export class JobQueueAggregateService {
               return this.http
                 .get(
                   job.data.settings.authServerURL +
-                    `${FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT}/${payload.success_log}`,
+                    `${FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT}/${doctype_name}`,
                   { headers },
                 )
                 .pipe(
@@ -189,7 +196,7 @@ export class JobQueueAggregateService {
                     return this.CREATE_PURCHASE_RECEIPT_JOB.linkPurchaseWarranty(
                       job.data.payload,
                       {
-                        name: payload.success_log,
+                        name: doctype_name,
                         items: purchase_receipt.items,
                       },
                       job.data.token,
@@ -224,11 +231,23 @@ export class JobQueueAggregateService {
         }),
       )
       .subscribe({
-        next: success => {},
+        next: success => {
+          this.jobService
+            .updateOne(
+              { 'data.dataImport.dataImportName': payload.name },
+              {
+                $set: {
+                  'data.status': AGENDA_JOB_STATUS.success,
+                },
+              },
+            )
+            .then(success => {})
+            .catch(err => {});
+        },
         error: error => {
           this.jobService
             .updateOne(
-              { 'data.uuid': payload.uuid },
+              { 'data.dataImport.dataImportName': payload.name },
               {
                 $set: {
                   'data.status': AGENDA_JOB_STATUS.fail,

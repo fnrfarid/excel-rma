@@ -71,8 +71,11 @@ export const PURCHASE_INVOICE_ON_CANCEL_ENDPOINT =
   '/api/purchase_invoice/webhook/v1/cancel';
 export const STOCK_ENTRY_API_ENDPOINT = '/api/resource/Stock Entry';
 export const DATA_IMPORT_API_ENDPOINT = '/api/resource/Data Import';
+export const LEGACY_DATA_IMPORT_API_ENDPOINT = '/api/resource/Data Import Legacy';
 export const FRAPPE_START_DATA_IMPORT_API_ENDPOINT =
   '/api/method/frappe.core.doctype.data_import.data_import.form_start_import';
+  export const FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT =
+  '/api/method/frappe.core.doctype.data_import_legacy.data_import_legacy.import_data';
 export const FRAPPE_FILE_ATTACH_API_ENDPOINT =
   '/api/method/frappe.client.attach_file';
 export const PURCHASE_RECEIPT_ON_CANCEL_ENDPOINT =
