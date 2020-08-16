@@ -1,7 +1,8 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import {
-  DATA_IMPORT_API_ENDPOINT,
   FRAPPE_FILE_ATTACH_API_ENDPOINT,
+  LEGACY_DATA_IMPORT_API_ENDPOINT,
+  FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
 } from '../../../constants/routes';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
@@ -28,7 +29,6 @@ import {
   VALIDATE_AUTH_STRING,
 } from '../../../constants/app-strings';
 import { of, throwError, forkJoin, Observable, from } from 'rxjs';
-import { FRAPPE_START_DATA_IMPORT_API_ENDPOINT } from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { AgendaJobService } from '../../entities/agenda-job/agenda-job.service';
 import { DataImportSuccessResponse } from '../../entities/agenda-job/agenda-job.entity';
@@ -51,12 +51,8 @@ export class DataImportService {
     const base64Buffer = Buffer.from(payload);
     return this.http
       .post(
-        settings.authServerURL + DATA_IMPORT_API_ENDPOINT,
-        {
-          reference_doctype,
-          import_type: FRAPPE_DATA_IMPORT_INSERT_ACTION,
-          submit_after_import: 1,
-        },
+        settings.authServerURL + LEGACY_DATA_IMPORT_API_ENDPOINT,
+        { reference_doctype, action: FRAPPE_DATA_IMPORT_INSERT_ACTION },
         { headers: this.getAuthorizationHeaders(token) },
       )
       .pipe(
@@ -82,9 +78,17 @@ export class DataImportService {
           response.file_url = success.file_url;
           return this.http.put(
             settings.authServerURL +
-              DATA_IMPORT_API_ENDPOINT +
+              LEGACY_DATA_IMPORT_API_ENDPOINT +
               `/${success.attached_to_name}`,
-            { import_file: success.file_url },
+            { import_file: success.file_url, submit_after_import: 1 },
+            { headers: this.getAuthorizationHeaders(token) },
+          );
+        }),
+        switchMap(success => {
+          return this.http.post(
+            settings.authServerURL +
+              FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
+            { data_import: response.dataImportName },
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
@@ -142,7 +146,8 @@ export class DataImportService {
         }
         return this.http
           .post(
-            job.settings.authServerURL + FRAPPE_START_DATA_IMPORT_API_ENDPOINT,
+            job.settings.authServerURL +
+              FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
             { data_import: job.payload.dataImportName },
             { headers },
           )
@@ -157,16 +162,17 @@ export class DataImportService {
       switchMap(done => {
         return this.http.get(
           job.settings.authServerURL +
-            DATA_IMPORT_API_ENDPOINT +
+            LEGACY_DATA_IMPORT_API_ENDPOINT +
             `/${job.payload.dataImportName}`,
           { headers },
         );
       }),
       map(data => data.data.data),
       switchMap((response: DataImportSuccessResponseInterface) => {
-        if (response.status === 'Success') {
-          const parsed_response = JSON.parse(response.import_log);
-          const doctype_name = parsed_response[0].docname;
+        if (response.import_status === 'Success') {
+          const parsed_response = JSON.parse(response.log_details);
+          const link = parsed_response.messages[0].link.split('/');
+          const doctype_name = link[link.length - 1];
           this.jobService
             .updateMany(
               { 'data.uuid': job.uuid },
@@ -176,13 +182,16 @@ export class DataImportService {
             .catch(err => {});
           return of(doctype_name);
         }
-        if (!response.import_log && response.status === 'Pending') {
+        if (
+          response.import_status === 'Pending' ||
+          response.import_status === 'In Progress'
+        ) {
           return of({}).pipe(
             delay(ONE_MINUTE_IN_MILLISECONDS / 4),
             switchMap(done => throwError('Data Import is in queue')),
           );
         }
-        if (response.import_log) {
+        if (response.import_status === AGENDA_JOB_STATUS.fail) {
           job.lastError = response;
           job.status = AGENDA_JOB_STATUS.fail;
         }

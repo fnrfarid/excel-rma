@@ -48,7 +48,7 @@ import {
   purchaseOrderOnSubmitWebhookData,
   purchaseInvoiceOnCancelWebhookData,
   purchaseReceiptOnCancelWebhookData,
-  excelBackgroundAfterInsertWebhookData,
+  dataImportLegacyAfterInsertWebhookData,
 } from '../../../constants/webhook-data';
 import {
   ITEM_AFTER_INSERT_ENDPOINT,
@@ -397,7 +397,7 @@ export class SettingsService extends AggregateRoot {
           this.http
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',
-              excelBackgroundAfterInsertWebhookData(
+              dataImportLegacyAfterInsertWebhookData(
                 serverSettings.appURL + EXCEL_BACKGROUND_AFTER_INSERT_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),

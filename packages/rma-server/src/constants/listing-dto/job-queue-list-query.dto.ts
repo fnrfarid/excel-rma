@@ -19,11 +19,14 @@ export class JobQueueListQueryDto {
 
 export class ExcelDataImportWebhookDto {
   @IsOptional()
-  uuid: string;
+  import_status: string;
 
   @IsOptional()
-  success_log: string;
+  log_details: string;
 
   @IsOptional()
-  error_log: string;
+  name: string;
+
+  @IsOptional()
+  reference_doctype: string;
 }

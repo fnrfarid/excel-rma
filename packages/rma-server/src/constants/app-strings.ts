@@ -162,7 +162,7 @@ export const SERIAL_WAREHOUSE_STATUS = {
 };
 export const AGENDA_MAX_RETRIES = 1;
 export const AGENDA_DATA_IMPORT_MAX_RETRIES = 2;
-export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert New Records';
+export const FRAPPE_DATA_IMPORT_INSERT_ACTION = 'Insert new records';
 export const SYNC_DELIVERY_NOTE_JOB = 'SYNC_DELIVERY_NOTE_JOB';
 export enum WARRANTY_TYPE {
   WARRANTY = 'Warranty',
@@ -211,3 +211,11 @@ export enum VERDICT {
 }
 export const ALL_TERRITORIES = 'All Territories';
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
+export const PURCHASE_RECEIPT_DOCTYPE_NAMES = [
+  PURCHASE_RECEIPT_DOCTYPE_NAME,
+  'Purchase%20Receipt',
+];
+export const DELIVERY_NOTE_DOCTYPE_NAMES = [
+  DELIVERY_NOTE_DOCTYPE,
+  'Delivery%20Note',
+];
