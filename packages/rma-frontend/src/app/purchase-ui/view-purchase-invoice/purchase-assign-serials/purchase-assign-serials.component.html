@@ -238,12 +238,22 @@
     <mat-progress-bar *ngIf="purchasedSerialsDataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
   </div>
 
-  <ion-card-header style="padding-bottom: 0;">
-    <ion-card-title>
-      <ion-text color="tertiary">
-        Delivered Serials
-      </ion-text>
-    </ion-card-title>
+  
+  <ion-card-header>
+    <ion-row class="align">
+      <ion-col>
+        <ion-card-title>
+          <ion-text color="tertiary">
+            Delivered Serials
+          </ion-text>
+        </ion-card-title>
+      </ion-col>
+      <ion-col class="ion-text-right">
+        <ion-button class="ion-text-right" [disabled]="readonly" color="tertiary" (click)="getDeliveredSerials()">
+          Get Serials
+        </ion-button>
+      </ion-col>
+    </ion-row>
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">

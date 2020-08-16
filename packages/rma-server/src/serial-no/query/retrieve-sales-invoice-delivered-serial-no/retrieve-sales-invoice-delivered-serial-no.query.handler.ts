@@ -9,14 +9,12 @@ export class RetrieveSalesInvoiceDeliveredSerialNoQueryHandler
 
   async execute(query: RetrieveSalesInvoiceDeliveredSerialNoQuery) {
     const { offset, limit, search, find, clientHttpRequest } = query;
-    return await this.manager
-      .getSalesInvoiceDeliveryNoteSerials(
-        find,
-        search,
-        Number(offset),
-        Number(limit),
-        clientHttpRequest,
-      )
-      .toPromise();
+    return await this.manager.getSalesInvoiceDeliveryNoteSerials(
+      find,
+      search,
+      Number(offset),
+      Number(limit),
+      clientHttpRequest,
+    );
   }
 }
