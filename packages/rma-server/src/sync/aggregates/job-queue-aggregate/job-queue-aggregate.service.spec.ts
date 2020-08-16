@@ -6,6 +6,7 @@ import { FrappeJobService } from '../../schedular/frappe-jobs-queue/frappe-jobs-
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { HttpService } from '@nestjs/common';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
+import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 
 describe('JobQueueAggregateService', () => {
   let service: JobQueueAggregateService;
@@ -20,6 +21,7 @@ describe('JobQueueAggregateService', () => {
         { provide: DirectService, useValue: {} },
         { provide: HttpService, useValue: {} },
         { provide: PurchaseReceiptSyncService, useValue: {} },
+        { provide: DeliveryNoteJobService, useValue: {} },
       ],
     }).compile();
 

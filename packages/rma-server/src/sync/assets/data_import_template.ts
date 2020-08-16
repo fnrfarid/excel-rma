@@ -6,7 +6,7 @@ export const CSV_TEMPLATE = {
   purchase_receipt: `"ID","Series","Supplier","Date","Posting Time","Company","Currency","Exchange Rate","Net Total (Company Currency)","Status","Item Code (Items)","Item Name (Items)","Description (Items)","Received Quantity (Items)","Accepted Quantity (Items)","UOM (Items)","Stock UOM (Items)","Conversion Factor (Items)","Rate (Company Currency) (Items)","Accepted Warehouse (Items)","Rejected Warehouse (Items)","Serial No (Items)","Purchase Order (Items)"
   `,
 
-  delivery_note_legacy : `Data Import Template,,,,,,,,,,,,,,,,,,,,,,,,,,
+  delivery_note_legacy: `Data Import Template,,,,,,,,,,,,,,,,,,,,,,,,,,
   Table:,Delivery Note,,,,,,,,,,,,,,,,,,,,,,,,,
   DocType:,Delivery Note,,,,,,,,,,,,~,Delivery Note Item,items,,,,,,~,~,~,~,Sales Team,sales_team
   Column Labels:,Series,Customer,Company,Date,Posting Time,Status,Set Source Warehouse,Total Quantity,Total,Price List,Price List Currency,Price List Exchange Rate,,Item Code,Item Name,Quantity,Amount,Against Sales Invoice,Serial No,Rate,,,,,Sales Person,
@@ -37,7 +37,7 @@ export const CSV_TEMPLATE = {
   Type:,Select,Link,Link,Date,Time,Link,Float,Currency,Select,,Link,Data,Text Editor,Float,Link,Link,Float,Currency,Link,Link,Link,Small Text,,,
   Info:,"One of: PREC-RET-, PREC-",Valid Supplier,Valid Company,dd-mm-yyyy,,Valid Currency,,,"One of: Draft, To Bill, Completed, Cancelled, Closed",,Valid Item,,,,Valid UOM,Valid UOM,,,Valid Warehouse,Valid Warehouse,Valid Purchase Order,,,,
   Start entering data below this line,,,,,,,,,,,,,,,,,,,,,,,,,
-`
+`,
 };
 
 export const CSV_TEMPLATE_HEADERS = {
@@ -93,7 +93,7 @@ export const CSV_TEMPLATE_HEADERS = {
     ['items', '0', 'rate'],
   ],
 
-  purchase_receipt_legacy : [
+  purchase_receipt_legacy: [
     'Column Name:',
     'naming_series',
     'supplier',
@@ -150,5 +150,5 @@ export const CSV_TEMPLATE_HEADERS = {
     '~',
     'sales_person',
     '~',
-  ]
+  ],
 };

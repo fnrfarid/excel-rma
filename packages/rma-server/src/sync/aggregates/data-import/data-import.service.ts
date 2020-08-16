@@ -78,19 +78,19 @@ export class DataImportService {
           response.file_url = success.file_url;
           return this.http.put(
             settings.authServerURL +
-            LEGACY_DATA_IMPORT_API_ENDPOINT +
+              LEGACY_DATA_IMPORT_API_ENDPOINT +
               `/${success.attached_to_name}`,
-            { import_file: success.file_url,submit_after_import: 1 },
+            { import_file: success.file_url, submit_after_import: 1 },
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
         switchMap(success => {
-          return this.http
-          .post(
-            settings.authServerURL + FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
+          return this.http.post(
+            settings.authServerURL +
+              FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
             { data_import: response.dataImportName },
             { headers: this.getAuthorizationHeaders(token) },
-          )
+          );
         }),
         switchMap(done => {
           return of(response);
@@ -146,7 +146,8 @@ export class DataImportService {
         }
         return this.http
           .post(
-            job.settings.authServerURL + FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
+            job.settings.authServerURL +
+              FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
             { data_import: job.payload.dataImportName },
             { headers },
           )
@@ -161,7 +162,7 @@ export class DataImportService {
       switchMap(done => {
         return this.http.get(
           job.settings.authServerURL +
-          LEGACY_DATA_IMPORT_API_ENDPOINT +
+            LEGACY_DATA_IMPORT_API_ENDPOINT +
             `/${job.payload.dataImportName}`,
           { headers },
         );
@@ -181,8 +182,9 @@ export class DataImportService {
             .catch(err => {});
           return of(doctype_name);
         }
-        if ( response.import_status === 'Pending' ||
-        response.import_status === 'In Progress'
+        if (
+          response.import_status === 'Pending' ||
+          response.import_status === 'In Progress'
         ) {
           return of({}).pipe(
             delay(ONE_MINUTE_IN_MILLISECONDS / 4),

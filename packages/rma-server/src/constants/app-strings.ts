@@ -181,9 +181,9 @@ export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 2000;
 export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
 export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
-// export const DEFAULT_CURRENCY = 'BDT';
-export const DEFAULT_CURRENCY = 'INR';
-console.log('unComment IT local testing');
+export const DEFAULT_CURRENCY = 'BDT';
+// export const DEFAULT_CURRENCY = 'INR';
+// console.log('unComment IT local testing');
 export const DEFAULT_NAMING_SERIES = {
   sales_order: 'SO-.YYYY.-',
   sales_invoice: 'SINV-.YYYY.-',
@@ -210,3 +210,11 @@ export enum VERDICT {
 }
 export const ALL_TERRITORIES = 'All Territories';
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
+export const PURCHASE_RECEIPT_DOCTYPE_NAMES = [
+  PURCHASE_RECEIPT_DOCTYPE_NAME,
+  'Purchase%20Receipt',
+];
+export const DELIVERY_NOTE_DOCTYPE_NAMES = [
+  DELIVERY_NOTE_DOCTYPE,
+  'Delivery%20Note',
+];

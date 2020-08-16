@@ -33,7 +33,10 @@ import {
 } from '../../../sync/aggregates/data-import/data-import.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { JsonToCSVParserService } from '../../../sync/entities/agenda-job/json-to-csv-parser.service';
-import { CSV_TEMPLATE_HEADERS, CSV_TEMPLATE } from '../../../sync/assets/data_import_template';
+import {
+  CSV_TEMPLATE_HEADERS,
+  CSV_TEMPLATE,
+} from '../../../sync/assets/data_import_template';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
 @Injectable()
@@ -47,7 +50,7 @@ export class PurchaseReceiptSyncService {
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
     private readonly jobService: AgendaJobService,
     private readonly purchaseReceiptService: PurchaseReceiptService,
-    private readonly jsonToCsv: JsonToCSVParserService
+    private readonly jsonToCsv: JsonToCSVParserService,
   ) {}
 
   execute(job) {
@@ -135,7 +138,8 @@ export class PurchaseReceiptSyncService {
         const csv_payload = this.jsonToCsv.mapJsonToCsv(
           payload,
           CSV_TEMPLATE_HEADERS.purchase_receipt_legacy,
-          CSV_TEMPLATE.purchase_receipt_legacy)
+          CSV_TEMPLATE.purchase_receipt_legacy,
+        );
         return this.importData.addDataImport(
           PURCHASE_RECEIPT_DOCTYPE_NAME,
           csv_payload,
