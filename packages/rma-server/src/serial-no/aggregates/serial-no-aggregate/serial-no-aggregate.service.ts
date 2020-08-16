@@ -39,7 +39,6 @@ import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
-import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { SERIAL_NO_NOT_FOUND } from '../../../constants/messages';
 
@@ -53,7 +52,6 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
     private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
     private readonly errorLogService: ErrorLogService,
-    private readonly salesInvoiceService: SalesInvoiceService,
   ) {
     super();
   }
@@ -297,46 +295,12 @@ export class SerialNoAggregateService extends AggregateRoot {
     limit,
     clientHttpRequest,
   ) {
-    return this.salesInvoiceService
-      .asyncAggregate([
-        {
-          $match: {
-            $or: [{ uuid: find }, { name: find }],
-          },
-        },
-        {
-          $project: {
-            delivery_note_items: 1,
-            _id: 0,
-          },
-        },
-        {
-          $unwind: {
-            path: '$delivery_note_items',
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $group: {
-            _id: 0,
-            delivery_note_names: {
-              $push: '$delivery_note_items.delivery_note',
-            },
-          },
-        },
-      ])
-      .pipe(
-        switchMap(delivery_note_names => {
-          return from(
-            this.serialNoService.listDeliveredSerial(
-              delivery_note_names[0].delivery_note_names,
-              search,
-              offset,
-              limit,
-            ),
-          );
-        }),
-      );
+    return this.serialNoService.listDeliveredSerial(
+      find,
+      search,
+      offset,
+      limit,
+    );
   }
 
   retrieveDirectSerialNo(serial_no: string) {
