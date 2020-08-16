@@ -95,6 +95,7 @@
                   [matDatepicker]="warranty_end_date"
                   placeholder="Warranty End Date"
                   formControlName="warranty_end_date"
+                  (dateChange)="dateChanges($event.value)"
                 />
                 <mat-datepicker-toggle
                   matSuffix
@@ -377,10 +378,10 @@
                   (optionSelected)="branchOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList |async"
+                    *ngFor="let option of territoryList"
                     [value]="option"
                   >
-                    {{ option.name }} <small>({{ option.warehouse }})</small>
+                    {{ option }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.receiving_branch.hasError('required')">
@@ -404,10 +405,10 @@
                   (optionSelected)="branchOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList |async"
+                    *ngFor="let option of territoryList"
                     [value]="option"
                   >
-                    {{ option.name }} <small>({{ option.warehouse }})</small>
+                    {{ option }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.delivery_branch.hasError('required')">

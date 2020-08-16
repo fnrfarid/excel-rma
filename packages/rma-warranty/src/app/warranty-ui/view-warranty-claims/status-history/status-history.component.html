@@ -40,14 +40,11 @@
               <mat-autocomplete
                 autoActiveFirstOption
                 #recievingBranch="matAutocomplete"
-                [displayWith]="getBranchOption"
+                [displayWith]="getCurrentStatus"
                 (optionSelected)="branchOptionChanged($event.option.value)"
               >
-                <mat-option
-                  *ngFor="let option of territoryList | async"
-                  [value]="option"
-                >
-                  {{ option.name }} <small>({{ option.warehouse }})</small>
+                <mat-option *ngFor="let option of territory" [value]="option">
+                  {{ option }}
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="f.status_from.hasError('required')">
@@ -74,7 +71,7 @@
                   *ngFor="let option of territoryList | async"
                   [value]="option"
                 >
-                  {{ option.name }} <small>({{ option.warehouse }})</small>
+                  {{ option.name }}
                 </mat-option>
               </mat-autocomplete>
               <mat-error *ngIf="f.transfer_branch.hasError('required')">
@@ -336,10 +333,10 @@
       *ngIf="
         (warrantyObject?.status_history)[
           warrantyObject?.status_history.length - 1
-        ].delivery_status === 'Upgraded' ||
+        ]?.delivery_status === 'Upgraded' ||
         (warrantyObject?.status_history)[
           warrantyObject?.status_history.length - 1
-        ].delivery_status === 'Replaced'
+        ]?.delivery_status === 'Replaced'
       "
     >
       <ion-row>
@@ -349,7 +346,7 @@
             *ngIf="
               (warrantyObject?.status_history)[
                 warrantyObject?.status_history.length - 1
-              ].delivery_status === 'Upgraded'
+              ]?.delivery_status === 'Upgraded'
             "
           >
             <input
@@ -365,7 +362,7 @@
             *ngIf="
               (warrantyObject?.status_history)[
                 warrantyObject?.status_history.length - 1
-              ].delivery_status === 'Replaced'
+              ]?.delivery_status === 'Replaced'
             "
           >
             <input
@@ -381,7 +378,7 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="warrantyObject?.recieving_branch"
+              [value]="warrantyObject?.receiving_branch"
               type="text"
               disabled
               placeholder="Damaged Warehouse"

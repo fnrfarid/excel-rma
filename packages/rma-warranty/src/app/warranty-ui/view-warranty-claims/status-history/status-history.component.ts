@@ -30,6 +30,7 @@ export class StatusHistoryComponent implements OnInit {
   warrantyObject: WarrantyClaimsDetails;
   statusHistoryForm: FormGroup;
   territoryList: any = [];
+  territory: any = [];
   currentStatus: any = [];
   deliveryStatus: any = [];
   posting_date: { date: string; time: string };
@@ -76,12 +77,12 @@ export class StatusHistoryComponent implements OnInit {
       transfer_branch: new FormControl(''),
       current_status_verdict: new FormControl('', [Validators.required]),
       description: new FormControl('', [Validators.required]),
-      delivery_status: new FormControl('', [Validators.required]),
+      delivery_status: new FormControl(''),
     });
   }
 
   getTerritoryList() {
-    this.territoryList = this.statusHistoryForm.controls.status_from.valueChanges.pipe(
+    this.territoryList = this.statusHistoryForm.controls.transfer_branch.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
       switchMap(value => {
@@ -89,6 +90,14 @@ export class StatusHistoryComponent implements OnInit {
       }),
       map(res => res.docs),
     );
+
+    this.statusHistoryService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        this.territory = territory;
+        this.statusHistoryForm.controls.status_from.setValue(territory[0]);
+      });
   }
 
   branchOptionChanged(option) {}
@@ -116,10 +125,19 @@ export class StatusHistoryComponent implements OnInit {
     statusHistoryDetails.uuid = this.warrantyObject.uuid;
     statusHistoryDetails.time = this.statusHistoryForm.controls.posting_time.value;
     statusHistoryDetails.posting_date = this.statusHistoryForm.controls.posting_date.value;
-    statusHistoryDetails.status_from = this.statusHistoryForm.controls.status_from.value.name;
+    statusHistoryDetails.status_from = this.statusHistoryForm.controls.status_from.value;
     statusHistoryDetails.verdict = this.statusHistoryForm.controls.current_status_verdict.value;
     statusHistoryDetails.description = this.statusHistoryForm.controls.description.value;
     statusHistoryDetails.delivery_status = this.statusHistoryForm.controls.delivery_status.value;
+    this.time.getDateAndTime(new Date()).then(dateTime => {
+      statusHistoryDetails.date = dateTime.date;
+    });
+    this.statusHistoryService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        statusHistoryDetails.delivery_branch = territory[0];
+      });
     if (
       this.statusHistoryForm.controls.current_status_verdict.value ===
       CURRENT_STATUS_VERDICT.TRANSFERRED

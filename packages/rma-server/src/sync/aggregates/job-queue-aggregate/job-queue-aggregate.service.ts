@@ -14,18 +14,20 @@ import {
   SYNC_PURCHASE_RECEIPT_JOB,
   FRAPPE_JOB_SELECT_FIELDS,
   BEARER_HEADER_VALUE_PREFIX,
+  DELIVERY_NOTE_DOCTYPE_NAMES,
 } from '../../../constants/app-strings';
 import { from, throwError, of } from 'rxjs';
 import { switchMap, map, catchError, retry } from 'rxjs/operators';
 import { FrappeJobService } from '../../schedular/frappe-jobs-queue/frappe-jobs-queue.service';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { ExcelDataImportWebhookDto } from '../../../constants/listing-dto/job-queue-list-query.dto';
-import { FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT } from '../../../constants/routes';
 import {
   AUTHORIZATION,
   VALIDATE_AUTH_STRING,
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
+import { PURCHASE_RECEIPT_DOCTYPE_NAMES } from '../../../constants/app-strings';
+import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 
 @Injectable()
 export class JobQueueAggregateService {
@@ -41,6 +43,7 @@ export class JobQueueAggregateService {
     private readonly tokenService: DirectService,
     private readonly http: HttpService,
     private readonly CREATE_PURCHASE_RECEIPT_JOB: PurchaseReceiptSyncService,
+    private readonly CREATE_DELIVERY_NOTE_JOB: DeliveryNoteJobService,
   ) {}
 
   async list(skip, take, sort, filter, token) {
@@ -149,24 +152,40 @@ export class JobQueueAggregateService {
   }
 
   jobUpdated(payload: ExcelDataImportWebhookDto) {
-    this.syncUpdatedJob(payload);
+    if (!payload || !payload.import_status) {
+      return of(true);
+    }
+    if (payload.import_status === AGENDA_JOB_STATUS.success) {
+      const parsed_response = JSON.parse(payload.log_details);
+      const link = parsed_response.messages[0].link.split('/');
+      const doctype = link[link.length - 2];
+      const doctype_name = link[link.length - 1];
+      this.syncUpdatedJob(payload, doctype_name, doctype);
+      return of(true);
+    }
     return from(
       this.jobService.updateOne(
-        { 'data.uuid': payload.uuid },
+        { 'data.dataImport.dataImportName': payload.name },
         {
           $set: {
-            'data.status': payload.error_log
-              ? AGENDA_JOB_STATUS.fail
-              : AGENDA_JOB_STATUS.success,
-            failReason: payload.error_log ? payload.error_log : '',
+            'data.status': AGENDA_JOB_STATUS.fail,
+            failReason: payload,
           },
         },
       ),
     );
   }
 
-  syncUpdatedJob(payload: ExcelDataImportWebhookDto) {
-    from(this.jobService.findOne({ 'data.uuid': payload.uuid }))
+  syncUpdatedJob(
+    payload: ExcelDataImportWebhookDto,
+    doctype_name: string,
+    doctype: string,
+  ) {
+    from(
+      this.jobService.findOne({
+        'data.dataImport.dataImportName': payload.name,
+      }),
+    )
       .pipe(
         switchMap(job => {
           if (!job) {
@@ -180,21 +199,38 @@ export class JobQueueAggregateService {
               return this.http
                 .get(
                   job.data.settings.authServerURL +
-                    `${FRAPPE_API_PURCHASE_RECEIPT_ENDPOINT}/${payload.success_log}`,
+                    `/api/resource/${doctype}/${doctype_name}`,
                   { headers },
                 )
                 .pipe(
                   map(data => data.data.data),
-                  switchMap((purchase_receipt: { items: any[] }) => {
-                    return this.CREATE_PURCHASE_RECEIPT_JOB.linkPurchaseWarranty(
-                      job.data.payload,
-                      {
-                        name: payload.success_log,
-                        items: purchase_receipt.items,
-                      },
-                      job.data.token,
-                      job.data.settings,
-                      job.data.parent,
+                  switchMap((doc: { items: any[] }) => {
+                    if (PURCHASE_RECEIPT_DOCTYPE_NAMES.includes(doctype)) {
+                      return this.CREATE_PURCHASE_RECEIPT_JOB.linkPurchaseWarranty(
+                        job.data.payload,
+                        {
+                          name: doctype_name,
+                          items: doc.items,
+                        },
+                        job.data.token,
+                        job.data.settings,
+                        job.data.parent,
+                      );
+                    }
+                    if (DELIVERY_NOTE_DOCTYPE_NAMES.includes(doctype)) {
+                      return this.CREATE_DELIVERY_NOTE_JOB.linkDeliveryNote(
+                        job.data.payload,
+                        {
+                          name: doctype_name,
+                          items: doc.items,
+                        },
+                        job.data.token,
+                        job.data.settings,
+                        job.data.parent,
+                      );
+                    }
+                    return throwError(
+                      `Doctype ${doctype_name} with doc ${doctype} not found.`,
                     );
                   }),
                 );
@@ -224,11 +260,23 @@ export class JobQueueAggregateService {
         }),
       )
       .subscribe({
-        next: success => {},
+        next: success => {
+          this.jobService
+            .updateOne(
+              { 'data.dataImport.dataImportName': payload.name },
+              {
+                $set: {
+                  'data.status': AGENDA_JOB_STATUS.success,
+                },
+              },
+            )
+            .then(done => {})
+            .catch(err => {});
+        },
         error: error => {
           this.jobService
             .updateOne(
-              { 'data.uuid': payload.uuid },
+              { 'data.dataImport.dataImportName': payload.name },
               {
                 $set: {
                   'data.status': AGENDA_JOB_STATUS.fail,

@@ -13,6 +13,7 @@ import {
   STOCK_ENTRY_STATUS,
   DURATION,
   MATERIAL_ISSUE,
+  MATERIAL_RECEIPT,
 } from '../../../../constants/app-string';
 import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
 import { DEFAULT_COMPANY } from '../../../../constants/storage';
@@ -21,6 +22,7 @@ import {
   DUPLICATE_SERIAL,
   STOCK_ENTRY_CREATED,
   STOCK_ENTRY_CREATE_FAILURE,
+  ITEM_NOT_FOUND,
 } from '../../../../constants/messages';
 
 @Component({
@@ -37,6 +39,7 @@ export class AddStockEntryPage implements OnInit {
   type: Array<any> = [];
   itemsControl: FormArray;
   serialActive: boolean;
+  button_active: boolean;
   displayedColumns: string[] = [
     'serial_no',
     'item_name',
@@ -65,6 +68,8 @@ export class AddStockEntryPage implements OnInit {
     this.dataSource = new ItemsDataSource();
     this.createFormGroup();
     this.setDateTime(new Date());
+    this.checkActive(this.dataSource.data().length);
+
     this.company = await this.addServiceInvoiceService
       .getStore()
       .getItem(DEFAULT_COMPANY);
@@ -86,14 +91,29 @@ export class AddStockEntryPage implements OnInit {
   }
 
   submitDraft() {
-    const selectedItem = {} as StockEntryDetails;
-    selectedItem.company = this.company;
-    selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
-    selectedItem.stock_entry_type = MATERIAL_ISSUE;
-    selectedItem.posting_date = this.stockEntryForm.controls.date.value;
-    selectedItem.type = this.stockEntryForm.controls.type.value;
-    selectedItem.description = this.stockEntryForm.controls.description.value;
-    selectedItem.items = this.dataSource.data();
+    for (let index = 0; index < this.dataSource.data().length; index++) {
+      const selectedItem = {} as StockEntryDetails;
+      selectedItem.company = this.company;
+      selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
+      selectedItem.posting_date = this.stockEntryForm.controls.date.value;
+      selectedItem.type = this.stockEntryForm.controls.type.value;
+      selectedItem.description = this.stockEntryForm.controls.description.value;
+      selectedItem.items = [this.dataSource.data()[index]];
+      switch (index) {
+        case 0:
+          selectedItem.stock_entry_type = MATERIAL_RECEIPT;
+          break;
+        case 1:
+          selectedItem.stock_entry_type = MATERIAL_ISSUE;
+          break;
+        default:
+          break;
+      }
+      this.createEntry(selectedItem);
+    }
+  }
+
+  createEntry(selectedItem: StockEntryDetails) {
     this.addServiceInvoiceService.createStockEntry(selectedItem).subscribe({
       next: res => {
         this.snackbar.open(STOCK_ENTRY_CREATED, 'Close', {
@@ -150,6 +170,7 @@ export class AddStockEntryPage implements OnInit {
   setStockEntryType(type) {
     this.trimRow();
     if (type === STOCK_ENTRY_STATUS.REPLACE) {
+      this.button_active = true;
       this.addServiceInvoiceService
         .getItemFromRMAServer(this.warrantyObject.item_code)
         .subscribe({
@@ -161,12 +182,22 @@ export class AddStockEntryPage implements OnInit {
                   next: item => {
                     this.AddSerialItem(item);
                   },
+                  error: err => {
+                    this.snackbar.open(`Serial ${ITEM_NOT_FOUND}`, 'Close', {
+                      duration: DURATION,
+                    });
+                  },
                 });
             } else {
               this.AddNonSerialItem(serialItem);
             }
           },
+          error: err => {
+            this.snackbar.open(ITEM_NOT_FOUND, 'Close', { duration: DURATION });
+          },
         });
+    } else {
+      this.checkActive(this.dataSource.data().length);
     }
   }
 
@@ -201,6 +232,7 @@ export class AddStockEntryPage implements OnInit {
       qty: 1,
       rate: 0,
       s_warehouse: serialItem.warehouse,
+      t_warehouse: serialItem.warehouse,
       serial_no: [serialItem.serial_no],
     });
     this.dataSource.update(itemDataSource);
@@ -214,6 +246,7 @@ export class AddStockEntryPage implements OnInit {
     const itemDataSource = this.dataSource.data().slice();
     Object.assign(row, item);
     row.s_warehouse = item.s_warehouse;
+    row.t_warehouse = item.t_warehouse;
     row.qty = 1;
     if (item.has_serial_no) {
       this.serialActive = true;
@@ -237,6 +270,7 @@ export class AddStockEntryPage implements OnInit {
     data.push(item);
     this.itemsControl.push(new FormControl(item));
     this.dataSource.update(data);
+    this.checkActive(this.dataSource.data().length);
   }
 
   updateQuantity(row: StockEntryItems, quantity: number) {
@@ -252,6 +286,7 @@ export class AddStockEntryPage implements OnInit {
     this.dataSource.data().splice(i, 1);
     this.itemsControl.removeAt(i);
     this.dataSource.update(this.dataSource.data());
+    this.checkActive(this.dataSource.data().length);
   }
 
   updateSWarehouse(row: StockEntryItems, source_warehouse: string) {
@@ -260,6 +295,7 @@ export class AddStockEntryPage implements OnInit {
     }
     const itemDataSource = this.dataSource.data().slice();
     row.s_warehouse = source_warehouse;
+    row.t_warehouse = source_warehouse;
     this.dataSource.update(itemDataSource);
   }
 
@@ -272,6 +308,7 @@ export class AddStockEntryPage implements OnInit {
       row.serial_no[0] = serial_no.serial_no[0];
       row.item_name = serial_no.item_name;
       row.s_warehouse = serial_no.source_warehouse;
+      row.t_warehouse = serial_no.source_warehouse;
       row.qty = serial_no.qty;
       row.item_code = serial_no.item_code;
       this.dataSource.update(itemDataSource);
@@ -288,5 +325,13 @@ export class AddStockEntryPage implements OnInit {
       }
     }
     return result;
+  }
+
+  checkActive(length: number) {
+    if (length >= 2) {
+      this.button_active = true;
+    } else {
+      this.button_active = false;
+    }
   }
 }

@@ -125,8 +125,8 @@ export class DeliveryNoteJobService {
         payload = this.setCsvDefaults(payload, job.settings);
         const csvPayload = this.csvService.mapJsonToCsv(
           payload,
-          CSV_TEMPLATE_HEADERS.delivery_note,
-          CSV_TEMPLATE.delivery_note,
+          CSV_TEMPLATE_HEADERS.delivery_note_legacy,
+          CSV_TEMPLATE.delivery_note_legacy,
         );
         return this.importData.addDataImport(
           DELIVERY_NOTE_DOCTYPE,
@@ -293,7 +293,6 @@ export class DeliveryNoteJobService {
         cost_center: item.cost_center,
         delivery_note: response.name,
       });
-      return;
     });
 
     this.salesInvoiceService
@@ -308,6 +307,8 @@ export class DeliveryNoteJobService {
       )
       .then(success => {})
       .catch(error => {});
+
+    return of(true);
   }
 
   resetSerialsMap(

@@ -2001,12 +2001,12 @@ export function purchaseReceiptOnCancelWebhookData(
   };
 }
 
-export function excelBackgroundAfterInsertWebhookData(
+export function dataImportLegacyAfterInsertWebhookData(
   webhookURL: string,
   webhookApiKey: string,
 ) {
   return {
-    webhook_doctype: 'Excel Background Log',
+    webhook_doctype: 'Data Import Legacy',
     webhook_docevent: 'after_insert',
     request_url: webhookURL,
     request_structure: 'Form URL-Encoded',
@@ -2023,9 +2023,9 @@ export function excelBackgroundAfterInsertWebhookData(
     ],
     webhook_data: [
       { fieldname: 'name', key: 'name' },
-      { fieldname: 'uuid', key: 'uuid' },
-      { fieldname: 'error_log', key: 'error_log' },
-      { fieldname: 'success_log', key: 'success_log' },
+      { fieldname: 'import_status', key: 'import_status' },
+      { fieldname: 'log_details', key: 'log_details' },
+      { fieldname: 'reference_doctype', key: 'reference_doctype' },
     ],
   };
 }

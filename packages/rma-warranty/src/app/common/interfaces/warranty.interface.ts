@@ -175,6 +175,8 @@ export class StatusHistoryDetails {
   description?: string;
   delivery_status?: string;
   status?: string;
+  delivery_branch?: string;
+  date: Date;
 }
 
 export class StockEntryDetails {
@@ -222,4 +224,5 @@ export class StockEntryItems {
   item_group?: string;
   item_defaults?: ItemDefaults;
   s_warehouse?: string;
+  t_warehouse?: string;
 }

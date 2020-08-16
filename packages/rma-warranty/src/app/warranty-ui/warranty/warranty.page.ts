@@ -40,14 +40,12 @@ export class WarrantyPage implements OnInit {
     'claim_no',
     'claim_type',
     'received_date',
-    'deliver_date',
     'customer_third_party',
+    'customer_name',
+    'third_party_name',
     'item_code',
     'claimed_serial',
-    'invoice_no',
-    'service_charge',
     'claim_status',
-    'warranty_status',
     'receiving_branch',
     'delivery_branch',
     'received_by',
@@ -84,13 +82,24 @@ export class WarrantyPage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map((event: any) => {
-          if (event.url === '/warranty') this.dataSource.loadItems();
+          if (event.url === '/warranty') this.getTerritory();
           return event;
         }),
       )
       .subscribe({
         next: res => {},
         error: err => {},
+      });
+  }
+
+  getTerritory() {
+    this.warrantyService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        this.dataSource.loadItems(undefined, undefined, undefined, {
+          territory,
+        });
       });
   }
 
