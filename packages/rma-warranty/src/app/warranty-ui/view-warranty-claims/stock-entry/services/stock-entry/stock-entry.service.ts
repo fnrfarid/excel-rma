@@ -8,6 +8,7 @@ import {
   BEARER_TOKEN_PREFIX,
 } from '../../../../../constants/storage';
 import { map, switchMap } from 'rxjs/operators';
+import { CANCEL_STOCK_ENTRY_ENDPOINT } from '../../../../../constants/url-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +40,15 @@ export class StockEntryService {
         return {
           [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
         };
+      }),
+    );
+  }
+
+  removeStockEntry(stockVoucherNumber: string) {
+    const URL = `${CANCEL_STOCK_ENTRY_ENDPOINT}/${stockVoucherNumber}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(URL, {}, { headers });
       }),
     );
   }

@@ -184,6 +184,7 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
       serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
       serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
+      serviceInvoiceDetails.debit_to = this.serviceInvoiceForm.controls.account.value.name;
       serviceInvoiceDetails.docstatus = 1;
 
       const itemList = this.dataSource.data().filter(item => {

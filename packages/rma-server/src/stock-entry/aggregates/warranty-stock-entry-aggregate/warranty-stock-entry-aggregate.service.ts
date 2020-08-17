@@ -3,6 +3,7 @@ import {
   NotImplementedException,
   HttpService,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
@@ -50,11 +51,13 @@ export class WarrantyStockEntryAggregateService {
   }
 
   createERPStockEntry(payload, req) {
+    let setting: any;
     return this.settingService.find().pipe(
       switchMap(settings => {
         if (!settings.authServerURL) {
           return throwError(new NotImplementedException());
         }
+        setting = settings;
         const url = `${settings.authServerURL}${ERPNEXT_STOCK_ENTRY_ENDPOINT}`;
         const body = this.mapWarrantyStock(payload);
         return this.http.post(url, body, {
@@ -63,7 +66,7 @@ export class WarrantyStockEntryAggregateService {
       }),
       map(res => res.data.data),
       switchMap(res => {
-        this.updateSerialItem(res.items);
+        this.updateSerialItem(res.items, payload, setting);
         return this.stockEntryService.updateOne(
           { uuid: payload.uuid },
           {
@@ -83,13 +86,18 @@ export class WarrantyStockEntryAggregateService {
     );
   }
 
-  updateSerialItem(items: any[]) {
-    items.forEach(item => {
-      this.serialService.updateOne(
-        { serial_no: item.serial_no },
-        { $set: { warehouse: '' } },
-      );
-    });
+  updateSerialItem(items: any[], payload, settings) {
+    this.serialService.updateOne(
+      { serial_no: items[0].serial_no },
+      {
+        $set: {
+          customer: payload.customer,
+          'warranty.salesWarrantyDate': payload.salesWarrantyDate,
+          'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
+          sales_invoice_name: payload.sales_invoice_name,
+        },
+      },
+    );
     return of().subscribe({ next: nxt => {} });
   }
   mapWarrantyStock(payload) {
@@ -121,5 +129,38 @@ export class WarrantyStockEntryAggregateService {
 
   retrieveStockEntry(warrantyClaimUuid: string) {
     return from(this.stockEntryService.findOne(warrantyClaimUuid));
+  }
+
+  removeStockEntry(stock_entry_name, req) {
+    let set: any;
+    return this.settingService.find().pipe(
+      switchMap(settings => {
+        if (!settings.authServerURL) {
+          return throwError(new NotImplementedException());
+        }
+        set = settings;
+        const url = `${settings.authServerURL}${ERPNEXT_STOCK_ENTRY_ENDPOINT}/${stock_entry_name}`;
+        return this.http.get(url, {
+          headers: this.settingService.getAuthorizationHeaders(req.token),
+        });
+      }),
+      map(res => res.data.data),
+      switchMap(response => {
+        if (!response) {
+          return throwError(new NotFoundException());
+        }
+        const url = `${set.authServerURL}${ERPNEXT_STOCK_ENTRY_ENDPOINT}/${stock_entry_name}`;
+        response.docstatus = 2;
+        return this.http.put(url, response, {
+          headers: this.settingService.getAuthorizationHeaders(req.token),
+        });
+      }),
+      map(res => res.data.data),
+      switchMap(res => {
+        return this.stockEntryService.deleteOne({
+          stock_voucher_number: res.name,
+        });
+      }),
+    );
   }
 }

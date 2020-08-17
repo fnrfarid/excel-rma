@@ -112,4 +112,8 @@ export class ServiceInvoiceDto {
   @IsString()
   @IsNotEmpty()
   warrantyClaimUuid: string;
+
+  @IsOptional()
+  @IsString()
+  debit_to: string;
 }

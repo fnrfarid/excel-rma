@@ -59,6 +59,7 @@ describe('AddStockEntryPage', () => {
             getItemList: (...args) => of([]),
             getWarrantyDetail: (...args) => of([]),
             getItemFromRMAServer: (...args) => of({}),
+            getSerialItemFromRMAServer: (...args) => of({}),
             getSerial: (...args) => of({}),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
