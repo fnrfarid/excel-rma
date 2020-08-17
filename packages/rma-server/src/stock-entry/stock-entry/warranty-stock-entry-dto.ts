@@ -57,6 +57,26 @@ export class WarrantyStockEntryDto {
   @IsString()
   doctype: string = STOCK_ENTRY;
 
+  @IsOptional()
+  @IsString()
+  customer: string;
+
+  @IsOptional()
+  @IsString()
+  salesWarrantyDate: string;
+
+  @IsOptional()
+  @IsString()
+  soldOn: string;
+
+  @IsOptional()
+  @IsString()
+  delivery_note: string;
+
+  @IsOptional()
+  @IsString()
+  sales_invoice_name: string;
+
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => WarrantyStockEntryItemDto)

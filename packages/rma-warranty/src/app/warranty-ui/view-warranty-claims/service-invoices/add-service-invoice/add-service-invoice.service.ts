@@ -147,6 +147,16 @@ export class AddServiceInvoiceService {
     );
   }
 
+  getSerialItemFromRMAServer(code: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(GET_DIRECT_SERIAL_ENDPOINT + '/' + code, {
+          headers,
+        });
+      }),
+    );
+  }
+
   getCustomerList(
     filter = '',
     sortOrder = 'asc',

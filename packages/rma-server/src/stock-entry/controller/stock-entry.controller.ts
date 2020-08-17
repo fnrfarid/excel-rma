@@ -98,4 +98,17 @@ export class StockEntryController {
   retrieveWarrantyStock(@Param() warrantyClaimUuid: string) {
     return this.warrantyStockAggregate.retrieveStockEntry(warrantyClaimUuid);
   }
+
+  @Post('v1/cancel_warranty_stock_entry/:stockVoucherNumber')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  removeWarrantyStock(
+    @Param('stockVoucherNumber') stockVoucherNumber: string,
+    @Req() req,
+  ) {
+    return this.warrantyStockAggregate.removeStockEntry(
+      stockVoucherNumber,
+      req,
+    );
+  }
 }

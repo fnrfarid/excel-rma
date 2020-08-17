@@ -188,6 +188,11 @@ export class StockEntryDetails {
   doctype?: string;
   type?: string;
   description?: string;
+  customer?: string;
+  salesWarrantyDate?: string;
+  soldOn?: string;
+  delivery_note?: string;
+  sales_invoice_name?: string;
   items?: StockItem[];
 }
 
