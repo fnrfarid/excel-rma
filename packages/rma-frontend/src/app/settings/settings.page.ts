@@ -42,6 +42,7 @@ export class SettingsPage implements OnInit {
     debtorAccount: new FormControl(),
     serviceAccountApiKey: new FormControl(),
     serviceAccountApiSecret: new FormControl(),
+    posProfile: new FormControl(),
   });
 
   companies: Observable<unknown[]> = this.companySettingsForm
@@ -82,6 +83,14 @@ export class SettingsPage implements OnInit {
       debounceTime(500),
       startWith(''),
       this.service.relayWarehousesOperation(),
+    );
+
+  posProfiles: Observable<unknown[]> = this.companySettingsForm
+    .get('posProfile')
+    .valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relayPosProfiles(),
     );
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -142,6 +151,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm
           .get('warrantyAppURL')
           .setValue(res.warrantyAppURL);
+        this.companySettingsForm.get('posProfile').setValue(res.posProfile);
       },
     });
 
@@ -177,6 +187,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('serviceAccountApiKey').value,
         this.companySettingsForm.get('serviceAccountApiSecret').value,
         this.companySettingsForm.get('warrantyAppURL').value,
+        this.companySettingsForm.get('posProfile').value,
       )
       .subscribe({
         next: success => {

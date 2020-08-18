@@ -42,11 +42,26 @@ export class StockEntryPoliciesService {
             serial_no: { $in: item.serial_no },
             item_code: item.item_code,
             $or: [
-              { warehouse: item.s_warehouse },
-              { 'queue_state.purchase_receipt.warehouse': item.s_warehouse },
+              {
+                $or: [
+                  { warehouse: item.s_warehouse },
+                  {
+                    'queue_state.purchase_receipt.warehouse': item.s_warehouse,
+                  },
+                ],
+              },
+              {
+                $or: [
+                  {
+                    'warranty.soldOn': { $exists: false },
+                    'queue_state.delivery_note': { $exists: false },
+                  },
+                  {
+                    'warranty.claim_no': { $exists: true },
+                  },
+                ],
+              },
             ],
-            'warranty.soldOn': { $exists: false },
-            'queue_state.delivery_note': { $exists: false },
           }),
         ).pipe(
           mergeMap(count => {

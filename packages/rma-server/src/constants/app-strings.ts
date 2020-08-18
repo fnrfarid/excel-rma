@@ -175,11 +175,12 @@ export enum WARRANTY_STATUS {
   EXPIRED = 'Expired',
 }
 
-export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 2000;
+export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 2500;
 // changing PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT would require change's in data import,
 // make sure to handle them before changing this.
 export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
 export const ONE_MINUTE_IN_MILLISECONDS = 60000;
+export const DATA_IMPORT_DELAY = 1739;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
 export const DEFAULT_CURRENCY = 'BDT';
 // export const DEFAULT_CURRENCY = 'INR';

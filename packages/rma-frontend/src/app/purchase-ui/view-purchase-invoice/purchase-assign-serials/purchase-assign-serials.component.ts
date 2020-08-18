@@ -200,9 +200,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
           Object.keys(res.purchase_receipt_items_map).length !== 0
             ? true
             : false;
-        if (this.displayDeliveredSerialsTable) {
-          this.getDeliveredSerials();
-        }
         this.getItemsWarranty();
       },
       error: err => {

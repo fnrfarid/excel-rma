@@ -140,4 +140,11 @@ export class ServerSettingsDto {
     type: 'string',
   })
   serviceAccountApiSecret: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'ERPNext POS Profiles',
+    type: 'string',
+  })
+  posProfile: string;
 }

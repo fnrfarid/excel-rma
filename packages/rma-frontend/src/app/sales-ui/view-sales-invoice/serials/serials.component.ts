@@ -235,9 +235,6 @@ export class SerialsComponent implements OnInit {
   getSalesInvoice(uuid: string) {
     return this.salesService.getSalesInvoice(uuid).subscribe({
       next: (sales_invoice: SalesInvoiceDetails) => {
-        if (sales_invoice.delivery_note_items) {
-          this.getDeliveredSerials(sales_invoice.uuid);
-        }
         this.salesInvoiceDetails = sales_invoice as SalesInvoiceDetails;
         this.disableDeliveredSerialsCard =
           Object.keys(this.salesInvoiceDetails.delivered_items_map).length === 0
@@ -260,9 +257,9 @@ export class SerialsComponent implements OnInit {
     });
   }
 
-  getDeliveredSerials(uuid) {
+  getDeliveredSerials() {
     this.deliveredSerialsDataSource.loadItems(
-      uuid,
+      this.salesInvoiceDetails.name,
       this.deliveredSerialsSearch,
       this.index,
       this.size,
@@ -322,7 +319,7 @@ export class SerialsComponent implements OnInit {
   }
 
   setFilter(event?) {
-    this.getDeliveredSerials(this.salesInvoiceDetails.uuid);
+    this.getDeliveredSerials();
   }
 
   assignSerial(itemRow: Item) {

@@ -40,6 +40,7 @@ export class AddStockEntryPage implements OnInit {
   itemsControl: FormArray;
   serialActive: boolean;
   button_active: boolean;
+  serialItem: any;
   displayedColumns: string[] = [
     'serial_no',
     'item_name',
@@ -93,23 +94,34 @@ export class AddStockEntryPage implements OnInit {
   submitDraft() {
     for (let index = 0; index < this.dataSource.data().length; index++) {
       const selectedItem = {} as StockEntryDetails;
-      selectedItem.company = this.company;
-      selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
-      selectedItem.posting_date = this.stockEntryForm.controls.date.value;
-      selectedItem.type = this.stockEntryForm.controls.type.value;
-      selectedItem.description = this.stockEntryForm.controls.description.value;
-      selectedItem.items = [this.dataSource.data()[index]];
-      switch (index) {
-        case 0:
-          selectedItem.stock_entry_type = MATERIAL_RECEIPT;
-          break;
-        case 1:
-          selectedItem.stock_entry_type = MATERIAL_ISSUE;
-          break;
-        default:
-          break;
-      }
-      this.createEntry(selectedItem);
+      this.addServiceInvoiceService
+        .getSerialItemFromRMAServer(this.dataSource.data()[0].serial_no[0])
+        .subscribe({
+          next: (res: any) => {
+            selectedItem.customer = res?.customer;
+            selectedItem.salesWarrantyDate = res?.warranty?.salesWarrantyDate;
+            selectedItem.delivery_note = res?.delivery_note;
+            selectedItem.sales_invoice_name = res?.sales_invoice_name;
+            selectedItem.company = this.company;
+            selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
+            selectedItem.posting_date = this.stockEntryForm.controls.date.value;
+            selectedItem.type = this.stockEntryForm.controls.type.value;
+            selectedItem.description = this.stockEntryForm.controls.description.value;
+            selectedItem.items = [this.dataSource.data()[index]];
+            switch (index) {
+              case 0:
+                selectedItem.stock_entry_type = MATERIAL_RECEIPT;
+                break;
+              case 1:
+                selectedItem.stock_entry_type = MATERIAL_ISSUE;
+                break;
+              default:
+                break;
+            }
+            this.createEntry(selectedItem);
+          },
+          error: err => {},
+        });
     }
   }
 
@@ -175,6 +187,7 @@ export class AddStockEntryPage implements OnInit {
         .getItemFromRMAServer(this.warrantyObject.item_code)
         .subscribe({
           next: serialItem => {
+            this.serialItem = serialItem;
             if (serialItem.has_serial_no) {
               this.addServiceInvoiceService
                 .getSerial(this.warrantyObject.serial_no)

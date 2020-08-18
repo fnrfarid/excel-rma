@@ -125,3 +125,5 @@ export const REMOVE_STATUS_HISTORY_ENDPOINT =
 export const CREATE_WARRANTY_STOCK_ENTRY =
   '/api/stock_entry/v1/create_warranty_stock';
 export const LIST_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/list';
+export const ERPNEXT_POS_PROFILE_ENDPOINT =
+  '/api/command/user/api/resource/POS%20Profile';

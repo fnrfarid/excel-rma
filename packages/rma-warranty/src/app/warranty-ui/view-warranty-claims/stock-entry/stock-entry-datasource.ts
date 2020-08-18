@@ -4,10 +4,12 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { StockEntryService } from './services/stock-entry/stock-entry.service';
 
 export interface ListingData {
-  uuid: string;
-  supplier: string;
-  status: string;
-  total: number;
+  stock_voucher_number: string;
+  type: string;
+  claim_no: string;
+  description: string;
+  posting_date: Date;
+  createdBy: string;
 }
 
 export interface ListResponse {

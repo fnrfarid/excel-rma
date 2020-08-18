@@ -88,6 +88,9 @@ export class ServerSettings extends BaseEntity {
   @Column()
   serviceAccountApiSecret: string;
 
+  @Column()
+  posProfile: string;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();

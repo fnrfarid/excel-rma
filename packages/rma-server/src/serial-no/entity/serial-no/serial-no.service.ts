@@ -79,10 +79,8 @@ export class SerialNoService {
     ]);
   }
 
-  async listDeliveredSerial(delivery_note_names, search, skip = 0, take = 10) {
-    const serialNoQuery: any = {
-      delivery_note: { $in: delivery_note_names },
-    };
+  async listDeliveredSerial(sales_invoice_name, search, skip = 0, take = 10) {
+    const serialNoQuery: any = { sales_invoice_name };
 
     if (search && search !== '') {
       serialNoQuery.serial_no = { $regex: search.toUpperCase() };
