@@ -11,6 +11,7 @@ import {
   GET_TIME_ZONE,
   ERPNEXT_ACCOUNT_ENDPOINT,
   ERPNEXT_WAREHOUSE_ENDPOINT,
+  ERPNEXT_POS_PROFILE_ENDPOINT,
 } from '../constants/url-strings';
 import {
   AUTHORIZATION,
@@ -125,6 +126,7 @@ export class SettingsService {
     serviceAccountApiKey: string,
     serviceAccountApiSecret: string,
     warrantyAppURL: string,
+    posProfile: string,
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -146,6 +148,7 @@ export class SettingsService {
             serviceAccountApiKey,
             serviceAccountApiSecret,
             warrantyAppURL,
+            posProfile,
           },
           { headers },
         );
@@ -221,6 +224,21 @@ export class SettingsService {
             .get<{ data: unknown[] }>(ERPNEXT_WAREHOUSE_ENDPOINT, {
               headers,
               params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
+  }
+
+  relayPosProfiles() {
+    return switchMap(value => {
+      if (!value) value = '';
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(ERPNEXT_POS_PROFILE_ENDPOINT, {
+              headers,
             })
             .pipe(map(res => res.data));
         }),

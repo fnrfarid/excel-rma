@@ -184,8 +184,14 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
       serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
       serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
-      serviceInvoiceDetails.debit_to = this.serviceInvoiceForm.controls.account.value.name;
       serviceInvoiceDetails.docstatus = 1;
+      serviceInvoiceDetails.is_pos = 1;
+      this.serviceInvoiceService
+        .getStore()
+        .getItem('pos_profile')
+        .then(profile => {
+          serviceInvoiceDetails.pos_profile = profile;
+        });
 
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
@@ -195,7 +201,14 @@ export class AddServiceInvoicePage implements OnInit {
           return item;
         }
       });
+      serviceInvoiceDetails.payments = [];
+      serviceInvoiceDetails.payments.push({
+        account: this.serviceInvoiceForm.controls.account.value.name,
+        mode_of_payment: 'Cash',
+        amount: serviceInvoiceDetails.total,
+      });
       serviceInvoiceDetails.items = itemList;
+
       const loading = await this.loadingController.create();
       await loading.present();
       this.serviceInvoiceService

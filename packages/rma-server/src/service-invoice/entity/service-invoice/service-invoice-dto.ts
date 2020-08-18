@@ -116,4 +116,21 @@ export class ServiceInvoiceDto {
   @IsOptional()
   @IsString()
   debit_to: string;
+
+  @IsOptional()
+  @IsNumber()
+  is_pos: number;
+
+  @IsOptional()
+  @IsString()
+  pos_profile: string;
+
+  @IsNotEmpty()
+  payments: Payments[];
+}
+
+export class Payments {
+  account: string;
+  mode_of_payment: string;
+  amount: number;
 }
