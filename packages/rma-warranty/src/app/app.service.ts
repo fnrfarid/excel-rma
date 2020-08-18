@@ -23,6 +23,7 @@ import {
   TRANSFER_WAREHOUSE,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
+  POS_PROFILE,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -75,6 +76,7 @@ export class AppService {
           response.sellingPriceList,
         ),
       )
+      .then(() => this.storage.setItem(POS_PROFILE, response.posProfile))
       .then(saved => {});
   }
 

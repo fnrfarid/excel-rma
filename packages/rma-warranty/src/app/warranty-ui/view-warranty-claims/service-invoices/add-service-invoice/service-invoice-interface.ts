@@ -29,4 +29,13 @@ export class ServiceInvoiceDetails {
   warrantyClaimUuid: string;
   debit_to?: string;
   cash_bank_account?: string;
+  is_pos?: number;
+  pos_profile?: string;
+  payments?: Payments[];
+}
+
+export class Payments {
+  account: string;
+  mode_of_payment: string;
+  amount: number;
 }
