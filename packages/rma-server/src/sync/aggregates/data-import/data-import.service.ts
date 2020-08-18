@@ -27,6 +27,7 @@ import {
   ONE_MINUTE_IN_MILLISECONDS,
   AGENDA_JOB_STATUS,
   VALIDATE_AUTH_STRING,
+  DATA_IMPORT_DELAY,
 } from '../../../constants/app-strings';
 import { of, throwError, forkJoin, Observable, from } from 'rxjs';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
@@ -84,6 +85,7 @@ export class DataImportService {
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
+        delay(DATA_IMPORT_DELAY),
         switchMap(success => {
           return this.http.post(
             settings.authServerURL +

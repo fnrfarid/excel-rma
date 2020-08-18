@@ -262,14 +262,7 @@ export class JobQueueAggregateService {
       .subscribe({
         next: success => {
           this.jobService
-            .updateOne(
-              { 'data.dataImport.dataImportName': payload.name },
-              {
-                $set: {
-                  'data.status': AGENDA_JOB_STATUS.success,
-                },
-              },
-            )
+            .deleteOne({ 'data.dataImport.dataImportName': payload.name })
             .then(done => {})
             .catch(err => {});
         },
