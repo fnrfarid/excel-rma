@@ -23,6 +23,8 @@ export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
 export const EXCEL_SALES_USER = 'Excel Sales User';
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
+  PAID: 'Paid',
+  UNPAID: 'Unpaid',
 };
 export const WARRANTY_TYPE = {
   WARRANTY: 'Warranty',

@@ -161,7 +161,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.posting_date = await this.time.getDateAndTime($event.value);
   }
 
-  async submitDraft() {
+  async createInvoice() {
     const isValid = this.serviceInvoiceService.validateItemList(
       this.dataSource.data().map(item => item.item_code),
     );
@@ -172,7 +172,7 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
       serviceInvoiceDetails.total_qty = 0;
       serviceInvoiceDetails.total = 0;
-      serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.SUBMITTED;
+      serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.UNPAID;
       serviceInvoiceDetails.due_date = this.serviceInvoiceForm.controls.posting_date.value;
       serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
       serviceInvoiceDetails.date = this.serviceInvoiceForm.controls.posting_date.value;
@@ -184,7 +184,7 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
       serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
       serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
-      serviceInvoiceDetails.docstatus = 1;
+      serviceInvoiceDetails.docstatus = 0;
       serviceInvoiceDetails.is_pos = 1;
       this.serviceInvoiceService
         .getStore()

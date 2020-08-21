@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { RouterTestingModule } from '@angular/router/testing';
+import { of } from 'rxjs';
 
 describe('WarrantyPage', () => {
   let component: WarrantyPage;
@@ -36,6 +37,7 @@ describe('WarrantyPage', () => {
         {
           provide: WarrantyService,
           useValue: {
+            getAddressList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

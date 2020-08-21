@@ -13,6 +13,7 @@ import {
   LIST_SERVICE_INVOICE_ENDPOINT,
   RELAY_LIST_ACCOUNT_ENDPOINT,
   RELAY_LIST_ADDRESS_ENDPOINT,
+  SUBMIT_SERVICE_INVOICE_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -298,6 +299,15 @@ export class AddServiceInvoiceService {
         return this.http.get<any>(url, { headers });
       }),
       map(res => res.data),
+    );
+  }
+
+  submitInvoice(payload) {
+    const url = SUBMIT_SERVICE_INVOICE_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, payload, { headers });
+      }),
     );
   }
 }
