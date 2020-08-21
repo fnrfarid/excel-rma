@@ -51,7 +51,10 @@ export class WarrantyPage implements OnInit {
     'received_by',
     'delivered_by',
   ];
-  customer: string;
+  claimList;
+  customerList;
+  territoryList;
+  customer: any;
   claim_no: string;
   customer_third_party: string;
   product: string;
@@ -77,6 +80,12 @@ export class WarrantyPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.claimList = [
+      'Warranty',
+      'Non Warranty',
+      'Non Serial Warranty',
+      'Third Party Warranty',
+    ];
     this.dataSource = new WarrantyClaimsDataSource(this.warrantyService);
     this.router.events
       .pipe(
@@ -90,6 +99,7 @@ export class WarrantyPage implements OnInit {
         next: res => {},
         error: err => {},
       });
+    this.getCustomerList();
   }
 
   getTerritory() {
@@ -97,6 +107,7 @@ export class WarrantyPage implements OnInit {
       .getStorage()
       .getItem('territory')
       .then(territory => {
+        this.territoryList = territory;
         this.dataSource.loadItems(undefined, undefined, undefined, {
           territory,
         });
@@ -143,7 +154,7 @@ export class WarrantyPage implements OnInit {
 
   getFilterQuery() {
     const query: any = {};
-    if (this.customer) query.customer = this.customer;
+    if (this.customer) query.customer = this.customer.name;
     if (this.claim_no) query.claim_no = this.claim_no;
     if (this.customer_third_party)
       query.customer_third_party = this.customer_third_party;
@@ -182,6 +193,7 @@ export class WarrantyPage implements OnInit {
         59,
       );
     }
+    query.territory = this.territoryList;
     return query;
   }
 
@@ -223,4 +235,19 @@ export class WarrantyPage implements OnInit {
   navigateBack() {
     this.location.back();
   }
+
+  getCustomerList() {
+    this.warrantyService.getAddressList().subscribe({
+      next: response => {
+        this.customerList = response;
+      },
+      error: error => {},
+    });
+  }
+
+  getCustomerOption(option) {
+    if (option) return option.name;
+  }
+
+  getOption() {}
 }

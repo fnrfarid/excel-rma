@@ -19,6 +19,7 @@ import { UpdateServiceInvoiceCommand } from '../../command/update-service-invoic
 import { RetrieveServiceInvoiceQuery } from '../../query/get-service-invoice/retrieve-service-invoice.query';
 import { RetrieveServiceInvoiceListQuery } from '../../query/list-service-invoice/retrieve-service-invoice-list.query';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
+import { SubmitServiceInvoiceCommand } from '../../../service-invoice/command/submit-service-invoice/submit-service-invoice.command';
 
 @Controller('service_invoice')
 export class ServiceInvoiceController {
@@ -44,7 +45,7 @@ export class ServiceInvoiceController {
 
   @Get('v1/get/:uuid')
   @UseGuards(TokenGuard)
-  async getClient(@Param('uuid') uuid: string, @Req() req) {
+  async getServiceInvoice(@Param('uuid') uuid: string, @Req() req) {
     return await this.queryBus.execute(
       new RetrieveServiceInvoiceQuery(uuid, req),
     );
@@ -52,7 +53,7 @@ export class ServiceInvoiceController {
 
   @Get('v1/list')
   @UseGuards(TokenGuard)
-  getClientList(
+  getServiceInvoiceList(
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
     @Query('search') search = '',
@@ -76,9 +77,21 @@ export class ServiceInvoiceController {
   @Post('v1/update')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateClient(@Body() updatePayload: UpdateServiceInvoiceDto) {
+  updateServiceInvoice(@Body() updatePayload: UpdateServiceInvoiceDto) {
     return this.commandBus.execute(
       new UpdateServiceInvoiceCommand(updatePayload),
+    );
+  }
+
+  @Post('v1/submit')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  submitServiceInvoice(
+    @Body() updatePayload: UpdateServiceInvoiceDto,
+    @Req() req,
+  ) {
+    return this.commandBus.execute(
+      new SubmitServiceInvoiceCommand(updatePayload, req),
     );
   }
 }

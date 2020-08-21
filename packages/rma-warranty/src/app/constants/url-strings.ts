@@ -135,3 +135,4 @@ export const GET_TERRITORY_BY_WAREHOUSE_ENDPOINT =
   '/api/territory/v1/get_territory_by_warehouse';
 export const CANCEL_STOCK_ENTRY_ENDPOINT =
   '/api/stock_entry/v1/cancel_warranty_stock_entry';
+export const SUBMIT_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/submit';

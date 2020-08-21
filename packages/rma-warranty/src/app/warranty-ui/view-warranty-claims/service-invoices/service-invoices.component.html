@@ -115,6 +115,22 @@
         <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
       </ng-container>
 
+      <ng-container matColumnDef="submit">
+        <mat-header-cell *matHeaderCellDef>Submit</mat-header-cell>
+        <mat-cell *matCellDef="let row; let i = index">
+          <ion-button
+            *ngIf="row?.status === 'Unpaid'"
+            (click)="submitInvoice(row)"
+            fill="solid"
+            color="tertiary"
+          >
+            submit
+          </ion-button>
+          <label *ngIf="row?.status === 'Paid'">Submitted</label>
+        </mat-cell>
+        <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+      </ng-container>
+
       <mat-header-row
         *matHeaderRowDef="displayedColumns; sticky: true"
       ></mat-header-row>
