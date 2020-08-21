@@ -41,13 +41,13 @@ export class WarrantyClaimsDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?, territory?) {
     if (!sortOrder) {
       sortOrder = { createdOn: 'desc' };
     }
     this.loadingSubject.next(true);
     this.warrantyService
-      .getWarrantyClaimsList(sortOrder, pageIndex, pageSize, query)
+      .getWarrantyClaimsList(sortOrder, pageIndex, pageSize, query, territory)
       .pipe(
         map((res: ListResponse) => {
           this.data = res.docs;

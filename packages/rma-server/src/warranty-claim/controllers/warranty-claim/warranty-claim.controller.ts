@@ -68,15 +68,25 @@ export class WarrantyClaimController {
     @Query() query: WarrantyClaimsListQueryDto,
     @Req() req,
   ) {
-    const { offset, limit, sort, filter_query } = query;
+    const { offset, limit, sort, filter_query, territories } = query;
     let filter;
+    let territory;
     try {
       filter = JSON.parse(filter_query);
+      territory = JSON.parse(territories);
     } catch {
       filter;
+      territory = territories;
     }
     return this.queryBus.execute(
-      new RetrieveWarrantyClaimListQuery(offset, limit, sort, filter, req),
+      new RetrieveWarrantyClaimListQuery(
+        offset,
+        limit,
+        sort,
+        filter,
+        territory,
+        req,
+      ),
     );
   }
 

@@ -6,6 +6,7 @@ export class RetrieveWarrantyClaimListQuery implements IQuery {
     public limit: number,
     public sort: string,
     public filter_query: any,
+    public territory: any,
     public req: any,
   ) {}
 }

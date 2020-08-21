@@ -24,7 +24,7 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.findOne(param, options);
   }
 
-  async list(skip, take, sort, filter_query?, clientHttpRequest?) {
+  async list(skip, take, sort, filter_query?, territory?, clientHttpRequest?) {
     let sortQuery;
     let dateQuery = {};
 
@@ -56,23 +56,19 @@ export class WarrantyClaimService {
     const $or: any[] = [
       {
         'status_history.transfer_branch': {
-          $in: filter_query.territory,
+          $in: territory.territory,
         },
       },
       {
         'status_history.status_from': {
-          $in: filter_query.territory,
+          $in: territory.territory,
         },
       },
     ];
 
     const $and: any[] = [
       { $or },
-      filter_query
-        ? filter_query.territory
-          ? {}
-          : this.getFilterQuery(filter_query)
-        : {},
+      filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
     ];
 
@@ -96,7 +92,7 @@ export class WarrantyClaimService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        if (key === 'status' && query[key] === 'All') {
+        if (key === 'claim_status' && query[key] === 'All') {
           delete query[key];
         } else {
           query[key] = new RegExp(query[key], 'i');

@@ -108,9 +108,13 @@ export class WarrantyPage implements OnInit {
       .getItem('territory')
       .then(territory => {
         this.territoryList = territory;
-        this.dataSource.loadItems(undefined, undefined, undefined, {
-          territory,
-        });
+        this.dataSource.loadItems(
+          undefined,
+          undefined,
+          undefined,
+          {},
+          { territory },
+        );
       });
   }
 
@@ -129,6 +133,7 @@ export class WarrantyPage implements OnInit {
       event.pageIndex,
       event.pageSize,
       query,
+      { territory: this.territoryList },
     );
   }
 
@@ -149,6 +154,7 @@ export class WarrantyPage implements OnInit {
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,
+      { territory: this.territoryList },
     );
   }
 
@@ -193,13 +199,14 @@ export class WarrantyPage implements OnInit {
         59,
       );
     }
-    query.territory = this.territoryList;
     return query;
   }
 
   statusChange(status) {
     if (status === 'All') {
-      this.dataSource.loadItems();
+      this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
+        territory: this.territoryList,
+      });
     } else {
       this.claim_status = status;
       this.setFilter();
@@ -229,7 +236,9 @@ export class WarrantyPage implements OnInit {
     this.fromDateFormControl.setValue('');
     this.toDateFormControl.setValue('');
     this.singleDateFormControl.setValue('');
-    this.dataSource.loadItems();
+    this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
+      territory: this.territoryList,
+    });
   }
 
   navigateBack() {
