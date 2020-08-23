@@ -48,6 +48,33 @@ export class DataImportService {
     settings: ServerSettings,
     token: TokenCache,
   ) {
+    return this.exportJob(reference_doctype, payload, settings, token).pipe(
+      switchMap(response => {
+        return of({}).pipe(
+          switchMap(obj => {
+            return this.http.post(
+              settings.authServerURL +
+                FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
+              { data_import: response.dataImportName },
+              { headers: this.getAuthorizationHeaders(token) },
+            );
+          }),
+          delay(DATA_IMPORT_DELAY / 2),
+          retry(3),
+          switchMap(success => {
+            return of(response);
+          }),
+        );
+      }),
+    );
+  }
+
+  exportJob(
+    reference_doctype: string,
+    payload: string,
+    settings: ServerSettings,
+    token: TokenCache,
+  ) {
     const response: DataImportSuccessResponse = {};
     const base64Buffer = Buffer.from(payload);
     return this.http
@@ -82,14 +109,6 @@ export class DataImportService {
               LEGACY_DATA_IMPORT_API_ENDPOINT +
               `/${success.attached_to_name}`,
             { import_file: success.file_url, submit_after_import: 1 },
-            { headers: this.getAuthorizationHeaders(token) },
-          );
-        }),
-        switchMap(success => {
-          return this.http.post(
-            settings.authServerURL +
-              FRAPPE_START_LEGACY_DATA_IMPORT_API_ENDPOINT,
-            { data_import: response.dataImportName },
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),

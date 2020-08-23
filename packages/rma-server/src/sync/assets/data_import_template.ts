@@ -116,7 +116,7 @@ export const CSV_TEMPLATE_HEADERS = {
     ['items', '0', 'warehouse'],
     ['items', '0', 'rejected_warehouse'],
     ['items', '0', 'purchase_order'],
-    ['items', '0', 'serial_no'],
+    ['items', '0', 'serial_no_skip'],
     '~',
     '~',
     '~',
