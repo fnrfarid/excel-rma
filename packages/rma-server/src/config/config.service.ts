@@ -41,9 +41,9 @@ export class ConfigService {
       DB_PASSWORD: Joi.string().required(),
       CACHE_DB_NAME: Joi.string().required(),
       CACHE_DB_USER: Joi.string().required(),
-      AGENDA_JOBS_CONCURRENCY: Joi.string().required(),
       CACHE_DB_PASSWORD: Joi.string().required(),
       MONGO_URI_PREFIX: Joi.string().optional(),
+      AGENDA_JOBS_CONCURRENCY: Joi.string().optional(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
