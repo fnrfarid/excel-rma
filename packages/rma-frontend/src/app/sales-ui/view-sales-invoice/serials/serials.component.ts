@@ -270,7 +270,7 @@ export class SerialsComponent implements OnInit {
     this.index = event.pageIndex;
     this.size = event.pageSize;
     this.deliveredSerialsDataSource.loadItems(
-      this.salesInvoiceDetails.uuid,
+      this.salesInvoiceDetails.name,
       this.deliveredSerialsSearch,
       this.index,
       this.size,
