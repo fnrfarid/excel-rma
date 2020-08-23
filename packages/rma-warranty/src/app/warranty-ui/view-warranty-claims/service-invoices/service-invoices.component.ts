@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
-import { WarrantyClaimsDetails } from 'src/app/common/interfaces/warranty.interface';
+import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DURATION } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';

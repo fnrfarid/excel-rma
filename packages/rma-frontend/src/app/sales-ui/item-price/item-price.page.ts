@@ -7,6 +7,8 @@ import { filter, map } from 'rxjs/operators';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
 import { SalesService } from '../services/sales.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { CLOSE } from '../../constants/app-string';
 
 @Component({
   selector: 'app-item-price',
@@ -20,9 +22,10 @@ export class ItemPricePage implements OnInit {
   displayedColumns = [
     'name',
     'item_name',
-    'price',
+    'has_serial',
     'purchaseWarrantyMonths',
     'salesWarrantyMonths',
+    'price',
     'selling_price',
   ];
   itemName: string = '';
@@ -34,6 +37,7 @@ export class ItemPricePage implements OnInit {
     private readonly router: Router,
     private readonly itemPriceService: ItemPriceService,
     private readonly salesService: SalesService,
+    private readonly snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -51,6 +55,31 @@ export class ItemPricePage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  itemSerialized(event, item_name) {
+    event = event ? 1 : 0;
+    return this.itemPriceService.updateHasSerialNo(event, item_name).subscribe({
+      next: success => {
+        this.snackBar.open('Item updated.', CLOSE, { duration: 2000 });
+      },
+      error: err => {
+        const data = this.dataSource.data;
+        data.forEach(item => {
+          item.item_name === item_name
+            ? (item.has_serial_no = event ? 0 : 1)
+            : null;
+        });
+        this.dataSource.update(data);
+        this.snackBar.open(
+          err?.error?.message
+            ? err.error.message
+            : `Error in updating item : ${err}`,
+          CLOSE,
+          { duration: 2000 },
+        );
+      },
+    });
   }
 
   setFilter(event?: Sort) {

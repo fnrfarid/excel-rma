@@ -247,19 +247,9 @@ export class AddSalesReturnPage implements OnInit {
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
         this.getItemsWarranty();
-        this.getDeliveryNoteNames();
+        this.deliveryNoteNames = res.delivery_note_names;
       },
     });
-  }
-
-  getDeliveryNoteNames() {
-    this.salesService
-      .getDeliveryNoteNames(this.salesInvoiceDetails.name)
-      .subscribe({
-        next: res => {
-          this.deliveryNoteNames = res.map(data => data.name);
-        },
-      });
   }
 
   getItemsWarranty() {

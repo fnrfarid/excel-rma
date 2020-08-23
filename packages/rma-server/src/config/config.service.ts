@@ -15,6 +15,7 @@ export const MONGO_URI_PREFIX = 'MONGO_URI_PREFIX';
 export const CACHE_DB_NAME = 'CACHE_DB_NAME';
 export const CACHE_DB_USER = 'CACHE_DB_USER';
 export const CACHE_DB_PASSWORD = 'CACHE_DB_PASSWORD';
+export const AGENDA_JOBS_CONCURRENCY = 'AGENDA_JOBS_CONCURRENCY';
 
 @Injectable()
 export class ConfigService {
@@ -40,6 +41,7 @@ export class ConfigService {
       DB_PASSWORD: Joi.string().required(),
       CACHE_DB_NAME: Joi.string().required(),
       CACHE_DB_USER: Joi.string().required(),
+      AGENDA_JOBS_CONCURRENCY: Joi.string().required(),
       CACHE_DB_PASSWORD: Joi.string().required(),
       MONGO_URI_PREFIX: Joi.string().optional(),
     });
