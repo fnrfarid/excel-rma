@@ -31,10 +31,10 @@ export const CSV_TEMPLATE = {
   You can only upload upto 5000 records in one go. (may be less in some cases),,,,,,,,,,,,,,,,,,,,,,,,,
   ,,,,,,,,,,,,,,,,,,,,,,,,,
   DocType:,Purchase Receipt,,,,,,,,,~,Purchase Receipt Item,items,,,,,,,,,,,~,~,~
-  Column Labels:,Series,Supplier,Company,Date,Posting Time,Currency,Exchange Rate,Net Total (Company Currency),Status,,Item Code,Item Name,Description,Received Quantity,UOM,Stock UOM,Conversion Factor,Rate,Accepted Warehouse,Rejected Warehouse,Purchase Order,Serial No,,,
-  Column Name:,naming_series,supplier,company,posting_date,posting_time,currency,conversion_rate,base_net_total,status,~,item_code,item_name,description,qty,uom,stock_uom,conversion_factor,rate,warehouse,rejected_warehouse,purchase_order,serial_no,~,~,~
+  Column Labels:,Series,Supplier,Company,Date,Posting Time,Currency,Exchange Rate,Net Total (Company Currency),Status,,Item Code,Item Name,Description,Received Quantity,UOM,Stock UOM,Conversion Factor,Rate,Accepted Warehouse,Rejected Warehouse,Purchase Order,excel_serials,,,
+  Column Name:,naming_series,supplier,company,posting_date,posting_time,currency,conversion_rate,base_net_total,status,~,item_code,item_name,description,qty,uom,stock_uom,conversion_factor,rate,warehouse,rejected_warehouse,purchase_order,excel_serials,~,~,~
   Mandatory:,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,No,No,No,No,,,
-  Type:,Select,Link,Link,Date,Time,Link,Float,Currency,Select,,Link,Data,Text Editor,Float,Link,Link,Float,Currency,Link,Link,Link,Small Text,,,
+  Type:,Select,Link,Link,Date,Time,Link,Float,Currency,Select,,Link,Data,Text Editor,Float,Link,Link,Float,Currency,Link,Link,Link,Long Text,,,
   Info:,"One of: PREC-RET-, PREC-",Valid Supplier,Valid Company,dd-mm-yyyy,,Valid Currency,,,"One of: Draft, To Bill, Completed, Cancelled, Closed",,Valid Item,,,,Valid UOM,Valid UOM,,,Valid Warehouse,Valid Warehouse,Valid Purchase Order,,,,
   Start entering data below this line,,,,,,,,,,,,,,,,,,,,,,,,,
 `,

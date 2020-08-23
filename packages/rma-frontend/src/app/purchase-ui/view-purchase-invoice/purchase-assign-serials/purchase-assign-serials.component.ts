@@ -231,7 +231,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.index = event.pageIndex;
     this.size = event.pageSize;
     this.purchasedSerialsDataSource.loadItems(
-      this.purchaseInvoiceDetails.purchase_receipt_names,
+      this.purchaseInvoiceDetails.name,
       this.deliveredSerialsSearch,
       this.index,
       this.size,
