@@ -36,7 +36,6 @@ export interface ItemWebhookInterface {
   shelf_life_in_days: number;
   end_of_life: string;
   default_material_request_type: string;
-  has_serial_no: number;
   has_variants: number;
   is_purchase_item: number;
   min_order_qty: number;

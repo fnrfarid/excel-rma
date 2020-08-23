@@ -14,6 +14,7 @@ import {
   RELAY_GET_STOCK_BALANCE_ENDPOINT,
   GET_BALANCE_ON_ENDPOINT,
   RELAY_API_RES_COMPANY,
+  UPDATE_ITEM_HAS_SERIAL_UPDATE_ENDPOINT,
   API_ITEM_SET_PURCHASE_WARRANTY_DAYS,
 } from '../../constants/url-strings';
 import { ItemListResponse } from '../item-price/item-price.datasource';
@@ -75,6 +76,18 @@ export class ItemPriceService {
           {
             headers,
           },
+        );
+      }),
+    );
+  }
+
+  updateHasSerialNo(has_serial_no, item_name) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          UPDATE_ITEM_HAS_SERIAL_UPDATE_ENDPOINT,
+          { has_serial_no, item_name },
+          { headers },
         );
       }),
     );

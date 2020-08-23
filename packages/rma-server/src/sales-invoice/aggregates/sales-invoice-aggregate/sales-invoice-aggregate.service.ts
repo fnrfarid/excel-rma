@@ -322,16 +322,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           ),
         }).pipe(
           switchMap(({ salesInvoice }) => {
-            this.createCreditNote(
-              settings,
-              createReturnPayload,
-              clientHttpRequest,
-              salesInvoice,
-            );
             delete createReturnPayload.delivery_note_names;
-            const deliveryNote = new DeliveryNote();
+            const serialMap = this.getSerialMap(createReturnPayload);
+            let deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
-            deliveryNote.naming_series = DEFAULT_NAMING_SERIES.delivery_return;
+            deliveryNote = this.setDeliveryNoteDefaults(deliveryNote);
 
             return this.http
               .post(
@@ -350,6 +345,16 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               .pipe(
                 map(data => data.data.data),
                 switchMap((response: DeliveryNoteWebhookDto) => {
+                  response.items.filter(item => {
+                    item.serial_no = serialMap[item.item_code];
+                    return item;
+                  });
+                  this.createCreditNote(
+                    settings,
+                    createReturnPayload,
+                    clientHttpRequest,
+                    salesInvoice,
+                  );
                   const items = this.mapSerialsFromItem(response.items);
 
                   const {
@@ -394,6 +399,25 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         return throwError(err);
       }),
     );
+  }
+
+  setDeliveryNoteDefaults(deliveryNote: DeliveryNote) {
+    deliveryNote.naming_series = DEFAULT_NAMING_SERIES.delivery_return;
+    deliveryNote.items.forEach(item => {
+      item.excel_serials = item.serial_no;
+      delete item.serial_no;
+    });
+    return deliveryNote;
+  }
+
+  getSerialMap(createReturnPayload: CreateSalesReturnDto) {
+    const hash_map = {};
+    createReturnPayload.items.forEach(item => {
+      hash_map[item.item_code]
+        ? (hash_map[item.item_code] += item.serial_no)
+        : (hash_map[item.item_code] = item.serial_no);
+    });
+    return hash_map;
   }
 
   linkSalesReturn(
@@ -559,10 +583,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     deliveryNoteBody.total_qty = assignPayload.total_qty;
     deliveryNoteBody.total = assignPayload.total;
     deliveryNoteBody.items = this.mapSerialsFromItem(assignPayload.items);
-    // deliveryNoteBody.pricing_rules = []
-    // deliveryNoteBody.packed_items = []
-    // deliveryNoteBody.taxes = []
-    // deliveryNoteBody.sales_team = []
     return deliveryNoteBody;
   }
 

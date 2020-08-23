@@ -85,7 +85,6 @@ export class DataImportService {
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
-        delay(DATA_IMPORT_DELAY),
         switchMap(success => {
           return this.http.post(
             settings.authServerURL +
@@ -94,6 +93,7 @@ export class DataImportService {
             { headers: this.getAuthorizationHeaders(token) },
           );
         }),
+        delay(DATA_IMPORT_DELAY),
         switchMap(done => {
           return of(response);
         }),

@@ -117,6 +117,7 @@ export class DeliveryNoteItems {
   item_group: string;
   image: string;
   qty: number;
+  excel_serials: string;
   has_serial_no: number;
   conversion_factor: number;
   stock_qty: number;
