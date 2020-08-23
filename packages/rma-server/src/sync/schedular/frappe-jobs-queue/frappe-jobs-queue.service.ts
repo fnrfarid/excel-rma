@@ -29,12 +29,12 @@ export class FrappeJobService implements OnModuleInit {
   async onModuleInit() {
     Logger.log(
       AGENDA_JOBS_CONCURRENCY_MESSAGE + process.env[AGENDA_JOBS_CONCURRENCY] ||
-        '3',
+        '1',
       AGENDA_JOBS_CONCURRENCY,
     );
     this.agenda.define(
       FRAPPE_QUEUE_JOB,
-      { concurrency: Number(process.env[AGENDA_JOBS_CONCURRENCY]) || 3 },
+      { concurrency: Number(process.env[AGENDA_JOBS_CONCURRENCY]) || 1 },
       async (job: any, done) => {
         // Please note done callback will work only when concurrency is provided.
         this[job.attrs.data.type]
