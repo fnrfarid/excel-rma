@@ -46,10 +46,15 @@ export class WarrantyService {
       }),
     );
   }
-  getWarrantyClaimsList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+  getWarrantyClaimsList(
+    sortOrder,
+    pageNumber = 0,
+    pageSize = 10,
+    query,
+    territory,
+  ) {
     if (!sortOrder) sortOrder = { createdOn: 'desc' };
     if (!query) query = {};
-
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch (error) {
@@ -60,7 +65,8 @@ export class WarrantyService {
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
       .set('sort', sortOrder)
-      .set('filter_query', JSON.stringify(query));
+      .set('filter_query', JSON.stringify(query))
+      .set('territories', JSON.stringify(territory));
 
     return this.getHeaders().pipe(
       switchMap(headers => {
