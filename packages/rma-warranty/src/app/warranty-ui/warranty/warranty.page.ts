@@ -51,7 +51,10 @@ export class WarrantyPage implements OnInit {
     'received_by',
     'delivered_by',
   ];
-  customer: string;
+  claimList;
+  customerList;
+  territoryList;
+  customer: any;
   claim_no: string;
   customer_third_party: string;
   product: string;
@@ -77,6 +80,12 @@ export class WarrantyPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.claimList = [
+      'Warranty',
+      'Non Warranty',
+      'Non Serial Warranty',
+      'Third Party Warranty',
+    ];
     this.dataSource = new WarrantyClaimsDataSource(this.warrantyService);
     this.router.events
       .pipe(
@@ -90,6 +99,7 @@ export class WarrantyPage implements OnInit {
         next: res => {},
         error: err => {},
       });
+    this.getCustomerList();
   }
 
   getTerritory() {
@@ -97,9 +107,14 @@ export class WarrantyPage implements OnInit {
       .getStorage()
       .getItem('territory')
       .then(territory => {
-        this.dataSource.loadItems(undefined, undefined, undefined, {
-          territory,
-        });
+        this.territoryList = territory;
+        this.dataSource.loadItems(
+          undefined,
+          undefined,
+          undefined,
+          {},
+          { territory },
+        );
       });
   }
 
@@ -118,6 +133,7 @@ export class WarrantyPage implements OnInit {
       event.pageIndex,
       event.pageSize,
       query,
+      { territory: this.territoryList },
     );
   }
 
@@ -138,12 +154,13 @@ export class WarrantyPage implements OnInit {
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,
+      { territory: this.territoryList },
     );
   }
 
   getFilterQuery() {
     const query: any = {};
-    if (this.customer) query.customer = this.customer;
+    if (this.customer) query.customer = this.customer.name;
     if (this.claim_no) query.claim_no = this.claim_no;
     if (this.customer_third_party)
       query.customer_third_party = this.customer_third_party;
@@ -187,7 +204,9 @@ export class WarrantyPage implements OnInit {
 
   statusChange(status) {
     if (status === 'All') {
-      this.dataSource.loadItems();
+      this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
+        territory: this.territoryList,
+      });
     } else {
       this.claim_status = status;
       this.setFilter();
@@ -217,10 +236,27 @@ export class WarrantyPage implements OnInit {
     this.fromDateFormControl.setValue('');
     this.toDateFormControl.setValue('');
     this.singleDateFormControl.setValue('');
-    this.dataSource.loadItems();
+    this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
+      territory: this.territoryList,
+    });
   }
 
   navigateBack() {
     this.location.back();
   }
+
+  getCustomerList() {
+    this.warrantyService.getAddressList().subscribe({
+      next: response => {
+        this.customerList = response;
+      },
+      error: error => {},
+    });
+  }
+
+  getCustomerOption(option) {
+    if (option) return option.name;
+  }
+
+  getOption() {}
 }

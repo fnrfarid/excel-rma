@@ -29,6 +29,7 @@ export interface CreateDeliveryNoteItemInterface {
   qty?: number;
   rate?: number;
   amount?: number;
+  excel_serials?: string;
   has_serial_no: number;
   warranty_date?: string;
   against_sales_invoice?: string;

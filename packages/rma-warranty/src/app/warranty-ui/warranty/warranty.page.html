@@ -44,9 +44,22 @@
               <input
                 matInput
                 placeholder="Customer"
+                [matAutocomplete]="address"
                 [(ngModel)]="customer"
-                (keyup.enter)="setFilter()"
               />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #address="matAutocomplete"
+                [displayWith]="getCustomerOption"
+                (optionSelected)="setFilter()"
+              >
+                <mat-option
+                  *ngFor="let option of customerList"
+                  [value]="option"
+                >
+                  {{ option.name }}
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
           </ion-col>
           <ion-col>
@@ -101,20 +114,45 @@
             <mat-form-field class="full-width">
               <input
                 matInput
-                placeholder="Claim Type"
+                type="text"
                 [(ngModel)]="claim_type"
-                (keyup.enter)="setFilter()"
+                placeholder="Claim Type"
+                [matAutocomplete]="claimType"
               />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #claimType="matAutocomplete"
+                [displayWith]="getOption"
+                (optionSelected)="setFilter()"
+              >
+                <mat-option *ngFor="let option of claimList" [value]="option">
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
           </ion-col>
           <ion-col>
             <mat-form-field class="full-width">
               <input
                 matInput
+                type="text"
                 placeholder="Branch"
+                [matAutocomplete]="branch"
                 [(ngModel)]="territory"
-                (keyup.enter)="setFilter()"
+                (optionSelected)="setFilter()"
               />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #branch="matAutocomplete"
+                [displayWith]="getOption"
+              >
+                <mat-option
+                  *ngFor="let option of territoryList"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
           </ion-col>
           <ion-col>

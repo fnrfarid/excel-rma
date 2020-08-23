@@ -16,4 +16,7 @@ export class WarrantyClaimsListQueryDto {
 
   @IsOptional()
   filter_query: string;
+
+  @IsOptional()
+  territories: string;
 }

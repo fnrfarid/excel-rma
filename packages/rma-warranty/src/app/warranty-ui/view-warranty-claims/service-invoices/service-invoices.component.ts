@@ -2,7 +2,10 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
-import { WarrantyClaimsDetails } from 'src/app/common/interfaces/warranty.interface';
+import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DURATION } from '../../../constants/app-string';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'service-invoices',
@@ -25,10 +28,13 @@ export class ServiceInvoicesComponent implements OnInit {
     'branch',
     'created_by',
     'submitted_by',
+    'submit',
   ];
   constructor(
     private readonly router: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
+    private readonly snackbar: MatSnackBar,
+    private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
@@ -44,5 +50,27 @@ export class ServiceInvoicesComponent implements OnInit {
       event.pageIndex,
       event.pageSize,
     );
+  }
+
+  async submitInvoice(row) {
+    const loading = await this.loadingController.create();
+    await loading.present();
+    row.status = 'Paid';
+    row.docstatus = 1;
+    this.serviceInvoice.submitInvoice(row).subscribe({
+      next: () => {
+        loading.dismiss();
+        this.snackbar.open('Invoice Submitted Sucessfully', 'Close', {
+          duration: DURATION,
+        });
+      },
+      error: ({ message }) => {
+        loading.dismiss();
+        if (!message) message = 'Failed to Submit Service Invoice';
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
   }
 }

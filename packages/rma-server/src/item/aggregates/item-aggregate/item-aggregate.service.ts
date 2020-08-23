@@ -18,6 +18,18 @@ export class ItemAggregateService extends AggregateRoot {
     return item;
   }
 
+  async updateItemHasSerialNo(has_serial_no: number, item_name: string) {
+    const item = await this.itemService.findOne({ item_name });
+    if (!item) {
+      throw new NotFoundException(ITEM_NOT_FOUND);
+    } else {
+      return await this.itemService.updateOne(
+        { item_name },
+        { $set: { has_serial_no } },
+      );
+    }
+  }
+
   async getItemList(offset, limit, sort, filterQuery, clientHttpRequest) {
     return this.itemService.list(offset, limit, sort, filterQuery);
   }

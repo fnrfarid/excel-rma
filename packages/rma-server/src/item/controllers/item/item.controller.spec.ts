@@ -3,6 +3,7 @@ import { ItemController } from './item.controller';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { RoleGuard } from '../../../auth/guards/role.guard';
+import { ItemAggregateService } from '../../aggregates/item-aggregate/item-aggregate.service';
 
 describe('Item Controller', () => {
   let controller: ItemController;
@@ -13,6 +14,7 @@ describe('Item Controller', () => {
       providers: [
         { provide: QueryBus, useValue: {} },
         { provide: CommandBus, useValue: {} },
+        { provide: ItemAggregateService, useValue: {} },
       ],
     })
       .overrideGuard(TokenGuard)

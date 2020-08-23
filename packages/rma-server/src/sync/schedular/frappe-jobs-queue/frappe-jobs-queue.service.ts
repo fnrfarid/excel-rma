@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
+import { Injectable, OnModuleInit, Inject, Logger } from '@nestjs/common';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import {
@@ -11,6 +11,8 @@ import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 import { AgendaJob } from '../../entities/agenda-job/agenda-job.entity';
 import { StockEntrySyncService } from '../../../stock-entry/schedular/stock-entry-sync/stock-entry-sync.service';
+import { AGENDA_JOBS_CONCURRENCY } from '../../../config/config.service';
+import { AGENDA_JOBS_CONCURRENCY_MESSAGE } from '../../../constants/messages';
 
 @Injectable()
 export class FrappeJobService implements OnModuleInit {
@@ -25,9 +27,14 @@ export class FrappeJobService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    Logger.log(
+      AGENDA_JOBS_CONCURRENCY_MESSAGE + process.env[AGENDA_JOBS_CONCURRENCY] ||
+        '3',
+      AGENDA_JOBS_CONCURRENCY,
+    );
     this.agenda.define(
       FRAPPE_QUEUE_JOB,
-      { concurrency: 1 },
+      { concurrency: Number(process.env[AGENDA_JOBS_CONCURRENCY]) || 3 },
       async (job: any, done) => {
         // Please note done callback will work only when concurrency is provided.
         this[job.attrs.data.type]

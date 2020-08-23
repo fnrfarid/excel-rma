@@ -141,6 +141,10 @@ export class DeliveryNoteItemsDto {
   @IsOptional()
   description: string;
 
+  @IsString()
+  @IsOptional()
+  serial_no: string;
+
   @IsNumber()
   @IsOptional()
   is_nil_exempt: number;

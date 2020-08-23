@@ -106,4 +106,32 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
     const update = Object.assign(provider, updatePayload);
     this.apply(new ServiceInvoiceUpdatedEvent(update));
   }
+
+  submitInvoice(payload: UpdateServiceInvoiceDto, clientHttpRequest) {
+    return this.settings.find().pipe(
+      switchMap(setting => {
+        if (!setting.authServerURL) {
+          return throwError(new NotImplementedException());
+        }
+        const url = `${setting.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${payload.invoice_no}`;
+        const body = payload;
+        return this.http.put<any>(url, body, {
+          headers: this.settings.getAuthorizationHeaders(
+            clientHttpRequest.token,
+          ),
+        });
+      }),
+      map(res => res.data),
+      switchMap(res => {
+        return from(
+          this.serviceInvoiceService.updateOne(
+            {
+              uuid: payload.uuid,
+            },
+            { $set: { docstatus: payload.docstatus, status: payload.status } },
+          ),
+        );
+      }),
+    );
+  }
 }

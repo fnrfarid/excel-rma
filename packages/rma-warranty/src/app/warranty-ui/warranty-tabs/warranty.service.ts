@@ -11,6 +11,7 @@ import { StorageService } from '../../api/storage/storage.service';
 import {
   LIST_WARRANTY_INVOICE_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
+  CUSTOMER_ENDPOINT,
 } from '../../constants/url-strings';
 import { APIResponse } from '../../common/interfaces/sales.interface';
 @Injectable({
@@ -45,10 +46,15 @@ export class WarrantyService {
       }),
     );
   }
-  getWarrantyClaimsList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+  getWarrantyClaimsList(
+    sortOrder,
+    pageNumber = 0,
+    pageSize = 10,
+    query,
+    territory,
+  ) {
     if (!sortOrder) sortOrder = { createdOn: 'desc' };
     if (!query) query = {};
-
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch (error) {
@@ -59,7 +65,8 @@ export class WarrantyService {
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
       .set('sort', sortOrder)
-      .set('filter_query', JSON.stringify(query));
+      .set('filter_query', JSON.stringify(query))
+      .set('territories', JSON.stringify(territory));
 
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -88,6 +95,16 @@ export class WarrantyService {
           [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
         };
       }),
+    );
+  }
+
+  getAddressList() {
+    const url = CUSTOMER_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
     );
   }
 

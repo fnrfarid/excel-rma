@@ -23,7 +23,7 @@ export class SerialsService {
     const data: any[] = _.range(start, end + 1);
     let i = 0;
     for (const value of data) {
-      if (value) {
+      if (value !== undefined) {
         data[i] = `${prefix}${this.getPaddedNumber(value, serialPadding)}`;
         i++;
       }

@@ -11,6 +11,7 @@ export interface ListingData {
   item_name?: string;
   price?: number;
   selling_price?: number;
+  has_serial_no: number;
   purchaseWarrantyMonths?: number;
   salesWarrantyMonths?: number;
 }

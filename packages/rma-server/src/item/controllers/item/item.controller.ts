@@ -24,12 +24,14 @@ import { RetrieveItemByNamesQuery } from '../../query/get-item-by-names/retrieve
 import { INVALID_ITEM_NAME_QUERY } from '../../../constants/messages';
 import { SetWarrantyMonthsCommand } from '../../commands/set-purchase-warranty-days/set-purchase-warranty-days.command';
 import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
+import { ItemAggregateService } from '../../aggregates/item-aggregate/item-aggregate.service';
 
 @Controller('item')
 export class ItemController {
   constructor(
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
+    private readonly aggregate: ItemAggregateService,
   ) {}
 
   @Get('v1/get/:uuid')
@@ -82,6 +84,21 @@ export class ItemController {
     return await this.commandBus.execute(
       new SetMinimumItemPriceCommand(uuid, minimumPrice),
     );
+  }
+
+  @Roles(SYSTEM_MANAGER)
+  @Post('v1/update_has_serial')
+  @UseGuards(TokenGuard, RoleGuard)
+  async updateItemHasSerialNo(
+    @Body('has_serial_no') has_serial_no,
+    @Body('item_name') item_name,
+  ) {
+    if (![0, 1].includes(has_serial_no)) {
+      throw new BadRequestException(
+        'Has serial number should be either 1 or 0',
+      );
+    }
+    return await this.aggregate.updateItemHasSerialNo(has_serial_no, item_name);
   }
 
   @Roles(SYSTEM_MANAGER)

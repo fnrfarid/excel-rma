@@ -32,6 +32,7 @@ describe('ServiceInvoicesComponent', () => {
           provide: AddServiceInvoiceService,
           useValue: {
             getServiceInvoiceList: (...args) => of([{}]),
+            submitInvoice: (...args) => of({}),
           },
         },
         {

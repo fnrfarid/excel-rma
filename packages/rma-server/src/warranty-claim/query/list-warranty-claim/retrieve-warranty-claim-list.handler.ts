@@ -7,12 +7,13 @@ export class RetrieveWarrantyClaimListQueryHandler
   implements IQueryHandler<RetrieveWarrantyClaimListQuery> {
   constructor(private readonly manager: WarrantyClaimAggregateService) {}
   async execute(query: RetrieveWarrantyClaimListQuery) {
-    const { offset, limit, sort, filter_query, req } = query;
+    const { offset, limit, sort, filter_query, territory, req } = query;
     return await this.manager.getWarrantyClaimList(
       Number(offset),
       Number(limit),
       sort,
       filter_query,
+      territory,
       req,
     );
   }
