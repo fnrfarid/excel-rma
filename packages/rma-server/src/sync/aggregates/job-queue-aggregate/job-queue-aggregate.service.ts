@@ -189,7 +189,15 @@ export class JobQueueAggregateService {
       .pipe(
         switchMap(job => {
           if (!job) {
-            return throwError('Parent job dose not exists.');
+            let webhook_data = '';
+            try {
+              webhook_data = JSON.stringify(payload);
+            } catch {
+              webhook_data = JSON.stringify({
+                name: payload.name,
+              });
+            }
+            return throwError('Parent job dose not exists. : ' + webhook_data);
           }
           return of({}).pipe(
             switchMap(object => {
