@@ -38,6 +38,12 @@ export class JobQueueController {
     return this.aggregate.resetJob(jobId);
   }
 
+  @Post('v1/resync')
+  @UseGuards(TokenGuard)
+  resyncJob(@Body('jobId') jobId: string, @Req() req) {
+    return this.aggregate.syncJob(jobId, req);
+  }
+
   @Get('v1/get_exported_job/:jobId')
   @UseGuards(TokenGuard)
   async retrieve(@Param('jobId') jobId: string) {
