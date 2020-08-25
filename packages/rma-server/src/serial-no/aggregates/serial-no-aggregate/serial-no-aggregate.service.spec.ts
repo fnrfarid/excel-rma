@@ -8,6 +8,7 @@ import { AssignSerialNoPoliciesService } from '../../policies/assign-serial-no-p
 import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
+import { SerialNoHistoryService } from '../../entity/serial-no-history/serial-no-history.service';
 
 describe('SerialNoAggregateService', () => {
   let service: SerialNoAggregateService;
@@ -48,6 +49,7 @@ describe('SerialNoAggregateService', () => {
           provide: SalesInvoiceService,
           useValue: {},
         },
+        { provide: SerialNoHistoryService, useValue: {} },
       ],
     }).compile();
 

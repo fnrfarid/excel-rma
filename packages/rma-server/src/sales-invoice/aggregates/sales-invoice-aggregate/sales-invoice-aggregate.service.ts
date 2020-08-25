@@ -27,6 +27,7 @@ import {
   DRAFT_STATUS,
   DEFAULT_NAMING_SERIES,
   SYSTEM_MANAGER,
+  UNSET,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -48,6 +49,8 @@ import { DateTime } from 'luxon';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -58,6 +61,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly serialNoService: SerialNoService,
     private readonly errorLogService: ErrorLogService,
     private readonly clientToken: ClientTokenManagerService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {
     super();
   }
@@ -453,7 +457,23 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           },
         },
       )
-      .then(success => {})
+      .then(success => {
+        return this.serialNoHistoryService.insertMany(
+          serials.map(serial => {
+            return {
+              serial_no: serial,
+              eventType: EventType.UpdateSerial,
+              eventDate: new Date(),
+              customer: UNSET,
+              'warranty.salesWarrantyDate': UNSET,
+              'warranty.soldOn': UNSET,
+              delivery_note: UNSET,
+              sales_invoice_name: UNSET,
+            };
+          }),
+        );
+      })
+      .then(updated => {})
       .catch(error => {});
 
     this.salesInvoiceService
