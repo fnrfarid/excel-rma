@@ -11,6 +11,7 @@ import {
   SYNC_DELIVERY_NOTE_JOB,
   DEFAULT_NAMING_SERIES,
   DEFAULT_CURRENCY,
+  UNSET,
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
@@ -37,6 +38,8 @@ import {
   CSV_TEMPLATE,
 } from '../../../sync/assets/data_import_template';
 import { DataImportSuccessResponse } from '../../../sync/entities/agenda-job/agenda-job.entity';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()
@@ -51,6 +54,7 @@ export class DeliveryNoteJobService {
     private readonly jobHelper: DeliveryNoteJobHelperService,
     private readonly csvService: JsonToCSVParserService,
     private readonly importData: DataImportService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {}
 
   execute(job) {
@@ -104,7 +108,24 @@ export class DeliveryNoteJobService {
           },
         },
       )
-      .then(success => {})
+      .then(success => {
+        return this.serialNoHistoryService.insertMany(
+          serials.map(serial => {
+            return {
+              serial_no: serial,
+              eventType: EventType.UpdateSerial,
+              eventDate: new Date(),
+              queue_state: {
+                delivery_note: {
+                  parent: UNSET,
+                  warehouse: UNSET,
+                },
+              },
+            };
+          }),
+        );
+      })
+      .then(updated => {})
       .catch(err => {});
 
     return of(true);
@@ -242,14 +263,15 @@ export class DeliveryNoteJobService {
     const items = [];
     payload.items.forEach(item => {
       if (item.has_serial_no) {
+        const serialArray =
+          typeof item.serial_no === 'string'
+            ? item.serial_no.split('\n')
+            : item.serial_no;
         this.serialNoService
           .updateMany(
             {
               serial_no: {
-                $in:
-                  typeof item.serial_no === 'string'
-                    ? item.serial_no.split('\n')
-                    : item.serial_no,
+                $in: serialArray,
               },
             },
             {
@@ -266,7 +288,24 @@ export class DeliveryNoteJobService {
               },
             },
           )
-          .then(success => {})
+          .then(success => {
+            return this.serialNoHistoryService.insertMany(
+              serialArray.map(serial => {
+                return {
+                  serial_no: serial,
+                  eventType: EventType.UpdateSerial,
+                  eventDate: new Date(),
+                  queue_state: {
+                    delivery_note: {
+                      parent: UNSET,
+                      warehouse: UNSET,
+                    },
+                  },
+                };
+              }),
+            );
+          })
+          .then(updated => {})
           .catch(err => {});
       }
     });
