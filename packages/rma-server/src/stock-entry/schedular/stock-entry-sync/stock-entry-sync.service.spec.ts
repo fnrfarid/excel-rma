@@ -7,6 +7,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { StockEntrySyncService } from './stock-entry-sync.service';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 describe('StockEntryJobService', () => {
   let service: StockEntrySyncService;
@@ -40,6 +41,7 @@ describe('StockEntryJobService', () => {
           provide: SerialNoService,
           useValue: {},
         },
+        { provide: SerialNoHistoryService, useValue: {} },
       ],
     }).compile();
 

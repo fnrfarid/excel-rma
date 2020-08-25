@@ -8,6 +8,7 @@ import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchas
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { DataImportService } from '../../../sync/aggregates/data-import/data-import.service';
 import { JsonToCSVParserService } from '../../../sync/entities/agenda-job/json-to-csv-parser.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 describe('PurchaseReceiptSyncService', () => {
   let service: PurchaseReceiptSyncService;
@@ -43,6 +44,10 @@ describe('PurchaseReceiptSyncService', () => {
         },
         {
           provide: JsonToCSVParserService,
+          useValue: {},
+        },
+        {
+          provide: SerialNoHistoryService,
           useValue: {},
         },
       ],

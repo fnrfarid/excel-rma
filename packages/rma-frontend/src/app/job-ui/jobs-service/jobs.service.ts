@@ -6,6 +6,7 @@ import {
   JOB_QUEUE_RETRY_ENDPOINT,
   JOB_QUEUE_RESET_ENDPOINT,
   GET_EXPORTED_JOB_ENDPOINT,
+  JOB_QUEUE_RESYNC_ENDPOINT,
 } from '../../constants/url-strings';
 import { switchMap, map } from 'rxjs/operators';
 import {
@@ -59,6 +60,20 @@ export class JobsService {
       switchMap(headers => {
         return this.http.post(
           JOB_QUEUE_RETRY_ENDPOINT,
+          { jobId },
+          {
+            headers,
+          },
+        );
+      }),
+    );
+  }
+
+  syncJob(jobId) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          JOB_QUEUE_RESYNC_ENDPOINT,
           { jobId },
           {
             headers,

@@ -18,6 +18,7 @@ export class JobData {
   exported?: boolean;
   status?: string;
   lastError?: any;
+  dataImport?: DataImportSuccessResponse;
 }
 
 @Entity({ name: 'agendaJobs' })
@@ -54,9 +55,6 @@ export class AgendaJob {
 
   @Column()
   repeatInterval: string;
-
-  @Column()
-  dataImport?: DataImportSuccessResponse;
 
   @Column()
   repeatTimezone: string;

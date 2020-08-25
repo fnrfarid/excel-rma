@@ -9,6 +9,8 @@ import { of, throwError, from } from 'rxjs';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 export const ACCEPT_STOCK_ENTRY_JOB = 'ACCEPT_STOCK_ENTRY_JOB';
@@ -22,6 +24,7 @@ export class StockEntrySyncService {
     private readonly serialNoService: SerialNoService,
     private readonly stockEntryService: StockEntryService,
     private readonly jobService: AgendaJobService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {}
 
   execute(job) {
@@ -140,6 +143,23 @@ export class StockEntrySyncService {
         { serial_no: { $in: serials } },
         { $set: { warehouse } },
       ),
+    ).pipe(
+      map(success => {
+        this.serialNoHistoryService
+          .insertMany(
+            serials.map(serial => {
+              return {
+                serial_no: serial,
+                eventType: EventType.UpdateSerial,
+                eventDate: new Date(),
+                warehouse,
+              };
+            }),
+          )
+          .then(updated => {})
+          .catch(error => {});
+        return success;
+      }),
     );
   }
 
