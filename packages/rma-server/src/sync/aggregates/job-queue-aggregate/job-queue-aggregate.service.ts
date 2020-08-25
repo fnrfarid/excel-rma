@@ -17,7 +17,7 @@ import {
   DELIVERY_NOTE_DOCTYPE_NAMES,
 } from '../../../constants/app-strings';
 import { from, throwError, of } from 'rxjs';
-import { switchMap, map, catchError, retry } from 'rxjs/operators';
+import { switchMap, map, catchError, retry, delay } from 'rxjs/operators';
 import { FrappeJobService } from '../../schedular/frappe-jobs-queue/frappe-jobs-queue.service';
 import { PurchaseReceiptSyncService } from '../../../purchase-receipt/schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { ExcelDataImportWebhookDto } from '../../../constants/listing-dto/job-queue-list-query.dto';
@@ -28,6 +28,8 @@ import {
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { PURCHASE_RECEIPT_DOCTYPE_NAMES } from '../../../constants/app-strings';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { LEGACY_DATA_IMPORT_API_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class JobQueueAggregateService {
@@ -38,6 +40,7 @@ export class JobQueueAggregateService {
   constructor(
     @Inject(AGENDA_TOKEN)
     private readonly agenda: Agenda,
+    private readonly settingService: SettingsService,
     private readonly jobService: AgendaJobService,
     private readonly frappeQueueService: FrappeJobService,
     private readonly tokenService: DirectService,
@@ -125,6 +128,46 @@ export class JobQueueAggregateService {
     );
   }
 
+  syncJob(jobId, clientHttpReq) {
+    return from(
+      this.jobService.findOne({
+        where: { _id: new ObjectId(jobId) },
+        select: ['_id', 'data.dataImport'],
+      }),
+    ).pipe(
+      switchMap(job => {
+        if (
+          !job ||
+          !job.data ||
+          !job.data.dataImport ||
+          !job.data.dataImport.dataImportName
+        ) {
+          return throwError(
+            new BadRequestException(
+              'Error occurred in fetching dataImport please try again after some time.',
+            ),
+          );
+        }
+        return this.settingService.find().pipe(
+          switchMap(settings => {
+            const headers = {};
+            headers[AUTHORIZATION] =
+              BEARER_HEADER_VALUE_PREFIX + clientHttpReq.token.accessToken;
+            return this.http.get(
+              settings.authServerURL +
+                `${LEGACY_DATA_IMPORT_API_ENDPOINT}/${job.data.dataImport.dataImportName}`,
+              { headers },
+            );
+          }),
+          map(data => data.data.data),
+          switchMap((dataImport: any) => {
+            return this.jobUpdated(dataImport, true);
+          }),
+        );
+      }),
+    );
+  }
+
   async create(jobId: string) {
     const _id = new ObjectId(jobId);
     const job = await this.jobService.findOne({ _id });
@@ -151,9 +194,17 @@ export class JobQueueAggregateService {
     return job;
   }
 
-  jobUpdated(payload: ExcelDataImportWebhookDto) {
-    if (!payload || !payload.import_status) {
-      return of(true);
+  jobUpdated(payload: ExcelDataImportWebhookDto, messages?) {
+    if (
+      !payload ||
+      !payload.import_status ||
+      payload.import_status === 'In Progress'
+    ) {
+      return of(
+        messages
+          ? { message: 'Job still in queue, try again after some time.' }
+          : true,
+      );
     }
     if (payload.import_status === AGENDA_JOB_STATUS.success) {
       const parsed_response = JSON.parse(payload.log_details);
@@ -161,8 +212,16 @@ export class JobQueueAggregateService {
       const doctype = link[link.length - 2];
       const doctype_name = link[link.length - 1];
       this.syncUpdatedJob(payload, doctype_name, doctype);
-      return of(true);
+      return of(
+        messages
+          ? {
+              message:
+                'Job succeeded, serials and related data will be synced.',
+            }
+          : true,
+      );
     }
+
     return from(
       this.jobService.updateOne(
         { 'data.dataImport.dataImportName': payload.name },
@@ -173,10 +232,58 @@ export class JobQueueAggregateService {
           },
         },
       ),
+    ).pipe(
+      switchMap(success => {
+        return of(
+          messages
+            ? {
+                message:
+                  'Job found to be In Progress or Failed, please wait or consider requeue or reset in case of deadlock.',
+              }
+            : true,
+        );
+      }),
+    );
+  }
+
+  validatedUpdatedJob(payload: ExcelDataImportWebhookDto) {
+    return of({}).pipe(
+      switchMap(obj => {
+        return from(
+          this.jobService.findOne({
+            where: { 'data.dataImport.dataImportName': payload.name },
+            select: ['_id'],
+          }),
+        );
+      }),
+      delay(1337),
+      switchMap(job => {
+        return job ? of(true) : throwError(new BadRequestException());
+      }),
+      retry(3),
+      catchError(err => of(false)),
     );
   }
 
   syncUpdatedJob(
+    payload: ExcelDataImportWebhookDto,
+    doctype_name: string,
+    doctype: string,
+  ) {
+    return this.validatedUpdatedJob(payload)
+      .pipe(
+        switchMap(isValid => {
+          isValid ? this.syncJobData(payload, doctype_name, doctype) : null;
+          return of(true);
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
+  }
+
+  syncJobData(
     payload: ExcelDataImportWebhookDto,
     doctype_name: string,
     doctype: string,
