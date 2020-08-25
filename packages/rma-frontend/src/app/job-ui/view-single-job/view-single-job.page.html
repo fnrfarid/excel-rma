@@ -5,7 +5,7 @@
       <ion-grid fixed>
             <ion-row>
               <ion-col >
-                Status : <ion-text color="primary"> {{ exportedJob?.data?.status || data?.data?.status }} </ion-text>
+                Status : <ion-text color="primary"> {{ data?.data?.status }} </ion-text>
               </ion-col>
               <ion-col *ngIf="state.reset">
                 <ion-buttons>
@@ -17,7 +17,7 @@
             </ion-row>
             <ion-row>
               <ion-col >
-                Parent : <ion-text color="primary"> {{ exportedJob?.data?.parent || data?.data?.parent}} </ion-text>
+                Parent : <ion-text color="primary"> {{ data?.data?.parent}} </ion-text>
               </ion-col>
               <ion-col *ngIf="state.retry">
                 <ion-buttons  >
