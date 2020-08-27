@@ -37,8 +37,6 @@ import {
   getItemAfterInsertWebhookData,
   getItemOnUpdateWebhookData,
   getItemOnTrashWebhookData,
-  getSerialNoAfterInsertWebhookData,
-  getSerialNoUpdateWebhookData,
   deliveryNoteOnUpdateWebhookData,
   deliveryNoteOnTrashWebhookData,
   deliveryNoteNoAfterInsertWebhookData,
@@ -63,8 +61,6 @@ import {
   SUPPLIER_ON_TRASH_ENDPOINT,
   TOKEN_ADD_ENDPOINT,
   TOKEN_DELETE_ENDPOINT,
-  SERIAL_NO_AFTER_INSERT_ENDPOINT,
-  SERIAL_NO_ON_UPDATE_ENDPOINT,
   FRAPPE_API_COMPANY_ENDPOINT,
   SALES_INVOICE_ON_SUBMIT_ENDPOINT,
   FRAPPE_API_GET_GLOBAL_DEFAULTS,
@@ -267,30 +263,7 @@ export class SettingsService extends AggregateRoot {
             )
             .pipe(map(res => res.data)),
 
-          // Serial No Token Webhooks
-
-          this.http
-            .post(
-              serverSettings.authServerURL + '/api/resource/Webhook',
-              getSerialNoAfterInsertWebhookData(
-                serverSettings.appURL + SERIAL_NO_AFTER_INSERT_ENDPOINT,
-                serverSettings.webhookApiKey,
-              ),
-              { headers },
-            )
-            .pipe(map(res => res.data)),
-
-          this.http
-            .post(
-              serverSettings.authServerURL + '/api/resource/Webhook',
-              getSerialNoUpdateWebhookData(
-                serverSettings.appURL + SERIAL_NO_ON_UPDATE_ENDPOINT,
-                serverSettings.webhookApiKey,
-              ),
-              { headers },
-            )
-            .pipe(map(res => res.data)),
-
+          // Delivery Note Webhooks
           this.http
             .post(
               serverSettings.authServerURL + '/api/resource/Webhook',

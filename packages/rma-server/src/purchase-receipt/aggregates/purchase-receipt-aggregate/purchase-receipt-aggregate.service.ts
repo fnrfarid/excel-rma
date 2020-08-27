@@ -47,6 +47,8 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { PurchaseReceiptSyncService } from '../../schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { PurchaseOrderService } from '../../../purchase-order/entity/purchase-order/purchase-order.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -60,6 +62,7 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     private readonly serialNoService: SerialNoService,
     private readonly prSyncService: PurchaseReceiptSyncService,
     private readonly purchaseOrderService: PurchaseOrderService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {
     super();
   }
@@ -185,6 +188,22 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           catchError(err => {
             return this.handleMongoExistingSerialsError(err, data);
           }),
+          map(serial => {
+            this.serialNoHistoryService
+              .insertMany(
+                data.map(item => {
+                  return {
+                    ...item,
+                    eventDate: new Date(),
+                    eventType: EventType.InsertSerial,
+                  };
+                }),
+                { ordered: false },
+              )
+              .then(success => {})
+              .catch(error => {});
+            return serial;
+          }),
         );
       }),
       retry(3),
@@ -234,6 +253,25 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
                 },
               },
             ),
+          ).pipe(
+            map(success => {
+              this.serialNoHistoryService
+                .insertMany(
+                  existingSerialsMap[item_code].serials.map(serial => {
+                    return {
+                      serial_no: serial,
+                      eventType: EventType.UpdateSerial,
+                      eventDate: new Date(),
+                      item_code,
+                      queue_state: existingSerialsMap[item_code].queue_state,
+                      item_name: existingSerialsMap[item_code].item_name,
+                    };
+                  }),
+                )
+                .then(updated => {})
+                .catch(error => {});
+              return success;
+            }),
           );
         }),
       );
@@ -301,20 +339,31 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       if (typeof item.serial_no === 'string') {
         item.serial_no = item.serial_no.split('\n');
       }
-
+      const warrantyPurchasedOn = new DateTime(settings.timeZone).toJSDate();
       this.serialNoService
         .updateMany(
           { serial_no: { $in: item.serial_no } },
           {
             $set: {
               'warranty.purchaseWarrantyDate': item.warranty_date,
-              'warranty.purchasedOn': new DateTime(
-                settings.timeZone,
-              ).toJSDate(),
+              'warranty.purchasedOn': warrantyPurchasedOn,
             },
           },
         )
-        .then(success => {})
+        .then(success => {
+          return this.serialNoHistoryService.insertMany(
+            item.serial_no.map(serial => {
+              return {
+                serial_no: serial,
+                eventType: EventType.UpdateSerial,
+                eventDate: new Date(),
+                'warranty.purchaseWarrantyDate': item.warranty_date,
+                'warranty.purchasedOn': warrantyPurchasedOn,
+              };
+            }),
+          );
+        })
+        .then(updated => {})
         .catch(err => {});
     });
   }
@@ -537,7 +586,21 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
             },
           },
         )
-        .then(success => {})
+        .then(success => {
+          return this.serialNoHistoryService.insertMany(
+            element.serial_no.map(serial => {
+              return {
+                serial_no: serial,
+                eventType: EventType.UpdateSerial,
+                eventDate: new Date(),
+                warehouse: element.warehouse,
+                purchase_document_type: element.purchase_document_type,
+                purchase_document_no: element.purchase_document_no,
+              };
+            }),
+          );
+        })
+        .then(updated => {})
         .catch(error => {});
     });
   }
@@ -652,7 +715,21 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
 
     if (purchaseReceipt) {
       const serials = purchaseReceipt.serial_no || [];
-      await this.serialNoService.deleteMany({ serial_no: { $in: serials } });
+      this.serialNoService
+        .deleteMany({ serial_no: { $in: serials } })
+        .then(success => {
+          return this.serialNoHistoryService.insertMany(
+            serials.map(serial => {
+              return {
+                serial_no: serial,
+                eventType: EventType.DeleteSerial,
+                eventDate: new Date(),
+              };
+            }),
+          );
+        })
+        .then(updated => {})
+        .catch(error => {});
       await this.purchaseReceiptService.updateOne(
         { name: purchaseReceipt.name },
         { $unset: { serial_no: 1 } },

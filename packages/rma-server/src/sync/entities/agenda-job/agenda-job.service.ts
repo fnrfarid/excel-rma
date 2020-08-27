@@ -24,6 +24,10 @@ export class AgendaJobService {
     return await this.agendaJobRepository.findOne(query, options);
   }
 
+  async count(query) {
+    return await this.agendaJobRepository.count(query);
+  }
+
   async updateMany(query, params) {
     return await this.agendaJobRepository.updateMany(query, params);
   }
