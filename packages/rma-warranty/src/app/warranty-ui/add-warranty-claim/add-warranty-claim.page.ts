@@ -245,8 +245,8 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.claim_type = this.warrantyClaimForm.controls.claim_type.value;
     warrantyClaimDetails.received_on = this.warrantyClaimForm.controls.received_on.value;
     warrantyClaimDetails.delivery_date = this.warrantyClaimForm.controls.delivery_date.value;
-    warrantyClaimDetails.receiving_branch = this.warrantyClaimForm.controls.receiving_branch.value.name;
-    warrantyClaimDetails.delivery_branch = this.warrantyClaimForm.controls.delivery_branch.value.name;
+    warrantyClaimDetails.receiving_branch = this.warrantyClaimForm.controls.receiving_branch.value;
+    warrantyClaimDetails.delivery_branch = this.warrantyClaimForm.controls.delivery_branch.value;
     warrantyClaimDetails.product_brand = this.warrantyClaimForm.controls.product_brand.value;
     warrantyClaimDetails.problem = this.warrantyClaimForm.controls.problem.value;
     warrantyClaimDetails.problem_details = this.warrantyClaimForm.controls.problem_details.value;

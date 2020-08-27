@@ -92,42 +92,94 @@ export class AddStockEntryPage implements OnInit {
   }
 
   submitDraft() {
+    if (this.dataSource.data()[0].has_serial_no) {
+      this.mapSerialStockEntry();
+    } else {
+      this.mapNonSerialEntry();
+    }
+  }
+
+  mapSerialStockEntry() {
+    let selectedItem = {} as StockEntryDetails;
+    this.addServiceInvoiceService
+      .getSerialItemFromRMAServer(this.dataSource.data()[0].serial_no[0])
+      .subscribe({
+        next: (res: any) => {
+          selectedItem = this.mapStockData(res);
+          selectedItem.items = [this.dataSource.data()[0]];
+          selectedItem.stock_entry_type = MATERIAL_RECEIPT;
+          this.createReturnDeliveryNote(selectedItem);
+        },
+        error: err => {},
+      });
+  }
+
+  mapNonSerialEntry() {
+    let selectedItem = {} as StockEntryDetails;
     for (let index = 0; index < this.dataSource.data().length; index++) {
-      const selectedItem = {} as StockEntryDetails;
       this.addServiceInvoiceService
-        .getSerialItemFromRMAServer(this.dataSource.data()[0].serial_no[0])
+        .getItemFromRMAServer(this.dataSource.data()[0].item_code)
         .subscribe({
           next: (res: any) => {
-            selectedItem.customer = res?.customer;
-            selectedItem.salesWarrantyDate = res?.warranty?.salesWarrantyDate;
-            selectedItem.delivery_note = res?.delivery_note;
-            selectedItem.sales_invoice_name = res?.sales_invoice_name;
-            selectedItem.company = this.company;
-            selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
-            selectedItem.posting_date = this.stockEntryForm.controls.date.value;
-            selectedItem.type = this.stockEntryForm.controls.type.value;
-            selectedItem.description = this.stockEntryForm.controls.description.value;
+            selectedItem = this.mapStockData(res);
             selectedItem.items = [this.dataSource.data()[index]];
             switch (index) {
               case 0:
                 selectedItem.stock_entry_type = MATERIAL_RECEIPT;
+                this.createStockEntry(selectedItem);
                 break;
               case 1:
                 selectedItem.stock_entry_type = MATERIAL_ISSUE;
+                this.createStockEntry(selectedItem);
                 break;
               default:
                 break;
             }
-            this.createEntry(selectedItem);
           },
           error: err => {},
         });
     }
   }
 
-  createEntry(selectedItem: StockEntryDetails) {
+  mapStockData(res) {
+    const selectedItem = {} as StockEntryDetails;
+    selectedItem.customer = res?.customer;
+    selectedItem.salesWarrantyDate = res?.warranty?.salesWarrantyDate;
+    selectedItem.delivery_note = res?.delivery_note;
+    selectedItem.sales_invoice_name = res?.sales_invoice_name;
+    selectedItem.company = this.company;
+    selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
+    selectedItem.posting_date = this.stockEntryForm.controls.date.value;
+    selectedItem.type = this.stockEntryForm.controls.type.value;
+    selectedItem.description = this.stockEntryForm.controls.description.value;
+    return selectedItem;
+  }
+
+  createStockEntry(selectedItem: StockEntryDetails) {
     this.addServiceInvoiceService.createStockEntry(selectedItem).subscribe({
       next: res => {
+        this.snackbar.open(STOCK_ENTRY_CREATED, 'Close', {
+          duration: DURATION,
+        });
+        this.router.navigate([
+          '/warranty/view-warranty-claims',
+          this.activatedRoute.snapshot.params.uuid,
+        ]);
+      },
+      error: ({ message }) => {
+        if (!message) message = STOCK_ENTRY_CREATE_FAILURE;
+        this.snackbar.open(message, 'Close', {
+          duration: DURATION,
+        });
+      },
+    });
+  }
+
+  createReturnDeliveryNote(selectedItem) {
+    this.addServiceInvoiceService.createStockReturn(selectedItem).subscribe({
+      next: res => {
+        selectedItem.stock_entry_type = MATERIAL_ISSUE;
+        this.createStockEntry(selectedItem);
         this.snackbar.open(STOCK_ENTRY_CREATED, 'Close', {
           duration: DURATION,
         });
@@ -226,6 +278,7 @@ export class AddStockEntryPage implements OnInit {
     this.serialActive = false;
     const itemDataSource = this.dataSource.data();
     itemDataSource.push({
+      has_serial_no: 0,
       item_code: serialItem.item_code,
       item_name: serialItem.item_name,
       qty: 1,
@@ -240,9 +293,10 @@ export class AddStockEntryPage implements OnInit {
     this.serialActive = true;
     const itemDataSource = this.dataSource.data();
     itemDataSource.push({
+      has_serial_no: 1,
       item_code: serialItem.item_code,
       item_name: serialItem.item_name,
-      qty: 1,
+      qty: -1,
       rate: 0,
       s_warehouse: serialItem.warehouse,
       t_warehouse: serialItem.warehouse,

@@ -18,7 +18,10 @@ import * as uuidv4 from 'uuid/v4';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
-import { ERPNEXT_STOCK_ENTRY_ENDPOINT } from '../../../constants/routes';
+import {
+  ERPNEXT_STOCK_ENTRY_ENDPOINT,
+  POST_DELIVERY_NOTE_ENDPOINT,
+} from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
@@ -32,20 +35,16 @@ export class WarrantyStockEntryAggregateService {
     private readonly http: HttpService,
   ) {}
 
-  createStockEntry(payload: WarrantyStockEntryDto, req) {
+  createStockEntry(payload: WarrantyStockEntryDto, res, req) {
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
         return this.settingService.find();
       }),
       switchMap(settings => {
         const stockEntry = this.setStockEntryDefaults(payload, req, settings);
-        return from(this.stockEntryService.create(stockEntry)).pipe(
-          switchMap(success => {
-            payload.docstatus = 1;
-            payload.uuid = stockEntry.uuid;
-            return this.createERPStockEntry(payload, req);
-          }),
-        );
+        stockEntry.stock_voucher_number = res.name;
+        stockEntry.status = STOCK_ENTRY_STATUS.delivered;
+        return from(this.stockEntryService.create(stockEntry));
       }),
     );
   }
@@ -66,16 +65,10 @@ export class WarrantyStockEntryAggregateService {
       }),
       map(res => res.data.data),
       switchMap(res => {
-        this.updateSerialItem(res.items, payload, setting);
-        return this.stockEntryService.updateOne(
-          { uuid: payload.uuid },
-          {
-            $set: {
-              stock_voucher_number: res.name,
-              status: STOCK_ENTRY_STATUS.delivered,
-            },
-          },
-        );
+        return this.createStockEntry(payload, res, req);
+      }),
+      switchMap(() => {
+        return this.updateSerialItem(payload.items, payload, setting);
       }),
       catchError(err => {
         if (err.response && err.response.data) {
@@ -98,9 +91,10 @@ export class WarrantyStockEntryAggregateService {
         },
       },
     );
-    return of().subscribe({ next: nxt => {} });
+    return of();
   }
   mapWarrantyStock(payload) {
+    payload.docstatus = 1;
     payload.items.forEach(item => {
       item.serial_no = item.serial_no[0];
     });
@@ -162,5 +156,64 @@ export class WarrantyStockEntryAggregateService {
         });
       }),
     );
+  }
+
+  returnStock(payload, clientHttpRequest) {
+    const delivery_note = payload.delivery_note;
+    let set;
+    return this.settingService.find().pipe(
+      switchMap(setting => {
+        if (!setting.authServerURL) {
+          return throwError(new NotImplementedException());
+        }
+        set = setting;
+        return this.http.get(
+          `${setting.authServerURL}/${POST_DELIVERY_NOTE_ENDPOINT}/${delivery_note}`,
+          {
+            headers: this.settingService.getAuthorizationHeaders(
+              clientHttpRequest.token,
+            ),
+          },
+        );
+      }),
+      map(res => res.data.data),
+      switchMap(res => {
+        const body = this.mapDeliveryNote(payload, res);
+        return this.http.post(
+          `${set.authServerURL}/${POST_DELIVERY_NOTE_ENDPOINT}`,
+          body,
+          {
+            headers: this.settingService.getAuthorizationHeaders(
+              clientHttpRequest.token,
+            ),
+          },
+        );
+      }),
+      switchMap(() => {
+        return this.serialService.updateOne(
+          { serial_no: payload.items[0].serial_no[0] },
+          {
+            $unset: {
+              customer: undefined,
+              'warranty.salesWarrantyDate': undefined,
+              'warranty.soldOn': undefined,
+              delivery_note: undefined,
+              sales_invoice_name: undefined,
+            },
+          },
+        );
+      }),
+    );
+  }
+
+  mapDeliveryNote(payload, res) {
+    res.is_return = 1;
+    res.docstatus = 1;
+    res.return_against = res.name;
+    res.items = [];
+    res.items[0] = payload.items[0];
+    res.items[0].serial_no = payload.items[0].serial_no[0];
+    res.items[0].stock_qty = payload.items[0].qty;
+    return res;
   }
 }
