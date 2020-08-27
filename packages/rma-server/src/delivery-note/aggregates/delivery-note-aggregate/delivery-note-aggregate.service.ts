@@ -48,6 +48,8 @@ import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { DeliveryNotePoliciesService } from '../../policies/delivery-note-policies/delivery-note-policies.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 
 @Injectable()
 export class DeliveryNoteAggregateService extends AggregateRoot {
@@ -61,6 +63,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     private readonly deliveryNoteJobService: DeliveryNoteJobService,
     private readonly serialNoService: SerialNoService,
     private readonly deliveryNotePolicyService: DeliveryNotePoliciesService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {
     super();
   }
@@ -263,7 +266,24 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
           },
         },
       )
-      .then(success => {})
+      .then(success => {
+        return this.serialNoHistoryService.insertMany(
+          serials.map(serial => {
+            return {
+              serial_no: serial,
+              eventType: EventType.UpdateSerial,
+              eventDate: new Date(),
+              queue_state: {
+                delivery_note: {
+                  parent: assignPayload.sales_invoice_name,
+                  warehouse: assignPayload.set_warehouse,
+                },
+              },
+            };
+          }),
+        );
+      })
+      .then(updated => {})
       .catch(error => {});
   }
 

@@ -41,6 +41,11 @@ import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { SERIAL_NO_NOT_FOUND } from '../../../constants/messages';
+import { SerialNoHistoryService } from '../../entity/serial-no-history/serial-no-history.service';
+import {
+  SerialNoHistory,
+  EventType,
+} from '../../entity/serial-no-history/serial-no-history.entity';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -52,6 +57,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
     private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
     private readonly errorLogService: ErrorLogService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {
     super();
   }
@@ -207,7 +213,15 @@ export class SerialNoAggregateService extends AggregateRoot {
                 },
               },
             )
-            .then(success => {})
+            .then(success => {
+              return this.serialNoHistoryService.create({
+                ...serialNo,
+                uuid: uuidv4(),
+                eventDate: new Date(),
+                eventType: EventType.UpdateSerial,
+              } as SerialNoHistory);
+            })
+            .then(updated => {})
             .catch(error => {});
         },
         error: err => {

@@ -8,7 +8,6 @@ import {
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { switchMap, map, catchError } from 'rxjs/operators';
-import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { from, throwError, of } from 'rxjs';
 import {
   STOCK_ENTRY,
@@ -24,6 +23,12 @@ import {
 } from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import {
+  EventType,
+  SerialNoHistory,
+} from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -33,7 +38,8 @@ export class WarrantyStockEntryAggregateService {
     private readonly settingService: SettingsService,
     private readonly serialService: SerialNoService,
     private readonly http: HttpService,
-  ) {}
+    private readonly serialNoHistoryService: SerialNoHistoryService,
+  ) { }
 
   createStockEntry(payload: WarrantyStockEntryDto, res, req) {
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
@@ -80,18 +86,28 @@ export class WarrantyStockEntryAggregateService {
   }
 
   updateSerialItem(items: any[], payload, settings) {
-    this.serialService.updateOne(
-      { serial_no: items[0].serial_no },
-      {
-        $set: {
-          customer: payload.customer,
-          'warranty.salesWarrantyDate': payload.salesWarrantyDate,
-          'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
-          sales_invoice_name: payload.sales_invoice_name,
+    this.serialService
+      .updateOne(
+        { serial_no: items[0].serial_no },
+        {
+          $set: {
+            customer: payload.customer,
+            'warranty.salesWarrantyDate': payload.salesWarrantyDate,
+            'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
+            sales_invoice_name: payload.sales_invoice_name,
+          },
         },
-      },
-    );
-    return of();
+      )
+      .then(success => {
+        return this.serialNoHistoryService.create({
+          ...items[0],
+          eventDate: new Date(),
+          eventType: EventType.UpdateSerial,
+        } as SerialNoHistory);
+      })
+      .then(updated => { })
+      .catch(error => { });
+    return of()
   }
   mapWarrantyStock(payload) {
     payload.docstatus = 1;

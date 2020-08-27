@@ -15,7 +15,7 @@ services:
     links:
       - rma-server
 
-rma-warranty:
+  rma-warranty:
     image: registry.gitlab.com/castlecraft/excel-rma/rma-warranty:latest
     restart: on-failure
     environment:

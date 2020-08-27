@@ -220,3 +220,4 @@ export const DELIVERY_NOTE_DOCTYPE_NAMES = [
   DELIVERY_NOTE_DOCTYPE,
   'Delivery%20Note',
 ];
+export const UNSET = 'UNSET';
