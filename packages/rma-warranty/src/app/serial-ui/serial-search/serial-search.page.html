@@ -192,7 +192,7 @@
 
         <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
 
-        <mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/serial-info',row.serial_no]"></mat-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" [routerLink]="['/serial-info',row.serial_no,row]"></mat-row>
         <mat-footer-row class="footer" *matFooterRowDef="displayedColumns; sticky: true"></mat-footer-row>
       </table>
 
