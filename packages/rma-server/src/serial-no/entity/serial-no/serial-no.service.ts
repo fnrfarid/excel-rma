@@ -26,32 +26,54 @@ export class SerialNoService {
     return await this.serialNoRepository.findOne(param, options);
   }
 
-  async list(skip, take, search, sort) {
-    const nameExp = new RegExp(search, 'i');
-    const columns = this.serialNoRepository.manager.connection
-      .getMetadata(SerialNo)
-      .ownColumns.map(column => column.propertyName);
+  async list(skip, take, sort, filterQuery) {
+    let order: unknown;
 
-    const $or = columns.map(field => {
-      const filter = {};
-      filter[field] = nameExp;
-      return filter;
-    });
-    const $and: any[] = [{ $or }];
+    try {
+      order = JSON.parse(sort);
+    } catch (error) {
+      order = { serial_no: 'asc' };
+    }
 
-    const where: { $and: any } = { $and };
+    if (Object.keys(order).length === 0) {
+      order = { serial_no: 'asc' };
+    }
 
-    const results = await this.serialNoRepository.find({
+    for (const key of Object.keys(order)) {
+      order[key] = order[key].toUpperCase();
+    }
+
+    try {
+      filterQuery = JSON.parse(filterQuery);
+    } catch (error) {
+      filterQuery = {};
+    }
+
+    const $and: unknown[] = [
+      filterQuery ? this.getFilterQuery(filterQuery) : {},
+    ];
+
+    const where: { $and: unknown[] } = { $and };
+    const results = await this.serialNoRepository.findAndCount({
       skip,
       take,
       where,
+      order,
     });
 
     return {
-      docs: results || [],
-      length: await this.serialNoRepository.count(where),
+      docs: results[0] || [],
+      length: results[1],
       offset: skip,
     };
+  }
+
+  getFilterQuery(query: unknown) {
+    const keys = Object.keys(query);
+    keys.forEach(key => {
+      query[key] = new RegExp(query[key], 'i');
+    });
+    return query;
   }
 
   async listPurchasedSerial(purchase_invoice_name, skip, take, search = '') {
