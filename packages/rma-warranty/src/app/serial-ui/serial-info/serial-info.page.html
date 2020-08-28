@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Serial Information</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Serial Details</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid class="ion-no-padding">
+        <form [formGroup]="serialInfoForm">
+          <ion-row>
+            <ion-col>
+              <ion-item lines="none">
+                <ion-label position="floating">Serial Number</ion-label>
+                <ion-input
+                  placeholder="Serial Number"
+                  readonly="true"
+                  type="string"
+                  formControlName="serial_no"
+                ></ion-input>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label position="floating">Item Name</ion-label>
+                <ion-input
+                  placeholder="Item Name"
+                  readonly="true"
+                  type="string"
+                  formControlName="item_name"
+                ></ion-input>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label position="floating">Item Code</ion-label>
+                <ion-input
+                  placeholder="Item Code"
+                  readonly="true"
+                  type="string"
+                  formControlName="item_code"
+                ></ion-input>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label position="floating">Warehouse</ion-label>
+                <ion-input
+                  placeholder="Warehouse"
+                  readonly="true"
+                  type="string"
+                  formControlName="warehouse"
+                ></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col>
+              <ion-item lines="none" (click)="viewSupplier()">
+                <ion-label position="floating">Supplier</ion-label>
+                <ion-input
+                  placeholder="Supplier"
+                  readonly="true"
+                  type="string"
+                  formControlName="supplier"
+                ></ion-input>
+              </ion-item>
+              <ion-item lines="none" (click)="viewPurchaseReceipt()">
+                <ion-label position="floating">Purchase Receipt</ion-label>
+                <ion-input
+                  placeholder="Purchase Receipt"
+                  readonly="true"
+                  type="string"
+                  formControlName="purchase_document_no"
+                ></ion-input>
+              </ion-item>
+              <ion-item lines="none" (click)="viewCustomer()">
+                <ion-label position="floating">Customer</ion-label>
+                <ion-input
+                  placeholder="Customer"
+                  readonly="true"
+                  type="string"
+                  formControlName="customer"
+                ></ion-input>
+              </ion-item>
+              <ion-item lines="none" (click)="viewDeliveryNote()">
+                <ion-label position="floating">Delivery Note</ion-label>
+                <ion-input
+                  placeholder="Delivery Note"
+                  readonly="true"
+                  type="string"
+                  formControlName="delivery_note"
+                ></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </form>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Serial History</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Coming soon
+    </ion-card-content>
+  </ion-card>
+</ion-content>

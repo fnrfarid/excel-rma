@@ -6,7 +6,6 @@
   },
   "devDependencies": {
     "cypress": "^4.7.0",
-    "lerna": "^3.21.0",
-    "protractor": "^7.0.0"
+    "lerna": "^3.21.0"
   }
 }
