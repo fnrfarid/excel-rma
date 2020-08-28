@@ -43,7 +43,11 @@ export class SerialInfoPage implements OnInit {
 
   ngOnInit() {
     this.serialNo = this.activatedRoute.snapshot.params.serial;
-    this.fetchSerialData();
+    if (this.activatedRoute.snapshot.paramMap.keys.length > 1) {
+      this.loadSerialFromParamMap();
+    } else {
+      this.fetchSerialData();
+    }
   }
 
   fetchSerialData() {
@@ -99,6 +103,24 @@ export class SerialInfoPage implements OnInit {
         },
         error: error => {},
       });
+  }
+
+  loadSerialFromParamMap() {
+    const paramMap = this.activatedRoute.snapshot.paramMap;
+    this.serialInfoForm.controls.serial_no.setValue(paramMap.get('serial_no'));
+    this.serialInfoForm.controls.item_code.setValue(paramMap.get('item_code'));
+    this.serialInfoForm.controls.item_name.setValue(paramMap.get('item_name'));
+    this.serialInfoForm.controls.warehouse.setValue(paramMap.get('warehouse'));
+    this.serialInfoForm.controls.purchase_document_no.setValue(
+      paramMap.get('purchase_document_no'),
+    );
+    this.serialInfoForm.controls.delivery_note.setValue(
+      paramMap.get('delivery_note'),
+    );
+    this.serialInfoForm.controls.customer.setValue(paramMap.get('customer'));
+    this.serialInfoForm.controls.supplier.setValue(paramMap.get('supplier'));
+    this.setViewUrls();
+    this.location.replaceState(`/serial-info/${paramMap.get('serial_no')}`);
   }
 
   navigateBack() {

@@ -72,7 +72,6 @@ export class SerialSearchPage implements OnInit {
 
   ngOnInit() {
     this.dataSource = new SerialSearchDataSource(this.serialSearchService);
-    this.dataSource.loadItems();
   }
 
   getUpdate(event) {
