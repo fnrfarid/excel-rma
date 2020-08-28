@@ -8,7 +8,6 @@ import {
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { switchMap, map, catchError } from 'rxjs/operators';
-import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { from, throwError, of } from 'rxjs';
 import {
   STOCK_ENTRY,
@@ -29,6 +28,7 @@ import {
   SerialNoHistory,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
