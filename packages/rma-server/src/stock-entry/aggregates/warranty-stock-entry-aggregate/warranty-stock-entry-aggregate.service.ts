@@ -39,7 +39,7 @@ export class WarrantyStockEntryAggregateService {
     private readonly serialService: SerialNoService,
     private readonly http: HttpService,
     private readonly serialNoHistoryService: SerialNoHistoryService,
-  ) { }
+  ) {}
 
   createStockEntry(payload: WarrantyStockEntryDto, res, req) {
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
@@ -105,9 +105,9 @@ export class WarrantyStockEntryAggregateService {
           eventType: EventType.UpdateSerial,
         } as SerialNoHistory);
       })
-      .then(updated => { })
-      .catch(error => { });
-    return of()
+      .then(updated => {})
+      .catch(error => {});
+    return of();
   }
   mapWarrantyStock(payload) {
     payload.docstatus = 1;
