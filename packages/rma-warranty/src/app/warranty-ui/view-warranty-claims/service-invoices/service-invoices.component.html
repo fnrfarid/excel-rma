@@ -25,7 +25,7 @@
     <mat-table #table [dataSource]="dataSource" style="width: 100%;">
       <ng-container matColumnDef="invoice_no">
         <mat-header-cell *matHeaderCellDef>Invoice No</mat-header-cell>
-        <mat-cell *matCellDef="let row">
+        <mat-cell *matCellDef="let row" (click)="openERPServiceInvoice(row)">
           <ng-container *ngIf="row.invoice_no">
             {{ row.invoice_no }}
           </ng-container>

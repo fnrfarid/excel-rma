@@ -6,6 +6,7 @@ import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.inter
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DURATION } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
+import { AUTH_SERVER_URL } from '../../../constants/storage';
 
 @Component({
   selector: 'service-invoices',
@@ -72,5 +73,17 @@ export class ServiceInvoicesComponent implements OnInit {
         });
       },
     });
+  }
+
+  openERPServiceInvoice(row) {
+    this.serviceInvoice
+      .getStore()
+      .getItem(AUTH_SERVER_URL)
+      .then(auth_url => {
+        window.open(
+          `${auth_url}/desk#Form/Sales%20Invoice/${row.invoice_no}`,
+          '_blank',
+        );
+      });
   }
 }
