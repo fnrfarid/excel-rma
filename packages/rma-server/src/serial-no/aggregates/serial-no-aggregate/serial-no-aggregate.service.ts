@@ -148,8 +148,8 @@ export class SerialNoAggregateService extends AggregateRoot {
       );
   }
 
-  async getSerialNoList(offset, limit, sort, search, clientHttpRequest) {
-    return this.serialNoService.list(offset, limit, search, sort);
+  async getSerialNoList(offset, limit, sort, filterQuery) {
+    return this.serialNoService.list(offset, limit, sort, filterQuery);
   }
 
   async removeSerialNo(uuid: string) {

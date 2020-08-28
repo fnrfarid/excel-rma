@@ -14,6 +14,7 @@ import {
   RELAY_LIST_ACCOUNT_ENDPOINT,
   RELAY_LIST_ADDRESS_ENDPOINT,
   SUBMIT_SERVICE_INVOICE_ENDPOINT,
+  RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -227,6 +228,17 @@ export class AddServiceInvoiceService {
 
   createStockEntry(warrantyStockPayload) {
     const url = CREATE_WARRANTY_STOCK_ENTRY;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<StockEntryDetails>(url, warrantyStockPayload, {
+          headers,
+        });
+      }),
+    );
+  }
+
+  createStockReturn(warrantyStockPayload) {
+    const url = RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post<StockEntryDetails>(url, warrantyStockPayload, {

@@ -7,13 +7,12 @@ export class RetrieveSerialNoListHandler
   implements IQueryHandler<RetrieveSerialNoListQuery> {
   constructor(private readonly manager: SerialNoAggregateService) {}
   async execute(query: RetrieveSerialNoListQuery) {
-    const { offset, limit, search, sort, clientHttpRequest } = query;
+    const { offset, limit, sort, query: filterQuery } = query;
     return await this.manager.getSerialNoList(
       Number(offset),
       Number(limit),
-      search,
       sort,
-      clientHttpRequest,
+      filterQuery,
     );
   }
 }
