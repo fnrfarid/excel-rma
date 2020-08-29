@@ -52,21 +52,14 @@ export class SerialNoController {
   getSerialNoList(
     @Query('offset') offset = 0,
     @Query('limit') limit = 10,
-    @Query('search') search = '',
     @Query('sort') sort,
-    @Req() clientHttpRequest,
+    @Query('query') query,
   ) {
     if (sort !== 'ASC') {
       sort = 'DESC';
     }
     return this.queryBus.execute(
-      new RetrieveSerialNoListQuery(
-        offset,
-        limit,
-        sort,
-        search,
-        clientHttpRequest,
-      ),
+      new RetrieveSerialNoListQuery(offset, limit, sort, query),
     );
   }
 

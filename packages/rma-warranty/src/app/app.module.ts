@@ -23,6 +23,7 @@ import { WarrantyUiModule } from './warranty-ui/warranty-ui.module';
 import { ExcelSalesManagerGuard } from './common/guards/excel-sales-manager.guard';
 import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
 import { PermissionManager } from './api/permission/permission.service';
+import { SerialUiModule } from './serial-ui/serial-ui.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -37,6 +38,7 @@ import { PermissionManager } from './api/permission/permission.service';
     BrowserAnimationsModule,
     AppCommonModule,
     WarrantyUiModule,
+    SerialUiModule,
   ],
   providers: [
     AppService,

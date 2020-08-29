@@ -66,6 +66,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.createFormGroup();
     this.getCurrentDate();
     this.dataSource = new ItemsDataSource();
+    this.serviceInvoiceForm.controls.is_pos.setValue(true);
     this.serviceInvoiceForm.controls.posting_date.setValue(
       await this.getCurrentDate(),
     );
@@ -149,6 +150,7 @@ export class AddServiceInvoicePage implements OnInit {
       branch: new FormControl('', [Validators.required]),
       items: new FormArray([], this.itemValidator),
       total: new FormControl(0),
+      is_pos: new FormControl(''),
     });
     this.itemsControl = this.serviceInvoiceForm.get('items') as FormArray;
   }
@@ -185,14 +187,23 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
       serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
       serviceInvoiceDetails.docstatus = 0;
-      serviceInvoiceDetails.is_pos = 1;
-      this.serviceInvoiceService
-        .getStore()
-        .getItem('pos_profile')
-        .then(profile => {
-          serviceInvoiceDetails.pos_profile = profile;
+      if (this.serviceInvoiceForm.controls.is_pos.value) {
+        serviceInvoiceDetails.is_pos = 1;
+        this.serviceInvoiceService
+          .getStore()
+          .getItem('pos_profile')
+          .then(profile => {
+            serviceInvoiceDetails.pos_profile = profile;
+          });
+        serviceInvoiceDetails.payments = [];
+        serviceInvoiceDetails.payments.push({
+          account: this.serviceInvoiceForm.controls.account.value.name,
+          mode_of_payment: 'Cash',
+          amount: serviceInvoiceDetails.total,
         });
-
+      } else {
+        serviceInvoiceDetails.is_pos = 0;
+      }
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;
@@ -201,14 +212,7 @@ export class AddServiceInvoicePage implements OnInit {
           return item;
         }
       });
-      serviceInvoiceDetails.payments = [];
-      serviceInvoiceDetails.payments.push({
-        account: this.serviceInvoiceForm.controls.account.value.name,
-        mode_of_payment: 'Cash',
-        amount: serviceInvoiceDetails.total,
-      });
       serviceInvoiceDetails.items = itemList;
-
       const loading = await this.loadingController.create();
       await loading.present();
       this.serviceInvoiceService

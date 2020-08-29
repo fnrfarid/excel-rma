@@ -74,6 +74,21 @@ const routes: Routes = [
         './warranty-ui/view-warranty-claims/stock-entry/add-stock-entry/add-stock-entry.module'
       ).then(m => m.AddStockEntryPageModule),
   },
+  {
+    path: 'serial-search',
+    loadChildren: () =>
+      import('./serial-ui/serial-search/serial-search.module').then(
+        m => m.SerialSearchPageModule,
+      ),
+  },
+  {
+    path: 'serial-info/:serial',
+    loadChildren: () =>
+      import('./serial-ui/serial-info/serial-info.module').then(
+        m => m.SerialInfoPageModule,
+      ),
+  },
+
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];

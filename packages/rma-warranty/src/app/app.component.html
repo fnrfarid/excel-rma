@@ -67,6 +67,17 @@
               <ion-label>Warranty</ion-label>
             </ion-item>
           </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item
+              *ngIf="loggedIn"
+              routerLink="/serial-search"
+              lines="none"
+              routerLinkActive="active"
+            >
+              <ion-icon slot="start" name="barcode"></ion-icon>
+              <ion-label>Serial Search</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
           <ion-item
             routerDirection="'root'"
             routerLink="/"

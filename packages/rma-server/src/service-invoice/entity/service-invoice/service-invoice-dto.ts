@@ -125,7 +125,7 @@ export class ServiceInvoiceDto {
   @IsString()
   pos_profile: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   payments: Payments[];
 }
 

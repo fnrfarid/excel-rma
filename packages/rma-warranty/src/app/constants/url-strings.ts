@@ -136,3 +136,7 @@ export const GET_TERRITORY_BY_WAREHOUSE_ENDPOINT =
 export const CANCEL_STOCK_ENTRY_ENDPOINT =
   '/api/stock_entry/v1/cancel_warranty_stock_entry';
 export const SUBMIT_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/submit';
+export const RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT =
+  '/api/stock_entry/v1/create_return';
+export const SERIAL_LIST_API = '/api/serial_no/v1/list';
+export const RELAY_DOCTYPE_ENDPOINT_PREFIX = '/api/command/user/api/resource/';
