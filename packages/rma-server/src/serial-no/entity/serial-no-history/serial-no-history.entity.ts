@@ -1,4 +1,11 @@
-import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity, Index } from 'typeorm';
+import {
+  Column,
+  ObjectIdColumn,
+  BaseEntity,
+  ObjectID,
+  Entity,
+  Index,
+} from 'typeorm';
 
 @Entity()
 export class SerialNoHistory extends BaseEntity {
@@ -44,4 +51,17 @@ export enum EventType {
   SerialTransferCreated = 'Serial Transfer Created',
   SerialTransferAccepted = 'Serial Transfer Accepted',
   SerialTransferRejected = 'Serial Transfer Rejected',
+}
+
+export class SerialNoHistoryInterface {
+  eventDate?: Date;
+  eventType?: EventType;
+  serial_no?: string;
+  document_no?: string;
+  transaction_from?: string;
+  transaction_to?: string;
+  document_type?: string;
+  parent_document?: string;
+  created_on?: string;
+  created_by?: string;
 }

@@ -50,8 +50,10 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
-import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
-import { SerialNoHistory } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import {
+  EventType,
+  SerialNoHistoryInterface,
+} from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -373,7 +375,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                     clientHttpRequest.token,
                     salesInvoice,
                     response.set_warehouse,
-                    settings
+                    settings,
                   );
 
                   this.salesInvoiceService
@@ -430,9 +432,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     items: any[],
     sales_return_name: string,
     token: any,
-    sales_invoice:SalesInvoice,
+    sales_invoice: SalesInvoice,
     warehouse,
-    settings
+    settings,
   ) {
     const serials = [];
 
@@ -461,42 +463,34 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         },
       )
       .then(success => {
-        const serialHistory = new SerialNoHistory();
+        const serialHistory: SerialNoHistoryInterface = {};
         serialHistory.created_by = token.fullName;
-        serialHistory.created_on =  new DateTime(settings.timeZone).toJSDate();
+        serialHistory.created_on = new DateTime(settings.timeZone).toJSDate();
         serialHistory.document_no = sales_return_name;
         serialHistory.document_type = DELIVERY_NOTE;
         serialHistory.eventDate = new DateTime(settings.timeZone);
-        serialHistory.eventType =  EventType.SerialReturned;
+        serialHistory.eventType = EventType.SerialReturned;
         serialHistory.parent_document = sales_invoice.name;
         serialHistory.transaction_from = sales_invoice.customer;
         serialHistory.transaction_to = warehouse;
-        this.serialNoHistoryService.addSerialHistory(
-          serials,
-          serialHistory
-        ).subscribe({
-          next: success => {},
-          error: err => {}
-        })
+        this.serialNoHistoryService
+          .addSerialHistory(serials, serialHistory)
+          .subscribe({
+            next: done => {},
+            error: err => {},
+          });
       })
       .then(updated => {})
       .catch(error => {});
 
     this.salesInvoiceService
-      .findOne({
-        name: sales_invoice.name,
-      })
-      .then(sales_invoice => {
-        this.salesInvoiceService
-          .updateMany(
-            { name: sales_invoice.name },
-            {
-              $push: { returned_items: { $each: items } },
-            },
-          )
-          .then(success => {})
-          .catch(error => {});
-      })
+      .updateMany(
+        { name: sales_invoice.name },
+        {
+          $push: { returned_items: { $each: items } },
+        },
+      )
+      .then(success => {})
       .catch(error => {});
   }
 

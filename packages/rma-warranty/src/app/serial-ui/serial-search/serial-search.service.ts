@@ -13,6 +13,7 @@ import {
   RELAY_DOCTYPE_ENDPOINT_PREFIX,
   GET_DIRECT_SERIAL_ENDPOINT,
   API_INFO_ENDPOINT,
+  GET_SERIAL_HISTORY_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
 
@@ -102,6 +103,16 @@ export class SerialSearchService {
         return {
           [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
         };
+      }),
+    );
+  }
+
+  getSerialHistory(serial_no: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(`${GET_SERIAL_HISTORY_ENDPOINT}/${serial_no}`, {
+          headers,
+        });
       }),
     );
   }
