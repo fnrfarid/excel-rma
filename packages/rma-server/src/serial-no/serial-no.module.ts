@@ -3,7 +3,6 @@ import { SerialNoAggregatesManager } from './aggregates';
 import { SerialNoEntitiesModule } from './entity/entity.module';
 import { SerialNoQueryManager } from './query';
 import { SerialNoCommandManager } from './command';
-import { SerialNoEventManager } from './event';
 import { SerialNoController } from './controllers/serial-no/serial-no.controller';
 import { SerialNoPoliciesService } from './policies/serial-no-policies/serial-no-policies.service';
 import { ItemEntitiesModule } from '../item/entity/item-entity.module';
@@ -26,7 +25,6 @@ import { DirectModule } from '../direct/direct.module';
   providers: [
     ...SerialNoAggregatesManager,
     ...SerialNoQueryManager,
-    ...SerialNoEventManager,
     ...SerialNoCommandManager,
     SerialNoPoliciesService,
     AssignSerialNoPoliciesService,

@@ -1,16 +1,24 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { switchMap, mergeMap, catchError, retry, map } from 'rxjs/operators';
-import { VALIDATE_AUTH_STRING } from '../../../constants/app-strings';
+import {
+  VALIDATE_AUTH_STRING,
+  STOCK_ENTRY,
+} from '../../../constants/app-strings';
 import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { of, throwError, from } from 'rxjs';
+import { of, throwError, from, forkJoin } from 'rxjs';
+import { DateTime } from 'luxon';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
-import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import {
+  EventType,
+  SerialNoHistoryInterface,
+} from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 export const ACCEPT_STOCK_ENTRY_JOB = 'ACCEPT_STOCK_ENTRY_JOB';
@@ -66,6 +74,8 @@ export class StockEntrySyncService {
               if (typeof item.serial_no === 'object') {
                 item.serial_no = item.serial_no.join('\n');
               }
+              item.excel_serials = item.serial_no;
+              delete item.serial_no;
               return item;
             });
             return this.http.post(
@@ -109,7 +119,19 @@ export class StockEntrySyncService {
       retry(3),
       map(data => data.data.data),
       switchMap(response => {
-        this.updateSerials(payload);
+        payload.items.filter(item => {
+          item.serial_no = this.getSplitSerials(item.excel_serials);
+          delete item.excel_serials;
+          return item;
+        });
+        this.updateSerials(
+          payload,
+          job.token,
+          response.name,
+          job.type,
+          job.settings,
+          job.parent,
+        );
         this.stockEntryService
           .updateOne({ uuid: job.parent }, { $push: { names: response.name } })
           .then(success => {})
@@ -119,7 +141,14 @@ export class StockEntrySyncService {
     );
   }
 
-  updateSerials(payload: StockEntry) {
+  updateSerials(
+    payload: StockEntry,
+    token: TokenCache,
+    doc_name: string,
+    type: string,
+    settings,
+    parent,
+  ) {
     this.updateStockEntryState(payload.uuid, {
       isSynced: true,
       inQueue: false,
@@ -128,7 +157,23 @@ export class StockEntrySyncService {
       .pipe(
         switchMap(item => {
           const serials = this.getSplitSerials(item.serial_no);
-          return this.updateMongoSerials(serials, item.t_warehouse);
+          const serialHistory: SerialNoHistoryInterface = {};
+          serialHistory.created_by = token.fullName;
+          serialHistory.created_on = new DateTime(settings.timeZone).toJSDate();
+          serialHistory.document_no = doc_name;
+          serialHistory.document_type = STOCK_ENTRY;
+          serialHistory.eventDate = new DateTime(settings.timeZone);
+          serialHistory.eventType = this.getEventType(type);
+          serialHistory.parent_document = parent;
+          serialHistory.transaction_from = item.s_warehouse;
+          serialHistory.transaction_to = item.t_warehouse;
+          return forkJoin({
+            serials: this.updateMongoSerials(serials, item.t_warehouse),
+            serial_history: this.serialNoHistoryService.addSerialHistory(
+              serials,
+              serialHistory,
+            ),
+          });
         }),
       )
       .subscribe({
@@ -137,35 +182,30 @@ export class StockEntrySyncService {
       });
   }
 
+  getEventType(type: string) {
+    if (type === ACCEPT_STOCK_ENTRY_JOB) {
+      return EventType.SerialTransferAccepted;
+    }
+    if (type === REJECT_STOCK_ENTRY_JOB) {
+      return EventType.SerialTransferRejected;
+    }
+    return EventType.SerialTransferCreated;
+  }
+
   updateMongoSerials(serials, warehouse) {
     return from(
       this.serialNoService.updateMany(
         { serial_no: { $in: serials } },
         { $set: { warehouse } },
       ),
-    ).pipe(
-      map(success => {
-        this.serialNoHistoryService
-          .insertMany(
-            serials.map(serial => {
-              return {
-                serial_no: serial,
-                eventType: EventType.UpdateSerial,
-                eventDate: new Date(),
-                warehouse,
-              };
-            }),
-          )
-          .then(updated => {})
-          .catch(error => {});
-        return success;
-      }),
     );
   }
 
   getSplitSerials(serials) {
-    const serial_no = serials.split('\n');
-    return serial_no;
+    if (typeof serials === 'string') {
+      serials = serials.split('\n');
+    }
+    return serials;
   }
 
   updateStockEntryState(

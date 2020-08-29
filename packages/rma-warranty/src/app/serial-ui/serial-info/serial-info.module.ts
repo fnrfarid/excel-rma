@@ -7,11 +7,13 @@ import { IonicModule } from '@ionic/angular';
 import { SerialInfoPageRoutingModule } from './serial-info-routing.module';
 
 import { SerialInfoPage } from './serial-info.page';
+import { MaterialModule } from '../../material/material.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    MaterialModule,
     IonicModule,
     SerialInfoPageRoutingModule,
     ReactiveFormsModule,
