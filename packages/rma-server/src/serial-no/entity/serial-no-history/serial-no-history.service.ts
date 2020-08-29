@@ -1,10 +1,13 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
-import { SerialNoHistory } from './serial-no-history.entity';
+import {
+  SerialNoHistory,
+  SerialNoHistoryInterface,
+} from './serial-no-history.entity';
 import { of, from } from 'rxjs';
 import { switchMap, map, bufferCount, concatMap } from 'rxjs/operators';
-import { MONGO_INSERT_MANY_BATCH_NUMBER } from 'src/constants/app-strings';
+import { MONGO_INSERT_MANY_BATCH_NUMBER } from '../../../constants/app-strings';
 
 @Injectable()
 export class SerialNoHistoryService {
@@ -92,20 +95,24 @@ export class SerialNoHistoryService {
     );
   }
 
-  addSerialHistory(serials:string[], update: SerialNoHistory){
+  addSerialHistory(serials: string[], update: SerialNoHistoryInterface) {
     return from(serials).pipe(
       map(serial => {
-        update.serial_no = serial
-        return of(update)
+        const serial_no_history = new SerialNoHistory();
+        Object.assign(serial_no_history, update);
+        serial_no_history.serial_no = serial;
+        return serial_no_history;
       }),
       bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
       concatMap(data => {
-        return from(this.serialNoRepository.insertMany(data)).pipe(switchMap(success => of(true)));
+        return from(this.insertMany(data, { ordered: false })).pipe(
+          switchMap(success => of(true)),
+        );
       }),
-      switchMap(success=> {
+      switchMap(success => {
         return of(true);
-      })
-    )
+      }),
+    );
   }
 
   async count(query) {

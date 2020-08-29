@@ -39,7 +39,7 @@ import {
   CSV_TEMPLATE,
 } from '../../../sync/assets/data_import_template';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
-import { SerialNoHistory } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { SerialNoHistoryInterface } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
@@ -235,7 +235,7 @@ export class PurchaseReceiptSyncService {
     const hash_map: {
       [key: string]: {
         serials?: string[];
-        item_name? : string;
+        item_name?: string;
         warranty_date?: string;
         warehouse?: string;
       };
@@ -273,9 +273,9 @@ export class PurchaseReceiptSyncService {
 
     return from(Object.keys(hash_map)).pipe(
       switchMap(key => {
-        const serialHistory = new SerialNoHistory();
+        const serialHistory: SerialNoHistoryInterface = {};
         serialHistory.created_by = token.fullName;
-        serialHistory.created_on =  warrantyPurchasedOn;
+        serialHistory.created_on = warrantyPurchasedOn;
         serialHistory.document_no = doc.name;
         serialHistory.document_type = PURCHASE_RECEIPT_DOCTYPE_NAME;
         serialHistory.eventDate = new DateTime(settings.timeZone);
@@ -283,7 +283,8 @@ export class PurchaseReceiptSyncService {
         serialHistory.parent_document = parent;
         serialHistory.transaction_from = payload[0].supplier;
         serialHistory.transaction_to = hash_map[key].warehouse;
-        return from(this.serialNoService.updateMany(
+        return from(
+          this.serialNoService.updateMany(
             { serial_no: { $in: hash_map[key].serials } },
             {
               $set: {
@@ -293,18 +294,19 @@ export class PurchaseReceiptSyncService {
                 purchase_document_no: doc.name,
                 'warranty.purchaseWarrantyDate': hash_map[key].warranty_date,
                 'warranty.purchasedOn': warrantyPurchasedOn,
-                item_name: hash_map[key].item_name
+                item_name: hash_map[key].item_name,
               },
               $unset: { 'queue_state.purchase_receipt': undefined },
             },
-          )).pipe(
-            switchMap(done => {
-              return this.serialNoHistoryService.addSerialHistory(
-                hash_map[key].serials,
-                serialHistory
-              )
-            })
-          )
+          ),
+        ).pipe(
+          switchMap(done => {
+            return this.serialNoHistoryService.addSerialHistory(
+              hash_map[key].serials,
+              serialHistory,
+            );
+          }),
+        );
       }),
       switchMap(done => {
         return from(
@@ -317,10 +319,9 @@ export class PurchaseReceiptSyncService {
           ),
         );
       }),
-      retry(2)
+      retry(2),
     );
   }
-
 
   addToQueueNow(data: {
     payload: any;

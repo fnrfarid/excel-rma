@@ -38,7 +38,10 @@ import {
 } from '../../../sync/assets/data_import_template';
 import { DataImportSuccessResponse } from '../../../sync/entities/agenda-job/agenda-job.entity';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
-import { EventType, SerialNoHistory } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import {
+  EventType,
+  SerialNoHistoryInterface,
+} from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()
@@ -271,9 +274,11 @@ export class DeliveryNoteJobService {
             },
           )
           .then(success => {
-            const serialHistory = new SerialNoHistory();
+            const serialHistory: SerialNoHistoryInterface = {};
             serialHistory.created_by = token.fullName;
-            serialHistory.created_on =  new DateTime(settings.timeZone).toJSDate();
+            serialHistory.created_on = new DateTime(
+              settings.timeZone,
+            ).toJSDate();
             serialHistory.document_no = response.name;
             serialHistory.document_type = DELIVERY_NOTE_DOCTYPE;
             serialHistory.eventDate = new DateTime(settings.timeZone);
@@ -281,13 +286,12 @@ export class DeliveryNoteJobService {
             serialHistory.parent_document = sales_invoice_name;
             serialHistory.transaction_from = payload.set_warehouse;
             serialHistory.transaction_to = payload.customer;
-            this.serialNoHistoryService.addSerialHistory(
-              serialArray,
-              serialHistory
-            ).subscribe({
-              next: success =>{},
-              error: err =>{},
-            });
+            this.serialNoHistoryService
+              .addSerialHistory(serialArray, serialHistory)
+              .subscribe({
+                next: done => {},
+                error: err => {},
+              });
             return true;
           })
           .then(updated => {})

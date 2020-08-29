@@ -37,6 +37,7 @@ import { DeliveryNoteAggregateService } from '../../../delivery-note/aggregates/
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { SERIAL_NO_NOT_FOUND } from '../../../constants/messages';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -45,6 +46,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly http: HttpService,
     private readonly settingsService: SettingsService,
     private readonly serialNoPolicyService: SerialNoPoliciesService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
     private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
     private readonly errorLogService: ErrorLogService,
@@ -67,6 +69,10 @@ export class SerialNoAggregateService extends AggregateRoot {
         );
       }),
     );
+  }
+
+  async retrieveSerialNoHistory(serial_no: string) {
+    return await this.serialNoHistoryService.find({ serial_no });
   }
 
   async retrieveSerialNo(serial_no: string) {

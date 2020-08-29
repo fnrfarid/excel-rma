@@ -23,7 +23,7 @@ import {
 } from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntry } from 'dist/stock-entry/stock-entry/stock-entry.entity';
+import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
