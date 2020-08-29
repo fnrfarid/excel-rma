@@ -15,14 +15,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { TokenGuard } from '../../../auth/guards/token.guard';
-import { AddSerialNoCommand } from '../../command/add-serial-no/add-serial-no.command';
-import { RemoveSerialNoCommand } from '../../command/remove-serial-no/remove-serial-no.command';
-import { UpdateSerialNoCommand } from '../../command/update-serial-no/update-serial-no.command';
 import { RetrieveSerialNoQuery } from '../../query/get-serial-no/retrieve-serial-no.query';
 import { RetrieveSerialNoListQuery } from '../../query/list-serial-no/retrieve-serial-no-list.query';
-import { UpdateSerialNoDto } from '../../entity/serial-no/update-serial-no-dto';
 import {
-  SerialNoDto,
   ValidateSerialsDto,
   ValidateReturnSerialsDto,
 } from '../../entity/serial-no/serial-no-dto';
@@ -45,21 +40,6 @@ export class SerialNoController {
     private readonly queryBus: QueryBus,
     private readonly serialAggregateService: SerialNoAggregateService,
   ) {}
-
-  @Post('v1/create')
-  @UseGuards(TokenGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  create(@Body() serialNoPayload: SerialNoDto, @Req() req) {
-    return this.commandBus.execute(
-      new AddSerialNoCommand(serialNoPayload, req),
-    );
-  }
-
-  @Post('v1/remove/:uuid')
-  @UseGuards(TokenGuard)
-  remove(@Param('uuid') uuid) {
-    return this.commandBus.execute(new RemoveSerialNoCommand(uuid));
-  }
 
   @Get('v1/get/:serial_no')
   @UseGuards(TokenGuard)
@@ -131,13 +111,6 @@ export class SerialNoController {
       +limit,
       clientHttpRequest,
     );
-  }
-
-  @Post('v1/update')
-  @UseGuards(TokenGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateSerialNo(@Body() updatePayload: UpdateSerialNoDto) {
-    return this.commandBus.execute(new UpdateSerialNoCommand(updatePayload));
   }
 
   @Post('v1/assign')

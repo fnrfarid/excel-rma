@@ -17,11 +17,11 @@ import { SyncAlreadyInProgressException } from '../../../constants/exceptions';
 import { SerialNoService } from '../../entity/serial-no/serial-no.service';
 import { SerialNo } from '../../entity/serial-no/serial-no.entity';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import {
-  EventType,
-  SerialNoHistory,
-} from '../../entity/serial-no-history/serial-no-history.entity';
-import { SerialNoHistoryService } from '../../entity/serial-no-history/serial-no-history.service';
+// import {
+//   EventType,
+//   SerialNoHistory,
+// } from '../../entity/serial-no-history/serial-no-history.entity';
+// import { SerialNoHistoryService } from '../../entity/serial-no-history/serial-no-history.service';
 
 export const SERIAL_NO_SYNC_SCHEDULE = 'SERIAL_NO_SYNC_SCHEDULE';
 
@@ -33,7 +33,7 @@ export class SerialNoSyncService implements OnModuleInit {
     private readonly sync: SyncAggregateService,
     private readonly serial: SerialNoService,
     private readonly requestState: RequestStateService,
-    private readonly serialNoHistoryService: SerialNoHistoryService,
+    // private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {}
 
   onModuleInit() {
@@ -72,26 +72,26 @@ export class SerialNoSyncService implements OnModuleInit {
                         { name: erpnextSerial.name },
                         { $set: erpnextSerial },
                       )
-                      .then(updatedSerial => {
-                        return this.serialNoHistoryService.create({
-                          ...erpnextSerial,
-                          eventDate: new Date(),
-                          eventType: EventType.UpdateSerial,
-                        } as SerialNoHistory);
-                      });
+                      // .then(updatedSerial => {
+                      //   return this.serialNoHistoryService.create({
+                      //     ...erpnextSerial,
+                      //     eventDate: new Date(),
+                      //     eventType: EventType.UpdateSerial,
+                      //   } as SerialNoHistory);
+                      // });
                   } else if (!serial) {
                     return new Promise((resolve, reject) => {
                       erpnextSerial.uuid = uuidv4();
                       this.serial
                         .create(erpnextSerial)
                         .then(() => resolve(erpnextSerial))
-                        .then(() => {
-                          return this.serialNoHistoryService.create({
-                            ...erpnextSerial,
-                            eventDate: new Date(),
-                            eventType: EventType.InsertSerial,
-                          } as SerialNoHistory);
-                        })
+                        // .then(() => {
+                        //   return this.serialNoHistoryService.create({
+                        //     ...erpnextSerial,
+                        //     eventDate: new Date(),
+                        //     eventType: EventType.InsertSerial,
+                        //   } as SerialNoHistory);
+                        // })
                         .catch(error => reject(error));
                     });
                   }

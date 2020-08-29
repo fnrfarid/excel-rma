@@ -9,7 +9,6 @@ import { DeliveryNoteService } from '../../entity/delivery-note-service/delivery
 import { DeliveryNoteJobService } from '../../schedular/delivery-note-job/delivery-note-job.service';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { DeliveryNotePoliciesService } from '../../../delivery-note/policies/delivery-note-policies/delivery-note-policies.service';
-import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 describe('DeliveryNoteAggregateService', () => {
   let service: DeliveryNoteAggregateService;
@@ -27,7 +26,6 @@ describe('DeliveryNoteAggregateService', () => {
         { provide: DeliveryNoteJobService, useValue: {} },
         { provide: SerialBatchService, useValue: {} },
         { provide: DeliveryNotePoliciesService, useValue: {} },
-        { provide: SerialNoHistoryService, useValue: {} },
       ],
     }).compile();
 

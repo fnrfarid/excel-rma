@@ -27,7 +27,7 @@ import {
   DRAFT_STATUS,
   DEFAULT_NAMING_SERIES,
   SYSTEM_MANAGER,
-  UNSET,
+  DELIVERY_NOTE,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -51,6 +51,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { SerialNoHistory } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -370,8 +371,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                     items,
                     response.name,
                     clientHttpRequest.token,
-                    salesInvoice.name,
+                    salesInvoice,
                     response.set_warehouse,
+                    settings
                   );
 
                   this.salesInvoiceService
@@ -428,8 +430,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     items: any[],
     sales_return_name: string,
     token: any,
-    sales_invoice_name: string,
+    sales_invoice:SalesInvoice,
     warehouse,
+    settings
   ) {
     const serials = [];
 
@@ -458,32 +461,35 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         },
       )
       .then(success => {
-        return this.serialNoHistoryService.insertMany(
-          serials.map(serial => {
-            return {
-              serial_no: serial,
-              eventType: EventType.UpdateSerial,
-              eventDate: new Date(),
-              customer: UNSET,
-              'warranty.salesWarrantyDate': UNSET,
-              'warranty.soldOn': UNSET,
-              delivery_note: UNSET,
-              sales_invoice_name: UNSET,
-            };
-          }),
-        );
+        const serialHistory = new SerialNoHistory();
+        serialHistory.created_by = token.fullName;
+        serialHistory.created_on =  new DateTime(settings.timeZone).toJSDate();
+        serialHistory.document_no = sales_return_name;
+        serialHistory.document_type = DELIVERY_NOTE;
+        serialHistory.eventDate = new DateTime(settings.timeZone);
+        serialHistory.eventType =  EventType.SerialReturned;
+        serialHistory.parent_document = sales_invoice.name;
+        serialHistory.transaction_from = sales_invoice.customer;
+        serialHistory.transaction_to = warehouse;
+        this.serialNoHistoryService.addSerialHistory(
+          serials,
+          serialHistory
+        ).subscribe({
+          next: success => {},
+          error: err => {}
+        })
       })
       .then(updated => {})
       .catch(error => {});
 
     this.salesInvoiceService
       .findOne({
-        name: sales_invoice_name,
+        name: sales_invoice.name,
       })
       .then(sales_invoice => {
         this.salesInvoiceService
           .updateMany(
-            { name: sales_invoice_name },
+            { name: sales_invoice.name },
             {
               $push: { returned_items: { $each: items } },
             },

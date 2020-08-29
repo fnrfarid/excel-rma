@@ -10,7 +10,6 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { PurchaseReceiptSyncService } from '../../schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { PurchaseOrderService } from '../../../purchase-order/entity/purchase-order/purchase-order.service';
-import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 describe('PurchaseInvoiceAggregateService', () => {
   let service: PurchaseReceiptAggregateService;
@@ -57,10 +56,6 @@ describe('PurchaseInvoiceAggregateService', () => {
         },
         {
           provide: PurchaseOrderService,
-          useValue: {},
-        },
-        {
-          provide: SerialNoHistoryService,
           useValue: {},
         },
       ],

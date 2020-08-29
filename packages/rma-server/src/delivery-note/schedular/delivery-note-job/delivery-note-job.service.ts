@@ -11,7 +11,6 @@ import {
   SYNC_DELIVERY_NOTE_JOB,
   DEFAULT_NAMING_SERIES,
   DEFAULT_CURRENCY,
-  UNSET,
 } from '../../../constants/app-strings';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
@@ -39,7 +38,7 @@ import {
 } from '../../../sync/assets/data_import_template';
 import { DataImportSuccessResponse } from '../../../sync/entities/agenda-job/agenda-job.entity';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
-import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { EventType, SerialNoHistory } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()
@@ -108,23 +107,6 @@ export class DeliveryNoteJobService {
           },
         },
       )
-      .then(success => {
-        return this.serialNoHistoryService.insertMany(
-          serials.map(serial => {
-            return {
-              serial_no: serial,
-              eventType: EventType.UpdateSerial,
-              eventDate: new Date(),
-              queue_state: {
-                delivery_note: {
-                  parent: UNSET,
-                  warehouse: UNSET,
-                },
-              },
-            };
-          }),
-        );
-      })
       .then(updated => {})
       .catch(err => {});
 
@@ -289,21 +271,24 @@ export class DeliveryNoteJobService {
             },
           )
           .then(success => {
-            return this.serialNoHistoryService.insertMany(
-              serialArray.map(serial => {
-                return {
-                  serial_no: serial,
-                  eventType: EventType.UpdateSerial,
-                  eventDate: new Date(),
-                  queue_state: {
-                    delivery_note: {
-                      parent: UNSET,
-                      warehouse: UNSET,
-                    },
-                  },
-                };
-              }),
-            );
+            const serialHistory = new SerialNoHistory();
+            serialHistory.created_by = token.fullName;
+            serialHistory.created_on =  new DateTime(settings.timeZone).toJSDate();
+            serialHistory.document_no = response.name;
+            serialHistory.document_type = DELIVERY_NOTE_DOCTYPE;
+            serialHistory.eventDate = new DateTime(settings.timeZone);
+            serialHistory.eventType = EventType.SerialDelivered;
+            serialHistory.parent_document = sales_invoice_name;
+            serialHistory.transaction_from = payload.set_warehouse;
+            serialHistory.transaction_to = payload.customer;
+            this.serialNoHistoryService.addSerialHistory(
+              serialArray,
+              serialHistory
+            ).subscribe({
+              next: success =>{},
+              error: err =>{},
+            });
+            return true;
           })
           .then(updated => {})
           .catch(err => {});

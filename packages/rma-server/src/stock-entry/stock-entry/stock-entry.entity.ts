@@ -80,6 +80,7 @@ export class StockEntryItem {
   t_warehouse: string;
   item_code: string;
   item_name: string;
+  excel_serials?: string;
   qty: number;
   has_serial_no: number;
   transfer_qty: number;

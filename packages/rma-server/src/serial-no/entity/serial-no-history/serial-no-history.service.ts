@@ -2,8 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { SerialNoHistory } from './serial-no-history.entity';
-import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { of, from } from 'rxjs';
+import { switchMap, map, bufferCount, concatMap } from 'rxjs/operators';
+import { MONGO_INSERT_MANY_BATCH_NUMBER } from 'src/constants/app-strings';
 
 @Injectable()
 export class SerialNoHistoryService {
@@ -89,6 +90,22 @@ export class SerialNoHistoryService {
         return aggregateData.toArray();
       }),
     );
+  }
+
+  addSerialHistory(serials:string[], update: SerialNoHistory){
+    return from(serials).pipe(
+      map(serial => {
+        update.serial_no = serial
+        return of(update)
+      }),
+      bufferCount(MONGO_INSERT_MANY_BATCH_NUMBER),
+      concatMap(data => {
+        return from(this.serialNoRepository.insertMany(data)).pipe(switchMap(success => of(true)));
+      }),
+      switchMap(success=> {
+        return of(true);
+      })
+    )
   }
 
   async count(query) {

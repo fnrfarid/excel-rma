@@ -109,7 +109,7 @@ export const SALES_INVOICE_STATUS_ENUM = [
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
 export const DELIVERY_NOTE_DOCTYPE = 'Delivery Note';
-export const STOCK_ENTRY_SERIALS_BATCH_SIZE = 1000;
+export const STOCK_ENTRY_SERIALS_BATCH_SIZE = 6000;
 export const DELIVERY_NOTE_SERIAL_BATCH_SIZE = 6000;
 export const SERIAL_NO_VALIDATION_BATCH_SIZE = 10000;
 export const FRAPPE_INSERT_MANY_BATCH_COUNT = 2;
@@ -182,9 +182,9 @@ export const PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT = 1;
 export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const DATA_IMPORT_DELAY = 1339;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
-export const DEFAULT_CURRENCY = 'BDT';
-// export const DEFAULT_CURRENCY = 'INR';
-// console.log('unComment IT local testing');
+// export const DEFAULT_CURRENCY = 'BDT';
+export const DEFAULT_CURRENCY = 'INR';
+console.log('unComment IT local testing');
 export const DEFAULT_NAMING_SERIES = {
   sales_order: 'SO-.YYYY.-',
   sales_invoice: 'SINV-.YYYY.-',
