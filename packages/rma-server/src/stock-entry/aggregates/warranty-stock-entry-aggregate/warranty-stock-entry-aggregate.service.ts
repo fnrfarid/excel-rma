@@ -23,11 +23,6 @@ import {
 } from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import {
-  EventType,
-  SerialNoHistory,
-} from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
-import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
 
 @Injectable()
@@ -38,7 +33,6 @@ export class WarrantyStockEntryAggregateService {
     private readonly settingService: SettingsService,
     private readonly serialService: SerialNoService,
     private readonly http: HttpService,
-    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {}
 
   createStockEntry(payload: WarrantyStockEntryDto, res, req) {
@@ -98,13 +92,6 @@ export class WarrantyStockEntryAggregateService {
           },
         },
       )
-      .then(success => {
-        return this.serialNoHistoryService.create({
-          ...items[0],
-          eventDate: new Date(),
-          eventType: EventType.UpdateSerial,
-        } as SerialNoHistory);
-      })
       .then(updated => {})
       .catch(error => {});
     return of();

@@ -10,6 +10,7 @@ import { SERIAL_FETCH_ERROR } from '../../constants/messages';
 import { CLOSE, DURATION } from '../../constants/app-string';
 import { SerialSearchService } from '../serial-search/serial-search.service';
 import { AUTH_SERVER_URL } from '../../constants/storage';
+import { SerialHistoryDataSource } from './serial-info-datasource';
 
 @Component({
   selector: 'app-serial-info',
@@ -22,7 +23,17 @@ export class SerialInfoPage implements OnInit {
   viewDNUrl: string;
   viewCustomerUrl: string;
   viewSupplierUrl: string;
-
+  displayedColumns: string[] = [
+    'eventType',
+    'transaction_from',
+    'transaction_to',
+    'document_type',
+    'document_no',
+    'created_by',
+    'parent_document',
+    'created_on',
+  ];
+  serialHistoryDataSource: SerialHistoryDataSource;
   serialInfoForm = new FormGroup({
     serial_no: new FormControl(),
     item_code: new FormControl(),
@@ -42,6 +53,9 @@ export class SerialInfoPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.serialHistoryDataSource = new SerialHistoryDataSource(
+      this.serialSearchService,
+    );
     this.serialNo = this.activatedRoute.snapshot.params.serial;
     if (this.activatedRoute.snapshot.paramMap.keys.length > 1) {
       this.loadSerialFromParamMap();
@@ -149,5 +163,9 @@ export class SerialInfoPage implements OnInit {
     if (this.viewPRUrl) {
       window.open(this.viewPRUrl, '_blank');
     }
+  }
+
+  getSerialHistory() {
+    this.serialHistoryDataSource.loadItems(this.serialNo);
   }
 }

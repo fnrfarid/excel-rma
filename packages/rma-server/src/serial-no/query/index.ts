@@ -3,10 +3,12 @@ import { RetrieveSerialNoListHandler } from './list-serial-no/retrieve-serial-no
 import { ValidateSerialsHandler } from './validate-serial/validate-serial-query.handler';
 import { RetrieveSalesInvoiceDeliveredSerialNoQueryHandler } from './retrieve-sales-invoice-delivered-serial-no/retrieve-sales-invoice-delivered-serial-no.query.handler'; // eslint-disable-line
 import { RetrieveDirectSerialNoHandler } from './get-direct-serial-no/retrieve-direct-serial-no-query.handler';
+import { RetrieveSerialNoHistoryHandler } from './get-serial-no-history/get-serial-no-history-query.handler';
 
 export const SerialNoQueryManager = [
   RetrieveSerialNoHandler,
   RetrieveSerialNoListHandler,
+  RetrieveSerialNoHistoryHandler,
   ValidateSerialsHandler,
   RetrieveSalesInvoiceDeliveredSerialNoQueryHandler,
   RetrieveDirectSerialNoHandler,

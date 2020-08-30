@@ -49,7 +49,10 @@ describe('SerialNoAggregateService', () => {
           provide: SalesInvoiceService,
           useValue: {},
         },
-        { provide: SerialNoHistoryService, useValue: {} },
+        {
+          provide: SerialNoHistoryService,
+          useValue: {},
+        },
       ],
     }).compile();
 
