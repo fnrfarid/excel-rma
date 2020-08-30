@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
 export class UpdateServiceInvoiceDto {
   @IsNotEmpty()
   uuid: string;
@@ -14,4 +14,21 @@ export class UpdateServiceInvoiceDto {
   @IsNotEmpty()
   @IsNumber()
   docstatus: string;
+
+  @IsOptional()
+  @IsNumber()
+  is_pos: number;
+
+  @IsOptional()
+  @IsString()
+  pos_profile: string;
+
+  @IsOptional()
+  payments: Payments[];
+}
+
+export class Payments {
+  account: string;
+  mode_of_payment: string;
+  amount: number;
 }

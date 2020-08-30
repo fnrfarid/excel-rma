@@ -37,6 +37,7 @@ export class AddWarrantyClaimPage implements OnInit {
   productList: any;
   territoryList: any;
   itemDetail: any;
+  problemList: any;
 
   constructor(
     private location: Location,
@@ -99,6 +100,15 @@ export class AddWarrantyClaimPage implements OnInit {
         this.territoryList = territory;
         this.warrantyClaimForm.controls.receiving_branch.setValue(territory[0]);
       });
+
+    this.problemList = this.warrantyClaimForm.controls.problem.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      switchMap(value => {
+        return this.warrantyService.getProblemList(value);
+      }),
+      map(res => res.docs),
+    );
   }
 
   getFormState(state) {
@@ -176,8 +186,6 @@ export class AddWarrantyClaimPage implements OnInit {
     const common_control = [
       'product_brand',
       'problem',
-      'problem_details',
-      'remarks',
       'claim_type',
       'received_on',
       'delivery_date',
@@ -248,7 +256,7 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.receiving_branch = this.warrantyClaimForm.controls.receiving_branch.value;
     warrantyClaimDetails.delivery_branch = this.warrantyClaimForm.controls.delivery_branch.value;
     warrantyClaimDetails.product_brand = this.warrantyClaimForm.controls.product_brand.value;
-    warrantyClaimDetails.problem = this.warrantyClaimForm.controls.problem.value;
+    warrantyClaimDetails.problem = this.warrantyClaimForm.controls.problem.value.problem_name;
     warrantyClaimDetails.problem_details = this.warrantyClaimForm.controls.problem_details.value;
     warrantyClaimDetails.remarks = this.warrantyClaimForm.controls.remarks.value;
     warrantyClaimDetails.customer_contact = this.warrantyClaimForm.controls.customer_contact.value;
@@ -364,6 +372,10 @@ export class AddWarrantyClaimPage implements OnInit {
 
   getBranchOption(option) {
     if (option) return option;
+  }
+
+  getProblemOption(option) {
+    if (option) return option.problem_name;
   }
 
   serialChanged(name) {

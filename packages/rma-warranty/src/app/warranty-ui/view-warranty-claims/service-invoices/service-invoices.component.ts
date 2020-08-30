@@ -4,7 +4,10 @@ import { AddServiceInvoiceService } from './add-service-invoice/add-service-invo
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
 import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DURATION } from '../../../constants/app-string';
+import {
+  DURATION,
+  SERVICE_INVOICE_STATUS,
+} from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 
@@ -56,8 +59,21 @@ export class ServiceInvoicesComponent implements OnInit {
   async submitInvoice(row) {
     const loading = await this.loadingController.create();
     await loading.present();
-    row.status = 'Paid';
     row.docstatus = 1;
+    row.is_pos = 1;
+    this.serviceInvoice
+      .getStore()
+      .getItem('pos_profile')
+      .then(profile => {
+        row.pos_profile = profile;
+      });
+    row.payments = [];
+    row.status = SERVICE_INVOICE_STATUS.PAID;
+    row.payments.push({
+      account: row.pos_profile,
+      mode_of_payment: 'Cash',
+      amount: row.total,
+    });
     this.serviceInvoice.submitInvoice(row).subscribe({
       next: () => {
         loading.dismiss();

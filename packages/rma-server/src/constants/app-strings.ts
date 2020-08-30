@@ -202,13 +202,13 @@ export const DEFAULT_NAMING_SERIES = {
 export const MAX_SERIAL_BODY_COUNT = 100000;
 export enum VERDICT {
   RECEIVED_FROM_CUSTOMER = 'Received from Customer',
-  TRANSFERRED = 'Transferred',
   RECEIVED_FROM_BRANCH = 'Received from Branch',
-  SOLVED = 'Solved',
-  UNSOLVED = 'Unsolved',
-  REJECTED = 'Rejected',
-  TO_REPLACE = 'To Replace',
   WORK_IN_PROGRESS = 'Work in Progress',
+  TRANSFERRED = 'Transferred',
+  SOLVED = 'Solved - Repairing done',
+  TO_REPLACE = 'Unsolved - To Replace',
+  UNSOLVED = 'Unsolved - Return to Owner',
+  DELIVER_TO_CUSTOMER = 'Deliver to Customer',
 }
 export const ALL_TERRITORIES = 'All Territories';
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
@@ -221,3 +221,17 @@ export const DELIVERY_NOTE_DOCTYPE_NAMES = [
   'Delivery%20Note',
 ];
 export const UNSET = 'UNSET';
+export enum CLAIM_STATUS {
+  IN_PROGRESS = 'In Progress',
+  TO_DELIVER = 'To Deliver',
+  DELIVERED = 'Delivered',
+  UNSOLVED = 'Unsolved',
+  REJECTED = 'Rejected',
+}
+
+export const DELIVERY_STATUS = {
+  REPAIRED: 'Repaired',
+  REPLACED: 'Replaced',
+  UPGRADED: 'Upgraded',
+  REJECTED: 'Rejected',
+};

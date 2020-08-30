@@ -141,3 +141,4 @@ export const RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT =
   '/api/stock_entry/v1/create_return';
 export const SERIAL_LIST_API = '/api/serial_no/v1/list';
 export const RELAY_DOCTYPE_ENDPOINT_PREFIX = '/api/command/user/api/resource/';
+export const GET_LIST_PROBLEM_ENDPOINT = '/api/problem/v1/list';
