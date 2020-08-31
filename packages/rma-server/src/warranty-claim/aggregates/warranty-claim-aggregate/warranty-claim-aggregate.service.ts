@@ -14,7 +14,11 @@ import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warra
 import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { INVALID_FILE, VERDICT } from '../../../constants/app-strings';
+import {
+  INVALID_FILE,
+  VERDICT,
+  CLAIM_STATUS,
+} from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
   BulkWarrantyClaim,
@@ -24,7 +28,7 @@ import { SerialNoAggregateService } from '../../../serial-no/aggregates/serial-n
 import { SerialNoDto } from '../../../serial-no/entity/serial-no/serial-no-dto';
 import { BulkWarrantyClaimsCreatedEvent } from '../../event/bulk-warranty-claims-created/bulk-warranty-claims.event';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { WARRANTY_TYPE } from '../../../constants/app-strings';
+import { WARRANTY_TYPE, DELIVERY_STATUS } from '../../../constants/app-strings';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
@@ -95,6 +99,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         Object.assign(warrantyClaim, warrantyClaimPayload);
         warrantyClaim.uuid = uuidv4();
         warrantyClaim.received_by = clientHttpRequest.token.fullName;
+        warrantyClaim.claim_status = CLAIM_STATUS.IN_PROGRESS;
         warrantyClaim.createdOn = new DateTime(settings.timeZone).toJSDate();
         return of(warrantyClaim);
       }),
@@ -289,6 +294,21 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       ),
     ).pipe(
       switchMap(history => {
+        return this.setClaimStatus(statusHistoryPayload);
+      }),
+      switchMap(state => {
+        return this.warrantyClaimService.updateOne(
+          {
+            uuid: statusHistoryPayload.uuid,
+          },
+          {
+            $set: {
+              claim_status: state,
+            },
+          },
+        );
+      }),
+      switchMap(() => {
         if (!statusHistoryPayload.delivery_status) {
           return of({});
         }
@@ -299,6 +319,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
               $set: {
                 delivery_date: statusHistoryPayload.date,
                 delivery_branch: statusHistoryPayload.delivery_branch,
+                delivered_by: clientHttpRequest.token.fullName,
               },
             },
           ),
@@ -328,5 +349,64 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         },
       }),
     );
+  }
+
+  setClaimStatus(statusHistoryPayload: StatusHistoryDto) {
+    let status = '';
+    switch (statusHistoryPayload.verdict) {
+      case VERDICT.RECEIVED_FROM_CUSTOMER:
+        status = CLAIM_STATUS.IN_PROGRESS;
+        break;
+      case VERDICT.RECEIVED_FROM_BRANCH:
+        status = CLAIM_STATUS.IN_PROGRESS;
+        break;
+      case VERDICT.WORK_IN_PROGRESS:
+        status = CLAIM_STATUS.IN_PROGRESS;
+        break;
+      case VERDICT.TRANSFERRED:
+        status = CLAIM_STATUS.IN_PROGRESS;
+        break;
+      case VERDICT.SOLVED:
+        status = CLAIM_STATUS.TO_DELIVER;
+        break;
+      case VERDICT.UNSOLVED:
+        status = CLAIM_STATUS.UNSOLVED;
+        break;
+      case VERDICT.TO_REPLACE:
+        status = CLAIM_STATUS.TO_DELIVER;
+        break;
+      case VERDICT.DELIVER_TO_CUSTOMER:
+        this.checkDeliveryStatus(
+          statusHistoryPayload.delivery_status,
+        ).subscribe({
+          next: claim_status => {
+            status = claim_status;
+          },
+        });
+        break;
+      default:
+        break;
+    }
+    return of(status);
+  }
+
+  checkDeliveryStatus(delivery_status: string) {
+    switch (delivery_status) {
+      case DELIVERY_STATUS.REPAIRED:
+        delivery_status = CLAIM_STATUS.DELIVERED;
+        break;
+      case DELIVERY_STATUS.REPLACED:
+        delivery_status = CLAIM_STATUS.DELIVERED;
+        break;
+      case DELIVERY_STATUS.UPGRADED:
+        delivery_status = CLAIM_STATUS.DELIVERED;
+        break;
+      case DELIVERY_STATUS.REJECTED:
+        delivery_status = CLAIM_STATUS.UNSOLVED;
+        break;
+      default:
+        break;
+    }
+    return of(delivery_status);
   }
 }

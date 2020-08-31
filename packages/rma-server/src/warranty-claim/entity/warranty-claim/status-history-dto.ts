@@ -40,4 +40,8 @@ export class StatusHistoryDto {
   @IsNotEmpty()
   @IsString()
   date: string;
+
+  @IsOptional()
+  @IsString()
+  claim_status: string;
 }

@@ -161,13 +161,9 @@
               <input
                 matInput
                 type="text"
-                required
                 placeholder="Description"
                 formControlName="description"
               />
-              <mat-error *ngIf="f.description.hasError('required')">
-                Description is <strong>required</strong>
-              </mat-error>
             </mat-form-field>
           </ion-col>
         </ion-row>

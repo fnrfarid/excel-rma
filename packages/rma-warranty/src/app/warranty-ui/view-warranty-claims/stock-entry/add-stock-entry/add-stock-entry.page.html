@@ -132,6 +132,38 @@
     <ion-card-content class="ion-no-padding">
       <ion-item lines="none">
         <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+          <ng-container matColumnDef="item_name">
+            <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
+            <mat-cell
+              *matCellDef="let row;let i = index"
+              [satPopoverAnchor]="p"
+              tabindex="0"
+              (keyup.enter)="p.open()"
+              (click)="p.open()"
+            >
+              <ng-container *ngIf="row.item_name">
+                {{row.item_name}}
+              </ng-container>
+              <span class="add-comment" *ngIf="!row.item_name">
+                Add an item
+              </span>
+              <sat-popover
+                #p
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateItem(row,i,$event)"
+              >
+                <inline-edit
+                  style="width: 400px !important;"
+                  [value]="row.item_name"
+                  column="item"
+                  [minimumPrice]="row.minimumPrice"
+                ></inline-edit>
+              </sat-popover>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+          </ng-container>
           <ng-container matColumnDef="serial_no">
             <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
             <mat-cell
@@ -165,38 +197,7 @@
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
-          <ng-container matColumnDef="item_name">
-            <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-            <mat-cell
-              *matCellDef="let row;let i = index"
-              [satPopoverAnchor]="p"
-              tabindex="0"
-              (keyup.enter)="p.open()"
-              (click)="p.open()"
-            >
-              <ng-container *ngIf="row.item_name">
-                {{row.item_name}}
-              </ng-container>
-              <span class="add-comment" *ngIf="!row.item_name">
-                Add an item
-              </span>
-              <sat-popover
-                #p
-                hasBackdrop
-                xAlign="start"
-                yAlign="start"
-                (closed)="updateItem(row,i,$event)"
-              >
-                <inline-edit
-                  style="width: 400px !important;"
-                  [value]="row.item_name"
-                  column="item"
-                  [minimumPrice]="row.minimumPrice"
-                ></inline-edit>
-              </sat-popover>
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-          </ng-container>
+
           <ng-container matColumnDef="source_warehouse">
             <mat-header-cell *matHeaderCellDef
               >Source Warehouse</mat-header-cell

@@ -10,6 +10,7 @@ import {
   RELAY_GET_FULL_ITEM_ENDPOINT,
   GET_TERRITORY_BY_WAREHOUSE_ENDPOINT,
   CUSTOMER_ENDPOINT,
+  GET_LIST_PROBLEM_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -163,5 +164,28 @@ export class AddWarrantyService {
 
   getStorage() {
     return this.storage;
+  }
+
+  getProblemList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 15,
+  ) {
+    const url = GET_LIST_PROBLEM_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', filter)
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+    );
   }
 }

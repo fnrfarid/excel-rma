@@ -86,4 +86,7 @@ export class ServiceInvoice extends BaseEntity {
 
   @Column()
   delivery_warehouse: string;
+
+  @Column()
+  docstatus: number;
 }
