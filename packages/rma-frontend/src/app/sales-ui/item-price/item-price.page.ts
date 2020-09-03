@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -9,6 +9,7 @@ import { ItemPriceService } from '../services/item-price.service';
 import { SalesService } from '../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../constants/app-string';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-item-price',
@@ -38,6 +39,7 @@ export class ItemPricePage implements OnInit {
     private readonly itemPriceService: ItemPriceService,
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
+    private readonly dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -57,20 +59,22 @@ export class ItemPricePage implements OnInit {
     this.location.back();
   }
 
-  itemSerialized(event, item_name) {
+  async itemSerialized(event, item_name) {
     event = event ? 1 : 0;
+    const dialog = this.dialog.open(ConfirmationDialog, { data: { event } });
+    const response = await dialog.afterClosed().toPromise();
+
+    if (!response) {
+      this.updateSerialized(item_name, event);
+      return;
+    }
+
     return this.itemPriceService.updateHasSerialNo(event, item_name).subscribe({
       next: success => {
         this.snackBar.open('Item updated.', CLOSE, { duration: 2000 });
       },
       error: err => {
-        const data = this.dataSource.data;
-        data.forEach(item => {
-          item.item_name === item_name
-            ? (item.has_serial_no = event ? 0 : 1)
-            : null;
-        });
-        this.dataSource.update(data);
+        this.updateSerialized(item_name, event);
         this.snackBar.open(
           err?.error?.message
             ? err.error.message
@@ -80,6 +84,16 @@ export class ItemPricePage implements OnInit {
         );
       },
     });
+  }
+
+  updateSerialized(item_name, event) {
+    const data = this.dataSource.data;
+    data.forEach(item => {
+      item.item_name === item_name
+        ? (item.has_serial_no = event ? 0 : 1)
+        : null;
+    });
+    this.dataSource.update(data);
   }
 
   setFilter(event?: Sort) {
@@ -150,17 +164,41 @@ export class ItemPricePage implements OnInit {
 
   loadPrice(row, index) {
     const data = this.dataSource.getData();
-    if (data.length !== 1) {
-      data[index] = { ...row };
-      this.salesService
-        .getItemPrice(data[index].name)
-        .pipe(map(prices => (prices.length ? prices[0].price_list_rate : 0)))
-        .subscribe({
-          next: price => {
-            data[index].selling_price = price;
-          },
-        });
-    }
-    this.dataSource.update(data);
+    this.salesService
+      .getItemPrice(data[index].name)
+      .pipe(map(prices => (prices.length ? prices[0].price_list_rate : 0)))
+      .subscribe({
+        next: price => {
+          data[index].selling_price = price;
+          this.dataSource.update(data);
+        },
+        error: err => {
+          this.snackBar.open(
+            `Failed to load selling price: ${err?.error?.message}`,
+            CLOSE,
+            { duration: 2500 },
+          );
+        },
+      });
   }
+}
+export interface DialogData {
+  event: boolean;
+}
+@Component({
+  selector: 'confirmation-dialog',
+  template: `
+    <h1 mat-dialog-title>
+      Reset the serial to be {{ data?.event ? 'Serialized' : 'Non Serialized' }}
+    </h1>
+    <mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="false">Cancel</button>
+      <button mat-button [mat-dialog-close]="true" cdkFocusInitial>
+        Reset
+      </button>
+    </mat-dialog-actions>
+  `,
+})
+export class ConfirmationDialog {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) {}
 }

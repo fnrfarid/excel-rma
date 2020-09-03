@@ -142,10 +142,10 @@
             Selling Price
           </th>
           <td class="ion-text-center" mat-cell *matCellDef="let row; let i = index">
-            <ion-text *ngIf="row.selling_price">
+            <ion-text *ngIf="row.selling_price !== undefined">
               {{row.selling_price | curFormat | async}}
             </ion-text>
-            <ion-button *ngIf="!row.selling_price" (click)="loadPrice(row, i)" fill="clear">
+            <ion-button *ngIf="row.selling_price === undefined" (click)="loadPrice(row, i)" fill="clear">
               <ion-icon slot="icon-only" name="refresh"></ion-icon>
             </ion-button>
           </td>
