@@ -142,9 +142,9 @@ export class AddServiceInvoicePage implements OnInit {
       customer_name: new FormControl('', [Validators.required]),
       customer_contact: new FormControl('', [Validators.required]),
       customer_address: new FormControl('', [Validators.required]),
-      third_party_name: new FormControl('', [Validators.required]),
-      third_party_contact: new FormControl('', [Validators.required]),
-      third_party_address: new FormControl('', [Validators.required]),
+      third_party_name: new FormControl(''),
+      third_party_contact: new FormControl(''),
+      third_party_address: new FormControl(''),
       account: new FormControl('', [Validators.required]),
       posting_date: new FormControl('', [Validators.required]),
       branch: new FormControl('', [Validators.required]),
@@ -174,7 +174,6 @@ export class AddServiceInvoicePage implements OnInit {
       serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
       serviceInvoiceDetails.total_qty = 0;
       serviceInvoiceDetails.total = 0;
-      serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.UNPAID;
       serviceInvoiceDetails.due_date = this.serviceInvoiceForm.controls.posting_date.value;
       serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
       serviceInvoiceDetails.date = this.serviceInvoiceForm.controls.posting_date.value;
@@ -196,6 +195,7 @@ export class AddServiceInvoicePage implements OnInit {
             serviceInvoiceDetails.pos_profile = profile;
           });
         serviceInvoiceDetails.payments = [];
+        serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.PAID;
         serviceInvoiceDetails.payments.push({
           account: this.serviceInvoiceForm.controls.account.value.name,
           mode_of_payment: 'Cash',
@@ -203,6 +203,7 @@ export class AddServiceInvoicePage implements OnInit {
         });
       } else {
         serviceInvoiceDetails.is_pos = 0;
+        serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.UNPAID;
       }
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {

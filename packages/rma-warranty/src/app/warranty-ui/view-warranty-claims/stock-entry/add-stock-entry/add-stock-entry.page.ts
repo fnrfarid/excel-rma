@@ -42,8 +42,8 @@ export class AddStockEntryPage implements OnInit {
   button_active: boolean;
   serialItem: any;
   displayedColumns: string[] = [
-    'serial_no',
     'item_name',
+    'serial_no',
     'source_warehouse',
     'quantity',
     'delete',
@@ -246,6 +246,7 @@ export class AddStockEntryPage implements OnInit {
                 .subscribe({
                   next: item => {
                     this.AddSerialItem(item);
+                    this.addReplaceItem(item);
                   },
                   error: err => {
                     this.snackbar.open(`Serial ${ITEM_NOT_FOUND}`, 'Close', {
@@ -255,6 +256,7 @@ export class AddStockEntryPage implements OnInit {
                 });
             } else {
               this.AddNonSerialItem(serialItem);
+              this.addReplaceItem(serialItem);
             }
           },
           error: err => {
@@ -286,7 +288,6 @@ export class AddStockEntryPage implements OnInit {
       serial_no: [''],
     });
     this.dataSource.update(itemDataSource);
-    this.addItem();
   }
 
   AddSerialItem(serialItem: any) {
@@ -303,7 +304,6 @@ export class AddStockEntryPage implements OnInit {
       serial_no: [serialItem.serial_no],
     });
     this.dataSource.update(itemDataSource);
-    this.addItem();
   }
 
   updateItem(row: StockEntryItems, index: number, item: StockEntryItems) {
@@ -331,6 +331,22 @@ export class AddStockEntryPage implements OnInit {
     item.item_code = '';
     item.item_name = '';
     item.qty = 0;
+    item.minimumPrice = 0;
+    item.serial_no = [];
+    item.s_warehouse = '';
+    data.push(item);
+    this.itemsControl.push(new FormControl(item));
+    this.dataSource.update(data);
+    this.checkActive(this.dataSource.data().length);
+  }
+
+  addReplaceItem(row) {
+    this.serialActive = false;
+    const data = this.dataSource.data();
+    const item = {} as StockEntryItems;
+    item.item_code = row.item_code;
+    item.item_name = row.item_name;
+    item.qty = 1;
     item.minimumPrice = 0;
     item.serial_no = [];
     item.s_warehouse = '';

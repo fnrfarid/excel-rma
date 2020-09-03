@@ -5,7 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ItemPricePage } from './item-price.page';
+import { ItemPricePage, ConfirmationDialog } from './item-price.page';
 import { MaterialModule } from '../../material/material.module';
 import { AppCommonModule } from '../../common/app-common.module';
 import { EditPriceComponent } from './edit-price/edit-price.component';
@@ -26,6 +26,12 @@ const routes: Routes = [
     MaterialModule,
     AppCommonModule,
   ],
-  declarations: [ItemPricePage, EditPriceComponent, EditDaysComponent],
+  entryComponents: [ConfirmationDialog],
+  declarations: [
+    ItemPricePage,
+    EditPriceComponent,
+    EditDaysComponent,
+    ConfirmationDialog,
+  ],
 })
 export class ItemPricePageModule {}

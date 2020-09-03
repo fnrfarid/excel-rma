@@ -35,6 +35,20 @@
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
+            <ion-col *ngIf="warrantyState.serial_no.active">
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Serial no"
+                  formControlName="serial_no"
+                  (keyup.enter)="serialChanged($event.target.value)"
+                />
+                <mat-error *ngIf="f.serial_no.hasError('required')">
+                  Serial no is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -56,20 +70,6 @@
                 </mat-autocomplete>
                 <mat-error *ngIf="f.claim_type.hasError('required')">
                   Claim Type is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-            <ion-col *ngIf="warrantyState.serial_no.active">
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  placeholder="Serial no"
-                  formControlName="serial_no"
-                  (keyup.enter)="serialChanged($event.target.value)"
-                />
-                <mat-error *ngIf="f.serial_no.hasError('required')">
-                  Serial no is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -161,7 +161,20 @@
                   type="text"
                   placeholder="Problem"
                   formControlName="problem"
+                  [matAutocomplete]="problem"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #problem="matAutocomplete"
+                  [displayWith]="getProblemOption"
+                >
+                  <mat-option
+                    *ngFor="let option of problemList | async"
+                    [value]="option"
+                  >
+                    {{ option.problem_name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.problem.hasError('required')">
                   Problem is <strong>required</strong>
                 </mat-error>
@@ -175,9 +188,6 @@
                   placeholder="Problem Details"
                   formControlName="problem_details"
                 />
-                <mat-error *ngIf="f.problem_details.hasError('required')">
-                  Problem Details is <strong>required</strong>
-                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -190,9 +200,6 @@
                   placeholder="Additional Remarks"
                   formControlName="remarks"
                 />
-                <mat-error *ngIf="f.remarks.hasError('required')">
-                  Additional remarks is <strong>required</strong>
-                </mat-error>
               </mat-form-field>
             </ion-col>
             <ion-col> </ion-col>
@@ -411,9 +418,6 @@
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.delivery_branch.hasError('required')">
-                  Delivery Branch is <strong>required</strong>
-                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>

@@ -121,7 +121,7 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
           ),
         });
       }),
-      map(res => res.data),
+      map(res => res.data.data),
       switchMap(res => {
         return from(
           this.serviceInvoiceService.updateOne(
