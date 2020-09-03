@@ -34,13 +34,14 @@ export const WARRANTY_TYPE = {
 };
 
 export const CURRENT_STATUS_VERDICT = {
-  TRANSFERRED: 'Transferred',
+  RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   RECEIVED_FROM_BRANCH: 'Received from Branch',
-  SOLVED: 'Solved',
-  UNSOLVED: 'Unsolved',
-  REJECTED: 'Rejected',
-  TO_REPLACE: 'To Replace',
   WORK_IN_PROGRESS: 'Work in Progress',
+  TRANSFERRED: 'Transferred',
+  SOLVED: 'Solved - Repairing done',
+  TO_REPLACE: 'Unsolved - To Replace',
+  UNSOLVED: 'Unsolved - Return to Owner',
+  DELIVER_TO_CUSTOMER: 'Deliver to Customer',
 };
 
 export const DELIVERY_STATUS = {

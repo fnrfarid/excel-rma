@@ -76,7 +76,7 @@ export class StatusHistoryComponent implements OnInit {
       status_from: new FormControl('', [Validators.required]),
       transfer_branch: new FormControl(''),
       current_status_verdict: new FormControl('', [Validators.required]),
-      description: new FormControl('', [Validators.required]),
+      description: new FormControl(''),
       delivery_status: new FormControl(''),
     });
   }
@@ -98,6 +98,7 @@ export class StatusHistoryComponent implements OnInit {
         this.territory = territory;
         this.statusHistoryForm.controls.status_from.setValue(territory[0]);
       });
+    this.selectedPostingDate({ value: new Date() });
   }
 
   branchOptionChanged(option) {}

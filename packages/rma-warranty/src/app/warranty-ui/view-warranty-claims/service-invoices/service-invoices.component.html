@@ -119,14 +119,14 @@
         <mat-header-cell *matHeaderCellDef>Submit</mat-header-cell>
         <mat-cell *matCellDef="let row; let i = index">
           <ion-button
-            *ngIf="row?.status === 'Unpaid'"
+            *ngIf="!row.docstatus"
             (click)="submitInvoice(row)"
             fill="solid"
             color="tertiary"
           >
             submit
           </ion-button>
-          <label *ngIf="row?.status === 'Paid'">Submitted</label>
+          <label *ngIf="row.docstatus">Submitted</label>
         </mat-cell>
         <mat-footer-cell *matFooterCellDef></mat-footer-cell>
       </ng-container>
