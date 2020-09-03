@@ -64,6 +64,7 @@ describe('AddSalesReturnPage', () => {
             getDeliveryNoteNames: (...args) => of([{ name: '' }]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),
+              getItemAsync: (...args) => of([]),
             }),
           },
         },
