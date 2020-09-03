@@ -27,7 +27,7 @@ import {
   ItemDataSource,
   SerialDataSource,
 } from '../view-sales-invoice/serials/serials-datasource';
-import { CLOSE } from '../../constants/app-string';
+import { CLOSE, WAREHOUSES } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AssignSerialsDialog,
@@ -95,6 +95,9 @@ export class AddSalesReturnPage implements OnInit {
   serialDataSource: SerialDataSource;
   filteredItemList = [];
   deliveryNoteNames = [];
+  initial: { [key: string]: number } = {
+    warehouse: 0,
+  };
 
   constructor(
     private readonly location: Location,
@@ -118,7 +121,17 @@ export class AddSalesReturnPage implements OnInit {
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getWarehouseList(value);
+        return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
+      }),
+      switchMap(data => {
+        if (data && data.length) {
+          this.initial.warehouse
+            ? null
+            : (this.warehouseFormControl.setValue(data[0]),
+              this.initial.warehouse++);
+          return of(data);
+        }
+        return of([]);
       }),
     );
   }

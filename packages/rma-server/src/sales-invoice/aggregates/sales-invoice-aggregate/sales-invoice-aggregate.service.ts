@@ -364,10 +364,10 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   );
                   const items = this.mapSerialsFromItem(response.items);
 
-                  const {
-                    returned_items_map,
-                    delivered_items_map,
-                  } = this.getReturnedItemsMap(items, salesInvoice);
+                  const { returned_items_map } = this.getReturnedItemsMap(
+                    items,
+                    salesInvoice,
+                  );
 
                   this.linkSalesReturn(
                     items,
@@ -381,7 +381,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                   this.salesInvoiceService
                     .updateOne(
                       { uuid: salesInvoice.uuid },
-                      { $set: { returned_items_map, delivered_items_map } },
+                      { $set: { returned_items_map } },
                     )
                     .then(success => {})
                     .catch(error => {});
