@@ -183,7 +183,7 @@ export class ItemPricePage implements OnInit {
   }
 }
 export interface DialogData {
-  confirmation: boolean;
+  event: boolean;
 }
 @Component({
   selector: 'confirmation-dialog',
