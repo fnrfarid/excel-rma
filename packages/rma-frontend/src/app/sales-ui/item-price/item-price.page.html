@@ -19,14 +19,22 @@
       </ion-card-title>
     </ion-card-header>
     <div class="loading-shade" *ngIf="dataSource.loading$ | async">
-      <mat-progress-bar *ngIf="dataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+      <mat-progress-bar
+        *ngIf="dataSource.loading$ | async"
+        mode="indeterminate"
+      ></mat-progress-bar>
     </div>
     <ion-card-content class="ion-padding">
       <ion-grid>
         <ion-row>
           <ion-col>
             <mat-form-field class="mat-input-wrapper">
-              <input matInput placeholder="Item Name" [(ngModel)]="itemName" (keyup.enter)="setFilter()" />
+              <input
+                matInput
+                placeholder="Item Name"
+                [(ngModel)]="itemName"
+                (keyup.enter)="setFilter()"
+              />
               <button mat-button matSuffix (click)="setFilter()">
                 <mat-icon>search</mat-icon>
               </button>
@@ -34,7 +42,12 @@
           </ion-col>
           <ion-col>
             <mat-form-field class="mat-input-wrapper">
-              <input matInput placeholder="Item Group" [(ngModel)]="itemGroup" (keyup.enter)="setFilter()" />
+              <input
+                matInput
+                placeholder="Item Group"
+                [(ngModel)]="itemGroup"
+                (keyup.enter)="setFilter()"
+              />
               <button mat-button matSuffix (click)="setFilter()">
                 <mat-icon>search</mat-icon>
               </button>
@@ -44,7 +57,12 @@
         <ion-row>
           <ion-col>
             <mat-form-field class="mat-input-wrapper">
-              <input matInput placeholder="Brand" [(ngModel)]="brand" (keyup.enter)="setFilter()" />
+              <input
+                matInput
+                placeholder="Brand"
+                [(ngModel)]="brand"
+                (keyup.enter)="setFilter()"
+              />
               <button mat-button matSuffix (click)="setFilter()">
                 <mat-icon>search</mat-icon>
               </button>
@@ -52,112 +70,185 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <table mat-table class="full-width-table" [dataSource]="dataSource" matSort (matSortChange)="setFilter($event)"
-        aria-label="Elements" style="width: 100%;">
-        <!-- Item -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="name">
-            Item
-          </th>
-          <td mat-cell *matCellDef="let row">
-            {{row.name}}
-          </td>
-        </ng-container>
+      <div class="example-container mat-elevation-z8">
+        <table
+          mat-table
+          class="full-width-table"
+          [dataSource]="dataSource"
+          matSort
+          (matSortChange)="setFilter($event)"
+          aria-label="Elements"
+        >
+          <!-- Item -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header="name">
+              Item
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.name}}
+            </td>
+          </ng-container>
 
-        <!-- Item Name -->
-        <ng-container matColumnDef="item_name">
-          <th mat-header-cell *matHeaderCellDef>
-            Item Name
-          </th>
-          <td mat-cell *matCellDef="let row">
-            {{row.item_name}}
-          </td>
-        </ng-container>
+          <!-- Item Name -->
+          <ng-container matColumnDef="item_name">
+            <th mat-header-cell *matHeaderCellDef>
+              Item Name
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.item_name}}
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="has_serial">
-          <th mat-header-cell *matHeaderCellDef>
-            Serialized
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <section>
-              <mat-checkbox [(ngModel)]="row.has_serial_no" (ngModelChange)="itemSerialized($event, row.item_name)"
-                class="example-margin"></mat-checkbox>
-            </section>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="has_serial">
+            <th mat-header-cell *matHeaderCellDef>
+              Serialized
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <section>
+                <mat-checkbox
+                  [(ngModel)]="row.has_serial_no"
+                  (ngModelChange)="itemSerialized($event, row.item_name)"
+                  class="example-margin"
+                ></mat-checkbox>
+              </section>
+            </td>
+          </ng-container>
 
-        <!-- sales Warranty Months Column -->
-        <ng-container matColumnDef="salesWarrantyMonths">
-          <th mat-header-cell *matHeaderCellDef class="ion-text-center">
-            Sales Warranty Months
-          </th>
+          <!-- sales Warranty Months Column -->
+          <ng-container matColumnDef="salesWarrantyMonths">
+            <th mat-header-cell *matHeaderCellDef class="ion-text-center">
+              Sales Warranty Months
+            </th>
 
-          <td class="ion-text-center" mat-cell *matCellDef="let row" [satPopoverAnchor]="d" tabindex="0"
-            (keyup.enter)="d.open()" (click)="d.open()">
-            <ion-text>
-              {{row.salesWarrantyMonths}}
-            </ion-text>
-            <sat-popover #d hasBackdrop xAlign="start" yAlign="start" (closed)="updateSalesWarrantyMonths(row, $event)">
-              <edit-days column="sales" [value]="row.salesWarrantyMonths"></edit-days>
-            </sat-popover>
-          </td>
-        </ng-container>
+            <td
+              class="ion-text-center"
+              mat-cell
+              *matCellDef="let row"
+              [satPopoverAnchor]="d"
+              tabindex="0"
+              (keyup.enter)="d.open()"
+              (click)="d.open()"
+            >
+              <ion-text>
+                {{row.salesWarrantyMonths}}
+              </ion-text>
+              <sat-popover
+                #d
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateSalesWarrantyMonths(row, $event)"
+              >
+                <edit-days
+                  column="sales"
+                  [value]="row.salesWarrantyMonths"
+                ></edit-days>
+              </sat-popover>
+            </td>
+          </ng-container>
 
-        <!-- purchase Warranty Months Column -->
-        <ng-container matColumnDef="purchaseWarrantyMonths">
-          <th mat-header-cell *matHeaderCellDef class="ion-text-center">
-            Purchase Warranty Months
-          </th>
+          <!-- purchase Warranty Months Column -->
+          <ng-container matColumnDef="purchaseWarrantyMonths">
+            <th mat-header-cell *matHeaderCellDef class="ion-text-center">
+              Purchase Warranty Months
+            </th>
 
-          <td class="ion-text-center" mat-cell *matCellDef="let row" [satPopoverAnchor]="d" tabindex="0"
-            (keyup.enter)="d.open()" (click)="d.open()">
-            <ion-text>
-              {{row.purchaseWarrantyMonths}}
-            </ion-text>
-            <sat-popover #d hasBackdrop xAlign="start" yAlign="start"
-              (closed)="updatePurchaseWarrantyMonths(row, $event)">
-              <edit-days column="purchase" [value]="row.purchaseWarrantyMonths"></edit-days>
-            </sat-popover>
-          </td>
-        </ng-container>
-        <!-- Price Column -->
-        <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef class="ion-text-center">
-            Price
-          </th>
-          <td class="ion-text-center" mat-cell *matCellDef="let row" [satPopoverAnchor]="p" tabindex="0"
-            (keyup.enter)="p.open()" (click)="p.open()">
-            <ion-text>
-              {{row.minimumPrice | curFormat | async}}
-            </ion-text>
-            <sat-popover #p hasBackdrop xAlign="start" yAlign="start" (closed)="updateMinPrice(row, $event)">
-              <edit-price [value]="row.minimumPrice" column="price"></edit-price>
-            </sat-popover>
-          </td>
-        </ng-container>
+            <td
+              class="ion-text-center"
+              mat-cell
+              *matCellDef="let row"
+              [satPopoverAnchor]="d"
+              tabindex="0"
+              (keyup.enter)="d.open()"
+              (click)="d.open()"
+            >
+              <ion-text>
+                {{row.purchaseWarrantyMonths}}
+              </ion-text>
+              <sat-popover
+                #d
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updatePurchaseWarrantyMonths(row, $event)"
+              >
+                <edit-days
+                  column="purchase"
+                  [value]="row.purchaseWarrantyMonths"
+                ></edit-days>
+              </sat-popover>
+            </td>
+          </ng-container>
+          <!-- Price Column -->
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef class="ion-text-center">
+              Price
+            </th>
+            <td
+              class="ion-text-center"
+              mat-cell
+              *matCellDef="let row"
+              [satPopoverAnchor]="p"
+              tabindex="0"
+              (keyup.enter)="p.open()"
+              (click)="p.open()"
+            >
+              <ion-text>
+                {{row.minimumPrice | curFormat | async}}
+              </ion-text>
+              <sat-popover
+                #p
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateMinPrice(row, $event)"
+              >
+                <edit-price
+                  [value]="row.minimumPrice"
+                  column="price"
+                ></edit-price>
+              </sat-popover>
+            </td>
+          </ng-container>
 
-        <!-- Selling Price Column -->
-        <ng-container matColumnDef="selling_price">
-          <th mat-header-cell *matHeaderCellDef class="text-center">
-            Selling Price
-          </th>
-          <td class="ion-text-center" mat-cell *matCellDef="let row; let i = index">
-            <ion-text *ngIf="row.selling_price !== undefined">
-              {{row.selling_price | curFormat | async}}
-            </ion-text>
-            <ion-button *ngIf="row.selling_price === undefined" (click)="loadPrice(row, i)" fill="clear">
-              <ion-icon slot="icon-only" name="refresh"></ion-icon>
-            </ion-button>
-          </td>
-        </ng-container>
+          <!-- Selling Price Column -->
+          <ng-container matColumnDef="selling_price">
+            <th mat-header-cell *matHeaderCellDef class="text-center">
+              Selling Price
+            </th>
+            <td
+              class="ion-text-center"
+              mat-cell
+              *matCellDef="let row; let i = index"
+            >
+              <ion-text *ngIf="row.selling_price !== undefined">
+                {{row.selling_price | curFormat | async}}
+              </ion-text>
+              <ion-button
+                *ngIf="row.selling_price === undefined"
+                (click)="loadPrice(row, i)"
+                fill="clear"
+              >
+                <ion-icon slot="icon-only" name="refresh"></ion-icon>
+              </ion-button>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
       <mat-card-actions>
-        <mat-paginator #paginator class="mat-paginator-sticky" (page)="getUpdate($event)" [length]="dataSource.length"
-          [pageSizeOptions]="[10, 50, 100, 500]">
+        <mat-paginator
+          #paginator
+          class="mat-paginator-sticky"
+          (page)="getUpdate($event)"
+          [length]="dataSource.length"
+          [pageSizeOptions]="[10, 50, 100, 500]"
+        >
         </mat-paginator>
       </mat-card-actions>
     </ion-card-content>

@@ -12,6 +12,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ItemPriceService } from '../sales-ui/services/item-price.service';
 import { TimeService } from '../api/time/time.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { RouterTestingModule } from '@angular/router/testing';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -34,6 +35,7 @@ describe('CustomerProfilePage', () => {
         ReactiveFormsModule,
         BrowserAnimationsModule,
         HttpClientTestingModule,
+        RouterTestingModule,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [

@@ -231,163 +231,162 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <div class="example-container mat-elevation-z8">
+        <table
+          mat-table
+          class="full-width-table"
+          matSort
+          aria-label="Elements"
+          [dataSource]="dataSource"
+          (matSortChange)="setFilter($event)"
+        >
+          <ng-container matColumnDef="sr_no">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let row;let i=index ">
+              {{i+1}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-      <table
-        mat-table
-        class="full-width-table"
-        matSort
-        aria-label="Elements"
-        style="width: 100%;"
-        [dataSource]="dataSource"
-        (matSortChange)="setFilter($event)"
-      >
-        <ng-container matColumnDef="sr_no">
-          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-          <mat-cell *matCellDef="let row;let i=index ">
-            {{i+1}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="claim_no">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
+              Claim no
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.claim_no}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="claim_no">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
-            Claim no
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.claim_no}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="claim_type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="claim_type">
+              Claim Type
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.claim_type}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="claim_type">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="claim_type">
-            Claim Type
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.claim_type}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="received_date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="received_date">
+              Received Date
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.received_on }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="customer_third_party">
+            <mat-header-cell *matHeaderCellDef>
+              Customer Third Party
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.customer_third_party}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="customer_name">
+            <mat-header-cell *matHeaderCellDef>
+              Customer name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.customer}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="third_party_name">
+            <mat-header-cell *matHeaderCellDef>
+              Third Party Customer Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.third_party_name}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="received_date">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="received_date">
-            Received Date
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.received_on }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <ng-container matColumnDef="customer_third_party">
-          <mat-header-cell *matHeaderCellDef>
-            Customer Third Party
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.customer_third_party}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <ng-container matColumnDef="customer_name">
-          <mat-header-cell *matHeaderCellDef>
-            Customer name
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.customer}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <ng-container matColumnDef="third_party_name">
-          <mat-header-cell *matHeaderCellDef>
-            Third Party Customer Name
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.third_party_name}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="item_code">
+            <mat-header-cell *matHeaderCellDef>
+              Item
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.item_code}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="item_code">
-          <mat-header-cell *matHeaderCellDef>
-            Item
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.item_code}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="claimed_serial">
+            <mat-header-cell *matHeaderCellDef>
+              Claimed Serial
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.serial_no}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="claimed_serial">
-          <mat-header-cell *matHeaderCellDef>
-            Claimed Serial
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.serial_no}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="claim_status">
+            <mat-header-cell *matHeaderCellDef>
+              Claim Status
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.claim_status}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="receiving_branch">
+            <mat-header-cell *matHeaderCellDef>
+              Receiving Branch
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.receiving_branch}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="claim_status">
-          <mat-header-cell *matHeaderCellDef>
-            Claim Status
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.claim_status}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <ng-container matColumnDef="receiving_branch">
-          <mat-header-cell *matHeaderCellDef>
-            Receiving Branch
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.receiving_branch}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="delivery_branch">
+            <mat-header-cell *matHeaderCellDef>
+              Delivery Branch
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.delivery_branch}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="delivery_branch">
-          <mat-header-cell *matHeaderCellDef>
-            Delivery Branch
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.delivery_branch}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="received_by">
+            <mat-header-cell *matHeaderCellDef>
+              Received By
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.received_by}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="received_by">
-          <mat-header-cell *matHeaderCellDef>
-            Received By
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.received_by}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="delivered_by">
+            <mat-header-cell *matHeaderCellDef>
+              Delivered by
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.delivered_by}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
 
-        <ng-container matColumnDef="delivered_by">
-          <mat-header-cell *matHeaderCellDef>
-            Delivered by
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.delivered_by}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></mat-header-row>
-
-        <mat-row
-          *matRowDef="let row; columns: displayedColumns;"
-          [routerLink]="['/warranty/view-warranty-claims',row.uuid]"
-        ></mat-row>
-        <mat-footer-row
-          class="footer"
-          *matFooterRowDef="displayedColumns; sticky: true"
-        ></mat-footer-row>
-      </table>
-
+          <mat-row
+            *matRowDef="let row; columns: displayedColumns;"
+            [routerLink]="['/warranty/view-warranty-claims',row.uuid]"
+          ></mat-row>
+          <mat-footer-row
+            class="footer"
+            *matFooterRowDef="displayedColumns; sticky: true"
+          ></mat-footer-row>
+        </table>
+      </div>
       <mat-card-actions>
         <mat-paginator
           #paginator

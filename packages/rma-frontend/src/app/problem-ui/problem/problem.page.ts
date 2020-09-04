@@ -6,6 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { PopoverController } from '@ionic/angular';
 import { AddProblemPage } from '../add-problem/add-problem.page';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-problem',
@@ -22,9 +23,13 @@ export class ProblemPage implements OnInit {
     private location: Location,
     private readonly problemService: ProblemService,
     private popoverController: PopoverController,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.search = '';
     this.dataSource = new ProblemDataSource(this.problemService);
     this.dataSource.loadItems();

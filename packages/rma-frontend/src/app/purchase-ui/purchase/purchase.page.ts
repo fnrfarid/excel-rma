@@ -6,7 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { PurchaseInvoice } from '../../common/interfaces/purchase.interface';
 import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import {
   DateAdapter,
@@ -58,9 +58,13 @@ export class PurchasePage implements OnInit {
     private location: Location,
     private readonly purchaseService: PurchaseService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new PurchaseInvoiceDataSource(this.purchaseService);
     this.router.events
       .pipe(

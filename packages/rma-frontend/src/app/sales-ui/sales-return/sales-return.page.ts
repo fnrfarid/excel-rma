@@ -5,6 +5,7 @@ import { SalesReturnListDataSource } from './sales-return-list.datasource';
 import { SalesReturnService } from '../view-sales-invoice/sales-return/sales-return.service';
 import { FormControl } from '@angular/forms';
 import { SalesService } from '../services/sales.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-sales-return',
@@ -36,9 +37,13 @@ export class SalesReturnPage implements OnInit {
   constructor(
     private readonly salesReturnService: SalesReturnService,
     private readonly salesService: SalesService,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new SalesReturnListDataSource(
       this.salesReturnService,
       this.salesService,

@@ -109,9 +109,9 @@
               >
                 <mat-option
                   *ngFor="let option of filteredWarehouseList | async"
-                  [value]="option.name"
+                  [value]="option"
                 >
-                  {{ option.name }}
+                  {{ option }}
                 </mat-option>
               </mat-autocomplete>
             </mat-form-field>

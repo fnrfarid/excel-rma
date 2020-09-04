@@ -178,157 +178,157 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <table
-        mat-table
-        class="full-width-table"
-        [dataSource]="dataSource"
-        matSort
-        (matSortChange)="setFilter($event)"
-        style="width: 100%;"
-      >
-        <ng-container matColumnDef="sr_no">
-          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-          <mat-cell *matCellDef="let row;let i=index ">
-            {{i+1}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <!-- customer_name Column -->
-        <ng-container matColumnDef="customer_name">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="customer_name">
-            Customer Name
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{ row.customer_name || row.customer }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef>Total</mat-footer-cell>
-        </ng-container>
+      <div class="example-container mat-elevation-z8">
+        <table
+          mat-table
+          class="full-width-table"
+          [dataSource]="dataSource"
+          matSort
+          (matSortChange)="setFilter($event)"
+        >
+          <ng-container matColumnDef="sr_no">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let row;let i=index ">
+              {{i+1}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <!-- customer_name Column -->
+          <ng-container matColumnDef="customer_name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="customer_name">
+              Customer Name
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ row.customer_name || row.customer }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>Total</mat-footer-cell>
+          </ng-container>
 
-        <!-- name Column -->
-        <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="name">
-            Invoice No
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.name}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <!-- name Column -->
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="name">
+              Invoice No
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.name}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="created_by">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="createdBy">
-            Created By
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{ row.createdBy }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="created_by">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="createdBy">
+              Created By
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ row.createdBy }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="delivered_by">
-          <mat-header-cell *matHeaderCellDef>
-            Delivered By
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{ (row.delivered_by.length === 0) ? '' : row.delivered_by[0] }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-        <!-- posting Column -->
-        <ng-container matColumnDef="posting_date">
-          <mat-header-cell mat-sort-header="created_on" *matHeaderCellDef>
-            Date
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{( getDate(row.posting_date) | date:'dd-MM-yyyy' )}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="delivered_by">
+            <mat-header-cell *matHeaderCellDef>
+              Delivered By
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ (row.delivered_by.length === 0) ? '' : row.delivered_by[0] }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <!-- posting Column -->
+          <ng-container matColumnDef="posting_date">
+            <mat-header-cell mat-sort-header="created_on" *matHeaderCellDef>
+              Date
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{( getDate(row.posting_date) | date:'dd-MM-yyyy' )}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="posting_time">
-          <mat-header-cell mat-sort-header="posting_time" *matHeaderCellDef>
-            time
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{( getStringTime(row.posting_time) | date:'mediumTime' )}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="posting_time">
+            <mat-header-cell mat-sort-header="posting_time" *matHeaderCellDef>
+              time
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{( getStringTime(row.posting_time) | date:'mediumTime' )}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="remarks">
-          <mat-header-cell *matHeaderCellDef>
-            Remarks
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.remarks}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="remarks">
+            <mat-header-cell *matHeaderCellDef>
+              Remarks
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.remarks}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <!-- territory Column -->
-        <ng-container matColumnDef="territory">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="territory">
-            Branch
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.territory}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <!-- territory Column -->
+          <ng-container matColumnDef="territory">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="territory">
+              Branch
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.territory}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="status"
-            >Status</mat-header-cell
-          >
-          <mat-cell *matCellDef="let row">
-            <ion-text [ngStyle]="getStatusColor(row.status)">
-              {{row.status}}
-            </ion-text>
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="status"
+              >Status</mat-header-cell
+            >
+            <mat-cell *matCellDef="let row">
+              <ion-text [ngStyle]="getStatusColor(row.status)">
+                {{row.status}}
+              </ion-text>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="total">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="total">
-            Invoice Amount
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.total | curFormat | async }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef>
-            {{ total | curFormat | async }}
-          </mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="total">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="total">
+              Invoice Amount
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.total | curFormat | async }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+              {{ total | curFormat | async }}
+            </mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="due_amount">
-          <mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header="outstanding_amount"
-          >
-            Due Amount
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.outstanding_amount | curFormat | async }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef>
-            {{ dueTotal | curFormat | async }}
-          </mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="due_amount">
+            <mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="outstanding_amount"
+            >
+              Due Amount
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.outstanding_amount | curFormat | async }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+              {{ dueTotal | curFormat | async }}
+            </mat-footer-cell>
+          </ng-container>
 
-        <mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></mat-header-row>
-        <mat-row
-          *matRowDef="let row; columns: displayedColumns;"
-          (click)="navigateBasedOnRoles(row)"
-        ></mat-row>
-        <mat-footer-row
-          class="footer"
-          *matFooterRowDef="displayedColumns; sticky: true"
-        ></mat-footer-row>
-      </table>
-
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedColumns;"
+            (click)="navigateBasedOnRoles(row)"
+          ></mat-row>
+          <mat-footer-row
+            class="footer"
+            *matFooterRowDef="displayedColumns; sticky: true"
+          ></mat-footer-row>
+        </table>
+      </div>
       <mat-card-actions>
         <mat-paginator
           #paginator

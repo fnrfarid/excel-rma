@@ -15,6 +15,7 @@ export const APPLICATION_JSON = 'application/json';
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
 export const JSON_BODY_MAX_SIZE = 8000;
+export const ASSIGN_SERIAL_DIALOG_QTY = 2;
 export const MATERIAL_TRANSFER = 'Material Transfer';
 export const PURCHASE_USER = 'Purchase User';
 export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';

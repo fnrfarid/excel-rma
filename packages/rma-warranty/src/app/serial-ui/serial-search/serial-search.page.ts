@@ -9,6 +9,7 @@ import { SerialSearchDataSource } from './serial-search-datasource';
 import { SerialSearchService } from './serial-search.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime, startWith } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-serial-search',
@@ -68,9 +69,13 @@ export class SerialSearchPage implements OnInit {
   constructor(
     private location: Location,
     private readonly serialSearchService: SerialSearchService,
+    private readonly route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new SerialSearchDataSource(this.serialSearchService);
   }
 

@@ -135,127 +135,127 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <mat-table
-        class="full-width-table"
-        [dataSource]="dataSource"
-        matSort
-        (matSortChange)="setFilter($event)"
-        style="width: 100%;"
-      >
-        <ng-container matColumnDef="sr_no">
-          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-          <mat-cell *matCellDef="let row;let i=index ">
-            {{i+1}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+      <div class="example-container mat-elevation-z8">
+        <mat-table
+          [dataSource]="dataSource"
+          matSort
+          (matSortChange)="setFilter($event)"
+        >
+          <ng-container matColumnDef="sr_no">
+            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let row;let i=index ">
+              {{i+1}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="purchase_invoice_number">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="name">
-            Invoice No.
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.name}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="purchase_invoice_number">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="name">
+              Invoice No.
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.name}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="status">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="status"
-            >Status</mat-header-cell
-          >
-          <mat-cell *matCellDef="let row">
-            <ion-text
-              [ngStyle]="{
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="status"
+              >Status</mat-header-cell
+            >
+            <mat-cell *matCellDef="let row">
+              <ion-text
+                [ngStyle]="{
               color: 'green'
             }"
-              *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' || row.status === 'Completed'"
-            >
-              {{row.status}}
-            </ion-text>
-            <ion-text
-              *ngIf="row.status === 'Draft' || row.status === 'Rejected' || row.status === 'Canceled'"
-              [ngStyle]="{
+                *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' || row.status === 'Completed'"
+              >
+                {{row.status}}
+              </ion-text>
+              <ion-text
+                *ngIf="row.status === 'Draft' || row.status === 'Rejected' || row.status === 'Canceled'"
+                [ngStyle]="{
               color: 'red'
             }"
+              >
+                {{row.status}}
+              </ion-text>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="created_on">
+              Date
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.posting_date | date:'dd-MM-yyyy'}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="supplier">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="supplier">
+              Supplier
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.supplier_name}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef style="justify-content: end;">
+              Total
+            </mat-footer-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="total">
+            <mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="total"
+              style="display: flex; justify-content: center;"
             >
-              {{row.status}}
-            </ion-text>
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+              Total
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.total | curFormat | async }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef>
+              {{ total | curFormat | async }}
+            </mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="date">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="created_on">
-            Date
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.posting_date | date:'dd-MM-yyyy'}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="created_by">
+            <mat-header-cell *matHeaderCellDef>
+              Created By
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ row.created_by }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="supplier">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="supplier">
-            Supplier
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.supplier_name}}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef>
-            Total
-          </mat-footer-cell>
-        </ng-container>
+          <ng-container matColumnDef="delivered_by">
+            <mat-header-cell *matHeaderCellDef>
+              Delivered By
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{ (row.deliveredBy && row.deliveredBy[0]) ? row.deliveredBy[0] :
+              '' }}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="total">
-          <mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header="total"
-            style="display: flex;justify-content: center;"
-          >
-            Total
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{row.total | curFormat | async }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef>
-            {{ total | curFormat | async }}
-          </mat-footer-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="created_by">
-          <mat-header-cell *matHeaderCellDef>
-            Created By
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{ row.created_by }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="delivered_by">
-          <mat-header-cell *matHeaderCellDef>
-            Delivered By
-          </mat-header-cell>
-          <mat-cell *matCellDef="let row">
-            {{ (row.deliveredBy && row.deliveredBy[0]) ? row.deliveredBy[0] : ''  }}
-          </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-        </ng-container>
-
-        <mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></mat-header-row>
-        <mat-row
-          *matRowDef="let row; columns: displayedColumns;"
-          [routerLink]="['/purchase/view-purchase-invoice',row.uuid]"
-        ></mat-row>
-        <mat-footer-row
-          class="footer"
-          *matFooterRowDef="displayedColumns; sticky: true"
-        ></mat-footer-row>
-      </mat-table>
-
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedColumns;"
+            [routerLink]="['/purchase/view-purchase-invoice',row.uuid]"
+          ></mat-row>
+          <mat-footer-row
+            class="footer"
+            *matFooterRowDef="displayedColumns; sticky: true"
+          ></mat-footer-row>
+        </mat-table>
+      </div>
       <mat-card-actions>
         <mat-paginator
           #paginator

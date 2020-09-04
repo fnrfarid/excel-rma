@@ -22,6 +22,7 @@ import {
   CLOSE,
   PURCHASE_RECEIPT,
   WAREHOUSES,
+  ASSIGN_SERIAL_DIALOG_QTY,
 } from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
 import {
@@ -364,7 +365,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
 
   async assignSingularSerials(row: Item) {
     const dialogRef =
-      row.remaining >= 30
+      row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? this.dialog.open(AssignSerialsDialog, {
             width: '250px',
             data: { serials: row.remaining || 0 },
@@ -372,7 +373,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         : null;
 
     const serials =
-      row.remaining >= 30
+      row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? await dialogRef.afterClosed().toPromise()
         : row.remaining;
     if (serials) {

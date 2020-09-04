@@ -27,7 +27,11 @@ import {
   ItemDataSource,
   SerialDataSource,
 } from '../view-sales-invoice/serials/serials-datasource';
-import { CLOSE } from '../../constants/app-string';
+import {
+  CLOSE,
+  WAREHOUSES,
+  ASSIGN_SERIAL_DIALOG_QTY,
+} from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   AssignSerialsDialog,
@@ -95,6 +99,9 @@ export class AddSalesReturnPage implements OnInit {
   serialDataSource: SerialDataSource;
   filteredItemList = [];
   deliveryNoteNames = [];
+  initial: { [key: string]: number } = {
+    warehouse: 0,
+  };
 
   constructor(
     private readonly location: Location,
@@ -118,7 +125,17 @@ export class AddSalesReturnPage implements OnInit {
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getWarehouseList(value);
+        return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
+      }),
+      switchMap(data => {
+        if (data && data.length) {
+          this.initial.warehouse
+            ? null
+            : (this.warehouseFormControl.setValue(data[0]),
+              this.initial.warehouse++);
+          return of(data);
+        }
+        return of([]);
       }),
     );
   }
@@ -366,7 +383,7 @@ export class AddSalesReturnPage implements OnInit {
 
   async assignSingularSerials(row: Item) {
     const dialogRef =
-      row.remaining >= 30
+      row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? this.dialog.open(AssignSerialsDialog, {
             width: '250px',
             data: { serials: row.remaining || 0 },
@@ -374,7 +391,7 @@ export class AddSalesReturnPage implements OnInit {
         : null;
 
     const serials =
-      row.remaining >= 30
+      row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? await dialogRef.afterClosed().toPromise()
         : row.remaining;
     if (serials && serials <= row.remaining) {
