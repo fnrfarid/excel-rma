@@ -48,6 +48,9 @@ export class JobsPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new JobsDataSource(this.jobsService);
     this.router.events
       .pipe(

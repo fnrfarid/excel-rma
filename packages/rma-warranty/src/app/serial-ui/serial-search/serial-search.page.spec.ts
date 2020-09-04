@@ -10,6 +10,7 @@ import { SerialSearchPage } from './serial-search.page';
 import { SerialSearchService } from './serial-search.service';
 import { StorageService } from '../../api/storage/storage.service';
 import { MaterialModule } from '../../material/material.module';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SerialSearchPage', () => {
   let component: SerialSearchPage;
@@ -34,6 +35,7 @@ describe('SerialSearchPage', () => {
         FormsModule,
         MaterialModule,
         BrowserAnimationsModule,
+        RouterTestingModule,
       ],
       declarations: [SerialSearchPage],
       providers: [

@@ -7,7 +7,7 @@ import { MatSort } from '@angular/material/sort';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
 import { SettingsService } from '../../settings/settings.service';
 import { SYSTEM_MANAGER } from '../../constants/app-string';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import {
   VIEW_SALES_INVOICE_PAGE_URL,
   ADD_SALES_INVOICE_PAGE_URL,
@@ -93,9 +93,13 @@ export class SalesPage implements OnInit {
     private location: Location,
     private readonly settingService: SettingsService,
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new SalesInvoiceDataSource(this.salesService);
     this.router.events
       .pipe(
