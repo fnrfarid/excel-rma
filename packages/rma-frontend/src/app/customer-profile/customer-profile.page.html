@@ -39,62 +39,69 @@
           </button>
         </mat-form-field>
       </div>
-      <table
-        mat-table
-        class="full-width-table"
-        [dataSource]="dataSource"
-        matSort
-        style="width: 100%;"
-      >
-        <!-- Custoemr Name Column -->
-        <ng-container matColumnDef="customer">
-          <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
-        </ng-container>
+      <div class="example-container mat-elevation-z8">
+        <table
+          mat-table
+          class="full-width-table"
+          [dataSource]="dataSource"
+          matSort
+        >
+          <!-- Custoemr Name Column -->
+          <ng-container matColumnDef="customer">
+            <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="credit_limit">
-          <mat-header-cell *matHeaderCellDef>Credit Limit</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ row.credit_limit | curFormat | async }}</mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="remaining_credit">
-          <mat-header-cell *matHeaderCellDef>Remaining Credit</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ getRemainingCredit(row) | curFormat | async }}</mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="territory">
-          <mat-header-cell *matHeaderCellDef>Territory name</mat-header-cell>
-          <mat-cell *matCellDef="let row">{{ row.territory }}</mat-cell>
-        </ng-container>
-
-
-        <ng-container matColumnDef="remaining_balance">
-          <mat-header-cell *matHeaderCellDef>Current Outstanding</mat-header-cell>
-
-          <mat-cell
-          class="ion-text-center"
-          mat-cell
-          *matCellDef="let row; let i = index"
+          <ng-container matColumnDef="credit_limit">
+            <mat-header-cell *matHeaderCellDef>Credit Limit</mat-header-cell>
+            <mat-cell *matCellDef="let row"
+              >{{ row.credit_limit | curFormat | async }}</mat-cell
             >
-            <ion-text *ngIf="row.remaining_balance">
-              {{row.remaining_balance | curFormat | async}}
-            </ion-text>
-            <ion-button
-              *ngIf="!row.remaining_balance"
-              (click)="loadPrice(row, i)"
-              fill="clear"
+          </ng-container>
+
+          <ng-container matColumnDef="remaining_credit">
+            <mat-header-cell *matHeaderCellDef
+              >Remaining Credit</mat-header-cell
             >
-              <ion-icon slot="icon-only" name="refresh"></ion-icon>
-            </ion-button>
-          </mat-cell>
-        </ng-container>
+            <mat-cell *matCellDef="let row"
+              >{{ getRemainingCredit(row) | curFormat | async }}</mat-cell
+            >
+          </ng-container>
 
-        <mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-      </table>
+          <ng-container matColumnDef="territory">
+            <mat-header-cell *matHeaderCellDef>Territory name</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.territory }}</mat-cell>
+          </ng-container>
 
+          <ng-container matColumnDef="remaining_balance">
+            <mat-header-cell *matHeaderCellDef
+              >Current Outstanding</mat-header-cell
+            >
+
+            <mat-cell
+              class="ion-text-center"
+              mat-cell
+              *matCellDef="let row; let i = index"
+            >
+              <ion-text *ngIf="row.remaining_balance">
+                {{row.remaining_balance | curFormat | async}}
+              </ion-text>
+              <ion-button
+                *ngIf="!row.remaining_balance"
+                (click)="loadPrice(row, i)"
+                fill="clear"
+              >
+                <ion-icon slot="icon-only" name="refresh"></ion-icon>
+              </ion-button>
+            </mat-cell>
+          </ng-container>
+
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        </table>
+      </div>
       <mat-card-actions>
         <mat-paginator
           #paginator

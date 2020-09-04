@@ -23,7 +23,10 @@
       </ion-row>
     </ion-card-header>
     <div class="loading-shade" *ngIf="dataSource.loading$ | async">
-      <mat-progress-bar *ngIf="dataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+      <mat-progress-bar
+        *ngIf="dataSource.loading$ | async"
+        mode="indeterminate"
+      ></mat-progress-bar>
     </div>
 
     <ion-card-content class="ion-no-padding">
@@ -32,7 +35,7 @@
           <ion-col>
             <mat-form-field class="full-width">
               <input
-              matTooltip="If you copied from below there could be space character before your search"
+                matTooltip="If you copied from below there could be space character before your search"
                 matInput
                 placeholder="Parent Name"
                 [(ngModel)]="parent"
@@ -47,10 +50,7 @@
                 [(value)]="status"
                 (selectionChange)="statusChange($event.value)"
               >
-                <mat-option
-                  *ngFor="let status of jobStatus"
-                  [value]="status"
-                >
+                <mat-option *ngFor="let status of jobStatus" [value]="status">
                   {{status}}
                 </mat-option>
               </mat-select>
@@ -58,42 +58,56 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <div class="example-container mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource">
+          <!-- Position Column -->
+          <ng-container matColumnDef="failCount">
+            <mat-header-cell *matHeaderCellDef>Retry Count</mat-header-cell>
+            <mat-cell *matCellDef="let element"
+              >{{element.failCount || 0}}</mat-cell
+            >
+          </ng-container>
 
-      <table mat-table [dataSource]="dataSource" >
-        <!-- Position Column -->
-        <ng-container matColumnDef="failCount">
-          <mat-header-cell *matHeaderCellDef>Retry Count</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.failCount || 0}}</mat-cell>
-        </ng-container>
+          <!-- Weight Column -->
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+            <mat-cell *matCellDef="let element"
+              >{{element.data.status}}</mat-cell
+            >
+          </ng-container>
 
-        <!-- Weight Column -->
-        <ng-container matColumnDef="status">
-          <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.data.status}}</mat-cell>
-        </ng-container>
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="parent">
+            <mat-header-cell *matHeaderCellDef>Parent</mat-header-cell>
+            <mat-cell *matCellDef="let element"
+              >{{element.data.parent}}</mat-cell
+            >
+          </ng-container>
 
-        <!-- Symbol Column -->
-        <ng-container matColumnDef="parent">
-          <mat-header-cell *matHeaderCellDef>Parent</mat-header-cell>
-          <mat-cell *matCellDef="let element">{{element.data.parent}}</mat-cell>
-        </ng-container>
+          <ng-container matColumnDef="serials">
+            <mat-header-cell *matHeaderCellDef>serials</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{element.data.type==='CREATE_PURCHASE_RECEIPT_JOB'?
+              getPurchaseSerialValue(element.data.payload)
+              :getSerialValue(element.data.payload) }}
+            </mat-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="serials">
-          <mat-header-cell *matHeaderCellDef>serials</mat-header-cell>
-          <mat-cell *matCellDef="let element">
-            {{element.data.type==='CREATE_PURCHASE_RECEIPT_JOB'? getPurchaseSerialValue(element.data.payload) :getSerialValue(element.data.payload) }}
-          </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="type">
-          <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-          <mat-cell *matCellDef="let element">
-            {{getCamelCase(element.data.type)}}
-          </mat-cell>
-        </ng-container>
-        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"  (click)="viewSingleJob(row)"></mat-row>
-      </table>
+          <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              {{getCamelCase(element.data.type)}}
+            </mat-cell>
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: displayedColumns;"
+            (click)="viewSingleJob(row)"
+          ></mat-row>
+        </table>
+      </div>
 
       <mat-card-actions>
         <mat-paginator

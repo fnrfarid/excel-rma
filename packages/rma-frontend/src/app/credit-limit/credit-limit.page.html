@@ -38,118 +38,118 @@
           </button>
         </mat-form-field>
       </div>
-      <table
-        mat-table
-        class="full-width-table"
-        [dataSource]="dataSource"
-        matSort
-        aria-label="Elements"
-        style="width: 100%;"
-      >
-        <!-- Customer -->
-        <ng-container matColumnDef="name">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header="name"
-            (click)="setFilter()"
-          >
-            Customer ID
-          </th>
-          <td mat-cell *matCellDef="let row">
-            {{row.name}}
-          </td>
-        </ng-container>
+      <div class="example-container mat-elevation-z8">
+        <table
+          mat-table
+          class="full-width-table"
+          [dataSource]="dataSource"
+          matSort
+          aria-label="Elements"
+        >
+          <!-- Customer -->
+          <ng-container matColumnDef="name">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="name"
+              (click)="setFilter()"
+            >
+              Customer ID
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.name}}
+            </td>
+          </ng-container>
 
-        <!-- Customer -->
-        <ng-container matColumnDef="customer_name">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            mat-sort-header="customer_name"
-            (click)="setFilter()"
-          >
-            Customer Name
-          </th>
-          <td mat-cell *matCellDef="let row">
-            {{row.customer_name}}
-          </td>
-        </ng-container>
+          <!-- Customer -->
+          <ng-container matColumnDef="customer_name">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header="customer_name"
+              (click)="setFilter()"
+            >
+              Customer Name
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.customer_name}}
+            </td>
+          </ng-container>
 
-        <!-- Credit Limits -->
-        <ng-container matColumnDef="credit_limits">
-          <th mat-header-cell *matHeaderCellDef>
-            Extended Limit
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <ion-text *ngFor="let limit of row.credit_limits">
-              {{limit.credit_limit | curFormat | async}}
-            </ion-text>
-          </td>
-        </ng-container>
+          <!-- Credit Limits -->
+          <ng-container matColumnDef="credit_limits">
+            <th mat-header-cell *matHeaderCellDef>
+              Extended Limit
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <ion-text *ngFor="let limit of row.credit_limits">
+                {{limit.credit_limit | curFormat | async}}
+              </ion-text>
+            </td>
+          </ng-container>
 
-        <!-- Extended Credit Limit -->
-        <ng-container matColumnDef="extended_credit_limit">
-          <th mat-header-cell *matHeaderCellDef>
-            Base Credit Limit
-          </th>
-          <td mat-cell *matCellDef="let row">
-            {{row.baseCreditLimitAmount ? (row.baseCreditLimitAmount | curFormat
-            | async) : ''}}
-          </td>
-        </ng-container>
+          <!-- Extended Credit Limit -->
+          <ng-container matColumnDef="extended_credit_limit">
+            <th mat-header-cell *matHeaderCellDef>
+              Base Credit Limit
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.baseCreditLimitAmount ? (row.baseCreditLimitAmount |
+              curFormat | async) : ''}}
+            </td>
+          </ng-container>
 
-        <!-- Expiry Date -->
-        <ng-container matColumnDef="expiry_date">
-          <th mat-header-cell *matHeaderCellDef class="text-center">
-            Expiry Date
-          </th>
-          <td class="ion-text-center" mat-cell *matCellDef="let row">
-            <ion-text>
-              {{row.tempCreditLimitPeriod ? (row.tempCreditLimitPeriod |
-              date:'mediumDate') : ''}}
-            </ion-text>
-          </td>
-        </ng-container>
+          <!-- Expiry Date -->
+          <ng-container matColumnDef="expiry_date">
+            <th mat-header-cell *matHeaderCellDef class="text-center">
+              Expiry Date
+            </th>
+            <td class="ion-text-center" mat-cell *matCellDef="let row">
+              <ion-text>
+                {{row.tempCreditLimitPeriod ? (row.tempCreditLimitPeriod |
+                date:'mediumDate') : ''}}
+              </ion-text>
+            </td>
+          </ng-container>
 
-        <!-- Set On -->
-        <ng-container matColumnDef="set_on">
-          <th mat-header-cell *matHeaderCellDef class="text-center">
-            Set On
-          </th>
-          <td class="ion-text-center" mat-cell *matCellDef="let row">
-            <ion-text>
-              {{row.creditLimitUpdatedOn ? (row.creditLimitUpdatedOn |
-              date:'mediumDate') : ''}}
-            </ion-text>
-          </td>
-        </ng-container>
+          <!-- Set On -->
+          <ng-container matColumnDef="set_on">
+            <th mat-header-cell *matHeaderCellDef class="text-center">
+              Set On
+            </th>
+            <td class="ion-text-center" mat-cell *matCellDef="let row">
+              <ion-text>
+                {{row.creditLimitUpdatedOn ? (row.creditLimitUpdatedOn |
+                date:'mediumDate') : ''}}
+              </ion-text>
+            </td>
+          </ng-container>
 
-        <!-- Set By -->
-        <ng-container matColumnDef="set_by">
-          <th mat-header-cell *matHeaderCellDef>
-            Set By
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <ion-text>
-              {{row.creditLimitSetByFullName}}
-            </ion-text>
-          </td>
-        </ng-container>
+          <!-- Set By -->
+          <ng-container matColumnDef="set_by">
+            <th mat-header-cell *matHeaderCellDef>
+              Set By
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <ion-text>
+                {{row.creditLimitSetByFullName}}
+              </ion-text>
+            </td>
+          </ng-container>
 
-        <tr
-          mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"
-        ></tr>
-        <tr
-          tabindex="0"
-          mat-row
-          (click)="updateCreditLimitDialog(row)"
-          (keyup.enter)="updateCreditLimitDialog(row)"
-          *matRowDef="let row; columns: displayedColumns;"
-        ></tr>
-      </table>
-
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+          ></tr>
+          <tr
+            tabindex="0"
+            mat-row
+            (click)="updateCreditLimitDialog(row)"
+            (keyup.enter)="updateCreditLimitDialog(row)"
+            *matRowDef="let row; columns: displayedColumns;"
+          ></tr>
+        </table>
+      </div>
       <mat-card-actions>
         <mat-paginator
           #paginator

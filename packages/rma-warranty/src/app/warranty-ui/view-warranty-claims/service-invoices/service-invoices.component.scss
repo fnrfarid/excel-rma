@@ -1,0 +1,30 @@
+.example-container {
+  box-shadow: none;
+  height: auto;
+  width: 100%;
+  overflow: auto;
+}
+
+table {
+  width: 150%;
+}
+
+td.mat-column-star {
+  width: 20px;
+  padding-right: 8px;
+}
+
+th.mat-column-position,
+td.mat-column-position {
+  padding-left: 8px;
+}
+
+mat-header-cell {
+  flex-wrap: nowrap;
+  min-width: 200px;
+}
+.mat-row,
+.mat-header-row {
+  min-width: 150%;
+  width: 100%;
+}
