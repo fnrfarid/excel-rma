@@ -8,6 +8,7 @@ import { SalesService } from '../sales-ui/services/sales.service';
 import { UpdateCreditLimitComponent } from './update-credit-limit/update-credit-limit.component';
 import { DEFAULT_COMPANY } from '../constants/storage';
 import { StorageService } from '../api/storage/storage.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-credit-limit',
@@ -34,9 +35,13 @@ export class CreditLimitPage implements OnInit {
     private readonly salesService: SalesService,
     private readonly storage: StorageService,
     private readonly popoverController: PopoverController,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new CreditLimitDataSource(this.salesService);
     this.dataSource.loadItems();
   }

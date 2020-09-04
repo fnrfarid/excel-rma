@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
@@ -40,9 +40,13 @@ export class ItemPricePage implements OnInit {
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
     private readonly dialog: MatDialog,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new ItemPriceDataSource(this.itemPriceService);
     this.router.events
       .pipe(

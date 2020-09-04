@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
@@ -10,6 +10,8 @@ import {
 } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'service-invoices',
@@ -17,6 +19,8 @@ import { AUTH_SERVER_URL } from '../../../constants/storage';
   styleUrls: ['./service-invoices.component.scss'],
 })
 export class ServiceInvoicesComponent implements OnInit {
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
   @Input()
   warrantyObject: WarrantyClaimsDetails;
   invoiceUuid: string;
@@ -35,22 +39,33 @@ export class ServiceInvoicesComponent implements OnInit {
     'submit',
   ];
   constructor(
-    private readonly router: ActivatedRoute,
+    private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
     private readonly snackbar: MatSnackBar,
     private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
-    this.invoiceUuid = this.router.snapshot.params.uuid;
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
+    this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoiceDataSource(this.serviceInvoice);
     this.dataSource.loadItems(this.invoiceUuid);
   }
 
   getUpdate(event) {
+    const sortQuery = {};
+    if (event) {
+      for (const key of Object.keys(event)) {
+        if (key === 'active' && event.direction !== '') {
+          sortQuery[event[key]] = event.direction;
+        }
+      }
+    }
     this.dataSource.loadItems(
       this.invoiceUuid,
-      'asc',
+      sortQuery,
       event.pageIndex,
       event.pageSize,
     );

@@ -13,7 +13,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
 
 @Component({
@@ -77,9 +77,13 @@ export class WarrantyPage implements OnInit {
     private location: Location,
     private readonly warrantyService: WarrantyService,
     private readonly router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.claimList = [
       'Warranty',
       'Non Warranty',

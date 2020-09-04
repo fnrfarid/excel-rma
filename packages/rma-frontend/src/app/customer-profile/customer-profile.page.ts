@@ -15,6 +15,7 @@ import {
 } from '../constants/storage';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../constants/app-string';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-customer-profile',
@@ -42,9 +43,13 @@ export class CustomerProfilePage implements OnInit {
     private readonly itemService: ItemPriceService,
     private readonly time: TimeService,
     private readonly snackBar: MatSnackBar,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.setDefaultCompany();
     this.dataSource = new CustomerDataSource(this.salesService);
     this.dataSource.loadItems(0, 10, this.filters, this.countFilter);

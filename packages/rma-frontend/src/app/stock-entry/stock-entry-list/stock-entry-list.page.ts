@@ -6,7 +6,7 @@ import {
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { Location } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import {
   DateAdapter,
@@ -60,9 +60,13 @@ export class StockEntryListPage implements OnInit {
     private location: Location,
     private readonly stockEntryService: StockEntryService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
+    this.route.params.subscribe(() => {
+      this.paginator.firstPage();
+    });
     this.dataSource = new StockEntryListDataSource(this.stockEntryService);
     this.router.events
       .pipe(
