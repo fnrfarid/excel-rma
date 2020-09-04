@@ -23,7 +23,11 @@ import {
   MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
-import { CLOSE, DELIVERY_NOTE } from '../../../constants/app-string';
+import {
+  CLOSE,
+  DELIVERY_NOTE,
+  ASSIGN_SERIAL_DIALOG_QTY,
+} from '../../../constants/app-string';
 import {
   ERROR_FETCHING_SALES_INVOICE,
   SERIAL_ASSIGNED,
@@ -279,7 +283,7 @@ export class SerialsComponent implements OnInit {
 
   async assignSingularSerials(row: Item) {
     const dialogRef =
-      row.remaining >= 30
+      row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? this.dialog.open(AssignSerialsDialog, {
             width: '250px',
             data: { serials: row.remaining || 0 },
@@ -287,9 +291,10 @@ export class SerialsComponent implements OnInit {
         : null;
 
     const serials =
-      row.remaining >= 30
+      row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? await dialogRef.afterClosed().toPromise()
         : row.remaining;
+
     if (serials && serials <= row.remaining) {
       this.addSingularSerials(row, serials);
       this.resetRangeState();
