@@ -28,8 +28,11 @@
             </ion-button>
           </ion-col>
           <ion-col class="ion-text-right">
-            <ion-button *ngIf="!readonly" color="tertiary" (click)="createMaterialTransfer()">
-              Submit Transfer
+            <ion-button *ngIf="!readonly" color="light" (click)="saveDraft()">
+              Save
+            </ion-button>
+            <ion-button *ngIf="!readonly" color="medium" (click)="createMaterialTransfer()">
+              Submit
             </ion-button>
             <ion-button *ngIf="readonly && status === 'In Transit'" color="tertiary" (click)="acceptTransfer()">
               Accept Transfer
@@ -37,7 +40,7 @@
             <ion-button *ngIf="readonly && status === 'In Transit'" color="danger" (click)="rejectTransfer()">
               Return Transfer
             </ion-button>
-            <ion-text *ngIf="readonly && status !== 'In Transit'"
+            <ion-text *ngIf="readonly && status !== 'In Transit' && status !== 'Draft'"
               [ngStyle]="{'color': status === 'Returned' ? 'red' : 'green' }">
               <h1>Stock Transfer {{ status }}</h1>
             </ion-text>

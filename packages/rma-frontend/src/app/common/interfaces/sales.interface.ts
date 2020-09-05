@@ -27,6 +27,7 @@ export class Item {
   purchaseWarrantyMonths?: number;
   against_sales_invoice?: string;
   stock?: any;
+  available_stock?: number;
   assigned?: number;
   remaining?: number;
   item_group?: string;
