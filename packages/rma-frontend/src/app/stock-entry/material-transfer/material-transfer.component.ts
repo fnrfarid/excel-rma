@@ -23,6 +23,7 @@ import {
   DELIVERY_NOTE,
   WAREHOUSES,
   TERRITORY,
+  STOCK_TRANSFER_STATUS,
 } from '../../constants/app-string';
 import * as _ from 'lodash';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -163,6 +164,10 @@ export class MaterialTransferComponent implements OnInit {
       this.readonly = true;
       this.stockEntryService.getStockEntry(this.uuid).subscribe({
         next: (success: any) => {
+          if (success.status === STOCK_TRANSFER_STATUS.draft) {
+            this.readonly = false;
+            this.subscribeEndpoints();
+          }
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
           this.remarks = success.remarks;
@@ -175,6 +180,10 @@ export class MaterialTransferComponent implements OnInit {
       return;
     }
 
+    this.subscribeEndpoints();
+  }
+
+  subscribeEndpoints() {
     this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
@@ -478,6 +487,15 @@ export class MaterialTransferComponent implements OnInit {
     });
     const assignValue = await dialogRef.afterClosed().toPromise();
 
+    if ((assignValue || 0) + row.assigned > row.available_stock) {
+      this.getMessage(
+        `Cannot assign ${(assignValue || 0) + row.assigned}, Only ${
+          row.available_stock - (row.assigned || 0)
+        } available.`,
+      );
+      return;
+    }
+
     if (assignValue) {
       const serials = this.materialTransferDataSource.data();
       serials.push({
@@ -540,6 +558,21 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   async createMaterialTransfer() {
+    const body = await this.getStockEntryBody();
+    this.stockEntryService.createMaterialTransfer(body).subscribe({
+      next: response => {
+        this.getMessage('Stock Entry Created');
+        this.resetRangeState();
+        this.materialTransferDataSource.update([]);
+        this.router.navigateByUrl('stock-entry');
+      },
+      error: err => {
+        this.getMessage(err.error.message);
+      },
+    });
+  }
+
+  async getStockEntryBody(): Promise<MaterialTransferDto> {
     if (!this.transferWarehouse) {
       this.getMessage(
         'Please select a transfer warehouse in settings, for material transfer.',
@@ -559,18 +592,18 @@ export class MaterialTransferComponent implements OnInit {
     body.posting_date = date.date;
     body.posting_time = date.time;
     body.stock_entry_type = MATERIAL_TRANSFER;
-    body.items = this.materialTransferDataSource.data().filter(item => {
-      item.transferWarehouse = this.transferWarehouse;
-      return item;
-    });
+    body.items = this.materialTransferDataSource.data();
     body.items = this.mergeItems(body.items);
+    body.uuid = this.uuid;
+    return body;
+  }
 
+  async saveDraft() {
+    const body = await this.getStockEntryBody();
+    body.status = STOCK_TRANSFER_STATUS.draft;
     this.stockEntryService.createMaterialTransfer(body).subscribe({
       next: response => {
-        this.getMessage('Stock Entry Created');
-        this.resetRangeState();
-        this.materialTransferDataSource.update([]);
-        this.router.navigateByUrl('stock-entry');
+        this.getMessage('Stock Entry Saved');
       },
       error: err => {
         this.getMessage(err.error.message);

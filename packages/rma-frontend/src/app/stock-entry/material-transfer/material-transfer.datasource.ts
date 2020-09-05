@@ -41,14 +41,12 @@ export class StockEntryRow {
 
 export class MaterialTransferDto {
   stock_entry_type: string;
-
+  uuid?: string;
   company: string;
   territory: string;
   remarks: string;
-
   posting_date: string;
-
   posting_time: string;
-
   items: StockEntryRow[];
+  status?: string;
 }

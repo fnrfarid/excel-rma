@@ -28,7 +28,13 @@ export const WARRANTY_TYPE = {
   NON_SERAIL: 'Non Serial Warranty',
   THIRD_PARTY: 'Third Party Warranty',
 };
-
+export const STOCK_TRANSFER_STATUS = {
+  delivered: 'Delivered',
+  returned: 'Returned',
+  in_transit: 'In Transit',
+  draft: 'Draft',
+  all: 'All',
+};
 export const CURRENT_STATUS_VERDICT = {
   RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   TRANSFERRED: 'Transferred',

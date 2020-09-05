@@ -11,7 +11,10 @@ import { Type } from 'class-transformer';
 
 export class StockEntryDto {
   docstatus?: 1;
+  @IsOptional()
+  @IsString()
   uuid?: string;
+
   @IsNotEmpty()
   @IsString()
   stock_entry_type: string;
@@ -19,6 +22,10 @@ export class StockEntryDto {
   @IsNotEmpty()
   @IsString()
   company: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 
   @IsOptional()
   @IsString()
