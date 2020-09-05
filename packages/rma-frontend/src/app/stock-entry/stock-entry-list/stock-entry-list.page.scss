@@ -55,7 +55,8 @@ mat-header-cell {
   flex-wrap: nowrap;
   min-width: 200px;
 }
-.mat-header-row,
-.mat-row {
-  display: inline-flex;
+.mat-row,
+.mat-header-row {
+  min-width: 150%;
+  width: 100%;
 }
