@@ -21,8 +21,9 @@ export class SalesReturnPage implements OnInit {
   status: string = '';
   statusList = ['Draft', 'To Bill', 'Completed'];
   total = 0;
-  customer: string = '';
+  customer: any;
   dataSource: SalesReturnListDataSource;
+  customerList: any;
   displayedColumns = [
     'name',
     'posting_date',
@@ -59,6 +60,7 @@ export class SalesReturnPage implements OnInit {
         this.total = total;
       },
     });
+    this.getCustomerList();
   }
 
   getUpdate(event) {
@@ -76,8 +78,8 @@ export class SalesReturnPage implements OnInit {
     this.filters.push(['is_return', '=', '1']);
     this.countFilter.is_return = ['=', '1'];
     if (this.customer) {
-      this.filters.push(['customer', 'like', `%${this.customer}%`]);
-      this.countFilter.customer = ['like', `%${this.customer}%`];
+      this.filters.push(['customer', 'like', `%${this.customer.name}%`]);
+      this.countFilter.customer = ['like', `%${this.customer.name}%`];
     }
     if (this.name) {
       this.filters.push(['name', 'like', `%${this.name}%`]);
@@ -126,5 +128,18 @@ export class SalesReturnPage implements OnInit {
     this.fromDateFormControl.setValue('');
     this.toDateFormControl.setValue('');
     this.setFilter();
+  }
+
+  getCustomerList() {
+    this.salesService.customerList().subscribe({
+      next: response => {
+        this.customerList = response;
+      },
+      error: error => {},
+    });
+  }
+
+  getCustomerOption(option) {
+    if (option) return option.name;
   }
 }

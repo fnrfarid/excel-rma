@@ -46,11 +46,12 @@ export class PurchasePage implements OnInit {
     'delivered_by',
   ];
   invoiceStatus: string[] = ['Completed', 'Canceled', 'Submitted', 'All'];
-  supplier: string = '';
+  supplier: any;
   status: string = 'All';
   name: string = '';
   search: string = '';
   total: number = 0;
+  supplierList = [];
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
   singleDateFormControl = new FormControl();
@@ -81,11 +82,12 @@ export class PurchasePage implements OnInit {
         },
         error: err => {},
       });
+    this.getSupplierList();
   }
 
   getUpdate(event) {
     const query: any = {};
-    if (this.supplier) query.supplier_name = this.supplier;
+    if (this.supplier) query.supplier_name = this.supplier.name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.singleDateFormControl.value) {
@@ -139,7 +141,7 @@ export class PurchasePage implements OnInit {
 
   setFilter(event?) {
     const query: any = {};
-    if (this.supplier) query.supplier_name = this.supplier;
+    if (this.supplier) query.supplier_name = this.supplier.name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.fromDateFormControl.value && this.toDateFormControl.value) {
@@ -217,5 +219,16 @@ export class PurchasePage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+  getSupplierList() {
+    this.purchaseService.getSupplierList().subscribe({
+      next: res => {
+        this.supplierList = res;
+      },
+    });
+  }
+
+  getSupplierOption(option) {
+    if (option) return option.name;
   }
 }

@@ -50,7 +50,7 @@ export class StockEntryListPage implements OnInit {
     'posting_date',
     'posting_time',
   ];
-  warehouses = ['coming_soon'];
+  warehouses = [];
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
   singleDateFormControl = new FormControl();
@@ -83,6 +83,8 @@ export class StockEntryListPage implements OnInit {
         next: res => {},
         error: err => {},
       });
+
+    this.getWarehouses();
   }
 
   statusChange(status) {
@@ -140,11 +142,13 @@ export class StockEntryListPage implements OnInit {
   }
 
   fromWarehouseChange(value) {
-    this.filterState.s_warehouse = value;
+    this.filterState.s_warehouse = value.name;
+    this.setFilter();
   }
 
   toWarehouseChange(value) {
-    this.filterState.t_warehouse = value;
+    this.filterState.t_warehouse = value.name;
+    this.setFilter();
   }
 
   singleDateFilter() {
@@ -214,5 +218,17 @@ export class StockEntryListPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  getWarehouses() {
+    this.stockEntryService.getWarehouseList().subscribe({
+      next: res => {
+        this.warehouses = res;
+      },
+    });
+  }
+
+  getOption(option) {
+    if (option) return option.name;
   }
 }

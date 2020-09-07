@@ -580,6 +580,15 @@ export class SalesService {
       }),
     );
   }
+  customerList() {
+    const url = CUSTOMER_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
+  }
 
   getStore() {
     return this.storage;

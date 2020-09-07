@@ -67,7 +67,7 @@ export class SalesPage implements OnInit {
     'All',
   ];
   campaignStatus: string[] = ['Yes', 'No', 'All'];
-  customer_name: string = '';
+  customer_name: any;
   status: string = 'All';
   name: string = '';
   branch: string = '';
@@ -79,6 +79,8 @@ export class SalesPage implements OnInit {
   toDateFormControl = new FormControl();
   singleDateFormControl = new FormControl();
   sortQuery: any = {};
+  customerList: any;
+  territoryList: any;
   statusColor = {
     Draft: 'blue',
     'To Deliver': '#4d2500',
@@ -123,6 +125,8 @@ export class SalesPage implements OnInit {
         this.disableRefresh = res;
       },
     });
+    this.getCustomerList();
+    this.getTerritory();
   }
 
   getTotal() {
@@ -146,7 +150,7 @@ export class SalesPage implements OnInit {
 
   getUpdate(event) {
     const query: any = {};
-    if (this.customer_name) query.customer_name = this.customer_name;
+    if (this.customer_name) query.customer = this.customer_name.name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.campaign) {
@@ -231,7 +235,7 @@ export class SalesPage implements OnInit {
 
   setFilter(event?) {
     const query: any = {};
-    if (this.customer_name) query.customer_name = this.customer_name;
+    if (this.customer_name) query.customer = this.customer_name.name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
     if (this.branch) query.territory = this.branch;
@@ -332,7 +336,33 @@ export class SalesPage implements OnInit {
     }
   }
 
+  getCustomerList() {
+    this.salesService.customerList().subscribe({
+      next: response => {
+        this.customerList = response;
+      },
+      error: error => {},
+    });
+  }
+
+  getCustomerOption(option) {
+    if (option) return option.name;
+  }
+
+  getTerritory() {
+    this.salesService
+      .getStore()
+      .getItem('territory')
+      .then(territory => {
+        this.territoryList = territory;
+      });
+  }
+
   getStatusColor(status: string) {
     return { color: this.statusColor[status] };
+  }
+
+  getOption(option) {
+    if (option) return option;
   }
 }

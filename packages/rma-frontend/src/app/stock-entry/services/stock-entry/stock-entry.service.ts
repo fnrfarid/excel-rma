@@ -11,6 +11,7 @@ import { map, switchMap } from 'rxjs/operators';
 import {
   STOCK_ENTRY_CREATE_ENDPOINT,
   STOCK_ENTRY_CREATE_FROM_FILE_ENDPOINT,
+  ERPNEXT_WAREHOUSE_ENDPOINT,
 } from '../../../constants/url-strings';
 import { MaterialTransferDto } from '../../material-transfer/material-transfer.datasource';
 import { JSON_BODY_MAX_SIZE } from '../../../constants/app-string';
@@ -100,6 +101,16 @@ export class StockEntryService {
           [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
         };
       }),
+    );
+  }
+
+  getWarehouseList() {
+    const url = ERPNEXT_WAREHOUSE_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
     );
   }
 }

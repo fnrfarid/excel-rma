@@ -43,6 +43,7 @@ describe('PurchasePage', () => {
           provide: PurchaseService,
           useValue: {
             getPurchaseInvoiceList: (...args) => of([{}]),
+            getSupplierList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
