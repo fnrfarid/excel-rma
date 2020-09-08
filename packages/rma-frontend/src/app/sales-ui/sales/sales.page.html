@@ -54,20 +54,47 @@
             <mat-form-field class="full-width">
               <input
                 matInput
-                placeholder="Customer Name"
+                placeholder="Customer"
+                [matAutocomplete]="Customer"
                 [(ngModel)]="customer_name"
-                (keyup.enter)="setFilter()"
               />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #Customer="matAutocomplete"
+                [displayWith]="getCustomerOption"
+                (optionSelected)="setFilter()"
+              >
+                <mat-option
+                  *ngFor="let option of customerList"
+                  [value]="option"
+                >
+                  {{ option.name }}
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
           </ion-col>
           <ion-col>
             <mat-form-field class="full-width">
               <input
                 matInput
+                type="text"
                 placeholder="Branch"
+                [matAutocomplete]="territory"
                 [(ngModel)]="branch"
-                (keyup.enter)="setFilter()"
+                (optionSelected)="setFilter()"
               />
+              <mat-autocomplete
+                autoActiveFirstOption
+                #territory="matAutocomplete"
+                [displayWith]="getOption"
+              >
+                <mat-option
+                  *ngFor="let option of territoryList"
+                  [value]="option"
+                >
+                  {{ option }}
+                </mat-option>
+              </mat-autocomplete>
             </mat-form-field>
           </ion-col>
         </ion-row>

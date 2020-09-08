@@ -61,12 +61,15 @@
         <ion-row>
           <ion-col>
             <mat-form-field class="full-width">
-              <input
-                matInput
-                placeholder="Supplier"
-                [(ngModel)]="supplier"
-                (keyup.enter)="setFilter()"
-              />
+              <mat-label>Supplier</mat-label>
+              <mat-select [(value)]="supplier" (selectionChange)="setFilter()">
+                <mat-option
+                  *ngFor="let option of supplierList"
+                  [value]="option"
+                >
+                  {{option.name}}
+                </mat-option>
+              </mat-select>
             </mat-form-field>
           </ion-col>
         </ion-row>

@@ -43,6 +43,7 @@ describe('PurchasePage', () => {
         {
           provide: StockEntryService,
           useValue: {
+            getWarehouseList: (...args) => of([{}]),
             getPurchaseInvoiceList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
