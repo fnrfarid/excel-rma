@@ -21,6 +21,9 @@
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right">
+          <ion-button class="ion-text-right" [disabled]="!this.dataSource.length" color="tertiary" (click)="downloadSerials()">
+            Download CSV
+          </ion-button>
           <ion-button color="tertiary" (click)="setFilter()">
             Search
           </ion-button>

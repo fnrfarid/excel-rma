@@ -23,6 +23,8 @@ import {
   PURCHASE_RECEIPT,
   WAREHOUSES,
   ASSIGN_SERIAL_DIALOG_QTY,
+  SERIAL_DOWNLOAD_HEADERS,
+  CSV_FILE_TYPE,
 } from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
 import {
@@ -518,6 +520,14 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       });
       this.serialDataSource.update(serials);
     });
+  }
+
+  downloadSerials() {
+    this.csvService.downloadAsCSV(
+      this.purchasedSerialsDataSource.data,
+      SERIAL_DOWNLOAD_HEADERS,
+      `${this.purchaseInvoiceDetails.name || ''}${CSV_FILE_TYPE}`,
+    );
   }
 
   validateState() {

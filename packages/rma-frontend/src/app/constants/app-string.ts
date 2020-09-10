@@ -52,7 +52,13 @@ export const DELIVERY_STATUS = {
   UPGRADED: 'Upgraded',
   REJECTED: 'Rejected',
 };
-
+export const SERIAL_DOWNLOAD_HEADERS = [
+  'serial_no',
+  'item_code',
+  'item_name',
+  'warehouse',
+];
+export const CSV_FILE_TYPE = ' serials.csv';
 export const ITEM_COLUMN = {
   SERIAL_NO: 'serial_no',
   ITEM: 'item',
