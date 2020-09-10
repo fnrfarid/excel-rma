@@ -40,20 +40,40 @@ export class StockEntryAggregateService {
   ) {}
 
   createStockEntry(payload: StockEntryDto, req) {
+    if (payload.status === STOCK_ENTRY_STATUS.draft) {
+      return this.saveDraft(payload, req);
+    }
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
         return this.settingService.find();
       }),
       switchMap(settings => {
-        const stockEntry = this.setStockEntryDefaults(payload, req, settings);
-        return from(this.stockEntryService.create(stockEntry)).pipe(
-          switchMap(success => {
-            payload.docstatus = 1;
-            payload.uuid = stockEntry.uuid;
-            this.batchQueueStockEntry(payload, req, stockEntry.uuid);
-            return of({});
-          }),
+        payload.docstatus = 1;
+        this.batchQueueStockEntry(payload, req, payload.uuid);
+        return from(
+          this.stockEntryService.updateOne(
+            { uuid: payload.uuid },
+            { $set: { status: STOCK_ENTRY_STATUS.in_transit } },
+          ),
         );
+      }),
+    );
+  }
+
+  saveDraft(payload: StockEntryDto, req) {
+    if (payload.uuid) {
+      return from(
+        this.stockEntryService.updateOne(
+          { uuid: payload.uuid },
+          { $set: payload },
+        ),
+      );
+    }
+    return this.settingService.find().pipe(
+      switchMap(settings => {
+        const stockEntry = this.setStockEntryDefaults(payload, req, settings);
+        stockEntry.status = STOCK_ENTRY_STATUS.draft;
+        return from(this.stockEntryService.create(stockEntry));
       }),
     );
   }
@@ -156,17 +176,19 @@ export class StockEntryAggregateService {
 
   getStockEntry(uuid: string) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
-      switchMap(data => {
-        data.items.filter(item => {
-          if (item.serial_no && item.serial_no.length) {
-            item.serial_no = [
-              item.serial_no[0],
-              item.serial_no[item.serial_no.length - 1],
-            ];
-          }
-          return item;
-        });
-        return of(data);
+      switchMap(stockEntry => {
+        if (stockEntry.status !== STOCK_ENTRY_STATUS.draft) {
+          stockEntry.items.filter(item => {
+            if (item.serial_no && item.serial_no.length) {
+              item.serial_no = [
+                item.serial_no[0],
+                item.serial_no[item.serial_no.length - 1],
+              ];
+            }
+            return item;
+          });
+        }
+        return of(stockEntry);
       }),
     );
   }

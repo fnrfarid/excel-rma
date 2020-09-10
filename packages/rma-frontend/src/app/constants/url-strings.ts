@@ -130,3 +130,5 @@ export const CREATE_WARRANTY_STOCK_ENTRY =
 export const LIST_SERVICE_INVOICE_ENDPOINT = 'api/service_invoice/v1/list';
 export const ERPNEXT_POS_PROFILE_ENDPOINT =
   '/api/command/user/api/resource/POS%20Profile';
+export const RELAY_LIST_SUPPLIER_ENDPOINT =
+  '/api/command/user/api/resource/Supplier';

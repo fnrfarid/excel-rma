@@ -50,6 +50,7 @@ describe('SalesReturnPage', () => {
         {
           provide: SalesService,
           useValue: {
+            customerList: (...args) => of([{}]),
             getDoctypeCount: (...args) => of(0),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),

@@ -96,6 +96,7 @@ export const STOCK_ENTRY_STATUS = {
   in_transit: 'In Transit',
   delivered: 'Delivered',
   returned: 'Returned',
+  draft: 'Draft',
 };
 export const CANCELED_STATUS = 'Canceled';
 export const SALES_USER = 'Sales User';
