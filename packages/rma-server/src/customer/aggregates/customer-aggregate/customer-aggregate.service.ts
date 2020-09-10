@@ -61,13 +61,12 @@ export class CustomerAggregateService extends AggregateRoot {
 
   async updateCustomer(updatePayload) {
     if (updatePayload.tempCreditLimitPeriod) {
-      const date = new Date(updatePayload.tempCreditLimitPeriod).setHours(
-        23,
-        59,
-        59,
-        8,
+      updatePayload.tempCreditLimitPeriod = new Date(
+        updatePayload.tempCreditLimitPeriod,
       );
-      updatePayload.tempCreditLimitPeriod = new Date(date);
+      updatePayload.tempCreditLimitPeriod.setDate(
+        updatePayload.tempCreditLimitPeriod.getDate() + 1,
+      );
     }
 
     const customer = await this.customerService.findOne({
