@@ -269,6 +269,35 @@ export class CsvJsonService {
       }),
     );
   }
+
+  downloadAsCSV(data: any[], fields: string[], filename) {
+    const replacer = function (key, value) {
+      return value === null ? '' : value;
+    };
+    let csv: any = data.map(function (row) {
+      return fields
+        .map(function (fieldName) {
+          return JSON.stringify(row[fieldName], replacer);
+        })
+        .join(',');
+    });
+    csv.unshift(fields.join(',')); // add header column
+    csv = csv.join('\r\n');
+    return this.downloadFile(csv, filename);
+  }
+
+  downloadFile(data: any, filename) {
+    const blob = new Blob([data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.setAttribute('style', 'display: none');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  }
 }
 
 export const FILE_HEADERS = ['item_name', 'serial_no'];

@@ -26,6 +26,13 @@ export const SERVICE_INVOICE_STATUS = {
   PAID: 'Paid',
   UNPAID: 'Unpaid',
 };
+export const SERIAL_DOWNLOAD_HEADERS = [
+  'serial_no',
+  'item_code',
+  'item_name',
+  'warehouse',
+];
+export const CSV_FILE_TYPE = ' serials.csv';
 export const WARRANTY_TYPE = {
   WARRANTY: 'Warranty',
   NON_WARRANTY: 'Non Warranty',

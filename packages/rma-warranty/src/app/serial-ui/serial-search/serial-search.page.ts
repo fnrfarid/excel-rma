@@ -3,13 +3,17 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Location } from '@angular/common';
 import { Observable } from 'rxjs';
-
+import {
+  SERIAL_DOWNLOAD_HEADERS,
+  CSV_FILE_TYPE,
+} from '../../constants/app-string';
 import { SerialSearchFields } from './search-fields.interface';
 import { SerialSearchDataSource } from './serial-search-datasource';
 import { SerialSearchService } from './serial-search.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime, startWith } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
+import { SerialsService } from 'src/app/common/helpers/serials/serials.service';
 
 @Component({
   selector: 'app-serial-search',
@@ -70,6 +74,7 @@ export class SerialSearchPage implements OnInit {
     private location: Location,
     private readonly serialSearchService: SerialSearchService,
     private readonly route: ActivatedRoute,
+    private readonly serialService: SerialsService,
   ) {}
 
   ngOnInit() {
@@ -141,5 +146,13 @@ export class SerialSearchPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  downloadSerials() {
+    this.serialService.downloadAsCSV(
+      this.dataSource.data,
+      SERIAL_DOWNLOAD_HEADERS,
+      `Dump${CSV_FILE_TYPE}`,
+    );
   }
 }

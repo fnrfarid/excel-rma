@@ -27,6 +27,8 @@ import {
   CLOSE,
   DELIVERY_NOTE,
   ASSIGN_SERIAL_DIALOG_QTY,
+  SERIAL_DOWNLOAD_HEADERS,
+  CSV_FILE_TYPE,
 } from '../../../constants/app-string';
 import {
   ERROR_FETCHING_SALES_INVOICE,
@@ -715,6 +717,14 @@ export class SerialsComponent implements OnInit {
         : `${notFoundMessage}`,
       CLOSE,
       { duration: 4500 },
+    );
+  }
+
+  downloadSerials() {
+    this.csvService.downloadAsCSV(
+      this.deliveredSerialsDataSource.data,
+      SERIAL_DOWNLOAD_HEADERS,
+      `${this.salesInvoiceDetails.name || ''}${CSV_FILE_TYPE}`,
     );
   }
 

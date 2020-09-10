@@ -249,6 +249,9 @@
         </ion-card-title>
       </ion-col>
       <ion-col class="ion-text-right">
+        <ion-button class="ion-text-right" [disabled]="!this.purchasedSerialsDataSource.length" color="tertiary" (click)="downloadSerials()">
+          Download CSV
+        </ion-button>
         <ion-button class="ion-text-right" [disabled]="readonly" color="tertiary" (click)="getDeliveredSerials()">
           Get Serials
         </ion-button>
