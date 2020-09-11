@@ -9,16 +9,17 @@
     <ion-icon name="lock-closed-outline"></ion-icon>
   </ion-fab-button>
   <ion-fab-list side="start" class="fab-position">
-    <ion-button color="danger" (click)="rejectSalesInvoice()">
+    <ion-button *ngIf="permissionState.sales_invoice.delete" color="danger" (click)="rejectSalesInvoice()">
       Reject
     </ion-button>
     <ion-button
       color="warning"
+      *ngIf="permissionState.sales_invoice.update"
       [routerLink]="['/sales/add-sales-invoice', 'edit', invoiceUuid]"
     >
       Edit
     </ion-button>
-    <ion-button (click)="submitSalesInvoice()">
+    <ion-button (click)="submitSalesInvoice()" *ngIf="permissionState.sales_invoice.submit">
       Submit
     </ion-button>
   </ion-fab-list>

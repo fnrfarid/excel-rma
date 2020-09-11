@@ -55,6 +55,7 @@ import { MY_FORMATS } from '../../../constants/date-format';
 import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 import { TimeService } from '../../../api/time/time.service';
 import { SerialsService } from '../../../common/helpers/serials/serials.service';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -83,6 +84,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   purchaseInvoiceDetails: PurchaseInvoiceDetails;
   getOptionText = '';
+  permissionState = PERMISSION_STATE;
 
   rangePickerState = {
     prefix: '',

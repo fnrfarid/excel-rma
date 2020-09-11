@@ -1,5 +1,6 @@
 <ion-fab vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
   <ion-fab-button
+    [disabled]="!permissionState.sales_return.create"
     [routerLink]="['/sales/add-sales-return', invoiceUuid]"
     class="fab-position"
   >

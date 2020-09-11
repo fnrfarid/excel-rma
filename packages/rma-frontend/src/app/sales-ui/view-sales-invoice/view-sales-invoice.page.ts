@@ -7,6 +7,7 @@ import { PopoverController } from '@ionic/angular';
 import { PrintComponent } from './print/print.component';
 import { ViewSalesInvoiceSubjectService } from './view-sales-invoice-subject.service';
 import { switchMap } from 'rxjs/operators';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'app-view-sales-invoice',
@@ -20,6 +21,8 @@ export class ViewSalesInvoicePage implements OnInit {
   showReturnTab: boolean;
   isCampaign: boolean;
   status: string = '';
+  permissionState = PERMISSION_STATE;
+
   constructor(
     private readonly location: Location,
     private route: ActivatedRoute,

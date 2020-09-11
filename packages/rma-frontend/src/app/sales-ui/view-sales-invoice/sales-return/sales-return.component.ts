@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SalesReturnService } from './sales-return.service';
 import { ActivatedRoute } from '@angular/router';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'sales-invoice-return',
@@ -27,6 +28,7 @@ export class SalesReturnComponent implements OnInit {
     'owner',
     'modified_by',
   ];
+  permissionState = PERMISSION_STATE;
   search: string = '';
   invoiceUuid: string = '';
   constructor(

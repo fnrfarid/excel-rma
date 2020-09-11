@@ -18,6 +18,7 @@ import { MY_FORMATS } from '../../constants/date-format';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { FormControl } from '@angular/forms';
 import { STOCK_TRANSFER_STATUS } from 'src/app/constants/app-string';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'app-stock-entry-list',
@@ -55,6 +56,7 @@ export class StockEntryListPage implements OnInit {
   toDateFormControl = new FormControl();
   singleDateFormControl = new FormControl();
   filterState: any = {};
+  permissionState = PERMISSION_STATE;
   invoiceStatus: string[] = Object.keys(STOCK_TRANSFER_STATUS).map(
     key => STOCK_TRANSFER_STATUS[key],
   );
