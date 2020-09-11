@@ -10,6 +10,7 @@ import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { filter } from 'rxjs/operators';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { ViewSalesInvoiceSubjectService } from '../view-sales-invoice-subject.service';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -31,6 +32,7 @@ export class DetailsComponent implements OnInit {
     Submitted: '#4d2500',
     Canceled: 'red',
   };
+  permissionState = PERMISSION_STATE;
   total = 0;
   total_qty = 0;
   constructor(

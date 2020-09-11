@@ -56,6 +56,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { TimeService } from '../../../api/time/time.service';
 import { SerialsService } from '../../../common/helpers/serials/serials.service';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -78,6 +79,7 @@ export class SerialsComponent implements OnInit {
   value: string;
   date = new FormControl(new Date());
   claimsReceivedDate: string;
+  permissionState = PERMISSION_STATE;
 
   warehouseFormControl = new FormControl('', [Validators.required]);
 

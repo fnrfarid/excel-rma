@@ -21,7 +21,7 @@
         <ion-segment-button value="0">
           <ion-label>Details</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="1" *ngIf="docstatus !== 2">
+        <ion-segment-button value="1" *ngIf="docstatus !== 2 && permissionState.purchase_receipt.active">
           <ion-label>Serials</ion-label>
         </ion-segment-button>
       </ion-segment>

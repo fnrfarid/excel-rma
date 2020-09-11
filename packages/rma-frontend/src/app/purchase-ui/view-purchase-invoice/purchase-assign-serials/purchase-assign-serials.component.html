@@ -1,4 +1,4 @@
-<ion-fab *ngIf="remaining > 0" vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
+<ion-fab *ngIf="remaining > 0 && permissionState.purchase_receipt.create" vertical="top" horizontal="end" slot="fixed" class="ion-margin-end">
   <ion-fab-button class="fab-position" (click)="submitPurchaseReceipt()">
     <ion-icon name="lock-closed-outline"></ion-icon>
   </ion-fab-button>
