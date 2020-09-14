@@ -44,7 +44,6 @@ import {
   DeliveryNoteItemInterface,
 } from './serials-datasource';
 import { SerialAssign } from '../../../common/interfaces/sales.interface';
-import { Location } from '@angular/common';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { LoadingController } from '@ionic/angular';
 import {
@@ -56,6 +55,8 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { TimeService } from '../../../api/time/time.service';
 import { SerialsService } from '../../../common/helpers/serials/serials.service';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { ViewSalesInvoicePage } from '../view-sales-invoice.page';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -78,6 +79,7 @@ export class SerialsComponent implements OnInit {
   value: string;
   date = new FormControl(new Date());
   claimsReceivedDate: string;
+  permissionState = PERMISSION_STATE;
 
   warehouseFormControl = new FormControl('', [Validators.required]);
 
@@ -145,8 +147,8 @@ export class SerialsComponent implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
-    private location: Location,
     private readonly timeService: TimeService,
+    private readonly viewSalesInvoicePage: ViewSalesInvoicePage,
     private readonly csvService: CsvJsonService,
     private readonly loadingController: LoadingController,
     private readonly serialService: SerialsService,
@@ -576,7 +578,7 @@ export class SerialsComponent implements OnInit {
         this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
           duration: 2500,
         });
-        this.location.back();
+        this.viewSalesInvoicePage.selectedSegment = 0;
       },
       error: err => {
         loading.dismiss();

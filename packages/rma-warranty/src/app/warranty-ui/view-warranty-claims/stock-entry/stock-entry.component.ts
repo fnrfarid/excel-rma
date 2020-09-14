@@ -8,6 +8,7 @@ import { LoadingController } from '@ionic/angular';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute } from '@angular/router';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 
 @Component({
   selector: 'stock-entry',
@@ -21,6 +22,7 @@ export class StockEntryComponent implements OnInit {
   warrantyObject: WarrantyClaimsDetails;
   warrantyClaimUuid: string = '';
   dataSource: StockEntryListDataSource;
+  permissionState = PERMISSION_STATE;
   active: boolean;
   displayedColumns = [
     'stock_voucher_number',

@@ -224,6 +224,7 @@ export const PERMISSION_STATE: PermissionStateInterface = {
     update: false,
     delete: false,
   },
+
   item_price: {
     create: false,
     read: false,

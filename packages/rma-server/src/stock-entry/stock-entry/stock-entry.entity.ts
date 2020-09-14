@@ -73,6 +73,7 @@ export class StockEntry extends BaseEntity {
 
   @Column()
   items: StockEntryItem[];
+  naming_series?: string;
 }
 
 export class StockEntryItem {

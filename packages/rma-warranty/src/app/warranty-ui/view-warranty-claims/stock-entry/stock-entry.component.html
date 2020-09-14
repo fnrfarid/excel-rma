@@ -11,6 +11,7 @@
         </ion-col>
         <ion-col class="ion-text-right" *ngIf="!dataSource?.data?.length">
           <ion-button
+            *ngIf="permissionState.warranty_claim.create"
             color="tertiary"
             [routerLink]="['/warranty/stock-entry', 'new', warrantyClaimUuid]"
           >

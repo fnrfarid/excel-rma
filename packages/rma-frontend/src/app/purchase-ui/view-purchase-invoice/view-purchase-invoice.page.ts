@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { PurchaseService } from '../services/purchase.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'app-view-purchase-invoice',
@@ -13,6 +14,7 @@ export class ViewPurchaseInvoicePage implements OnInit {
   docstatus: number;
   invoiceUuid: string;
   invoiceName: string;
+  permissionState = PERMISSION_STATE;
 
   constructor(
     private readonly location: Location,

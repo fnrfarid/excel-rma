@@ -21,7 +21,7 @@
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right">
-          <ion-button color="tertiary" [routerLink]="['/material-transfer']">
+          <ion-button [disabled]="!permissionState.stock_entry.create" color="tertiary" [routerLink]="['/material-transfer']">
             Add
           </ion-button>
         </ion-col>

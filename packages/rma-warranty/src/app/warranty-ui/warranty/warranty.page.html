@@ -22,6 +22,7 @@
         </ion-col>
         <ion-col class="ion-text-right">
           <ion-button
+            *ngIf="permissionState.warranty_claim.create"
             color="tertiary"
             [routerLink]="['/warranty/add-warranty-claim', 'add']"
           >

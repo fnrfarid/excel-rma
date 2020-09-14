@@ -19,6 +19,7 @@ import {
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
+import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 export const ACCEPT_STOCK_ENTRY_JOB = 'ACCEPT_STOCK_ENTRY_JOB';
@@ -62,12 +63,15 @@ export class StockEntrySyncService {
             job.settings = settings;
             payload.items.filter((item: any) => {
               if (job.type === CREATE_STOCK_ENTRY_JOB) {
+                payload.naming_series = DEFAULT_NAMING_SERIES.stock_send;
                 item.t_warehouse = item.transferWarehouse;
               }
               if (job.type === ACCEPT_STOCK_ENTRY_JOB) {
+                payload.naming_series = DEFAULT_NAMING_SERIES.stock_receive;
                 item.s_warehouse = item.transferWarehouse;
               }
               if (job.type === REJECT_STOCK_ENTRY_JOB) {
+                payload.naming_series = DEFAULT_NAMING_SERIES.stock_receive;
                 item.t_warehouse = item.s_warehouse;
                 item.s_warehouse = item.transferWarehouse;
               }
