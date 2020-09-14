@@ -52,6 +52,7 @@ export class SerialNo extends BaseEntity {
   creation: string;
 
   @Column()
+  @Index()
   sales_invoice_name: string;
 
   @Column()
@@ -110,6 +111,7 @@ export class SerialNo extends BaseEntity {
   queue_state: QueueState;
 
   @Column()
+  @Index()
   purchase_invoice_name: string;
 
   @Column()

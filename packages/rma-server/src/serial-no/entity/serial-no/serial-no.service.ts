@@ -83,21 +83,18 @@ export class SerialNoService {
       searchQuery.serial_no = { $regex: search.toUpperCase() };
     }
 
-    const sort = { 'warranty.purchasedOn': -1 };
-
     return {
-      docs: await this.aggregateList(skip, take, searchQuery, sort).toPromise(),
+      docs: await this.aggregateList(skip, take, searchQuery).toPromise(),
       length: await this.serialNoRepository.count(searchQuery),
       offset: skip,
     };
   }
 
-  aggregateList(skip = 0, limit = 10, query, sort) {
+  aggregateList(skip = 0, limit = 10, query, sort?) {
     return this.asyncAggregate([
       { $match: query },
       { $skip: skip },
       { $limit: limit },
-      { $sort: sort },
     ]);
   }
 
@@ -108,15 +105,8 @@ export class SerialNoService {
       serialNoQuery.serial_no = { $regex: search.toUpperCase() };
     }
 
-    const sort = { 'warranty.soldOn': -1 };
-
     return {
-      docs: await this.aggregateList(
-        skip,
-        take,
-        serialNoQuery,
-        sort,
-      ).toPromise(),
+      docs: await this.aggregateList(skip, take, serialNoQuery).toPromise(),
       length: await this.serialNoRepository.count(serialNoQuery),
       offset: skip,
     };
