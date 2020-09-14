@@ -15,6 +15,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'app-warranty',
@@ -33,7 +34,7 @@ export class WarrantyPage implements OnInit {
   warrantyClaimsList: Array<WarrantyClaims>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-
+  permissionState = PERMISSION_STATE;
   dataSource: WarrantyClaimsDataSource;
   displayedColumns = [
     'sr_no',

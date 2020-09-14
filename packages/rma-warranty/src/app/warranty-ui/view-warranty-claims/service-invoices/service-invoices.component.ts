@@ -12,6 +12,7 @@ import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'service-invoices',
@@ -25,6 +26,7 @@ export class ServiceInvoicesComponent implements OnInit {
   warrantyObject: WarrantyClaimsDetails;
   invoiceUuid: string;
   dataSource: ServiceInvoiceDataSource;
+  permissionState = PERMISSION_STATE;
   displayedColumns = [
     'invoice_no',
     'status',
