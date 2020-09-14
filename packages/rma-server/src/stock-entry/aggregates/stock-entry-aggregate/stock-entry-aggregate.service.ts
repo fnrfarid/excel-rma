@@ -48,11 +48,18 @@ export class StockEntryAggregateService {
         return this.settingService.find();
       }),
       switchMap(settings => {
-        payload.docstatus = 1;
-        this.batchQueueStockEntry(payload, req, payload.uuid);
+        const stockEntry = this.setStockEntryDefaults(payload, req, settings);
+        return from(this.stockEntryService.create(stockEntry)).pipe(
+          switchMap(data => {
+            return of(stockEntry);
+          }),
+        );
+      }),
+      switchMap(stockEntry => {
+        this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
         return from(
           this.stockEntryService.updateOne(
-            { uuid: payload.uuid },
+            { uuid: stockEntry.uuid },
             { $set: { status: STOCK_ENTRY_STATUS.in_transit } },
           ),
         );

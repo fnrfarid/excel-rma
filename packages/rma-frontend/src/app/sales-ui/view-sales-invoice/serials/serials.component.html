@@ -5,7 +5,7 @@
   class="ion-margin-end"
   *ngIf="remaining > 0"
 >
-  <ion-fab-button disabled="!permissionState.delivery_note.create" class="fab-position" (click)="submitDeliveryNote()">
+  <ion-fab-button [disabled]="!permissionState.delivery_note.create" class="fab-position" (click)="submitDeliveryNote()">
     <ion-icon name="lock-closed"></ion-icon>
   </ion-fab-button>
 </ion-fab>
