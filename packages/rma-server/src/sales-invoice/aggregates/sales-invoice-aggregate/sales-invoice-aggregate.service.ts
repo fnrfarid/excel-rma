@@ -140,6 +140,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   async update(updatePayload: SalesInvoiceUpdateDto, clientHttpRequest: any) {
+    const isValid = await this.validateSalesInvoicePolicy
+      .validateItems(updatePayload.items)
+      .toPromise();
+    if (!isValid)
+      throw new BadRequestException('Failed to validate Sales Invoice Items.');
     const provider = await this.salesInvoiceService.findOne({
       uuid: updatePayload.uuid,
     });
