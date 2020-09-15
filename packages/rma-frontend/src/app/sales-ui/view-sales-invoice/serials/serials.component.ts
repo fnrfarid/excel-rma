@@ -251,6 +251,7 @@ export class SerialsComponent implements OnInit {
         this.filteredItemList = this.getFilteredItems(sales_invoice);
         this.itemDataSource.loadItems(this.filteredItemList);
         this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
+        this.date.setValue(new Date(this.salesInvoiceDetails.posting_date));
         this.getItemsWarranty();
       },
       error: err => {
@@ -431,7 +432,7 @@ export class SerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(salesWarrantyMonths: number) {
-    let date = new Date();
+    let date = this.date.value;
     let dateTime;
     if (salesWarrantyMonths) {
       try {

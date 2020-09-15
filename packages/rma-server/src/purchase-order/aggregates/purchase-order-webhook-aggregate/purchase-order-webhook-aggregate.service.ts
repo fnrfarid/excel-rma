@@ -49,7 +49,12 @@ export class PurchaseOrderWebhookAggregateService {
     }).pipe(
       switchMap(({ purchaseOrder, settings }) => {
         const provider = this.mapPurchaseOrder(purchaseOrderPayload);
-        provider.created_on = new DateTime(settings.timeZone).toJSDate();
+        const created_no = purchaseOrderPayload.transaction_date;
+        provider.created_on = DateTime.fromISO(
+          purchaseOrderPayload.transaction_date,
+        )
+          .setZone(settings.timeZone)
+          .toJSDate();
         return this.getUserDetails(purchaseOrderPayload.owner).pipe(
           switchMap(user => {
             provider.created_by = user.full_name;
@@ -63,9 +68,12 @@ export class PurchaseOrderWebhookAggregateService {
                 .create(provider)
                 .then(success => {})
                 .catch(error => {});
+              this.createPurchaseInvoice(
+                purchaseOrderPayload,
+                settings,
+                created_no,
+              );
             }
-
-            this.createPurchaseInvoice(purchaseOrderPayload, settings);
             return of({});
           }),
         );
@@ -103,6 +111,7 @@ export class PurchaseOrderWebhookAggregateService {
   createPurchaseInvoice(
     order: PurchaseOrderWebhookDto,
     settings: ServerSettings,
+    created_on: string,
   ) {
     return this.direct
       .getUserAccessToken(order.owner)
@@ -122,6 +131,7 @@ export class PurchaseOrderWebhookAggregateService {
             .pipe(
               map(res => res.data),
               switchMap(invoice => {
+                invoice.message.posting_date = created_on;
                 headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
                 headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
                 return this.http

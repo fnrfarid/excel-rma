@@ -155,7 +155,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.purchasedSerialsDataSource = new PurchasedSerialsDataSource(
       this.purchaseService,
     );
-    this.purchaseReceiptDate = this.getParsedDate(this.date.value);
     this.getPurchaseInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -205,6 +204,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
           Object.keys(res.purchase_receipt_items_map).length !== 0
             ? true
             : false;
+        this.date.setValue(new Date(this.purchaseInvoiceDetails.posting_date));
+        this.purchaseReceiptDate = this.getParsedDate(this.date.value);
         this.getItemsWarranty();
       },
       error: err => {
@@ -567,7 +568,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(purchaseWarrantyMonths: number) {
-    let date = new Date();
+    let date = this.date.value;
     let dateTime;
     if (purchaseWarrantyMonths) {
       try {
