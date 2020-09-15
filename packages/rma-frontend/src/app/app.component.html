@@ -81,7 +81,7 @@
               class="ion-margin-start ion-no-padding"
             >
               <ion-item
-                *ngIf="loggedIn && permissionState?.sales_invoice?.active"
+                *ngIf="permissionState.sales_invoice.active && loggedIn"
                 routerLink="/sales"
                 lines="none"
                 routerLinkActive="active"

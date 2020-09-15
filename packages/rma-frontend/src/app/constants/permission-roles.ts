@@ -211,39 +211,47 @@ export const PERMISSION_STATE: PermissionStateInterface = {
   sales_invoice: {
     create: false,
     read: false,
-    active: false,
     update: false,
     delete: false,
     submit: false,
+    active: false,
   },
 
   delivery_note: {
     create: false,
     read: false,
-    active: false,
     update: false,
     delete: false,
+    active: false,
   },
 
   item_price: {
     create: false,
     read: false,
-    active: false,
     update: false,
+    active: false,
   },
 
   sales_return: {
     create: false,
     read: false,
-    active: false,
     update: false,
     delete: false,
+    active: false,
+  },
+
+  credit_limit: {
+    create: false,
+    read: false,
+    update: false,
+    delete: false,
+    active: false,
   },
 
   rd_products: {
     read: false,
-    active: false,
     create: false,
+    active: false,
   },
 
   credit_note: {
@@ -265,9 +273,9 @@ export const PERMISSION_STATE: PermissionStateInterface = {
   warranty_claim: {
     create: false,
     read: false,
-    active: false,
     update: false,
     delete: false,
+    active: false,
   },
 
   service_invoice: {
@@ -279,9 +287,9 @@ export const PERMISSION_STATE: PermissionStateInterface = {
   status_history: {
     create: false,
     read: false,
-    active: false,
     update: false,
     delete: false,
+    active: false,
   },
 
   stock_history: {
@@ -298,8 +306,8 @@ export const PERMISSION_STATE: PermissionStateInterface = {
 
   jobs: {
     read: false,
-    active: false,
     update: false,
+    active: false,
   },
 
   customer_profile: {
@@ -309,7 +317,7 @@ export const PERMISSION_STATE: PermissionStateInterface = {
 
   settings: {
     read: false,
-    active: false,
     update: false,
+    active: false,
   },
 };
