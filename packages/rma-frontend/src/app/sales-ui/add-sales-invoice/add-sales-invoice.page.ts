@@ -455,10 +455,10 @@ export class AddSalesInvoicePage implements OnInit {
             this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
           error: err => {
-            let message = err;
+            let message = err?.error?.message || err;
             if (!message) message = UPDATE_ERROR;
             this.snackbar.open(message, 'Close', {
-              duration: DURATION,
+              duration: 3000,
             });
           },
         });
@@ -496,9 +496,12 @@ export class AddSalesInvoicePage implements OnInit {
       salesInvoiceDetails.update_stock = 0;
       salesInvoiceDetails.total_qty = 0;
       salesInvoiceDetails.total = 0;
-      salesInvoiceDetails.contact_email = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
         'customer',
-      ).value.owner;
+      ).value.name;
+      salesInvoiceDetails.customer_name = this.salesInvoiceForm.get(
+        'customer',
+      ).value.customer_name;
       salesInvoiceDetails.delivery_warehouse = this.salesInvoiceForm.get(
         'warehouse',
       ).value;
@@ -537,7 +540,8 @@ export class AddSalesInvoicePage implements OnInit {
           next: res => {
             this.router.navigate(['sales', 'view-sales-invoice', res.uuid]);
           },
-          error: ({ message }) => {
+          error: err => {
+            let message = err?.error?.message || err;
             if (!message) message = UPDATE_ERROR;
             this.snackbar.open(message, 'Close', {
               duration: DURATION,

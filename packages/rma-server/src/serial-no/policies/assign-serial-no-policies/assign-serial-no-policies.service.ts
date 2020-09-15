@@ -18,6 +18,7 @@ import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ItemService } from '../../../item/entity/item/item.service';
+import { ItemDto } from '../../../sales-invoice/entity/sales-invoice/sales-invoice-dto';
 
 @Injectable()
 export class AssignSerialNoPoliciesService {
@@ -138,6 +139,21 @@ export class AssignSerialNoPoliciesService {
                 item.length,
                 itemCount,
               ),
+            ),
+          );
+        }
+        return of(true);
+      }),
+    );
+  }
+
+  validateItemRate(item: ItemDto) {
+    return from(this.itemService.findOne({ item_code: item.item_code })).pipe(
+      switchMap(existingItem => {
+        if (existingItem.minimumPrice > item.rate) {
+          return throwError(
+            new BadRequestException(
+              `Item: ${item.item_name}, has minimum price of ${existingItem.minimumPrice}.`,
             ),
           );
         }

@@ -150,16 +150,9 @@
             <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
             <mat-cell
               *matCellDef="let row"
-              [ngStyle]="{
-              color:
-                row.status === 'Completed'
-                  ? 'green'
-                  : row.status === 'To Bill'
-                  ? 'orange'
-                  : 'red'
-            }"
+              [ngStyle]="{color: 'red'}"
             >
-              {{ row.status }}
+              Returned
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>

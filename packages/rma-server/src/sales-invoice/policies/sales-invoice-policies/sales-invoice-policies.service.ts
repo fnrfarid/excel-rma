@@ -70,9 +70,15 @@ export class SalesInvoicePoliciesService {
       switchMap(() => {
         return this.assignSerialPolicyService.validateItem(item_code);
       }),
+      switchMap(() => {
+        return from(items).pipe(
+          switchMap(item => {
+            return this.assignSerialPolicyService.validateItemRate(item);
+          }),
+        );
+      }),
     );
   }
-
   validateItemsTotal(items: ItemDto[]) {
     for (let i = 0; i <= items.length - 1; i++) {
       if (items[i].amount !== items[i].qty * items[i].rate) {
