@@ -5,6 +5,7 @@ import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { ItemService } from '../../../item/entity/item/item.service';
+import { PurchaseOrderService } from '../../../purchase-order/entity/purchase-order/purchase-order.service';
 
 describe('PurchaseInvoiceWebhookAggregateService', () => {
   let service: PurchaseInvoiceWebhookAggregateService;
@@ -31,6 +32,10 @@ describe('PurchaseInvoiceWebhookAggregateService', () => {
         },
         {
           provide: ItemService,
+          useValue: {},
+        },
+        {
+          provide: PurchaseOrderService,
           useValue: {},
         },
       ],

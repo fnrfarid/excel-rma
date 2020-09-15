@@ -8,9 +8,14 @@ import { PurchaseInvoiceController } from './controllers/purchase-invoice/purcha
 import { PurchaseInvoicePoliciesService } from './policies/purchase-invoice-policies/purchase-invoice-policies.service';
 import { PurchaseInvoiceWebhookController } from './controllers/purchase-invoice-webhook/purchase-invoice-webhook.controller';
 import { ItemEntitiesModule } from '../item/entity/item-entity.module';
+import { PurchaseOrderEntitiesModule } from '../purchase-order/entity/entity.module';
 
 @Module({
-  imports: [PurchaseInvoiceEntitiesModule, ItemEntitiesModule],
+  imports: [
+    PurchaseInvoiceEntitiesModule,
+    ItemEntitiesModule,
+    PurchaseOrderEntitiesModule,
+  ],
   controllers: [PurchaseInvoiceController, PurchaseInvoiceWebhookController],
   providers: [
     ...PurchaseInvoiceAggregatesManager,
