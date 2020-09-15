@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { SystemManagerGuard } from './common/guards/system-manager.guard';
-import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
 
 const routes: Routes = [
   {
@@ -14,7 +12,6 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () =>
       import('./settings/settings.module').then(m => m.SettingsPageModule),
-    canActivate: [SystemManagerGuard],
   },
   {
     path: 'callback',
@@ -30,7 +27,6 @@ const routes: Routes = [
     path: 'sales',
     loadChildren: () =>
       import('./sales-ui/sales/sales.module').then(m => m.SalesPageModule),
-    canActivate: [ExcelSalesUserGuard],
   },
   {
     path: 'stock-entry',
@@ -83,7 +79,6 @@ const routes: Routes = [
       import('./sales-ui/view-sales-invoice/view-sales-invoice.module').then(
         m => m.ViewSalesInvoicePageModule,
       ),
-    canActivate: [ExcelSalesUserGuard],
   },
   {
     path: 'settings/item-price',
@@ -91,7 +86,6 @@ const routes: Routes = [
       import('./sales-ui/item-price/item-price.module').then(
         m => m.ItemPricePageModule,
       ),
-    canActivate: [SystemManagerGuard],
   },
   {
     path: 'purchase/view-purchase-invoice/:invoiceUuid',
@@ -106,7 +100,6 @@ const routes: Routes = [
       import('./sales-ui/add-sales-return/add-sales-return.module').then(
         m => m.AddSalesReturnPageModule,
       ),
-    canActivate: [ExcelSalesUserGuard],
   },
   {
     path: 'settings/credit-limit',
@@ -114,7 +107,6 @@ const routes: Routes = [
       import('./credit-limit/credit-limit.module').then(
         m => m.CreditLimitPageModule,
       ),
-    canActivate: [SystemManagerGuard],
   },
   {
     path: 'settings/problem',
@@ -141,7 +133,6 @@ const routes: Routes = [
       import('./sales-ui/sales-return/sales-return.module').then(
         m => m.SalesReturnPageModule,
       ),
-    canActivate: [ExcelSalesUserGuard],
   },
   {
     path: 'sales-return/details/:name',

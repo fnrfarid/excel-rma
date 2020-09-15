@@ -271,6 +271,8 @@ export class PurchaseReceiptSyncService {
       .catch(err => {});
     const warrantyPurchasedOn = new DateTime(settings.timeZone).toJSDate();
 
+    if (!Object.keys(hash_map).length) return of(true);
+
     return from(Object.keys(hash_map)).pipe(
       switchMap(key => {
         const serialHistory: SerialNoHistoryInterface = {};
@@ -356,7 +358,7 @@ export class PurchaseReceiptSyncService {
     const purchase_receipt_list = [];
     purchaseReceipt.items.forEach(item => {
       const purchase_receipt: any = {};
-      purchase_receipt.purchase_document_type = purchaseReceipt.doctype;
+      purchase_receipt.purchase_document_type = PURCHASE_RECEIPT_DOCTYPE_NAME;
       purchase_receipt.purchase_document_no = purchaseReceipt.name;
       purchase_receipt.purchase_invoice_name = purchase_invoice_name;
       purchase_receipt.amount = item.amount;

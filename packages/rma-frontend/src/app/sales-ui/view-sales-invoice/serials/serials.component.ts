@@ -251,6 +251,7 @@ export class SerialsComponent implements OnInit {
         this.filteredItemList = this.getFilteredItems(sales_invoice);
         this.itemDataSource.loadItems(this.filteredItemList);
         this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
+        this.date.setValue(new Date(this.salesInvoiceDetails.posting_date));
         this.getItemsWarranty();
       },
       error: err => {
@@ -431,7 +432,7 @@ export class SerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(salesWarrantyMonths: number) {
-    let date = new Date();
+    let date = this.date.value;
     let dateTime;
     if (salesWarrantyMonths) {
       try {
@@ -493,13 +494,6 @@ export class SerialsComponent implements OnInit {
     }
     for (const item of data) {
       index++;
-      if (!item.warranty_date) {
-        isValid = false;
-        this.getMessage(
-          `Warranty date empty for ${item.item_name} at position ${index}, please add a warranty date`,
-        );
-        break;
-      }
       if (
         !item.serial_no ||
         !item.serial_no.length ||
@@ -525,7 +519,7 @@ export class SerialsComponent implements OnInit {
     const assignSerial = {} as SerialAssign;
     assignSerial.company = this.salesInvoiceDetails.company;
     assignSerial.customer = this.salesInvoiceDetails.customer;
-    assignSerial.posting_date = this.getParsedDate(this.date.value);
+    assignSerial.posting_date = this.getParsedDate(new Date());
     assignSerial.posting_time = this.getFrappeTime();
     assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
     assignSerial.set_warehouse = this.warehouseFormControl.value;

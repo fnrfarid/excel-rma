@@ -15,7 +15,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpErrorHandler } from './common/interfaces/services/http-error-handler/http-error-handler.service';
 import { MessageService } from './common/interfaces/services/message/message.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SystemManagerGuard } from './common/guards/system-manager.guard';
 import { LoginService } from './api/login/login.service';
 import { StorageService, STORAGE_TOKEN } from './api/storage/storage.service';
 import { SERVICE_NAME } from './constants/storage';
@@ -24,8 +23,6 @@ import { TimeService } from './api/time/time.service';
 import { CsvJsonService } from './api/csv-json/csv-json.service';
 import { ProblemUiModule } from './problem-ui/problem-ui.module';
 import { JobUIModule } from './job-ui/job-ui.module';
-import { ExcelSalesManagerGuard } from './common/guards/excel-sales-manager.guard';
-import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
 import { PermissionManager } from './api/permission/permission.service';
 
 @NgModule({
@@ -53,10 +50,7 @@ import { PermissionManager } from './api/permission/permission.service';
     CsvJsonService,
     HttpErrorHandler,
     SplashScreen,
-    SystemManagerGuard,
-    ExcelSalesManagerGuard,
     PermissionManager,
-    ExcelSalesUserGuard,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     LoginService,
     {

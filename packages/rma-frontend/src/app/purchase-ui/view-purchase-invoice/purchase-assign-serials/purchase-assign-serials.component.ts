@@ -155,7 +155,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.purchasedSerialsDataSource = new PurchasedSerialsDataSource(
       this.purchaseService,
     );
-    this.purchaseReceiptDate = this.getParsedDate(this.date.value);
     this.getPurchaseInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -205,6 +204,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
           Object.keys(res.purchase_receipt_items_map).length !== 0
             ? true
             : false;
+        this.date.setValue(new Date(this.purchaseInvoiceDetails.posting_date));
+        this.purchaseReceiptDate = this.getParsedDate(this.date.value);
         this.getItemsWarranty();
       },
       error: err => {
@@ -254,7 +255,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     const purchaseReceipt = {} as PurchaseReceipt;
     purchaseReceipt.company = this.purchaseInvoiceDetails.company;
     purchaseReceipt.naming_series = this.purchaseInvoiceDetails.naming_series;
-    purchaseReceipt.posting_date = this.getParsedDate(this.date.value);
+    purchaseReceipt.posting_date = this.getParsedDate(new Date());
     purchaseReceipt.posting_time = this.getFrappeTime();
     purchaseReceipt.purchase_invoice_name = this.purchaseInvoiceDetails.name;
     purchaseReceipt.supplier = this.purchaseInvoiceDetails.supplier;
@@ -544,13 +545,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     }
     for (const item of data) {
       index++;
-      if (!item.warranty_date) {
-        isValid = false;
-        this.getMessage(
-          `Warranty date empty for ${item.item_name} at position ${index}, please add a warranty date`,
-        );
-        break;
-      }
       if (
         !item.serial_no ||
         !item.serial_no.length ||
@@ -567,7 +561,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(purchaseWarrantyMonths: number) {
-    let date = new Date();
+    let date = this.date.value;
     let dateTime;
     if (purchaseWarrantyMonths) {
       try {

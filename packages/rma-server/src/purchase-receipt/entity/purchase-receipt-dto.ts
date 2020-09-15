@@ -22,7 +22,7 @@ export class PurchaseReceiptItemDto {
   @IsString()
   warehouse: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   warranty_date: string;
 

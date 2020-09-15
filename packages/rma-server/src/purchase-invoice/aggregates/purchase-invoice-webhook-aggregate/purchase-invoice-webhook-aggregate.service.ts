@@ -5,7 +5,7 @@ import {
 } from '../../entity/purchase-invoice/purchase-invoice-webhook-dto';
 import { PurchaseInvoiceService } from '../../entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseInvoice } from '../../entity/purchase-invoice/purchase-invoice.entity';
-import { from, of, forkJoin } from 'rxjs';
+import { from, of, forkJoin, Observable } from 'rxjs';
 import { switchMap, map, toArray, mergeMap } from 'rxjs/operators';
 import * as uuidv4 from 'uuid/v4';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
@@ -18,6 +18,8 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
 import { DateTime } from 'luxon';
 import { ItemService } from '../../../item/entity/item/item.service';
+import { PurchaseOrder } from '../../../purchase-order/entity/purchase-order/purchase-order.entity';
+import { PurchaseOrderService } from '../../../purchase-order/entity/purchase-order/purchase-order.service';
 @Injectable()
 export class PurchaseInvoiceWebhookAggregateService {
   constructor(
@@ -26,6 +28,7 @@ export class PurchaseInvoiceWebhookAggregateService {
     private readonly settings: SettingsService,
     private readonly http: HttpService,
     private readonly itemService: ItemService,
+    private readonly purchaseOrderService: PurchaseOrderService,
   ) {}
 
   purchaseInvoiceCreated(purchaseInvoicePayload: PurchaseInvoiceWebhookDto) {
@@ -42,16 +45,21 @@ export class PurchaseInvoiceWebhookAggregateService {
           return of({ message: PURCHASE_INVOICE_ALREADY_EXIST });
         }
         return this.mapPurchaseInvoice(purchaseInvoicePayload).pipe(
-          switchMap(provider => {
+          switchMap((provider: PurchaseInvoice) => {
             provider.created_on = new DateTime(settings.timeZone).toJSDate();
             return this.getUserDetails(purchaseInvoicePayload.owner).pipe(
               switchMap(user => {
                 provider.created_by = user.full_name;
-                this.purchaseInvoiceService
-                  .create(provider)
-                  .then(success => {})
-                  .catch(error => {});
-                return of({});
+                return from(
+                  this.purchaseOrderService.findOne({
+                    purchase_invoice_name: purchaseInvoicePayload.name,
+                  }),
+                ).pipe(
+                  switchMap((purchaseOrder: PurchaseOrder) => {
+                    provider.posting_date = purchaseOrder.transaction_date;
+                    return from(this.purchaseInvoiceService.create(provider));
+                  }),
+                );
               }),
             );
           }),
@@ -60,7 +68,9 @@ export class PurchaseInvoiceWebhookAggregateService {
     );
   }
 
-  mapPurchaseInvoice(purchaseInvoicePayload: PurchaseInvoiceWebhookDto) {
+  mapPurchaseInvoice(
+    purchaseInvoicePayload: PurchaseInvoiceWebhookDto,
+  ): Observable<PurchaseInvoice> {
     return this.getSerializedItem(purchaseInvoicePayload.items).pipe(
       switchMap(serializedItems => {
         const purchaseInvoice = new PurchaseInvoice();
