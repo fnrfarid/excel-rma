@@ -107,6 +107,7 @@ export const SALES_INVOICE_STATUS_ENUM = [
   'Rejected',
   'Submitted',
 ];
+export const WARRANTY_CLAIM_DOCTYPE = 'Warranty Claim';
 export const PURCHASE_RECEIPT = 'purchase_receipt';
 export const DELIVERY_NOTE = 'delivery_note';
 export const DELIVERY_NOTE_DOCTYPE = 'Delivery Note';
