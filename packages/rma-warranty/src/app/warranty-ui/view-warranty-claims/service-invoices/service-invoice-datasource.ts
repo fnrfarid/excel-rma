@@ -31,7 +31,7 @@ export class ServiceInvoiceDataSource extends DataSource<
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder?, pageIndex = 0, pageSize = 10) {
+  loadItems(filter = '', sortOrder?, pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
     this.serviceInvoice
       .getServiceInvoiceList(filter, sortOrder, pageIndex, pageSize)

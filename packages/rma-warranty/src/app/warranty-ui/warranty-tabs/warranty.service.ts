@@ -28,7 +28,7 @@ export class WarrantyService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = `api/${model}/v1/list`;
     const params = new HttpParams()
@@ -49,7 +49,7 @@ export class WarrantyService {
   getWarrantyClaimsList(
     sortOrder,
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
     query,
     territory,
   ) {

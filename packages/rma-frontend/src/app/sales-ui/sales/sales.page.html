@@ -214,7 +214,7 @@
           (matSortChange)="setFilter($event)"
         >
           <ng-container matColumnDef="sr_no">
-            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef >No. </mat-header-cell>
             <mat-cell *matCellDef="let row;let i=index ">
               {{i+1}}
             </mat-cell>
@@ -362,7 +362,7 @@
           class="mat-paginator-sticky"
           (page)="getUpdate($event)"
           [length]="dataSource.length"
-          [pageSizeOptions]="[10, 50, 100, 500]"
+          [pageSizeOptions]="[30, 50, 100, 500]"
         >
         </mat-paginator>
       </mat-card-actions>

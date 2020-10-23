@@ -46,7 +46,7 @@ export class JobsDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 30, query?) {
     this.loadingSubject.next(true);
     this.jobService
       .getJobsList(sortOrder, pageIndex, pageSize, query)

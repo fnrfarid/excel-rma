@@ -23,7 +23,7 @@ import { Problem } from '../../../common/interfaces/problem-interface';
 export class ProblemService {
   constructor(private http: HttpClient, private storage: StorageService) {}
 
-  getProblemList(search = '', sort = 'ASC', pageNumber = 0, pageSize = 10) {
+  getProblemList(search = '', sort = 'ASC', pageNumber = 0, pageSize = 30) {
     const url = LIST_PROBLEMS_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())

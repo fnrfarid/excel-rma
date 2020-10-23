@@ -22,7 +22,7 @@ export class CreditNoteService {
     filter = '',
     sortOrder = 'asc',
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_CREDIT_NOTE_ENDPOINT;
     const params = new HttpParams()

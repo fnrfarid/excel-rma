@@ -590,10 +590,18 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     purchase_receipt_items_map: any,
   ) {
     items.forEach(item => {
-      if (purchase_receipt_items_map[item.item_code]) {
-        purchase_receipt_items_map[item.item_code] += item.qty;
+      if (
+        purchase_receipt_items_map[
+          Buffer.from(item.item_code).toString('base64')
+        ]
+      ) {
+        purchase_receipt_items_map[
+          Buffer.from(item.item_code).toString('base64')
+        ] += item.qty;
       } else {
-        purchase_receipt_items_map[item.item_code] = item.qty;
+        purchase_receipt_items_map[
+          Buffer.from(item.item_code).toString('base64')
+        ] = item.qty;
       }
     });
     return purchase_receipt_items_map;
@@ -663,8 +671,9 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       });
 
       if (purchaseInvoice) {
-        purchaseInvoice.purchase_receipt_items_map[purchaseReceipt.item_code] -=
-          purchaseReceipt.qty;
+        purchaseInvoice.purchase_receipt_items_map[
+          Buffer.from(purchaseReceipt.item_code).toString('base64')
+        ] -= purchaseReceipt.qty;
         purchaseInvoice.status = this.getStatus(
           purchaseInvoice,
           purchaseInvoice.purchase_receipt_items_map,

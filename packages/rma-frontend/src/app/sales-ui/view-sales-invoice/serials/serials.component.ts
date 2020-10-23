@@ -203,10 +203,11 @@ export class SerialsComponent implements OnInit {
       this.itemMap[item.item_code] = item;
       item.assigned = 0;
       item.remaining = item.qty;
-      if (salesInvoice.delivered_items_map[item.item_code]) {
-        item.assigned = salesInvoice.delivered_items_map[item.item_code] || 0;
+      if (salesInvoice.delivered_items_map[btoa(item.item_code)]) {
+        item.assigned =
+          salesInvoice.delivered_items_map[btoa(item.item_code)] || 0;
         item.remaining =
-          item.qty - salesInvoice.delivered_items_map[item.item_code];
+          item.qty - salesInvoice.delivered_items_map[btoa(item.item_code)];
       }
       remaining += item.remaining;
       filteredItemList.push(item);

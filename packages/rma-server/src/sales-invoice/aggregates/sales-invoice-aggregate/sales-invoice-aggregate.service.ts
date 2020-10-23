@@ -632,7 +632,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   ) {
     const returnItemsMap = {};
     items.forEach(item => {
-      returnItemsMap[item.item_code] = item.qty;
+      returnItemsMap[Buffer.from(item.item_code).toString('base64')] = item.qty;
     });
     for (const key of Object.keys(returnItemsMap)) {
       sales_invoice.delivered_items_map[key] += returnItemsMap[key];

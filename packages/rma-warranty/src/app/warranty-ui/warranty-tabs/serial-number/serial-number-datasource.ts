@@ -36,7 +36,7 @@ export class SerialNumberDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 10) {
+  loadItems(filter = '', sortOrder = 'asc', pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
     this.listingService
       .findModels(this.model, filter, sortOrder, pageIndex, pageSize)

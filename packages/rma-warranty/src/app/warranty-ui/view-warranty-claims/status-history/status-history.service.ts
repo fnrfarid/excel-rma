@@ -30,7 +30,7 @@ export class StatusHistoryService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_TERRITORIES_ENDPOINT;
     const params = new HttpParams()

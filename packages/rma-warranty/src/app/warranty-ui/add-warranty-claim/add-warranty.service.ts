@@ -58,7 +58,7 @@ export class AddWarrantyService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_CUSTOMER_ENDPOINT;
     const params = new HttpParams()
@@ -91,7 +91,7 @@ export class AddWarrantyService {
     );
   }
 
-  getItemList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+  getItemList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 30) {
     const url = LIST_ITEMS_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())

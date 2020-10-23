@@ -46,7 +46,7 @@ export class AccountsDataSource extends DataSource<Account> {
     filter = '',
     sortOrder = 'asc',
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     this.loadingSubject.next(true);
     this.accountsService

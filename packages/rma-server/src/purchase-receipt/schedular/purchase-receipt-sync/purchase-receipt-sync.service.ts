@@ -103,9 +103,9 @@ export class PurchaseReceiptSyncService {
           if (code === 'serials') {
             return;
           }
-          decrementQuery[`purchase_receipt_items_map.${code}`] = -item_hash[
-            code
-          ];
+          decrementQuery[
+            `purchase_receipt_items_map.${Buffer.from(code).toString('base64')}`
+          ] = -item_hash[code];
         });
         return from(
           this.purchaseInvoiceService.updateOne(

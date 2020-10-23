@@ -23,7 +23,7 @@ export class SalesReturnService {
     filter = '',
     sortOrder = 'asc',
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_DELIVERY_NOTE_ENDPOINT;
     const params = new HttpParams()
@@ -43,7 +43,7 @@ export class SalesReturnService {
     );
   }
 
-  getSalesReturnList(pageIndex = 0, pageSize = 10, filters: any[]) {
+  getSalesReturnList(pageIndex = 0, pageSize = 30, filters: any[]) {
     const url = RELAY_GET_DELIVERY_NOTE_ENDPOINT;
 
     const params = new HttpParams({

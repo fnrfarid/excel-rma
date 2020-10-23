@@ -40,7 +40,7 @@ export class TerritoryDataSource extends DataSource<ListingData> {
     filter = '',
     sortOrder = 'asc',
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
     group?,
   ) {
     this.loadingSubject.next(true);
