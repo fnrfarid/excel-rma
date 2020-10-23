@@ -152,7 +152,7 @@ export class SalesService {
     );
   }
 
-  getSalesInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+  getSalesInvoiceList(sortOrder, pageNumber = 0, pageSize = 30, query) {
     if (!sortOrder) sortOrder = { created_on: 'desc' };
     if (!query) query = {};
 
@@ -214,7 +214,7 @@ export class SalesService {
     filter = {},
     sortOrder: any = { item_name: 'asc' },
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     try {
       sortOrder = JSON.stringify(sortOrder);
@@ -333,7 +333,7 @@ export class SalesService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_CUSTOMER_ENDPOINT;
     const params = new HttpParams()
@@ -352,7 +352,7 @@ export class SalesService {
     );
   }
 
-  relayCustomerList(pageIndex = 0, pageSize = 10, filters) {
+  relayCustomerList(pageIndex = 0, pageSize = 30, filters) {
     const url = CUSTOMER_ENDPOINT;
 
     const params = new HttpParams({
@@ -398,7 +398,7 @@ export class SalesService {
     );
   }
 
-  getSerialList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 10) {
+  getSerialList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 30) {
     const url = LIST_SERIAL_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())

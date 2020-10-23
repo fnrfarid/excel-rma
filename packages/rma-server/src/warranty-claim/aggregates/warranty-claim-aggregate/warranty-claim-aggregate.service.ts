@@ -12,12 +12,13 @@ import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/wa
 import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/warranty-claim-updated.event';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 import { from, throwError, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 
 import {
   INVALID_FILE,
   VERDICT,
   CLAIM_STATUS,
+  WARRANTY_CLAIM_DOCTYPE,
 } from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
@@ -34,6 +35,11 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { CLAIM_TYPE_INVLAID } from '../../../constants/messages';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
 import { StatusHistoryDto } from '../../entity/warranty-claim/status-history-dto';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import {
+  SerialNoHistoryInterface,
+  EventType,
+} from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -42,6 +48,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     private readonly serialNoAggregateService: SerialNoAggregateService,
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {
     super();
   }
@@ -124,6 +131,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         switchMap((warrantyClaimPayload: WarrantyClaim) => {
           return from(this.warrantyClaimService.create(warrantyClaimPayload));
         }),
+        map(res => res.ops[0]),
+        switchMap((res: WarrantyClaim) => {
+          return this.addSerialNoHistory(
+            res,
+            [res.serial_no],
+            clientHttpRequest.token,
+          );
+        }),
       );
   }
 
@@ -137,6 +152,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         switchMap((warrantyClaimPayload: WarrantyClaim) => {
           return from(this.warrantyClaimService.create(warrantyClaimPayload));
         }),
+        map(res => res.ops[0]),
+        switchMap((res: WarrantyClaim) => {
+          return this.addSerialNoHistory(
+            res,
+            [res.serial_no],
+            clientHttpRequest.token,
+          );
+        }),
       );
   }
 
@@ -144,6 +167,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return this.assignFields(claimsPayload, clientHttpRequest).pipe(
       switchMap(warrantyClaimPayload => {
         return from(this.warrantyClaimService.create(warrantyClaimPayload));
+      }),
+      map(res => res.ops[0]),
+      switchMap((res: WarrantyClaim) => {
+        return this.addSerialNoHistory(
+          res,
+          [res.serial_no],
+          clientHttpRequest.token,
+        );
       }),
     );
   }
@@ -325,6 +356,19 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           ),
         );
       }),
+      switchMap(() => {
+        return this.warrantyClaimService.findOne({
+          uuid: statusHistoryPayload.uuid,
+        });
+      }),
+      switchMap(res => {
+        statusHistoryPayload.doc_name = res.claim_no;
+        return this.addSerialNoStatusHistory(
+          statusHistoryPayload,
+          [res.serial_no],
+          clientHttpRequest.token,
+        );
+      }),
     );
   }
 
@@ -408,5 +452,57 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         break;
     }
     return of(delivery_status);
+  }
+
+  addSerialNoHistory(warrantyClaim: WarrantyClaim, serialArray, token) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        const serialHistory: SerialNoHistoryInterface = {};
+        serialHistory.created_by = token.fullName;
+        serialHistory.created_on = new DateTime(settings.timeZone).toJSDate();
+        serialHistory.document_no = warrantyClaim.claim_no;
+        serialHistory.document_type = WARRANTY_CLAIM_DOCTYPE;
+        serialHistory.eventDate = new DateTime(settings.timeZone);
+        serialHistory.eventType = EventType.RECEIVED_FROM_CUSTOMER;
+        serialHistory.parent_document = warrantyClaim.uuid;
+        serialHistory.transaction_from = warrantyClaim.customer;
+        serialHistory.transaction_to = warrantyClaim.receiving_branch;
+        return this.serialNoHistoryService.addSerialHistory(
+          serialArray,
+          serialHistory,
+        );
+      }),
+    );
+  }
+
+  addSerialNoStatusHistory(
+    statusHistoryPayload: StatusHistoryDto,
+    serialArray,
+    token,
+  ) {
+    const verdict_key = Object.keys(VERDICT).find(
+      key => VERDICT[key] === statusHistoryPayload.verdict,
+    );
+    const eventType = EventType[verdict_key];
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        const serialHistory: SerialNoHistoryInterface = {};
+        serialHistory.created_by = token.fullName;
+        serialHistory.created_on = new DateTime(settings.timeZone).toJSDate();
+        serialHistory.document_no = statusHistoryPayload.doc_name;
+        serialHistory.document_type = WARRANTY_CLAIM_DOCTYPE;
+        serialHistory.eventDate = new DateTime(settings.timeZone);
+        serialHistory.eventType = eventType;
+        serialHistory.parent_document = statusHistoryPayload.uuid;
+        serialHistory.transaction_from = statusHistoryPayload.status_from;
+        serialHistory.transaction_to = !statusHistoryPayload.transfer_branch
+          ? statusHistoryPayload.status_from
+          : statusHistoryPayload.transfer_branch;
+        return this.serialNoHistoryService.addSerialHistory(
+          serialArray,
+          serialHistory,
+        );
+      }),
+    );
   }
 }

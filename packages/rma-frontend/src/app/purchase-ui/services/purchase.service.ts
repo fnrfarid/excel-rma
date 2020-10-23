@@ -27,7 +27,7 @@ import { PurchaseOrder } from '../../common/interfaces/purchase.interface';
 export class PurchaseService {
   constructor(private http: HttpClient, private storage: StorageService) {}
 
-  getPurchaseInvoiceList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+  getPurchaseInvoiceList(sortOrder, pageNumber = 0, pageSize = 30, query) {
     if (!sortOrder) sortOrder = { created_on: 'desc' };
     if (!query) query = {};
 

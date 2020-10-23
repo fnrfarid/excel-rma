@@ -50,7 +50,7 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 30, query?) {
     if (!sortOrder) {
       sortOrder = { created_on: 'desc' };
     }

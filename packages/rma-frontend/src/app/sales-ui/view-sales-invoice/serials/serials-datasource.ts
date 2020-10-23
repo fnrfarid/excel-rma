@@ -82,7 +82,7 @@ export class DeliveredSerialsDataSource extends DataSource<DeliveredSerial> {
     this.loadingSubject.complete();
   }
 
-  loadItems(uuid: string, search?, pageIndex = 0, pageSize = 10) {
+  loadItems(uuid: string, search?, pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
     this.salesService
       .getDeliveredSerials(uuid, search, pageIndex, pageSize)

@@ -16,7 +16,7 @@ import { CANCEL_STOCK_ENTRY_ENDPOINT } from '../../../../../constants/url-string
 export class StockEntryService {
   constructor(private http: HttpClient, private storage: StorageService) {}
 
-  getStockEntryList(sortOrder, pageNumber = 0, pageSize = 10, query) {
+  getStockEntryList(sortOrder, pageNumber = 0, pageSize = 30, query) {
     if (!query) query = {};
 
     const url = 'api/stock_entry/v1/list';

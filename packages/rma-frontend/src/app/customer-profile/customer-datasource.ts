@@ -40,7 +40,7 @@ export class CustomerDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(pageIndex = 0, pageSize = 10, filters: any[], countFilter) {
+  loadItems(pageIndex = 0, pageSize = 30, filters: any[], countFilter) {
     this.loadingSubject.next(true);
     this.salesService
       .relayCustomerList(pageIndex, pageSize, filters)

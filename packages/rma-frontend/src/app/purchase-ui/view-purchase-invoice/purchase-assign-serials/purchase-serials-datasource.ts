@@ -25,7 +25,7 @@ export class PurchasedSerialsDataSource extends DataSource<DeliveredSerial> {
     this.loadingSubject.complete();
   }
 
-  loadItems(purchase_invoice_name, search?, pageIndex = 0, pageSize = 10) {
+  loadItems(purchase_invoice_name, search?, pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
     this.purchaseService
       .getDeliveredSerials(purchase_invoice_name, search, pageIndex, pageSize)

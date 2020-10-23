@@ -26,7 +26,7 @@ export class JobsService {
     private readonly storage: StorageService,
   ) {}
 
-  getJobsList(sortOrder, pageNumber = 0, pageSize = 10, query?) {
+  getJobsList(sortOrder, pageNumber = 0, pageSize = 30, query?) {
     if (!sortOrder) sortOrder = { _id: -1 };
     if (query && query['data.status'] === 'Failed') {
       sortOrder = { failedAt: -1 };

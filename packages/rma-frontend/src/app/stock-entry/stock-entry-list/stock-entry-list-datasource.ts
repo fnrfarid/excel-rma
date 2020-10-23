@@ -39,7 +39,7 @@ export class StockEntryListDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(sortOrder?, pageIndex = 0, pageSize = 10, query?) {
+  loadItems(sortOrder?, pageIndex = 0, pageSize = 30, query?) {
     this.loadingSubject.next(true);
     this.StockEntryListService.getStockEntryList(
       sortOrder,

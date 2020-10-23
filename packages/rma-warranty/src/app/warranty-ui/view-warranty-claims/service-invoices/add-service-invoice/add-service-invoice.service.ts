@@ -44,7 +44,7 @@ export class AddServiceInvoiceService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_TERRITORIES_ENDPOINT;
     const params = new HttpParams()
@@ -67,7 +67,7 @@ export class AddServiceInvoiceService {
     filter = {},
     sortOrder: any = { item_name: 'asc' },
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     try {
       sortOrder = JSON.stringify(sortOrder);
@@ -163,7 +163,7 @@ export class AddServiceInvoiceService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_CUSTOMER_ENDPOINT;
     const params = new HttpParams()
@@ -256,7 +256,7 @@ export class AddServiceInvoiceService {
     filter = '',
     sortOrder = 'asc',
     pageNumber = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_SERVICE_INVOICE_ENDPOINT;
     const params = new HttpParams()

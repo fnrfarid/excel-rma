@@ -48,7 +48,7 @@ export class ItemPriceDataSource extends DataSource<ListingData> {
     filter = {},
     sortOrder: any = { name: 'asc' },
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     this.loadingSubject.next(true);
     try {

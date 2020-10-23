@@ -181,11 +181,12 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       this.itemMap[item.item_code] = item;
       item.assigned = 0;
       item.remaining = item.qty;
-      if (purchaseInvoice.purchase_receipt_items_map[item.item_code]) {
+      if (purchaseInvoice.purchase_receipt_items_map[btoa(item.item_code)]) {
         item.assigned =
-          purchaseInvoice.purchase_receipt_items_map[item.item_code] || 0;
+          purchaseInvoice.purchase_receipt_items_map[btoa(item.item_code)] || 0;
         item.remaining =
-          item.qty - purchaseInvoice.purchase_receipt_items_map[item.item_code];
+          item.qty -
+          purchaseInvoice.purchase_receipt_items_map[btoa(item.item_code)];
       }
       remaining += item.remaining;
       filteredItemList.push(item);

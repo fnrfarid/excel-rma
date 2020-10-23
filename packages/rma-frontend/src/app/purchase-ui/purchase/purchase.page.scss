@@ -36,6 +36,7 @@
 .date-filter-text {
   font-size: 0.7rem;
 }
+
 .example-container {
   box-shadow: none;
   height: auto;
@@ -43,26 +44,14 @@
   overflow: auto;
 }
 
-table {
-  width: 150%;
+// common width for all columns
+[class*='mat-column-']{
+  flex: 0 0 13.5% !important;
+  min-width: 150px !important;
 }
 
-td.mat-column-star {
-  width: 20px;
-  padding-right: 8px;
-}
-
-th.mat-column-position,
-td.mat-column-position {
-  padding-left: 8px;
-}
-
-mat-header-cell {
-  flex-wrap: nowrap;
-  min-width: 200px;
-}
-.mat-row,
-.mat-header-row {
-  min-width: 120%;
-  width: 100%;
+// similarly override any table column with name from matColumnDef.
+.mat-column-sr_no {
+  flex: 0 0 5% !important;
+  min-width: 10px !important;
 }

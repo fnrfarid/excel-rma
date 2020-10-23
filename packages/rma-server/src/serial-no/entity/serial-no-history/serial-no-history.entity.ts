@@ -51,6 +51,14 @@ export enum EventType {
   SerialTransferCreated = 'Serial Transfer Created',
   SerialTransferAccepted = 'Serial Transfer Accepted',
   SerialTransferRejected = 'Serial Transfer Rejected',
+  RECEIVED_FROM_CUSTOMER = 'Received from Customer',
+  RECEIVED_FROM_BRANCH = 'Received from Branch',
+  WORK_IN_PROGRESS = 'Work in Progress',
+  TRANSFERRED = 'Transferred',
+  SOLVED = 'Solved - Repairing done',
+  TO_REPLACE = 'Unsolved - To Replace',
+  UNSOLVED = 'Unsolved - Return to Owner',
+  DELIVER_TO_CUSTOMER = 'Deliver to Customer',
 }
 
 export class SerialNoHistoryInterface {

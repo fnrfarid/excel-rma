@@ -39,7 +39,7 @@ export class SalesReturnListDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(pageIndex = 0, pageSize = 10, filters: any[], countFilter: any) {
+  loadItems(pageIndex = 0, pageSize = 30, filters: any[], countFilter: any) {
     this.loadingSubject.next(true);
     this.salesReturnService
       .getSalesReturnList(pageIndex, pageSize, filters)

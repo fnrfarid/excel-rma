@@ -36,7 +36,7 @@ export class ProblemDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder = 'ASC', pageIndex = 0, pageSize = 10) {
+  loadItems(filter = '', sortOrder = 'ASC', pageIndex = 0, pageSize = 30) {
     if (sortOrder === '') sortOrder = 'ASC';
     this.loadingSubject.next(true);
     this.problemService

@@ -295,12 +295,12 @@ export class AddSalesReturnPage implements OnInit {
     salesInvoice.items.forEach(item => {
       item.assigned = 0;
       item.remaining = item.qty;
-      if (salesInvoice.delivered_items_map[item.item_code]) {
-        item.qty = salesInvoice.delivered_items_map[item.item_code];
+      if (salesInvoice.delivered_items_map[btoa(item.item_code)]) {
+        item.qty = salesInvoice.delivered_items_map[btoa(item.item_code)];
         item.assigned =
-          0 - salesInvoice.returned_items_map[item.item_code] || 0;
-        item.remaining = salesInvoice.returned_items_map[item.item_code]
-          ? item.qty + salesInvoice.returned_items_map[item.item_code]
+          0 - salesInvoice.returned_items_map[btoa(item.item_code)] || 0;
+        item.remaining = salesInvoice.returned_items_map[btoa(item.item_code)]
+          ? item.qty + salesInvoice.returned_items_map[btoa(item.item_code)]
           : item.qty;
         filteredItemList.push(item);
       }

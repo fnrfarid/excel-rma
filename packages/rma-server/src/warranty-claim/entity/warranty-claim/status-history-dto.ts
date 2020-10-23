@@ -44,4 +44,8 @@ export class StatusHistoryDto {
   @IsOptional()
   @IsString()
   claim_status: string;
+
+  @IsOptional()
+  @IsString()
+  doc_name: string;
 }

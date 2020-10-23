@@ -76,10 +76,10 @@ export class DeliveryNoteJobService {
     const query: { [key: string]: number } = {};
 
     job.data.payload.items.forEach(item => {
-      if (query[item.item_code]) {
-        query[item.item_code] += item.qty;
+      if (query[Buffer.from(item.item_code).toString('base64')]) {
+        query[Buffer.from(item.item_code).toString('base64')] += item.qty;
       } else {
-        query[item.item_code] = item.qty;
+        query[Buffer.from(item.item_code).toString('base64')] = item.qty;
       }
 
       if (item.has_serial_no) {
@@ -345,7 +345,8 @@ export class DeliveryNoteJobService {
   ) {
     const delivered_items_map = {};
     deliveryNotePayload.items.forEach(item => {
-      delivered_items_map[item.item_code] = item.qty;
+      delivered_items_map[Buffer.from(item.item_code).toString('base64')] =
+        item.qty;
     });
 
     this.salesInvoiceService

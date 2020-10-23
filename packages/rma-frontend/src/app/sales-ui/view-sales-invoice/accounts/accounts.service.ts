@@ -21,7 +21,7 @@ export class AccountsService {
     filter = '',
     sortOrder = 'asc',
     pageIndex = 0,
-    pageSize = 10,
+    pageSize = 30,
   ) {
     const url = LIST_RETURN_VOUCHER_ENDPOINT;
     const params = new HttpParams()
