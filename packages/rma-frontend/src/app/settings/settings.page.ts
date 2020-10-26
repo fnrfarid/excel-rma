@@ -225,8 +225,8 @@ export class SettingsPage implements OnInit {
     this.territoryDataSource.loadItems(
       this.search,
       this.sort.direction,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
+      0,
+      30,
       value !== undefined ? value : this.group,
     );
   }

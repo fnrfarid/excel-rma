@@ -135,8 +135,8 @@ export class WarrantyPage implements OnInit {
     }
     this.dataSource.loadItems(
       sortQuery,
-      event.pageIndex,
-      event.pageSize,
+      event?.pageIndex || 0,
+      event?.pageSize || 30,
       query,
       { territory: this.territoryList },
     );

@@ -24,6 +24,7 @@ import { CsvJsonService } from './api/csv-json/csv-json.service';
 import { ProblemUiModule } from './problem-ui/problem-ui.module';
 import { JobUIModule } from './job-ui/job-ui.module';
 import { PermissionManager } from './api/permission/permission.service';
+import { ApiModule } from './api/api.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,6 +39,7 @@ import { PermissionManager } from './api/permission/permission.service';
     HttpClientModule,
     SalesUiModule,
     PurchaseUiModule,
+    ApiModule,
     BrowserAnimationsModule,
     AppCommonModule,
     ProblemUiModule,

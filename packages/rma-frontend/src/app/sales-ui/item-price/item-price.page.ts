@@ -115,12 +115,7 @@ export class ItemPricePage implements OnInit {
       }
     }
 
-    this.dataSource.loadItems(
-      query,
-      sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-    );
+    this.dataSource.loadItems(query, sortQuery, 0, 30);
   }
 
   updatePurchaseWarrantyMonths(row: ListingData, days: number) {
