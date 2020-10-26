@@ -225,8 +225,8 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     this.purchasedSerialsDataSource.loadItems(
       this.purchaseInvoiceDetails.name,
       this.deliveredSerialsSearch,
-      this.index,
-      this.size,
+      0,
+      30,
     );
   }
 

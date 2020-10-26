@@ -97,8 +97,8 @@ export class ProblemPage implements OnInit {
     this.dataSource.loadItems(
       this.search,
       this.sort.direction,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
+      event?.pageIndex || 0,
+      event?.pageSize || 30,
     );
   }
 }

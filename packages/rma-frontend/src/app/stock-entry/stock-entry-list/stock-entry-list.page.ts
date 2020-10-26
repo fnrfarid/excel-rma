@@ -210,10 +210,12 @@ export class StockEntryListPage implements OnInit {
       }
     }
 
+    this.paginator.pageIndex = event?.pageIndex || 0;
+    this.paginator.pageSize = event?.pageSize || 30;
     this.dataSource.loadItems(
       sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
+      event?.pageIndex || undefined,
+      event?.pageSize || undefined,
       query,
     );
   }

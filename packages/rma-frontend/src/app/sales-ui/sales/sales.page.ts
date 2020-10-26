@@ -189,11 +189,14 @@ export class SalesPage implements OnInit {
       );
     }
 
+    this.paginator.pageIndex = event?.pageIndex || 0;
+    this.paginator.pageSize = event?.pageSize || 30;
+
     if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
       this.sortQuery,
-      event.pageIndex,
-      event.pageSize,
+      event?.pageIndex || undefined,
+      event?.pageSize || undefined,
       query,
     );
   }

@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StorageService } from '../storage/storage.service';
 import { SalesService } from '../../sales-ui/services/sales.service';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('csvJsonService', () => {
   beforeEach(() =>
@@ -13,6 +14,10 @@ describe('csvJsonService', () => {
         CsvJsonService,
         {
           provide: MatSnackBar,
+          useValue: {},
+        },
+        {
+          provide: MatDialog,
           useValue: {},
         },
         {
