@@ -53,8 +53,8 @@ export class AccountsComponent implements OnInit {
       this.sales_invoice,
       this.search,
       this.sort.direction,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
+      0,
+      30,
     );
   }
 }

@@ -1,6 +1,4 @@
-import { Injectable } from '@angular/core';
-// import { switchMap } from 'rxjs/operators';
-// import { of } from 'rxjs';
+import { Component, Inject, Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { of, from, throwError } from 'rxjs';
 import * as CSVTOJSON from 'csvjson-csv2json';
@@ -25,8 +23,16 @@ import {
   VALIDATE_SERIAL_BUFFER_COUNT,
 } from '../../constants/storage';
 import { StorageService } from '../storage/storage.service';
-import { CsvJsonObj } from '../../sales-ui/view-sales-invoice/serials/serials.component';
+import {
+  AssignSerialsDialog,
+  CsvJsonObj,
+} from '../../sales-ui/view-sales-invoice/serials/serials.component';
 import { SalesService } from '../../sales-ui/services/sales.service';
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +41,7 @@ export class CsvJsonService {
   arrayBuffer;
   constructor(
     private readonly snackBar: MatSnackBar,
+    public dialog: MatDialog,
     private storage: StorageService,
     private readonly salesService: SalesService,
   ) {}
@@ -270,18 +277,40 @@ export class CsvJsonService {
     );
   }
 
-  downloadAsCSV(data: any[], fields: string[], filename) {
-    const replacer = function (key, value) {
-      return value === null ? '' : value;
-    };
+  async downloadAsCSV(data: any[], fields: string[], filename) {
+    const parsedFields = {};
+    Object.keys(data[0]).forEach(key => {
+      parsedFields[key] = false;
+      if (fields.includes(key)) {
+        parsedFields[key] = true;
+      }
+      if (!['string', 'number'].includes(typeof data[0][key])) {
+        delete parsedFields[key];
+      }
+    });
+
+    const dialogRef = this.dialog.open(SelectDumpHeadersDialog, {
+      width: '250px',
+      data: parsedFields,
+    });
+
+    let selectedFields = await dialogRef.afterClosed().toPromise();
+    selectedFields = Object.keys(selectedFields).filter(key => {
+      if (selectedFields[key]) {
+        return key;
+      }
+    });
+
     let csv: any = data.map(function (row) {
-      return fields
+      return selectedFields
         .map(function (fieldName) {
-          return JSON.stringify(row[fieldName], replacer);
+          return JSON.stringify(row[fieldName], (key, value) => {
+            return value === null ? '' : value;
+          });
         })
         .join(',');
     });
-    csv.unshift(fields.join(',')); // add header column
+    csv.unshift(selectedFields.join(',')); // add header column
     csv = csv.join('\r\n');
     return this.downloadFile(csv, filename);
   }
@@ -301,3 +330,31 @@ export class CsvJsonService {
 }
 
 export const FILE_HEADERS = ['item_name', 'serial_no'];
+
+@Component({
+  selector: 'select-dump-headers-dialog',
+  templateUrl: 'select-dump-headers-dialog.html',
+  styles: ['./select-dump-headers-dialog.scss'],
+})
+export class SelectDumpHeadersDialog {
+  keys = [];
+  constructor(
+    public dialogRef: MatDialogRef<AssignSerialsDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
+    this.keys = Object.keys(data);
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  parsedTitle(title) {
+    return title
+      .split('_')
+      .filter(element => {
+        return element.charAt(0).toUpperCase() + element.slice(1);
+      })
+      .join(' ');
+  }
+}

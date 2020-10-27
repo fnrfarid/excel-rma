@@ -282,8 +282,8 @@ export class SerialsComponent implements OnInit {
     this.deliveredSerialsDataSource.loadItems(
       this.salesInvoiceDetails.name,
       this.deliveredSerialsSearch,
-      this.index,
-      this.size,
+      event?.pageIndex || 0,
+      event?.pageSize || 30,
     );
   }
 

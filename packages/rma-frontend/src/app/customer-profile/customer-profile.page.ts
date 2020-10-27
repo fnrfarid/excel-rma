@@ -73,12 +73,7 @@ export class CustomerProfilePage implements OnInit {
       this.countFilter.name = ['like', `%${this.search}%`];
     }
 
-    this.dataSource.loadItems(
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-      this.filters,
-      this.countFilter,
-    );
+    this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }
 
   loadPrice(row, index) {

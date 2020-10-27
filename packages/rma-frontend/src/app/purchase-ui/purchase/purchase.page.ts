@@ -184,10 +184,12 @@ export class PurchasePage implements OnInit {
     sortQuery =
       Object.keys(sortQuery).length === 0 ? { created_on: 'DESC' } : sortQuery;
 
+    this.paginator.pageIndex = event?.pageIndex || 0;
+    this.paginator.pageSize = event?.pageSize || 30;
     this.dataSource.loadItems(
       sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
+      event?.pageIndex || undefined,
+      event?.pageSize || undefined,
       query,
     );
   }

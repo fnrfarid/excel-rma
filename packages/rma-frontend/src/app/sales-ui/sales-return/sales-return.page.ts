@@ -98,12 +98,7 @@ export class SalesReturnPage implements OnInit {
       this.countFilter.creation = ['Between', `${fromDate} ${toDate}`];
     }
 
-    this.dataSource.loadItems(
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-      this.filters,
-      this.countFilter,
-    );
+    this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }
 
   dateFilter() {

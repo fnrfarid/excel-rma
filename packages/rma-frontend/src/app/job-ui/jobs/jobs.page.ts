@@ -163,10 +163,12 @@ export class JobsPage implements OnInit {
 
     sortQuery = Object.keys(sortQuery).length === 0 ? undefined : sortQuery;
 
+    this.index, (this.paginator.pageIndex = event?.pageIndex || 0);
+    this.size, (this.paginator.pageSize = event?.pageSize || 30);
     this.dataSource.loadItems(
       sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
+      event?.pageIndex || undefined,
+      event?.pageSize || undefined,
       query,
     );
   }

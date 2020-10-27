@@ -59,7 +59,7 @@
         </ion-row>
       </ion-grid>
       <div class="example-container mat-elevation-z8">
-        <table mat-table [dataSource]="dataSource">
+        <mat-table matSort [dataSource]="dataSource">
           <!-- Position Column -->
           <ng-container matColumnDef="failCount">
             <mat-header-cell *matHeaderCellDef>Retry Count</mat-header-cell>
@@ -106,7 +106,7 @@
             *matRowDef="let row; columns: displayedColumns;"
             (click)="viewSingleJob(row)"
           ></mat-row>
-        </table>
+        </mat-table>
       </div>
 
       <mat-card-actions>
