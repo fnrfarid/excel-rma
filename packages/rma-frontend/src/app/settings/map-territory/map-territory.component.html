@@ -31,7 +31,7 @@
           required
           placeholder="Warehouse"
           aria-label="Warehouse"
-          (focusout)="validateInput(f.warehouse, filteredWarehouseList)"
+          (focusout)="validateInput(f.warehouse, warehouses)"
           [matAutocomplete]="autoWH"
           formControlName="warehouse">
         <mat-autocomplete #autoWH="matAutocomplete">
