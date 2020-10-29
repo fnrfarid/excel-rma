@@ -17,8 +17,8 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { FormControl } from '@angular/forms';
-import { STOCK_TRANSFER_STATUS } from 'src/app/constants/app-string';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { STOCK_TRANSFER_STATUS } from '../../constants/app-string';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
 
 @Component({
   selector: 'app-stock-entry-list',

@@ -55,7 +55,8 @@ import { MY_FORMATS } from '../../../constants/date-format';
 import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 import { TimeService } from '../../../api/time/time.service';
 import { SerialsService } from '../../../common/helpers/serials/serials.service';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
+import { ValidateInputSelected } from '../../../common/pipes/validators';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -92,7 +93,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     toRange: '',
     serials: [],
   };
-
+  validateInput: any = ValidateInputSelected;
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
   itemDisplayedColumns = [

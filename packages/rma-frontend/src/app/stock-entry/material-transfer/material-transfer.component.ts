@@ -55,6 +55,7 @@ import {
   MatDialog,
 } from '@angular/material/dialog';
 import { Item } from '../../common/interfaces/sales.interface';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 
 @Component({
   selector: 'app-material-transfer',
@@ -81,6 +82,7 @@ export class MaterialTransferComponent implements OnInit {
     s_warehouse: new FormControl(''),
     t_warehouse: new FormControl(''),
   };
+  validateInput: any = ValidateInputSelected;
 
   @ViewChild('csvFileInput', { static: false })
   csvFileInput: ElementRef;
@@ -181,6 +183,10 @@ export class MaterialTransferComponent implements OnInit {
     }
 
     this.subscribeEndpoints();
+  }
+
+  get f() {
+    return this.form.controls;
   }
 
   subscribeEndpoints() {
@@ -769,6 +775,7 @@ export class ItemInterface {
 export class AddItemDialog {
   filteredItemList: Observable<any[]>;
   itemFormControl = new FormControl();
+  validateInput: any = ValidateInputSelected;
 
   constructor(
     public dialogRef: MatDialogRef<AddItemDialog>,

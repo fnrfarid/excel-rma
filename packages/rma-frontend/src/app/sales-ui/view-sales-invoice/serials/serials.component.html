@@ -54,6 +54,7 @@
               placeholder="Select Warehouse"
               matInput
               [formControl]="warehouseFormControl"
+              (focusout)="validateInput(warehouseFormControl, filteredWarehouseList)"
               [matAutocomplete]="auto"
             />
             <mat-autocomplete
@@ -68,6 +69,10 @@
                 {{ option.name }}
               </mat-option>
             </mat-autocomplete>
+            <mat-error *ngIf="warehouseFormControl.hasError('falseValse')">
+              You should select a value from dropdown only. 
+              <strong>'{{warehouseFormControl.value}}'</strong> is not allowed.
+            </mat-error>
             <mat-error *ngIf="warehouseFormControl.hasError('required')">
               warehouse is <strong>required</strong>
             </mat-error>

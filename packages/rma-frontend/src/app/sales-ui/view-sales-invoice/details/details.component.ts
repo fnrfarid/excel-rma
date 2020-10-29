@@ -10,7 +10,7 @@ import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { filter } from 'rxjs/operators';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { ViewSalesInvoiceSubjectService } from '../view-sales-invoice-subject.service';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 
 @Component({
   selector: 'sales-invoice-details',

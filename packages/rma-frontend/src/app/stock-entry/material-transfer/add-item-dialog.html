@@ -5,23 +5,27 @@
       type="text"
       placeholder="Select Item"
       matInput
+      (focusout)="validateInput(itemFormControl, filteredItemList)"
       [formControl]="itemFormControl"
       [matAutocomplete]="auto"
+      required
     />
     <mat-autocomplete
       autoActiveFirstOption
       #auto="matAutocomplete"
-      [displayWith]="getOptionText"
-    >
+      [displayWith]="getOptionText">
       <mat-option
         *ngFor="let option of filteredItemList | async"
-        [value]="option"
-      >
+        [value]="option">
         {{ option.item_name }}
       </mat-option>
     </mat-autocomplete>
+    <mat-error *ngIf="itemFormControl.hasError('falseValse')">
+      You should select a value from dropdown only. 
+      <strong>'{{itemFormControl.value}}'</strong> is not allowed.
+    </mat-error>
     </mat-form-field>
 </div>
 <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">Done</button>
+    <button mat-button [disabled]="!itemFormControl.valid" (click)="onNoClick()">Done</button>
 </div>

@@ -15,6 +15,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TerritoryDataSource } from './territory-datasource';
 import { MapTerritoryComponent } from './map-territory/map-territory.component';
+import { ValidateInputSelected } from '../common/pipes/validators';
 
 @Component({
   selector: 'app-settings',
@@ -44,6 +45,7 @@ export class SettingsPage implements OnInit {
     serviceAccountApiSecret: new FormControl(),
     posProfile: new FormControl(),
   });
+  validateInput: any = ValidateInputSelected;
 
   companies: Observable<unknown[]> = this.companySettingsForm
     .get('defaultCompany')
@@ -167,6 +169,10 @@ export class SettingsPage implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  get f() {
+    return this.companySettingsForm.controls;
   }
 
   updateSettings() {
