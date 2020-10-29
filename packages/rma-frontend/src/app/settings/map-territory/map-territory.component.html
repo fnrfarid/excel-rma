@@ -12,6 +12,7 @@
           required
           placeholder="Territory"
           aria-label="Territory"
+          (focusout)="validateInput(f.territory, territories)"
           [matAutocomplete]="autoTerritory"
           formControlName="territory">
         <mat-autocomplete #autoTerritory="matAutocomplete">
@@ -19,6 +20,10 @@
             <span>{{territory.name}}</span>
           </mat-option>
         </mat-autocomplete>
+        <mat-error *ngIf="f.territory.hasError('falseValse')">
+          You should select a value from dropdown only. 
+          <strong>'{{f.territory.value}}'</strong> is not allowed.
+        </mat-error>
       </mat-form-field>
       <mat-form-field class="mat-input-wrapper">
         <input
@@ -26,6 +31,7 @@
           required
           placeholder="Warehouse"
           aria-label="Warehouse"
+          (focusout)="validateInput(f.warehouse, warehouses)"
           [matAutocomplete]="autoWH"
           formControlName="warehouse">
         <mat-autocomplete #autoWH="matAutocomplete">
@@ -33,6 +39,10 @@
             <span>{{warehouse.name}}</span>
           </mat-option>
         </mat-autocomplete>
+        <mat-error *ngIf="f.warehouse.hasError('falseValse')">
+          You should select a value from dropdown only. 
+          <strong>'{{f.warehouse.value}}'</strong> is not allowed.
+        </mat-error>
       </mat-form-field>
     </form>
   </ion-card-content>

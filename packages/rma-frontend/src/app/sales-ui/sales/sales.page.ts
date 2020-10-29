@@ -290,12 +290,7 @@ export class SalesPage implements OnInit {
         ? { created_on: 'DESC' }
         : this.sortQuery;
 
-    this.dataSource.loadItems(
-      this.sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-      query,
-    );
+    this.dataSource.loadItems(this.sortQuery, undefined, undefined, query);
   }
 
   navigateBasedOnRoles(row) {

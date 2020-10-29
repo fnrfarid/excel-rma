@@ -4,7 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SalesReturnService } from './sales-return.service';
 import { ActivatedRoute } from '@angular/router';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 
 @Component({
   selector: 'sales-invoice-return',

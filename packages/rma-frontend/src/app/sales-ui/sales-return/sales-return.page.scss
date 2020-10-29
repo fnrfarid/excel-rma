@@ -15,7 +15,7 @@
 }
 
 table {
-  width: 150%;
+  width: 100%;
 }
 
 td.mat-column-star {
@@ -30,5 +30,5 @@ td.mat-column-position {
 
 mat-header-cell {
   flex-wrap: nowrap;
-  min-width: 200px;
+  min-width: 150px;
 }

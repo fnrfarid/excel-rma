@@ -7,7 +7,7 @@ import { PopoverController } from '@ionic/angular';
 import { PrintComponent } from './print/print.component';
 import { ViewSalesInvoiceSubjectService } from './view-sales-invoice-subject.service';
 import { switchMap } from 'rxjs/operators';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
 
 @Component({
   selector: 'app-view-sales-invoice',

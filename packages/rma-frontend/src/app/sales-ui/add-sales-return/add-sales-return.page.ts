@@ -41,6 +41,7 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 import { LoadingController } from '@ionic/angular';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 @Component({
   selector: 'app-add-sales-return',
   templateUrl: './add-sales-return.page.html',
@@ -70,6 +71,7 @@ export class AddSalesReturnPage implements OnInit {
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
   getOptionText = '';
+  validateInput: any = ValidateInputSelected;
   rangePickerState = {
     prefix: '',
     fromRange: '',

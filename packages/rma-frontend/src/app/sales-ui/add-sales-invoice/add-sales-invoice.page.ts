@@ -40,6 +40,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -73,6 +74,8 @@ export class AddSalesInvoicePage implements OnInit {
   filteredCustomerList: Observable<any[]>;
   salesInvoiceForm: FormGroup;
   itemsControl: FormArray;
+  validateInput: any = ValidateInputSelected;
+
   get f() {
     return this.salesInvoiceForm.controls;
   }
