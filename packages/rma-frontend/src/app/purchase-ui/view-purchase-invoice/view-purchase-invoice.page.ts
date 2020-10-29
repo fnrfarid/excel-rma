@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { PurchaseService } from '../services/purchase.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
 
 @Component({
   selector: 'app-view-purchase-invoice',

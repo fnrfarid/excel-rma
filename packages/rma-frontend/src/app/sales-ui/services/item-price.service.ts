@@ -53,16 +53,11 @@ export class ItemPriceService {
 
   getStockBalance(item_code: string, warehouse: string) {
     const url = RELAY_GET_STOCK_BALANCE_ENDPOINT;
-    const params = new HttpParams()
-      .set('item_code', item_code)
-      .set('warehouse', warehouse);
+    const body = { item_code, warehouse };
 
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get<any>(url, {
-          params,
-          headers,
-        });
+        return this.http.post<any>(url, body, { headers });
       }),
     );
   }

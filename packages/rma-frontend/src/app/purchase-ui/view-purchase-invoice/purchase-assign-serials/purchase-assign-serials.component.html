@@ -25,13 +25,21 @@
       <ion-row>
         <ion-col size-md="6">
           <mat-form-field class="example-full-width">
-            <input [formControl]="warehouseFormControl" type="text" placeholder="Select Warehouse" matInput
-              [matAutocomplete]="auto" required />
+            <input  matInput
+            placeholder="Select Warehouse" 
+            [formControl]="warehouseFormControl" 
+            type="text" 
+            (focusout)="validateInput(warehouseFormControl, filteredWarehouseList)"
+            [matAutocomplete]="auto" required />
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="getOptionText">
               <mat-option *ngFor="let option of filteredWarehouseList | async" [value]="option">
                 {{ option }}
               </mat-option>
             </mat-autocomplete>
+            <mat-error *ngIf="warehouseFormControl.hasError('falseValse')">
+              You should select a value from dropdown only. 
+              <strong>'{{warehouseFormControl.value}}'</strong> is not allowed.
+            </mat-error>
             <mat-error *ngIf="warehouseFormControl.hasError('required')">
               Warehouse is <strong>required</strong>
             </mat-error>

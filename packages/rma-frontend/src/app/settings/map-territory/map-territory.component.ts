@@ -6,6 +6,7 @@ import { debounceTime, startWith } from 'rxjs/operators';
 import { PopoverController, NavParams } from '@ionic/angular';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../constants/app-string';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 
 @Component({
   selector: 'app-map-territory',
@@ -25,7 +26,7 @@ export class MapTerritoryComponent implements OnInit {
       startWith(''),
       this.mapTerritory.relayTerritories(),
     );
-
+  validateInput: any = ValidateInputSelected;
   warehouses: Observable<unknown[]> = this.territoryForm
     .get('warehouse')
     .valueChanges.pipe(
@@ -57,6 +58,10 @@ export class MapTerritoryComponent implements OnInit {
 
   async onCancel() {
     return await this.popoverCtrl.dismiss();
+  }
+
+  get f() {
+    return this.territoryForm.controls;
   }
 
   onUpdate() {

@@ -55,8 +55,9 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { TimeService } from '../../../api/time/time.service';
 import { SerialsService } from '../../../common/helpers/serials/serials.service';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ViewSalesInvoicePage } from '../view-sales-invoice.page';
+import { ValidateInputSelected } from '../../../common/pipes/validators';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -98,6 +99,7 @@ export class SerialsComponent implements OnInit {
   filteredItemList = [];
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
+  validateInput: any = ValidateInputSelected;
   itemDisplayedColumns = [
     'item_name',
     'qty',

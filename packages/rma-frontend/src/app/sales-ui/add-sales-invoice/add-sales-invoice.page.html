@@ -82,6 +82,7 @@
                   matInput
                   formControlName="customer"
                   [matAutocomplete]="auto"
+                  (focusout)="validateInput(f.customer, filteredCustomerList)"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
@@ -99,6 +100,10 @@
                     </small>
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="f.customer.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.customer.value}}'</strong> is not allowed.
+                </mat-error>
                 <mat-error *ngIf="f.customer.hasError('required')">
                   Customer is <strong>required</strong>
                 </mat-error>
@@ -135,6 +140,7 @@
                   placeholder="Select Warehouse"
                   matInput
                   formControlName="warehouse"
+                  (focusout)="validateInput(f.warehouse, filteredWarehouseList)"
                   [matAutocomplete]="warehouse"
                 />
                 <mat-autocomplete
@@ -151,6 +157,10 @@
                 </mat-autocomplete>
                 <mat-error *ngIf="f.warehouse.hasError('required')">
                   Warehouse is <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="f.warehouse.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.warehouse.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -224,6 +234,7 @@
                   placeholder="Select territory"
                   matInput
                   formControlName="territory"
+                  (focusout)="validateInput(f.territory, territoryList)"
                   [matAutocomplete]="territory"
                 />
                 <mat-autocomplete
@@ -237,6 +248,10 @@
                     {{ territory }}
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="f.territory.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.territory.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>

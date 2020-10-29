@@ -46,7 +46,7 @@
             </ion-text>
           </ion-col>
         </ion-row>
-        <ion-row >
+        <ion-row>
           <ion-col>
             <mat-form-field class="example-full-width">
               <mat-label>Remarks</mat-label>
@@ -56,26 +56,18 @@
           <ion-col>
             <form [formGroup]="form">
               <mat-form-field class="example-full-width">
-                <input
-                  required
-                  type="text"
-                  autocomplete="off"
-                  placeholder="Select territory"
-                  matInput
-                  formControlName="territory"
-                  [matAutocomplete]="territory"
-                />
-                <mat-autocomplete
-                  autoActiveFirstOption
-                  #territory="matAutocomplete"
-                >
-                  <mat-option
-                    *ngFor="let territory of territoryList | async"
-                    [value]="territory"
-                  >
+                <input required type="text" autocomplete="off" placeholder="Select territory" matInput
+                  (focusout)="validateInput(f.territory, territoryList)" formControlName="territory"
+                  [matAutocomplete]="territory" />
+                <mat-autocomplete autoActiveFirstOption #territory="matAutocomplete">
+                  <mat-option *ngFor="let territory of territoryList | async" [value]="territory">
                     {{ territory }}
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="f.territory.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.territory.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
             </form>
           </ion-col>
@@ -120,7 +112,9 @@
 
           <ion-col>
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Source Warehouse" [disabled]="readonly" matInput [formControl]="warehouseState.s_warehouse"
+              <input type="text" placeholder="Source Warehouse" [disabled]="readonly" matInput
+                [formControl]="warehouseState.s_warehouse"
+                (focusout)="validateInput(warehouseState.s_warehouse, filteredWarehouseList1)"
                 [matAutocomplete]="from_warehouse" />
               <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
                 <mat-option (onSelectionChange)="updateItemStock($event.source.value)"
@@ -128,16 +122,25 @@
                   {{ s_warehouse }}
                 </mat-option>
               </mat-autocomplete>
+              <mat-error *ngIf="warehouseState.s_warehouse.hasError('falseValse')">
+                You should select a value from dropdown only.
+                <strong>'{{warehouseState.s_warehouse.value}}'</strong> is not allowed.
+              </mat-error>
             </mat-form-field>
 
             <mat-form-field class="example-full-width">
-              <input type="text" placeholder="Target Warehouse" matInput [disabled]="readonly" [formControl]="warehouseState.t_warehouse"
-                [matAutocomplete]="warehouse" />
+              <input type="text" placeholder="Target Warehouse" matInput [disabled]="readonly"
+                (focusout)="validateInput(warehouseState.t_warehouse, filteredWarehouseList2)"
+                [formControl]="warehouseState.t_warehouse" [matAutocomplete]="warehouse" />
               <mat-autocomplete autoActiveFirstOption #warehouse="matAutocomplete">
                 <mat-option *ngFor="let warehouse of filteredWarehouseList2 | async" [value]="warehouse.name">
                   {{ warehouse.name }}
                 </mat-option>
               </mat-autocomplete>
+              <mat-error *ngIf="warehouseState.t_warehouse.hasError('falseValse')">
+                You should select a value from dropdown only.
+                <strong>'{{warehouseState.t_warehouse.value}}'</strong> is not allowed.
+              </mat-error>
             </mat-form-field>
           </ion-col>
         </ion-row>
