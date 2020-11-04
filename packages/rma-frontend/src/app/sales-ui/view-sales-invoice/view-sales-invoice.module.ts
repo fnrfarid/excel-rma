@@ -20,6 +20,7 @@ import { MaterialModule } from '../../material/material.module';
 import { EditTableComponent } from './edit-table/edit-table.component';
 import { AppCommonModule } from '../../common/app-common.module';
 import { PrintComponent } from './print/print.component';
+import { AssignSerialModule } from '../../../app/assign-serial/assign-serial.module';
 
 const routes: Routes = [
   {
@@ -30,6 +31,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    AssignSerialModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

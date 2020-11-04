@@ -9,8 +9,6 @@ import { MatDialog } from '@angular/material/dialog';
 import {
   startWith,
   switchMap,
-  debounceTime,
-  distinctUntilChanged,
   map,
   bufferCount,
   delay,
@@ -54,7 +52,6 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 import { TimeService } from '../../../api/time/time.service';
-import { SerialsService } from '../../../common/helpers/serials/serials.service';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ValidateInputSelected } from '../../../common/pipes/validators';
 
@@ -74,7 +71,11 @@ import { ValidateInputSelected } from '../../../common/pipes/validators';
 export class PurchaseAssignSerialsComponent implements OnInit {
   @ViewChild('csvFileInput', { static: false })
   csvFileInput: ElementRef;
-
+  state = {
+    component: PURCHASE_RECEIPT,
+    warehouse: undefined,
+    itemData: [],
+  };
   warehouseFormControl = new FormControl('', [Validators.required]);
   dataSource = [];
   csvFile: any;
@@ -145,12 +146,9 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     private loadingController: LoadingController,
     private readonly timeService: TimeService,
     private readonly csvService: CsvJsonService,
-    private readonly serialsService: SerialsService,
   ) {}
 
   ngOnInit() {
-    this.onFromRange(this.value);
-    this.onToRange(this.value);
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
     this.purchasedSerialsDataSource = new PurchasedSerialsDataSource(
@@ -209,6 +207,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         this.date.setValue(new Date(this.purchaseInvoiceDetails.posting_date));
         this.purchaseReceiptDate = this.getParsedDate(this.date.value);
         this.getItemsWarranty();
+        this.state.itemData = this.itemDataSource.data();
       },
       error: err => {
         this.snackBar.open(
@@ -344,30 +343,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         },
         error: err => {},
       });
-  }
-
-  onFromRange(value) {
-    this.fromRangeUpdate
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(v => {
-        this.generateSerials(value, this.rangePickerState.toRange);
-      });
-  }
-
-  onToRange(value) {
-    this.toRangeUpdate
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(v => {
-        this.generateSerials(this.rangePickerState.fromRange, value);
-      });
-  }
-
-  generateSerials(fromRange?, toRange?) {
-    this.rangePickerState.serials =
-      this.serialsService.getSerialsFromRange(
-        fromRange || this.rangePickerState.fromRange || 0,
-        toRange || this.rangePickerState.toRange || 0,
-      ) || [];
   }
 
   async assignSingularSerials(row: Item) {
@@ -668,89 +643,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     ].join('-');
   }
 
-  async fileChangedEvent($event) {
-    const loading = await this.loadingController.create({
-      message: 'Fetching And validating serials for Purchase Receipt...!',
-    });
-    await loading.present();
-
-    const reader = new FileReader();
-    reader.readAsText($event.target.files[0]);
-    reader.onload = (file: any) => {
-      const csvData = file.target.result;
-      const headers = csvData
-        .split('\n')[0]
-        .replace(/"/g, '')
-        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-        .split(',');
-      if (this.csvService.validateHeaders(headers)) {
-        this.csvService
-          .csvToJSON(csvData)
-          .pipe(
-            switchMap(json => {
-              const hashMap = this.csvService.mapJson(json);
-              const item_names = [];
-              item_names.push(...Object.keys(hashMap));
-              if (this.validateJson(hashMap)) {
-                return this.csvService
-                  .validateSerials(item_names, hashMap, PURCHASE_RECEIPT)
-                  .pipe(
-                    switchMap((response: boolean) => {
-                      this.csvFileInput.nativeElement.value = '';
-                      if (response) {
-                        this.getMessage('Serials Validated Successfully.');
-                        return of(hashMap);
-                      }
-                      return of(false);
-                    }),
-                  );
-              }
-              return of(false);
-            }),
-          )
-          .subscribe({
-            next: (response: CsvJsonObj | boolean) => {
-              loading.dismiss();
-              if (response) {
-                this.addSerialsFromCsvJson(response);
-              }
-              this.csvFileInput.nativeElement.value = '';
-            },
-            error: err => {
-              this.getMessage(
-                'Error occurred while validation of serials : ' +
-                  (err && err.error && err.error.message)
-                  ? err.error.message
-                  : '',
-              );
-              loading.dismiss();
-              this.csvFileInput.nativeElement.value = '';
-            },
-          });
-      } else {
-        loading.dismiss();
-        this.csvFileInput.nativeElement.value = '';
-      }
-    };
-  }
-
-  validateJson(json: CsvJsonObj) {
-    let isValid = true;
-    const data = this.itemDataSource.data();
-    for (const value of data) {
-      if (json[value.item_name]) {
-        if (value.remaining < json[value.item_name].serial_no.length) {
-          this.getMessage(`Item ${value.item_name} has
-          ${value.remaining} remaining, but provided
-          ${json[value.item_name].serial_no.length} serials.`);
-          isValid = false;
-          break;
-        }
-      }
-    }
-    return isValid;
-  }
-
   getMessage(notFoundMessage, expected?, found?) {
     return this.snackBar.open(
       expected && found
@@ -780,5 +672,9 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         return false;
       }
     });
+  }
+
+  assignPickerState(rangePickerState) {
+    this.rangePickerState = rangePickerState;
   }
 }

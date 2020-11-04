@@ -9,10 +9,12 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AppCommonModule } from '../common/app-common.module';
+import { AssignSerialModule } from '../assign-serial/assign-serial.module';
 
 @NgModule({
   declarations: [MaterialTransferComponent, AddItemDialog],
   imports: [
+    AssignSerialModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

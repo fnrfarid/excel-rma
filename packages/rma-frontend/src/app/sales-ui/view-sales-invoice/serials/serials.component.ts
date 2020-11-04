@@ -9,14 +9,7 @@ import { SalesService } from '../../services/sales.service';
 import { FormControl, Validators } from '@angular/forms';
 
 import { Observable, Subject, of, from } from 'rxjs';
-import {
-  startWith,
-  switchMap,
-  debounceTime,
-  distinctUntilChanged,
-  mergeMap,
-  toArray,
-} from 'rxjs/operators';
+import { startWith, switchMap, mergeMap, toArray } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   MatDialogRef,
@@ -54,7 +47,6 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
 import { TimeService } from '../../../api/time/time.service';
-import { SerialsService } from '../../../common/helpers/serials/serials.service';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ViewSalesInvoicePage } from '../view-sales-invoice.page';
 import { ValidateInputSelected } from '../../../common/pipes/validators';
@@ -87,7 +79,11 @@ export class SerialsComponent implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
-
+  state = {
+    component: DELIVERY_NOTE,
+    warehouse: '',
+    itemData: [],
+  };
   rangePickerState = {
     prefix: '',
     fromRange: '',
@@ -153,11 +149,7 @@ export class SerialsComponent implements OnInit {
     private readonly viewSalesInvoicePage: ViewSalesInvoicePage,
     private readonly csvService: CsvJsonService,
     private readonly loadingController: LoadingController,
-    private readonly serialService: SerialsService,
-  ) {
-    this.onFromRange(this.value);
-    this.onToRange(this.value);
-  }
+  ) {}
 
   ngOnInit() {
     this.serialDataSource = new SerialDataSource();
@@ -172,30 +164,6 @@ export class SerialsComponent implements OnInit {
         return this.salesService.getWarehouseList(value);
       }),
     );
-  }
-
-  onFromRange(value) {
-    this.fromRangeUpdate
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(v => {
-        this.generateSerials(value, this.rangePickerState.toRange);
-      });
-  }
-
-  onToRange(value) {
-    this.toRangeUpdate
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(v => {
-        this.generateSerials(this.rangePickerState.fromRange, value);
-      });
-  }
-
-  generateSerials(fromRange?, toRange?) {
-    this.rangePickerState.serials =
-      this.serialService.getSerialsFromRange(
-        fromRange || this.rangePickerState.fromRange || 0,
-        toRange || this.rangePickerState.toRange || 0,
-      ) || [];
   }
 
   getFilteredItems(salesInvoice: SalesInvoiceDetails) {
@@ -256,6 +224,8 @@ export class SerialsComponent implements OnInit {
         this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
         this.date.setValue(new Date(this.salesInvoiceDetails.posting_date));
         this.getItemsWarranty();
+        this.state.itemData = this.itemDataSource.data();
+        this.state.warehouse = this.warehouseFormControl.value;
       },
       error: err => {
         this.snackBar.open(
@@ -612,82 +582,6 @@ export class SerialsComponent implements OnInit {
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
   }
 
-  async fileChangedEvent($event) {
-    if (!this.warehouseFormControl.value) {
-      this.getMessage('Please select a warehouse to validate serials.');
-      return;
-    }
-
-    const loading = await this.loadingController.create({
-      message: 'Fetching And validating serials for Purchase Receipt...!',
-    });
-    await loading.present();
-
-    const reader = new FileReader();
-    reader.readAsText($event.target.files[0]);
-    reader.onload = (file: any) => {
-      const csvData = file.target.result;
-      const headers = csvData
-        .split('\n')[0]
-        .replace(/"/g, '')
-        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-        .split(',');
-      if (this.csvService.validateHeaders(headers)) {
-        this.csvService
-          .csvToJSON(csvData)
-          .pipe(
-            switchMap(json => {
-              const hashMap = this.csvService.mapJson(json);
-              const item_names = [];
-              item_names.push(...Object.keys(hashMap));
-              if (this.validateJson(hashMap)) {
-                return this.csvService
-                  .validateSerials(
-                    item_names,
-                    hashMap,
-                    DELIVERY_NOTE,
-                    this.warehouseFormControl.value,
-                  )
-                  .pipe(
-                    switchMap((response: boolean) => {
-                      this.csvFileInput.nativeElement.value = '';
-                      if (response) {
-                        this.getMessage('Serials Validated Successfully.');
-                        return of(hashMap);
-                      }
-                      return of(false);
-                    }),
-                  );
-              }
-              return of(false);
-            }),
-          )
-          .subscribe({
-            next: (response: CsvJsonObj | boolean) => {
-              loading.dismiss();
-              if (response) {
-                this.addSerialsFromCsvJson(response);
-              }
-              this.csvFileInput.nativeElement.value = '';
-            },
-            error: err => {
-              this.getMessage(
-                'Error occurred while validation of serials : ' +
-                  (err && err.error && err.error.message)
-                  ? err.error.message
-                  : '',
-              );
-              loading.dismiss();
-              this.csvFileInput.nativeElement.value = '';
-            },
-          });
-      } else {
-        loading.dismiss();
-        this.csvFileInput.nativeElement.value = '';
-      }
-    };
-  }
-
   addSerialsFromCsvJson(csvJsonObj: CsvJsonObj | any) {
     const data = this.itemDataSource.data();
     data.some(element => {
@@ -727,25 +621,6 @@ export class SerialsComponent implements OnInit {
     );
   }
 
-  validateJson(json: CsvJsonObj) {
-    let isValid = true;
-    const data = this.itemDataSource.data();
-    for (const value of data) {
-      if (json[value.item_name]) {
-        if (value.remaining < json[value.item_name].serial_no.length) {
-          this.getMessage(`Item ${value.item_name} has
-          ${value.remaining} remaining, but provided
-          ${json[value.item_name].serial_no.length} serials.`);
-          isValid = false;
-          break;
-        }
-        json[value.item_code] = json[value.item_name];
-        delete json[value.item_name];
-      }
-    }
-    return isValid;
-  }
-
   getParsedDate(value) {
     const date = new Date(value);
     return [
@@ -754,6 +629,14 @@ export class SerialsComponent implements OnInit {
       // +1 as index of months start's from 0
       date.getDate(),
     ].join('-');
+  }
+
+  assignPickerState(rangePickerState) {
+    this.rangePickerState = rangePickerState;
+  }
+
+  warehouseOptionChanged(warehouse) {
+    this.state.warehouse = warehouse;
   }
 }
 

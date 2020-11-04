@@ -25,11 +25,13 @@ import { ProblemUiModule } from './problem-ui/problem-ui.module';
 import { JobUIModule } from './job-ui/job-ui.module';
 import { PermissionManager } from './api/permission/permission.service';
 import { ApiModule } from './api/api.module';
+import { AssignSerialModule } from './assign-serial/assign-serial.module';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
+    AssignSerialModule,
     JobUIModule,
     BrowserModule,
     FormsModule,
