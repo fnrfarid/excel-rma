@@ -5,11 +5,13 @@ import { AddPurchaseInvoicePageModule } from './add-purchase-invoice/add-purchas
 import { PurchaseService } from './services/purchase.service';
 import { ViewPurchaseInvoicePageModule } from './view-purchase-invoice/view-purchase-invoice.module';
 import { MaterialModule } from '../material/material.module';
+import { AssignSerialModule } from '../assign-serial/assign-serial.module';
 
 @NgModule({
   declarations: [],
 
   imports: [
+    AssignSerialModule,
     CommonModule,
     PurchasePageModule,
     AddPurchaseInvoicePageModule,
