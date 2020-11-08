@@ -64,7 +64,7 @@ export class ItemPricePage implements OnInit {
   }
 
   async itemSerialized(event, item_name) {
-    event = event ? 1 : 0;
+    event = `Reset the serial to be ${event ? 'Serialized' : 'Non Serialized'}`;
     const dialog = this.dialog.open(ConfirmationDialog, { data: { event } });
     const response = await dialog.afterClosed().toPromise();
 
@@ -187,9 +187,7 @@ export interface DialogData {
 @Component({
   selector: 'confirmation-dialog',
   template: `
-    <h1 mat-dialog-title>
-      Reset the serial to be {{ data?.event ? 'Serialized' : 'Non Serialized' }}
-    </h1>
+    <div [innerHTML]="data?.event"></div>
     <mat-dialog-actions align="end">
       <button mat-button [mat-dialog-close]="false">Cancel</button>
       <button mat-button [mat-dialog-close]="true" cdkFocusInitial>

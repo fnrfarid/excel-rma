@@ -132,3 +132,5 @@ export const ERPNEXT_POS_PROFILE_ENDPOINT =
   '/api/command/user/api/resource/POS%20Profile';
 export const RELAY_LIST_SUPPLIER_ENDPOINT =
   '/api/command/user/api/resource/Supplier';
+export const PURCHASE_ORDER_RESET_ENDPOINT =
+  '/api/purchase_order/v1/reset_order';

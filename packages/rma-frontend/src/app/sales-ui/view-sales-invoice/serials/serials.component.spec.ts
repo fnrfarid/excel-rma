@@ -12,7 +12,6 @@ import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { TimeService } from '../../../api/time/time.service';
-import { SerialsService } from '../../../common/helpers/serials/serials.service';
 import { ViewSalesInvoicePage } from '../view-sales-invoice.page';
 
 describe('SerialsComponent', () => {
@@ -52,10 +51,6 @@ describe('SerialsComponent', () => {
         },
         {
           provide: CsvJsonService,
-          useValue: {},
-        },
-        {
-          provide: SerialsService,
           useValue: {},
         },
         {

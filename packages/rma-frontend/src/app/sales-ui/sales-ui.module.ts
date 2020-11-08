@@ -6,11 +6,13 @@ import { SalesService } from './services/sales.service';
 import { MaterialModule } from '../material/material.module';
 import { ViewSalesInvoicePageModule } from './view-sales-invoice/view-sales-invoice.module';
 import { ViewSalesInvoiceSubjectService } from './view-sales-invoice/view-sales-invoice-subject.service';
+import { AssignSerialModule } from '../assign-serial/assign-serial.module';
 
 @NgModule({
   declarations: [],
 
   imports: [
+    AssignSerialModule,
     CommonModule,
     SalesPageModule,
     AddSalesInvoicePageModule,

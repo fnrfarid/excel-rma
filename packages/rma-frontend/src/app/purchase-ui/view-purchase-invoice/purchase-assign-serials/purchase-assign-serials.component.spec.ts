@@ -14,7 +14,6 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Location } from '@angular/common';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { TimeService } from '../../../api/time/time.service';
-import { SerialsService } from '../../../common/helpers/serials/serials.service';
 
 describe('PurchaseAssignSerialsComponent', () => {
   let component: PurchaseAssignSerialsComponent;
@@ -65,13 +64,8 @@ describe('PurchaseAssignSerialsComponent', () => {
           provide: CsvJsonService,
           useValue: {},
         },
-        {
-          provide: SerialsService,
-          useValue: {},
-        },
       ],
     }).compileComponents();
-
     fixture = TestBed.createComponent(PurchaseAssignSerialsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

@@ -6,6 +6,7 @@ import { ServerSettingsService } from '../../../system-settings/entities/server-
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { TokenGuard } from '../../../auth/guards/token.guard';
+import { PurchaseOrderAggregateService } from '../../aggregates/purchase-order-aggregate/purchase-order-aggregate.service';
 
 describe('PurchaseOrder Controller', () => {
   let controller: PurchaseOrderController;
@@ -20,6 +21,7 @@ describe('PurchaseOrder Controller', () => {
         { provide: HttpService, useValue: {} },
         { provide: SettingsService, useValue: {} },
         { provide: QueryBus, useValue: {} },
+        { provide: PurchaseOrderAggregateService, useValue: {} },
       ],
     })
       .overrideGuard(TokenGuard)

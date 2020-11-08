@@ -13,7 +13,7 @@ import { SerialSearchService } from './serial-search.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime, startWith } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
-import { SerialsService } from 'src/app/common/helpers/serials/serials.service';
+import { SerialsService } from '../../common/helpers/serials/serials.service';
 
 @Component({
   selector: 'app-serial-search',

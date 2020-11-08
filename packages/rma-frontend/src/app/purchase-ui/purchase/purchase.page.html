@@ -171,12 +171,12 @@
                 [ngStyle]="{
               color: 'green'
             }"
-                *ngIf="row.status === 'To Deliver' || row.status === 'Submitted' || row.status === 'Completed'"
+                *ngIf="['To Deliver', 'Submitted', 'Completed'].includes(row.status)"
               >
                 {{row.status}}
               </ion-text>
               <ion-text
-                *ngIf="row.status === 'Draft' || row.status === 'Rejected' || row.status === 'Canceled'"
+                *ngIf="['Draft', 'Rejected', 'Canceled'].includes(row.status)"
                 [ngStyle]="{
               color: 'red'
             }"

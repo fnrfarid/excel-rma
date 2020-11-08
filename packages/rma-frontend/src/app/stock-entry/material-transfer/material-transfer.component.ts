@@ -9,7 +9,6 @@ import { Subject, Observable, of, from } from 'rxjs';
 import { Location } from '@angular/common';
 import {
   debounceTime,
-  distinctUntilChanged,
   startWith,
   switchMap,
   mergeMap,
@@ -40,13 +39,11 @@ import {
 } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
-import { SerialsService } from '../../common/helpers/serials/serials.service';
 import {
   CsvJsonObj,
   AssignSerialsDialog,
   AssignNonSerialsItemDialog,
 } from '../../sales-ui/view-sales-invoice/serials/serials.component';
-import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StockItemsDataSource } from './items-datasource';
 import {
@@ -83,6 +80,11 @@ export class MaterialTransferComponent implements OnInit {
     t_warehouse: new FormControl(''),
   };
   validateInput: any = ValidateInputSelected;
+  state = {
+    component: 'Material',
+    warehouse: undefined,
+    itemData: [],
+  };
 
   @ViewChild('csvFileInput', { static: false })
   csvFileInput: ElementRef;
@@ -141,14 +143,9 @@ export class MaterialTransferComponent implements OnInit {
     private readonly timeService: TimeService,
     public dialog: MatDialog,
     private readonly stockEntryService: StockEntryService,
-    private readonly serialService: SerialsService,
-    private readonly csvService: CsvJsonService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-  ) {
-    this.onFromRange(this.value);
-    this.onToRange(this.value);
-  }
+  ) {}
 
   async ngOnInit() {
     this.form = new FormGroup({
@@ -262,22 +259,6 @@ export class MaterialTransferComponent implements OnInit {
     });
   }
 
-  onFromRange(value) {
-    this.fromRangeUpdate
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(v => {
-        this.generateSerials(value, this.rangePickerState.toRange);
-      });
-  }
-
-  onToRange(value) {
-    this.toRangeUpdate
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(v => {
-        this.generateSerials(this.rangePickerState.fromRange, value);
-      });
-  }
-
   async addItems() {
     const dialogRef = this.dialog.open(AddItemDialog, {
       width: '250px',
@@ -303,14 +284,6 @@ export class MaterialTransferComponent implements OnInit {
     serialData.length === 1 ? (serialData = []) : serialData.splice(i, 1);
 
     this.itemDataSource.update(serialData);
-  }
-
-  generateSerials(fromRange?, toRange?) {
-    this.rangePickerState.serials =
-      this.serialService.getSerialsFromRange(
-        fromRange || this.rangePickerState.fromRange || 0,
-        toRange || this.rangePickerState.toRange || 0,
-      ) || [];
   }
 
   deleteRow(row, i) {
@@ -671,59 +644,11 @@ export class MaterialTransferComponent implements OnInit {
     return this.snackBar.open(notFoundMessage, CLOSE, { duration: 4500 });
   }
 
-  fileChangedEvent($event): void {
+  addSerialsFromCsvJson(csvJsonObj: CsvJsonObj) {
     if (!this.validateWarehouseState()) {
       this.csvFileInput.nativeElement.value = '';
       return;
     }
-    const reader = new FileReader();
-    reader.readAsText($event.target.files[0]);
-    reader.onload = (file: any) => {
-      const csvData = file.target.result;
-      const headers = csvData
-        .split('\n')[0]
-        .replace(/"/g, '')
-        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-        .split(',');
-      // validate file headers
-      if (this.csvService.validateHeaders(headers)) {
-        this.csvService
-          .csvToJSON(csvData)
-          .pipe(
-            switchMap((json: any) => {
-              const data = this.csvService.mapJson(json);
-              const item_names = [];
-              const itemObj: CsvJsonObj = {};
-
-              for (const key in data) {
-                if (key) {
-                  item_names.push(key);
-                  itemObj[key] = {
-                    serial_no: data[key].serial_no.map(serial => {
-                      return serial.toUpperCase();
-                    }),
-                  };
-                }
-              }
-              return of(itemObj);
-            }),
-          )
-          .subscribe({
-            next: (response: CsvJsonObj) => {
-              response ? this.addSerialsFromCsvJson(response) : null;
-              this.csvFileInput.nativeElement.value = '';
-            },
-            error: err => {
-              this.csvFileInput.nativeElement.value = '';
-            },
-          });
-      } else {
-        this.csvFileInput.nativeElement.value = '';
-      }
-    };
-  }
-
-  addSerialsFromCsvJson(csvJsonObj: CsvJsonObj) {
     const item_names = Object.keys(csvJsonObj);
     return this.salesService
       .getItemByItemNames(item_names)
@@ -759,6 +684,10 @@ export class MaterialTransferComponent implements OnInit {
         const filter = `name=["in","${this.stock_receipt_names.join()}"]`;
         window.open(`${url}/desk#List/Stock Entry/List?${filter}`, '_blank');
       });
+  }
+
+  assignPickerState(rangePickerState) {
+    this.rangePickerState = rangePickerState;
   }
 }
 

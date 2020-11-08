@@ -15,7 +15,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
 
 @Component({
   selector: 'app-warranty',
