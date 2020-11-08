@@ -3,26 +3,17 @@
         <ion-icon name="lock-closed-outline"></ion-icon>
     </ion-fab-button>
 </ion-fab>
-<app-assign-serial *ngIf="remaining > 0" [state]="state" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
 <ion-card *ngIf="remaining > 0">
     <ion-card-content>
         <ion-grid class="ion-no-padding">
             <ion-row class="align">
                 <ion-col>
                     <mat-form-field class="example-full-width transform">
-                        <input matInput [matDatepicker]="purchaseReceiptDate" [formControl]="date" placeholder="Date" readonly (dateChange)="selectedPurchaseReceiptDate($event)" />
-                        <mat-datepicker-toggle matSuffix [for]="purchaseReceiptDate"></mat-datepicker-toggle>
-                        <mat-datepicker #purchaseReceiptDate disabled="false"></mat-datepicker>
-                        <mat-error *ngIf="date.hasError('required')">
-                            Date is <strong>required</strong>
-                        </mat-error>
-                    </mat-form-field>
-                </ion-col>
-                <ion-col>
-                    <mat-form-field class="example-full-width transform">
-                        <input matInput placeholder="Select Warehouse" [formControl]="warehouseFormControl" type="text" (focusout)="
-                validateInput(warehouseFormControl, filteredWarehouseList)
-              " [matAutocomplete]="auto" required />
+                        <input matInput placeholder="Select Warehouse"
+                            [formControl]="warehouseFormControl"
+                            type="text"
+                            (focusout)="validateInput(warehouseFormControl, filteredWarehouseList)" 
+                            [matAutocomplete]="auto" required />
                         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="getOptionText">
                             <mat-option *ngFor="let option of filteredWarehouseList | async" [value]="option">
                                 {{ option }}
@@ -37,10 +28,21 @@
                         </mat-error>
                     </mat-form-field>
                 </ion-col>
+                <ion-col>
+                    <mat-form-field class="example-full-width transform">
+                        <input matInput [matDatepicker]="purchaseReceiptDate" [formControl]="date" placeholder="Date" readonly (dateChange)="selectedPurchaseReceiptDate($event)" />
+                        <mat-datepicker-toggle matSuffix [for]="purchaseReceiptDate"></mat-datepicker-toggle>
+                        <mat-datepicker #purchaseReceiptDate disabled="false"></mat-datepicker>
+                        <mat-error *ngIf="date.hasError('required')">
+                            Date is <strong>required</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </ion-col>
             </ion-row>
         </ion-grid>
     </ion-card-content>
 </ion-card>
+<app-assign-serial *ngIf="remaining > 0" [state]="state" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
 <ion-card *ngIf="remaining > 0">
     <ion-card-header>
         <ion-card-title>

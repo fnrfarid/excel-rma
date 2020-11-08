@@ -10,6 +10,8 @@ import {
   ERROR_FETCHING_PURCHASE_INVOICE,
   ERROR_FETCHING_PURCHASE_ORDER,
 } from '../../../constants/messages';
+import { ConfirmationDialog } from '../../../sales-ui/item-price/item-price.page';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'purchase-details',
@@ -30,6 +32,7 @@ export class PurchaseDetailsComponent implements OnInit {
     private readonly purchaseService: PurchaseService,
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
+    private readonly dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -124,5 +127,39 @@ export class PurchaseDetailsComponent implements OnInit {
         );
       },
     });
+  }
+
+  async resetInvoice() {
+    const dialog = this.dialog.open(ConfirmationDialog, {
+      data: {
+        event: `
+      <h3>Reseting Invoice will cancel linked:</h3>
+      <li> Purchase Order
+      <li> Purchase Invoice
+      <li> Purchase Receipts
+      <li> Linked/Assigned Serial's
+      <li> Serial History
+
+      <h3>
+      Mate sure to take a dump of serials from delivered serials before the reset,
+           as all links will reset too.
+      </h3> 
+      `,
+      },
+    });
+    const response = await dialog.afterClosed().toPromise();
+
+    if (!response) {
+      return;
+    }
+
+    // this.purchaseService.purchaseReset(this.purchaseInvoiceDetails.name).subscribe({
+    //   next: success => {
+    this.snackBar.open('Coming Soon.', CLOSE, { duration: 3500 });
+    //   },
+    //   error: err => {
+    //     this.snackBar.open(err?.error?.message || JSON.stringify(err) || UPDATE_ERROR, CLOSE, {duration: 3500})
+    //   }
+    // })
   }
 }

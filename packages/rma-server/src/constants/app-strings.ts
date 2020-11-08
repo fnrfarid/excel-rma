@@ -237,3 +237,27 @@ export const DELIVERY_STATUS = {
   UPGRADED: 'Upgraded',
   REJECTED: 'Rejected',
 };
+
+export const PURCHASE_INVOICE_STATUS = {
+  SUBMITTED: 'Submitted',
+  COMPLETED: 'Completed',
+  CANCELED: 'Canceled',
+  RESETED: 'Reseted',
+};
+
+export const DOC_NAMES = {
+  PURCHASE_ORDER: 'Purchase Order',
+};
+
+export const DOC_RESET_INFO = {
+  [DOC_NAMES.PURCHASE_ORDER]: {
+    'Purchase Invoice': {
+      child_doctype: 'Purchase Invoice Item',
+      fieldname: ['purchase_order'],
+    },
+    'Purchase Receipt': {
+      child_doctype: 'Purchase Receipt Item',
+      fieldname: ['purchase_order'],
+    },
+  },
+};

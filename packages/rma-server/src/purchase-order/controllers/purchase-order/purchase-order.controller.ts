@@ -6,16 +6,22 @@ import {
   UsePipes,
   ValidationPipe,
   Query,
+  Req,
+  Post,
 } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { QueryBus } from '@nestjs/cqrs';
 import { RetrievePurchaseOrderQuery } from '../../query/get-purchase-order/retrieve-purchase-order.query';
 import { RetrievePurchaseOrderListQuery } from '../../query/list-purchase-order/retrieve-purchase-order-list.query';
 import { PurchaseOrderListQueryDto } from '../../../constants/listing-dto/purchase-order-list-query';
+import { PurchaseOrderAggregateService } from '../../aggregates/purchase-order-aggregate/purchase-order-aggregate.service';
 
 @Controller('purchase_order')
 export class PurchaseOrderController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly purchaseOrderAggregate: PurchaseOrderAggregateService,
+  ) {}
 
   @Get('v1/get/:uuid')
   @UseGuards(TokenGuard)
@@ -31,6 +37,12 @@ export class PurchaseOrderController {
     return await this.queryBus.execute(
       new RetrievePurchaseOrderQuery({ purchase_invoice_name: name }),
     );
+  }
+
+  @Post('v1/reset_order/:name')
+  @UseGuards(TokenGuard)
+  async resetOrder(@Param('name') name: string, @Req() req) {
+    return await this.purchaseOrderAggregate.resetOrder(name, req);
   }
 
   @Get('v1/list')

@@ -12,7 +12,7 @@ import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 
 @Component({
   selector: 'service-invoices',
