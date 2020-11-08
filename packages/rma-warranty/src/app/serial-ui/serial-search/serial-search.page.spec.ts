@@ -11,7 +11,7 @@ import { SerialSearchService } from './serial-search.service';
 import { StorageService } from '../../api/storage/storage.service';
 import { MaterialModule } from '../../material/material.module';
 import { RouterTestingModule } from '@angular/router/testing';
-import { SerialsService } from 'src/app/common/helpers/serials/serials.service';
+import { SerialsService } from '../../common/helpers/serials/serials.service';
 
 describe('SerialSearchPage', () => {
   let component: SerialSearchPage;

@@ -15,6 +15,7 @@ import {
   CREATE_PURCHASE_RECEIPT_BULK_ENDPOINT,
   GET_PURCHASE_INVOICE_DELIVERED_SERIALS_ENDPOINT,
   GET_PO_FROM_PI_NUMBER_ENDPOINT,
+  PURCHASE_ORDER_RESET_ENDPOINT,
   RELAY_LIST_SUPPLIER_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
@@ -149,5 +150,17 @@ export class PurchaseService {
 
   getApiInfo() {
     return this.http.get<any>(API_INFO_ENDPOINT);
+  }
+
+  purchaseReset(name: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          PURCHASE_ORDER_RESET_ENDPOINT + `/${name}`,
+          {},
+          { headers },
+        );
+      }),
+    );
   }
 }

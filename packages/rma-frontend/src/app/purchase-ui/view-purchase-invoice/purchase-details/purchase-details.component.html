@@ -1,3 +1,20 @@
+
+<ion-fab
+vertical="top"
+horizontal="end"
+slot="fixed"
+*ngIf="purchaseInvoiceDetails.status !== 'Canceled'"
+class="ion-margin-end"
+>
+<ion-fab-button
+  color="danger"
+  class="fab-position"
+  (click)="resetInvoice()"
+>
+  <ion-icon name="close-outline"></ion-icon>
+</ion-fab-button>
+</ion-fab>
+
 <ion-card>
   <ion-card-content>
     <ion-grid class="ion-no-padding">
