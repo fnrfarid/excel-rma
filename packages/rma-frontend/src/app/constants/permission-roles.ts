@@ -205,6 +205,11 @@ export const PermissionRoles = {
     update: [],
     delete: [],
   },
+
+  campaign_return: {
+    create: [],
+    read: [],
+  },
 };
 
 export const PERMISSION_STATE: PermissionStateInterface = {
@@ -319,5 +324,9 @@ export const PERMISSION_STATE: PermissionStateInterface = {
     read: false,
     update: false,
     active: false,
+  },
+  campaign_return: {
+    create: false,
+    read: false,
   },
 };

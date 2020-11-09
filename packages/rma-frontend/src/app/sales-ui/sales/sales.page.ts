@@ -12,7 +12,7 @@ import {
   VIEW_SALES_INVOICE_PAGE_URL,
   ADD_SALES_INVOICE_PAGE_URL,
 } from '../../constants/url-strings';
-import { map, filter } from 'rxjs/operators';
+import { map, filter, startWith, switchMap } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import {
   DateAdapter,
@@ -22,6 +22,8 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
+import { Observable, of } from 'rxjs';
+import { ValidateInputSelected } from 'src/app/common/pipes/validators';
 
 @Component({
   selector: 'app-sales',
@@ -78,7 +80,9 @@ export class SalesPage implements OnInit {
   fromDateFormControl = new FormControl();
   toDateFormControl = new FormControl();
   singleDateFormControl = new FormControl();
+  salesPersonControl = new FormControl('');
   sortQuery: any = {};
+  filteredSalesPersonList: Observable<any[]>;
   customerList: any;
   territoryList: any;
   statusColor = {
@@ -89,6 +93,7 @@ export class SalesPage implements OnInit {
     Submitted: '#4d2500',
     Canceled: 'red',
   };
+  validateInput = ValidateInputSelected;
 
   constructor(
     private readonly salesService: SalesService,
@@ -102,6 +107,19 @@ export class SalesPage implements OnInit {
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
+    this.filteredSalesPersonList = this.salesPersonControl.valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getSalesPersonList(value);
+      }),
+      switchMap((data: any[]) => {
+        const salesPersons = [];
+        data.forEach(person =>
+          person.name !== 'Sales Team' ? salesPersons.push(person.name) : null,
+        );
+        return of(salesPersons);
+      }),
+    );
     this.dataSource = new SalesInvoiceDataSource(this.salesService);
     this.router.events
       .pipe(
@@ -153,6 +171,8 @@ export class SalesPage implements OnInit {
     if (this.customer_name) query.customer = this.customer_name.name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
+    if (this.salesPersonControl.value)
+      query.sales_team = this.salesPersonControl.value;
     if (this.campaign) {
       if (this.campaign === 'Yes') {
         query.isCampaign = true;
@@ -231,6 +251,7 @@ export class SalesPage implements OnInit {
     this.branch = '';
     this.campaign = 'All';
     this.fromDateFormControl.setValue('');
+    this.salesPersonControl.setValue('');
     this.toDateFormControl.setValue('');
     this.singleDateFormControl.setValue('');
     this.dataSource.loadItems();
@@ -240,6 +261,8 @@ export class SalesPage implements OnInit {
     const query: any = {};
     if (this.customer_name) query.customer = this.customer_name.name;
     if (this.status) query.status = this.status;
+    if (this.salesPersonControl.value)
+      query.sales_team = this.salesPersonControl.value;
     if (this.name) query.name = this.name;
     if (this.branch) query.territory = this.branch;
     if (this.campaign) {

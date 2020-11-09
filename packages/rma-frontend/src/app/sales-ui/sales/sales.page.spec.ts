@@ -49,6 +49,7 @@ describe('SalesPage', () => {
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
             }),
+            getSalesPersonList: (...args) => of([]),
           },
         },
         {

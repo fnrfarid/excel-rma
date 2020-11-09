@@ -237,7 +237,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
         name: assignPayload.sales_invoice_name,
       })
       .then(sales_invoice => {
-        const status = this.getStatus(sales_invoice);
+        const status = this.getStatus(sales_invoice, incrementMap);
         this.salesInvoiceService
           .updateMany(
             { name: assignPayload.sales_invoice_name },
@@ -269,11 +269,17 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
       .catch(error => {});
   }
 
-  getStatus(sales_invoice: SalesInvoice) {
+  getStatus(
+    sales_invoice: SalesInvoice,
+    incrementMap: { [key: string]: number },
+  ) {
     let total = 0;
+    Object.keys(incrementMap).forEach(key => (total += incrementMap[key]));
+
     for (const key of Object.keys(sales_invoice.delivered_items_map)) {
       total += sales_invoice.delivered_items_map[key];
     }
+
     if (total === sales_invoice.total_qty) return COMPLETED_STATUS;
     else return TO_DELIVER_STATUS;
   }
