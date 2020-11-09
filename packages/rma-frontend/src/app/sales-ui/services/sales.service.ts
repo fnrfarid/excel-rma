@@ -20,6 +20,7 @@ import {
   LIST_ITEMS_ENDPOINT,
   CREATE_SALES_INVOICE_ENDPOINT,
   SUBMIT_SALES_INVOICE_ENDPOINT,
+  RELAY_GET_SALES_PERSON_STOCK_ENDPOINT,
   LIST_CUSTOMER_ENDPOINT,
   LIST_WAREHOUSE_ENDPOINT,
   LIST_SERIAL_ENDPOINT,
@@ -70,6 +71,24 @@ export class SalesService {
       switchMap(headers => {
         return this.http.get('/api/item/v1/get_by_names', { headers, params });
       }),
+    );
+  }
+
+  getSalesPersonList(name: string) {
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: name ? `[["name","like","%${name}%"]]` : ``,
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(RELAY_GET_SALES_PERSON_STOCK_ENDPOINT, {
+          headers,
+          params,
+        });
+      }),
+      map((data: any) => data.data),
     );
   }
 

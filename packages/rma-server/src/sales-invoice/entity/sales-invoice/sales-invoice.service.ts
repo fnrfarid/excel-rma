@@ -62,6 +62,10 @@ export class SalesInvoiceService {
       };
     }
 
+    const salesTeamQuery = filter_query.sales_team
+      ? { sales_team: filter_query.sales_team }
+      : {};
+
     const customerQuery =
       territories &&
       territories.length !== 0 &&
@@ -72,6 +76,7 @@ export class SalesInvoiceService {
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
+      salesTeamQuery,
       customerQuery,
     ];
 
@@ -130,6 +135,8 @@ export class SalesInvoiceService {
           delete query[key];
         } else if (key === 'isCampaign' && query[key] === true) {
           query[key] = true;
+        } else if (key === 'sales_team') {
+          delete query[key];
         } else if (key === 'isCampaign' && query[key] === false) {
           query[key] = false;
         } else if (key === 'fromDate' || key === 'toDate') {

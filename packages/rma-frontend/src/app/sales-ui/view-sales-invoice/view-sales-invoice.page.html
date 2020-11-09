@@ -40,7 +40,7 @@
         </ion-segment-button>
         <ion-segment-button
           value="3"
-          disabled="{{isCampaign ? true : false }}"
+          [disabled]="permissionState.campaign_return.active"
           *ngIf="sales_invoice_name && showReturnTab && permissionState.sales_return.active"
         >
           <ion-label>Sales Return</ion-label>
