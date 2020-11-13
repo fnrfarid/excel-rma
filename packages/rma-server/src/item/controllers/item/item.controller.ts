@@ -60,6 +60,19 @@ export class ItemController {
     );
   }
 
+  @Get('v1/get_bundle_items')
+  @UseGuards(TokenGuard)
+  async getBundleItems(@Query('item_codes') item_codes: string) {
+    // here item_codes will be hash like item-0001 : 11, where 11 is qty of item.
+    let query = {};
+    try {
+      query = JSON.parse(item_codes);
+    } catch {
+      throw new BadRequestException(`Please provide item_code as an array.`);
+    }
+    return await this.aggregate.getBundleItems(query);
+  }
+
   @Get('v1/list')
   @UseGuards(TokenGuard)
   async getItemList(

@@ -78,3 +78,25 @@ export interface ItemApiResponseInterface {
   taxes: any[];
   brand?: string;
 }
+
+export interface ItemBundleWebhookInterface {
+  name: string;
+  owner: string;
+  creation: string;
+  modified: string;
+  modified_by: string;
+  new_item_code: string;
+  items: ItemBundleItemWebhookInterface[];
+}
+
+export interface ItemBundleItemWebhookInterface {
+  parent: string;
+  parentfield: string;
+  parenttype: string;
+  item_code: string;
+  item_name?: string;
+  description: string;
+  qty: number;
+  rate: number;
+  uom: string;
+}

@@ -43,6 +43,7 @@ import {
   CUSTOMER_ENDPOINT,
   GET_DOCTYPE_COUNT_METHOD,
   RELAY_GET_ITEM_STOCK_ENDPOINT,
+  GET_PRODUCT_BUNDLE_ITEMS,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -60,6 +61,18 @@ export class SalesService {
     this.salesInvoiceList = [];
 
     this.itemList = [];
+  }
+
+  getBundleItem(item_codes: { [key: string]: number }) {
+    const params = new HttpParams().set(
+      'item_codes',
+      JSON.stringify(item_codes),
+    );
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(GET_PRODUCT_BUNDLE_ITEMS, { headers, params });
+      }),
+    );
   }
 
   getItemByItemNames(item_names: string[]) {

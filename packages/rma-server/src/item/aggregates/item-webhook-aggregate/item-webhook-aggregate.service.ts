@@ -8,6 +8,7 @@ import {
 import {
   ItemWebhookInterface,
   ItemApiResponseInterface,
+  ItemBundleWebhookInterface,
 } from '../../entity/item/item-webhook-interface';
 import { ItemService } from '../../entity/item/item.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
@@ -50,6 +51,40 @@ export class ItemWebhookAggregateService extends AggregateRoot {
           .catch(error => {});
         this.syncItemMetadata(provider);
         return of({});
+      }),
+    );
+  }
+
+  bundleUpdated(bundlePayload: ItemBundleWebhookInterface) {
+    const code = [];
+    bundlePayload.items.forEach(item => code.push(item.item_code));
+    return from(this.itemService.find({ item_code: { $in: code } })).pipe(
+      switchMap(itemList => {
+        const hash = {};
+        itemList.forEach(item => {
+          hash[item.item_code] = item;
+        });
+        return of(hash);
+      }),
+      switchMap(hash => {
+        const items = [];
+        bundlePayload.items.forEach(item => {
+          Object.assign(hash[item.item_code], item);
+          items.push(hash[item.item_code]);
+        });
+        return of(items);
+      }),
+      switchMap(bundleItems => {
+        return from(
+          this.itemService.updateOne(
+            { item_code: bundlePayload.new_item_code },
+            {
+              $set: {
+                bundle_items: bundleItems,
+              },
+            },
+          ),
+        );
       }),
     );
   }
