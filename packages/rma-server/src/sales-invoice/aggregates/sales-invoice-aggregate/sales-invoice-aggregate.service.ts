@@ -54,6 +54,7 @@ import {
   EventType,
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { ItemService } from '../../../item/entity/item/item.service';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -65,6 +66,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly errorLogService: ErrorLogService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly serialNoHistoryService: SerialNoHistoryService,
+    private readonly itemService: ItemService,
   ) {
     super();
   }
@@ -246,6 +248,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       .pipe(map(data => data.data.data))
       .pipe(
         switchMap(successResponse => {
+          this.updateBundleItem(salesInvoice);
           return from(
             this.salesInvoiceService.updateOne(
               { uuid: salesInvoice.uuid },
@@ -646,5 +649,37 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       returned_items_map: sales_invoice.returned_items_map,
       delivered_items_map: sales_invoice.delivered_items_map,
     };
+  }
+
+  updateBundleItem(salesInvoice: SalesInvoice) {
+    const itemCodes = [];
+    salesInvoice.items.forEach(item => itemCodes.push(item.item_code));
+    return from(
+      this.itemService.count({
+        item_code: { $in: itemCodes },
+        bundle_items: { $exists: true },
+      }),
+    )
+      .pipe(
+        switchMap(count => {
+          if (count) {
+            return from(
+              this.salesInvoiceService.updateOne(
+                { uuid: salesInvoice.uuid },
+                {
+                  $set: {
+                    has_bundle_item: true,
+                  },
+                },
+              ),
+            );
+          }
+          return of(false);
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
   }
 }

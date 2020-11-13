@@ -32,6 +32,7 @@ import {
   getSupplierOnUpdateWebhookData,
   getSupplierOnTrashWebhookData,
   getCustomerAfterInsertWebhookData,
+  itemBundleAfterUpdateWebhookData,
   getCustomerOnUpdateWebhookData,
   getCustomerOnTrashWebhookData,
   getItemAfterInsertWebhookData,
@@ -73,6 +74,7 @@ import {
   PURCHASE_INVOICE_ON_CANCEL_ENDPOINT,
   PURCHASE_RECEIPT_ON_CANCEL_ENDPOINT,
   EXCEL_BACKGROUND_AFTER_INSERT_ENDPOINT,
+  EXCEL_PRODUCT_BUNDLE_AFTER_UPDATE_ENDPOINT,
 } from '../../../constants/routes';
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import {
@@ -372,6 +374,18 @@ export class SettingsService extends AggregateRoot {
               serverSettings.authServerURL + '/api/resource/Webhook',
               dataImportLegacyAfterInsertWebhookData(
                 serverSettings.appURL + EXCEL_BACKGROUND_AFTER_INSERT_ENDPOINT,
+                serverSettings.webhookApiKey,
+              ),
+              { headers },
+            )
+            .pipe(map(res => res.data)),
+
+          this.http
+            .post(
+              serverSettings.authServerURL + '/api/resource/Webhook',
+              itemBundleAfterUpdateWebhookData(
+                serverSettings.appURL +
+                  EXCEL_PRODUCT_BUNDLE_AFTER_UPDATE_ENDPOINT,
                 serverSettings.webhookApiKey,
               ),
               { headers },

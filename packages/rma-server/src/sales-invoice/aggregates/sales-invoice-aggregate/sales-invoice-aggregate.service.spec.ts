@@ -9,6 +9,7 @@ import { DirectService } from '../../../direct/aggregates/direct/direct.service'
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { ItemService } from '../../../item/entity/item/item.service';
 
 describe('SalesInvoiceAggregateService', () => {
   let service: SalesInvoiceAggregateService;
@@ -51,6 +52,10 @@ describe('SalesInvoiceAggregateService', () => {
         },
         {
           provide: SerialNoHistoryService,
+          useValue: {},
+        },
+        {
+          provide: ItemService,
           useValue: {},
         },
       ],

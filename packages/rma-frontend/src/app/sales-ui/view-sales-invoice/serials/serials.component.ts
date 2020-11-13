@@ -212,31 +212,51 @@ export class SerialsComponent implements OnInit {
   }
 
   getSalesInvoice(uuid: string) {
-    return this.salesService.getSalesInvoice(uuid).subscribe({
-      next: (sales_invoice: SalesInvoiceDetails) => {
-        this.salesInvoiceDetails = sales_invoice as SalesInvoiceDetails;
-        this.disableDeliveredSerialsCard =
-          Object.keys(this.salesInvoiceDetails.delivered_items_map).length === 0
-            ? true
-            : false;
-        this.filteredItemList = this.getFilteredItems(sales_invoice);
-        this.itemDataSource.loadItems(this.filteredItemList);
-        this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
-        this.date.setValue(new Date(this.salesInvoiceDetails.posting_date));
-        this.getItemsWarranty();
-        this.state.itemData = this.itemDataSource.data();
-        this.state.warehouse = this.warehouseFormControl.value;
-      },
-      error: err => {
-        this.snackBar.open(
-          err.error.message
-            ? err.error.message
-            : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
-          CLOSE,
-          { duration: 2500 },
-        );
-      },
-    });
+    return this.salesService
+      .getSalesInvoice(uuid)
+      .pipe(
+        switchMap((sales_invoice: SalesInvoiceDetails) => {
+          if (sales_invoice.has_bundle_item) {
+            const item_codes = {};
+            sales_invoice.items.forEach(item => {
+              item_codes[item.item_code] = item.qty;
+            });
+            return this.salesService.getBundleItem(item_codes).pipe(
+              switchMap((data: any[]) => {
+                sales_invoice.items = data;
+                return of(sales_invoice);
+              }),
+            );
+          }
+          return of(sales_invoice);
+        }),
+      )
+      .subscribe({
+        next: (sales_invoice: SalesInvoiceDetails) => {
+          this.salesInvoiceDetails = sales_invoice as SalesInvoiceDetails;
+          this.disableDeliveredSerialsCard =
+            Object.keys(this.salesInvoiceDetails.delivered_items_map).length ===
+            0
+              ? true
+              : false;
+          this.filteredItemList = this.getFilteredItems(sales_invoice);
+          this.itemDataSource.loadItems(this.filteredItemList);
+          this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
+          this.date.setValue(new Date(this.salesInvoiceDetails.posting_date));
+          this.getItemsWarranty();
+          this.state.itemData = this.itemDataSource.data();
+          this.state.warehouse = this.warehouseFormControl.value;
+        },
+        error: err => {
+          this.snackBar.open(
+            err.error.message
+              ? err.error.message
+              : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
+            CLOSE,
+            { duration: 2500 },
+          );
+        },
+      });
   }
 
   getDeliveredSerials() {

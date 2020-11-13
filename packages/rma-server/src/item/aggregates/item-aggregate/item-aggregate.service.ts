@@ -5,6 +5,8 @@ import { MinimumItemPriceSetEvent } from '../../events/minimum-item-price-set/mi
 import { WarrantyMonthsSetEvent } from '../../events/purchase-warranty-days-set/purchase-warranty-days-set.event';
 import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
 import { ITEM_NOT_FOUND } from '../../../constants/messages';
+import { from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class ItemAggregateService extends AggregateRoot {
@@ -60,5 +62,40 @@ export class ItemAggregateService extends AggregateRoot {
     });
     if (!item) throw new NotFoundException();
     return item;
+  }
+
+  getBundleItems(item_codes) {
+    return from(
+      this.itemService.find({ item_code: { $in: Object.keys(item_codes) } }),
+    ).pipe(
+      switchMap(itemList => {
+        const items = {};
+        itemList.forEach(singleItem => {
+          if (!singleItem.bundle_items) {
+            if (items[singleItem.item_code]) {
+              items[singleItem.item_code].qty +=
+                item_codes[singleItem.item_code];
+            } else {
+              items[singleItem.item_code] = singleItem;
+              items[singleItem.item_code].qty =
+                item_codes[singleItem.item_code];
+            }
+            return;
+          }
+
+          singleItem.bundle_items.forEach(item => {
+            if (items[item.item_code]) {
+              items[item.item_code].qty +=
+                item.qty * item_codes[singleItem.item_code];
+              return;
+            }
+            items[item.item_code] = item;
+            items[item.item_code].qty =
+              item.qty * item_codes[singleItem.item_code];
+          });
+        });
+        return of([...Object.values(items)]);
+      }),
+    );
   }
 }

@@ -254,21 +254,40 @@ export class AddSalesReturnPage implements OnInit {
   }
 
   getSalesInvoice() {
-    this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
-      next: (res: SalesInvoiceDetails) => {
-        this.salesInvoiceDetails = res;
-        this.companyFormControl.setValue(res.company);
-        this.customerFormControl.setValue(res.customer);
-        this.branchFormControl.setValue(res.territory);
-        this.warehouseFormControl.setValue(res.delivery_warehouse);
-        this.postingDateFormControl.setValue(new Date());
-        this.dueDateFormControl.setValue(new Date(res.due_date));
-        this.filteredItemList = this.getFilteredItems(res);
-        this.itemDataSource.loadItems(this.filteredItemList);
-        this.getItemsWarranty();
-        this.deliveryNoteNames = res.delivery_note_names;
-      },
-    });
+    this.salesService
+      .getSalesInvoice(this.invoiceUuid)
+      .pipe(
+        switchMap((sales_invoice: SalesInvoiceDetails) => {
+          if (sales_invoice.has_bundle_item) {
+            const item_codes = {};
+            sales_invoice.items.forEach(item => {
+              item_codes[item.item_code] = item.qty;
+            });
+            return this.salesService.getBundleItem(item_codes).pipe(
+              switchMap((data: any[]) => {
+                sales_invoice.items = data;
+                return of(sales_invoice);
+              }),
+            );
+          }
+          return of(sales_invoice);
+        }),
+      )
+      .subscribe({
+        next: (res: SalesInvoiceDetails) => {
+          this.salesInvoiceDetails = res;
+          this.companyFormControl.setValue(res.company);
+          this.customerFormControl.setValue(res.customer);
+          this.branchFormControl.setValue(res.territory);
+          this.warehouseFormControl.setValue(res.delivery_warehouse);
+          this.postingDateFormControl.setValue(new Date());
+          this.dueDateFormControl.setValue(new Date(res.due_date));
+          this.filteredItemList = this.getFilteredItems(res);
+          this.itemDataSource.loadItems(this.filteredItemList);
+          this.getItemsWarranty();
+          this.deliveryNoteNames = res.delivery_note_names;
+        },
+      });
   }
 
   getItemsWarranty() {

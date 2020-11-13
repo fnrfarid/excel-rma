@@ -64,8 +64,13 @@ export class ItemPricePage implements OnInit {
   }
 
   async itemSerialized(event, item_name) {
-    event = `Reset the serial to be ${event ? 'Serialized' : 'Non Serialized'}`;
-    const dialog = this.dialog.open(ConfirmationDialog, { data: { event } });
+    event = event ? 1 : 0;
+    const message = `Reset the serial to be ${
+      event ? 'Serialized' : 'Non Serialized'
+    }`;
+    const dialog = this.dialog.open(ConfirmationDialog, {
+      data: { event: message },
+    });
     const response = await dialog.afterClosed().toPromise();
 
     if (!response) {

@@ -136,3 +136,4 @@ export const PURCHASE_ORDER_RESET_ENDPOINT =
   '/api/purchase_order/v1/reset_order';
 export const RELAY_GET_SALES_PERSON_STOCK_ENDPOINT =
   '/api/command/user/api/resource/Sales Person';
+export const GET_PRODUCT_BUNDLE_ITEMS = '/api/item/v1/get_bundle_items';
