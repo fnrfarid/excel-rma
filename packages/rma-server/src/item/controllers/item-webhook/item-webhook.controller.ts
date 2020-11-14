@@ -6,7 +6,10 @@ import {
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ItemWebhookInterface } from '../../entity/item/item-webhook-interface';
+import {
+  ItemBundleWebhookInterface,
+  ItemWebhookInterface,
+} from '../../entity/item/item-webhook-interface';
 import { ItemWebhookAggregateService } from '../../aggregates/item-webhook-aggregate/item-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 
@@ -21,6 +24,13 @@ export class ItemWebhookController {
   @UseGuards(FrappeWebhookGuard)
   itemCreated(@Body() itemPayload: ItemWebhookInterface) {
     return this.itemWebhookAggregate.itemCreated(itemPayload);
+  }
+
+  @Post('webhook/v1/bundle')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UseGuards(FrappeWebhookGuard)
+  bundleUpdated(@Body() bundlePayload: ItemBundleWebhookInterface) {
+    return this.itemWebhookAggregate.bundleUpdated(bundlePayload);
   }
 
   @Post('webhook/v1/update')

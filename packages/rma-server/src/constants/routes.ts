@@ -83,3 +83,5 @@ export const EXCEL_BACKGROUND_AFTER_INSERT_ENDPOINT =
 export const ERPNEXT_STOCK_ENTRY_ENDPOINT = '/api/resource/Stock%20Entry';
 export const ERPNEXT_CANCEL_ALL_DOCS_ENDPOINT =
   '/api/method/frappe.desk.form.linked_with.cancel_all_linked_docs';
+export const EXCEL_PRODUCT_BUNDLE_AFTER_UPDATE_ENDPOINT =
+  '/api/item/webhook/v1/bundle';

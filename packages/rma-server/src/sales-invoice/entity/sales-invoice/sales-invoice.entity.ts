@@ -159,6 +159,9 @@ export class SalesInvoice extends BaseEntity {
   remarks: string;
 
   @Column()
+  has_bundle_item: boolean;
+
+  @Column()
   modified: string;
 }
 

@@ -218,6 +218,7 @@ export class SalesInvoiceDetails {
   base_net_total?: number;
   total?: number;
   net_total?: number;
+  has_bundle_item?: boolean;
   items?: Item[];
   pos_total_qty?: number;
   name?: string;

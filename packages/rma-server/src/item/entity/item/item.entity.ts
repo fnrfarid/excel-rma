@@ -6,6 +6,7 @@ import {
   Entity,
   Index,
 } from 'typeorm';
+import { ItemBundleItemWebhookInterface } from './item-webhook-interface';
 
 export class Barcodes {
   name: string;
@@ -133,4 +134,7 @@ export class Item extends BaseEntity {
 
   @Column()
   brand: string;
+
+  @Column()
+  bundle_items: ItemBundleItemWebhookInterface[];
 }

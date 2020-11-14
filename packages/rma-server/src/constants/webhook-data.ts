@@ -1755,3 +1755,32 @@ export function dataImportLegacyAfterInsertWebhookData(
     ],
   };
 }
+
+export function itemBundleAfterUpdateWebhookData(
+  webhookURL: string,
+  webhookApiKey: string,
+) {
+  return {
+    webhook_doctype: 'Product Bundle',
+    webhook_docevent: 'on_update',
+    request_url: webhookURL,
+    request_structure: 'Form URL-Encoded',
+    doctype: 'Webhook',
+    webhook_headers: [
+      {
+        key: 'Content-Type',
+        value: 'application/json',
+      },
+      {
+        key: 'x-frappe-api-key',
+        value: webhookApiKey,
+      },
+    ],
+    webhook_data: [
+      { fieldname: 'name', key: 'name' },
+      { fieldname: 'items', key: 'items' },
+      { fieldname: 'description', key: 'description' },
+      { fieldname: 'new_item_code', key: 'new_item_code' },
+    ],
+  };
+}
