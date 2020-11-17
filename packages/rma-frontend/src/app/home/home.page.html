@@ -21,6 +21,20 @@
       <ion-card-title>Welcome {{ fullName }}!</ion-card-title>
     </ion-card-header>
   </ion-card>
+
+    <div class="panel-container">
+      <mat-expansion-panel class="panel" *ngFor="let panel of noteList">
+        <mat-expansion-panel-header>
+          <ion-card-subtitle>
+          <ion-text color="tertiary">
+            {{panel.name}}
+          </ion-text>
+        </ion-card-subtitle>
+        </mat-expansion-panel-header>
+      <ion-card-subtitle>Description</ion-card-subtitle>
+        <ion-text [innerHTML]="panel.content"></ion-text>
+      </mat-expansion-panel>
+    </div>  
 </ion-content>
 
 <ion-content *ngIf="!loggedIn && !spinner" class="card">

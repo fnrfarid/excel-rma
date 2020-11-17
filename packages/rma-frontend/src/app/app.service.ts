@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { from, Observable } from 'rxjs';
 import {
   CLIENT_ID,
   REDIRECT_URI,
@@ -25,14 +25,17 @@ import {
   BEARER_TOKEN_PREFIX,
   WARRANTY_APP_URL,
   POS_PROFILE,
+  ACCESS_TOKEN,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
   GET_GLOBAL_DEFAULTS_ENDPOINT,
+  RELAY_LIST_NOTE_ENDPOINT,
   API_INFO_ENDPOINT,
   DIRECT_PROFILE_ENDPOINT,
 } from './constants/url-strings';
 import { IDTokenClaims } from './common/interfaces/id-token-claims.interfaces';
+import { map, switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class AppService {
@@ -177,5 +180,27 @@ export class AppService {
     authorizationUrl += `&response_type=${frappe_auth_config.response_type}`;
     authorizationUrl += `&state=${state}`;
     return authorizationUrl;
+  }
+
+  getNoteList(date: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        const params = new HttpParams({
+          fromObject: {
+            filters: `[["expire_notification_on",">","${date}"]]`,
+            fields: '["*"]',
+          },
+        });
+        return this.http.get(RELAY_LIST_NOTE_ENDPOINT, { headers, params });
+      }),
+    );
+  }
+
+  getHeaders() {
+    return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
+      map(token => ({
+        [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
+      })),
+    );
   }
 }
