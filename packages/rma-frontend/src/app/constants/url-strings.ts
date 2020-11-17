@@ -42,6 +42,7 @@ export const RELAY_LIST_TERRITORIES_ENDPOINT =
   '/api/command/user/api/resource/Territory';
 export const RELAY_LIST_SALES_RETURN_ENDPOINT =
   '/api/command/user/api/resource/Sales Invoice';
+export const RELAY_LIST_NOTE_ENDPOINT = '/api/command/user/api/resource/Note';
 export const LIST_TERRITORIES_ENDPOINT = '/api/territory/v1/list';
 export const CREATE_TERRITORY_ENDPOINT = '/api/territory/v1/create';
 export const UPDATE_TERRITORY_ENDPOINT = '/api/territory/v1/update';

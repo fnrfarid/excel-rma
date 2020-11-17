@@ -31,6 +31,7 @@ describe('HomePage', () => {
           useValue: {
             getMessage: () => of({}),
             setInfoLocalStorage: (...args) => {},
+            getNoteList: (...args) => of([]),
           },
         },
       ],

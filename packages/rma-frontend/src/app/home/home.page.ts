@@ -33,6 +33,7 @@ export class HomePage implements OnInit {
   email: string;
   fullName: string;
   spinner = true;
+  noteList: NoteInterface[] = [];
 
   constructor(
     private readonly http: HttpClient,
@@ -50,6 +51,7 @@ export class HomePage implements OnInit {
           this.spinner = true;
           if (event.url === '/home') {
             this.loadProfile();
+            this.loadNoteList();
             return event;
           }
         }),
@@ -69,6 +71,7 @@ export class HomePage implements OnInit {
       });
     this.setUserSession();
     this.loadProfile();
+    this.loadNoteList();
   }
 
   setUserSession() {
@@ -131,7 +134,35 @@ export class HomePage implements OnInit {
       });
   }
 
+  loadNoteList() {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - 1);
+    const date = [
+      currentDate.getDate(),
+      currentDate.getMonth() + 1,
+      currentDate.getFullYear(),
+    ].join('-');
+
+    this.appService.getNoteList(date).subscribe({
+      next: (response: { data: any[] }) => {
+        this.noteList = response.data;
+      },
+      error: err => {},
+    });
+  }
+
   connectBackend() {
     window.location.href = CONNECT_BACKEND_ENDPOINT;
   }
+}
+
+export interface NoteInterface {
+  name: string;
+  owner: string;
+  creation: string;
+  title: string;
+  notify_on_login: number;
+  notify_on_every_login: number;
+  expire_notification_on: string;
+  content: string;
 }
