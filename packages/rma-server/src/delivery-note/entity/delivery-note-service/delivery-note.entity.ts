@@ -106,6 +106,7 @@ export class DeliveryNote extends BaseEntity {
 
   @Column()
   sales_team: DeliveryNoteSalesTeam[];
+  credit_note_items?: any[];
 }
 export class DeliveryNoteItems {
   name: string;

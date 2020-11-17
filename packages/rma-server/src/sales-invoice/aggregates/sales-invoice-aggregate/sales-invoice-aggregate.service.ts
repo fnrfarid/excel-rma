@@ -341,6 +341,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             const serialMap = this.getSerialMap(createReturnPayload);
             let deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
+            delete deliveryNote.credit_note_items;
             deliveryNote = this.setDeliveryNoteDefaults(deliveryNote);
 
             return this.http
@@ -575,7 +576,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     salesInvoice: SalesInvoice,
   ) {
     // cleanup math calculations after DTO validations are added
-    return {
+    const body = {
       docstatus: 1,
       naming_series: DEFAULT_NAMING_SERIES.sales_return,
       customer: assignPayload.customer,
@@ -593,6 +594,10 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         };
       }),
     };
+    if (assignPayload?.credit_note_items?.length) {
+      body.items = assignPayload.credit_note_items;
+    }
+    return body;
   }
 
   mapCreateDeliveryNote(

@@ -42,6 +42,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 import { LoadingController } from '@ionic/angular';
 import { ValidateInputSelected } from '../../common/pipes/validators';
+import { EditSalesReturnTableComponent } from './edit-sales-return-table/edit-sales-return-table.component';
 @Component({
   selector: 'app-add-sales-return',
   templateUrl: './add-sales-return.page.html',
@@ -78,6 +79,7 @@ export class AddSalesReturnPage implements OnInit {
     toRange: '',
     serials: [],
   };
+  salesInvoiceItems: Item[] = [];
   DEFAULT_SERIAL_RANGE = { start: 0, end: 0, prefix: '', serialPadding: 0 };
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
@@ -259,6 +261,7 @@ export class AddSalesReturnPage implements OnInit {
       .pipe(
         switchMap((sales_invoice: SalesInvoiceDetails) => {
           if (sales_invoice.has_bundle_item) {
+            this.salesInvoiceItems = sales_invoice.items;
             const item_codes = {};
             sales_invoice.items.forEach(item => {
               item_codes[item.item_code] = item.qty;
@@ -470,10 +473,50 @@ export class AddSalesReturnPage implements OnInit {
   }
 
   async submitSalesReturn() {
+    const credit_note_items = [];
+    if (this.salesInvoiceItems?.length) {
+      const dialogRef = this.dialog.open(EditSalesReturnTableComponent, {
+        width: '50%',
+        data: { items: this.salesInvoiceItems },
+      });
+
+      const response = await dialogRef.afterClosed().toPromise();
+
+      if (!response) {
+        this.getMessage('Please select items for Credit Note');
+        return;
+      }
+
+      let valid = true;
+      response.forEach(element => {
+        if (!valid) return;
+
+        if (
+          element.credit_note_qty >= 0 ||
+          element.credit_note_qty < 0 - element.qty
+        ) {
+          this.getMessage(
+            `Credit Note Item quantity for ${
+              element.item_name
+            }, should be between -1 and ${0 - element.qty}`,
+          );
+          valid = false;
+          return;
+        }
+        const data: any = {};
+        Object.assign(data, element);
+        data.qty = data.credit_note_qty;
+        delete data.credit_note_qty;
+        credit_note_items.push(data);
+      });
+
+      if (!valid) return;
+    }
     const loading = await this.loadingController.create({
       message: 'Creating Delivery Note..',
     });
     await loading.present();
+
     if (!this.validateState()) {
       loading.dismiss();
       return;
@@ -501,9 +544,9 @@ export class AddSalesReturnPage implements OnInit {
       serialItem.item_code = item_code;
       for (const item of this.serialDataSource.data()) {
         if (item_code === item.item_code && item.serial_no) {
-          serialItem.rate = item.rate;
-          serialItem.qty -= item.qty;
-          serialItem.amount += item.qty * item.rate;
+          serialItem.rate = item.rate || 0;
+          serialItem.qty -= item.qty || 0;
+          serialItem.amount += item.qty * item.rate || 0;
           serialItem.has_serial_no = item.has_serial_no;
           serialItem.serial_no.push(...item.serial_no);
         }
@@ -520,6 +563,9 @@ export class AddSalesReturnPage implements OnInit {
     salesReturn.posting_time = this.getFrappeTime();
     salesReturn.set_warehouse = this.warehouseFormControl.value;
     salesReturn.delivery_note_names = this.deliveryNoteNames;
+    salesReturn.credit_note_items = credit_note_items?.length
+      ? credit_note_items
+      : undefined;
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
         this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 2500 });

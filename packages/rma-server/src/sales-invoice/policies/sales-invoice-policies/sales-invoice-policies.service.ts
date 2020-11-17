@@ -220,6 +220,9 @@ export class SalesInvoicePoliciesService {
   validateReturnSerials(payload: CreateSalesReturnDto) {
     return from(payload.items).pipe(
       mergeMap(item => {
+        if (!item.has_serial_no) {
+          return of({ notFoundSerials: [] });
+        }
         return this.serialNoPoliciesService.validateReturnSerials({
           delivery_note_names: payload.delivery_note_names,
           item_code: item.item_code,
