@@ -54,6 +54,9 @@ export class CreateSalesReturnDto {
 
   @IsOptional()
   sales_team: any[];
+
+  @IsOptional()
+  credit_note_items: SalesReturnItemDto[];
 }
 
 export class SalesReturnItemDto {

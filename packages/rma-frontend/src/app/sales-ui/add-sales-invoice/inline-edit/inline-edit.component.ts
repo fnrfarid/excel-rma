@@ -23,17 +23,16 @@ export class InlineEditComponent {
     this.rateFormControl.setValue(x);
     this._value = x;
   }
+  @Input()
+  minimumPrice: number;
 
   @Input()
   column: string;
 
-  @Input()
-  minimumPrice: number;
-
   private _value = '';
 
   itemFormControl = new FormControl();
-  rateFormControl = new FormControl('', [Validators.min(this.minimumPrice)]);
+  rateFormControl = new FormControl('');
 
   itemList: Array<Item>;
   filteredItemList: Observable<any[]>;
@@ -52,6 +51,7 @@ export class InlineEditComponent {
         .pipe(filter(val => val == null))
         .subscribe(() => (this.comment = this.value || null));
     }
+    this.rateFormControl.setValidators(Validators.min(this.minimumPrice));
     this.getItemList();
   }
 
@@ -90,6 +90,7 @@ export class InlineEditComponent {
           .subscribe({
             next: res => {
               const selectedItem = {} as Item;
+              Object.assign(selectedItem, res.item);
               selectedItem.uuid = res.item.uuid;
               selectedItem.minimumPrice = res.item.minimumPrice;
               selectedItem.item_code = this.itemFormControl.value.item_code;
