@@ -53,16 +53,9 @@
         <td
           mat-cell
           *matCellDef="let row"
-          [ngStyle]="{
-            color:
-              row.status === 'Completed'
-                ? 'green'
-                : row.status === 'To Bill'
-                ? 'orange'
-                : 'red'
-          }"
+          [ngStyle]="{ color: 'red'}"
         >
-          {{ row.status }}
+        Returned
         </td>
       </ng-container>
 

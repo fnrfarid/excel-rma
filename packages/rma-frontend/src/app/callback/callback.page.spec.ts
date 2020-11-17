@@ -19,7 +19,12 @@ describe('CallbackPage', () => {
     TestBed.configureTestingModule({
       declarations: [CallbackPage, MockComponent],
       providers: [
-        { provide: STORAGE_TOKEN, useValue: {} },
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve(),
+          },
+        },
         {
           provide: LoginService,
           useValue: {

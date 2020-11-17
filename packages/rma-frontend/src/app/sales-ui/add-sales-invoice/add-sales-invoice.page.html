@@ -322,9 +322,9 @@
           </ng-container>
           <ng-container matColumnDef="stock">
             <mat-header-cell *matHeaderCellDef>Available Stock</mat-header-cell>
-            <mat-cell *matCellDef="let row"
-              >{{row.stock ? row.stock : 0}}</mat-cell
-            >
+            <mat-cell *matCellDef="let row" [ngStyle]="{'color': row.stock > 0 ? 'green' : 'red'}">
+              {{row.stock > 0 ? 'Yes' : 'No'}}
+            </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="quantity">

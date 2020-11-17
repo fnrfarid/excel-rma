@@ -284,7 +284,7 @@ export class AddSalesInvoicePage implements OnInit {
     if (warehouse) {
       data.forEach((item, index) => {
         if (item.name) {
-          this.getWarehouseStock(item.item_code).subscribe({
+          this.getWarehouseStock(item).subscribe({
             next: res => {
               data[index].stock = res.message;
               this.dataSource.update(data);
@@ -303,9 +303,12 @@ export class AddSalesInvoicePage implements OnInit {
     }
   }
 
-  getWarehouseStock(item_code: string) {
+  getWarehouseStock(item: { item_code: string; bundle_items?: any[] }) {
+    if (item.bundle_items) {
+      return of({ message: 1000000 });
+    }
     return this.itemPriceService.getStockBalance(
-      item_code,
+      item.item_code,
       this.salesInvoiceForm.get('warehouse').value,
     );
   }
@@ -317,7 +320,7 @@ export class AddSalesInvoicePage implements OnInit {
     const copy = this.dataSource.data().slice();
     Object.assign(row, item);
     if (this.salesInvoiceForm.get('warehouse').value) {
-      this.getWarehouseStock(item.item_code).subscribe({
+      this.getWarehouseStock(item).subscribe({
         next: res => {
           row.qty = 1;
           row.rate = item.rate;
