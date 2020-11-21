@@ -1,17 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { PurchaseService } from '../../services/purchase.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PurchaseInvoiceDetails } from '../../../common/interfaces/purchase.interface';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
-import { CLOSE } from '../../../constants/app-string';
+import { CLOSE, UPDATE_ERROR } from '../../../constants/app-string';
 import {
   ERROR_FETCHING_PURCHASE_INVOICE,
   ERROR_FETCHING_PURCHASE_ORDER,
 } from '../../../constants/messages';
 import { ConfirmationDialog } from '../../../sales-ui/item-price/item-price.page';
 import { MatDialog } from '@angular/material/dialog';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'purchase-details',
@@ -33,6 +34,8 @@ export class PurchaseDetailsComponent implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
     private readonly dialog: MatDialog,
+    private readonly router: Router,
+    private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
@@ -153,13 +156,28 @@ export class PurchaseDetailsComponent implements OnInit {
       return;
     }
 
-    // this.purchaseService.purchaseReset(this.purchaseInvoiceDetails.name).subscribe({
-    //   next: success => {
-    this.snackBar.open('Coming Soon.', CLOSE, { duration: 3500 });
-    //   },
-    //   error: err => {
-    //     this.snackBar.open(err?.error?.message || JSON.stringify(err) || UPDATE_ERROR, CLOSE, {duration: 3500})
-    //   }
-    // })
+    const loading = await this.loadingController.create({
+      message:
+        'validating and reseting all linked documents Purchase, this may take a while...!',
+    });
+    await loading.present();
+
+    this.purchaseService
+      .purchaseReset(this.purchaseInvoiceDetails.name)
+      .subscribe({
+        next: success => {
+          loading.dismiss();
+          this.snackBar.open('Coming Soon.', CLOSE, { duration: 5500 });
+          this.router.navigateByUrl('purchase');
+        },
+        error: err => {
+          loading.dismiss();
+          this.snackBar.open(
+            err?.error?.message || JSON.stringify(err) || UPDATE_ERROR,
+            CLOSE,
+            { duration: 3500 },
+          );
+        },
+      });
   }
 }

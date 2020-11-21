@@ -211,6 +211,37 @@
             </td>
           </ng-container>
 
+          <ng-container matColumnDef="mrp">
+            <th mat-header-cell *matHeaderCellDef class="ion-text-center">
+              MRP
+            </th>
+            <td
+              class="ion-text-center"
+              mat-cell
+              *matCellDef="let row"
+              [satPopoverAnchor]="p"
+              tabindex="0"
+              (keyup.enter)="p.open()"
+              (click)="p.open()"
+            >
+              <ion-text>
+                {{row.mrp | curFormat | async}}
+              </ion-text>
+              <sat-popover
+                #p
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateMRP(row, $event)"
+              >
+                <edit-price
+                  [value]="row.mrp"
+                  column="mrp"
+                ></edit-price>
+              </sat-popover>
+            </td>
+          </ng-container>
+
           <!-- Selling Price Column -->
           <ng-container matColumnDef="selling_price">
             <th mat-header-cell *matHeaderCellDef class="text-center">

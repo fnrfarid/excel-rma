@@ -27,6 +27,6 @@ import { PurchaseReceiptWebhookController } from './controllers/purchase-receipt
     PurchaseReceiptPoliciesService,
     PurchaseReceiptService,
   ],
-  exports: [...PurchaseReceiptSchedularManager],
+  exports: [...PurchaseReceiptSchedularManager, PurchaseReceiptService],
 })
 export class PurchaseReceiptModule {}

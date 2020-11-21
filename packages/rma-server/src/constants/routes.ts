@@ -85,3 +85,7 @@ export const ERPNEXT_CANCEL_ALL_DOCS_ENDPOINT =
   '/api/method/frappe.desk.form.linked_with.cancel_all_linked_docs';
 export const EXCEL_PRODUCT_BUNDLE_AFTER_UPDATE_ENDPOINT =
   '/api/item/webhook/v1/bundle';
+export const GET_FRAPPE_LINKED_DOCS_ENDPOINT =
+  '/api/method/frappe.desk.form.linked_with.get_linked_docs';
+export const LANDED_COST_VOUCHER_ENDPOINT =
+  '/api/resource/Landed%20Cost%20Voucher';

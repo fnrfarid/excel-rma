@@ -7,6 +7,7 @@ import { PurchaseOrderPoliciesService } from '../../policies/purchase-order-poli
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { PurchaseReceiptService } from '../../../purchase-receipt/entity/purchase-receipt.service';
 
 describe('PurchaseOrderAggregateService', () => {
   let service: PurchaseOrderAggregateService;
@@ -38,6 +39,10 @@ describe('PurchaseOrderAggregateService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: PurchaseReceiptService,
           useValue: {},
         },
       ],
