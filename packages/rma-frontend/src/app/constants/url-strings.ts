@@ -55,6 +55,7 @@ export const LIST_DELIVERY_NOTE_ENDPOINT = 'api/delivery_note/v1/list';
 export const API_INFO_ENDPOINT = '/api/info';
 export const API_ITEM_LIST = '/api/item/v1/list';
 export const API_ITEM_SET_MIN_PRICE = '/api/item/v1/set_minimum_item_price';
+export const API_ITEM_SET_MRP = '/api/item/v1/set_item_mrp';
 export const UPDATE_ITEM_HAS_SERIAL_UPDATE_ENDPOINT =
   '/api/item/v1/update_has_serial';
 export const API_ITEM_GET_BY_CODE = '/api/item/v1/get_by_item_code';

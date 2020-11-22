@@ -7,6 +7,7 @@ import { PurchaseOrderQueries } from './query';
 import { PurchaseOrderPoliciesManager } from './policies';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { PurchaseInvoiceEntitiesModule } from '../purchase-invoice/entity/entity.module';
+import { PurchaseReceiptModule } from '../purchase-receipt/purchase-receipt.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PurchaseInvoiceEntitiesModule } from '../purchase-invoice/entity/entity
     DirectModule,
     SerialNoEntitiesModule,
     PurchaseInvoiceEntitiesModule,
+    PurchaseReceiptModule,
   ],
   providers: [
     ...PurchaseOrderAggregates,

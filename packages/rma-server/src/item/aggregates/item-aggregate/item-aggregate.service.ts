@@ -64,6 +64,10 @@ export class ItemAggregateService extends AggregateRoot {
     return item;
   }
 
+  async set_item_mrp(uuid: string, mrp: string) {
+    return await this.itemService.updateOne({ uuid }, { $set: { mrp } });
+  }
+
   getBundleItems(item_codes) {
     return from(
       this.itemService.find({ item_code: { $in: Object.keys(item_codes) } }),

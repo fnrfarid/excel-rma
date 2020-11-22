@@ -136,5 +136,8 @@ export class Item extends BaseEntity {
   brand: string;
 
   @Column()
+  mrp: number;
+
+  @Column()
   bundle_items: ItemBundleItemWebhookInterface[];
 }

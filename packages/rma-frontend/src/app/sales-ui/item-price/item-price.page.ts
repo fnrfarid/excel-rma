@@ -27,6 +27,7 @@ export class ItemPricePage implements OnInit {
     'purchaseWarrantyMonths',
     'salesWarrantyMonths',
     'price',
+    'mrp',
     'selling_price',
   ];
   itemName: string = '';
@@ -149,6 +150,15 @@ export class ItemPricePage implements OnInit {
 
     this.itemPriceService.setMinPrice(row.uuid, minPrice).subscribe({
       next: success => (row.minimumPrice = minPrice),
+      error: error => {},
+    });
+  }
+
+  updateMRP(row: ListingData, mrp: number) {
+    if (mrp == null) return;
+
+    this.itemPriceService.setMRP(row.uuid, mrp).subscribe({
+      next: success => (row.mrp = mrp),
       error: error => {},
     });
   }

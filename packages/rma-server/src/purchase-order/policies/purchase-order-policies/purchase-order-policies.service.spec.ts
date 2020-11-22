@@ -3,6 +3,7 @@ import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchas
 import { PurchaseOrderService } from '../../entity/purchase-order/purchase-order.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { PurchaseOrderPoliciesService } from './purchase-order-policies.service';
+import { HttpService } from '@nestjs/common';
 
 describe('PurchaseOrderPoliciesService', () => {
   let service: PurchaseOrderPoliciesService;
@@ -21,6 +22,10 @@ describe('PurchaseOrderPoliciesService', () => {
         },
         {
           provide: SerialNoService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
           useValue: {},
         },
       ],

@@ -3,7 +3,7 @@
 vertical="top"
 horizontal="end"
 slot="fixed"
-*ngIf="purchaseInvoiceDetails.status !== 'Canceled'"
+*ngIf="!['Canceled','Reseted'].includes(purchaseInvoiceDetails.status)"
 class="ion-margin-end"
 >
 <ion-fab-button
@@ -91,8 +91,9 @@ class="ion-margin-end"
               value="{{ purchaseInvoiceDetails?.status }}"
               placeholder="Status"
               [ngStyle]="{
-                color:
-                  purchaseInvoiceDetails?.submitted === true ? 'green' : 'red'
+                color: ['Submitted','To Deliver'].includes(purchaseInvoiceDetails?.status) ? '#4d2500' : 
+                ['Completed'].includes(purchaseInvoiceDetails?.status) ? 'green' :
+                'red'
               }"
             ></ion-input>
           </ion-item>
