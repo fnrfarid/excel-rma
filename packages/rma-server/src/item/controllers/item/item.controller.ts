@@ -100,6 +100,13 @@ export class ItemController {
   }
 
   @Roles(SYSTEM_MANAGER)
+  @Post('v1/set_item_mrp/:uuid')
+  @UseGuards(TokenGuard, RoleGuard)
+  async set_item_mrp(@Param('uuid') uuid, @Body('mrp') mrp) {
+    return await this.aggregate.set_item_mrp(uuid, mrp);
+  }
+
+  @Roles(SYSTEM_MANAGER)
   @Post('v1/update_has_serial')
   @UseGuards(TokenGuard, RoleGuard)
   async updateItemHasSerialNo(

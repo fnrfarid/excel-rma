@@ -168,18 +168,11 @@
             >
             <mat-cell *matCellDef="let row">
               <ion-text
-                [ngStyle]="{
-              color: 'green'
-            }"
-                *ngIf="['To Deliver', 'Submitted', 'Completed'].includes(row.status)"
-              >
-                {{row.status}}
-              </ion-text>
-              <ion-text
-                *ngIf="['Draft', 'Rejected', 'Canceled'].includes(row.status)"
-                [ngStyle]="{
-              color: 'red'
-            }"
+              [ngStyle]="{
+                color: ['Submitted','To Deliver'].includes(row.status) ? '#4d2500' : 
+                ['Completed'].includes(row.status) ? 'green' :
+                'red'
+              }"
               >
                 {{row.status}}
               </ion-text>

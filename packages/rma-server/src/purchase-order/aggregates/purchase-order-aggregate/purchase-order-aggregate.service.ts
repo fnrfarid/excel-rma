@@ -2,19 +2,22 @@ import { HttpService, Injectable } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { PurchaseOrderPoliciesService } from '../../policies/purchase-order-policies/purchase-order-policies.service';
 import { PurchaseOrderService } from '../../entity/purchase-order/purchase-order.service';
-import { switchMap } from 'rxjs/operators';
-import { forkJoin, from, of } from 'rxjs';
+import { catchError, concatMap, switchMap, toArray } from 'rxjs/operators';
+import { forkJoin, from, of, throwError } from 'rxjs';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { PurchaseOrder } from '../../entity/purchase-order/purchase-order.entity';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
+import { FRAPPE_CLIENT_CANCEL } from '../../../constants/routes';
 import {
   DOC_NAMES,
-  DOC_RESET_INFO,
+  AUTHORIZATION,
   PURCHASE_INVOICE_STATUS,
+  BEARER_HEADER_VALUE_PREFIX,
 } from '../../../constants/app-strings';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { ERPNEXT_CANCEL_ALL_DOCS_ENDPOINT } from '../../../constants/routes';
+import { PurchaseReceiptService } from '../../../purchase-receipt/entity/purchase-receipt.service';
 
 @Injectable()
 export class PurchaseOrderAggregateService extends AggregateRoot {
@@ -26,6 +29,7 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
     private readonly purchaseInvoiceService: PurchaseInvoiceService,
     private readonly serverSettings: SettingsService,
     private readonly http: HttpService,
+    private readonly purchaseReceiptService: PurchaseReceiptService,
   ) {
     super();
   }
@@ -44,56 +48,127 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
   }
 
   resetOrder(name: string, req) {
-    return this.purchaseOrderPolicy.validatePurchaseOrderReset(name).pipe(
-      switchMap(valid => {
-        return from(
-          this.purchaseOrderService.findOne({ purchase_invoice_name: name }),
-        );
-      }),
-      switchMap(purchaseOrder => {
-        return this.cancelERPNextDocs(purchaseOrder, req);
-      }),
-      switchMap((purchaseOrder: PurchaseOrder) => {
-        return forkJoin({
-          resetSerials: from(
-            this.serialNoService.deleteMany({
-              purchase_invoice_name: purchaseOrder.purchase_invoice_name,
+    return this.serverSettings.find().pipe(
+      switchMap(settings => {
+        return this.purchaseOrderPolicy
+          .validatePurchaseOrderReset(name, settings, req)
+          .pipe(
+            switchMap((docs: { [key: string]: string[] }) => {
+              return this.cancelERPNextDocs(docs, req, settings);
             }),
-          ),
-          resetSerialHistory: this.serialHistoryService.deleteMany({
-            parent_document: purchaseOrder.purchase_invoice_name,
-          }),
-        });
-      }),
-      switchMap(success => {
-        return from(
-          this.purchaseInvoiceService.updateOne({
-            name,
-            $set: {
-              status: PURCHASE_INVOICE_STATUS.RESETED,
-            },
-          }),
-        );
+            switchMap(success => {
+              return this.purchaseOrderService.findOne({
+                purchase_invoice_name: name,
+              });
+            }),
+            switchMap((purchaseOrder: PurchaseOrder) => {
+              return forkJoin({
+                resetSerials: from(
+                  this.serialNoService.deleteMany({
+                    purchase_invoice_name: purchaseOrder.purchase_invoice_name,
+                  }),
+                ),
+                resetSerialHistory: from(
+                  this.serialHistoryService.deleteMany({
+                    parent_document: purchaseOrder.purchase_invoice_name,
+                  }),
+                ),
+                updatePurchaseOrder: from(
+                  this.purchaseOrderService.updateOne(
+                    { name: purchaseOrder.name },
+                    {
+                      $set: {
+                        docstatus: 2,
+                        status: PURCHASE_INVOICE_STATUS.CANCELED,
+                      },
+                    },
+                  ),
+                ),
+                updatePurchaseInvoice: from(
+                  this.purchaseInvoiceService.updateOne(
+                    { name },
+                    {
+                      $set: {
+                        docstatus: 2,
+                        status: PURCHASE_INVOICE_STATUS.RESETED,
+                      },
+                    },
+                  ),
+                ),
+                updatePurchaseReceipt: from(
+                  this.purchaseReceiptService.updateMany(
+                    {
+                      purchase_invoice_name:
+                        purchaseOrder.purchase_invoice_name,
+                    },
+                    {
+                      $set: {
+                        docstatus: 2,
+                        status: PURCHASE_INVOICE_STATUS.RESETED,
+                      },
+                    },
+                  ),
+                ),
+              });
+            }),
+            switchMap(success => of(true)),
+          );
       }),
     );
   }
 
-  cancelERPNextDocs(purchaseOrder: PurchaseOrder, req) {
-    return this.serverSettings.find().pipe(
-      switchMap(settings => {
-        return this.http.post(
-          settings.authServerURL + ERPNEXT_CANCEL_ALL_DOCS_ENDPOINT,
-          {
-            doctype: DOC_NAMES.PURCHASE_ORDER,
-            name: purchaseOrder.name,
-            linkinfo: DOC_RESET_INFO[DOC_NAMES.PURCHASE_ORDER],
-          },
-          { headers: this.serverSettings.getAuthorizationHeaders(req.token) },
+  cancelERPNextDocs(docs: { [key: string]: string[] }, req, settings) {
+    return of({}).pipe(
+      switchMap(obj => {
+        return from(Object.keys(docs)).pipe(
+          concatMap((docType: string) => {
+            return from(docs[docType]).pipe(
+              concatMap(doc => {
+                return this.cancelDoc(docType, doc, settings, req);
+              }),
+              switchMap(success => of(true)),
+            );
+          }),
+          catchError(err => {
+            const doc: { doctype: string; name: string } = JSON.parse(
+              err.config.data,
+            );
+            if (
+              err?.response?.data?.exc &&
+              err?.response?.data?.exc.includes(
+                'Cannot edit cancelled document',
+              ) &&
+              doc.doctype === DOC_NAMES.PURCHASE_ORDER
+            ) {
+              return from(
+                this.purchaseOrderService.updateOne(
+                  { name: doc.name },
+                  {
+                    $set: {
+                      docstatus: 2,
+                      status: PURCHASE_INVOICE_STATUS.RESETED,
+                    },
+                  },
+                ),
+              );
+            }
+            return throwError(err);
+          }),
         );
       }),
-      switchMap(success => {
-        return of(purchaseOrder);
-      }),
+      toArray(),
     );
+  }
+
+  cancelDoc(doctype, docName, settings: ServerSettings, req) {
+    const doc = {
+      doctype,
+      name: docName,
+    };
+    return this.http.post(settings.authServerURL + FRAPPE_CLIENT_CANCEL, doc, {
+      headers: {
+        [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + req.token.accessToken,
+      },
+    });
   }
 }

@@ -16,6 +16,7 @@ import {
   RELAY_API_RES_COMPANY,
   UPDATE_ITEM_HAS_SERIAL_UPDATE_ENDPOINT,
   API_ITEM_SET_PURCHASE_WARRANTY_DAYS,
+  API_ITEM_SET_MRP,
 } from '../../constants/url-strings';
 import { ItemListResponse } from '../item-price/item-price.datasource';
 
@@ -68,6 +69,20 @@ export class ItemPriceService {
         return this.http.post(
           API_ITEM_SET_MIN_PRICE + '/' + itemUuid,
           { minimumPrice },
+          {
+            headers,
+          },
+        );
+      }),
+    );
+  }
+
+  setMRP(itemUuid: string, mrp: number) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          API_ITEM_SET_MRP + '/' + itemUuid,
+          { mrp },
           {
             headers,
           },

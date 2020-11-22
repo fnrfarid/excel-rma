@@ -247,6 +247,10 @@ export const PURCHASE_INVOICE_STATUS = {
 
 export const DOC_NAMES = {
   PURCHASE_ORDER: 'Purchase Order',
+  PURCHASE_RECEIPT: 'Purchase Receipt',
+  PURCHASE_INVOICE: 'Purchase Invoice',
+  PAYMENT_ENTRY: 'Payment Entry',
+  LANDED_COST_VOUCHER: 'Landed Cost Voucher',
 };
 
 export const DOC_RESET_INFO = {
@@ -258,6 +262,25 @@ export const DOC_RESET_INFO = {
     'Purchase Receipt': {
       child_doctype: 'Purchase Receipt Item',
       fieldname: ['purchase_order'],
+    },
+  },
+  [DOC_NAMES.PURCHASE_INVOICE]: {
+    'Payment Entry': {
+      child_doctype: 'Payment Entry Reference',
+      fieldname: ['reference_name'],
+      doctype_fieldname: 'reference_doctype',
+    },
+    'Landed Cost Voucher': {
+      child_doctype: 'Landed Cost Purchase Receipt',
+      fieldname: ['receipt_document'],
+      doctype_fieldname: 'receipt_document_type',
+    },
+  },
+  [DOC_NAMES.PURCHASE_RECEIPT]: {
+    'Landed Cost Voucher': {
+      child_doctype: 'Landed Cost Purchase Receipt',
+      fieldname: ['receipt_document'],
+      doctype_fieldname: 'receipt_document_type',
     },
   },
 };
