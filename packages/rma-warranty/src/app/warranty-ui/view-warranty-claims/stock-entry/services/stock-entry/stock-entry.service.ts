@@ -44,11 +44,11 @@ export class StockEntryService {
     );
   }
 
-  removeStockEntry(stockVoucherNumber: string) {
-    const URL = `${CANCEL_STOCK_ENTRY_ENDPOINT}/${stockVoucherNumber}`;
+  removeStockEntry(stockVoucherNumber: any) {
+    const URL = `${CANCEL_STOCK_ENTRY_ENDPOINT}`;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(URL, {}, { headers });
+        return this.http.post(URL, stockVoucherNumber, { headers });
       }),
     );
   }

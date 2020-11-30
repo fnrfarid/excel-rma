@@ -73,6 +73,9 @@ export class StockEntry extends BaseEntity {
 
   @Column()
   items: StockEntryItem[];
+
+  @Column()
+  replacedSerial: string;
   naming_series?: string;
 }
 

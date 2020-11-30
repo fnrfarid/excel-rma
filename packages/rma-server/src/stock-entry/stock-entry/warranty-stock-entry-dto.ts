@@ -5,7 +5,6 @@ import {
   ValidateNested,
   IsNumber,
   IsOptional,
-  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -77,6 +76,14 @@ export class WarrantyStockEntryDto {
   @IsString()
   sales_invoice_name: string;
 
+  @IsOptional()
+  @IsString()
+  set_warehouse: string;
+
+  @IsOptional()
+  @IsString()
+  replacedSerial: string;
+
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => WarrantyStockEntryItemDto)
@@ -113,6 +120,18 @@ export class WarrantyStockEntryItemDto {
   qty: number;
 
   @IsOptional()
-  @IsArray()
-  serial_no: string[];
+  @IsString()
+  serial_no: string;
+
+  @IsOptional()
+  @IsString()
+  warehouse: string;
+
+  @IsOptional()
+  @IsString()
+  replacedSerial: string;
+
+  @IsOptional()
+  @IsString()
+  stock_entry_type: string;
 }

@@ -66,29 +66,29 @@ export class StockEntryComponent implements OnInit {
   }
 
   async removeStockEntry(row) {
-    const loading = await this.loadingController.create();
+    const loading = await this.loadingController.create({
+      message: 'Reverting Stock Entrry...!',
+    });
     await loading.present();
-    this.stockEntryService
-      .removeStockEntry(row.stock_voucher_number)
-      .subscribe({
-        next: res => {
-          loading.dismiss();
-          this.snackbar.open('Stock Entry Cacelled succesfully', 'Close', {
-            duration: DURATION,
-          });
-          this.dataSource.loadItems('asc', 0, 10, {
-            warrantyClaimUuid: this.warrantyClaimUuid,
-          });
-        },
-        error: err => {
-          loading.dismiss();
-          this.snackbar.open('Failed to Cancel Stock Entry', 'Close', {
-            duration: DURATION,
-          });
-          this.dataSource.loadItems('asc', 0, 10, {
-            warrantyClaimUuid: this.warrantyClaimUuid,
-          });
-        },
-      });
+    this.stockEntryService.removeStockEntry(row).subscribe({
+      next: res => {
+        loading.dismiss();
+        this.snackbar.open('Stock Entry Cacelled succesfully', 'Close', {
+          duration: DURATION,
+        });
+        this.dataSource.loadItems('asc', 0, 10, {
+          warrantyClaimUuid: this.warrantyClaimUuid,
+        });
+      },
+      error: err => {
+        loading.dismiss();
+        this.snackbar.open('Failed to Cancel Stock Entry', 'Close', {
+          duration: DURATION,
+        });
+        this.dataSource.loadItems('asc', 0, 10, {
+          warrantyClaimUuid: this.warrantyClaimUuid,
+        });
+      },
+    });
   }
 }

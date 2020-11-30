@@ -8,7 +8,7 @@ import { LoadingController } from '@ionic/angular';
 import {
   WarrantyState,
   SerialNoDetails,
-  Item,
+  WarrantyItem,
   WarrantyClaimsDetails,
 } from '../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -443,7 +443,7 @@ export class AddWarrantyClaimPage implements OnInit {
 
   itemOptionChanged(option) {
     this.warrantyService.getItem(option.item_code).subscribe({
-      next: (res: Item) => {
+      next: (res: WarrantyItem) => {
         this.itemDetail = res;
         if (!res.brand) {
           this.getItemBrandFromERP(res.item_code);

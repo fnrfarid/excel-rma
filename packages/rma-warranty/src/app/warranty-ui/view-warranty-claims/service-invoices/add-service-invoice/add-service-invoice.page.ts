@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { TimeService } from '../../../../api/time/time.service';
 import {
-  Item,
+  WarrantyItem,
   WarrantyClaimsDetails,
 } from '../../../../common/interfaces/warranty.interface';
 import { AddServiceInvoiceService } from './add-service-invoice.service';
@@ -243,7 +243,7 @@ export class AddServiceInvoicePage implements OnInit {
 
   addItem() {
     const data = this.dataSource.data();
-    const item = {} as Item;
+    const item = {} as WarrantyItem;
     item.item_code = '';
     item.item_name = '';
     item.qty = 0;
@@ -254,7 +254,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.dataSource.update(data);
   }
 
-  updateItem(row: Item, index: number, item: Item) {
+  updateItem(row: WarrantyItem, index: number, item: WarrantyItem) {
     if (item == null) {
       return;
     }
@@ -268,7 +268,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.itemsControl.controls[index].setValue(item);
   }
 
-  updateQuantity(row: Item, quantity: number) {
+  updateQuantity(row: WarrantyItem, quantity: number) {
     if (quantity == null) {
       return;
     }
@@ -291,7 +291,7 @@ export class AddServiceInvoicePage implements OnInit {
     }
   }
 
-  updateRate(row: Item, rate: number) {
+  updateRate(row: WarrantyItem, rate: number) {
     if (rate == null) {
       return;
     }
@@ -306,7 +306,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.dataSource.update(copy);
   }
 
-  calculateTotal(itemList: Item[]) {
+  calculateTotal(itemList: WarrantyItem[]) {
     let sum = 0;
     itemList.forEach(item => {
       sum += item.qty * item.rate;
