@@ -1,4 +1,4 @@
-import { Item } from '../../../../common/interfaces/warranty.interface';
+import { WarrantyItem } from '../../../../common/interfaces/warranty.interface';
 
 export class ServiceInvoiceDetails {
   customer: string;
@@ -10,7 +10,7 @@ export class ServiceInvoiceDetails {
   due_date?: string;
   remarks?: string;
   delivery_warehouse?: string;
-  items: Item[];
+  items: WarrantyItem[];
   invoice_no?: string;
   date: string;
   customer_third_party?: string;

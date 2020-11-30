@@ -89,7 +89,7 @@ export class StockEntryController {
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   createWarrantyStock(@Body() body: WarrantyStockEntryDto, @Req() req) {
-    return this.warrantyStockAggregate.createERPStockEntry(body, req);
+    return this.warrantyStockAggregate.createStockEntry(body, req);
   }
 
   @Get('v1/get_warranty_stock/:warrantyClaimUuid')
@@ -99,13 +99,10 @@ export class StockEntryController {
     return this.warrantyStockAggregate.retrieveStockEntry(warrantyClaimUuid);
   }
 
-  @Post('v1/cancel_warranty_stock_entry/:stockVoucherNumber')
+  @Post('v1/cancel_warranty_stock_entry')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  removeWarrantyStock(
-    @Param('stockVoucherNumber') stockVoucherNumber: string,
-    @Req() req,
-  ) {
+  removeWarrantyStock(@Body() stockVoucherNumber: any, @Req() req) {
     return this.warrantyStockAggregate.removeStockEntry(
       stockVoucherNumber,
       req,
