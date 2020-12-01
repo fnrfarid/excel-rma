@@ -64,7 +64,7 @@ export class ClaimDetailsComponent implements OnInit {
             ? err.error.message
             : `${ERROR_FETCHING_WARRANTY_CLAIM}${err.error.error}`,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
       },
     });

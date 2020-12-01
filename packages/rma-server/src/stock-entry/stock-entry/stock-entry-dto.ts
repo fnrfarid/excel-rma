@@ -78,6 +78,10 @@ export class StockEntryItemDto {
   @IsString()
   item_name: string;
 
+  @IsOptional()
+  @IsString()
+  warranty_date?: string;
+
   @IsNotEmpty()
   @IsNumber()
   qty: number;

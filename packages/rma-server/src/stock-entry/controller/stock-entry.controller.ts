@@ -73,6 +73,12 @@ export class StockEntryController {
     return this.aggregate.getStockEntry(uuid);
   }
 
+  @Post('v1/delete/:uuid')
+  @UseGuards(TokenGuard)
+  deleteStockEntry(@Param('uuid') uuid, @Req() req) {
+    return this.aggregate.deleteDraft(uuid);
+  }
+
   @Post('v1/accept_transfer/:uuid')
   @UseGuards(TokenGuard)
   acceptStockEntry(@Param('uuid') uuid, @Req() req) {

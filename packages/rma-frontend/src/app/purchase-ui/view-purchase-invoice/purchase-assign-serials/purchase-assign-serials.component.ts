@@ -215,7 +215,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
             ? err.error.message
             : `${ERROR_FETCHING_PURCHASE_INVOICE}${err.error.error}`,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
       },
     });
@@ -429,7 +429,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       this.snackBar.open(
         `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
         CLOSE,
-        { duration: 2500 },
+        { duration: 4500 },
       );
       return;
     }
@@ -470,10 +470,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
                   item.serials,
                   success.notFoundSerials,
                 )
-                  .splice(0, 5)
+                  .splice(0, 50)
                   .join(', ')}...`,
                 CLOSE,
-                { duration: 2500 },
+                { duration: 4500 },
               );
         },
         error: err => {},

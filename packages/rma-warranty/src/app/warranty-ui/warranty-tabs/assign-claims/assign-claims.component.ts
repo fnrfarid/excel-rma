@@ -81,6 +81,6 @@ export class AssignClaimsComponent implements OnInit {
       });
       return;
     }
-    this.snackbar.open('Warranty Claims Created', 'Close', { duration: 2500 });
+    this.snackbar.open('Warranty Claims Created', 'Close', { duration: 4500 });
   }
 }

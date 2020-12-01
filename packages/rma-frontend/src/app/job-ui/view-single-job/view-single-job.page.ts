@@ -86,7 +86,7 @@ export class ViewSingleJobPage {
         this.dialogRef.close(true);
       },
       error: err => {
-        this.snackBar.open(err.error.message, CLOSE, { duration: 2500 });
+        this.snackBar.open(err.error.message, CLOSE, { duration: 4500 });
       },
     });
   }

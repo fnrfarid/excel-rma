@@ -51,6 +51,8 @@ export enum EventType {
   SerialTransferCreated = 'Serial Transfer Created',
   SerialTransferAccepted = 'Serial Transfer Accepted',
   SerialTransferRejected = 'Serial Transfer Rejected',
+  MaterialReceipt = 'Material Receipt',
+  MaterialIssue = 'Material Issue',
   RECEIVED_FROM_CUSTOMER = 'Received from Customer',
   RECEIVED_FROM_BRANCH = 'Received from Branch',
   WORK_IN_PROGRESS = 'Work in Progress',

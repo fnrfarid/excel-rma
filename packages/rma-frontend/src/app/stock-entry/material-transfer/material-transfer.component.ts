@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  Inject,
-} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Subject, Observable, of, from } from 'rxjs';
 import { Location } from '@angular/common';
 import {
@@ -18,11 +12,13 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   CLOSE,
-  MATERIAL_TRANSFER,
   DELIVERY_NOTE,
   WAREHOUSES,
   TERRITORY,
   STOCK_TRANSFER_STATUS,
+  MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
+  STOCK_ENTRY_TYPE,
+  PURCHASE_RECEIPT,
 } from '../../constants/app-string';
 import * as _ from 'lodash';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -46,13 +42,10 @@ import {
 } from '../../sales-ui/view-sales-invoice/serials/serials.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StockItemsDataSource } from './items-datasource';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialog,
-} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Item } from '../../common/interfaces/sales.interface';
 import { ValidateInputSelected } from '../../common/pipes/validators';
+import { AddItemDialog } from './add-item-dialog';
 
 @Component({
   selector: 'app-material-transfer',
@@ -93,19 +86,13 @@ export class MaterialTransferComponent implements OnInit {
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
   territoryList: Observable<any[]>;
+  stockEntryType: string[] = Object.values(STOCK_ENTRY_TYPE);
   initial: { [key: string]: number } = {
     s_warehouse: 0,
     territory: 0,
   };
   form: FormGroup;
-  materialTransferDisplayedColumns = [
-    's_warehouse',
-    't_warehouse',
-    'item_name',
-    'qty',
-    'serial_no',
-    'delete',
-  ];
+  materialTransferDisplayedColumns = MATERIAL_TRANSFER_DISPLAYED_COLUMNS;
   itemDataSource: StockItemsDataSource;
   itemDisplayedColumns = [
     'item_name',
@@ -150,7 +137,9 @@ export class MaterialTransferComponent implements OnInit {
   async ngOnInit() {
     this.form = new FormGroup({
       territory: new FormControl('', [Validators.required]),
+      stock_entry_type: new FormControl('', [Validators.required]),
     });
+
     this.itemDataSource = new StockItemsDataSource();
     this.transferWarehouse = await this.salesService
       .getStore()
@@ -160,6 +149,7 @@ export class MaterialTransferComponent implements OnInit {
     this.uuid = this.activatedRoute.snapshot.params.uuid;
 
     if (this.uuid) {
+      this.form.controls.stock_entry_type.disable();
       this.readonly = true;
       this.stockEntryService.getStockEntry(this.uuid).subscribe({
         next: (success: any) => {
@@ -170,9 +160,13 @@ export class MaterialTransferComponent implements OnInit {
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
           this.remarks = success.remarks;
-          this.form.get('territory').setValue(success.territory);
-          this.form.get('territory').disable();
+          this.form.controls.territory.setValue(success.territory);
+          this.form.controls.stock_entry_type.setValue(
+            success.stock_entry_type,
+          );
+          this.form.controls.territory.disable();
           this.materialTransferDataSource.update(success.items);
+          this.typeChange(success.stock_entry_type);
         },
         error: err => {},
       });
@@ -402,7 +396,7 @@ export class MaterialTransferComponent implements OnInit {
       this.snackBar.open(
         `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
         CLOSE,
-        { duration: 2500 },
+        { duration: 4500 },
       );
       return;
     }
@@ -422,7 +416,11 @@ export class MaterialTransferComponent implements OnInit {
     row: Item,
   ) {
     item.warehouse = this.warehouseState.s_warehouse.value;
-    item.validateFor = DELIVERY_NOTE;
+    item.validateFor =
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+        ? PURCHASE_RECEIPT
+        : DELIVERY_NOTE;
     this.salesService.validateSerials(item).subscribe({
       next: (success: { notFoundSerials: string[] }) => {
         if (success.notFoundSerials && success.notFoundSerials.length) {
@@ -430,7 +428,7 @@ export class MaterialTransferComponent implements OnInit {
             `Found ${success.notFoundSerials.length} Invalid Serials for
               item: ${item.item_code} at
               warehouse: ${item.warehouse},
-              ${success.notFoundSerials.splice(0, 5).join(', ')}...`,
+              ${success.notFoundSerials.splice(0, 50).join(', ')}...`,
             CLOSE,
             { duration: 5500 },
           );
@@ -570,7 +568,7 @@ export class MaterialTransferComponent implements OnInit {
     body.remarks = this.remarks;
     body.posting_date = date.date;
     body.posting_time = date.time;
-    body.stock_entry_type = MATERIAL_TRANSFER;
+    body.stock_entry_type = this.form.controls.stock_entry_type.value;
     body.items = this.materialTransferDataSource.data();
     body.items = this.mergeItems(body.items);
     body.uuid = this.uuid;
@@ -581,7 +579,10 @@ export class MaterialTransferComponent implements OnInit {
     const body = await this.getStockEntryBody();
     body.status = STOCK_TRANSFER_STATUS.draft;
     this.stockEntryService.createMaterialTransfer(body).subscribe({
-      next: response => {
+      next: (response: any) => {
+        this.uuid = response.uuid;
+        this.form.controls.stock_entry_type.disable();
+        this.status = response.status;
         this.getMessage('Stock Entry Saved');
       },
       error: err => {
@@ -625,6 +626,11 @@ export class MaterialTransferComponent implements OnInit {
       this.getMessage(
         'Source warehouse and target warehouse should be unique.',
       );
+      return false;
+    }
+
+    if (!this.form.controls.stock_entry_type.value) {
+      this.getMessage('Please select a stock entry type.');
       return false;
     }
     return true;
@@ -686,8 +692,40 @@ export class MaterialTransferComponent implements OnInit {
       });
   }
 
+  typeChange(value) {
+    this.materialTransferDisplayedColumns = [
+      ...MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
+    ];
+    if (value !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
+      this.materialTransferDisplayedColumns = [
+        ...MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
+      ];
+      this.materialTransferDisplayedColumns.splice(
+        this.materialTransferDisplayedColumns.length - 1,
+        0,
+        'warranty_date',
+      );
+    }
+  }
+
   assignPickerState(rangePickerState) {
     this.rangePickerState = rangePickerState;
+  }
+
+  deleteStockEntry() {
+    return this.stockEntryService.deleteStockEntry(this.uuid).subscribe({
+      next: success => {
+        this.getMessage('Stock Entry Deleted.');
+        this.router.navigateByUrl('stock-entry');
+      },
+      error: err => {
+        this.getMessage(
+          err.error && err.error.message
+            ? err.error.message
+            : 'Error occurred while returning stock transfer',
+        );
+      },
+    });
   }
 }
 
@@ -695,39 +733,4 @@ export class ItemInterface {
   item_code: string;
   item_name: string;
   has_serial_no: number;
-}
-
-@Component({
-  selector: 'add-item-dialog',
-  templateUrl: 'add-item-dialog.html',
-})
-export class AddItemDialog {
-  filteredItemList: Observable<any[]>;
-  itemFormControl = new FormControl();
-  validateInput: any = ValidateInputSelected;
-
-  constructor(
-    public dialogRef: MatDialogRef<AddItemDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private salesService: SalesService,
-  ) {
-    this.getItemList();
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close(this.itemFormControl.value);
-  }
-
-  getItemList() {
-    this.filteredItemList = this.itemFormControl.valueChanges.pipe(
-      startWith(''),
-      switchMap(value => {
-        return this.salesService.getItemList(value);
-      }),
-    );
-  }
-
-  getOptionText(option) {
-    return option && option.item_name ? option.item_name : '';
-  }
 }

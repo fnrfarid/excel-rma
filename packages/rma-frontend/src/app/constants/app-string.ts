@@ -73,3 +73,18 @@ export const STOCK_ENTRY_STATUS = {
   REPLACE: 'Replace',
   UPGRADE: 'Upgrade',
 };
+
+export const STOCK_ENTRY_TYPE = {
+  MATERIAL_TRANSFER: 'Material Transfer',
+  MATERIAL_RECEIPT: 'Material Receipt',
+  MATERIAL_ISSUE: 'Material Issue',
+};
+
+export const MATERIAL_TRANSFER_DISPLAYED_COLUMNS = [
+  's_warehouse',
+  't_warehouse',
+  'item_name',
+  'qty',
+  'serial_no',
+  'delete',
+];
