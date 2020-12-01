@@ -70,7 +70,7 @@ export class DeliveryNotePoliciesService {
                                     item: ${item.item_code} at
                                     warehouse: ${assignPayload.set_warehouse},
                                     ${data.notFoundSerials
-                                      .splice(0, 5)
+                                      .splice(0, 50)
                                       .join(', ')}...`),
                 );
               }

@@ -651,36 +651,12 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
   }
 
   async purchaseReceiptCancelled(payload) {
-    const purchaseReceipt = await this.purchaseReceiptService.findOne({
-      purchase_document_no: payload.name,
-    });
-
-    if (purchaseReceipt) {
-      const serials = purchaseReceipt.serial_no || [];
-      this.serialNoService
-        .deleteMany({ serial_no: { $in: serials } })
-        .then(updated => {})
-        .catch(error => {});
-      await this.purchaseReceiptService.updateOne(
-        { name: purchaseReceipt.name },
-        { $unset: { serial_no: 1 } },
-      );
-
-      const purchaseInvoice = await this.purchaseInvoiceService.findOne({
-        name: purchaseReceipt.purchase_invoice_name,
-      });
-
-      if (purchaseInvoice) {
-        purchaseInvoice.purchase_receipt_items_map[
-          Buffer.from(purchaseReceipt.item_code).toString('base64')
-        ] -= purchaseReceipt.qty;
-        purchaseInvoice.status = this.getStatus(
-          purchaseInvoice,
-          purchaseInvoice.purchase_receipt_items_map,
-        );
-        await purchaseInvoice.save();
-      }
-    }
+    return await this.purchaseReceiptService.updateOne(
+      {
+        purchase_document_no: payload.name,
+      },
+      { $set: { docstatus: 1 } },
+    );
   }
 }
 

@@ -76,7 +76,7 @@ export class MapTerritoryComponent implements OnInit {
               ? error.error.message
               : error,
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
         },
       });
@@ -98,7 +98,7 @@ export class MapTerritoryComponent implements OnInit {
               ? error.error.message
               : error,
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
         },
       });
@@ -115,7 +115,7 @@ export class MapTerritoryComponent implements OnInit {
             ? error.error.message
             : error,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
       },
     });

@@ -82,7 +82,7 @@ export class PurchaseDetailsComponent implements OnInit {
             ? err.error.message
             : `${ERROR_FETCHING_PURCHASE_INVOICE}${err.error.error}`,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
       },
     });
@@ -126,7 +126,7 @@ export class PurchaseDetailsComponent implements OnInit {
             ? err.error.message
             : `${ERROR_FETCHING_PURCHASE_ORDER}${err.error.error}`,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
       },
     });

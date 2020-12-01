@@ -52,7 +52,7 @@ export class CustomerProfilePage implements OnInit {
     });
     this.setDefaultCompany();
     this.dataSource = new CustomerDataSource(this.salesService);
-    this.dataSource.loadItems(0, 10, this.filters, this.countFilter);
+    this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }
 
   getUpdate(event) {

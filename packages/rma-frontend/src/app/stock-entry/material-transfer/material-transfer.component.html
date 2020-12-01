@@ -22,10 +22,13 @@
                         </ion-button>
                     </ion-col>
                     <ion-col class="ion-text-right">
+                        <ion-button *ngIf="status === 'Draft'" color="danger" fill="clear" (click)="deleteStockEntry()">
+                            <ion-icon name="trash"></ion-icon>
+                        </ion-button>
                         <ion-button *ngIf="!readonly" color="light" (click)="saveDraft()">
                             Save
                         </ion-button>
-                        <ion-button *ngIf="!readonly" color="medium" (click)="createMaterialTransfer()">
+                        <ion-button *ngIf="!readonly" [disabled]="!uuid" color="medium" (click)="createMaterialTransfer()">
                             Submit
                         </ion-button>
                         <ion-button *ngIf="readonly && status === 'In Transit'" color="tertiary" (click)="acceptTransfer()">
@@ -41,12 +44,6 @@
                 </ion-row>
                 <ion-row>
                     <ion-col>
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Remarks</mat-label>
-                            <textarea matInput [disabled]="readonly" [(ngModel)]="remarks"></textarea>
-                        </mat-form-field>
-                    </ion-col>
-                    <ion-col>
                         <form [formGroup]="form">
                             <mat-form-field class="example-full-width">
                                 <input required type="text" autocomplete="off" placeholder="Select territory" matInput (focusout)="validateInput(f.territory, territoryList)" formControlName="territory" [matAutocomplete]="territory" />
@@ -60,7 +57,25 @@
                                     <strong>'{{ f.territory.value }}'</strong> is not allowed.
                                 </mat-error>
                             </mat-form-field>
+
+                            <mat-form-field class="example-full-width">
+                                <mat-label>Stock Entry Type</mat-label>
+                                <mat-select (selectionChange)="typeChange($event.value)"  formControlName="stock_entry_type">
+                                  <mat-option
+                                    *ngFor="let type of stockEntryType"
+                                    [value]="type"
+                                  >
+                                    {{type}}
+                                  </mat-option>
+                                </mat-select>
+                            </mat-form-field>
                         </form>
+                    </ion-col>
+                    <ion-col>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Remarks</mat-label>
+                            <textarea rows="5" matInput [disabled]="readonly" [(ngModel)]="remarks"></textarea>
+                        </mat-form-field>
                     </ion-col>
                 </ion-row>
             </ion-grid>
@@ -256,6 +271,15 @@
                         <ng-container>
                             {{ row.qty }}
                         </ng-container>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="warranty_date">
+                    <mat-header-cell *matHeaderCellDef>Warranty Date</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <input matInput [(ngModel)]="row.warranty_date" [matDatepicker]="warranty_date" disabled />
+                        <mat-datepicker-toggle matSuffix [for]="warranty_date"></mat-datepicker-toggle>
+                        <mat-datepicker #warranty_date disabled="false"></mat-datepicker>
                     </mat-cell>
                 </ng-container>
 

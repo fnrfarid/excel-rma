@@ -102,10 +102,10 @@ export class CsvJsonService {
               if (isValid.length) {
                 this.snackBar.open(
                   `${isValid.length} Invalid Serials: ${isValid
-                    .splice(0, 5)
+                    .splice(0, 50)
                     .join(', ')}`,
                   CLOSE,
-                  { duration: 2500 },
+                  { duration: 4500 },
                 );
                 return of(false);
               }
@@ -125,7 +125,7 @@ export class CsvJsonService {
                 _.isEqual,
               ).join(', ')}`,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
         return of(false);
       }),
@@ -154,14 +154,14 @@ export class CsvJsonService {
       }),
       catchError(err => {
         if (err && err.error && err.error.message) {
-          this.snackBar.open(err.error.message, CLOSE, { duration: 2500 });
+          this.snackBar.open(err.error.message, CLOSE, { duration: 4500 });
         } else {
           this.snackBar.open(
             `Found ${
               validateFor === PURCHASE_RECEIPT ? `${err.length}+` : ''
-            } Invalid Serials: ${err.splice(0, 5).join(', ')}..`,
+            } Invalid Serials: ${err.splice(0, 50).join(', ')}..`,
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
         }
         return of(false);
@@ -182,7 +182,7 @@ export class CsvJsonService {
             _.isEqual,
           ).join(', ')}`,
       CLOSE,
-      { duration: 2500 },
+      { duration: 4500 },
     );
   }
 

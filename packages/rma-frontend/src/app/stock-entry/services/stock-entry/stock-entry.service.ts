@@ -56,6 +56,18 @@ export class StockEntryService {
     );
   }
 
+  deleteStockEntry(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          '/api/stock_entry/v1/delete/' + uuid,
+          {},
+          { headers },
+        );
+      }),
+    );
+  }
+
   rejectMaterialTransfer(uuid: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {

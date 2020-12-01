@@ -88,6 +88,7 @@ export class StockEntryItem {
   qty: number;
   has_serial_no: number;
   transfer_qty: number;
+  warranty_date?: string;
   transferWarehouse: string;
   serial_no: string[];
 }

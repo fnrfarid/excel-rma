@@ -190,7 +190,7 @@ export class ItemPricePage implements OnInit {
           this.snackBar.open(
             `Failed to load selling price: ${err?.error?.message}`,
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
         },
       });

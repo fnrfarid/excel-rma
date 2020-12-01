@@ -2,7 +2,7 @@ import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { StockEntryDto } from '../../stock-entry/stock-entry-dto';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
-import { switchMap, mergeMap, retry, concatMap } from 'rxjs/operators';
+import { switchMap, mergeMap, retry, concatMap, toArray } from 'rxjs/operators';
 import { StockEntry } from '../../stock-entry/stock-entry.entity';
 import { from, throwError, of } from 'rxjs';
 import {
@@ -10,23 +10,23 @@ import {
   FRAPPE_QUEUE_JOB,
   STOCK_ENTRY_SERIALS_BATCH_SIZE,
   STOCK_ENTRY_STATUS,
+  CREATE_STOCK_ENTRY_JOB,
+  ACCEPT_STOCK_ENTRY_JOB,
+  REJECT_STOCK_ENTRY_JOB,
 } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import {
-  CREATE_STOCK_ENTRY_JOB,
-  ACCEPT_STOCK_ENTRY_JOB,
-  REJECT_STOCK_ENTRY_JOB,
-} from '../../schedular/stock-entry-sync/stock-entry-sync.service';
-import {
   INVALID_FILE,
+  STOCK_ENTRY_TYPE,
   AGENDA_JOB_STATUS,
 } from '../../../constants/app-strings';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
+import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 
 @Injectable()
 export class StockEntryAggregateService {
@@ -37,34 +37,125 @@ export class StockEntryAggregateService {
     private readonly stockEntryPolicies: StockEntryPoliciesService,
     private readonly serialBatchService: SerialBatchService,
     private readonly settingService: SettingsService,
+    private readonly serialNoService: SerialNoService,
   ) {}
 
   createStockEntry(payload: StockEntryDto, req) {
-    if (payload.status === STOCK_ENTRY_STATUS.draft) {
+    if (payload.status === STOCK_ENTRY_STATUS.draft || !payload.uuid) {
       return this.saveDraft(payload, req);
     }
     return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
       switchMap(valid => {
-        return this.settingService.find();
+        return from(this.stockEntryService.findOne({ uuid: payload.uuid }));
       }),
-      switchMap(settings => {
-        const stockEntry = this.setStockEntryDefaults(payload, req, settings);
-        return from(this.stockEntryService.create(stockEntry)).pipe(
-          switchMap(data => {
+      switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry not found'));
+        }
+        const mongoSerials: SerialHash = this.getStockEntryMongoSerials(
+          stockEntry,
+        );
+
+        if (stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+          return from(
+            this.serialNoService.insertMany(mongoSerials, { ordered: false }),
+          ).pipe(
+            switchMap(success => {
+              this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+              return of(stockEntry);
+            }),
+          );
+        }
+
+        this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+        return from(Object.keys(mongoSerials)).pipe(
+          switchMap(key => {
+            return from(
+              this.serialNoService.updateOne(
+                { serial_no: { $in: mongoSerials[key].serial_no } },
+                {
+                  $set: {
+                    queue_state: {
+                      stock_entry: {
+                        parent: stockEntry.uuid,
+                        warehouse: mongoSerials[key].t_warehouse,
+                      },
+                    },
+                  },
+                },
+              ),
+            );
+          }),
+          toArray(),
+          switchMap(success => {
             return of(stockEntry);
           }),
         );
       }),
       switchMap(stockEntry => {
-        this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
         return from(
           this.stockEntryService.updateOne(
             { uuid: stockEntry.uuid },
-            { $set: { status: STOCK_ENTRY_STATUS.in_transit } },
+            {
+              $set: {
+                status:
+                  payload.stock_entry_type ===
+                  STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+                    ? STOCK_ENTRY_STATUS.in_transit
+                    : STOCK_ENTRY_STATUS.delivered,
+              },
+            },
           ),
         );
       }),
     );
+  }
+
+  getStockEntryMongoSerials(stockEntry) {
+    let mongoSerials;
+    stockEntry.items.forEach(item => {
+      if (!item.has_serial_no) return;
+      item.serial_no.forEach(serial_no => {
+        if (stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+          if (!mongoSerials) mongoSerials = [];
+          mongoSerials.push({
+            serial_no,
+            item_code: item.item_code,
+            item_name: item.item_name,
+            company: stockEntry.company,
+            queue_state: {
+              stock_entry: {
+                parent: stockEntry.uuid,
+                warehouse: item.t_warehouse,
+              },
+            },
+          });
+          return;
+        }
+        if (!mongoSerials) mongoSerials = {};
+        if (mongoSerials[item.item_code]) {
+          mongoSerials[item.item_code].serial_no.push(serial_no);
+        } else {
+          mongoSerials[item.item_code] = { serial_no: [serial_no] };
+          mongoSerials[item.item_code].t_warehouse = item.t_warehouse;
+        }
+      });
+    });
+    return mongoSerials;
+  }
+
+  async deleteDraft(uuid: string) {
+    const stockEntry = await this.stockEntryService.findOne({ uuid });
+    if (!stockEntry) {
+      throw new BadRequestException('Stock Entry Not Found');
+    }
+    if (stockEntry.status !== STOCK_ENTRY_STATUS.draft) {
+      throw new BadRequestException(
+        `Stock Entry with status ${stockEntry.status}, cannot be deleted.`,
+      );
+    }
+    await this.stockEntryService.deleteOne({ uuid });
+    return true;
   }
 
   saveDraft(payload: StockEntryDto, req) {
@@ -74,13 +165,15 @@ export class StockEntryAggregateService {
           { uuid: payload.uuid },
           { $set: payload },
         ),
-      );
+      ).pipe(switchMap(data => of(payload)));
     }
     return this.settingService.find().pipe(
       switchMap(settings => {
         const stockEntry = this.setStockEntryDefaults(payload, req, settings);
         stockEntry.status = STOCK_ENTRY_STATUS.draft;
-        return from(this.stockEntryService.create(stockEntry));
+        return from(this.stockEntryService.create(stockEntry)).pipe(
+          switchMap(data => of(stockEntry)),
+        );
       }),
     );
   }
@@ -271,4 +364,8 @@ export class StockEntryAggregateService {
       }),
     );
   }
+}
+
+export interface SerialHash {
+  [key: string]: { serial_no: string[]; t_warehouse: string };
 }

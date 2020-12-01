@@ -96,7 +96,7 @@ export class DetailsComponent implements OnInit {
             ? err.error.message
             : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
           CLOSE,
-          { duration: 2500 },
+          { duration: 4500 },
         );
       },
     });
@@ -120,7 +120,7 @@ export class DetailsComponent implements OnInit {
           this.snackBar.open(
             errMessage[errMessage.length - 2].split(':')[1],
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
           loading.dismiss();
         },
@@ -176,7 +176,7 @@ export class DetailsComponent implements OnInit {
                   this.snackBar.open(
                     errMessage[errMessage.length - 2].split(':')[1],
                     CLOSE,
-                    { duration: 2500 },
+                    { duration: 4500 },
                   );
                 },
               });
