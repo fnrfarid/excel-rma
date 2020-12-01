@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CLOSE } from '../../../constants/app-string';
 import {
-  Item,
+  WarrantyItem,
   WarrantyClaimsDetails,
 } from '../../../common/interfaces/warranty.interface';
 import { WarrantyService } from '../../warranty-tabs/warranty.service';
@@ -31,7 +31,7 @@ export class ClaimDetailsComponent implements OnInit {
     'servicing_amount',
   ];
   warrantyClaimsDetails: WarrantyClaimsDetails;
-  dataSource: Item[];
+  dataSource: WarrantyItem[];
   invoiceUuid: string;
   viewWArrantyClaimUrl: string;
   constructor(

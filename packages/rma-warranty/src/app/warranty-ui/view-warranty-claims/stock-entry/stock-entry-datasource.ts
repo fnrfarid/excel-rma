@@ -64,27 +64,3 @@ export class StockEntryListDataSource extends DataSource<ListingData> {
       });
   }
 }
-
-export class StockEntryListData {
-  _id: string;
-  uuid: string;
-  docstatus: number;
-  createdOn: string;
-  createdByEmail: string;
-  createdBy: string;
-  stock_entry_type: string;
-  company: string;
-  posting_date: string;
-  posting_time: string;
-  doctype: string;
-  items: StockEntryListItem[];
-}
-
-export class StockEntryListItem {
-  s_warehouse: string;
-  t_warehouse: string;
-  item_code: string;
-  item_name: string;
-  qty: number;
-  transferWarehouse: string;
-}

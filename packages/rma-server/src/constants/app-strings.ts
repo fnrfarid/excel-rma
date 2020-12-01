@@ -136,6 +136,7 @@ export const STOCK_ENTRY_LIST_ITEM_SELECT_KEYS = [
   'qty',
   'transfer_qty',
   'transferWarehouse',
+  'serial_no',
 ];
 // following fields would be listed in API for job_queue/v1/list.
 export const FRAPPE_JOB_SELECT_FIELDS = [
