@@ -66,9 +66,14 @@ export const ITEM_COLUMN = {
   QUANTITY: 'quantity',
   RATE: 'rate',
   WAREHOUSE: 'warehouse',
+  STOCK_ENTRY_ITEM_TYPE: 'stock_entry_type',
 };
 
 export const STOCK_ENTRY_STATUS = {
   REPLACE: 'Replace',
   UPGRADE: 'Upgrade',
+};
+export const STOCK_ENTRY_ITEM_TYPE = {
+  RETURNED: 'Returned',
+  DELIVERED: 'Delivered',
 };

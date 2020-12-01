@@ -6,12 +6,12 @@ export class WarrantyClaims {
   company: string;
   addressDisplay: string;
   total: number;
-  items: Array<Item>;
+  items: Array<WarrantyItem>;
   claim_no: number;
   claim_status: string;
 }
 
-export class Item {
+export class WarrantyItem {
   customer?: string;
   uuid?: string;
   name?: string;
@@ -34,6 +34,9 @@ export class Item {
   item_defaults?: ItemDefaults;
   s_warehouse?: string;
   t_warehouse?: string;
+  has_serial_no?: number;
+  stock_entry_type?: string;
+  warehouse?: string;
 }
 
 export class ItemDefaults {
@@ -195,6 +198,9 @@ export class StockEntryDetails {
   delivery_note?: string;
   sales_invoice_name?: string;
   items?: StockItem[];
+  set_warehouse?: string;
+  replacedSerial?: string;
+  is_return?: number;
 }
 
 export class StockItem {
@@ -204,21 +210,22 @@ export class StockItem {
   item_code?: string;
   item_name?: string;
   qty?: number;
-  serial_no?: string[];
+  serial_no?: string;
+  replacedSerial?: string;
 }
 
 export class StockEntryItems {
   uuid?: string;
   name?: string;
   owner?: string;
-  item_code: string;
-  item_name: string;
-  qty: number;
+  item_code?: string;
+  item_name?: string;
+  qty?: number;
   rate?: number;
   amount?: number;
   minimumPrice?: number;
   description?: string;
-  serial_no?: string[];
+  serial_no?: string;
   delivery_note?: string;
   has_serial_no?: number;
   salesWarrantyMonths?: number;
@@ -231,4 +238,8 @@ export class StockEntryItems {
   item_defaults?: ItemDefaults;
   s_warehouse?: string;
   t_warehouse?: string;
+  warehouse?: string;
+  type?: string;
+  stock_entry_type?: string;
+  replacedSerial?: string;
 }

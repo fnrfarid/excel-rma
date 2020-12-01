@@ -5,7 +5,10 @@ import { FormControl } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
-import { ITEM_COLUMN } from '../../../../../constants/app-string';
+import {
+  ITEM_COLUMN,
+  STOCK_ENTRY_ITEM_TYPE,
+} from '../../../../../constants/app-string';
 
 @Component({
   selector: 'inline-edit',
@@ -24,6 +27,7 @@ export class InlineEditComponent {
     this.serial_no = x;
     this.warehouseFormControl.setValue({ name: x });
     this._value = x;
+    this.stock_entry_type.setValue(x);
   }
 
   @Input()
@@ -46,6 +50,8 @@ export class InlineEditComponent {
   comment = '';
   quantity: number = null;
   serial_no: string = '';
+  stock_entry_type = new FormControl();
+  stockEntryType: Array<string> = Object.values(STOCK_ENTRY_ITEM_TYPE);
 
   constructor(
     @Optional() @Host() public popover: SatPopover,
@@ -89,6 +95,10 @@ export class InlineEditComponent {
     if (option) return option.warehouse;
   }
 
+  getStockTypeOptionType(option) {
+    if (option) return option;
+  }
+
   getWarehouseList() {
     this.warehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -116,6 +126,9 @@ export class InlineEditComponent {
                 selectedItem.item_name = this.itemFormControl.value.item_name;
                 selectedItem.item_code = this.itemFormControl.value.item_code;
                 selectedItem.has_serial_no = res.has_serial_no;
+                selectedItem.serial_no = selectedItem.has_serial_no
+                  ? res.serial_no
+                  : 'Non Serial Item';
                 this.popover.close(selectedItem);
               },
               error: err => {},
@@ -123,7 +136,7 @@ export class InlineEditComponent {
           break;
         case ITEM_COLUMN.SERIAL_NO:
           this.addServiceInvoiceService
-            .getSerial(this.serial_no)
+            .getSerialItemFromRMAServer(this.serial_no)
             .pipe(
               switchMap(item => {
                 return this.addServiceInvoiceService
@@ -142,12 +155,12 @@ export class InlineEditComponent {
               next: res => {
                 const selectedItem = {} as any;
                 selectedItem.uuid = res.item.uuid;
-                selectedItem.serial_no = [res.item.serial_no];
+                selectedItem.serial_no = res.item.serial_no;
                 selectedItem.minimumPrice = res.item.minimumPrice;
                 selectedItem.item_code = res.item.item_code;
                 selectedItem.item_name = res.item.item_name;
                 selectedItem.item_group = res.item.item_group;
-                selectedItem.source_warehouse = res.item.warehouse;
+                selectedItem.s_warehouse = res.item.warehouse;
                 selectedItem.qty = 1;
                 selectedItem.has_serial_no = res.item.has_serial_no;
                 if (res.priceListArray.length > 0) {
@@ -160,11 +173,18 @@ export class InlineEditComponent {
           break;
 
         case ITEM_COLUMN.QUANTITY:
-          this.popover.close(this.quantity);
+          this.popover.close({ qty: this.quantity });
           break;
 
         case ITEM_COLUMN.WAREHOUSE:
-          this.popover.close(this.warehouseFormControl.value.warehouse);
+          this.popover.close({
+            warehouse: this.warehouseFormControl.value.warehouse,
+            s_warehouse: this.warehouseFormControl.value.warehouse,
+          });
+          break;
+
+        case ITEM_COLUMN.STOCK_ENTRY_ITEM_TYPE:
+          this.popover.close({ stock_entry_type: this.stock_entry_type.value });
           break;
 
         default:
