@@ -153,7 +153,7 @@ export class PurchaseOrderPoliciesService {
         switchMap((data: { _id: string; historyEvents: number }[]) => {
           if (data?.length) {
             const serialEventsMessage = data
-              .splice(0, 5)
+              .splice(0, 50)
               .filter(element => `${element._id} has ${element.historyEvents}`)
               .join(', ');
             return throwError(

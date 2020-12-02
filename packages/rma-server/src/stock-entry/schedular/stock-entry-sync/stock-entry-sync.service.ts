@@ -3,6 +3,11 @@ import { switchMap, mergeMap, catchError, retry, map } from 'rxjs/operators';
 import {
   VALIDATE_AUTH_STRING,
   STOCK_ENTRY,
+  STOCK_ENTRY_TYPE,
+  STOCK_ENTRY_NAMING_SERIES,
+  CREATE_STOCK_ENTRY_JOB,
+  ACCEPT_STOCK_ENTRY_JOB,
+  REJECT_STOCK_ENTRY_JOB,
 } from '../../../constants/app-strings';
 import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
@@ -19,11 +24,9 @@ import {
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
-import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
+import { StockEntryItem } from '../../stock-entry/stock-entry.entity';
+import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 
-export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
-export const ACCEPT_STOCK_ENTRY_JOB = 'ACCEPT_STOCK_ENTRY_JOB';
-export const REJECT_STOCK_ENTRY_JOB = 'REJECT_STOCK_ENTRY_JOB';
 @Injectable()
 export class StockEntrySyncService {
   constructor(
@@ -63,28 +66,36 @@ export class StockEntrySyncService {
             job.settings = settings;
             payload.items.filter((item: any) => {
               if (job.type === CREATE_STOCK_ENTRY_JOB) {
-                payload.naming_series = DEFAULT_NAMING_SERIES.stock_send;
-                item.t_warehouse = item.transferWarehouse;
+                if (
+                  job.payload.stock_entry_type ===
+                  STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+                ) {
+                  item.t_warehouse = item.transferWarehouse;
+                }
+                payload.naming_series =
+                  STOCK_ENTRY_NAMING_SERIES[job.payload.stock_entry_type];
+              } else {
+                payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
               }
+
               if (job.type === ACCEPT_STOCK_ENTRY_JOB) {
-                payload.naming_series = DEFAULT_NAMING_SERIES.stock_receive;
                 item.s_warehouse = item.transferWarehouse;
               }
               if (job.type === REJECT_STOCK_ENTRY_JOB) {
-                payload.naming_series = DEFAULT_NAMING_SERIES.stock_receive;
                 item.t_warehouse = item.s_warehouse;
                 item.s_warehouse = item.transferWarehouse;
               }
-              if (typeof item.serial_no === 'object') {
+              if (item.serial_no && typeof item.serial_no === 'object') {
                 item.serial_no = item.serial_no.join('\n');
               }
               item.excel_serials = item.serial_no;
               delete item.serial_no;
               return item;
             });
+            const frappePayload = this.parseFrappePayload(payload);
             return this.http.post(
               settings.authServerURL + STOCK_ENTRY_API_ENDPOINT,
-              payload,
+              frappePayload,
               {
                 headers: this.settingsService.getAuthorizationHeaders(
                   job.token,
@@ -145,6 +156,11 @@ export class StockEntrySyncService {
     );
   }
 
+  parseFrappePayload(payload: StockEntry) {
+    delete payload.names;
+    return payload;
+  }
+
   updateSerials(
     payload: StockEntry,
     token: TokenCache,
@@ -160,6 +176,9 @@ export class StockEntrySyncService {
     from(payload.items)
       .pipe(
         switchMap(item => {
+          if (!item.has_serial_no) {
+            return of(true);
+          }
           const serials = this.getSplitSerials(item.serial_no);
           const serialHistory: SerialNoHistoryInterface = {};
           serialHistory.created_by = token.fullName;
@@ -167,12 +186,15 @@ export class StockEntrySyncService {
           serialHistory.document_no = doc_name;
           serialHistory.document_type = STOCK_ENTRY;
           serialHistory.eventDate = new DateTime(settings.timeZone);
-          serialHistory.eventType = this.getEventType(type);
+          serialHistory.eventType = this.getEventType(type, payload);
           serialHistory.parent_document = parent;
           serialHistory.transaction_from = item.s_warehouse;
           serialHistory.transaction_to = item.t_warehouse;
           return forkJoin({
-            serials: this.updateMongoSerials(serials, item.t_warehouse),
+            serials: this.updateMongoSerials(
+              serials,
+              this.getSerialUpdateKey(item, payload, doc_name, settings),
+            ),
             serial_history: this.serialNoHistoryService.addSerialHistory(
               serials,
               serialHistory,
@@ -186,21 +208,61 @@ export class StockEntrySyncService {
       });
   }
 
-  getEventType(type: string) {
+  getSerialUpdateKey(
+    item: StockEntryItem,
+    payload: StockEntry,
+    doc_name: string,
+    settings: ServerSettings,
+  ) {
+    const update = { warehouse: item.t_warehouse };
+    if (payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
+      return update;
+    }
+    return payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+      ? {
+          ...update,
+          purchase_document_no: doc_name,
+          purchase_document_type: STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
+          'warranty.purchaseWarrantyDate': item.warranty_date,
+          'warranty.purchasedOn': new Date(payload.posting_date),
+          item_name: item.item_name,
+        }
+      : {
+          ...update,
+          'warranty.salesWarrantyDate': item.warranty_date,
+          'warranty.soldOn': DateTime.fromJSDate(new Date(payload.posting_date))
+            .setZone(settings.timeZone)
+            .toJSDate(),
+          sales_document_type: STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+          sales_document_no: doc_name,
+        };
+  }
+
+  getEventType(type: string, payload: StockEntry) {
     if (type === ACCEPT_STOCK_ENTRY_JOB) {
       return EventType.SerialTransferAccepted;
     }
     if (type === REJECT_STOCK_ENTRY_JOB) {
       return EventType.SerialTransferRejected;
     }
-    return EventType.SerialTransferCreated;
+    if (payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
+      return EventType.SerialTransferCreated;
+    }
+    return payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_ISSUE
+      ? EventType.MaterialIssue
+      : EventType.MaterialReceipt;
   }
 
-  updateMongoSerials(serials, warehouse) {
+  updateMongoSerials(serials, update) {
     return from(
       this.serialNoService.updateMany(
         { serial_no: { $in: serials } },
-        { $set: { warehouse } },
+        {
+          $set: update,
+          $unset: {
+            'queue_state.stock_entry': null,
+          },
+        },
       ),
     );
   }

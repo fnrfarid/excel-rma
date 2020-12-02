@@ -73,6 +73,9 @@ export class StockEntry extends BaseEntity {
 
   @Column()
   items: StockEntryItem[];
+
+  @Column()
+  replacedSerial: string;
   naming_series?: string;
 }
 
@@ -85,6 +88,7 @@ export class StockEntryItem {
   qty: number;
   has_serial_no: number;
   transfer_qty: number;
+  warranty_date?: string;
   transferWarehouse: string;
   serial_no: string[];
 }

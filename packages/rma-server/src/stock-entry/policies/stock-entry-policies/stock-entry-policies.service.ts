@@ -7,7 +7,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { switchMap, mergeMap, toArray } from 'rxjs/operators';
 import { from, of, throwError } from 'rxjs';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-
+import { STOCK_ENTRY_TYPE } from '../../../constants/app-strings';
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
@@ -20,6 +20,7 @@ export class StockEntryPoliciesService {
       switchMap(settings => {
         return this.validateStockSerials(
           payload.items,
+          payload.stock_entry_type,
           settings,
           clientHttpRequest,
         );
@@ -29,6 +30,7 @@ export class StockEntryPoliciesService {
 
   validateStockSerials(
     items: StockEntryItemDto[],
+    stock_entry_type: string,
     settings,
     clientHttpRequest,
   ) {
@@ -37,42 +39,51 @@ export class StockEntryPoliciesService {
         if (!item.has_serial_no) {
           return of(true);
         }
-        return from(
-          this.serialNoService.count({
+        let query: any = {
+          serial_no: { $in: item.serial_no },
+          item_code: item.item_code,
+          warehouse: item.s_warehouse,
+          'queue_state.purchase_receipt': { $exists: false },
+          $or: [
+            {
+              'warranty.soldOn': { $exists: false },
+              'queue_state.delivery_note': { $exists: false },
+            },
+            {
+              'warranty.claim_no': { $exists: true },
+            },
+          ],
+        };
+        if (stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+          query = {
             serial_no: { $in: item.serial_no },
-            item_code: item.item_code,
             $or: [
-              {
-                $or: [
-                  { warehouse: item.s_warehouse },
-                  {
-                    'queue_state.purchase_receipt.warehouse': item.s_warehouse,
-                  },
-                ],
-              },
-              {
-                $or: [
-                  {
-                    'warranty.soldOn': { $exists: false },
-                    'queue_state.delivery_note': { $exists: false },
-                  },
-                  {
-                    'warranty.claim_no': { $exists: true },
-                  },
-                ],
-              },
+              { 'queue_state.purchase_receipt': { $exists: true } },
+              { 'queue_state.stock_entry': { $exists: true } },
+              { purchase_document_no: { $exists: true } },
             ],
-          }),
-        ).pipe(
+          };
+        }
+
+        return from(this.serialNoService.count(query)).pipe(
           mergeMap(count => {
-            if (count === item.serial_no.length) {
+            const message = `Found ${count} for Item: ${item.item_name} at warehouse: ${item.s_warehouse}.`;
+            if (
+              count === item.serial_no.length &&
+              [
+                STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
+                STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+              ].includes(stock_entry_type)
+            ) {
               return of(true);
             }
-            return throwError(
-              new BadRequestException(
-                `Expected ${item.serial_no.length} serials for Item: ${item.item_name} at warehouse: ${item.s_warehouse}, found ${count}.`,
-              ),
-            );
+            if (
+              count === 0 &&
+              stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+            ) {
+              return of(true);
+            }
+            return throwError(new BadRequestException(message));
           }),
         );
       }),

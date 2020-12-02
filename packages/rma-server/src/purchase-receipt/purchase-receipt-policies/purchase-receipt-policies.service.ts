@@ -28,6 +28,7 @@ export class PurchaseReceiptPoliciesService {
           serial_no: { $in: serials },
           $or: [
             { 'queue_state.purchase_receipt': { $exists: true } },
+            { 'queue_state.stock_entry': { $exists: true } },
             { purchase_document_no: { $exists: true } },
           ],
         };
@@ -57,7 +58,7 @@ export class PurchaseReceiptPoliciesService {
     return `Found ${
       foundSerials.length
     } serials that are in a queue or already exist : ${foundSerials
-      .splice(0, 5)
+      .splice(0, 50)
       .join(', ')}..`;
   }
 

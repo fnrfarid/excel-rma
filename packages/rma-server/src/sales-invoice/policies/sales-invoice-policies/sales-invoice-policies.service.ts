@@ -241,7 +241,7 @@ export class SalesInvoicePoliciesService {
         if (invalidSerials.length > 0) {
           return throwError(
             new BadRequestException({
-              invalidSerials: invalidSerials.splice(0, 5).join(', '),
+              invalidSerials: invalidSerials.splice(0, 50).join(', '),
             }),
           );
         }

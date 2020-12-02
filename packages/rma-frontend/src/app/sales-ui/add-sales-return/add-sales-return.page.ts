@@ -346,10 +346,10 @@ export class AddSalesReturnPage implements OnInit {
           success.notFoundSerials && success.notFoundSerials.length
             ? this.snackBar.open(
                 `Invalid Serials ${success.notFoundSerials
-                  .splice(0, 5)
+                  .splice(0, 50)
                   .join(', ')}...`,
                 CLOSE,
-                { duration: 2500 },
+                { duration: 4500 },
               )
             : this.assignRangeSerial(row, this.rangePickerState.serials);
         },
@@ -395,7 +395,7 @@ export class AddSalesReturnPage implements OnInit {
       this.snackBar.open(
         `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
         CLOSE,
-        { duration: 2500 },
+        { duration: 4500 },
       );
       return;
     }
@@ -568,7 +568,7 @@ export class AddSalesReturnPage implements OnInit {
       : undefined;
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
-        this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 2500 });
+        this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 4500 });
         loading.dismiss();
         this.location.back();
       },
@@ -584,7 +584,7 @@ export class AddSalesReturnPage implements OnInit {
                 : err
             }...`,
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
         }
       },

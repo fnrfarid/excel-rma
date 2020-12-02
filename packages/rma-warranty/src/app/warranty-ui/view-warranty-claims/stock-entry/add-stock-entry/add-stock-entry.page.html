@@ -120,8 +120,8 @@
             matTooltip=" ( ctrl + i ) "
             matTooltipPosition="above"
             matTooltipClass="tooltip"
-            (ctrlI)="addItem()"
-            (click)="addItem()"
+            (ctrlI)="AddItem({})"
+            (click)="AddItem({})"
             [disabled]="button_active"
           >
             Add
@@ -132,6 +132,40 @@
     <ion-card-content class="ion-no-padding">
       <ion-item lines="none">
         <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+          <ng-container matColumnDef="stock_entry_type">
+            <mat-header-cell *matHeaderCellDef
+              >Stock Entry Type</mat-header-cell
+            >
+            <mat-cell
+              *matCellDef="let row;let i = index"
+              [satPopoverAnchor]="stock"
+              tabindex="0"
+              (keyup.enter)="stock.open()"
+              (click)="stock.open()"
+            >
+              <ng-container *ngIf="row.stock_entry_type">
+                {{row.stock_entry_type}}
+              </ng-container>
+              <span class="add-comment" *ngIf="!row.stock_entry_type">
+                Stock Entry Type
+              </span>
+              <sat-popover
+                #stock
+                hasBackdrop
+                xAlign="start"
+                yAlign="start"
+                (closed)="updateItem(i,$event)"
+              >
+                <inline-edit
+                  style="width: 400px !important;"
+                  [value]="row.stock_entry_type"
+                  column="stock_entry_type"
+                ></inline-edit>
+              </sat-popover>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+          </ng-container>
+
           <ng-container matColumnDef="item_name">
             <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
             <mat-cell
@@ -152,7 +186,7 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateItem(row,i,$event)"
+                (closed)="updateItem(i,$event)"
               >
                 <inline-edit
                   style="width: 400px !important;"
@@ -173,10 +207,10 @@
               (keyup.enter)="popover.open()"
               (click)="popover.open()"
             >
-              <ng-container *ngIf="row.serial_no[0]">
-                {{row.serial_no[0]}}
+              <ng-container *ngIf="row.serial_no">
+                {{row.serial_no}}
               </ng-container>
-              <span class="add-comment" *ngIf="!row.serial_no[0]">
+              <span class="add-comment" *ngIf="!row.serial_no">
                 Add Serial No
               </span>
               <sat-popover
@@ -184,12 +218,12 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateSerial(row,$event)"
+                (closed)="updateSerial(i,$event)"
               >
                 <inline-edit
-                  *ngIf="serialActive"
+                  *ngIf="row.has_serial_no"
                   style="width: 400px !important;"
-                  [value]="row.serial_no[0]"
+                  [value]="row.serial_no"
                   column="serial_no"
                   [minimumPrice]="row.minimumPrice"
                 ></inline-edit>
@@ -220,7 +254,7 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateSWarehouse(row,$event)"
+                (closed)="updateItem(i,$event)"
               >
                 <inline-edit
                   style="width: 400px !important;"
@@ -234,7 +268,7 @@
           <ng-container matColumnDef="quantity">
             <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
             <mat-cell
-              *matCellDef="let row"
+              *matCellDef="let row; let i = index"
               [satPopoverAnchor]="p"
               tabindex="0"
               (keyup.enter)="p.open()"
@@ -249,7 +283,7 @@
                 hasBackdrop
                 xAlign="start"
                 yAlign="start"
-                (closed)="updateQuantity(row, $event)"
+                (closed)="updateItem(i, $event)"
               >
                 <inline-edit
                   [value]="row.qty"

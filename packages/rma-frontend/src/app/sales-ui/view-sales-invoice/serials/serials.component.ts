@@ -253,7 +253,7 @@ export class SerialsComponent implements OnInit {
               ? err.error.message
               : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
             CLOSE,
-            { duration: 2500 },
+            { duration: 4500 },
           );
         },
       });
@@ -341,7 +341,7 @@ export class SerialsComponent implements OnInit {
       this.snackBar.open(
         `Only ${itemRow.remaining} serials could be assigned to ${itemRow.item_code}`,
         CLOSE,
-        { duration: 2500 },
+        { duration: 4500 },
       );
       return;
     }
@@ -394,7 +394,7 @@ export class SerialsComponent implements OnInit {
             `Found ${success.notFoundSerials.length} Invalid Serials for
               item: ${item.item_code} at
               warehouse: ${item.warehouse},
-              ${success.notFoundSerials.splice(0, 5).join(', ')}...`,
+              ${success.notFoundSerials.splice(0, 50).join(', ')}...`,
             CLOSE,
             { duration: 5500 },
           );

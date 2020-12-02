@@ -17,10 +17,7 @@ import {
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
-import {
-  APIResponse,
-  Item,
-} from '../../../../common/interfaces/sales.interface';
+import { APIResponse } from '../../../../common/interfaces/sales.interface';
 import { of, from } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -30,13 +27,16 @@ import {
 } from '../../../../constants/storage';
 import { StorageService } from '../../../../api/storage/storage.service';
 import { ServiceInvoiceDetails } from './service-invoice-interface';
-import { StockEntryDetails } from '../../../../common/interfaces/warranty.interface';
+import {
+  WarrantyItem,
+  StockEntryDetails,
+} from '../../../../common/interfaces/warranty.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AddServiceInvoiceService {
-  itemList: Array<Item>;
+  itemList: Array<WarrantyItem>;
 
   constructor(private http: HttpClient, private storage: StorageService) {}
 
@@ -142,7 +142,7 @@ export class AddServiceInvoiceService {
   getItemFromRMAServer(code: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get<Item>(API_ITEM_GET_BY_CODE + '/' + code, {
+        return this.http.get<WarrantyItem>(API_ITEM_GET_BY_CODE + '/' + code, {
           headers,
         });
       }),
@@ -213,15 +213,6 @@ export class AddServiceInvoiceService {
             headers,
           },
         );
-      }),
-    );
-  }
-
-  getSerial(serial_no) {
-    const url = `${GET_DIRECT_SERIAL_ENDPOINT}/${serial_no}`;
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<any>(url, { headers });
       }),
     );
   }

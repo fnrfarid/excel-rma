@@ -99,6 +99,12 @@ export class SerialNo extends BaseEntity {
   purchase_document_type: string;
 
   @Column()
+  sales_document_type: string;
+
+  @Column()
+  sales_document_no: string;
+
+  @Column()
   company: string;
 
   @Column()
