@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NavParams, PopoverController } from '@ionic/angular';
 import { StorageService } from '../../../api/storage/storage.service';
-import { AUTH_SERVER_URL } from '../../../constants/storage';
+import {
+  AUTH_SERVER_URL,
+  PRINT_FORMAT_PREFIX,
+} from '../../../constants/storage';
 import {
   PRINT_SALES_INVOICE_PDF_METHOD,
   PRINT_DELIVERY_NOTE_PDF_METHOD,
@@ -33,12 +36,13 @@ export class PrintComponent implements OnInit {
   async getPrintSalesInvoiceURL() {
     const authURL = await this.storage.getItem(AUTH_SERVER_URL);
     const url = `${authURL}${PRINT_SALES_INVOICE_PDF_METHOD}`;
-    const doctype = 'doctype=Sales Invoice';
+    const doctype = 'Sales Invoice';
     const name = `name=${this.invoice_name}`;
-    const format = 'format=Standard';
     const no_letterhead = 'no_letterhead=0';
     // If kept in single line, npm run format gives this error : This line has a length of 158. Maximum allowed is 150
-    this.printSalesInvoiceURL = `${url}?${doctype}&${name}&${format}&${no_letterhead}`;
+    this.printSalesInvoiceURL = `${url}?doctype=${doctype}&${name}&format=${
+      PRINT_FORMAT_PREFIX + doctype
+    }&${no_letterhead}`;
   }
 
   getPrintDeliveryNoteURL() {
@@ -50,11 +54,12 @@ export class PrintComponent implements OnInit {
           ];
           const authURL = await this.storage.getItem(AUTH_SERVER_URL);
           const url = `${authURL}${PRINT_DELIVERY_NOTE_PDF_METHOD}`;
-          const doctype = 'doctype=Delivery Note';
+          const doctype = 'Delivery Note';
           const name = `name=${JSON.stringify(deliveryNoteNames)}`;
-          const format = 'format=Standard';
           const no_letterhead = 'no_letterhead=0';
-          this.printDeliveryNoteURL = `${url}?${doctype}&${name}&${format}&${no_letterhead}`;
+          this.printDeliveryNoteURL = `${url}?doctype=${doctype}&${name}&format=${
+            PRINT_FORMAT_PREFIX + doctype
+          }&${no_letterhead}`;
         } else this.printDeliveryNoteURL = '';
       },
     });

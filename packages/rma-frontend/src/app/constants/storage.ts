@@ -41,3 +41,4 @@ export const VALIDATE_SERIAL_BUFFER_COUNT = 50000;
 export const ALL_TERRITORIES = 'All Territories';
 export const WARRANTY_APP_URL = 'warranty_app_url';
 export const POS_PROFILE = 'pos_profile';
+export const PRINT_FORMAT_PREFIX = 'Excel ';

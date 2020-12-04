@@ -66,7 +66,6 @@ export class JobsPage implements OnInit {
         next: res => {
           if (res) {
             this.parent = this.route.snapshot.queryParams.parent;
-            this.parent = this.parent ? this.parent.toUpperCase() : this.parent;
             this.status = 'All';
             this.setFilter();
           }
