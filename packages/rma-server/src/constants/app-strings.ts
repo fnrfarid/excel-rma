@@ -199,6 +199,9 @@ export const DEFAULT_NAMING_SERIES = {
   purchase_receipt: 'PD-.YYYY.-',
   stock_send: 'TROUT-.YYYY.-',
   stock_receive: 'TRIN-.YYYY.-',
+  stock_rejected: 'BTRIN-.YYYY.-',
+  material_receipt: 'PAQ-.YYYY.-',
+  material_issue: 'PCM-.YYYY.-',
   stock_transfer_internal: 'TRO-.YYYY.-',
   warranty_claim: 'WAR-00',
 };
@@ -296,9 +299,9 @@ export const STOCK_ENTRY_TYPE = {
   MATERIAL_ISSUE: 'Material Issue',
 };
 export const STOCK_ENTRY_NAMING_SERIES = {
-  [CREATE_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_receive,
-  [ACCEPT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_send,
-  [REJECT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_receive,
-  [STOCK_ENTRY_TYPE.MATERIAL_ISSUE]: DEFAULT_NAMING_SERIES.stock_send,
-  [STOCK_ENTRY_TYPE.MATERIAL_RECEIPT]: DEFAULT_NAMING_SERIES.stock_receive,
+  [CREATE_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_send,
+  [ACCEPT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_receive,
+  [REJECT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_rejected,
+  [STOCK_ENTRY_TYPE.MATERIAL_ISSUE]: DEFAULT_NAMING_SERIES.material_issue,
+  [STOCK_ENTRY_TYPE.MATERIAL_RECEIPT]: DEFAULT_NAMING_SERIES.material_receipt,
 };

@@ -32,6 +32,7 @@ import {
   DEFAULT_COMPANY,
   TRANSFER_WAREHOUSE,
   AUTH_SERVER_URL,
+  PRINT_FORMAT_PREFIX,
 } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
@@ -46,6 +47,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Item } from '../../common/interfaces/sales.interface';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { AddItemDialog } from './add-item-dialog';
+import { PRINT_DELIVERY_NOTE_PDF_METHOD } from 'src/app/constants/url-strings';
+import { SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
   selector: 'app-material-transfer',
@@ -78,6 +81,7 @@ export class MaterialTransferComponent implements OnInit {
     warehouse: undefined,
     itemData: [],
   };
+  accounts: Observable<any[]>;
 
   @ViewChild('csvFileInput', { static: false })
   csvFileInput: ElementRef;
@@ -132,13 +136,20 @@ export class MaterialTransferComponent implements OnInit {
     private readonly stockEntryService: StockEntryService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
+    private readonly service: SettingsService,
   ) {}
 
   async ngOnInit() {
     this.form = new FormGroup({
       territory: new FormControl('', [Validators.required]),
       stock_entry_type: new FormControl('', [Validators.required]),
+      accounts: new FormControl(''),
     });
+    this.accounts = this.form.controls.accounts.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relayAccountsOperation(),
+    );
 
     this.itemDataSource = new StockItemsDataSource();
     this.transferWarehouse = await this.salesService
@@ -153,6 +164,7 @@ export class MaterialTransferComponent implements OnInit {
       this.readonly = true;
       this.stockEntryService.getStockEntry(this.uuid).subscribe({
         next: (success: any) => {
+          if (!success) return;
           if (success.status === STOCK_TRANSFER_STATUS.draft) {
             this.readonly = false;
             this.subscribeEndpoints();
@@ -160,6 +172,12 @@ export class MaterialTransferComponent implements OnInit {
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
           this.remarks = success.remarks;
+          if (success.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_ISSUE) {
+            this.form.controls.accounts.setValue(
+              success?.items[0]?.expense_account || '',
+            );
+            this.readonly ? this.form.controls.accounts.disable() : null;
+          }
           this.form.controls.territory.setValue(success.territory);
           this.form.controls.stock_entry_type.setValue(
             success.stock_entry_type,
@@ -255,7 +273,7 @@ export class MaterialTransferComponent implements OnInit {
 
   async addItems() {
     const dialogRef = this.dialog.open(AddItemDialog, {
-      width: '250px',
+      width: '450px',
       data: { item: undefined },
     });
     const item = await dialogRef.afterClosed().toPromise();
@@ -557,6 +575,16 @@ export class MaterialTransferComponent implements OnInit {
       return;
     }
 
+    if (
+      this.form.controls.stock_entry_type.value ===
+        STOCK_ENTRY_TYPE.MATERIAL_ISSUE &&
+      this.form.controls.accounts.valid &&
+      !this.form.controls.accounts.value
+    ) {
+      this.getMessage('Please select an expense account.');
+      return;
+    }
+
     if (this.materialTransferDataSource.data().length === 0) {
       this.getMessage('Please Add serials for transfer');
       return;
@@ -595,6 +623,12 @@ export class MaterialTransferComponent implements OnInit {
     const hash = {};
     const merged_items = [];
     items.forEach(item => {
+      if (
+        this.form.controls.stock_entry_type.value ===
+        STOCK_ENTRY_TYPE.MATERIAL_ISSUE
+      ) {
+        item.expense_account = this.form.controls.accounts.value;
+      }
       if (hash[item.item_code]) {
         hash[item.item_code].qty += item.qty;
         if (item.has_serial_no) {
@@ -726,6 +760,24 @@ export class MaterialTransferComponent implements OnInit {
         );
       },
     });
+  }
+
+  async getPrint() {
+    const authURL = await this.salesService.getStore().getItem(AUTH_SERVER_URL);
+    const url = `${authURL}${PRINT_DELIVERY_NOTE_PDF_METHOD}`;
+    const doctype = 'Stock Entry';
+    const name = `name=${JSON.stringify(this.stock_receipt_names)}`;
+    const no_letterhead = 'no_letterhead=0';
+    window.open(
+      `${url}?doctype=${doctype}&${name}&format=${
+        PRINT_FORMAT_PREFIX + doctype
+      }&${no_letterhead}`,
+      '_blank',
+    );
+  }
+
+  showJobs() {
+    this.router.navigateByUrl(`jobs?parent=${this.uuid}`);
   }
 }
 

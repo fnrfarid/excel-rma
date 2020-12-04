@@ -6,12 +6,14 @@ import { MaterialModule } from '../../material/material.module';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
+import { empty, of } from 'rxjs';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { TimeService } from '../../api/time/time.service';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SettingsService } from 'src/app/settings/settings.service';
+import { switchMap } from 'rxjs/operators';
 
 describe('MaterialTransferComponent', () => {
   let component: MaterialTransferComponent;
@@ -49,6 +51,12 @@ describe('MaterialTransferComponent', () => {
         {
           provide: StockEntryService,
           useValue: {},
+        },
+        {
+          provide: SettingsService,
+          useValue: {
+            relayAccountsOperation: (...args) => switchMap(res => empty()),
+          },
         },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
