@@ -58,7 +58,7 @@ export class StockEntrySyncService {
     parent: string;
     type: string;
   }) {
-    const payload = job.payload;
+    const payload: StockEntry = Object.assign({}, job.payload);
     return of({}).pipe(
       mergeMap(object => {
         return this.settingsService.find().pipe(
@@ -66,18 +66,19 @@ export class StockEntrySyncService {
             job.settings = settings;
             payload.items.filter((item: any) => {
               if (job.type === CREATE_STOCK_ENTRY_JOB) {
+                payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
                 if (
                   job.payload.stock_entry_type ===
                   STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
                 ) {
                   item.t_warehouse = item.transferWarehouse;
+                } else {
+                  payload.naming_series =
+                    STOCK_ENTRY_NAMING_SERIES[payload.stock_entry_type];
                 }
-                payload.naming_series =
-                  STOCK_ENTRY_NAMING_SERIES[job.payload.stock_entry_type];
               } else {
                 payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
               }
-
               if (job.type === ACCEPT_STOCK_ENTRY_JOB) {
                 item.s_warehouse = item.transferWarehouse;
               }

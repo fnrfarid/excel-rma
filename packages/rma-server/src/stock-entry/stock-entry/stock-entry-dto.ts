@@ -89,4 +89,8 @@ export class StockEntryItemDto {
   @IsNotEmpty()
   @IsArray()
   serial_no: string[];
+
+  @IsOptional()
+  @IsString()
+  expense_account?: string;
 }

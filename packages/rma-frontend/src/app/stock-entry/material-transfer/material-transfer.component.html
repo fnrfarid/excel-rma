@@ -8,6 +8,16 @@
         <ion-title>
             Stock Entry
         </ion-title>
+        <ion-buttons slot="end" *ngIf="uuid">
+            <ion-button (click)="showJobs()" color="primary">
+              Jobs
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end" *ngIf="stock_receipt_names?.length">
+        <ion-button (click)="getPrint()" color="primary">
+            <ion-icon slot="icon-only" name="print-outline"></ion-icon>
+        </ion-button>
+        </ion-buttons>
     </ion-toolbar>
 </ion-header>
 
@@ -69,6 +79,30 @@
                                   </mat-option>
                                 </mat-select>
                             </mat-form-field>
+
+                            <mat-form-field *ngIf="f.stock_entry_type.value === 'Material Issue'" class="mat-input-wrapper">
+                                <input
+                                  matInput
+                                  required
+                                  placeholder="Expense Account"
+                                  aria-label="Expense Account"
+                                  [matAutocomplete]="expenseAccount"
+                                  (focusout)="validateInput(f.accounts, accounts)"
+                                  formControlName="accounts"
+                                />
+                                <mat-autocomplete #expenseAccount="matAutocomplete">
+                                  <mat-option
+                                    *ngFor="let account of accounts | async"
+                                    [value]="account.name"
+                                  >
+                                    <span>{{account.name}}</span>
+                                  </mat-option>
+                                </mat-autocomplete>
+                                <mat-error *ngIf="f.accounts.hasError('falseValse')">
+                                  You should select a value from dropdown only. 
+                                  <strong>'{{f.accounts.value}}'</strong> is not allowed.
+                                </mat-error>
+                              </mat-form-field>
                         </form>
                     </ion-col>
                     <ion-col>
@@ -142,8 +176,8 @@
     </ion-card>
 
     <ion-card>
-        <div class="loading-shade" *ngIf="itemDataSource.loading$ | async">
-            <mat-progress-bar *ngIf="itemDataSource.loading$ | async" mode="indeterminate"></mat-progress-bar>
+        <div class="loading-shade" *ngIf="itemDataSource?.loading$ | async">
+            <mat-progress-bar *ngIf="itemDataSource?.loading$ | async" mode="indeterminate"></mat-progress-bar>
         </div>
         <ion-card-header>
             <ion-row class="align">

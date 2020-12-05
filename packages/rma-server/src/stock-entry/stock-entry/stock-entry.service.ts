@@ -25,7 +25,7 @@ export class StockEntryService {
 
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
-    let dateQuery = {};
+    const query: any = {};
 
     try {
       sortQuery = JSON.parse(sort);
@@ -44,19 +44,22 @@ export class StockEntryService {
     }
 
     if (filter_query?.fromDate && filter_query?.toDate) {
-      dateQuery = {
-        createdAt: {
-          $gte: new Date(filter_query.fromDate),
-          $lte: new Date(filter_query.toDate),
-        },
+      query.createdAt = {
+        $gte: new Date(filter_query.fromDate),
+        $lte: new Date(filter_query.toDate),
       };
       delete filter_query.fromDate;
       delete filter_query.toDate;
     }
 
+    if (filter_query?.warrantyClaimUuid) {
+      query.warrantyClaimUuid = filter_query.warrantyClaimUuid;
+      delete filter_query.warrantyClaimUuid;
+    }
+
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},
-      dateQuery,
+      query,
     ];
 
     const where: { $and: any } = { $and };
