@@ -212,6 +212,7 @@ export class StockItem {
   qty?: number;
   serial_no?: string;
   replacedSerial?: string;
+  has_serial_no?: number;
 }
 
 export class StockEntryItems {
