@@ -67,7 +67,7 @@ export class StockEntryComponent implements OnInit {
 
   async removeStockEntry(row) {
     const loading = await this.loadingController.create({
-      message: 'Reverting Stock Entrry...!',
+      message: 'Reverting Stock Entry...!',
     });
     await loading.present();
     this.stockEntryService.removeStockEntry(row).subscribe({
@@ -82,6 +82,11 @@ export class StockEntryComponent implements OnInit {
       },
       error: err => {
         loading.dismiss();
+        if (err && err.error && err.error.message) {
+          this.snackbar.open(err.error.message, 'Close', {
+            duration: DURATION,
+          });
+        }
         this.snackbar.open('Failed to Cancel Stock Entry', 'Close', {
           duration: DURATION,
         });
