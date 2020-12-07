@@ -3,12 +3,13 @@ import {
   NotImplementedException,
   HttpService,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { StockEntryService } from '../../stock-entry/stock-entry.service';
-import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, toArray, mergeMap } from 'rxjs/operators';
 import { from, throwError, of } from 'rxjs';
 import {
+  DEFAULT_NAMING_SERIES,
   STOCK_ENTRY,
   STOCK_ENTRY_STATUS,
 } from '../../../constants/app-strings';
@@ -20,57 +21,58 @@ import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
+import {
+  StockEntryDto,
+  StockEntryItemDto,
+} from 'src/stock-entry/stock-entry/stock-entry-dto';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
   constructor(
     private readonly stockEntryService: StockEntryService,
-    private readonly stockEntryPolicies: StockEntryPoliciesService,
     private readonly settingService: SettingsService,
     private readonly serialService: SerialNoService,
     private readonly http: HttpService,
   ) {}
 
   createStockEntry(payload: WarrantyStockEntryDto, req) {
-    let warrantyPayload: any = {};
+    const warrantyPayload: any = {};
     let serverSettings;
     const serial_no = payload.replacedSerial;
     Object.assign(warrantyPayload, payload);
     warrantyPayload.items[0].serial_no = warrantyPayload.items[0].serial_no.split();
-    return this.stockEntryPolicies
-      .validateStockEntry(warrantyPayload, req)
-      .pipe(
-        switchMap(valid => {
-          return this.settingService.find();
-        }),
-        switchMap(settings => {
-          const stockEntry = this.setStockEntryDefaults(payload, req, settings);
-          warrantyPayload = stockEntry;
-          serverSettings = settings;
-          return from(this.stockEntryService.create(stockEntry));
-        }),
-        switchMap(() => {
-          Object.assign(warrantyPayload, payload);
-          warrantyPayload.status = undefined;
-          return this.createERPStockEntry(warrantyPayload, req, serverSettings);
-        }),
-        map(res => res.data.data),
-        switchMap(erpDeliveryNote => {
-          return this.updateStockEntry(erpDeliveryNote, warrantyPayload);
-        }),
-        switchMap(payloadObject => {
-          if (warrantyPayload.items[0].has_serial_no) {
-            payloadObject.payload.delivery_note =
-              payloadObject.erpDeliveryNote.delivery_note;
-            return this.updateSerialItem(
-              serial_no,
-              payloadObject.payload,
-              serverSettings,
-            );
-          }
-          return of({});
-        }),
-      );
+    return this.validateStockEntry(warrantyPayload, req).pipe(
+      switchMap(valid => {
+        return this.settingService.find();
+      }),
+      switchMap(settings => {
+        const stockEntry = this.setStockEntryDefaults(payload, req, settings);
+        serverSettings = settings;
+        return from(this.stockEntryService.create(stockEntry));
+      }),
+      map(res => res.ops[0]),
+      switchMap(stockEntry => {
+        warrantyPayload.uuid = stockEntry.uuid;
+        warrantyPayload.status = undefined;
+        return this.createERPStockEntry(warrantyPayload, req, serverSettings);
+      }),
+      map(res => res.data.data),
+      switchMap(erpDeliveryNote => {
+        return this.updateStockEntry(erpDeliveryNote, warrantyPayload);
+      }),
+      switchMap(payloadObject => {
+        if (warrantyPayload.items[0].has_serial_no) {
+          payloadObject.payload.delivery_note =
+            payloadObject.erpDeliveryNote.delivery_note;
+          return this.updateSerialItem(
+            serial_no,
+            payloadObject.payload,
+            serverSettings,
+          );
+        }
+        return of({});
+      }),
+    );
   }
 
   createERPStockEntry(payload, req, settings) {
@@ -119,9 +121,14 @@ export class WarrantyStockEntryAggregateService {
     erpPayload.has_serial_no = 0;
     erpPayload.docstatus = 1;
     erpPayload.items.forEach(item => {
+      item.excel_serials = item.serial_no[0];
       item.serial_no = undefined;
       if (item.stock_entry_type === 'Returned') {
+        erpPayload.naming_series =
+          DEFAULT_NAMING_SERIES.warranty_delivery_return;
         erpPayload.is_return = 1;
+      } else {
+        erpPayload.naming_series = DEFAULT_NAMING_SERIES.warranty_delivery_note;
       }
     });
     return erpPayload;
@@ -153,7 +160,6 @@ export class WarrantyStockEntryAggregateService {
 
   removeStockEntry(stockEntry, req) {
     let set: any;
-    let updatedDeliveryNote: any;
     return this.settingService.find().pipe(
       switchMap(settings => {
         if (!settings.authServerURL) {
@@ -166,31 +172,16 @@ export class WarrantyStockEntryAggregateService {
         });
       }),
       map(res => res.data.data),
-      switchMap(deliveryNoteBody => {
-        const body = this.mapEditDeliveryNote(deliveryNoteBody);
-        return this.http
-          .post(`${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}`, body, {
-            headers: this.settingService.getAuthorizationHeaders(req.token),
-          })
-          .pipe(
-            map(res => res.data.data),
-            switchMap(deliveryData => {
-              return of({ deliveryData, deliveryNoteBody });
-            }),
-          );
-      }),
       switchMap(response => {
-        updatedDeliveryNote = response.deliveryData;
-        if (!response.deliveryNoteBody) {
+        if (!response) {
           return throwError(new NotFoundException());
         }
         const url = `${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
-        response.deliveryNoteBody.docstatus = 2;
-        response.deliveryNoteBody.items.forEach(item => {
+        response.docstatus = 2;
+        response.items.forEach(item => {
           item.docstatus = 2;
-          item.actual_qty += 1;
         });
-        return this.http.put(url, response.deliveryNoteBody, {
+        return this.http.put(url, response, {
           headers: this.settingService.getAuthorizationHeaders(req.token),
         });
       }),
@@ -201,6 +192,13 @@ export class WarrantyStockEntryAggregateService {
         });
       }),
       switchMap(() => {
+        return from(
+          this.serialService.findOne({
+            serial_no: stockEntry.items[0]?.serial_no[0],
+          }),
+        );
+      }),
+      switchMap(serialItem => {
         if (stockEntry.stock_entry_type === 'Delivered') {
           return from(
             this.serialService.updateOne(
@@ -223,7 +221,7 @@ export class WarrantyStockEntryAggregateService {
               { serial_no: stockEntry.items[0]?.serial_no[0] },
               {
                 $set: {
-                  delivery_note: updatedDeliveryNote.name,
+                  delivery_note: serialItem.retrieve_delivery_note,
                 },
               },
             ),
@@ -237,13 +235,13 @@ export class WarrantyStockEntryAggregateService {
   returnStock(payload, clientHttpRequest) {
     const serial_no = payload.items[0].serial_no;
     let delivery_note = payload.delivery_note;
-    let set;
+    let serverSettings;
     return this.settingService.find().pipe(
       switchMap(setting => {
         if (!setting.authServerURL) {
           return throwError(new NotImplementedException());
         }
-        set = setting;
+        serverSettings = setting;
         if (payload.items[0].has_serial_no) {
           return this.http.get(
             `${setting.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${delivery_note}`,
@@ -261,7 +259,7 @@ export class WarrantyStockEntryAggregateService {
         const body = this.mapDeliveryNote(payload, res);
         body.items[0].serial_no = undefined;
         return this.http.post(
-          `${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}`,
+          `${serverSettings.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}`,
           body,
           {
             headers: this.settingService.getAuthorizationHeaders(
@@ -275,7 +273,7 @@ export class WarrantyStockEntryAggregateService {
         const stockEntry = this.setStockEntryDefaults(
           payload,
           clientHttpRequest,
-          set,
+          serverSettings,
         );
         stockEntry.status = STOCK_ENTRY_STATUS.returned;
         stockEntry.stock_voucher_number = res.name;
@@ -307,16 +305,71 @@ export class WarrantyStockEntryAggregateService {
     return res;
   }
 
-  mapEditDeliveryNote(deliveryNoteBody) {
-    if (deliveryNoteBody.is_return) {
-      deliveryNoteBody.is_return = 0;
-    } else {
-      deliveryNoteBody.is_return = 1;
-    }
-    deliveryNoteBody.total_qty = -deliveryNoteBody.total_qty;
-    deliveryNoteBody.items[0].qty = -deliveryNoteBody.items[0].qty;
-    deliveryNoteBody.items[0].stock_qty = -deliveryNoteBody.items[0].stock_qty;
-    deliveryNoteBody.items[0].actual_qty += deliveryNoteBody.total_qty;
-    return deliveryNoteBody;
+  validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
+    return this.settingService.find().pipe(
+      switchMap(settings => {
+        return this.validateStockSerials(
+          payload.items,
+          settings,
+          clientHttpRequest,
+        );
+      }),
+    );
+  }
+
+  validateStockSerials(
+    items: StockEntryItemDto[],
+    settings,
+    clientHttpRequest,
+  ) {
+    return from(items).pipe(
+      mergeMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
+        return from(
+          this.serialService.count({
+            serial_no: { $in: item.serial_no },
+            item_code: item.item_code,
+            $or: [
+              {
+                $or: [
+                  { warehouse: item.s_warehouse },
+                  {
+                    'queue_state.purchase_receipt.warehouse': item.s_warehouse,
+                  },
+                ],
+              },
+              {
+                $or: [
+                  {
+                    'warranty.soldOn': { $exists: false },
+                    'queue_state.delivery_note': { $exists: false },
+                  },
+                  {
+                    'warranty.claim_no': { $exists: true },
+                  },
+                ],
+              },
+            ],
+          }),
+        ).pipe(
+          mergeMap(count => {
+            if (count === item.serial_no.length) {
+              return of(true);
+            }
+            return throwError(
+              new BadRequestException(
+                `Expected ${item.serial_no.length} serials for Item: ${item.item_name} at warehouse: ${item.s_warehouse}, found ${count}.`,
+              ),
+            );
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(isValid => {
+        return of(true);
+      }),
+    );
   }
 }

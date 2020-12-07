@@ -21,6 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   STOCK_ENTRY_CREATED,
   ITEM_NOT_FOUND,
+  STOCK_ENTRY_CREATE_FAILURE,
 } from '../../../../constants/messages';
 import { LoadingController } from '@ionic/angular';
 import { mergeMap, switchMap, toArray } from 'rxjs/operators';
@@ -124,6 +125,12 @@ export class AddStockEntryPage implements OnInit {
             this.activatedRoute.snapshot.params.uuid,
           ]);
         },
+        error: err => {
+          loading.dismiss();
+          this.snackbar.open(STOCK_ENTRY_CREATE_FAILURE, 'Close', {
+            duration: DURATION,
+          });
+        },
       });
   }
 
@@ -210,7 +217,10 @@ export class AddStockEntryPage implements OnInit {
 
   setStockEntryType(type) {
     this.trimRow();
-    if (type === STOCK_ENTRY_STATUS.REPLACE) {
+    if (
+      type === STOCK_ENTRY_STATUS.REPLACE ||
+      type === STOCK_ENTRY_STATUS.UPGRADE
+    ) {
       this.button_active = true;
       this.addServiceInvoiceService
         .getItemFromRMAServer(this.warrantyObject.item_code)
@@ -306,17 +316,22 @@ export class AddStockEntryPage implements OnInit {
     }
     if (this.checkDuplicateSerial()) {
       if (
-        (this.dataSource.data()[index].stock_entry_type =
-          STOCK_ENTRY_ITEM_TYPE.DELIVERED)
+        this.stockEntryForm.controls.type.value === STOCK_ENTRY_STATUS.REPLACE
       ) {
-        this.dataSource.data()[
-          this.dataSource
-            .data()
-            .findIndex(
-              serialData =>
-                serialData.stock_entry_type === STOCK_ENTRY_ITEM_TYPE.RETURNED,
-            )
-        ].replacedSerial = serialObject.serial_no;
+        if (
+          this.dataSource.data()[index].stock_entry_type ===
+          STOCK_ENTRY_ITEM_TYPE.DELIVERED
+        ) {
+          this.dataSource.data()[
+            this.dataSource
+              .data()
+              .findIndex(
+                serialData =>
+                  serialData.stock_entry_type ===
+                  STOCK_ENTRY_ITEM_TYPE.RETURNED,
+              )
+          ].replacedSerial = serialObject.serial_no;
+        }
       }
       this.updateItem(index, serialObject);
     }
