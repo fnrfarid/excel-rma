@@ -86,7 +86,11 @@ export class StockEntrySyncService {
                 item.t_warehouse = item.s_warehouse;
                 item.s_warehouse = item.transferWarehouse;
               }
-              if (item.serial_no && typeof item.serial_no === 'object') {
+              if (
+                item.has_serial_no &&
+                item.serial_no &&
+                typeof item.serial_no === 'object'
+              ) {
                 item.serial_no = item.serial_no.join('\n');
               }
               item.excel_serials = item.serial_no;
@@ -136,8 +140,10 @@ export class StockEntrySyncService {
       map(data => data.data.data),
       switchMap(response => {
         payload.items.filter(item => {
-          item.serial_no = this.getSplitSerials(item.excel_serials);
-          delete item.excel_serials;
+          if (item.has_serial_no) {
+            item.serial_no = this.getSplitSerials(item.excel_serials);
+            delete item.excel_serials;
+          }
           return item;
         });
         this.updateSerials(

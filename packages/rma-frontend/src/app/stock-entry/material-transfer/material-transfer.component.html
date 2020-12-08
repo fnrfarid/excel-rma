@@ -80,7 +80,7 @@
                                 </mat-select>
                             </mat-form-field>
 
-                            <mat-form-field *ngIf="f.stock_entry_type.value === 'Material Issue'" class="mat-input-wrapper">
+                            <mat-form-field *ngIf="f.stock_entry_type.value !== 'Material Transfer'" class="mat-input-wrapper">
                                 <input
                                   matInput
                                   required
