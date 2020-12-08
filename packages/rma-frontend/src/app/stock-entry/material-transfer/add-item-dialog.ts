@@ -31,7 +31,13 @@ export class AddItemDialog {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getItemList(value);
+        return this.salesService.getItemList(
+          value,
+          undefined,
+          undefined,
+          undefined,
+          { bundle_items: { $exists: false } },
+        );
       }),
     );
   }

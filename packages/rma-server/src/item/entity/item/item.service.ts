@@ -78,6 +78,9 @@ export class ItemService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
+        if (key === 'bundle_items') {
+          return;
+        }
         if (key === 'status' && query[key] === 'All') {
           delete query[key];
         } else {

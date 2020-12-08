@@ -86,7 +86,7 @@ export class MaterialTransferComponent implements OnInit {
   @ViewChild('csvFileInput', { static: false })
   csvFileInput: ElementRef;
   uuid: string;
-  materialTransferDataSource: MaterialTransferDataSource;
+  materialTransferDataSource: MaterialTransferDataSource = new MaterialTransferDataSource();
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
   territoryList: Observable<any[]>;
@@ -95,9 +95,13 @@ export class MaterialTransferComponent implements OnInit {
     s_warehouse: 0,
     territory: 0,
   };
-  form: FormGroup;
+  form: FormGroup = new FormGroup({
+    territory: new FormControl('', [Validators.required]),
+    stock_entry_type: new FormControl('', [Validators.required]),
+    accounts: new FormControl(''),
+  });
   materialTransferDisplayedColumns = MATERIAL_TRANSFER_DISPLAYED_COLUMNS;
-  itemDataSource: StockItemsDataSource;
+  itemDataSource: StockItemsDataSource = new StockItemsDataSource();
   itemDisplayedColumns = [
     'item_name',
     'assigned',
@@ -140,23 +144,12 @@ export class MaterialTransferComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.form = new FormGroup({
-      territory: new FormControl('', [Validators.required]),
-      stock_entry_type: new FormControl('', [Validators.required]),
-      accounts: new FormControl(''),
-    });
-    this.accounts = this.form.controls.accounts.valueChanges.pipe(
-      debounceTime(500),
-      startWith(''),
-      this.service.relayAccountsOperation(),
-    );
+    this.subscribeEndpoints();
 
-    this.itemDataSource = new StockItemsDataSource();
     this.transferWarehouse = await this.salesService
       .getStore()
       .getItem(TRANSFER_WAREHOUSE);
     this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
-    this.materialTransferDataSource = new MaterialTransferDataSource();
     this.uuid = this.activatedRoute.snapshot.params.uuid;
 
     if (this.uuid) {
@@ -172,9 +165,9 @@ export class MaterialTransferComponent implements OnInit {
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
           this.remarks = success.remarks;
-          if (success.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_ISSUE) {
+          if (success.stock_entry_type !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
             this.form.controls.accounts.setValue(
-              success?.items[0]?.expense_account || '',
+              success.items[0]?.expense_account || '',
             );
             this.readonly ? this.form.controls.accounts.disable() : null;
           }
@@ -190,8 +183,6 @@ export class MaterialTransferComponent implements OnInit {
       });
       return;
     }
-
-    this.subscribeEndpoints();
   }
 
   get f() {
@@ -248,6 +239,11 @@ export class MaterialTransferComponent implements OnInit {
         }
         return of([]);
       }),
+    );
+    this.accounts = this.form.controls.accounts.valueChanges.pipe(
+      debounceTime(500),
+      startWith(''),
+      this.service.relayAccountsOperation(),
     );
   }
 
@@ -576,10 +572,9 @@ export class MaterialTransferComponent implements OnInit {
     }
 
     if (
-      this.form.controls.stock_entry_type.value ===
-        STOCK_ENTRY_TYPE.MATERIAL_ISSUE &&
-      this.form.controls.accounts.valid &&
-      !this.form.controls.accounts.value
+      this.form.controls.stock_entry_type.value !==
+        STOCK_ENTRY_TYPE.MATERIAL_TRANSFER &&
+      (!this.form.controls.accounts.valid || !this.form.controls.accounts.value)
     ) {
       this.getMessage('Please select an expense account.');
       return;
@@ -605,6 +600,7 @@ export class MaterialTransferComponent implements OnInit {
 
   async saveDraft() {
     const body = await this.getStockEntryBody();
+    if (!body) return;
     body.status = STOCK_TRANSFER_STATUS.draft;
     this.stockEntryService.createMaterialTransfer(body).subscribe({
       next: (response: any) => {
@@ -624,8 +620,8 @@ export class MaterialTransferComponent implements OnInit {
     const merged_items = [];
     items.forEach(item => {
       if (
-        this.form.controls.stock_entry_type.value ===
-        STOCK_ENTRY_TYPE.MATERIAL_ISSUE
+        this.form.controls.stock_entry_type.value !==
+        STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
       ) {
         item.expense_account = this.form.controls.accounts.value;
       }
