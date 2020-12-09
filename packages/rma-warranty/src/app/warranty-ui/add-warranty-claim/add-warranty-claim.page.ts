@@ -228,7 +228,7 @@ export class AddWarrantyClaimPage implements OnInit {
     this.location.back();
   }
 
-  async submitDraft() {
+  async createClaim() {
     const loading = await this.loadingController.create();
     await loading.present();
     const detail = await this.assignFields();
@@ -382,41 +382,50 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyService.getSerial(name).subscribe({
       next: (res: SerialNoDetails) => {
         this.getSerialData = res;
-        if (!res.delivery_note) {
+        if (res.claim_no) {
+          this.snackbar.open(
+            `Claim already exists serial no ${res.serial_no}`,
+            'Close',
+            {
+              duration: DURATION,
+            },
+          );
+          return;
+        }
+        if (!res.warranty.salesWarrantyDate) {
           this.snackbar.open('Serial not sold yet', 'Close', {
             duration: DURATION,
           });
-        } else {
-          if (
-            this.warrantyClaimForm.controls.received_on.value <
-            this.getSerialData.warranty.salesWarrantyDate
-          ) {
-            this.warrantyClaimForm.controls.claim_type.setValue(
-              WARRANTY_TYPE.WARRANTY,
-            );
-          } else {
-            this.warrantyClaimForm.controls.claim_type.setValue(
-              WARRANTY_TYPE.NON_WARRANTY,
-            );
-          }
-          this.warrantyClaimForm.controls.warranty_end_date.setValue(
-            res.warranty.salesWarrantyDate,
-          );
-          this.warrantyClaimForm.controls.invoice_no.setValue(
-            res.sales_invoice_name,
-          );
-          this.warrantyClaimForm.controls.warranty_end_date.setValue(
-            new Date(res.warranty.salesWarrantyDate),
-          );
-          this.warrantyClaimForm.controls.product_name.setValue({
-            item_name: res.item_name,
-          });
-          this.warrantyClaimForm.controls.customer_name.setValue({
-            name: res.customer,
-          });
-          this.itemOptionChanged({ item_code: res.item_code });
-          this.customerChanged({ name: res.customer });
+          return;
         }
+        if (
+          this.warrantyClaimForm.controls.received_on.value <
+          this.getSerialData.warranty.salesWarrantyDate
+        ) {
+          this.warrantyClaimForm.controls.claim_type.setValue(
+            WARRANTY_TYPE.WARRANTY,
+          );
+        }
+        this.warrantyClaimForm.controls.claim_type.setValue(
+          WARRANTY_TYPE.NON_WARRANTY,
+        );
+        this.warrantyClaimForm.controls.warranty_end_date.setValue(
+          res.warranty.salesWarrantyDate,
+        );
+        this.warrantyClaimForm.controls.invoice_no.setValue(
+          res.sales_invoice_name,
+        );
+        this.warrantyClaimForm.controls.warranty_end_date.setValue(
+          new Date(res.warranty.salesWarrantyDate),
+        );
+        this.warrantyClaimForm.controls.product_name.setValue({
+          item_name: res.item_name,
+        });
+        this.warrantyClaimForm.controls.customer_name.setValue({
+          name: res.customer,
+        });
+        this.itemOptionChanged({ item_code: res.item_code });
+        this.customerChanged({ name: res.customer });
       },
       error: ({ message }) => {
         if (!message) message = `${SOMETHING_WENT_WRONG}${SERIAL_FETCH_ERROR}`;

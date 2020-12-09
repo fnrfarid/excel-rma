@@ -322,7 +322,7 @@ export class AddStockEntryPage implements OnInit {
           this.dataSource.data()[index].stock_entry_type ===
           STOCK_ENTRY_ITEM_TYPE.DELIVERED
         ) {
-          this.dataSource.data()[
+          this.dataSource.data()[index].replacedSerial = this.dataSource.data()[
             this.dataSource
               .data()
               .findIndex(
@@ -330,7 +330,7 @@ export class AddStockEntryPage implements OnInit {
                   serialData.stock_entry_type ===
                   STOCK_ENTRY_ITEM_TYPE.RETURNED,
               )
-          ].replacedSerial = serialObject.serial_no;
+          ].serial_no;
         }
       }
       this.updateItem(index, serialObject);
