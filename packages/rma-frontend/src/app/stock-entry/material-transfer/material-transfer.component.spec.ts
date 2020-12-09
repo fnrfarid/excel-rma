@@ -41,6 +41,7 @@ describe('MaterialTransferComponent', () => {
             getWarehouseList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),
+              getItemAsync: (...args) => of({}),
             }),
           },
         },

@@ -57,14 +57,18 @@ export class StockEntryAggregateService {
         );
 
         if (stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
-          return from(
-            this.serialNoService.insertMany(mongoSerials, { ordered: false }),
-          ).pipe(
-            switchMap(success => {
-              this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
-              return of(stockEntry);
-            }),
-          );
+          if (mongoSerials && mongoSerials.length) {
+            return from(
+              this.serialNoService.insertMany(mongoSerials, { ordered: false }),
+            ).pipe(
+              switchMap(success => {
+                this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+                return of(stockEntry);
+              }),
+            );
+          }
+          this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+          return of(stockEntry);
         }
 
         this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);

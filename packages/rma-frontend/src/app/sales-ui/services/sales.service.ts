@@ -247,6 +247,7 @@ export class SalesService {
     sortOrder: any = { item_name: 'asc' },
     pageIndex = 0,
     pageSize = 30,
+    query?: { [key: string]: any },
   ) {
     try {
       sortOrder = JSON.stringify(sortOrder);
@@ -254,7 +255,7 @@ export class SalesService {
       sortOrder = JSON.stringify({ item_name: 'asc' });
     }
     const url = LIST_ITEMS_ENDPOINT;
-    const query: any = {};
+    query = query ? query : {};
     query.item_name = filter;
     const params = new HttpParams()
       .set('limit', pageSize.toString())
