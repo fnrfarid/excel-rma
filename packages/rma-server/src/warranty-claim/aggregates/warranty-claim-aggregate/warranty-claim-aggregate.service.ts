@@ -310,6 +310,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   addStatusHistory(statusHistoryPayload: StatusHistoryDto, clientHttpRequest) {
+    let warrantyState = {} as WarrantyClaim;
     const statusHistoryDetails = this.mapStatusHistory(
       statusHistoryPayload,
       clientHttpRequest,
@@ -362,12 +363,27 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         });
       }),
       switchMap(res => {
+        warrantyState = res;
         statusHistoryPayload.doc_name = res.claim_no;
         return this.addSerialNoStatusHistory(
           statusHistoryPayload,
           [res.serial_no],
           clientHttpRequest.token,
         );
+      }),
+      switchMap(() => {
+        if (
+          warrantyState.claim_status === CLAIM_STATUS.DELIVERED ||
+          warrantyState.claim_status === CLAIM_STATUS.UNSOLVED
+        ) {
+          return from(
+            this.serialNoService.updateOne(
+              { serial_no: warrantyState.serial_no },
+              { $unset: { claim_no: undefined } },
+            ),
+          );
+        }
+        return of();
       }),
     );
   }
@@ -470,6 +486,18 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.serialNoHistoryService.addSerialHistory(
           serialArray,
           serialHistory,
+        );
+      }),
+      switchMap(() => {
+        return this.serialNoService.updateOne(
+          {
+            serial_no: warrantyClaim.serial_no,
+          },
+          {
+            $set: {
+              claim_no: warrantyClaim.claim_no,
+            },
+          },
         );
       }),
     );

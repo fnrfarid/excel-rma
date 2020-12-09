@@ -6,9 +6,11 @@ import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
 import {
+  DURATION,
   ITEM_COLUMN,
   STOCK_ENTRY_ITEM_TYPE,
 } from '../../../../../constants/app-string';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'inline-edit',
@@ -56,6 +58,7 @@ export class InlineEditComponent {
   constructor(
     @Optional() @Host() public popover: SatPopover,
     private addServiceInvoiceService: AddServiceInvoiceService,
+    private snackbar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -143,6 +146,12 @@ export class InlineEditComponent {
                   .getItemPrice(item.item_code)
                   .pipe(
                     map(priceListArray => {
+                      if (item.warranty.salesWarrantyDate) {
+                        this.snackbar.open('Serial already sold', 'Close', {
+                          duration: DURATION,
+                        });
+                        return {};
+                      }
                       return {
                         priceListArray,
                         item,

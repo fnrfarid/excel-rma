@@ -166,6 +166,7 @@ export class SerialNoDetails {
   queue_state?: QueueState;
   purchase_invoice_name?: string;
   brand?: string;
+  claim_no?: string;
 }
 
 export class StatusHistoryDetails {
