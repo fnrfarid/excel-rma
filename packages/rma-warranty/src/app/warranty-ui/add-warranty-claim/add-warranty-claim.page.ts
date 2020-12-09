@@ -392,7 +392,7 @@ export class AddWarrantyClaimPage implements OnInit {
           );
           return;
         }
-        if (!res.warranty.salesWarrantyDate) {
+        if (!res.delivery_note) {
           this.snackbar.open('Serial not sold yet', 'Close', {
             duration: DURATION,
           });
