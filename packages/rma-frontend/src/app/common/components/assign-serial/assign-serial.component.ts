@@ -12,14 +12,14 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadingController } from '@ionic/angular';
 import { of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { CsvJsonService } from '../api/csv-json/csv-json.service';
-import { SerialsService } from '../common/helpers/serials/serials.service';
-import { CLOSE, DELIVERY_NOTE } from '../constants/app-string';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
+import { DELIVERY_NOTE, CLOSE } from '../../../constants/app-string';
 import {
   ItemDataSource,
   SerialDataSource,
-} from '../sales-ui/view-sales-invoice/serials/serials-datasource';
-import { CsvJsonObj } from '../sales-ui/view-sales-invoice/serials/serials.component';
+} from '../../../sales-ui/view-sales-invoice/serials/serials-datasource';
+import { CsvJsonObj } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
+import { SerialsService } from '../../helpers/serials/serials.service';
 
 @Component({
   selector: 'app-assign-serial',

@@ -295,6 +295,9 @@ export class CsvJsonService {
     });
 
     let selectedFields = await dialogRef.afterClosed().toPromise();
+    if (!selectedFields) {
+      return;
+    }
     selectedFields = Object.keys(selectedFields).filter(key => {
       if (selectedFields[key]) {
         return key;

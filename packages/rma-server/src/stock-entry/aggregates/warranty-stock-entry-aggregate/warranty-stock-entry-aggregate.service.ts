@@ -4,7 +4,7 @@ import {
   HttpService,
   NotFoundException,
 } from '@nestjs/common';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
+import { StockEntryService } from '../../entities/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { switchMap, map } from 'rxjs/operators';
 import { from, throwError, of } from 'rxjs';
@@ -17,9 +17,9 @@ import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
-import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
+import { WarrantyStockEntryDto } from '../../entities/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
+import { StockEntry } from '../../entities/stock-entry.entity';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {

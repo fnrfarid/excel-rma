@@ -47,9 +47,12 @@
                         <ion-button *ngIf="readonly && status === 'In Transit'" color="danger" (click)="rejectTransfer()">
                             Return Transfer
                         </ion-button>
-                        <ion-text *ngIf="readonly && status !== 'In Transit' && status !== 'Draft'" [ngStyle]="{ color: status === 'Returned' ? 'red' : 'green' }">
+                        <ion-text *ngIf="readonly && status !== 'In Transit' && status !== 'Draft'" [ngStyle]="{ color:  ['Returned','Reseted'].includes(status) ? 'red' : 'green' }">
                             <h1>Stock Transfer {{ status }}</h1>
                         </ion-text>
+                        <ion-button *ngIf="readonly && status === 'Delivered'" color="danger" (click)="resetStockEntry()">
+                            Cancel
+                        </ion-button>
                     </ion-col>
                 </ion-row>
                 <ion-row>
@@ -115,9 +118,9 @@
             </ion-grid>
         </ion-card-content>
     </ion-card>
-    <app-assign-serial [state]="state" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
+    <app-assign-serial *ngIf="!readonly" [state]="state" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
 
-    <ion-card>
+    <ion-card *ngIf="!readonly">
         <ion-card-header>
             <ion-row class="align">
                 <ion-col>
@@ -134,12 +137,12 @@
                 <ion-row>
                     <ion-col>
                         <mat-form-field class="example-full-width">
-                            <input type="text" placeholder="Source Warehouse" [disabled]="readonly" matInput [formControl]="warehouseState.s_warehouse" (focusout)="
-                  validateInput(
-                    warehouseState.s_warehouse,
-                    filteredWarehouseList1
-                  )
-                " [matAutocomplete]="from_warehouse" />
+                            <input type="text" 
+                                placeholder="Source Warehouse" 
+                                [disabled]="readonly" matInput 
+                                [formControl]="warehouseState.s_warehouse" 
+                                (focusout)="validateInput(warehouseState.s_warehouse, filteredWarehouseList1)" 
+                                [matAutocomplete]="from_warehouse" />
                             <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
                                 <mat-option (onSelectionChange)="updateItemStock($event.source.value)" *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse">
                                     {{ s_warehouse }}
@@ -175,7 +178,7 @@
         </ion-card-content>
     </ion-card>
 
-    <ion-card>
+    <ion-card *ngIf="!readonly">
         <div class="loading-shade" *ngIf="itemDataSource?.loading$ | async">
             <mat-progress-bar *ngIf="itemDataSource?.loading$ | async" mode="indeterminate"></mat-progress-bar>
         </div>
@@ -311,9 +314,9 @@
                 <ng-container matColumnDef="warranty_date">
                     <mat-header-cell *matHeaderCellDef>Warranty Date</mat-header-cell>
                     <mat-cell *matCellDef="let row">
-                        <input matInput [(ngModel)]="row.warranty_date" [matDatepicker]="warranty_date" disabled />
+                        <input matInput [disabled]="readonly && status !=='Draft'" [(ngModel)]="row.warranty_date" [matDatepicker]="warranty_date" disabled />
                         <mat-datepicker-toggle matSuffix [for]="warranty_date"></mat-datepicker-toggle>
-                        <mat-datepicker #warranty_date disabled="false"></mat-datepicker>
+                        <mat-datepicker #warranty_date [disabled]="readonly && status !=='Draft'"></mat-datepicker>
                     </mat-cell>
                 </ng-container>
 
@@ -345,4 +348,7 @@
             </mat-table>
         </ion-card-content>
     </ion-card>
+
+    <app-delivered-serials *ngIf="readonly && status !== 'Reseted'" [deliveredSerialsState]="deliveredSerialsState"></app-delivered-serials>
+
 </ion-content>

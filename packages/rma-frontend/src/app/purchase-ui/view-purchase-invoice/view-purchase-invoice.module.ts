@@ -12,11 +12,11 @@ import { PurchaseDetailsComponent } from './purchase-details/purchase-details.co
 import { MaterialModule } from '../../material/material.module';
 import { AppCommonModule } from '../../common/app-common.module';
 import { EditPurchaseTableComponent } from './edit-purchase-table/edit-purchase-table.component';
-import { AssignSerialModule } from '../../assign-serial/assign-serial.module';
+import { CommonComponentModule } from '../../common/components/common-component.module';
 
 @NgModule({
   imports: [
-    AssignSerialModule,
+    CommonComponentModule,
     CommonModule,
     FormsModule,
     MaterialModule,

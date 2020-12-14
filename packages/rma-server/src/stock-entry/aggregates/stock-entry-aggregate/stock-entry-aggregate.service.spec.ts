@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StockEntryAggregateService } from './stock-entry-aggregate.service';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
+import { StockEntryService } from '../../entities/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { HttpService } from '@nestjs/common';
 
 describe('StockEntryAggregateService', () => {
   let service: StockEntryAggregateService;
@@ -32,6 +34,14 @@ describe('StockEntryAggregateService', () => {
         },
         {
           provide: SerialNoService,
+          useValue: {},
+        },
+        {
+          provide: SerialNoHistoryService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
           useValue: {},
         },
         { provide: AGENDA_TOKEN, useValue: {} },
