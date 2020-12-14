@@ -166,6 +166,7 @@ export class SerialNoDetails {
   queue_state?: QueueState;
   purchase_invoice_name?: string;
   brand?: string;
+  claim_no?: string;
 }
 
 export class StatusHistoryDetails {
@@ -212,6 +213,7 @@ export class StockItem {
   qty?: number;
   serial_no?: string;
   replacedSerial?: string;
+  has_serial_no?: number;
 }
 
 export class StockEntryItems {
