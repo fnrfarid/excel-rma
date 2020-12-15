@@ -193,7 +193,7 @@
             >
             <mat-cell *matCellDef="let row">
               <ion-text
-                [ngStyle]="{'color': (row.status === 'Delivered') ? 'green' : (row.status === 'Returned') ? 'red' : 'blue' }"
+                [ngStyle]="{'color': (row.status === 'Delivered') ? 'green' : ['Returned','Reseted'].includes(row.status) ? 'red' : 'blue' }"
               >
                 {{row.status}}
               </ion-text>

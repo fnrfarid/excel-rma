@@ -60,13 +60,6 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'add-purchase-invoice',
-    loadChildren: () =>
-      import(
-        './purchase-ui/add-purchase-invoice/add-purchase-invoice.module'
-      ).then(m => m.AddPurchaseInvoicePageModule),
-  },
-  {
     path: 'purchase',
     loadChildren: () =>
       import('./purchase-ui/purchase/purchase.module').then(

@@ -1,3 +1,5 @@
+import { DELIVERED_SERIALS_BY } from './app-string';
+
 export const CLIENT_ID = 'client_id';
 export const REDIRECT_URI = 'redirect_uri';
 export const SILENT_REFRESH_REDIRECT_URI = 'silent_refresh_redirect_uri';
@@ -42,3 +44,21 @@ export const ALL_TERRITORIES = 'All Territories';
 export const WARRANTY_APP_URL = 'warranty_app_url';
 export const POS_PROFILE = 'pos_profile';
 export const PRINT_FORMAT_PREFIX = 'Excel ';
+export const DELIVERED_SERIALS_DISPLAYED_COLUMNS = {
+  [DELIVERED_SERIALS_BY.purchase_invoice_name]: [
+    'sr_no',
+    'serial_no',
+    'item_name',
+    'warehouse',
+    'purchaseWarrantyDate',
+    'purchasedOn',
+  ],
+  [DELIVERED_SERIALS_BY.sales_invoice_name]: [
+    'sr_no',
+    'serial_no',
+    'item_name',
+    'warehouse',
+    'salesWarrantyDate',
+    'soldOn',
+  ],
+};

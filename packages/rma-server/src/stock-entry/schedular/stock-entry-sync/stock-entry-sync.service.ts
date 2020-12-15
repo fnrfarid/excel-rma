@@ -15,8 +15,8 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { of, throwError, from, forkJoin } from 'rxjs';
 import { DateTime } from 'luxon';
-import { StockEntry } from '../../stock-entry/stock-entry.entity';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
+import { StockEntry } from '../../entities/stock-entry.entity';
+import { StockEntryService } from '../../entities/stock-entry.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import {
@@ -24,7 +24,7 @@ import {
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
-import { StockEntryItem } from '../../stock-entry/stock-entry.entity';
+import { StockEntryItem } from '../../entities/stock-entry.entity';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 
 @Injectable()
@@ -232,6 +232,7 @@ export class StockEntrySyncService {
           purchase_document_type: STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
           'warranty.purchaseWarrantyDate': item.warranty_date,
           'warranty.purchasedOn': new Date(payload.posting_date),
+          purchase_invoice_name: payload.uuid,
           item_name: item.item_name,
         }
       : {
@@ -242,6 +243,7 @@ export class StockEntrySyncService {
             .toJSDate(),
           sales_document_type: STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
           sales_document_no: doc_name,
+          sales_invoice_name: payload.uuid,
         };
   }
 

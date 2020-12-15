@@ -35,6 +35,7 @@ export class SerialNoHistory extends BaseEntity {
   document_type: string;
 
   @Column()
+  @Index()
   parent_document: string;
 
   @Column()

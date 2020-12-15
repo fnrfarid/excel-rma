@@ -6,13 +6,13 @@ import { SalesService } from './services/sales.service';
 import { MaterialModule } from '../material/material.module';
 import { ViewSalesInvoicePageModule } from './view-sales-invoice/view-sales-invoice.module';
 import { ViewSalesInvoiceSubjectService } from './view-sales-invoice/view-sales-invoice-subject.service';
-import { AssignSerialModule } from '../assign-serial/assign-serial.module';
+import { CommonComponentModule } from '../common/components/common-component.module';
 
 @NgModule({
   declarations: [],
 
   imports: [
-    AssignSerialModule,
+    CommonComponentModule,
     CommonModule,
     SalesPageModule,
     AddSalesInvoicePageModule,

@@ -6,13 +6,13 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AppCommonModule } from '../common/app-common.module';
-import { AssignSerialModule } from '../assign-serial/assign-serial.module';
 import { AddItemDialog } from './material-transfer/add-item-dialog';
+import { CommonComponentModule } from '../common/components/common-component.module';
 
 @NgModule({
   declarations: [MaterialTransferComponent, AddItemDialog],
   imports: [
-    AssignSerialModule,
+    CommonComponentModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

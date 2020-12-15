@@ -2,9 +2,9 @@ import { StockEntryAggregateService } from './aggregates/stock-entry-aggregate/s
 import { StockEntryPoliciesService } from './policies/stock-entry-policies/stock-entry-policies.service';
 import { StockEntryController } from './controller/stock-entry.controller';
 import { Module } from '@nestjs/common';
-import { StockEntry } from './stock-entry/stock-entry.entity';
+import { StockEntry } from './entities/stock-entry.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { StockEntryService } from './stock-entry/stock-entry.service';
+import { StockEntryService } from './entities/stock-entry.service';
 import { SerialNoEntitiesModule } from '../serial-no/entity/entity.module';
 import { DirectModule } from '../direct/direct.module';
 import { StockEntrySyncService } from './schedular/stock-entry-sync/stock-entry-sync.service';

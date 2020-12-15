@@ -5,8 +5,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
-import { switchMap, map, toArray, mergeMap } from 'rxjs/operators';
+import { StockEntryService } from '../../entities/stock-entry.service';
 import { from, throwError, of } from 'rxjs';
 import {
   DEFAULT_NAMING_SERIES,
@@ -18,13 +17,14 @@ import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
-import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
+import { WarrantyStockEntryDto } from '../../entities/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
 import {
   StockEntryDto,
   StockEntryItemDto,
-} from 'src/stock-entry/stock-entry/stock-entry-dto';
+} from '../../entities/stock-entry-dto';
+import { StockEntry } from '../../entities/stock-entry.entity';
+import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -38,7 +38,6 @@ export class WarrantyStockEntryAggregateService {
   createStockEntry(payload: WarrantyStockEntryDto, req) {
     const warrantyPayload: any = {};
     let serverSettings;
-    const serial_no = payload.replacedSerial;
     Object.assign(warrantyPayload, payload);
     warrantyPayload.items[0].serial_no = warrantyPayload.items[0].serial_no.split();
     return this.validateStockEntry(warrantyPayload, req).pipe(
@@ -61,16 +60,32 @@ export class WarrantyStockEntryAggregateService {
         return this.updateStockEntry(erpDeliveryNote, warrantyPayload);
       }),
       switchMap(payloadObject => {
-        if (warrantyPayload.items[0].has_serial_no) {
+        if (
+          warrantyPayload.items[0].excel_serials &&
+          payloadObject.payload.stock_entry_type === 'Delivered'
+        ) {
+          payloadObject.payload.retrieve_delivery_note =
+            payloadObject.payload.delivery_note;
           payloadObject.payload.delivery_note =
-            payloadObject.erpDeliveryNote.delivery_note;
-          return this.updateSerialItem(
-            serial_no,
-            payloadObject.payload,
-            serverSettings,
-          );
+            payloadObject.erpDeliveryNote.name;
+          return this.updateSerialItem(payloadObject.payload, serverSettings);
         }
-        return of({});
+        payloadObject.payload.retrieve_delivery_note =
+          payloadObject.payload.delivery_note;
+        payloadObject.payload.delivery_note =
+          payloadObject.erpDeliveryNote.name;
+        return from(
+          this.serialService.updateOne(
+            { serial_no: payloadObject.payload.items[0].excel_serials },
+            {
+              $set: {
+                retrieve_delivery_note:
+                  payloadObject.payload.retrieve_delivery_note,
+                delivery_note: payloadObject.erpDeliveryNote.name,
+              },
+            },
+          ),
+        );
       }),
     );
   }
@@ -98,20 +113,29 @@ export class WarrantyStockEntryAggregateService {
     );
   }
 
-  updateSerialItem(serial_no, payload, settings) {
-    return from(
-      this.serialService.updateOne(
-        { serial_no },
-        {
-          $set: {
-            customer: payload.customer,
-            'warranty.salesWarrantyDate': payload.salesWarrantyDate,
-            'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
-            sales_invoice_name: payload.sales_invoice_name,
-            delivery_note: payload.delivery_note,
-          },
-        },
-      ),
+  getSerialItem(serial_no) {
+    return from(this.serialService.findOne({ serial_no }));
+  }
+
+  updateSerialItem(payload, settings) {
+    return this.getSerialItem(payload.items[0].replacedSerial).pipe(
+      switchMap(serialItem => {
+        return from(
+          this.serialService.updateOne(
+            { serial_no: payload.items[0].excel_serials },
+            {
+              $set: {
+                customer: serialItem.customer,
+                'warranty.salesWarrantyDate':
+                  serialItem.warranty.salesWarrantyDate,
+                'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
+                sales_invoice_name: serialItem.sales_invoice_name,
+                delivery_note: payload.delivery_note,
+              },
+            },
+          ),
+        );
+      }),
     );
   }
 
@@ -127,9 +151,9 @@ export class WarrantyStockEntryAggregateService {
         erpPayload.naming_series =
           DEFAULT_NAMING_SERIES.warranty_delivery_return;
         erpPayload.is_return = 1;
-      } else {
-        erpPayload.naming_series = DEFAULT_NAMING_SERIES.warranty_delivery_note;
       }
+      if (item.stock_entry_type === 'Delivered')
+        erpPayload.naming_series = DEFAULT_NAMING_SERIES.warranty_delivery_note;
     });
     return erpPayload;
   }
@@ -222,6 +246,9 @@ export class WarrantyStockEntryAggregateService {
               {
                 $set: {
                   delivery_note: serialItem.retrieve_delivery_note,
+                },
+                $unset: {
+                  retrieve_delivery_note: undefined,
                 },
               },
             ),

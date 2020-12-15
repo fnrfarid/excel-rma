@@ -19,6 +19,8 @@ import {
   MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
   STOCK_ENTRY_TYPE,
   PURCHASE_RECEIPT,
+  UPDATE_ERROR,
+  DELIVERED_SERIALS_BY,
 } from '../../constants/app-string';
 import * as _ from 'lodash';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -33,6 +35,7 @@ import {
   TRANSFER_WAREHOUSE,
   AUTH_SERVER_URL,
   PRINT_FORMAT_PREFIX,
+  DELIVERED_SERIALS_DISPLAYED_COLUMNS,
 } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
@@ -47,8 +50,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Item } from '../../common/interfaces/sales.interface';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { AddItemDialog } from './add-item-dialog';
-import { PRINT_DELIVERY_NOTE_PDF_METHOD } from 'src/app/constants/url-strings';
-import { SettingsService } from 'src/app/settings/settings.service';
+import { PRINT_DELIVERY_NOTE_PDF_METHOD } from '../../constants/url-strings';
+import { SettingsService } from '../../settings/settings.service';
+import { ConfirmationDialog } from '../../sales-ui/item-price/item-price.page';
+import { LoadingController } from '@ionic/angular';
+import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 
 @Component({
   selector: 'app-material-transfer',
@@ -110,6 +116,9 @@ export class MaterialTransferComponent implements OnInit {
     'add_serial',
     'delete',
   ];
+  deliveredSerialsState: DeliveredSerialsState = {
+    deliveredSerialsDisplayedColumns: [],
+  };
 
   popWarehouse = switchMap((warehouses: any[]) => {
     return from(warehouses).pipe(
@@ -141,15 +150,11 @@ export class MaterialTransferComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private readonly service: SettingsService,
+    private readonly loadingController: LoadingController,
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     this.subscribeEndpoints();
-
-    this.transferWarehouse = await this.salesService
-      .getStore()
-      .getItem(TRANSFER_WAREHOUSE);
-    this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
     this.uuid = this.activatedRoute.snapshot.params.uuid;
 
     if (this.uuid) {
@@ -189,7 +194,12 @@ export class MaterialTransferComponent implements OnInit {
     return this.form.controls;
   }
 
-  subscribeEndpoints() {
+  async subscribeEndpoints() {
+    this.transferWarehouse = await this.salesService
+      .getStore()
+      .getItem(TRANSFER_WAREHOUSE);
+    this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
+
     this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
@@ -249,6 +259,32 @@ export class MaterialTransferComponent implements OnInit {
 
   navigateBack() {
     this.location.back();
+  }
+
+  setDeliveredSerialState(stock_entry_type) {
+    switch (stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        this.deliveredSerialsState.type =
+          DELIVERED_SERIALS_BY.sales_invoice_name;
+        this.deliveredSerialsState.deliveredSerialsDisplayedColumns =
+          DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+            DELIVERED_SERIALS_BY.sales_invoice_name
+          ];
+        this.deliveredSerialsState.uuid = this.uuid;
+        break;
+
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        this.deliveredSerialsState.type =
+          DELIVERED_SERIALS_BY.purchase_invoice_name;
+        this.deliveredSerialsState.deliveredSerialsDisplayedColumns =
+          DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+            DELIVERED_SERIALS_BY.purchase_invoice_name
+          ];
+        this.deliveredSerialsState.uuid = this.uuid;
+
+      default:
+        break;
+    }
   }
 
   rejectTransfer() {
@@ -736,6 +772,7 @@ export class MaterialTransferComponent implements OnInit {
         'warranty_date',
       );
     }
+    this.setDeliveredSerialState(value);
   }
 
   assignPickerState(rangePickerState) {
@@ -753,6 +790,51 @@ export class MaterialTransferComponent implements OnInit {
           err.error && err.error.message
             ? err.error.message
             : 'Error occurred while returning stock transfer',
+        );
+      },
+    });
+  }
+
+  async resetStockEntry() {
+    const dialog = this.dialog.open(ConfirmationDialog, {
+      data: {
+        event: `
+      <h3>Reseting Stock Entry will cancel linked:</h3>
+      <li> All Linked ERPNExt Stock Entries.
+      <li> Linked/Assigned Serial's.
+      <li> Serial History.
+
+      <h3>
+      Mate sure to take a dump of serials from delivered serials before the reset,
+           as all links will reset too.
+      </h3> 
+      `,
+      },
+    });
+    const response = await dialog.afterClosed().toPromise();
+
+    if (!response) {
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message:
+        'validating and reseting all linked documents, this may take a while...!',
+    });
+    await loading.present();
+
+    this.stockEntryService.resetStockEntry(this.uuid).subscribe({
+      next: success => {
+        loading.dismiss();
+        this.snackBar.open('Stock Entry Reseted.', CLOSE, { duration: 5500 });
+        this.router.navigateByUrl('stock-entry');
+      },
+      error: err => {
+        loading.dismiss();
+        this.snackBar.open(
+          err?.error?.message || JSON.stringify(err) || UPDATE_ERROR,
+          CLOSE,
+          { duration: 3500 },
         );
       },
     });

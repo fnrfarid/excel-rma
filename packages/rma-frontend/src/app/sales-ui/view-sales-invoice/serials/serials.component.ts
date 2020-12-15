@@ -20,8 +20,7 @@ import {
   CLOSE,
   DELIVERY_NOTE,
   ASSIGN_SERIAL_DIALOG_QTY,
-  SERIAL_DOWNLOAD_HEADERS,
-  CSV_FILE_TYPE,
+  DELIVERED_SERIALS_BY,
 } from '../../../constants/app-string';
 import {
   ERROR_FETCHING_SALES_INVOICE,
@@ -33,11 +32,9 @@ import * as _ from 'lodash';
 import {
   SerialDataSource,
   ItemDataSource,
-  DeliveredSerialsDataSource,
   DeliveryNoteItemInterface,
 } from './serials-datasource';
 import { SerialAssign } from '../../../common/interfaces/sales.interface';
-import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { LoadingController } from '@ionic/angular';
 import {
   DateAdapter,
@@ -50,6 +47,8 @@ import { TimeService } from '../../../api/time/time.service';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ViewSalesInvoicePage } from '../view-sales-invoice.page';
 import { ValidateInputSelected } from '../../../common/pipes/validators';
+import { DeliveredSerialsState } from 'src/app/common/components/delivered-serials/delivered-serials.component';
+import { DELIVERED_SERIALS_DISPLAYED_COLUMNS } from 'src/app/constants/storage';
 
 @Component({
   selector: 'sales-invoice-serials',
@@ -124,7 +123,6 @@ export class SerialsComponent implements OnInit {
   ];
   serialDataSource: SerialDataSource;
 
-  deliveredSerialsDataSource: DeliveredSerialsDataSource;
   deliveredSerialsDisplayedColumns = [
     'sr_no',
     'item_name',
@@ -133,6 +131,13 @@ export class SerialsComponent implements OnInit {
     'sales_warranty_expiry',
     'serial_no',
   ];
+  deliveredSerialsState: DeliveredSerialsState = {
+    deliveredSerialsDisplayedColumns:
+      DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+        DELIVERED_SERIALS_BY.sales_invoice_name
+      ],
+    type: DELIVERED_SERIALS_BY.sales_invoice_name,
+  };
   deliveredSerialsSearch: string = '';
   disableDeliveredSerialsCard: boolean = false;
   remaining: number = 0;
@@ -147,16 +152,12 @@ export class SerialsComponent implements OnInit {
     public dialog: MatDialog,
     private readonly timeService: TimeService,
     private readonly viewSalesInvoicePage: ViewSalesInvoicePage,
-    private readonly csvService: CsvJsonService,
     private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
-    this.deliveredSerialsDataSource = new DeliveredSerialsDataSource(
-      this.salesService,
-    );
     this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -216,6 +217,7 @@ export class SerialsComponent implements OnInit {
       .getSalesInvoice(uuid)
       .pipe(
         switchMap((sales_invoice: SalesInvoiceDetails) => {
+          this.deliveredSerialsState.uuid = sales_invoice.name;
           if (sales_invoice.has_bundle_item) {
             const item_codes = {};
             sales_invoice.items.forEach(item => {
@@ -259,26 +261,6 @@ export class SerialsComponent implements OnInit {
       });
   }
 
-  getDeliveredSerials() {
-    this.deliveredSerialsDataSource.loadItems(
-      this.salesInvoiceDetails.name,
-      this.deliveredSerialsSearch,
-      this.index,
-      this.size,
-    );
-  }
-
-  getUpdate(event) {
-    this.index = event.pageIndex;
-    this.size = event.pageSize;
-    this.deliveredSerialsDataSource.loadItems(
-      this.salesInvoiceDetails.name,
-      this.deliveredSerialsSearch,
-      event?.pageIndex || 0,
-      event?.pageSize || 30,
-    );
-  }
-
   async assignSingularSerials(row: Item) {
     const dialogRef =
       row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
@@ -319,10 +301,6 @@ export class SerialsComponent implements OnInit {
     this.updateProductState(row.item_code, serials.length);
     this.serialDataSource.update(data);
     this.resetRangeState();
-  }
-
-  setFilter(event?) {
-    this.getDeliveredSerials();
   }
 
   assignSerial(itemRow: Item) {
@@ -630,14 +608,6 @@ export class SerialsComponent implements OnInit {
         : `${notFoundMessage}`,
       CLOSE,
       { duration: 4500 },
-    );
-  }
-
-  downloadSerials() {
-    this.csvService.downloadAsCSV(
-      this.deliveredSerialsDataSource.data,
-      SERIAL_DOWNLOAD_HEADERS,
-      `${this.salesInvoiceDetails.name || ''}${CSV_FILE_TYPE}`,
     );
   }
 

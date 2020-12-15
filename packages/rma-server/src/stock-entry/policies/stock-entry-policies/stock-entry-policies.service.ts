@@ -2,12 +2,17 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import {
   StockEntryDto,
   StockEntryItemDto,
-} from '../../stock-entry/stock-entry-dto';
+} from '../../entities/stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { switchMap, mergeMap, toArray } from 'rxjs/operators';
-import { from, of, throwError } from 'rxjs';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { STOCK_ENTRY_TYPE } from '../../../constants/app-strings';
+import {
+  STOCK_ENTRY_STATUS,
+  STOCK_ENTRY_TYPE,
+} from '../../../constants/app-strings';
+import { StockEntry } from '../../entities/stock-entry.entity';
+
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
@@ -24,6 +29,121 @@ export class StockEntryPoliciesService {
           settings,
           clientHttpRequest,
         );
+      }),
+    );
+  }
+  validateStockEntryCancel(stockEntry: StockEntry): Observable<StockEntry> {
+    if (stockEntry.status !== STOCK_ENTRY_STATUS.delivered) {
+      return throwError(
+        new BadRequestException(
+          `${stockEntry.status} stock entry cannot be canceled`,
+        ),
+      );
+    }
+
+    const message = `${stockEntry.stock_entry_type} stock entry with status ${stockEntry.status} cannot be canceled.`;
+
+    switch (stockEntry.stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return throwError(new BadRequestException(message));
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return throwError(new BadRequestException(message));
+
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return this.validateMaterialReceiptReset(stockEntry);
+
+      default:
+        return throwError(new BadRequestException('Invalid Stock Entry'));
+    }
+  }
+
+  validateMaterialReceiptReset(stockEntry: StockEntry) {
+    return forkJoin({
+      validateSerialState: this.validateSerialState(stockEntry),
+      validateSerials: this.validateMaterialReceiptSerials(stockEntry),
+    }).pipe(
+      switchMap(valid => {
+        return of(stockEntry);
+      }),
+    );
+  }
+
+  validateMaterialReceiptSerials(invoice: StockEntry) {
+    return this.serialNoService
+      .asyncAggregate([
+        {
+          $match: {
+            purchase_invoice_name: invoice.uuid,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            serial_no: 1,
+          },
+        },
+        {
+          $lookup: {
+            from: 'serial_no_history',
+            localField: 'serial_no',
+            foreignField: 'serial_no',
+            as: 'history',
+          },
+        },
+        { $unwind: '$history' },
+        {
+          $group: {
+            _id: '$serial_no',
+            historyEvents: { $sum: 1 },
+          },
+        },
+        {
+          $redact: {
+            $cond: {
+              if: {
+                $gt: ['$historyEvents', 1],
+              },
+              then: '$$KEEP',
+              else: '$$PRUNE',
+            },
+          },
+        },
+      ])
+      .pipe(
+        switchMap((data: { _id: string; historyEvents: number }[]) => {
+          if (data?.length) {
+            const serialEventsMessage = data
+              .splice(0, 50)
+              .filter(element => `${element._id} has ${element.historyEvents}`)
+              .join(', ');
+            return throwError(
+              new BadRequestException(
+                `Found ${data.length} Serials having multiple events : ${serialEventsMessage}..`,
+              ),
+            );
+          }
+          return of(invoice);
+        }),
+      );
+  }
+
+  validateSerialState(invoice: StockEntry) {
+    return from(
+      this.serialNoService.count({
+        purchase_invoice_name: invoice.uuid,
+        queue_state: { $gt: {} },
+      }),
+    ).pipe(
+      switchMap(count => {
+        if (count) {
+          return throwError(
+            new BadRequestException(
+              `Found ${count} serials to be already in queue, please reset queue to proceed.`,
+            ),
+          );
+        }
+        return of(invoice);
       }),
     );
   }

@@ -96,6 +96,7 @@ export const STOCK_ENTRY_STATUS = {
   in_transit: 'In Transit',
   delivered: 'Delivered',
   returned: 'Returned',
+  reseted: 'Reseted',
   draft: 'Draft',
 };
 export const CANCELED_STATUS = 'Canceled';
@@ -257,6 +258,7 @@ export const DOC_NAMES = {
   PURCHASE_INVOICE: 'Purchase Invoice',
   PAYMENT_ENTRY: 'Payment Entry',
   LANDED_COST_VOUCHER: 'Landed Cost Voucher',
+  STOCK_ENTRY: 'Stock Entry',
 };
 
 export const DOC_RESET_INFO = {
