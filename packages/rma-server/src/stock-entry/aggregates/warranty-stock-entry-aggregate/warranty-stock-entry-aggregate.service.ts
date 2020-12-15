@@ -19,7 +19,10 @@ import { ServerSettings } from '../../../system-settings/entities/server-setting
 import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
 import { WarrantyStockEntryDto } from '../../entities/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntryDto, StockEntryItemDto } from '../../entities/stock-entry-dto';
+import {
+  StockEntryDto,
+  StockEntryItemDto,
+} from '../../entities/stock-entry-dto';
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
 
