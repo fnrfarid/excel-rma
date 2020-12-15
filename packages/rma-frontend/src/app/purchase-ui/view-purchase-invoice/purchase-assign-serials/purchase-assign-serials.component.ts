@@ -21,8 +21,7 @@ import {
   PURCHASE_RECEIPT,
   WAREHOUSES,
   ASSIGN_SERIAL_DIALOG_QTY,
-  SERIAL_DOWNLOAD_HEADERS,
-  CSV_FILE_TYPE,
+  DELIVERED_SERIALS_BY,
 } from '../../../constants/app-string';
 import { ERROR_FETCHING_PURCHASE_INVOICE } from '../../../constants/messages';
 import {
@@ -42,7 +41,6 @@ import {
   CsvJsonObj,
   AssignNonSerialsItemDialog,
 } from '../../../sales-ui/view-sales-invoice/serials/serials.component';
-import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import {
   DateAdapter,
   MAT_DATE_LOCALE,
@@ -50,10 +48,11 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../../constants/date-format';
-import { PurchasedSerialsDataSource } from './purchase-serials-datasource';
 import { TimeService } from '../../../api/time/time.service';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ValidateInputSelected } from '../../../common/pipes/validators';
+import { DELIVERED_SERIALS_DISPLAYED_COLUMNS } from 'src/app/constants/storage';
+import { DeliveredSerialsState } from 'src/app/common/components/delivered-serials/delivered-serials.component';
 
 @Component({
   selector: 'purchase-assign-serials',
@@ -116,21 +115,17 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     'delete',
   ];
   serialDataSource: SerialDataSource;
-  deliveredSerialsDisplayedColumns = [
-    'sr_no',
-    'item_name',
-    'warehouse',
-    'purchase_warranty_period',
-    'purchase_warranty_expiry',
-    'serial_no',
-  ];
-  purchasedSerialsDataSource: PurchasedSerialsDataSource;
+  deliveredSerialsState: DeliveredSerialsState = {
+    deliveredSerialsDisplayedColumns:
+      DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+        DELIVERED_SERIALS_BY.purchase_invoice_name
+      ],
+    type: DELIVERED_SERIALS_BY.purchase_invoice_name,
+  };
   displayDeliveredSerialsTable: boolean = false;
   remaining: number = 0;
   deliveredSerialsSearch: string = '';
   filteredItemList = [];
-  index: number = 0;
-  size: number = 10;
   itemMap: any = {};
   initial: { [key: string]: number } = {
     warehouse: 0,
@@ -145,15 +140,11 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     public dialog: MatDialog,
     private loadingController: LoadingController,
     private readonly timeService: TimeService,
-    private readonly csvService: CsvJsonService,
   ) {}
 
   ngOnInit() {
     this.serialDataSource = new SerialDataSource();
     this.itemDataSource = new ItemDataSource();
-    this.purchasedSerialsDataSource = new PurchasedSerialsDataSource(
-      this.purchaseService,
-    );
     this.getPurchaseInvoice(this.route.snapshot.params.invoiceUuid);
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
@@ -197,6 +188,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   getPurchaseInvoice(uuid: string) {
     this.purchaseService.getPurchaseInvoice(uuid).subscribe({
       next: (res: PurchaseInvoiceDetails) => {
+        this.deliveredSerialsState.uuid = res.name;
         this.purchaseInvoiceDetails = res as PurchaseInvoiceDetails;
         this.filteredItemList = this.getFilteredItems(res);
         this.itemDataSource.loadItems(this.filteredItemList);
@@ -219,30 +211,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
         );
       },
     });
-  }
-
-  getDeliveredSerials() {
-    this.purchasedSerialsDataSource.loadItems(
-      this.purchaseInvoiceDetails.name,
-      this.deliveredSerialsSearch,
-      0,
-      30,
-    );
-  }
-
-  setFilter() {
-    this.getDeliveredSerials();
-  }
-
-  getUpdate(event) {
-    this.index = event.pageIndex;
-    this.size = event.pageSize;
-    this.purchasedSerialsDataSource.loadItems(
-      this.purchaseInvoiceDetails.name,
-      this.deliveredSerialsSearch,
-      this.index,
-      this.size,
-    );
   }
 
   async submitPurchaseReceipt() {
@@ -500,14 +468,6 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       });
       this.serialDataSource.update(serials);
     });
-  }
-
-  downloadSerials() {
-    this.csvService.downloadAsCSV(
-      this.purchasedSerialsDataSource.data,
-      SERIAL_DOWNLOAD_HEADERS,
-      `${this.purchaseInvoiceDetails.name || ''}${CSV_FILE_TYPE}`,
-    );
   }
 
   validateState() {

@@ -10,6 +10,7 @@ describe('StorageService', () => {
           provide: STORAGE_TOKEN,
           useValue: {
             getItem: (...args) => Promise.resolve(),
+            removeItem: (...args) => Promise.resolve(),
           },
         },
       ],

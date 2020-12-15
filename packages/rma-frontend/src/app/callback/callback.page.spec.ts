@@ -23,6 +23,7 @@ describe('CallbackPage', () => {
           provide: STORAGE_TOKEN,
           useValue: {
             getItem: (...args) => Promise.resolve(),
+            removeItem: (...args) => Promise.resolve(),
           },
         },
         {

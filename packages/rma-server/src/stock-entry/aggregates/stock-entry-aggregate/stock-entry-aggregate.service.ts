@@ -1,10 +1,23 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
-import { StockEntryDto } from '../../stock-entry/stock-entry-dto';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  NotFoundException,
+  HttpService,
+} from '@nestjs/common';
+import { StockEntryService } from '../../entities/stock-entry.service';
+import { StockEntryDto } from '../../entities/stock-entry-dto';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
-import { switchMap, mergeMap, retry, concatMap, toArray } from 'rxjs/operators';
-import { StockEntry } from '../../stock-entry/stock-entry.entity';
-import { from, throwError, of } from 'rxjs';
+import {
+  switchMap,
+  mergeMap,
+  retry,
+  concatMap,
+  toArray,
+  catchError,
+} from 'rxjs/operators';
+import { StockEntry } from '../../entities/stock-entry.entity';
+import { from, throwError, of, forkJoin } from 'rxjs';
 import {
   STOCK_ENTRY,
   FRAPPE_QUEUE_JOB,
@@ -13,6 +26,8 @@ import {
   CREATE_STOCK_ENTRY_JOB,
   ACCEPT_STOCK_ENTRY_JOB,
   REJECT_STOCK_ENTRY_JOB,
+  AUTHORIZATION,
+  BEARER_HEADER_VALUE_PREFIX,
 } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import * as Agenda from 'agenda';
@@ -21,12 +36,15 @@ import {
   INVALID_FILE,
   STOCK_ENTRY_TYPE,
   AGENDA_JOB_STATUS,
+  DOC_NAMES,
 } from '../../../constants/app-strings';
 import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
+import { FRAPPE_CLIENT_CANCEL } from '../../../constants/routes';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 @Injectable()
 export class StockEntryAggregateService {
@@ -36,7 +54,9 @@ export class StockEntryAggregateService {
     private readonly stockEntryService: StockEntryService,
     private readonly stockEntryPolicies: StockEntryPoliciesService,
     private readonly serialBatchService: SerialBatchService,
+    private readonly http: HttpService,
     private readonly settingService: SettingsService,
+    private readonly serialHistoryService: SerialNoHistoryService,
     private readonly serialNoService: SerialNoService,
   ) {}
 
@@ -160,6 +180,57 @@ export class StockEntryAggregateService {
     }
     await this.stockEntryService.deleteOne({ uuid });
     return true;
+  }
+
+  resetStockEntry(uuid: string, req) {
+    return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new NotFoundException('Stock Entry not found'));
+        }
+        return forkJoin({
+          stockEntry: this.stockEntryPolicies.validateStockEntryCancel(
+            stockEntry,
+          ),
+          settings: this.settingService.find(),
+        });
+      }),
+      switchMap(({ stockEntry, settings }) => {
+        return this.cancelERPNextDocument(stockEntry, settings, req);
+      }),
+      switchMap(stockEntry => {
+        return forkJoin({
+          stockReset: this.updateStockEntryReset(stockEntry),
+          serialReset: this.resetStockEntrySerial(stockEntry),
+          serialHistoryReset: this.resetStockEntrySerialHistory(stockEntry),
+        });
+      }),
+    );
+  }
+
+  cancelERPNextDocument(stockEntry: StockEntry, settings: ServerSettings, req) {
+    return from(stockEntry.names).pipe(
+      concatMap(docName => {
+        return this.cancelDoc(DOC_NAMES.STOCK_ENTRY, docName, settings, req);
+      }),
+      catchError(err => {
+        const doc: { doctype: string; name: string } = JSON.parse(
+          err.config.data,
+        );
+        if (
+          err?.response?.data?.exc &&
+          err?.response?.data?.exc.includes('Cannot edit cancelled document') &&
+          doc.doctype === DOC_NAMES.STOCK_ENTRY
+        ) {
+          return of(true);
+        }
+        return throwError(err);
+      }),
+      toArray(),
+      switchMap(success => {
+        return of(stockEntry);
+      }),
+    );
   }
 
   saveDraft(payload: StockEntryDto, req) {
@@ -367,6 +438,71 @@ export class StockEntryAggregateService {
           );
       }),
     );
+  }
+
+  cancelDoc(doctype, docName, settings: ServerSettings, req) {
+    const doc = {
+      doctype,
+      name: docName,
+    };
+    return this.http.post(settings.authServerURL + FRAPPE_CLIENT_CANCEL, doc, {
+      headers: {
+        [AUTHORIZATION]: BEARER_HEADER_VALUE_PREFIX + req.token.accessToken,
+      },
+    });
+  }
+
+  updateStockEntryReset(stockEntry: StockEntry) {
+    return from(
+      this.stockEntryService.updateOne(
+        { uuid: stockEntry.uuid },
+        {
+          $set: {
+            status: STOCK_ENTRY_STATUS.reseted,
+          },
+        },
+      ),
+    );
+  }
+
+  resetStockEntrySerial(stockEntry: StockEntry) {
+    switch (stockEntry.stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return from(
+          this.serialNoService.deleteMany({
+            purchase_invoice_name: stockEntry.uuid,
+          }),
+        );
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return of({});
+
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return of({});
+
+      default:
+        return throwError(new BadRequestException('Invalid Stock Entry type.'));
+    }
+  }
+
+  resetStockEntrySerialHistory(stockEntry: StockEntry) {
+    switch (stockEntry.stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return from(
+          this.serialHistoryService.deleteMany({
+            parent_document: stockEntry.uuid,
+          }),
+        );
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return of({});
+
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return of({});
+
+      default:
+        return throwError(new BadRequestException('Invalid Stock Entry type.'));
+    }
   }
 }
 

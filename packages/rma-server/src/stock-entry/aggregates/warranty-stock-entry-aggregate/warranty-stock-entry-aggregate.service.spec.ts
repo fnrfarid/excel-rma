@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WarrantyStockEntryAggregateService } from './warranty-stock-entry-aggregate.service';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { HttpService } from '@nestjs/common';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { StockEntryService } from '../../entities/stock-entry.service';
 
 describe('WarrantyStockEntryAggregateService', () => {
   let service: WarrantyStockEntryAggregateService;

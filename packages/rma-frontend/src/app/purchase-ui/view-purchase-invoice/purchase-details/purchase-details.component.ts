@@ -158,7 +158,7 @@ export class PurchaseDetailsComponent implements OnInit {
 
     const loading = await this.loadingController.create({
       message:
-        'validating and reseting all linked documents Purchase, this may take a while...!',
+        'validating and reseting all linked documents, this may take a while...!',
     });
     await loading.present();
 
@@ -167,7 +167,7 @@ export class PurchaseDetailsComponent implements OnInit {
       .subscribe({
         next: success => {
           loading.dismiss();
-          this.snackBar.open('Coming Soon.', CLOSE, { duration: 5500 });
+          this.snackBar.open('Reset complete.', CLOSE, { duration: 5500 });
           this.router.navigateByUrl('purchase');
         },
         error: err => {

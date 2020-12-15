@@ -14,14 +14,14 @@ import {
   Param,
 } from '@nestjs/common';
 import { StockEntryAggregateService } from '../aggregates/stock-entry-aggregate/stock-entry-aggregate.service';
-import { StockEntryDto } from '../stock-entry/stock-entry-dto';
+import { StockEntryDto } from '../entities/stock-entry-dto';
 import { TokenGuard } from '../../auth/guards/token.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { throwError } from 'rxjs';
 import { INVALID_FILE } from '../../constants/app-strings';
 import { PurchaseInvoiceListQueryDto } from '../../constants/listing-dto/purchase-invoice-list-query';
 import { WarrantyStockEntryAggregateService } from '../aggregates/warranty-stock-entry-aggregate/warranty-stock-entry-aggregate.service';
-import { WarrantyStockEntryDto } from '../stock-entry/warranty-stock-entry-dto';
+import { WarrantyStockEntryDto } from '../entities/warranty-stock-entry-dto';
 
 @Controller('stock_entry')
 export class StockEntryController {
@@ -77,6 +77,12 @@ export class StockEntryController {
   @UseGuards(TokenGuard)
   deleteStockEntry(@Param('uuid') uuid, @Req() req) {
     return this.aggregate.deleteDraft(uuid);
+  }
+
+  @Post('v1/reset/:uuid')
+  @UseGuards(TokenGuard)
+  reset(@Param('uuid') uuid, @Req() req) {
+    return this.aggregate.resetStockEntry(uuid, req);
   }
 
   @Post('v1/accept_transfer/:uuid')

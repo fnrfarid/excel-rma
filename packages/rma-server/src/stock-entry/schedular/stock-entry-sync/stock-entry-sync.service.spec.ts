@@ -5,7 +5,7 @@ import { HttpService } from '@nestjs/common';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { StockEntrySyncService } from './stock-entry-sync.service';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
+import { StockEntryService } from '../../entities/stock-entry.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 

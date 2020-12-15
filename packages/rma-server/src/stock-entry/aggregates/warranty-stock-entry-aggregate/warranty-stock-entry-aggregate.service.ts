@@ -5,8 +5,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { StockEntryService } from '../../stock-entry/stock-entry.service';
-import { switchMap, map, toArray, mergeMap } from 'rxjs/operators';
+import { StockEntryService } from '../../entities/stock-entry.service';
 import { from, throwError, of } from 'rxjs';
 import {
   DEFAULT_NAMING_SERIES,
@@ -18,13 +17,14 @@ import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { POST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';
-import { WarrantyStockEntryDto } from '../../../stock-entry/stock-entry/warranty-stock-entry-dto';
+import { WarrantyStockEntryDto } from '../../entities/warranty-stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { StockEntry } from '../../../stock-entry/stock-entry/stock-entry.entity';
 import {
   StockEntryDto,
   StockEntryItemDto,
-} from 'src/stock-entry/stock-entry/stock-entry-dto';
+} from '../../entities/stock-entry-dto';
+import { StockEntry } from '../../entities/stock-entry.entity';
+import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {

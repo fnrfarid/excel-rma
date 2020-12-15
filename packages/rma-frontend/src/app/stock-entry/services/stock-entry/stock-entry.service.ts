@@ -12,6 +12,7 @@ import {
   STOCK_ENTRY_CREATE_ENDPOINT,
   STOCK_ENTRY_CREATE_FROM_FILE_ENDPOINT,
   ERPNEXT_WAREHOUSE_ENDPOINT,
+  STOCK_ENTRY_RESET_ENDPOINT,
 } from '../../../constants/url-strings';
 import { MaterialTransferDto } from '../../material-transfer/material-transfer.datasource';
 import { JSON_BODY_MAX_SIZE } from '../../../constants/app-string';
@@ -123,6 +124,18 @@ export class StockEntryService {
         return this.http.get<any>(url, { headers });
       }),
       map(res => res.data),
+    );
+  }
+
+  resetStockEntry(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          STOCK_ENTRY_RESET_ENDPOINT + uuid,
+          {},
+          { headers },
+        );
+      }),
     );
   }
 }
