@@ -475,7 +475,32 @@ export class StockEntryAggregateService {
         );
 
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
-        return of({});
+        return from(stockEntry.items).pipe(
+          concatMap(item => {
+            if (!item.has_serial_no) {
+              return of(true);
+            }
+            return from(
+              this.serialNoService.updateMany(
+                {
+                  serial_no: { $in: item.serial_no },
+                },
+                {
+                  $set: {
+                    warehouse: item.s_warehouse,
+                  },
+                  $unset: {
+                    sales_document_type: null,
+                    sales_document_no: null,
+                    sales_invoice_name: null,
+                    'warranty.salesWarrantyDate': null,
+                    'warranty.soldOn': null,
+                  },
+                },
+              ),
+            );
+          }),
+        );
 
       case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
         return of({});
@@ -495,7 +520,11 @@ export class StockEntryAggregateService {
         );
 
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
-        return of({});
+        return from(
+          this.serialHistoryService.deleteMany({
+            parent_document: stockEntry.uuid,
+          }),
+        );
 
       case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
         return of({});
