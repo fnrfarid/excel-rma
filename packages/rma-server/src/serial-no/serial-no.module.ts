@@ -4,13 +4,12 @@ import { SerialNoEntitiesModule } from './entity/entity.module';
 import { SerialNoQueryManager } from './query';
 import { SerialNoCommandManager } from './command';
 import { SerialNoController } from './controllers/serial-no/serial-no.controller';
-import { SerialNoPoliciesService } from './policies/serial-no-policies/serial-no-policies.service';
 import { ItemEntitiesModule } from '../item/entity/item-entity.module';
 import { SupplierEntitiesModule } from '../supplier/entity/entity.module';
-import { AssignSerialNoPoliciesService } from './policies/assign-serial-no-policies/assign-serial-no-policies.service';
 import { SalesInvoiceEntitiesModule } from '../sales-invoice/entity/entity.module';
 import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { DirectModule } from '../direct/direct.module';
+import { SerialNoPolicies } from './policies';
 
 @Module({
   imports: [
@@ -26,14 +25,12 @@ import { DirectModule } from '../direct/direct.module';
     ...SerialNoAggregatesManager,
     ...SerialNoQueryManager,
     ...SerialNoCommandManager,
-    SerialNoPoliciesService,
-    AssignSerialNoPoliciesService,
+    ...SerialNoPolicies,
   ],
   exports: [
     SerialNoEntitiesModule,
     ...SerialNoAggregatesManager,
-    AssignSerialNoPoliciesService,
-    SerialNoPoliciesService,
+    ...SerialNoPolicies,
   ],
 })
 export class SerialNoModule {}
