@@ -5,7 +5,7 @@ import {
   SerialNoHistory,
   SerialNoHistoryInterface,
 } from './serial-no-history.entity';
-import { of, from } from 'rxjs';
+import { of, from, Observable } from 'rxjs';
 import { switchMap, map, bufferCount, concatMap } from 'rxjs/operators';
 import { MONGO_INSERT_MANY_BATCH_NUMBER } from '../../../constants/app-strings';
 
@@ -87,7 +87,7 @@ export class SerialNoHistoryService {
     return await this.serialNoRepository.insertMany(query, options);
   }
 
-  asyncAggregate(query) {
+  asyncAggregate(query): Observable<any> {
     return of(this.serialNoRepository.aggregate(query)).pipe(
       switchMap((aggregateData: any) => {
         return aggregateData.toArray();

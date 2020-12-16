@@ -12,12 +12,14 @@ import {
   STOCK_ENTRY_TYPE,
 } from '../../../constants/app-strings';
 import { StockEntry } from '../../entities/stock-entry.entity';
+import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
+    private readonly serialNoHistoryPolicy: SerialNoHistoryPoliciesService,
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
@@ -48,7 +50,7 @@ export class StockEntryPoliciesService {
         return throwError(new BadRequestException(message));
 
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
-        return throwError(new BadRequestException(message));
+        return this.validateMaterialIssueReset(stockEntry);
 
       case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
         return this.validateMaterialReceiptReset(stockEntry);
@@ -69,59 +71,65 @@ export class StockEntryPoliciesService {
     );
   }
 
-  validateMaterialReceiptSerials(invoice: StockEntry) {
-    return this.serialNoService
-      .asyncAggregate([
-        {
-          $match: {
-            purchase_invoice_name: invoice.uuid,
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            serial_no: 1,
-          },
-        },
-        {
-          $lookup: {
-            from: 'serial_no_history',
-            localField: 'serial_no',
-            foreignField: 'serial_no',
-            as: 'history',
-          },
-        },
-        { $unwind: '$history' },
-        {
-          $group: {
-            _id: '$serial_no',
-            historyEvents: { $sum: 1 },
-          },
-        },
-        {
-          $redact: {
-            $cond: {
-              if: {
-                $gt: ['$historyEvents', 1],
-              },
-              then: '$$KEEP',
-              else: '$$PRUNE',
-            },
-          },
-        },
-      ])
+  validateMaterialIssueReset(stockEntry: StockEntry) {
+    return forkJoin({
+      validateSerialState: this.validateSerialState(stockEntry),
+      validateSerials: this.validateMaterialIssueSerials(stockEntry),
+    }).pipe(
+      switchMap(valid => {
+        return of(stockEntry);
+      }),
+    );
+  }
+
+  validateMaterialIssueSerials(invoice: StockEntry) {
+    const serials = this.getInvoiceSerials(invoice);
+    return this.serialNoHistoryPolicy
+      .validateLatestEventWithParent(invoice.uuid, serials)
       .pipe(
-        switchMap((data: { _id: string; historyEvents: number }[]) => {
-          if (data?.length) {
-            const serialEventsMessage = data
-              .splice(0, 50)
-              .filter(element => `${element._id} has ${element.historyEvents}`)
-              .join(', ');
-            return throwError(
-              new BadRequestException(
-                `Found ${data.length} Serials having multiple events : ${serialEventsMessage}..`,
-              ),
-            );
+        switchMap(response => {
+          let message = `Found ${response.length} Events, please cancel Following events for serials
+        `;
+          response.forEach(value =>
+            value
+              ? (message += `${value._id} : ${value.serials
+                  .splice(0, 50)
+                  .join(', ')}`)
+              : null,
+          );
+          if (response && response.length) {
+            return throwError(message);
+          }
+          return of(true);
+        }),
+      );
+  }
+
+  getInvoiceSerials(invoice: StockEntry) {
+    const serials = [];
+    invoice.items.forEach(item =>
+      item.has_serial_no ? serials.push(...item.serial_no) : null,
+    );
+    return serials;
+  }
+
+  validateMaterialReceiptSerials(invoice: StockEntry) {
+    const serials = this.getInvoiceSerials(invoice);
+    return this.serialNoHistoryPolicy
+      .validateLatestEventWithParent(invoice.uuid, serials)
+      .pipe(
+        switchMap(response => {
+          let message = `Found ${response.length} Events, please cancel Following events for serials
+          `;
+          response.forEach(value =>
+            value
+              ? (message += `${value._id} : ${value.serials
+                  .splice(0, 50)
+                  .join(', ')}`)
+              : null,
+          );
+          if (response && response.length) {
+            return throwError(new BadRequestException(message));
           }
           return of(invoice);
         }),

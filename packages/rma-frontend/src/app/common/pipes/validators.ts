@@ -7,6 +7,7 @@ export function ValidateInputSelected(
 ) {
   options.subscribe({
     next: (data: any[]) => {
+      if (!data) return;
       if (typeof formControl.value === 'object') {
         return true;
       }
@@ -19,9 +20,12 @@ export function ValidateInputSelected(
           if (Object.keys(obj).find(key => obj[key] === formControl.value)) {
             result = true;
           }
-          return;
         });
-        if (result) return;
+        if (result) {
+          formControl.setErrors({ falseValse: null });
+          formControl.updateValueAndValidity();
+          return;
+        }
       }
       formControl.setErrors({ falseValse: formControl.value });
     },

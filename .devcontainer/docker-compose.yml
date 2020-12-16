@@ -12,16 +12,20 @@ services:
     image: bitnami/mongodb:latest
     restart: on-failure
     environment:
-      - MONGODB_USERNAME=rma-server
+      - MONGODB_PRIMARY_ROOT_USER=root
+      - MONGODB_USERNAME=excel-rma
       - MONGODB_PASSWORD=admin
-      - MONGODB_DATABASE=rma-server
+      - MONGODB_DATABASE=excel-rma
       - MONGODB_ROOT_PASSWORD=admin
+      - SERVER_DB=rma-server
+      - SERVER_USER=rma-server
+      - SERVER_DB_PASSWORD=admin
       - CACHE_DB=cache-db
       - CACHE_USER=cache-db
       - CACHE_DB_PASSWORD=admin
     volumes:
       - mongo-vol:/bitnami
-      - ./createdatabases.sh:/docker-entrypoint-initdb.d/createdatabases.sh
+      - ../docker/backing-services/files/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     depends_on:
       - fix-mongodb-permissions
 
@@ -32,7 +36,6 @@ services:
       - ..:/workspace
     working_dir: /workspace
     ports:
-      - '4700:4700'
       - '8800:8800'
 
 volumes:
