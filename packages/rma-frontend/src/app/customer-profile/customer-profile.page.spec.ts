@@ -43,6 +43,7 @@ describe('CustomerProfilePage', () => {
           provide: SalesService,
           useValue: {
             relayCustomerList: (...args) => of([{}]),
+            customerList: (...args) => of([{}]),
             getDoctypeCount: (...args) => of(0),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),

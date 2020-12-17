@@ -31,11 +31,27 @@
           <input
             matInput
             placeholder="Customer name"
-            [(ngModel)]="search"
-            (keyup.enter)="setFilter()"
+            [matAutocomplete]="Customer"
+            [(ngModel)]="customer"
           />
-          <button mat-button matSuffix (click)="setFilter()">
+          <mat-autocomplete
+                autoActiveFirstOption
+                #Customer="matAutocomplete"
+                [displayWith]="getCustomerOption"
+                (optionSelected)="setFilter()"
+              >
+                <mat-option
+                  *ngFor="let option of (customerList | async)"
+                  [value]="option"
+                >
+                  {{ option.name }}
+                </mat-option>
+              </mat-autocomplete>
+          <button mat-button matSuffix (click)="setFilter()" *ngIf="!customer">
             <mat-icon>search</mat-icon>
+          </button>
+          <button mat-button matSuffix (click)="clearFilters()" *ngIf="customer">
+            <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
       </div>
