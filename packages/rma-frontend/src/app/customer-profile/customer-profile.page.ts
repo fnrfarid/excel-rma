@@ -34,9 +34,10 @@ export class CustomerProfilePage implements OnInit {
     'remaining_balance',
     'remaining_credit',
   ];
-  search: string = '';
+  customer: any;
   filters: any = [];
   countFilter: any = {};
+  customerList = this.salesService.customerList();
   constructor(
     private readonly location: Location,
     private readonly salesService: SalesService,
@@ -55,6 +56,15 @@ export class CustomerProfilePage implements OnInit {
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }
 
+  getCustomerOption(option) {
+    if (option) return option.name;
+  }
+
+  clearFilters() {
+    this.customer = '';
+    this.setFilter();
+  }
+
   getUpdate(event) {
     this.dataSource.loadItems(
       event.pageIndex,
@@ -68,9 +78,9 @@ export class CustomerProfilePage implements OnInit {
     this.filters = [];
     this.countFilter = {};
 
-    if (this.search) {
-      this.filters.push(['name', 'like', `%${this.search}%`]);
-      this.countFilter.name = ['like', `%${this.search}%`];
+    if (this.customer) {
+      this.filters.push(['name', 'like', `%${this.customer.name}%`]);
+      this.countFilter.name = ['like', `%${this.customer.name}%`];
     }
 
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
