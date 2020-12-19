@@ -29,13 +29,29 @@
         <mat-form-field class="mat-input-wrapper">
           <input
             matInput
-            placeholder="Search"
+            placeholder="Customer name"
+            [matAutocomplete]="Customer"
             [(ngModel)]="search"
-            (keyup.enter)="setFilter()"
           />
-          <button mat-button matSuffix (click)="setFilter()">
-            <mat-icon>search</mat-icon>
-          </button>
+          <mat-autocomplete
+                autoActiveFirstOption
+                #Customer="matAutocomplete"
+                [displayWith]="getCustomerOption"
+                (optionSelected)="setFilter()"
+              >
+                <mat-option
+                  *ngFor="let option of (customerList | async)"
+                  [value]="option"
+                >
+                  {{ option.name }}
+                </mat-option>
+              </mat-autocomplete>
+              <button mat-button matSuffix (click)="setFilter()" *ngIf="!search">
+                <mat-icon>search</mat-icon>
+              </button>
+              <button mat-button matSuffix (click)="clearFilters()" *ngIf="search">
+                <mat-icon>close</mat-icon>
+              </button>
         </mat-form-field>
       </div>
       <div class="example-container mat-elevation-z8">

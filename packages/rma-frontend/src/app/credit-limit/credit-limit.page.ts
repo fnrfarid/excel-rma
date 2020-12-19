@@ -28,7 +28,9 @@ export class CreditLimitPage implements OnInit {
     'set_by',
     'set_on',
   ];
-  search: string = '';
+  search: any;
+  filters: any = [];
+  customerList = this.salesService.customerList();
 
   constructor(
     private readonly location: Location,
@@ -44,6 +46,15 @@ export class CreditLimitPage implements OnInit {
     });
     this.dataSource = new CreditLimitDataSource(this.salesService);
     this.dataSource.loadItems();
+  }
+
+  getCustomerOption(option) {
+    if (option) return option.name;
+  }
+
+  clearFilters() {
+    this.search = '';
+    this.setFilter();
   }
 
   navigateBack() {
@@ -80,7 +91,7 @@ export class CreditLimitPage implements OnInit {
 
   setFilter(event?) {
     this.dataSource.loadItems(
-      this.search,
+      this.search.name,
       this.sort.direction,
       event?.pageIndex || 0,
       event?.pageSize || 30,
