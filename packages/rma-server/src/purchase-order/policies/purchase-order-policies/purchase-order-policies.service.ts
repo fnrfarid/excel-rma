@@ -1,6 +1,6 @@
 import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
-import { from, of, throwError } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
   BEARER_HEADER_VALUE_PREFIX,
@@ -221,11 +221,15 @@ export class PurchaseOrderPoliciesService {
       switchMap((docs: { message: { [key: string]: DocInfoInterface[] } }) => {
         return of({
           [DOC_NAMES.PURCHASE_RECEIPT]: docs.message[DOC_NAMES.PURCHASE_RECEIPT]
-            .filter(data => data.docstatus !== 2)
-            .map(data => data.name),
+            ? docs.message[DOC_NAMES.PURCHASE_RECEIPT]
+                .filter(data => data.docstatus !== 2)
+                .map(data => data.name)
+            : [],
           [DOC_NAMES.PURCHASE_INVOICE]: docs.message[DOC_NAMES.PURCHASE_INVOICE]
-            .filter(data => data.docstatus !== 2)
-            .map(data => data.name),
+            ? docs.message[DOC_NAMES.PURCHASE_INVOICE]
+                .filter(data => data.docstatus !== 2)
+                .map(data => data.name)
+            : [],
           [DOC_NAMES.PURCHASE_ORDER]: order.docstatus === 2 ? [] : [order.name],
         });
       }),
@@ -296,7 +300,7 @@ export class PurchaseOrderPoliciesService {
     docInfo,
     settings: ServerSettings,
     clienthttpReq,
-  ) {
+  ): Observable<{ message: { [key: string]: DocInfoInterface[] } }> {
     return this.http
       .post(
         settings.authServerURL + GET_FRAPPE_LINKED_DOCS_ENDPOINT,
