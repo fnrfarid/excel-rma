@@ -91,7 +91,16 @@ export const DRAFT_STATUS = 'Draft';
 export const TO_DELIVER_STATUS = 'To Deliver';
 export const REJECTED_STATUS = 'Rejected';
 export const SUBMITTED_STATUS = 'Submitted';
+export const CANCELED_STATUS = 'Canceled';
 export const COMPLETED_STATUS = 'Completed';
+export const SALES_INVOICE_STATUS = {
+  deliver: TO_DELIVER_STATUS,
+  rejected: REJECTED_STATUS,
+  submitted: SUBMITTED_STATUS,
+  completed: COMPLETED_STATUS,
+  reseted: 'Reseted',
+  canceled: CANCELED_STATUS,
+};
 export const STOCK_ENTRY_STATUS = {
   in_transit: 'In Transit',
   delivered: 'Delivered',
@@ -99,7 +108,6 @@ export const STOCK_ENTRY_STATUS = {
   reseted: 'Reseted',
   draft: 'Draft',
 };
-export const CANCELED_STATUS = 'Canceled';
 export const SALES_USER = 'Sales User';
 export const SALES_MANAGER = 'Sales Manager';
 export const SALES_INVOICE_STATUS_ENUM = [
@@ -259,6 +267,8 @@ export const DOC_NAMES = {
   PAYMENT_ENTRY: 'Payment Entry',
   LANDED_COST_VOUCHER: 'Landed Cost Voucher',
   STOCK_ENTRY: 'Stock Entry',
+  SALES_INVOICE: 'Sales Invoice',
+  DELIVERY_NOTE: 'Delivery Note',
 };
 
 export const DOC_RESET_INFO = {
@@ -291,6 +301,15 @@ export const DOC_RESET_INFO = {
       doctype_fieldname: 'receipt_document_type',
     },
   },
+  [DOC_NAMES.SALES_INVOICE]: {
+    'Sales Invoice': {
+      fieldname: ['amended_from', 'return_against'],
+    },
+    'Delivery Note': {
+      child_doctype: 'Delivery Note Item',
+      fieldname: ['against_sales_invoice'],
+    },
+  },
 };
 
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
@@ -309,3 +328,4 @@ export const STOCK_ENTRY_NAMING_SERIES = {
   [STOCK_ENTRY_TYPE.MATERIAL_ISSUE]: DEFAULT_NAMING_SERIES.material_issue,
   [STOCK_ENTRY_TYPE.MATERIAL_RECEIPT]: DEFAULT_NAMING_SERIES.material_receipt,
 };
+export const INVALID_REGEX = /[°"§%()\[\]{}=\\?´`'#<>|,;.:+_-]+/g;

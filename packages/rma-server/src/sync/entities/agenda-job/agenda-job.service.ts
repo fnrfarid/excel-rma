@@ -16,8 +16,8 @@ export class AgendaJobService {
     private readonly agendaJobRepository: MongoRepository<AgendaJob>,
   ) {}
 
-  async find() {
-    return await this.agendaJobRepository.find();
+  async find(query?) {
+    return await this.agendaJobRepository.find(query);
   }
 
   async findOne(query, options?) {
