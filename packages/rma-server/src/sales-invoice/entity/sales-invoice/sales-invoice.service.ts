@@ -159,6 +159,10 @@ export class SalesInvoiceService {
     );
   }
 
+  async count(query) {
+    return await this.salesInvoiceRepository.count(query);
+  }
+
   getKeys() {
     const group: any = {};
     const keys = this.getColumns();
