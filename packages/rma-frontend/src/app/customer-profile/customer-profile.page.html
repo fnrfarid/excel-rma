@@ -18,116 +18,125 @@
 
 <ion-content color="light">
   <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-text color="primary">
-          Customers
-        </ion-text>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="ion-no-padding">
-      <div class="ion-padding">
-        <mat-form-field class="mat-input-wrapper">
-          <input
-            matInput
-            placeholder="Customer name"
-            [matAutocomplete]="Customer"
-            [(ngModel)]="customer"
-          />
-          <mat-autocomplete
-                autoActiveFirstOption
-                #Customer="matAutocomplete"
-                [displayWith]="getCustomerOption"
-                (optionSelected)="setFilter()"
+    <form [formGroup]="customerProfileForm">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-text color="primary">
+            Customers
+          </ion-text>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="ion-no-padding">
+        <div class="ion-padding">
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              placeholder="Customer name"
+              [matAutocomplete]="auto"
+              formControlName="customer"
+              (focusout)="validateInput(f.customer, filteredCustomerList)"
+            />
+            <mat-autocomplete
+              autoActiveFirstOption
+              #auto="matAutocomplete"
+              [displayWith]="getCustomerOption"
+              (optionSelected)="setFilter($event.option.value)"
+            >
+              <mat-option
+                *ngFor="let option of filteredCustomerList | async"
+                [value]="option"
               >
-                <mat-option
-                  *ngFor="let option of (customerList | async)"
-                  [value]="option"
+                {{ option.customer_name }}
+                <small class="text-muted">
+                  {{ option.name}}
+                </small>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="f.customer.hasError('falseValse')">
+              You should select a value from dropdown only.
+              <strong>'{{f.customer.value}}'</strong> is not allowed.
+            </mat-error>
+          </mat-form-field>
+          <ion-button color="tertiary" (click)="clearFilters()" fill="outline">
+            Clear
+          </ion-button>
+        </div>
+        <div class="example-container mat-elevation-z8">
+          <table
+            mat-table
+            class="full-width-table"
+            [dataSource]="dataSource"
+            matSort
+          >
+            <!-- Custoemr Name Column -->
+            <ng-container matColumnDef="customer">
+              <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
+              <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="credit_limit">
+              <mat-header-cell *matHeaderCellDef>Credit Limit</mat-header-cell>
+              <mat-cell *matCellDef="let row"
+                >{{ row.credit_limit | curFormat | async }}</mat-cell
+              >
+            </ng-container>
+
+            <ng-container matColumnDef="remaining_credit">
+              <mat-header-cell *matHeaderCellDef
+                >Remaining Credit</mat-header-cell
+              >
+              <mat-cell *matCellDef="let row"
+                >{{ getRemainingCredit(row) | curFormat | async }}</mat-cell
+              >
+            </ng-container>
+
+            <ng-container matColumnDef="territory">
+              <mat-header-cell *matHeaderCellDef
+                >Territory name</mat-header-cell
+              >
+              <mat-cell *matCellDef="let row">{{ row.territory }}</mat-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="remaining_balance">
+              <mat-header-cell *matHeaderCellDef
+                >Current Outstanding</mat-header-cell
+              >
+
+              <mat-cell
+                class="ion-text-center"
+                mat-cell
+                *matCellDef="let row; let i = index"
+              >
+                <ion-text *ngIf="row.remaining_balance">
+                  {{row.remaining_balance | curFormat | async}}
+                </ion-text>
+                <ion-button
+                  *ngIf="!row.remaining_balance"
+                  (click)="loadPrice(row, i)"
+                  fill="clear"
                 >
-                  {{ option.name }}
-                </mat-option>
-              </mat-autocomplete>
-          <button mat-button matSuffix (click)="setFilter()" *ngIf="!customer">
-            <mat-icon>search</mat-icon>
-          </button>
-          <button mat-button matSuffix (click)="clearFilters()" *ngIf="customer">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
-      </div>
-      <div class="example-container mat-elevation-z8">
-        <table
-          mat-table
-          class="full-width-table"
-          [dataSource]="dataSource"
-          matSort
-        >
-          <!-- Custoemr Name Column -->
-          <ng-container matColumnDef="customer">
-            <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
-            <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
-          </ng-container>
+                  <ion-icon slot="icon-only" name="refresh"></ion-icon>
+                </ion-button>
+              </mat-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="credit_limit">
-            <mat-header-cell *matHeaderCellDef>Credit Limit</mat-header-cell>
-            <mat-cell *matCellDef="let row"
-              >{{ row.credit_limit | curFormat | async }}</mat-cell
-            >
-          </ng-container>
-
-          <ng-container matColumnDef="remaining_credit">
-            <mat-header-cell *matHeaderCellDef
-              >Remaining Credit</mat-header-cell
-            >
-            <mat-cell *matCellDef="let row"
-              >{{ getRemainingCredit(row) | curFormat | async }}</mat-cell
-            >
-          </ng-container>
-
-          <ng-container matColumnDef="territory">
-            <mat-header-cell *matHeaderCellDef>Territory name</mat-header-cell>
-            <mat-cell *matCellDef="let row">{{ row.territory }}</mat-cell>
-          </ng-container>
-
-          <ng-container matColumnDef="remaining_balance">
-            <mat-header-cell *matHeaderCellDef
-              >Current Outstanding</mat-header-cell
-            >
-
-            <mat-cell
-              class="ion-text-center"
-              mat-cell
-              *matCellDef="let row; let i = index"
-            >
-              <ion-text *ngIf="row.remaining_balance">
-                {{row.remaining_balance | curFormat | async}}
-              </ion-text>
-              <ion-button
-                *ngIf="!row.remaining_balance"
-                (click)="loadPrice(row, i)"
-                fill="clear"
-              >
-                <ion-icon slot="icon-only" name="refresh"></ion-icon>
-              </ion-button>
-            </mat-cell>
-          </ng-container>
-
-          <mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-        </table>
-      </div>
-      <mat-card-actions>
-        <mat-paginator
-          #paginator
-          class="mat-paginator-sticky"
-          (page)="getUpdate($event)"
-          [length]="dataSource.length"
-          [pageSizeOptions]="[30, 50, 100, 500]"
-        >
-        </mat-paginator>
-      </mat-card-actions>
-    </ion-card-content>
+            <mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+          </table>
+        </div>
+        <mat-card-actions>
+          <mat-paginator
+            #paginator
+            class="mat-paginator-sticky"
+            (page)="getUpdate($event)"
+            [length]="dataSource.length"
+            [pageSizeOptions]="[30, 50, 100, 500]"
+          >
+          </mat-paginator>
+        </mat-card-actions>
+      </ion-card-content>
+    </form>
   </ion-card>
 </ion-content>
