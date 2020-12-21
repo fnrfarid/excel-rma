@@ -29,6 +29,10 @@ export class StockEntryDto {
 
   @IsOptional()
   @IsString()
+  customer?: string;
+
+  @IsOptional()
+  @IsString()
   remarks: string;
 
   @IsNotEmpty()

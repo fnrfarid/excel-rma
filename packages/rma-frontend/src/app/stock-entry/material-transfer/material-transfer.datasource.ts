@@ -45,6 +45,7 @@ export class MaterialTransferDto {
   company: string;
   territory: string;
   remarks: string;
+  customer?: string;
   posting_date: string;
   posting_time: string;
   items: StockEntryRow[];

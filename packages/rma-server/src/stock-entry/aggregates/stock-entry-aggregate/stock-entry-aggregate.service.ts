@@ -200,10 +200,9 @@ export class StockEntryAggregateService {
       }),
       switchMap(stockEntry => {
         return forkJoin({
-          stockReset: this.updateStockEntryReset(stockEntry),
           serialReset: this.resetStockEntrySerial(stockEntry),
           serialHistoryReset: this.resetStockEntrySerialHistory(stockEntry),
-        });
+        }).pipe(switchMap(success => this.updateStockEntryReset(stockEntry)));
       }),
     );
   }
@@ -211,20 +210,20 @@ export class StockEntryAggregateService {
   cancelERPNextDocument(stockEntry: StockEntry, settings: ServerSettings, req) {
     return from(stockEntry.names).pipe(
       concatMap(docName => {
-        return this.cancelDoc(DOC_NAMES.STOCK_ENTRY, docName, settings, req);
+        const doctypeName =
+          stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
+            ? DOC_NAMES.DELIVERY_NOTE
+            : DOC_NAMES.STOCK_ENTRY;
+        return this.cancelDoc(doctypeName, docName, settings, req);
       }),
       catchError(err => {
-        const doc: { doctype: string; name: string } = JSON.parse(
-          err.config.data,
-        );
         if (
           err?.response?.data?.exc &&
-          err?.response?.data?.exc.includes('Cannot edit cancelled document') &&
-          doc.doctype === DOC_NAMES.STOCK_ENTRY
+          err?.response?.data?.exc.includes('Cannot edit cancelled document')
         ) {
           return of(true);
         }
-        return throwError(err);
+        return throwError(new BadRequestException(err));
       }),
       toArray(),
       switchMap(success => {
@@ -475,32 +474,10 @@ export class StockEntryAggregateService {
         );
 
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
-        return from(stockEntry.items).pipe(
-          concatMap(item => {
-            if (!item.has_serial_no) {
-              return of(true);
-            }
-            return from(
-              this.serialNoService.updateMany(
-                {
-                  serial_no: { $in: item.serial_no },
-                },
-                {
-                  $set: {
-                    warehouse: item.s_warehouse,
-                  },
-                  $unset: {
-                    sales_document_type: null,
-                    sales_document_no: null,
-                    sales_invoice_name: null,
-                    'warranty.salesWarrantyDate': null,
-                    'warranty.soldOn': null,
-                  },
-                },
-              ),
-            );
-          }),
-        );
+        return this.resetMaterialIssueSerials(stockEntry);
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return this.resetMaterialIssueSerials(stockEntry);
 
       case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
         return of({});
@@ -508,6 +485,35 @@ export class StockEntryAggregateService {
       default:
         return throwError(new BadRequestException('Invalid Stock Entry type.'));
     }
+  }
+
+  resetMaterialIssueSerials(stockEntry: StockEntry) {
+    return from(stockEntry.items).pipe(
+      concatMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
+        return from(
+          this.serialNoService.updateMany(
+            {
+              serial_no: { $in: item.serial_no },
+            },
+            {
+              $set: {
+                warehouse: item.s_warehouse,
+              },
+              $unset: {
+                sales_document_type: null,
+                sales_document_no: null,
+                sales_invoice_name: null,
+                'warranty.salesWarrantyDate': null,
+                'warranty.soldOn': null,
+              },
+            },
+          ),
+        );
+      }),
+    );
   }
 
   resetStockEntrySerialHistory(stockEntry: StockEntry) {
@@ -520,6 +526,13 @@ export class StockEntryAggregateService {
         );
 
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return from(
+          this.serialHistoryService.deleteMany({
+            parent_document: stockEntry.uuid,
+          }),
+        );
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
         return from(
           this.serialHistoryService.deleteMany({
             parent_document: stockEntry.uuid,

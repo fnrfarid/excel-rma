@@ -96,6 +96,7 @@ export const COMPLETED_STATUS = 'Completed';
 export const SALES_INVOICE_STATUS = {
   deliver: TO_DELIVER_STATUS,
   rejected: REJECTED_STATUS,
+  draft: DRAFT_STATUS,
   submitted: SUBMITTED_STATUS,
   completed: COMPLETED_STATUS,
   reseted: 'Reseted',
@@ -320,12 +321,14 @@ export const STOCK_ENTRY_TYPE = {
   MATERIAL_TRANSFER: 'Material Transfer',
   MATERIAL_RECEIPT: 'Material Receipt',
   MATERIAL_ISSUE: 'Material Issue',
+  RnD_PRODUCTS: 'R&D Products',
 };
 export const STOCK_ENTRY_NAMING_SERIES = {
   [CREATE_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_send,
   [ACCEPT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_receive,
   [REJECT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_rejected,
   [STOCK_ENTRY_TYPE.MATERIAL_ISSUE]: DEFAULT_NAMING_SERIES.material_issue,
+  [STOCK_ENTRY_TYPE.RnD_PRODUCTS]: DEFAULT_NAMING_SERIES.material_issue,
   [STOCK_ENTRY_TYPE.MATERIAL_RECEIPT]: DEFAULT_NAMING_SERIES.material_receipt,
 };
 export const INVALID_REGEX = /[°"§%()\[\]{}=\\?´`'#<>|,;.:+_-]+/g;

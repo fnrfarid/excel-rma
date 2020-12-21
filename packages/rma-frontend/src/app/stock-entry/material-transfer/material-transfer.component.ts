@@ -8,6 +8,7 @@ import {
   mergeMap,
   toArray,
   catchError,
+  map,
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
@@ -101,10 +102,12 @@ export class MaterialTransferComponent implements OnInit {
     s_warehouse: 0,
     territory: 0,
   };
+  filteredCustomerList: Observable<any[]>;
   form: FormGroup = new FormGroup({
     territory: new FormControl('', [Validators.required]),
     stock_entry_type: new FormControl('', [Validators.required]),
     accounts: new FormControl(''),
+    customer: new FormControl(''),
   });
   materialTransferDisplayedColumns = MATERIAL_TRANSFER_DISPLAYED_COLUMNS;
   itemDataSource: StockItemsDataSource = new StockItemsDataSource();
@@ -174,6 +177,9 @@ export class MaterialTransferComponent implements OnInit {
             this.form.controls.accounts.setValue(
               success.items[0]?.expense_account || '',
             );
+            this.form.controls.customer.setValue(
+              success.customer ? { name: success.customer } : '',
+            );
             this.readonly ? this.form.controls.accounts.disable() : null;
           }
           this.form.controls.territory.setValue(success.territory);
@@ -199,6 +205,15 @@ export class MaterialTransferComponent implements OnInit {
       .getStore()
       .getItem(TRANSFER_WAREHOUSE);
     this.company = await this.salesService.getStore().getItem(DEFAULT_COMPANY);
+
+    this.filteredCustomerList = this.form.get('customer').valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService
+          .getCustomerList(value)
+          .pipe(map(res => res.docs));
+      }),
+    );
 
     this.filteredWarehouseList1 = this.warehouseState.s_warehouse.valueChanges.pipe(
       startWith(''),
@@ -264,6 +279,16 @@ export class MaterialTransferComponent implements OnInit {
   setDeliveredSerialState(stock_entry_type) {
     switch (stock_entry_type) {
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        this.deliveredSerialsState.type =
+          DELIVERED_SERIALS_BY.sales_invoice_name;
+        this.deliveredSerialsState.deliveredSerialsDisplayedColumns =
+          DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+            DELIVERED_SERIALS_BY.sales_invoice_name
+          ];
+        this.deliveredSerialsState.uuid = this.uuid;
+        break;
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
         this.deliveredSerialsState.type =
           DELIVERED_SERIALS_BY.sales_invoice_name;
         this.deliveredSerialsState.deliveredSerialsDisplayedColumns =
@@ -608,9 +633,20 @@ export class MaterialTransferComponent implements OnInit {
     }
 
     if (
-      this.form.controls.stock_entry_type.value !==
-        STOCK_ENTRY_TYPE.MATERIAL_TRANSFER &&
+      [
+        STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+        STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
+      ].includes(this.form.controls.stock_entry_type.value) &&
       (!this.form.controls.accounts.valid || !this.form.controls.accounts.value)
+    ) {
+      this.getMessage('Please select an expense account.');
+      return;
+    }
+
+    if (
+      this.form.controls.stock_entry_type.value ===
+        STOCK_ENTRY_TYPE.RnD_PRODUCTS &&
+      (!this.form.controls.customer.valid || !this.form.controls.customer.value)
     ) {
       this.getMessage('Please select an expense account.');
       return;
@@ -631,7 +667,22 @@ export class MaterialTransferComponent implements OnInit {
     body.items = this.materialTransferDataSource.data();
     body.items = this.mergeItems(body.items);
     body.uuid = this.uuid;
+    if (
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.RnD_PRODUCTS
+    ) {
+      body.customer = this.form.controls.customer.value.name;
+    }
     return body;
+  }
+
+  getOptionText(option) {
+    if (option) {
+      if (option.customer_name) {
+        return `${option.customer_name} (${option.name})`;
+      }
+      return option.name;
+    }
   }
 
   async saveDraft() {
@@ -656,8 +707,10 @@ export class MaterialTransferComponent implements OnInit {
     const merged_items = [];
     items.forEach(item => {
       if (
-        this.form.controls.stock_entry_type.value !==
-        STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+        [
+          STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+          STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
+        ].includes(this.form.controls.stock_entry_type.value)
       ) {
         item.expense_account = this.form.controls.accounts.value;
       }
@@ -754,8 +807,18 @@ export class MaterialTransferComponent implements OnInit {
       .getItem(AUTH_SERVER_URL)
       .then(url => {
         const filter = `name=["in","${this.stock_receipt_names.join()}"]`;
-        window.open(`${url}/desk#List/Stock Entry/List?${filter}`, '_blank');
+        window.open(
+          `${url}/desk#List/${this.getStockEntryDoctype()}/List?${filter}`,
+          '_blank',
+        );
       });
+  }
+
+  getStockEntryDoctype() {
+    return this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.RnD_PRODUCTS
+      ? `Delivery Note`
+      : `Stock Entry`;
   }
 
   typeChange(value) {
@@ -843,7 +906,7 @@ export class MaterialTransferComponent implements OnInit {
   async getPrint() {
     const authURL = await this.salesService.getStore().getItem(AUTH_SERVER_URL);
     const url = `${authURL}${PRINT_DELIVERY_NOTE_PDF_METHOD}`;
-    const doctype = 'Stock Entry';
+    const doctype = this.getStockEntryDoctype();
     const name = `name=${JSON.stringify(this.stock_receipt_names)}`;
     const no_letterhead = 'no_letterhead=0';
     window.open(

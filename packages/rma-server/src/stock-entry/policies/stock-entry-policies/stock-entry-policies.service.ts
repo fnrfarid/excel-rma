@@ -55,6 +55,9 @@ export class StockEntryPoliciesService {
       case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
         return this.validateMaterialReceiptReset(stockEntry);
 
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return this.validateMaterialIssueReset(stockEntry);
+
       default:
         return throwError(new BadRequestException('Invalid Stock Entry'));
     }
@@ -195,12 +198,13 @@ export class StockEntryPoliciesService {
 
         return from(this.serialNoService.count(query)).pipe(
           mergeMap(count => {
-            const message = `Found ${count} for Item: ${item.item_name} at warehouse: ${item.s_warehouse}.`;
+            const message = `Found ${count} Qty for Item : ${item.item_name} at warehouse: ${item.s_warehouse}.`;
             if (
               count === item.serial_no.length &&
               [
                 STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
                 STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+                STOCK_ENTRY_TYPE.RnD_PRODUCTS,
               ].includes(stock_entry_type)
             ) {
               return of(true);

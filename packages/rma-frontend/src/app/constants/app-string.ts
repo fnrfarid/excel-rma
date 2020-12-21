@@ -78,6 +78,7 @@ export const STOCK_ENTRY_TYPE = {
   MATERIAL_TRANSFER: 'Material Transfer',
   MATERIAL_RECEIPT: 'Material Receipt',
   MATERIAL_ISSUE: 'Material Issue',
+  RnD_PRODUCTS: 'R&D Products',
 };
 
 export const MATERIAL_TRANSFER_DISPLAYED_COLUMNS = [

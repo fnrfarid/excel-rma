@@ -28,6 +28,7 @@ import {
   DEFAULT_NAMING_SERIES,
   SYSTEM_MANAGER,
   DELIVERY_NOTE,
+  SALES_INVOICE_STATUS,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -134,11 +135,18 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   async remove(uuid: string) {
-    const found = await this.salesInvoiceService.findOne({ uuid });
-    if (!found) {
+    const salesInvoice = await this.salesInvoiceService.findOne({ uuid });
+    if (!salesInvoice) {
       throw new NotFoundException();
     }
-    this.apply(new SalesInvoiceRemovedEvent(found));
+    if (salesInvoice.status !== SALES_INVOICE_STATUS.draft) {
+      return throwError(
+        new BadRequestException(
+          `Sales Invoice with ${salesInvoice.status} status cannot be deleted.`,
+        ),
+      );
+    }
+    this.apply(new SalesInvoiceRemovedEvent(salesInvoice));
   }
 
   async update(updatePayload: SalesInvoiceUpdateDto, clientHttpRequest: any) {

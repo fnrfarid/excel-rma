@@ -9,6 +9,13 @@
     <ion-icon name="lock-closed-outline"></ion-icon>
   </ion-fab-button>
   <ion-fab-list side="start" class="fab-position">
+    <ion-button
+    color="medium"
+    *ngIf="permissionState.sales_invoice.update"
+    (click)="deleteSalesInvoice()"
+  >
+    Delete
+  </ion-button>
     <ion-button *ngIf="permissionState.sales_invoice.delete" color="danger" (click)="rejectSalesInvoice()">
       Reject
     </ion-button>

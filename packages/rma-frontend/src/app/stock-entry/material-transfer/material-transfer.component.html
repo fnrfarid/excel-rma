@@ -83,7 +83,7 @@
                                 </mat-select>
                             </mat-form-field>
 
-                            <mat-form-field *ngIf="f.stock_entry_type.value !== 'Material Transfer'" class="mat-input-wrapper">
+                            <mat-form-field *ngIf="['Material Receipt','Material Issue'].includes(f.stock_entry_type.value)" class="mat-input-wrapper">
                                 <input
                                   matInput
                                   required
@@ -104,6 +104,40 @@
                                 <mat-error *ngIf="f.accounts.hasError('falseValse')">
                                   You should select a value from dropdown only. 
                                   <strong>'{{f.accounts.value}}'</strong> is not allowed.
+                                </mat-error>
+                              </mat-form-field>
+
+                              <mat-form-field *ngIf="f.stock_entry_type.value === 'R&D Products'" class="example-full-width">
+                                <input
+                                  required
+                                  type="text"
+                                  placeholder="Select Customer"
+                                  matInput
+                                  formControlName="customer"
+                                  [matAutocomplete]="auto"
+                                  (focusout)="validateInput(f.customer, filteredCustomerList)"
+                                />
+                                <mat-autocomplete
+                                  autoActiveFirstOption
+                                  #auto="matAutocomplete"
+                                  [displayWith]="getOptionText"
+                                >
+                                  <mat-option
+                                    *ngFor="let option of filteredCustomerList | async"
+                                    [value]="option"
+                                  >
+                                    {{ option.customer_name }}
+                                    <small class="text-muted">
+                                      {{ option.name}}
+                                    </small>
+                                  </mat-option>
+                                </mat-autocomplete>
+                                <mat-error *ngIf="f.customer.hasError('falseValse')">
+                                  You should select a value from dropdown only. 
+                                  <strong>'{{f.customer.value}}'</strong> is not allowed.
+                                </mat-error>
+                                <mat-error *ngIf="f.customer.hasError('required')">
+                                  Customer is <strong>required</strong>
                                 </mat-error>
                               </mat-form-field>
                         </form>
