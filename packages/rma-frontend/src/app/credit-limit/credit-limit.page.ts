@@ -9,6 +9,10 @@ import { UpdateCreditLimitComponent } from './update-credit-limit/update-credit-
 import { DEFAULT_COMPANY } from '../constants/storage';
 import { StorageService } from '../api/storage/storage.service';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { map, startWith, switchMap } from 'rxjs/operators';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ValidateInputSelected } from '../common/pipes/validators';
 
 @Component({
   selector: 'app-credit-limit',
@@ -28,9 +32,17 @@ export class CreditLimitPage implements OnInit {
     'set_by',
     'set_on',
   ];
+  name: any;
+  customer_name: any;
   search: any;
   filters: any = [];
-  customerList = this.salesService.customerList();
+  filteredCustomerList: Observable<any[]>;
+  customerProfileForm: FormGroup;
+  validateInput: any = ValidateInputSelected;
+
+  get f() {
+    return this.customerProfileForm.controls;
+  }
 
   constructor(
     private readonly location: Location,
@@ -41,20 +53,44 @@ export class CreditLimitPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
     this.dataSource = new CreditLimitDataSource(this.salesService);
     this.dataSource.loadItems();
+    this.filteredCustomerList = this.customerProfileForm
+      .get('customer')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService
+            .getCustomerList(value)
+            .pipe(map(res => res.docs));
+        }),
+      );
+  }
+
+  createFormGroup() {
+    this.customerProfileForm = new FormGroup({
+      customer: new FormControl(),
+    });
   }
 
   getCustomerOption(option) {
-    if (option) return option.name;
+    if (option) {
+      if (option.customer_name) {
+        return `${option.customer_name} (${option.name})`;
+      }
+      return option.name;
+    }
   }
 
   clearFilters() {
-    this.search = '';
-    this.setFilter();
+    this.customer_name = '';
+    this.name = '';
+    this.f.customer.setValue('');
+    this.dataSource.loadItems();
   }
 
   navigateBack() {
@@ -89,12 +125,12 @@ export class CreditLimitPage implements OnInit {
     return await popover.present();
   }
 
-  setFilter(event?) {
+  setFilter(customer?) {
     this.dataSource.loadItems(
-      this.search.name,
+      customer.name,
       this.sort.direction,
-      event?.pageIndex || 0,
-      event?.pageSize || 30,
+      customer?.pageIndex || 0,
+      customer?.pageSize || 30,
     );
   }
 }

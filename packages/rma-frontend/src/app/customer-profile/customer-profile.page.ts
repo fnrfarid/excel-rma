@@ -79,10 +79,9 @@ export class CustomerProfilePage implements OnInit {
   }
 
   createFormGroup() {
-    this.customerProfileForm = new FormGroup(
-      {
-        customer: new FormControl()
-      });
+    this.customerProfileForm = new FormGroup({
+      customer: new FormControl(),
+    });
   }
 
   getCustomerOption(option) {
