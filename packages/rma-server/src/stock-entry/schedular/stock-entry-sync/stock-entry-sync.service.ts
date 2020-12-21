@@ -9,7 +9,10 @@ import {
   ACCEPT_STOCK_ENTRY_JOB,
   REJECT_STOCK_ENTRY_JOB,
 } from '../../../constants/app-strings';
-import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
+import {
+  POST_DELIVERY_NOTE_ENDPOINT,
+  STOCK_ENTRY_API_ENDPOINT,
+} from '../../../constants/routes';
 import { DirectService } from '../../../direct/aggregates/direct/direct.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
@@ -98,8 +101,12 @@ export class StockEntrySyncService {
               return item;
             });
             const frappePayload = this.parseFrappePayload(payload);
+            const endpoint =
+              frappePayload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
+                ? POST_DELIVERY_NOTE_ENDPOINT
+                : STOCK_ENTRY_API_ENDPOINT;
             return this.http.post(
-              settings.authServerURL + STOCK_ENTRY_API_ENDPOINT,
+              settings.authServerURL + endpoint,
               frappePayload,
               {
                 headers: this.settingsService.getAuthorizationHeaders(
@@ -165,6 +172,14 @@ export class StockEntrySyncService {
 
   parseFrappePayload(payload: StockEntry) {
     delete payload.names;
+    switch (payload.stock_entry_type) {
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        break;
+
+      default:
+        delete payload.customer;
+        break;
+    }
     return payload;
   }
 
@@ -196,7 +211,10 @@ export class StockEntrySyncService {
           serialHistory.eventType = this.getEventType(type, payload);
           serialHistory.parent_document = parent;
           serialHistory.transaction_from = item.s_warehouse;
-          serialHistory.transaction_to = item.t_warehouse;
+          serialHistory.transaction_to =
+            payload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
+              ? payload.customer
+              : item.t_warehouse;
           return forkJoin({
             serials: this.updateMongoSerials(
               serials,
@@ -229,7 +247,7 @@ export class StockEntrySyncService {
       ? {
           ...update,
           purchase_document_no: doc_name,
-          purchase_document_type: STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
+          purchase_document_type: payload.stock_entry_type,
           'warranty.purchaseWarrantyDate': item.warranty_date,
           'warranty.purchasedOn': new Date(payload.posting_date),
           purchase_invoice_name: payload.uuid,
@@ -241,7 +259,7 @@ export class StockEntrySyncService {
           'warranty.soldOn': DateTime.fromJSDate(new Date(payload.posting_date))
             .setZone(settings.timeZone)
             .toJSDate(),
-          sales_document_type: STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+          sales_document_type: payload.stock_entry_type,
           sales_document_no: doc_name,
           sales_invoice_name: payload.uuid,
         };
@@ -254,12 +272,19 @@ export class StockEntrySyncService {
     if (type === REJECT_STOCK_ENTRY_JOB) {
       return EventType.SerialTransferRejected;
     }
-    if (payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
-      return EventType.SerialTransferCreated;
+    switch (payload.stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return EventType.SerialTransferCreated;
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return EventType.MaterialIssue;
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return EventType.RnD_PRODUCTS;
+
+      default:
+        return EventType.MaterialReceipt;
     }
-    return payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_ISSUE
-      ? EventType.MaterialIssue
-      : EventType.MaterialReceipt;
   }
 
   updateMongoSerials(serials, update) {

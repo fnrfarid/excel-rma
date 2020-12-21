@@ -24,6 +24,9 @@ export class StockEntry extends BaseEntity {
   createdByEmail: string;
 
   @Column()
+  customer: string;
+
+  @Column()
   createdBy: string;
 
   @Column()
