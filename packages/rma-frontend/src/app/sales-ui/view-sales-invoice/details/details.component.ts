@@ -2,15 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE, REJECTED } from '../../../constants/app-string';
+import { CLOSE, REJECTED, UPDATE_ERROR } from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { filter } from 'rxjs/operators';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { ViewSalesInvoiceSubjectService } from '../view-sales-invoice-subject.service';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
+import { ConfirmationDialog } from '../../item-price/item-price.page';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -42,8 +44,8 @@ export class DetailsComponent implements OnInit {
     private location: Location,
     private readonly router: Router,
     private readonly loadingController: LoadingController,
-    private readonly alertController: AlertController,
     private readonly siSub: ViewSalesInvoiceSubjectService,
+    private readonly dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -147,45 +149,51 @@ export class DetailsComponent implements OnInit {
   }
 
   async cancelSalesInvoice() {
-    const alert = await this.alertController.create({
-      header: 'Cancel Sales Invoice',
-      message: `Are you sure you want to cancel ${this.salesInvoiceDetails.name} ?`,
-      buttons: [
-        {
-          text: 'No',
-          handler: () => {},
-        },
-        {
-          text: 'Yes',
-          cssClass: 'cancel',
-          handler: async () => {
-            const loading = await this.loadingController.create({
-              message: 'Cancelling Invoice...!',
-            });
-            await loading.present();
-            this.salesService
-              .cancelSalesInvoice(this.route.snapshot.params.invoiceUuid)
-              .subscribe({
-                next: success => {
-                  loading.dismiss();
-                  this.location.back();
-                },
-                error: err => {
-                  loading.dismiss();
-                  const errMessage = err.error.message.split('\\n');
-                  this.snackBar.open(
-                    errMessage[errMessage.length - 2].split(':')[1],
-                    CLOSE,
-                    { duration: 4500 },
-                  );
-                },
-              });
-          },
-        },
-      ],
-    });
+    const dialog = this.dialog.open(ConfirmationDialog, {
+      data: {
+        event: `
+      <h3>Reseting Invoice will cancel linked:</h3>
+      <li> Sales Invoice
+      <li> Delivery Note's
+      <li> Sales Return's
+      <li> Credit Note's
+      <li> Linked/Assigned Serial's
+      <li> Serial History
 
-    await alert.present();
+      <h3>
+      Mate sure to take a dump of serials from delivered serials before the reset,
+           as all links will reset too.
+      </h3> 
+      `,
+      },
+    });
+    const response = await dialog.afterClosed().toPromise();
+
+    if (!response) {
+      return;
+    }
+
+    const loading = await this.loadingController.create({
+      message: 'Reseting Invoice...!',
+    });
+    await loading.present();
+    this.salesService
+      .cancelSalesInvoice(this.route.snapshot.params.invoiceUuid)
+      .subscribe({
+        next: success => {
+          loading.dismiss();
+          this.salesInvoiceDetails.status === 'Canceled';
+          this.location.back();
+        },
+        error: err => {
+          loading.dismiss();
+          this.snackBar.open(
+            err?.error?.message ? err?.error?.message : UPDATE_ERROR,
+            CLOSE,
+            { duration: 4500 },
+          );
+        },
+      });
   }
 
   getStatusColor(status: string) {

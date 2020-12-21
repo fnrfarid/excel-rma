@@ -5,6 +5,7 @@ import { TokenCacheService } from '../../../auth/entities/token-cache/token-cach
 import { HttpService } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { SalesInvoiceAggregateService } from '../../aggregates/sales-invoice-aggregate/sales-invoice-aggregate.service';
+import { SalesInvoiceResetAggregateService } from '../../aggregates/sales-invoice-reset-aggregate/sales-invoice-reset-aggregate.service';
 
 describe('SalesInvoice Controller', () => {
   let controller: SalesInvoiceController;
@@ -31,6 +32,10 @@ describe('SalesInvoice Controller', () => {
         },
         {
           provide: SalesInvoiceAggregateService,
+          useValue: {},
+        },
+        {
+          provide: SalesInvoiceResetAggregateService,
           useValue: {},
         },
       ],
