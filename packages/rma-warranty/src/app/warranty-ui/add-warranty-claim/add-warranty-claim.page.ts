@@ -399,16 +399,19 @@ export class AddWarrantyClaimPage implements OnInit {
           return;
         }
         if (
-          this.warrantyClaimForm.controls.received_on.value <
-          this.getSerialData.warranty.salesWarrantyDate
+          new Date().toJSON().split('T')[0] <
+          new Date(this.getSerialData.warranty.salesWarrantyDate)
+            .toJSON()
+            .split('T')[0]
         ) {
           this.warrantyClaimForm.controls.claim_type.setValue(
             WARRANTY_TYPE.WARRANTY,
           );
+        } else {
+          this.warrantyClaimForm.controls.claim_type.setValue(
+            WARRANTY_TYPE.NON_WARRANTY,
+          );
         }
-        this.warrantyClaimForm.controls.claim_type.setValue(
-          WARRANTY_TYPE.NON_WARRANTY,
-        );
         this.warrantyClaimForm.controls.warranty_end_date.setValue(
           res.warranty.salesWarrantyDate,
         );

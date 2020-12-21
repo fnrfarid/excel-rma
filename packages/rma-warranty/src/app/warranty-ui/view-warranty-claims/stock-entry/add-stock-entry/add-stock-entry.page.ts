@@ -172,6 +172,7 @@ export class AddStockEntryPage implements OnInit {
     selectedItem.company = this.company;
     selectedItem.warrantyClaimUuid = this.warrantyObject.uuid;
     selectedItem.posting_date = this.stockEntryForm.controls.date.value;
+    selectedItem.posting_time = this.stockEntryForm.controls.time.value;
     selectedItem.type = this.stockEntryForm.controls.type.value;
     selectedItem.stock_entry_type = item.stock_entry_type;
     selectedItem.description = this.stockEntryForm.controls.description.value;
@@ -185,6 +186,7 @@ export class AddStockEntryPage implements OnInit {
     this.stockEntryForm = new FormGroup({
       type: new FormControl('', [Validators.required]),
       date: new FormControl('', Validators.required),
+      time: new FormControl(),
       description: new FormControl('', Validators.required),
       items: new FormArray([]),
     });
@@ -194,6 +196,7 @@ export class AddStockEntryPage implements OnInit {
   async setDateTime(date: Date) {
     const dateTime = await this.time.getDateAndTime(date);
     this.stockEntryForm.controls.date.setValue(dateTime.date);
+    this.stockEntryForm.controls.time.setValue(dateTime.time);
   }
 
   getOption(option) {

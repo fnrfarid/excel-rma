@@ -11,6 +11,7 @@ import {
   DEFAULT_NAMING_SERIES,
   STOCK_ENTRY,
   STOCK_ENTRY_STATUS,
+  VERDICT,
 } from '../../../constants/app-strings';
 import * as uuidv4 from 'uuid/v4';
 import { DateTime } from 'luxon';
@@ -25,6 +26,8 @@ import {
 } from '../../entities/stock-entry-dto';
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
+import { StatusHistoryDto } from '../../../warranty-claim/entity/warranty-claim/status-history-dto';
+import { WarrantyClaimAggregateService } from '../../../warranty-claim/aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -33,6 +36,7 @@ export class WarrantyStockEntryAggregateService {
     private readonly settingService: SettingsService,
     private readonly serialService: SerialNoService,
     private readonly http: HttpService,
+    private warrantyService: WarrantyClaimAggregateService,
   ) {}
 
   createStockEntry(payload: WarrantyStockEntryDto, req) {
@@ -85,6 +89,31 @@ export class WarrantyStockEntryAggregateService {
               },
             },
           ),
+        );
+      }),
+      switchMap(() => {
+        const statusHistoryPayload = {} as StatusHistoryDto;
+        statusHistoryPayload.uuid = payload.warrantyClaimUuid;
+        statusHistoryPayload.time = payload.posting_time;
+        statusHistoryPayload.posting_date = payload.posting_date;
+        statusHistoryPayload.description = payload.description;
+        statusHistoryPayload.delivery_status = payload.stock_entry_type;
+        statusHistoryPayload.doc_name = warrantyPayload.delivery_note;
+        if (warrantyPayload.stock_entry_type === 'Returned') {
+          statusHistoryPayload.verdict = VERDICT.RECEIVED_FROM_CUSTOMER;
+          statusHistoryPayload.transfer_branch =
+            warrantyPayload.items[0].warehouse;
+          statusHistoryPayload.status_from = payload.customer;
+        }
+        if (warrantyPayload.stock_entry_type === 'Delivered') {
+          statusHistoryPayload.verdict = VERDICT.DELIVER_TO_CUSTOMER;
+          statusHistoryPayload.status_from = req.token.territory[0];
+          statusHistoryPayload.transfer_branch = payload.customer;
+        }
+        return this.warrantyService.addSerialNoStatusHistory(
+          statusHistoryPayload,
+          [warrantyPayload.items[0].excel_serials],
+          req.token,
         );
       }),
     );
