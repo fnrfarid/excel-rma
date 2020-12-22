@@ -399,10 +399,8 @@ export class AddWarrantyClaimPage implements OnInit {
           return;
         }
         if (
-          new Date().toJSON().split('T')[0] <
+          new Date(this.warrantyClaimForm.controls.received_on.value) <
           new Date(this.getSerialData.warranty.salesWarrantyDate)
-            .toJSON()
-            .split('T')[0]
         ) {
           this.warrantyClaimForm.controls.claim_type.setValue(
             WARRANTY_TYPE.WARRANTY,
