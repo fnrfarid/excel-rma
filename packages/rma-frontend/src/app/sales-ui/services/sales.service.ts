@@ -44,6 +44,7 @@ import {
   GET_DOCTYPE_COUNT_METHOD,
   RELAY_GET_ITEM_STOCK_ENDPOINT,
   GET_PRODUCT_BUNDLE_ITEMS,
+  REMOVE_SALES_INVOICE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -71,6 +72,18 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get(GET_PRODUCT_BUNDLE_ITEMS, { headers, params });
+      }),
+    );
+  }
+
+  deleteSalesInvoice(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(
+          `${REMOVE_SALES_INVOICE_ENDPOINT}/${uuid}`,
+          {},
+          { headers },
+        );
       }),
     );
   }

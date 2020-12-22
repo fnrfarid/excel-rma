@@ -54,12 +54,32 @@ export class DetailsComponent implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe({
-        next: event => {
-          if (this.invoiceUuid) {
+        next: (event: any) => {
+          if (
+            this.invoiceUuid &&
+            event.url.includes('sales/view-sales-invoice')
+          ) {
             this.getSalesInvoice(this.invoiceUuid);
           }
         },
       });
+  }
+
+  deleteSalesInvoice() {
+    return this.salesService.deleteSalesInvoice(this.invoiceUuid).subscribe({
+      next: success => {
+        this.snackBar.open('Sales Invoice deleted.', CLOSE, { duration: 3500 });
+        this.router.navigateByUrl('/sales');
+        return;
+      },
+      error: err => {
+        this.snackBar.open(
+          err?.error?.message ? err?.error?.message : UPDATE_ERROR,
+          CLOSE,
+          { duration: 3500 },
+        );
+      },
+    });
   }
 
   getSalesInvoice(uuid: string) {
