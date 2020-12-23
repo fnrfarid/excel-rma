@@ -11,6 +11,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddWarrantyService } from './add-warranty.service';
 import { of } from 'rxjs';
+import { StorageService } from '../../api/storage/storage.service';
 
 describe('AddWarrantyClaimPage', () => {
   let component: AddWarrantyClaimPage;
@@ -55,6 +56,10 @@ describe('AddWarrantyClaimPage', () => {
               getItems: (...args) => Promise.resolve({}),
             }),
           },
+        },
+        {
+          provide: StorageService,
+          useValue: {},
         },
       ],
     }).compileComponents();

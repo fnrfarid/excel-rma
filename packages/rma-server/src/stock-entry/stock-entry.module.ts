@@ -11,6 +11,7 @@ import { StockEntrySyncService } from './schedular/stock-entry-sync/stock-entry-
 import { SerialBatchService } from '../sync/aggregates/serial-batch/serial-batch.service';
 import { WarrantyStockEntryAggregateService } from './aggregates/warranty-stock-entry-aggregate/warranty-stock-entry-aggregate.service';
 import { SerialNoModule } from '../serial-no/serial-no.module';
+import { WarrantyClaimModule } from '../warranty-claim/warranty-claim.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SerialNoModule } from '../serial-no/serial-no.module';
     SerialNoEntitiesModule,
     DirectModule,
     SerialNoModule,
+    WarrantyClaimModule,
   ],
   controllers: [StockEntryController],
   providers: [
