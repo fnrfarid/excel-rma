@@ -10,9 +10,11 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import {
   STOCK_ENTRY_STATUS,
   STOCK_ENTRY_TYPE,
+  AGENDA_JOB_STATUS,
 } from '../../../constants/app-strings';
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
+import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 
 @Injectable()
 export class StockEntryPoliciesService {
@@ -20,6 +22,7 @@ export class StockEntryPoliciesService {
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
     private readonly serialNoHistoryPolicy: SerialNoHistoryPoliciesService,
+    private readonly agendaJob: AgendaJobService,
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
@@ -106,6 +109,33 @@ export class StockEntryPoliciesService {
           return of(true);
         }),
       );
+  }
+
+  validateStockEntryQueue(stockEntry: StockEntry) {
+    return from(
+      this.agendaJob.count({
+        'data.parent': stockEntry.uuid,
+        'data.status': {
+          $in: [
+            AGENDA_JOB_STATUS.exported,
+            AGENDA_JOB_STATUS.fail,
+            AGENDA_JOB_STATUS.in_queue,
+            AGENDA_JOB_STATUS.retrying,
+          ],
+        },
+      }),
+    ).pipe(
+      switchMap(response => {
+        if (response) {
+          return throwError(
+            new BadRequestException(
+              `Found ${response}, jobs in queue for sales invoice: ${stockEntry.uuid}`,
+            ),
+          );
+        }
+        return of(true);
+      }),
+    );
   }
 
   getInvoiceSerials(invoice: StockEntry) {

@@ -461,8 +461,15 @@ export class AddSalesInvoicePage implements OnInit {
             this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
           error: err => {
-            let message = err?.error?.message || err;
-            if (!message) message = UPDATE_ERROR;
+            // bad way of doing error's do not follow this. message should always be thrown ideally as err.error.message in exception.
+            let message = err?.error?.message || '';
+            if (!message) {
+              try {
+                message = err.message ? err.message : JSON.stringify(err);
+              } catch {
+                message = UPDATE_ERROR;
+              }
+            }
             this.snackbar.open(message, 'Close', {
               duration: 3000,
             });
@@ -547,8 +554,14 @@ export class AddSalesInvoicePage implements OnInit {
             this.router.navigate(['sales', 'view-sales-invoice', res.uuid]);
           },
           error: err => {
-            let message = err?.error?.message || err;
-            if (!message) message = UPDATE_ERROR;
+            let message = err?.error?.message || '';
+            if (!message) {
+              try {
+                message = err.message ? err.message : JSON.stringify(err);
+              } catch {
+                message = UPDATE_ERROR;
+              }
+            }
             this.snackbar.open(message, 'Close', {
               duration: DURATION,
             });

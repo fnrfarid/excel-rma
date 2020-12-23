@@ -25,6 +25,6 @@ import { CustomerModule } from '../customer/customer.module';
     ...WarrantyClaimCommandManager,
     WarrantyClaimPoliciesService,
   ],
-  exports: [WarrantyClaimEntitiesModule],
+  exports: [WarrantyClaimEntitiesModule, ...WarrantyClaimAggregatesManager],
 })
 export class WarrantyClaimModule {}

@@ -55,9 +55,9 @@
                         </ion-button>
                     </ion-col>
                 </ion-row>
+                <form [formGroup]="form">
                 <ion-row>
                     <ion-col>
-                        <form [formGroup]="form">
                             <mat-form-field class="example-full-width">
                                 <input required type="text" autocomplete="off" placeholder="Select territory" matInput (focusout)="validateInput(f.territory, territoryList)" formControlName="territory" [matAutocomplete]="territory" />
                                 <mat-autocomplete autoActiveFirstOption #territory="matAutocomplete">
@@ -83,12 +83,12 @@
                                 </mat-select>
                             </mat-form-field>
 
-                            <mat-form-field *ngIf="['Material Receipt','Material Issue'].includes(f.stock_entry_type.value)" class="mat-input-wrapper">
+                            <mat-form-field *ngIf="['Material Receipt','Material Issue','R&D Products'].includes(f.stock_entry_type.value)" class="mat-input-wrapper">
                                 <input
                                   matInput
                                   required
-                                  placeholder="Expense Account"
-                                  aria-label="Expense Account"
+                                  placeholder="Account"
+                                  aria-label="Account"
                                   [matAutocomplete]="expenseAccount"
                                   (focusout)="validateInput(f.accounts, accounts)"
                                   formControlName="accounts"
@@ -107,52 +107,53 @@
                                 </mat-error>
                               </mat-form-field>
 
-                              <mat-form-field *ngIf="f.stock_entry_type.value === 'R&D Products'" class="example-full-width">
-                                <input
-                                  required
-                                  type="text"
-                                  placeholder="Select Customer"
-                                  matInput
-                                  formControlName="customer"
-                                  [matAutocomplete]="auto"
-                                  (focusout)="validateInput(f.customer, filteredCustomerList)"
-                                />
-                                <mat-autocomplete
-                                  autoActiveFirstOption
-                                  #auto="matAutocomplete"
-                                  [displayWith]="getOptionText"
-                                >
-                                  <mat-option
-                                    *ngFor="let option of filteredCustomerList | async"
-                                    [value]="option"
-                                  >
-                                    {{ option.customer_name }}
-                                    <small class="text-muted">
-                                      {{ option.name}}
-                                    </small>
-                                  </mat-option>
-                                </mat-autocomplete>
-                                <mat-error *ngIf="f.customer.hasError('falseValse')">
-                                  You should select a value from dropdown only. 
-                                  <strong>'{{f.customer.value}}'</strong> is not allowed.
-                                </mat-error>
-                                <mat-error *ngIf="f.customer.hasError('required')">
-                                  Customer is <strong>required</strong>
-                                </mat-error>
-                              </mat-form-field>
-                        </form>
                     </ion-col>
                     <ion-col>
                         <mat-form-field class="example-full-width">
                             <mat-label>Remarks</mat-label>
-                            <textarea rows="5" matInput [disabled]="readonly" [(ngModel)]="remarks"></textarea>
+                            <textarea matInput formControlName="remarks"></textarea>
                         </mat-form-field>
+
+                        <mat-form-field *ngIf="f.stock_entry_type.value === 'R&D Products'" class="example-full-width">
+                            <input
+                              required
+                              type="text"
+                              placeholder="Select Customer"
+                              matInput
+                              formControlName="customer"
+                              [matAutocomplete]="auto"
+                              (focusout)="validateInput(f.customer, filteredCustomerList)"
+                            />
+                            <mat-autocomplete
+                              autoActiveFirstOption
+                              #auto="matAutocomplete"
+                              [displayWith]="getOptionText"
+                            >
+                              <mat-option
+                                *ngFor="let option of filteredCustomerList | async"
+                                [value]="option"
+                              >
+                                {{ option.customer_name }}
+                                <small class="text-muted">
+                                  {{ option.name}}
+                                </small>
+                              </mat-option>
+                            </mat-autocomplete>
+                            <mat-error *ngIf="f.customer.hasError('falseValse')">
+                              You should select a value from dropdown only. 
+                              <strong>'{{f.customer.value}}'</strong> is not allowed.
+                            </mat-error>
+                            <mat-error *ngIf="f.customer.hasError('required')">
+                              Customer is <strong>required</strong>
+                            </mat-error>
+                          </mat-form-field>
                     </ion-col>
                 </ion-row>
+            </form>
             </ion-grid>
         </ion-card-content>
     </ion-card>
-    <app-assign-serial *ngIf="!readonly" [state]="state" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
+    <app-assign-serial *ngIf="!readonly" [state]="state" [rangePickerState]="rangePickerState" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
 
     <ion-card *ngIf="!readonly">
         <ion-card-header>
@@ -173,7 +174,7 @@
                         <mat-form-field class="example-full-width">
                             <input type="text" 
                                 placeholder="Source Warehouse" 
-                                [disabled]="readonly" matInput 
+                                matInput 
                                 [formControl]="warehouseState.s_warehouse" 
                                 (focusout)="validateInput(warehouseState.s_warehouse, filteredWarehouseList1)" 
                                 [matAutocomplete]="from_warehouse" />
@@ -190,7 +191,7 @@
                     </ion-col>
                     <ion-col>
                         <mat-form-field class="example-full-width">
-                            <input type="text" placeholder="Target Warehouse" matInput [disabled]="readonly" (focusout)="
+                            <input type="text" placeholder="Target Warehouse" matInput (focusout)="
                   validateInput(
                     warehouseState.t_warehouse,
                     filteredWarehouseList2

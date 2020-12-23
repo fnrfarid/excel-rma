@@ -3,10 +3,10 @@ import { Location } from '@angular/common';
 import { CustomerDataSource } from './customer-datasource';
 import { SalesService } from '../sales-ui/services/sales.service';
 import { MatPaginator } from '@angular/material/paginator';
-import { forkJoin, from, throwError, of } from 'rxjs';
+import { forkJoin, from, throwError, of, Observable } from 'rxjs';
 import { ItemPriceService } from '../sales-ui/services/item-price.service';
 import { TimeService } from '../api/time/time.service';
-import { map, switchMap, retry } from 'rxjs/operators';
+import { map, switchMap, retry, startWith } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
@@ -16,6 +16,8 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../constants/app-string';
 import { ActivatedRoute } from '@angular/router';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ValidateInputSelected } from '../common/pipes/validators';
 
 @Component({
   selector: 'app-customer-profile',
@@ -34,10 +36,19 @@ export class CustomerProfilePage implements OnInit {
     'remaining_balance',
     'remaining_credit',
   ];
-  customer: any;
+  customer_name: any;
+  name: any;
   filters: any = [];
   countFilter: any = {};
-  customerList = this.salesService.customerList();
+  customerProfileForm: FormGroup;
+  filteredCustomerList: Observable<any[]>;
+  address = {} as any;
+  validateInput: any = ValidateInputSelected;
+
+  get f() {
+    return this.customerProfileForm.controls;
+  }
+
   constructor(
     private readonly location: Location,
     private readonly salesService: SalesService,
@@ -48,21 +59,45 @@ export class CustomerProfilePage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
     this.setDefaultCompany();
     this.dataSource = new CustomerDataSource(this.salesService);
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
+    this.filteredCustomerList = this.customerProfileForm
+      .get('customer')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService
+            .getCustomerList(value)
+            .pipe(map(res => res.docs));
+        }),
+      );
+  }
+
+  createFormGroup() {
+    this.customerProfileForm = new FormGroup({
+      customer: new FormControl(),
+    });
   }
 
   getCustomerOption(option) {
-    if (option) return option.name;
+    if (option) {
+      if (option.customer_name) {
+        return `${option.customer_name} (${option.name})`;
+      }
+      return option.name;
+    }
   }
 
   clearFilters() {
-    this.customer = '';
-    this.setFilter();
+    this.customer_name = '';
+    this.name = '';
+    this.f.customer.setValue('');
+    this.dataSource.loadItems();
   }
 
   getUpdate(event) {
@@ -74,13 +109,13 @@ export class CustomerProfilePage implements OnInit {
     );
   }
 
-  setFilter() {
+  setFilter(customer) {
     this.filters = [];
     this.countFilter = {};
 
-    if (this.customer) {
-      this.filters.push(['name', 'like', `%${this.customer.name}%`]);
-      this.countFilter.name = ['like', `%${this.customer.name}%`];
+    if (customer) {
+      this.filters.push(['name', 'like', `%${customer.name}%`]);
+      this.countFilter.name = ['like', `%${customer.name}%`];
     }
 
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);

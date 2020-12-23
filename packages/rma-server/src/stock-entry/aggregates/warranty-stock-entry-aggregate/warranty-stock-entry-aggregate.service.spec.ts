@@ -5,6 +5,7 @@ import { HttpService } from '@nestjs/common';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { StockEntryService } from '../../entities/stock-entry.service';
+import { WarrantyClaimAggregateService } from '../../../warranty-claim/aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
 
 describe('WarrantyStockEntryAggregateService', () => {
   let service: WarrantyStockEntryAggregateService;
@@ -27,6 +28,10 @@ describe('WarrantyStockEntryAggregateService', () => {
         },
         {
           provide: SerialNoService,
+          useValue: {},
+        },
+        {
+          provide: WarrantyClaimAggregateService,
           useValue: {},
         },
         { provide: SerialNoHistoryService, useValue: {} },

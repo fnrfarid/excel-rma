@@ -3,6 +3,7 @@ import { StockEntryPoliciesService } from './stock-entry-policies.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
+import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 
 describe('StockEntryPoliciesService', () => {
   let service: StockEntryPoliciesService;
@@ -21,6 +22,10 @@ describe('StockEntryPoliciesService', () => {
         },
         {
           provide: SerialNoHistoryPoliciesService,
+          useValue: {},
+        },
+        {
+          provide: AgendaJobService,
           useValue: {},
         },
       ],

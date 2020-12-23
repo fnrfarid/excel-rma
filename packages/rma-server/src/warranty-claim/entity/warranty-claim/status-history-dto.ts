@@ -7,11 +7,11 @@ export class StatusHistoryDto {
 
   @IsNotEmpty()
   @IsString()
-  posting_date: Date;
+  posting_date: string;
 
   @IsNotEmpty()
   @IsString()
-  time: Date;
+  time: string;
 
   @IsNotEmpty()
   @IsString()

@@ -310,6 +310,11 @@ export const DOC_RESET_INFO = {
       child_doctype: 'Delivery Note Item',
       fieldname: ['against_sales_invoice'],
     },
+    'Payment Entry': {
+      child_doctype: 'Payment Entry Reference',
+      fieldname: ['reference_name'],
+      doctype_fieldname: 'reference_doctype',
+    },
   },
 };
 
