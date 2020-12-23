@@ -108,6 +108,7 @@ export class MaterialTransferComponent implements OnInit {
     accounts: new FormControl(''),
     customer: new FormControl(''),
     remarks: new FormControl(''),
+    posting_date: new FormControl(''),
   });
   materialTransferDisplayedColumns = MATERIAL_TRANSFER_DISPLAYED_COLUMNS;
   itemDataSource: StockItemsDataSource = new StockItemsDataSource();
@@ -158,8 +159,7 @@ export class MaterialTransferComponent implements OnInit {
 
   ngOnInit() {
     this.subscribeEndpoints();
-    this.uuid = this.activatedRoute.snapshot.params.uuid;
-    this.readonlyFormControl(this.readonly);
+    this.setDefaults();
 
     if (this.uuid) {
       this.form.controls.stock_entry_type.disable();
@@ -173,6 +173,9 @@ export class MaterialTransferComponent implements OnInit {
             this.readonlyFormControl(this.readonly);
             this.subscribeEndpoints();
           }
+          this.form.controls.posting_date.setValue(
+            new Date(success.posting_date),
+          );
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
           this.form.controls.remarks.setValue(success.remarks);
@@ -196,6 +199,12 @@ export class MaterialTransferComponent implements OnInit {
       });
       return;
     }
+  }
+
+  setDefaults() {
+    this.uuid = this.activatedRoute.snapshot.params.uuid;
+    this.form.controls.posting_date.setValue(new Date());
+    this.readonlyFormControl(this.readonly);
   }
 
   get f() {
@@ -541,7 +550,11 @@ export class MaterialTransferComponent implements OnInit {
     });
     const assignValue = await dialogRef.afterClosed().toPromise();
 
-    if ((assignValue || 0) + row.assigned > row.available_stock) {
+    if (
+      (assignValue || 0) + row.assigned > row.available_stock &&
+      this.form.controls.stock_entry_type.value !==
+        STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+    ) {
       this.getMessage(
         `Cannot assign ${(assignValue || 0) + row.assigned}, Only ${
           row.available_stock - (row.assigned || 0)
@@ -664,7 +677,9 @@ export class MaterialTransferComponent implements OnInit {
     body.company = this.company;
     body.territory = this.form.get('territory').value;
     body.remarks = this.form.controls.remarks.value;
-    body.posting_date = date.date;
+    body.posting_date = this.getParsedDate(
+      this.form.controls.posting_date.value,
+    );
     body.posting_time = date.time;
     body.stock_entry_type = this.form.controls.stock_entry_type.value;
     body.items = this.materialTransferDataSource.data();
@@ -677,6 +692,16 @@ export class MaterialTransferComponent implements OnInit {
       body.customer = this.form.controls.customer.value.name;
     }
     return body;
+  }
+
+  getParsedDate(value) {
+    const date = new Date(value);
+    return [
+      date.getFullYear(),
+      date.getMonth() + 1,
+      // +1 as index of months start's from 0
+      date.getDate(),
+    ].join('-');
   }
 
   getOptionText(option) {
@@ -718,6 +743,12 @@ export class MaterialTransferComponent implements OnInit {
     boolean
       ? this.form.controls.accounts.disable()
       : this.form.controls.accounts.enable();
+    boolean
+      ? this.form.controls.posting_date.disable()
+      : this.form.controls.posting_date.enable();
+    boolean
+      ? this.form.controls.customer.disable()
+      : this.form.controls.customer.enable();
   }
 
   mergeItems(items: Item[]) {

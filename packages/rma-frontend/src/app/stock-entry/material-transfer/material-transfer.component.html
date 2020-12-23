@@ -109,6 +109,22 @@
 
                     </ion-col>
                     <ion-col>
+
+                        <mat-form-field class="example-full-width">
+                            <input
+                              required
+                              matInput
+                              [matDatepicker]="postingDate"
+                              placeholder="Due Date"
+                              formControlName="posting_date"
+                            />
+                            <mat-datepicker-toggle
+                              matSuffix
+                              [for]="postingDate"
+                            ></mat-datepicker-toggle>
+                            <mat-datepicker #postingDate disabled="false"></mat-datepicker> 
+                        </mat-form-field>
+
                         <mat-form-field class="example-full-width">
                             <mat-label>Remarks</mat-label>
                             <textarea matInput formControlName="remarks"></textarea>
