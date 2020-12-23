@@ -21,7 +21,9 @@ import {
   ITEM_NOT_FOUND,
 } from '../../constants/messages';
 import { Router } from '@angular/router';
-import { AUTH_SERVER_URL } from '../../constants/storage';
+import { AUTH_SERVER_URL, TIME_ZONE } from '../../constants/storage';
+import { DateTime } from 'luxon';
+import { StorageService } from '../../api/storage/storage.service';
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
@@ -46,6 +48,7 @@ export class AddWarrantyClaimPage implements OnInit {
     private readonly loadingController: LoadingController,
     private readonly snackbar: MatSnackBar,
     private readonly router: Router,
+    private readonly storage: StorageService,
   ) {}
 
   async ngOnInit() {
@@ -211,8 +214,8 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   async getDateTime(date: Date) {
-    const DateTime = await this.time.getDateAndTime(date);
-    return { date: DateTime.date, time: DateTime.time };
+    const luxonDateTime = await this.time.getDateAndTime(date);
+    return { date: luxonDateTime.date, time: luxonDateTime.time };
   }
 
   async getDeliveryDate(date: Date) {
@@ -378,7 +381,8 @@ export class AddWarrantyClaimPage implements OnInit {
     if (option) return option.problem_name;
   }
 
-  serialChanged(name) {
+  async serialChanged(name) {
+    const timeZone = await this.storage.getItem(TIME_ZONE);
     this.warrantyService.getSerial(name).subscribe({
       next: (res: SerialNoDetails) => {
         this.getSerialData = res;
@@ -399,8 +403,12 @@ export class AddWarrantyClaimPage implements OnInit {
           return;
         }
         if (
-          new Date(this.warrantyClaimForm.controls.received_on.value) <
-          new Date(this.getSerialData.warranty.salesWarrantyDate)
+          DateTime.fromISO(this.warrantyClaimForm.controls.received_on.value)
+            .setZone(timeZone)
+            .toFormat('yyyy-MM-dd') <
+          DateTime.fromISO(this.getSerialData.warranty.salesWarrantyDate)
+            .setZone(timeZone)
+            .toFormat('yyyy-MM-dd')
         ) {
           this.warrantyClaimForm.controls.claim_type.setValue(
             WARRANTY_TYPE.WARRANTY,
