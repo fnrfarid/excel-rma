@@ -1,15 +1,18 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort, Sort } from '@angular/material/sort';
+import { MatSort } from '@angular/material/sort';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, startWith, switchMap } from 'rxjs/operators';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
 import { SalesService } from '../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../constants/app-string';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-item-price',
@@ -34,6 +37,14 @@ export class ItemPricePage implements OnInit {
   brand: string = '';
   itemGroup: string = '';
   purchaseWarrantyMonths: string = '';
+  itemsForm: FormGroup;
+  validateInput: any = ValidateInputSelected;
+  filteredItemList: Observable<any[]>;
+
+  get f() {
+    return this.itemsForm.controls;
+  }
+
   constructor(
     private readonly location: Location,
     private readonly router: Router,
@@ -45,6 +56,7 @@ export class ItemPricePage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
@@ -58,6 +70,28 @@ export class ItemPricePage implements OnInit {
         }),
       )
       .subscribe({ next: res => {}, error: err => {} });
+
+    this.filteredItemList = this.itemsForm.get('itemName').valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getItemList(value);
+      }),
+    );
+  }
+
+  createFormGroup() {
+    this.itemsForm = new FormGroup({
+      itemName: new FormControl(),
+    });
+  }
+
+  getItemOption(option) {
+    if (option) {
+      if (option.item_name) {
+        return `${option.item_name}`;
+      }
+      return option.name;
+    }
   }
 
   navigateBack() {
@@ -106,22 +140,29 @@ export class ItemPricePage implements OnInit {
     this.dataSource.update(data);
   }
 
-  setFilter(event?: Sort) {
+  setFilter(item?) {
     const query: any = {};
-    if (this.brand) query.brand = this.brand;
-    if (this.itemGroup) query.item_group = this.itemGroup;
-    if (this.itemName) query.item_name = this.itemName;
+    if (item) query.item_group = item.item_group;
+    if (item) query.item_name = item.item_name;
 
     const sortQuery = {};
-    if (event) {
-      for (const key of Object.keys(event)) {
+    if (item) {
+      for (const key of Object.keys(item)) {
         if (key === 'active') {
-          sortQuery[event[key]] = event.direction;
+          sortQuery[item[key]] = item.direction;
         }
       }
     }
 
     this.dataSource.loadItems(query, sortQuery, 0, 30);
+  }
+
+  clearFilters() {
+    this.itemName = '';
+    this.brand = '';
+    this.itemGroup = '';
+    this.f.itemName.setValue('');
+    this.dataSource.loadItems();
   }
 
   updatePurchaseWarrantyMonths(row: ListingData, days: number) {
