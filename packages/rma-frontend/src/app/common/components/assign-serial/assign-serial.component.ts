@@ -40,6 +40,7 @@ export class AssignSerialComponent implements OnInit {
   @Input()
   state: any = {};
 
+  @Input()
   rangePickerState = {
     prefix: '',
     fromRange: '',

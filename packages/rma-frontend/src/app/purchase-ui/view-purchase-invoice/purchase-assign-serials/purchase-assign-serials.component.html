@@ -42,7 +42,7 @@
         </ion-grid>
     </ion-card-content>
 </ion-card>
-<app-assign-serial *ngIf="remaining > 0" [state]="state" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
+<app-assign-serial *ngIf="remaining > 0" [state]="state" [rangePickerState]="rangePickerState" (sendPickerState)="assignPickerState($event)" (sendCSVJSON)="addSerialsFromCsvJson($event)"></app-assign-serial>
 <ion-card *ngIf="remaining > 0">
     <ion-card-header>
         <ion-card-title>

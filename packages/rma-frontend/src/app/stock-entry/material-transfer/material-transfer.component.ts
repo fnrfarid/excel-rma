@@ -74,7 +74,6 @@ export class MaterialTransferComponent implements OnInit {
   readonly: boolean = false;
   company: string;
   status: string;
-  remarks: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
   transferWarehouse: string;
@@ -108,6 +107,7 @@ export class MaterialTransferComponent implements OnInit {
     stock_entry_type: new FormControl('', [Validators.required]),
     accounts: new FormControl(''),
     customer: new FormControl(''),
+    remarks: new FormControl(''),
   });
   materialTransferDisplayedColumns = MATERIAL_TRANSFER_DISPLAYED_COLUMNS;
   itemDataSource: StockItemsDataSource = new StockItemsDataSource();
@@ -159,20 +159,23 @@ export class MaterialTransferComponent implements OnInit {
   ngOnInit() {
     this.subscribeEndpoints();
     this.uuid = this.activatedRoute.snapshot.params.uuid;
+    this.readonlyFormControl(this.readonly);
 
     if (this.uuid) {
       this.form.controls.stock_entry_type.disable();
       this.readonly = true;
+      this.readonlyFormControl(this.readonly);
       this.stockEntryService.getStockEntry(this.uuid).subscribe({
         next: (success: any) => {
           if (!success) return;
           if (success.status === STOCK_TRANSFER_STATUS.draft) {
             this.readonly = false;
+            this.readonlyFormControl(this.readonly);
             this.subscribeEndpoints();
           }
           this.stock_receipt_names = success.names || [];
           this.status = success.status;
-          this.remarks = success.remarks;
+          this.form.controls.remarks.setValue(success.remarks);
           if (success.stock_entry_type !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
             this.form.controls.accounts.setValue(
               success.items[0]?.expense_account || '',
@@ -180,7 +183,6 @@ export class MaterialTransferComponent implements OnInit {
             this.form.controls.customer.setValue(
               success.customer ? { name: success.customer } : '',
             );
-            this.readonly ? this.form.controls.accounts.disable() : null;
           }
           this.form.controls.territory.setValue(success.territory);
           this.form.controls.stock_entry_type.setValue(
@@ -636,6 +638,7 @@ export class MaterialTransferComponent implements OnInit {
       [
         STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
         STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
+        STOCK_ENTRY_TYPE.RnD_PRODUCTS,
       ].includes(this.form.controls.stock_entry_type.value) &&
       (!this.form.controls.accounts.valid || !this.form.controls.accounts.value)
     ) {
@@ -660,7 +663,7 @@ export class MaterialTransferComponent implements OnInit {
     const date = await this.timeService.getDateAndTime(new Date());
     body.company = this.company;
     body.territory = this.form.get('territory').value;
-    body.remarks = this.remarks;
+    body.remarks = this.form.controls.remarks.value;
     body.posting_date = date.date;
     body.posting_time = date.time;
     body.stock_entry_type = this.form.controls.stock_entry_type.value;
@@ -702,6 +705,21 @@ export class MaterialTransferComponent implements OnInit {
     });
   }
 
+  readonlyFormControl(boolean) {
+    boolean
+      ? this.warehouseState.s_warehouse.disable()
+      : this.warehouseState.s_warehouse.enable();
+    boolean
+      ? this.warehouseState.t_warehouse.disable()
+      : this.warehouseState.t_warehouse.enable();
+    boolean
+      ? this.form.controls.remarks.disable()
+      : this.form.controls.remarks.enable();
+    boolean
+      ? this.form.controls.accounts.disable()
+      : this.form.controls.accounts.enable();
+  }
+
   mergeItems(items: Item[]) {
     const hash = {};
     const merged_items = [];
@@ -710,6 +728,7 @@ export class MaterialTransferComponent implements OnInit {
         [
           STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
           STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
+          STOCK_ENTRY_TYPE.RnD_PRODUCTS,
         ].includes(this.form.controls.stock_entry_type.value)
       ) {
         item.expense_account = this.form.controls.accounts.value;

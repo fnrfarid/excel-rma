@@ -190,7 +190,7 @@ export class SettingsService {
           const params = new HttpParams({
             fromObject: {
               fields: '["*"]',
-              filters: `[["name","like","%${value}%"],["company","=","${company}"]]`,
+              filters: `[["name","like","%${value}%"],["company","=","${company}"],["is_group","=",0]]`,
             },
           });
 

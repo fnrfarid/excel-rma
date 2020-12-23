@@ -92,6 +92,9 @@ export class StockEntryAggregateService {
         }
 
         this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+        if (!mongoSerials) {
+          return of(stockEntry);
+        }
         return from(Object.keys(mongoSerials)).pipe(
           switchMap(key => {
             return from(
@@ -190,6 +193,9 @@ export class StockEntryAggregateService {
         }
         return forkJoin({
           stockEntry: this.stockEntryPolicies.validateStockEntryCancel(
+            stockEntry,
+          ),
+          stockEntryQueue: this.stockEntryPolicies.validateStockEntryQueue(
             stockEntry,
           ),
           settings: this.settingService.find(),
