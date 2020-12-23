@@ -26,49 +26,75 @@
     </div>
     <ion-card-content class="ion-padding">
       <ion-grid>
-        <ion-row>
-          <ion-col>
-            <mat-form-field class="mat-input-wrapper">
-              <input
-                matInput
-                placeholder="Item Name"
-                [(ngModel)]="itemName"
-                (keyup.enter)="setFilter()"
-              />
-              <button mat-button matSuffix (click)="setFilter()">
-                <mat-icon>search</mat-icon>
-              </button>
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="mat-input-wrapper">
-              <input
-                matInput
-                placeholder="Item Group"
-                [(ngModel)]="itemGroup"
-                (keyup.enter)="setFilter()"
-              />
-              <button mat-button matSuffix (click)="setFilter()">
-                <mat-icon>search</mat-icon>
-              </button>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <mat-form-field class="mat-input-wrapper">
-              <input
-                matInput
-                placeholder="Brand"
-                [(ngModel)]="brand"
-                (keyup.enter)="setFilter()"
-              />
-              <button mat-button matSuffix (click)="setFilter()">
-                <mat-icon>search</mat-icon>
-              </button>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
+        <form [formGroup]="itemsForm">
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Item Name"
+                  [matAutocomplete]="auto"
+                  formControlName="itemName"
+                  (focusout)="validateInput(f.itemName, filteredItemList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #auto="matAutocomplete"
+                  [displayWith]="getItemOption"
+                  (optionSelected)="setFilter($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredItemList | async"
+                    [value]="option"
+                  >
+                    {{ option.item_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.itemName.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.itemName.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Item Group"
+                  (keyup.enter)="setFilter()"
+                />
+                <button mat-button matSuffix (click)="setFilter()">
+                  <mat-icon>search</mat-icon>
+                </button>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Brand"
+                  (keyup.enter)="setFilter()"
+                />
+                <button
+                  mat-button
+                  matSuffix
+                  (click)="setFilter($event.option.value)"
+                >
+                  <mat-icon>search</mat-icon>
+                </button>
+              </mat-form-field>
+              <ion-button
+                color="tertiary"
+                (click)="clearFilters()"
+                fill="outline"
+              >
+                Clear
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </form>
       </ion-grid>
       <div class="example-container mat-elevation-z8">
         <table
@@ -234,10 +260,7 @@
                 yAlign="start"
                 (closed)="updateMRP(row, $event)"
               >
-                <edit-price
-                  [value]="row.mrp"
-                  column="mrp"
-                ></edit-price>
+                <edit-price [value]="row.mrp" column="mrp"></edit-price>
               </sat-popover>
             </td>
           </ng-container>
