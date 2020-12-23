@@ -27,7 +27,7 @@ export class SalesReturnService {
   ) {
     const url = LIST_DELIVERY_NOTE_ENDPOINT;
     const params = new HttpParams()
-      .set('sales_invoice', sales_invoice)
+      .set('against_sales_invoice', sales_invoice)
       .set('limit', pageSize.toString())
       .set('offset', (pageIndex * pageSize).toString())
       .set('search', filter)

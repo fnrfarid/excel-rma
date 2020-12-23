@@ -307,8 +307,10 @@ export class StockEntryAggregateService {
   ): StockEntry {
     const stockEntry = new StockEntry();
     Object.assign(stockEntry, payload);
+    delete stockEntry.names;
     stockEntry.uuid = uuidv4();
     stockEntry.doctype = STOCK_ENTRY;
+    stockEntry.set_posting_time = 1;
     stockEntry.createdOn = payload.posting_date;
     stockEntry.createdAt = new DateTime(settings.timeZone).toJSDate();
     stockEntry.createdByEmail = clientHttpRequest.token.email;
