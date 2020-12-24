@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CsvJsonService } from 'src/app/api/csv-json/csv-json.service';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import {
   CSV_FILE_TYPE,
   SERIAL_DOWNLOAD_HEADERS,
-} from 'src/app/constants/app-string';
+} from '../../../constants/app-string';
 import { PurchaseService } from '../../../purchase-ui/services/purchase.service';
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { CommonDeliveredSerialsDataSource } from './delivered-serials-datasource';

@@ -3,6 +3,7 @@ import { WarrantyClaim } from './warranty-claim.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
+import { PARSE_REGEX } from '../../../constants/app-strings';
 
 @Injectable()
 export class WarrantyClaimService {
@@ -95,7 +96,11 @@ export class WarrantyClaimService {
         if (key === 'claim_status' && query[key] === 'All') {
           delete query[key];
         } else {
-          query[key] = new RegExp(query[key], 'i');
+          if (typeof query[key] === 'string') {
+            query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
+          } else {
+            delete query[key];
+          }
         }
       } else {
         delete query[key];

@@ -20,7 +20,7 @@ import { MaterialModule } from '../../material/material.module';
 import { EditTableComponent } from './edit-table/edit-table.component';
 import { AppCommonModule } from '../../common/app-common.module';
 import { PrintComponent } from './print/print.component';
-import { CommonComponentModule } from 'src/app/common/components/common-component.module';
+import { CommonComponentModule } from '../../common/components/common-component.module';
 
 const routes: Routes = [
   {

@@ -336,4 +336,28 @@ export const STOCK_ENTRY_NAMING_SERIES = {
   [STOCK_ENTRY_TYPE.RnD_PRODUCTS]: DEFAULT_NAMING_SERIES.material_issue,
   [STOCK_ENTRY_TYPE.MATERIAL_RECEIPT]: DEFAULT_NAMING_SERIES.material_receipt,
 };
-export const INVALID_REGEX = /[°"§%()\[\]{}=\\?´`'#<>|,;.:+_-]+/g;
+export const INVALID_REGEX = ['+', '(', ')'];
+export function PARSE_REGEX(value: string) {
+  const indices = new Set();
+  INVALID_REGEX.forEach(key => {
+    if (value.includes(key)) {
+      indices.add(value.indexOf(key));
+      indices.add(value.lastIndexOf(key));
+    }
+  });
+  if (!Array.from(indices).length) {
+    return value;
+  }
+  const array: any[] = Array.from(indices);
+  const state = {
+    first: Math.min(...array),
+    last: Math.max(...array),
+  };
+  return (
+    value.slice(0, state.first) +
+    '[' +
+    value.slice(state.first, state.last + 1) +
+    ']' +
+    value.slice(state.last + 1, value.length)
+  );
+}

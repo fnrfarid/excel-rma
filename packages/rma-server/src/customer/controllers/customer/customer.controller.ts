@@ -59,6 +59,9 @@ export class CustomerController {
     @Query('sort') sort: string,
     @Req() clientHttpRequest,
   ) {
+    try {
+      search = decodeURIComponent(search);
+    } catch {}
     return await this.queryBus.execute(
       new RetrieveCustomerListQuery(
         offset,

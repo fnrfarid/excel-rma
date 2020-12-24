@@ -3,7 +3,14 @@ import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
 import { SalesService } from '../services/sales.service';
@@ -11,7 +18,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../constants/app-string';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -73,6 +80,8 @@ export class ItemPricePage implements OnInit {
 
     this.filteredItemList = this.itemsForm.get('itemName').valueChanges.pipe(
       startWith(''),
+      debounceTime(400),
+      distinctUntilChanged(),
       switchMap(value => {
         return this.salesService.getItemList(value);
       }),
@@ -153,7 +162,6 @@ export class ItemPricePage implements OnInit {
         }
       }
     }
-
     this.dataSource.loadItems(query, sortQuery, 0, 30);
   }
 
@@ -207,9 +215,15 @@ export class ItemPricePage implements OnInit {
   getUpdate(event) {
     this.dataSource.loadItems(
       {
-        brand: this.brand,
-        item_group: this.itemGroup,
-        item_name: this.itemName,
+        brand: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.brand.value
+          : '',
+        item_group: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.item_group.value
+          : '',
+        item_name: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.item_name.value
+          : '',
       },
       this.sort.direction,
       event.pageIndex,
