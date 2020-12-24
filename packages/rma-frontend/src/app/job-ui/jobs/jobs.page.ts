@@ -76,7 +76,7 @@ export class JobsPage implements OnInit {
   getUpdate(event) {
     this.index = event.pageIndex;
     this.size = event.pageSize;
-    this.setFilter();
+    this.setFilter(event);
   }
 
   navigateBack() {

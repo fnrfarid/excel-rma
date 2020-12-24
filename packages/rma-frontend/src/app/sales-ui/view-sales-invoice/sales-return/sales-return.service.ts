@@ -8,40 +8,12 @@ import {
 } from '../../../constants/storage';
 import { map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
-import {
-  LIST_DELIVERY_NOTE_ENDPOINT,
-  RELAY_GET_DELIVERY_NOTE_ENDPOINT,
-} from '../../../constants/url-strings';
+import { RELAY_GET_DELIVERY_NOTE_ENDPOINT } from '../../../constants/url-strings';
 @Injectable({
   providedIn: 'root',
 })
 export class SalesReturnService {
   constructor(private http: HttpClient, private storage: StorageService) {}
-
-  getReturnVoucherList(
-    sales_invoice: string,
-    filter = '',
-    sortOrder = 'asc',
-    pageIndex = 0,
-    pageSize = 30,
-  ) {
-    const url = LIST_DELIVERY_NOTE_ENDPOINT;
-    const params = new HttpParams()
-      .set('against_sales_invoice', sales_invoice)
-      .set('limit', pageSize.toString())
-      .set('offset', (pageIndex * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
-
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get(url, {
-          params,
-          headers,
-        });
-      }),
-    );
-  }
 
   getSalesReturnList(pageIndex = 0, pageSize = 30, filters: any[]) {
     const url = RELAY_GET_DELIVERY_NOTE_ENDPOINT;

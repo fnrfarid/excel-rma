@@ -214,6 +214,7 @@ export const DEFAULT_NAMING_SERIES = {
   stock_rejected: 'BTRIN-.YYYY.-',
   material_receipt: 'PAQ-.YYYY.-',
   material_issue: 'PCM-.YYYY.-',
+  rnd_products: 'RND-.YYYY.-',
   stock_transfer_internal: 'TRO-.YYYY.-',
   warranty_claim: 'WAR-00',
 };
@@ -333,7 +334,7 @@ export const STOCK_ENTRY_NAMING_SERIES = {
   [ACCEPT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_receive,
   [REJECT_STOCK_ENTRY_JOB]: DEFAULT_NAMING_SERIES.stock_rejected,
   [STOCK_ENTRY_TYPE.MATERIAL_ISSUE]: DEFAULT_NAMING_SERIES.material_issue,
-  [STOCK_ENTRY_TYPE.RnD_PRODUCTS]: DEFAULT_NAMING_SERIES.material_issue,
+  [STOCK_ENTRY_TYPE.RnD_PRODUCTS]: DEFAULT_NAMING_SERIES.rnd_products,
   [STOCK_ENTRY_TYPE.MATERIAL_RECEIPT]: DEFAULT_NAMING_SERIES.material_receipt,
 };
 export const INVALID_REGEX = ['+', '(', ')'];
