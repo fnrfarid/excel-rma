@@ -51,8 +51,8 @@ import { MY_FORMATS } from '../../../constants/date-format';
 import { TimeService } from '../../../api/time/time.service';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ValidateInputSelected } from '../../../common/pipes/validators';
-import { DELIVERED_SERIALS_DISPLAYED_COLUMNS } from 'src/app/constants/storage';
-import { DeliveredSerialsState } from 'src/app/common/components/delivered-serials/delivered-serials.component';
+import { DELIVERED_SERIALS_DISPLAYED_COLUMNS } from '../../../constants/storage';
+import { DeliveredSerialsState } from '../../../common/components/delivered-serials/delivered-serials.component';
 
 @Component({
   selector: 'purchase-assign-serials',

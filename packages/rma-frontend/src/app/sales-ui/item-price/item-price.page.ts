@@ -178,7 +178,6 @@ export class ItemPricePage implements OnInit {
         }
       }
     }
-
     this.dataSource.loadItems(query, sortQuery, 0, 30);
   }
 
@@ -233,9 +232,15 @@ export class ItemPricePage implements OnInit {
   getUpdate(event) {
     this.dataSource.loadItems(
       {
-        item_brand: this.itemBrand,
-        item_group: this.itemGroup,
-        item_name: this.itemName,
+        brand: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.brand.value
+          : '',
+        item_group: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.item_group.value
+          : '',
+        item_name: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.item_name.value
+          : '',
       },
       this.sort.direction,
       event.pageIndex,

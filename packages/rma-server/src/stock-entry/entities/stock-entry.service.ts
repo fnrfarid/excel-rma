@@ -3,6 +3,7 @@ import { StockEntry } from './stock-entry.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { STOCK_ENTRY_LIST_ITEM_SELECT_KEYS } from '../../constants/app-strings';
+import { PARSE_REGEX } from '../../constants/app-strings';
 
 @Injectable()
 export class StockEntryService {
@@ -99,7 +100,11 @@ export class StockEntryService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        query[key] = new RegExp(query[key], 'i');
+        if (typeof query[key] === 'string') {
+          query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
+        } else {
+          delete query[key];
+        }
       } else {
         delete query[key];
       }

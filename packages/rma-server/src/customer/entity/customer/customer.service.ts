@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { Customer } from './customer.entity';
+import { PARSE_REGEX } from '../../../constants/app-strings';
 
 @Injectable()
 export class CustomerService {
@@ -26,7 +27,7 @@ export class CustomerService {
 
   async list(skip, take, search, sort, territories: string[]) {
     const sortQuery = { name: sort };
-    const nameExp = new RegExp(search, 'i');
+    const nameExp = { $regex: PARSE_REGEX(search), $options: 'i' };
     const columns = this.customerRepository.manager.connection
       .getMetadata(Customer)
       .ownColumns.map(column => column.propertyName);
@@ -36,7 +37,6 @@ export class CustomerService {
       filter[field] = nameExp;
       return filter;
     });
-
     const customerQuery =
       territories && territories.length !== 0
         ? { territory: { $in: territories } }

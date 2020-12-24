@@ -257,7 +257,7 @@ export class SalesService {
   }
 
   getItemList(
-    filter = {},
+    filter: any = {},
     sortOrder: any = { item_name: 'asc' },
     pageIndex = 0,
     pageSize = 30,
@@ -270,11 +270,12 @@ export class SalesService {
     }
     const url = LIST_ITEMS_ENDPOINT;
     query = query ? query : {};
-    query.item_name = filter;
+    query.item_name = filter?.item_name ? filter.item_name : filter;
+
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageIndex * pageSize).toString())
-      .set('search', JSON.stringify(query))
+      .set('search', encodeURIComponent(JSON.stringify(query)))
       .set('sort', sortOrder);
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -405,7 +406,7 @@ export class SalesService {
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
+      .set('search', encodeURIComponent(filter))
       .set('sort', sortOrder);
 
     return this.getHeaders().pipe(

@@ -3,8 +3,8 @@ import { FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { startWith, switchMap } from 'rxjs/operators';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
-import { SalesService } from 'src/app/sales-ui/services/sales.service';
+import { ValidateInputSelected } from '../../common/pipes/validators';
+import { SalesService } from '../../sales-ui/services/sales.service';
 
 @Component({
   selector: 'add-item-dialog',

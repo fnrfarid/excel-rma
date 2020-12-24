@@ -12,7 +12,7 @@ import { TimeService } from '../../api/time/time.service';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
-import { SettingsService } from 'src/app/settings/settings.service';
+import { SettingsService } from '../../settings/settings.service';
 import { switchMap } from 'rxjs/operators';
 
 describe('MaterialTransferComponent', () => {
