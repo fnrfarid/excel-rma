@@ -33,18 +33,18 @@
                 <input
                   matInput
                   placeholder="Item Name"
-                  [matAutocomplete]="auto"
+                  [matAutocomplete]="itemNameAutocomplete"
                   formControlName="itemName"
-                  (focusout)="validateInput(f.itemName, filteredItemList)"
+                  (focusout)="validateInput(f.itemName, filteredItemNameList)"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
-                  #auto="matAutocomplete"
-                  [displayWith]="getItemOption"
+                  #itemNameAutocomplete="matAutocomplete"
+                  [displayWith]="getItemNameOption"
                   (optionSelected)="setFilter($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of filteredItemList | async"
+                    *ngFor="let option of filteredItemNameList | async"
                     [value]="option"
                   >
                     {{ option.item_name }}
@@ -61,11 +61,27 @@
                 <input
                   matInput
                   placeholder="Item Group"
-                  (keyup.enter)="setFilter()"
+                  [matAutocomplete]="itemGroupAutocomplete"
+                  formControlName="itemGroup"
+                  (focusout)="validateInput(f.itemGroup, filteredItemGroupList)"
                 />
-                <button mat-button matSuffix (click)="setFilter()">
-                  <mat-icon>search</mat-icon>
-                </button>
+                <mat-autocomplete
+              autoActiveFirstOption
+              #itemGroupAutocomplete="matAutocomplete"
+              [displayWith]="getItemGroupOption"
+              (optionSelected)="setFilter($event.option.value)"
+            >
+              <mat-option
+                *ngFor="let option of filteredItemGroupList | async"
+                [value]="option"
+              >
+                {{ option.item_group_name }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="f.itemGroup.hasError('falseValse')">
+              You should select a value from dropdown only.
+              <strong>'{{f.itemGroup.value}}'</strong> is not allowed.
+            </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>

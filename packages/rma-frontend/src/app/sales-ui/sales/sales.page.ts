@@ -23,7 +23,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import { Observable, of } from 'rxjs';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 
 @Component({
   selector: 'app-sales',

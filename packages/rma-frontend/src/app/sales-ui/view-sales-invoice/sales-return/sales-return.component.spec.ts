@@ -27,7 +27,7 @@ describe('SalesReturnComponent', () => {
         {
           provide: SalesReturnService,
           useValue: {
-            getReturnVoucherList: (...args) => of([{}]),
+            getSalesReturnList: (...args) => of([{}]),
           },
         },
       ],

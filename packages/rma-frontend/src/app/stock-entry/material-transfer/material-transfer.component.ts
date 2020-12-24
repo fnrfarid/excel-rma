@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Subject, Observable, of, from } from 'rxjs';
 import { Location } from '@angular/common';
 import {
@@ -88,9 +88,6 @@ export class MaterialTransferComponent implements OnInit {
     itemData: [],
   };
   accounts: Observable<any[]>;
-
-  @ViewChild('csvFileInput', { static: false })
-  csvFileInput: ElementRef;
   uuid: string;
   materialTransferDataSource: MaterialTransferDataSource = new MaterialTransferDataSource();
   fromRangeUpdate = new Subject<string>();
@@ -603,6 +600,7 @@ export class MaterialTransferComponent implements OnInit {
   assignSerials(serials, item: ItemInterface) {
     const materialTransferData = this.materialTransferDataSource.data();
     const materialTransferRow = new StockEntryRow();
+    materialTransferRow.transferWarehouse = this.transferWarehouse;
     materialTransferRow.s_warehouse = this.warehouseState.s_warehouse.value;
     materialTransferRow.t_warehouse = this.warehouseState.t_warehouse.value;
     materialTransferRow.item_code = item.item_code;
@@ -821,7 +819,6 @@ export class MaterialTransferComponent implements OnInit {
 
   addSerialsFromCsvJson(csvJsonObj: CsvJsonObj) {
     if (!this.validateWarehouseState()) {
-      this.csvFileInput.nativeElement.value = '';
       return;
     }
     const item_names = Object.keys(csvJsonObj);

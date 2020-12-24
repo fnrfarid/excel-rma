@@ -12,7 +12,7 @@ import { CLOSE } from '../../constants/app-string';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ValidateInputSelected } from 'src/app/common/pipes/validators';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-item-price',
@@ -34,12 +34,13 @@ export class ItemPricePage implements OnInit {
     'selling_price',
   ];
   itemName: string = '';
-  brand: string = '';
+  itemBrand: string = '';
   itemGroup: string = '';
   purchaseWarrantyMonths: string = '';
   itemsForm: FormGroup;
   validateInput: any = ValidateInputSelected;
-  filteredItemList: Observable<any[]>;
+  filteredItemNameList: Observable<any[]>;
+  filteredItemGroupList: Observable<any>;
 
   get f() {
     return this.itemsForm.controls;
@@ -71,26 +72,50 @@ export class ItemPricePage implements OnInit {
       )
       .subscribe({ next: res => {}, error: err => {} });
 
-    this.filteredItemList = this.itemsForm.get('itemName').valueChanges.pipe(
-      startWith(''),
-      switchMap(value => {
-        return this.salesService.getItemList(value);
-      }),
-    );
+    this.filteredItemNameList = this.itemsForm
+      .get('itemName')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getItemList(value);
+        }),
+      );
+
+    this.filteredItemGroupList = this.itemsForm
+      .get('itemGroup')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getItemGroupList(value);
+        }),
+        switchMap(data => {
+          return of(data);
+        }),
+      );
   }
 
   createFormGroup() {
     this.itemsForm = new FormGroup({
       itemName: new FormControl(),
+      itemGroup: new FormControl(),
     });
   }
 
-  getItemOption(option) {
+  getItemNameOption(option) {
     if (option) {
       if (option.item_name) {
         return `${option.item_name}`;
       }
       return option.name;
+    }
+  }
+
+  getItemGroupOption(option) {
+    if (option) {
+      if (option.item_group_name) {
+        return `${option.item_group_name}`;
+      }
+      return option.item_group_name;
     }
   }
 
@@ -142,8 +167,8 @@ export class ItemPricePage implements OnInit {
 
   setFilter(item?) {
     const query: any = {};
-    if (item) query.item_group = item.item_group;
-    if (item) query.item_name = item.item_name;
+    if (item.item_group_name) query.item_group = item.item_group_name;
+    if (item.item_name) query.item_name = item.item_name;
 
     const sortQuery = {};
     if (item) {
@@ -153,15 +178,15 @@ export class ItemPricePage implements OnInit {
         }
       }
     }
-
     this.dataSource.loadItems(query, sortQuery, 0, 30);
   }
 
   clearFilters() {
     this.itemName = '';
-    this.brand = '';
+    this.itemBrand = '';
     this.itemGroup = '';
     this.f.itemName.setValue('');
+    this.f.itemGroup.setValue('');
     this.dataSource.loadItems();
   }
 
@@ -207,9 +232,15 @@ export class ItemPricePage implements OnInit {
   getUpdate(event) {
     this.dataSource.loadItems(
       {
-        brand: this.brand,
-        item_group: this.itemGroup,
-        item_name: this.itemName,
+        brand: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.brand.value
+          : '',
+        item_group: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.item_group.value
+          : '',
+        item_name: this.itemsForm.controls.brand.value
+          ? this.itemsForm.controls.item_name.value
+          : '',
       },
       this.sort.direction,
       event.pageIndex,

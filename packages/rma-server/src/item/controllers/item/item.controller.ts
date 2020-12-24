@@ -82,6 +82,9 @@ export class ItemController {
     @Query('sort') sort,
     @Req() clientHttpRequest,
   ) {
+    try {
+      search = decodeURIComponent(search);
+    } catch {}
     return await this.queryBus.execute(
       new RetrieveItemListQuery(offset, limit, sort, search, clientHttpRequest),
     );

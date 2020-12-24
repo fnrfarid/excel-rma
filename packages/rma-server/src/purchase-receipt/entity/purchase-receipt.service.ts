@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PurchaseReceipt } from './purchase-receipt.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
+import { PARSE_REGEX } from '../../constants/app-strings';
 
 @Injectable()
 export class PurchaseReceiptService {
@@ -73,7 +74,11 @@ export class PurchaseReceiptService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        query[key] = new RegExp(query[key], 'i');
+        if (typeof query[key] === 'string') {
+          query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
+        } else {
+          delete query[key];
+        }
       } else {
         delete query[key];
       }

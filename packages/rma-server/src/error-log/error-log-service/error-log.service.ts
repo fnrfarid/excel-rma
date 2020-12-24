@@ -3,6 +3,7 @@ import { ErrorLog } from './error-log.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import * as uuidv4 from 'uuid/v4';
+import { PARSE_REGEX } from '../../constants/app-strings';
 
 @Injectable()
 export class ErrorLogService {
@@ -72,7 +73,11 @@ export class ErrorLogService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        query[key] = new RegExp(query[key], 'i');
+        if (typeof query[key] === 'string') {
+          query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
+        } else {
+          delete query[key];
+        }
       } else {
         delete query[key];
       }

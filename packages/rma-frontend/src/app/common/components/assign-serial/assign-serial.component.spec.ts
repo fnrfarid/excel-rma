@@ -6,8 +6,8 @@ import {
   NoopAnimationsModule,
 } from '@angular/platform-browser/animations';
 import { IonicModule, LoadingController } from '@ionic/angular';
-import { CsvJsonService } from 'src/app/api/csv-json/csv-json.service';
-import { MaterialModule } from 'src/app/material/material.module';
+import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
+import { MaterialModule } from '../../../material/material.module';
 import { SerialsService } from '../../helpers/serials/serials.service';
 import { AssignSerialComponent } from './assign-serial.component';
 
