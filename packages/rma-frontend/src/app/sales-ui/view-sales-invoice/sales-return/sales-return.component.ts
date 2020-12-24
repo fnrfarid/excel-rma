@@ -45,8 +45,6 @@ export class SalesReturnComponent implements OnInit {
   getUpdate(event) {
     this.dataSource.loadItems(
       this.sales_invoice,
-      this.search,
-      this.sort.direction,
       event.pageIndex,
       event.pageSize,
     );
@@ -55,8 +53,6 @@ export class SalesReturnComponent implements OnInit {
   setFilter() {
     this.dataSource.loadItems(
       this.sales_invoice,
-      this.search,
-      this.sort.direction,
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );

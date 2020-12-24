@@ -36,22 +36,13 @@ export class SalesReturnDataSource extends DataSource<ListingData> {
     this.loadingSubject.complete();
   }
 
-  loadItems(
-    sales_invoice: string,
-    filter = '',
-    sortOrder = 'asc',
-    pageIndex = 0,
-    pageSize = 30,
-  ) {
+  loadItems(sales_invoice: string, pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
     this.salesReturnService
-      .getReturnVoucherList(
-        sales_invoice,
-        filter,
-        sortOrder,
-        pageIndex,
-        pageSize,
-      )
+      .getSalesReturnList(pageIndex, pageSize, [
+        ['against_sales_invoice', '=', `${sales_invoice}`],
+        ['is_return', '=', '1'],
+      ])
       .pipe(
         map((items: ListingData[]) => {
           this.data = items;
