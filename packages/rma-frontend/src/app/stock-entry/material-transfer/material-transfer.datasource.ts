@@ -31,6 +31,7 @@ export class MaterialTransferDataSource extends DataSource<StockEntryRow> {
 export class StockEntryRow {
   s_warehouse: string;
   t_warehouse: string;
+  warranty_date?: string;
   item_code: string;
   transferWarehouse: string;
   has_serial_no: number;

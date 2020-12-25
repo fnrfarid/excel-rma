@@ -498,15 +498,13 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(purchaseWarrantyMonths: number) {
-    let date = this.date.value;
-    let dateTime;
+    let date = new Date(this.date.value);
     if (purchaseWarrantyMonths) {
       try {
         date = new Date(
           date.setMonth(date.getMonth() + purchaseWarrantyMonths),
         );
-        dateTime = await this.timeService.getDateAndTime(date);
-        return dateTime.date;
+        return await (await this.timeService.getDateAndTime(date)).date;
       } catch (err) {
         this.getMessage(`Error occurred while settings warranty date: ${err}`);
       }

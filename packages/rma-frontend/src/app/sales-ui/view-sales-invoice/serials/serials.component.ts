@@ -403,13 +403,11 @@ export class SerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(salesWarrantyMonths: number) {
-    let date = this.date.value;
-    let dateTime;
+    let date = new Date(this.date.value);
     if (salesWarrantyMonths) {
       try {
         date = new Date(date.setMonth(date.getMonth() + salesWarrantyMonths));
-        dateTime = await this.timeService.getDateAndTime(date);
-        return dateTime.date;
+        return await (await this.timeService.getDateAndTime(date)).date;
       } catch (err) {
         this.getMessage(`Error occurred while settings warranty date: ${err}`);
       }

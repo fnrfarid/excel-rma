@@ -13,7 +13,7 @@ import { LoadingController } from '@ionic/angular';
 import { of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
-import { CLOSE } from '../../../constants/app-string';
+import { CLOSE, DELIVERY_NOTE } from '../../../constants/app-string';
 import {
   ItemDataSource,
   SerialDataSource,
@@ -169,10 +169,13 @@ export class AssignSerialComponent implements OnInit {
           isValid = false;
           break;
         }
-        // if (this.state.component === DELIVERY_NOTE) {
-        //   hashMap[value.item_code] = hashMap[value.item_name];
-        //   delete hashMap[value.item_name];
-        // }
+        if (
+          this.state.component === DELIVERY_NOTE &&
+          value.item_code !== value.item_name
+        ) {
+          hashMap[value.item_code] = hashMap[value.item_name];
+          delete hashMap[value.item_name];
+        }
       }
     }
     return isValid;
