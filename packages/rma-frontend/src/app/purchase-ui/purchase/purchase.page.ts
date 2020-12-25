@@ -45,7 +45,13 @@ export class PurchasePage implements OnInit {
     'created_by',
     'delivered_by',
   ];
-  invoiceStatus: string[] = ['Completed', 'Canceled', 'Submitted', 'All'];
+  invoiceStatus: string[] = [
+    'Completed',
+    'Canceled',
+    'Submitted',
+    'All',
+    'Reseted',
+  ];
   supplier: any;
   status: string = 'All';
   name: string = '';
