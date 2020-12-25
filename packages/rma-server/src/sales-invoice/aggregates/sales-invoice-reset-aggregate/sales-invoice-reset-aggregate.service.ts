@@ -64,7 +64,7 @@ export class SalesInvoiceResetAggregateService extends AggregateRoot {
         const returned_serials = [];
         salesInvoice.returned_items?.forEach(item =>
           item.serial_no
-            ? returned_serials.push(item.serial_no.split('\n'))
+            ? returned_serials.push(...item.serial_no.split('\n'))
             : null,
         );
         return forkJoin({

@@ -597,7 +597,7 @@ export class MaterialTransferComponent implements OnInit {
     });
   }
 
-  assignSerials(serials, item: ItemInterface) {
+  async assignSerials(serials, item: ItemInterface) {
     const materialTransferData = this.materialTransferDataSource.data();
     const materialTransferRow = new StockEntryRow();
     materialTransferRow.transferWarehouse = this.transferWarehouse;
@@ -605,12 +605,39 @@ export class MaterialTransferComponent implements OnInit {
     materialTransferRow.t_warehouse = this.warehouseState.t_warehouse.value;
     materialTransferRow.item_code = item.item_code;
     materialTransferRow.item_name = item.item_name;
+    materialTransferRow.warranty_date = await this.getWarrantyDate(item);
     materialTransferRow.qty = serials.length;
     materialTransferRow.serial_no = serials;
     materialTransferRow.has_serial_no = item.has_serial_no;
     this.resetRangeState();
+    this.updateProductState(item.item_code, serials?.length || 0);
     materialTransferData.push(materialTransferRow);
     this.materialTransferDataSource.update(materialTransferData);
+  }
+
+  async getWarrantyDate(item: ItemInterface) {
+    if (
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+    ) {
+      return;
+    }
+    const warrantyInMonths =
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+        ? item.purchaseWarrantyMonths
+        : item.salesWarrantyMonths;
+
+    let date = new Date(this.form.controls.posting_date.value);
+    if (warrantyInMonths) {
+      try {
+        date = new Date(date.setMonth(date.getMonth() + warrantyInMonths));
+        return await (await this.timeService.getDateAndTime(date)).date;
+      } catch (err) {
+        this.getMessage(`Error occurred while settings warranty date: ${err}`);
+      }
+    }
+    return;
   }
 
   resetRangeState() {
@@ -973,4 +1000,6 @@ export class ItemInterface {
   item_code: string;
   item_name: string;
   has_serial_no: number;
+  purchaseWarrantyMonths: number;
+  salesWarrantyMonths: number;
 }
