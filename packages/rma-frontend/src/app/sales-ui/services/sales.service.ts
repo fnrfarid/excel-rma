@@ -92,7 +92,7 @@ export class SalesService {
   getItemByItemNames(item_names: string[]) {
     const params = new HttpParams().set(
       'item_names',
-      JSON.stringify(item_names),
+      encodeURIComponent(JSON.stringify(item_names)),
     );
     return this.getHeaders().pipe(
       switchMap(headers => {

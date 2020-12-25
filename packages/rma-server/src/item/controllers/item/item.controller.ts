@@ -51,7 +51,7 @@ export class ItemController {
   async getItemByNames(@Query('item_names') item_names: string, @Req() req) {
     let query = [];
     try {
-      query = JSON.parse(item_names);
+      query = JSON.parse(decodeURIComponent(item_names));
     } catch {
       throw new BadRequestException(INVALID_ITEM_NAME_QUERY);
     }

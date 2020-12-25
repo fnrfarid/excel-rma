@@ -13,7 +13,7 @@ import { LoadingController } from '@ionic/angular';
 import { of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
-import { DELIVERY_NOTE, CLOSE } from '../../../constants/app-string';
+import { CLOSE } from '../../../constants/app-string';
 import {
   ItemDataSource,
   SerialDataSource,
@@ -108,8 +108,7 @@ export class AssignSerialComponent implements OnInit {
                 return of(itemObj);
               }
               const hashMap = this.csvService.mapJson(json);
-              const item_names = [];
-              item_names.push(...Object.keys(hashMap));
+              const item_names = Object.keys(hashMap);
               if (this.validateJson(hashMap)) {
                 return this.csvService
                   .validateSerials(
@@ -158,22 +157,22 @@ export class AssignSerialComponent implements OnInit {
     };
   }
 
-  validateJson(json: CsvJsonObj) {
+  validateJson(hashMap: CsvJsonObj) {
     let isValid = true;
     const data = this.state.itemData;
     for (const value of data) {
-      if (json[value.item_name]) {
-        if (value.remaining < json[value.item_name].serial_no.length) {
+      if (hashMap[value.item_name]) {
+        if (value.remaining < hashMap[value.item_name].serial_no.length) {
           this.getMessage(`Item ${value.item_name} has
           ${value.remaining} remaining, but provided
-          ${json[value.item_name].serial_no.length} serials.`);
+          ${hashMap[value.item_name].serial_no.length} serials.`);
           isValid = false;
           break;
         }
-        if (this.state.component === DELIVERY_NOTE) {
-          json[value.item_code] = json[value.item_name];
-          delete json[value.item_name];
-        }
+        // if (this.state.component === DELIVERY_NOTE) {
+        //   hashMap[value.item_code] = hashMap[value.item_name];
+        //   delete hashMap[value.item_name];
+        // }
       }
     }
     return isValid;
