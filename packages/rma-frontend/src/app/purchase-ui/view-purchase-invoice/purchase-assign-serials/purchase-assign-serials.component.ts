@@ -224,7 +224,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     const purchaseReceipt = {} as PurchaseReceipt;
     purchaseReceipt.company = this.purchaseInvoiceDetails.company;
     purchaseReceipt.naming_series = this.purchaseInvoiceDetails.naming_series;
-    purchaseReceipt.posting_date = this.getParsedDate(new Date());
+    purchaseReceipt.posting_date = this.getParsedDate(this.date.value);
     purchaseReceipt.posting_time = this.getFrappeTime();
     purchaseReceipt.purchase_invoice_name = this.purchaseInvoiceDetails.name;
     purchaseReceipt.supplier = this.purchaseInvoiceDetails.supplier;
@@ -498,15 +498,13 @@ export class PurchaseAssignSerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(purchaseWarrantyMonths: number) {
-    let date = this.date.value;
-    let dateTime;
+    let date = new Date(this.date.value);
     if (purchaseWarrantyMonths) {
       try {
         date = new Date(
           date.setMonth(date.getMonth() + purchaseWarrantyMonths),
         );
-        dateTime = await this.timeService.getDateAndTime(date);
-        return dateTime.date;
+        return await (await this.timeService.getDateAndTime(date)).date;
       } catch (err) {
         this.getMessage(`Error occurred while settings warranty date: ${err}`);
       }

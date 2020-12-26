@@ -204,6 +204,7 @@ export class PurchaseReceiptSyncService {
     purchase_receipt.conversion_rate = purchase_receipt.conversion_rate
       ? purchase_receipt.conversion_rate
       : 1;
+    purchase_receipt.set_posting_time = 1;
     purchase_receipt.status = purchase_receipt.status
       ? purchase_receipt.status
       : 'To Bill';

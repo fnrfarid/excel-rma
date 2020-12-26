@@ -61,63 +61,68 @@ export class StockEntrySyncService {
     parent: string;
     type: string;
   }) {
-    const payload: StockEntry = Object.assign({}, job.payload);
-    return of({}).pipe(
-      mergeMap(object => {
-        return this.settingsService.find().pipe(
-          switchMap(settings => {
-            job.settings = settings;
-            payload.items.filter((item: any) => {
-              if (job.type === CREATE_STOCK_ENTRY_JOB) {
-                payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
-                if (
-                  job.payload.stock_entry_type ===
-                  STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
-                ) {
-                  item.t_warehouse = item.transferWarehouse;
-                } else {
-                  payload.naming_series =
-                    STOCK_ENTRY_NAMING_SERIES[payload.stock_entry_type];
-                }
-              } else {
-                payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
-              }
-              if (job.type === ACCEPT_STOCK_ENTRY_JOB) {
-                item.s_warehouse = item.transferWarehouse;
-              }
-              if (job.type === REJECT_STOCK_ENTRY_JOB) {
-                item.t_warehouse = item.s_warehouse;
-                item.s_warehouse = item.transferWarehouse;
-              }
-              if (
-                item.has_serial_no &&
-                item.serial_no &&
-                typeof item.serial_no === 'object'
-              ) {
-                item.serial_no = item.serial_no.join('\n');
-              }
-              item.excel_serials = item.serial_no;
-              delete item.serial_no;
-              return item;
-            });
-            const frappePayload = this.parseFrappePayload(payload);
-            const endpoint =
-              frappePayload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
-                ? POST_DELIVERY_NOTE_ENDPOINT
-                : STOCK_ENTRY_API_ENDPOINT;
-            return this.http.post(
-              settings.authServerURL + endpoint,
-              frappePayload,
-              {
-                headers: this.settingsService.getAuthorizationHeaders(
-                  job.token,
-                ),
-              },
-            );
-          }),
+    const serialHash: { [key: string]: string[] } = {};
+    const payload: StockEntry = job.payload;
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        job.settings = settings;
+        payload.items.filter((item: any) => {
+          if (job.type === CREATE_STOCK_ENTRY_JOB) {
+            payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
+            if (
+              job.payload.stock_entry_type ===
+              STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+            ) {
+              item.t_warehouse = item.transferWarehouse;
+            } else {
+              payload.naming_series =
+                STOCK_ENTRY_NAMING_SERIES[payload.stock_entry_type];
+            }
+          } else {
+            payload.naming_series = STOCK_ENTRY_NAMING_SERIES[job.type];
+          }
+          if (job.type === ACCEPT_STOCK_ENTRY_JOB) {
+            item.s_warehouse = item.transferWarehouse;
+          }
+          if (job.type === REJECT_STOCK_ENTRY_JOB) {
+            item.t_warehouse = item.s_warehouse;
+            item.s_warehouse = item.transferWarehouse;
+          }
+
+          serialHash[item.item_code] =
+            this.getSplitSerials(item.serial_no) ||
+            this.getSplitSerials(item.excel_serials);
+          if (
+            item.has_serial_no &&
+            item.serial_no &&
+            typeof item.serial_no === 'object'
+          ) {
+            item.serial_no = item.serial_no.join('\n');
+          }
+          item.excel_serials = item.serial_no;
+          delete item.serial_no;
+          return item;
+        });
+        const frappePayload = this.parseFrappePayload(payload);
+        const endpoint =
+          frappePayload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
+            ? POST_DELIVERY_NOTE_ENDPOINT
+            : STOCK_ENTRY_API_ENDPOINT;
+        return this.http.post(
+          settings.authServerURL + endpoint,
+          frappePayload,
+          {
+            headers: this.settingsService.getAuthorizationHeaders(job.token),
+          },
         );
       }),
       catchError(err => {
+        payload.items.filter((item: any) => {
+          if (item.has_serial_no) {
+            item.serial_no = serialHash[item.item_code];
+          }
+          return item;
+        });
         if (
           (err && err.response && err.response.status === 403) ||
           (err &&
@@ -144,14 +149,12 @@ export class StockEntrySyncService {
         return throwError(err);
       }),
       retry(3),
-      map(data => data.data.data),
+      map((data: any) => data.data.data),
       switchMap(response => {
-        payload.items.filter(item => {
+        payload.items.filter((item: any) => {
           if (item.has_serial_no) {
-            item.serial_no = this.getSplitSerials(item.excel_serials);
-            delete item.excel_serials;
+            item.serial_no = serialHash[item.item_code];
           }
-          return item;
         });
         this.updateSerials(
           payload,
@@ -166,6 +169,16 @@ export class StockEntrySyncService {
           .then(success => {})
           .catch(err => {});
         return of({});
+      }),
+      catchError(err => {
+        payload.items.filter((item: any) => {
+          if (item.has_serial_no) {
+            delete item.excel_serials;
+            item.serial_no = serialHash[item.item_code];
+          }
+          return item;
+        });
+        return throwError(err);
       }),
     );
   }
@@ -303,7 +316,7 @@ export class StockEntrySyncService {
 
   getSplitSerials(serials) {
     if (typeof serials === 'string') {
-      serials = serials.split('\n');
+      return serials.split('\n');
     }
     return serials;
   }

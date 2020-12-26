@@ -180,6 +180,7 @@ export class DeliveryNoteJobService {
     payload.naming_series = payload.naming_series
       ? payload.naming_series
       : DEFAULT_NAMING_SERIES.delivery_note;
+    payload.set_posting_time = 1;
     payload.price_list_currency = payload.price_list_currency
       ? payload.price_list_currency
       : DEFAULT_CURRENCY;
@@ -380,11 +381,18 @@ export class DeliveryNoteJobService {
   }
 
   getStatus(sales_invoice: SalesInvoice) {
-    let total = 0;
-    for (const key of Object.keys(sales_invoice.delivered_items_map)) {
-      total += sales_invoice.delivered_items_map[key];
-    }
-    if (total === sales_invoice.total_qty) return COMPLETED_STATUS;
+    const total = sales_invoice.has_bundle_item
+      ? Object.values(sales_invoice.bundle_items_map).reduce(
+          (a: number, b: number) => a + b,
+          0,
+        )
+      : sales_invoice.total_qty;
+
+    const delivered_qty = Object.values(
+      sales_invoice.delivered_items_map,
+    ).reduce((a: number, b: number) => a + b, 0);
+
+    if (total === delivered_qty) return COMPLETED_STATUS;
     else return TO_DELIVER_STATUS;
   }
 

@@ -403,13 +403,11 @@ export class SerialsComponent implements OnInit {
   }
 
   async getWarrantyDate(salesWarrantyMonths: number) {
-    let date = this.date.value;
-    let dateTime;
+    let date = new Date(this.date.value);
     if (salesWarrantyMonths) {
       try {
         date = new Date(date.setMonth(date.getMonth() + salesWarrantyMonths));
-        dateTime = await this.timeService.getDateAndTime(date);
-        return dateTime.date;
+        return await (await this.timeService.getDateAndTime(date)).date;
       } catch (err) {
         this.getMessage(`Error occurred while settings warranty date: ${err}`);
       }
@@ -490,7 +488,7 @@ export class SerialsComponent implements OnInit {
     const assignSerial = {} as SerialAssign;
     assignSerial.company = this.salesInvoiceDetails.company;
     assignSerial.customer = this.salesInvoiceDetails.customer;
-    assignSerial.posting_date = this.getParsedDate(new Date());
+    assignSerial.posting_date = this.getParsedDate(this.date.value);
     assignSerial.posting_time = this.getFrappeTime();
     assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
     assignSerial.set_warehouse = this.warehouseFormControl.value;

@@ -10,8 +10,8 @@ import { DeliveryNoteModule } from '../delivery-note/delivery-note.module';
 import { SerialNoModule } from '../serial-no/serial-no.module';
 import { SalesInvoiceWebhookController } from './controllers/sales-invoice-webhook/sales-invoice-webhook.controller';
 import { DirectModule } from '../direct/direct.module';
-import { ItemEntitiesModule } from '../item/entity/item-entity.module';
 import { SalesInvoicePoliciesManager } from './policies';
+import { ItemModule } from '../item/item.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { SalesInvoicePoliciesManager } from './policies';
     DeliveryNoteModule,
     SerialNoModule,
     DirectModule,
-    ItemEntitiesModule,
+    ItemModule,
   ],
   controllers: [SalesInvoiceController, SalesInvoiceWebhookController],
   providers: [

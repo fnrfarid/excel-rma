@@ -5,7 +5,7 @@ import { MinimumItemPriceSetEvent } from '../../events/minimum-item-price-set/mi
 import { WarrantyMonthsSetEvent } from '../../events/purchase-warranty-days-set/purchase-warranty-days-set.event';
 import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
 import { ITEM_NOT_FOUND } from '../../../constants/messages';
-import { from, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 @Injectable()
@@ -68,7 +68,7 @@ export class ItemAggregateService extends AggregateRoot {
     return await this.itemService.updateOne({ uuid }, { $set: { mrp } });
   }
 
-  getBundleItems(item_codes) {
+  getBundleItems(item_codes): Observable<any[]> {
     return from(
       this.itemService.find({ item_code: { $in: Object.keys(item_codes) } }),
     ).pipe(
