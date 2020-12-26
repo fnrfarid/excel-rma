@@ -77,6 +77,8 @@ export class PurchaseReceiptDto {
   @IsString()
   posting_time: string;
 
+  set_posting_time?: number;
+
   @IsNotEmpty()
   @IsString()
   company: string;

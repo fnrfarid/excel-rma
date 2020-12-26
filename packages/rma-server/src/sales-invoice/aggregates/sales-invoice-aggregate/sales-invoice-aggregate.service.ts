@@ -181,37 +181,33 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               );
             }),
             switchMap(() => {
-              return this.validateSalesInvoicePolicy
-                .validateSubmittedState(salesInvoice)
-                .pipe(
-                  switchMap(() => {
-                    return this.validateSalesInvoicePolicy.validateQueueState(
-                      salesInvoice,
-                    );
-                  }),
-                )
-                .pipe(
-                  switchMap(isValid => {
-                    salesInvoice.naming_series =
-                      DEFAULT_NAMING_SERIES.sales_invoice;
-                    return from(
-                      this.salesInvoiceService.updateOne(
-                        { uuid: salesInvoice.uuid },
-                        { $set: { inQueue: true } },
-                      ),
-                    ).pipe(
-                      switchMap(() => {
-                        this.apply(
-                          new SalesInvoiceSubmittedEvent(salesInvoice),
-                        );
-                        return this.syncSubmittedSalesInvoice(
-                          salesInvoice,
-                          clientHttpRequest,
-                        );
-                      }),
-                    );
-                  }),
-                );
+              return this.validateSalesInvoicePolicy.validateSubmittedState(
+                salesInvoice,
+              );
+            }),
+            switchMap(() => {
+              return this.validateSalesInvoicePolicy.validateQueueState(
+                salesInvoice,
+              );
+            }),
+            switchMap(isValid => {
+              salesInvoice.naming_series = DEFAULT_NAMING_SERIES.sales_invoice;
+              return from(
+                this.salesInvoiceService.updateOne(
+                  { uuid: salesInvoice.uuid },
+                  { $set: { inQueue: true } },
+                ),
+              );
+            }),
+            switchMap(() => {
+              return this.syncSubmittedSalesInvoice(
+                salesInvoice,
+                clientHttpRequest,
+              );
+            }),
+            switchMap(() => {
+              this.apply(new SalesInvoiceSubmittedEvent(salesInvoice));
+              return of(salesInvoice);
             }),
           );
       }),

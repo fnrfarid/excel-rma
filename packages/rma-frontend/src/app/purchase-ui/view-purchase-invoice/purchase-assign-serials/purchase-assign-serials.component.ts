@@ -224,7 +224,7 @@ export class PurchaseAssignSerialsComponent implements OnInit {
     const purchaseReceipt = {} as PurchaseReceipt;
     purchaseReceipt.company = this.purchaseInvoiceDetails.company;
     purchaseReceipt.naming_series = this.purchaseInvoiceDetails.naming_series;
-    purchaseReceipt.posting_date = this.getParsedDate(new Date());
+    purchaseReceipt.posting_date = this.getParsedDate(this.date.value);
     purchaseReceipt.posting_time = this.getFrappeTime();
     purchaseReceipt.purchase_invoice_name = this.purchaseInvoiceDetails.name;
     purchaseReceipt.supplier = this.purchaseInvoiceDetails.supplier;
