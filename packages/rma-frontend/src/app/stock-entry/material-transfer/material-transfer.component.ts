@@ -783,7 +783,7 @@ export class MaterialTransferComponent implements OnInit {
       if (
         [
           STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
-          STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
+          STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
           STOCK_ENTRY_TYPE.RnD_PRODUCTS,
         ].includes(this.form.controls.stock_entry_type.value)
       ) {

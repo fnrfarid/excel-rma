@@ -105,6 +105,9 @@ export class SalesInvoice extends BaseEntity {
   delivered_items_map: any = {};
 
   @Column()
+  bundle_items_map: any = {};
+
+  @Column()
   returned_items_map: any = {};
 
   @Column()
