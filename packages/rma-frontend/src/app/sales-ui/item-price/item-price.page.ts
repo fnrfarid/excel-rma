@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../constants/app-string';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable, of } from 'rxjs';
 
 @Component({

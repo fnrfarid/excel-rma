@@ -10,6 +10,7 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { ItemService } from '../../../item/entity/item/item.service';
+import { ItemAggregateService } from '../../../item/aggregates/item-aggregate/item-aggregate.service';
 
 describe('SalesInvoiceAggregateService', () => {
   let service: SalesInvoiceAggregateService;
@@ -56,6 +57,10 @@ describe('SalesInvoiceAggregateService', () => {
         },
         {
           provide: ItemService,
+          useValue: {},
+        },
+        {
+          provide: ItemAggregateService,
           useValue: {},
         },
       ],

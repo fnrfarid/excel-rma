@@ -56,6 +56,7 @@ import {
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { ItemService } from '../../../item/entity/item/item.service';
+import { ItemAggregateService } from '../../../item/aggregates/item-aggregate/item-aggregate.service';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -68,6 +69,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     private readonly clientToken: ClientTokenManagerService,
     private readonly serialNoHistoryService: SerialNoHistoryService,
     private readonly itemService: ItemService,
+    private readonly itemAggregateService: ItemAggregateService,
   ) {
     super();
   }
@@ -210,6 +212,31 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               return of(salesInvoice);
             }),
           );
+      }),
+    );
+  }
+
+  addSalesInvoiceBundleMap(salesInvoice: SalesInvoice) {
+    let itemsMap = {};
+    salesInvoice.items.forEach(item => {
+      itemsMap[item.item_code] = item.qty;
+    });
+    return this.itemAggregateService.getBundleItems(itemsMap).pipe(
+      switchMap(data => {
+        itemsMap = {};
+        data.forEach(item => {
+          itemsMap[Buffer.from(item.item_code).toString('base64')] = item.qty;
+        });
+        return from(
+          this.salesInvoiceService.updateOne(
+            { uuid: salesInvoice.uuid },
+            {
+              $set: {
+                bundle_items_map: itemsMap,
+              },
+            },
+          ),
+        );
       }),
     );
   }
@@ -672,18 +699,21 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       .pipe(
         switchMap(count => {
           if (count) {
-            return from(
-              this.salesInvoiceService.updateOne(
-                { uuid: salesInvoice.uuid },
-                {
-                  $set: {
-                    has_bundle_item: true,
+            return forkJoin({
+              updateBundle: from(
+                this.salesInvoiceService.updateOne(
+                  { uuid: salesInvoice.uuid },
+                  {
+                    $set: {
+                      has_bundle_item: true,
+                    },
                   },
-                },
+                ),
               ),
-            );
+              updateBundleMap: this.addSalesInvoiceBundleMap(salesInvoice),
+            });
           }
-          return of(false);
+          return of(true);
         }),
       )
       .subscribe({
