@@ -132,6 +132,7 @@ export class PurchaseOrderWebhookAggregateService {
               map(res => res.data),
               switchMap(invoice => {
                 invoice.message.posting_date = created_on;
+                invoice.message.set_posting_time = 1;
                 headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
                 headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
                 return this.http

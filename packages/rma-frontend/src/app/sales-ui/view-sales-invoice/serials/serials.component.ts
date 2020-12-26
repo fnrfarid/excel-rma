@@ -488,7 +488,7 @@ export class SerialsComponent implements OnInit {
     const assignSerial = {} as SerialAssign;
     assignSerial.company = this.salesInvoiceDetails.company;
     assignSerial.customer = this.salesInvoiceDetails.customer;
-    assignSerial.posting_date = this.getParsedDate(new Date());
+    assignSerial.posting_date = this.getParsedDate(this.date.value);
     assignSerial.posting_time = this.getFrappeTime();
     assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
     assignSerial.set_warehouse = this.warehouseFormControl.value;

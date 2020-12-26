@@ -180,6 +180,7 @@ export class DeliveryNoteJobService {
     payload.naming_series = payload.naming_series
       ? payload.naming_series
       : DEFAULT_NAMING_SERIES.delivery_note;
+    payload.set_posting_time = 1;
     payload.price_list_currency = payload.price_list_currency
       ? payload.price_list_currency
       : DEFAULT_CURRENCY;
