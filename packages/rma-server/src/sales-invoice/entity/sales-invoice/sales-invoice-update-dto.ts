@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SALES_INVOICE_STATUS_ENUM } from '../../../constants/app-strings';
+import { ItemDto } from './sales-invoice-dto';
 
 export class SalesInvoiceUpdateDto {
   @IsNotEmpty()
@@ -169,38 +170,4 @@ export class TaxDto {
   @IsOptional()
   @IsNumber()
   rate: number;
-}
-
-export class ItemDto {
-  @IsOptional()
-  @IsString()
-  name: string;
-
-  @IsOptional()
-  @IsString()
-  owner: string;
-
-  @IsOptional()
-  @IsString()
-  item_code: string;
-
-  @IsOptional()
-  @IsString()
-  item_name: string;
-
-  @IsOptional()
-  @IsNumber()
-  qty: number;
-
-  @IsOptional()
-  @IsNumber()
-  rate: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  has_serial_no: number;
-
-  @IsOptional()
-  @IsNumber()
-  amount: number;
 }

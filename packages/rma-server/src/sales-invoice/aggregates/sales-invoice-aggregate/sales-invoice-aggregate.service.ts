@@ -192,6 +192,12 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                 salesInvoice,
               );
             }),
+            switchMap(() => {
+              return this.validateSalesInvoicePolicy.validateSalesInvoiceStock(
+                salesInvoice,
+                clientHttpRequest,
+              );
+            }),
             switchMap(isValid => {
               salesInvoice.naming_series = DEFAULT_NAMING_SERIES.sales_invoice;
               return from(

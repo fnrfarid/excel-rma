@@ -138,13 +138,13 @@ export class DetailsComponent implements OnInit {
           this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
         },
         error: err => {
-          const errMessage = err.error.message.split('\\n');
+          loading.dismiss();
+          const errMessage = err?.error?.message?.split('\\n') || err;
           this.snackBar.open(
-            errMessage[errMessage.length - 2].split(':')[1],
+            errMessage[errMessage.length - 2]?.split(':')[1],
             CLOSE,
             { duration: 4500 },
           );
-          loading.dismiss();
         },
       });
   }

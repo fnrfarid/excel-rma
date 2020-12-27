@@ -5,6 +5,7 @@ import {
   IsNumber,
   ValidateNested,
   IsEnum,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SALES_INVOICE_STATUS_ENUM } from '../../../constants/app-strings';
@@ -187,6 +188,10 @@ export class ItemDto {
   @IsNotEmpty()
   @IsNumber()
   rate: number;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  has_bundle_item?: boolean;
 
   @IsNotEmpty()
   @IsNumber()

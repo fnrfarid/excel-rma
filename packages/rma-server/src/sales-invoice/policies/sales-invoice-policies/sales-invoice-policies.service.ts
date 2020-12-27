@@ -31,8 +31,10 @@ import { ClientTokenManagerService } from '../../../auth/aggregates/client-token
 import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
+  RELAY_GET_STOCK_BALANCE_ENDPOINT,
 } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
+import { SalesInvoice } from 'src/sales-invoice/entity/sales-invoice/sales-invoice.entity';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -190,6 +192,50 @@ export class SalesInvoicePoliciesService {
           return throwError(new BadRequestException(DELIVERY_NOTE_IN_QUEUE));
         }
         return of(queueState);
+      }),
+    );
+  }
+
+  validateSalesInvoiceStock(sales_invoice: SalesInvoice, req) {
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        if (!settings.validateStock) {
+          return of(true);
+        }
+        return from(sales_invoice.items).pipe(
+          switchMap(item => {
+            if (item.has_bundle_item) {
+              return of(true);
+            }
+            const body = {
+              item_code: item.item_code,
+              warehouse: sales_invoice.delivery_warehouse,
+            };
+            const headers = this.settings.getAuthorizationHeaders(req.token);
+            return this.http
+              .post(
+                settings.authServerURL + RELAY_GET_STOCK_BALANCE_ENDPOINT,
+                body,
+                { headers },
+              )
+              .pipe(
+                map(data => data.data.message),
+                switchMap(message => {
+                  if (message < item.qty) {
+                    return throwError(
+                      new BadRequestException(`
+                  Only ${message} available in stock for item ${item.item_name}, 
+                  at warehouse ${sales_invoice.delivery_warehouse}.
+                  `),
+                    );
+                  }
+                  return of(true);
+                }),
+                toArray(),
+                switchMap(success => of(true)),
+              );
+          }),
+        );
       }),
     );
   }

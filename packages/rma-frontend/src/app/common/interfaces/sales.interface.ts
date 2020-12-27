@@ -29,6 +29,8 @@ export class Item {
   stock?: any;
   expense_account?: string;
   available_stock?: number;
+  has_bundle_item?: boolean;
+  bundle_items?: any[];
   assigned?: number;
   remaining?: number;
   item_group?: string;
