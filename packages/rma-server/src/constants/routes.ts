@@ -89,3 +89,5 @@ export const GET_FRAPPE_LINKED_DOCS_ENDPOINT =
   '/api/method/frappe.desk.form.linked_with.get_linked_docs';
 export const LANDED_COST_VOUCHER_ENDPOINT =
   '/api/resource/Landed%20Cost%20Voucher';
+export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
+  '/api/method/erpnext.stock.utils.get_stock_balance';
