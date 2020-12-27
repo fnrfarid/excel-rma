@@ -183,6 +183,7 @@ export class Item {
   owner: string;
   item_code: string;
   has_serial_no?: number;
+  has_bundle_item?: boolean;
   item_name: string;
   qty: number;
   rate: number;
