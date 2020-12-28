@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { WarrantyClaimsDataSource } from './warranty-claims-datasource';
@@ -16,6 +16,12 @@ import { MY_FORMATS } from '../../constants/date-format';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
+import {
+  WARRANTY_CLAIMS_CSV_FILE,
+  WARRANTY_CLAIMS_DOWNLOAD_HEADERS,
+} from '../../constants/app-string';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 
 @Component({
   selector: 'app-warranty',
@@ -79,6 +85,7 @@ export class WarrantyPage implements OnInit {
     private readonly warrantyService: WarrantyService,
     private readonly router: Router,
     private route: ActivatedRoute,
+    private csvService: CsvJsonService,
   ) {}
 
   ngOnInit() {
@@ -264,4 +271,25 @@ export class WarrantyPage implements OnInit {
   }
 
   getOption() {}
+
+  downloadSerials() {
+    this.csvService.downloadAsCSV(
+      this.dataSource.data,
+      WARRANTY_CLAIMS_DOWNLOAD_HEADERS,
+      `${WARRANTY_CLAIMS_CSV_FILE}`,
+    );
+  }
+}
+@Component({
+  selector: 'assign-serials-dialog',
+  templateUrl: 'assign-serials-dialog.html',
+})
+export class AssignSerialsDialog {
+  constructor(
+    public dialogRef: MatDialogRef<AssignSerialsDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {}
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
 }
