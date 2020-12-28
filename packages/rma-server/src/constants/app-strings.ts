@@ -99,7 +99,6 @@ export const SALES_INVOICE_STATUS = {
   draft: DRAFT_STATUS,
   submitted: SUBMITTED_STATUS,
   completed: COMPLETED_STATUS,
-  reseted: 'Reseted',
   canceled: CANCELED_STATUS,
 };
 export const STOCK_ENTRY_STATUS = {
@@ -259,7 +258,6 @@ export const PURCHASE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
   COMPLETED: 'Completed',
   CANCELED: 'Canceled',
-  RESETED: 'Reseted',
 };
 
 export const DOC_NAMES = {
