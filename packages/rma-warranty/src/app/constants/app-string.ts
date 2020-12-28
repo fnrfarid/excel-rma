@@ -32,6 +32,22 @@ export const SERIAL_DOWNLOAD_HEADERS = [
   'item_name',
   'warehouse',
 ];
+export const WARRANTY_CLAIMS_DOWNLOAD_HEADERS = [
+  'claim_no',
+  'claim_type',
+  'received_date',
+  'customer_third_party',
+  'customer_name',
+  'third_party_name',
+  'item_code',
+  'claimed_serial',
+  'claim_status',
+  'receiving_branch',
+  'delivery_branch',
+  'received_by',
+  'delivered_by',
+];
+export const WARRANTY_CLAIMS_CSV_FILE = 'warranty-claim-list.csv';
 export const CSV_FILE_TYPE = ' serials.csv';
 export const WARRANTY_TYPE = {
   WARRANTY: 'Warranty',

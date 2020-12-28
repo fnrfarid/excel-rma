@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { WarrantyPageRoutingModule } from './warranty-routing.module';
-import { WarrantyPage } from './warranty.page';
+import { AssignSerialsDialog, WarrantyPage } from './warranty.page';
 import { MaterialModule } from '../../material/material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppCommonModule } from '../../common/app-common.module';
@@ -20,7 +20,8 @@ import { AppCommonModule } from '../../common/app-common.module';
     HttpClientModule,
     AppCommonModule,
   ],
-  declarations: [WarrantyPage],
+  entryComponents: [AssignSerialsDialog],
+  declarations: [WarrantyPage, AssignSerialsDialog],
   providers: [],
 })
 export class WarrantyPageModule {}

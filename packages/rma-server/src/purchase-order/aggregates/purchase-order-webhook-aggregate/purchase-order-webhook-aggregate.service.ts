@@ -129,35 +129,35 @@ export class PurchaseOrderWebhookAggregateService {
               headers,
             })
             .pipe(
-              map(res => res.data),
+              map(res => res.data.message),
               switchMap(invoice => {
-                invoice.message.posting_date = created_on;
-                invoice.message.set_posting_time = 1;
+                invoice.posting_date = created_on;
+                invoice.due_date = created_on;
+                invoice.set_posting_time = 1;
                 headers[ACCEPT] = APPLICATION_JSON_CONTENT_TYPE;
                 headers[CONTENT_TYPE] = APPLICATION_JSON_CONTENT_TYPE;
                 return this.http
                   .post(
                     settings.authServerURL + ERPNEXT_PURCHASE_INVOICE_ENDPOINT,
                     {
-                      ...invoice.message,
+                      ...invoice,
                       owner: order.owner,
                       naming_series: DEFAULT_NAMING_SERIES.purchase_invoice,
                     },
                     { headers },
                   )
-                  .pipe(map(res => res.data));
+                  .pipe(map(res => res.data.data));
               }),
               switchMap(invoice => {
-                return this.http.post(
-                  settings.authServerURL + FRAPPE_CLIENT_SUBMIT_ENDPOINT,
-                  { doc: invoice.data },
-                  { headers },
-                );
+                return this.http
+                  .post(
+                    settings.authServerURL + FRAPPE_CLIENT_SUBMIT_ENDPOINT,
+                    { doc: invoice },
+                    { headers },
+                  )
+                  .pipe(map(data => data.data.message));
               }),
             );
-        }),
-        map(data => {
-          return data.data.message;
         }),
       )
       .subscribe({
@@ -171,11 +171,14 @@ export class PurchaseOrderWebhookAggregateService {
             .catch(error => {});
         },
         error: error => {
-          const errorJson = JSON.stringify(
+          try {
+            error = JSON.stringify(error?.response?.data?.exc || error);
+          } catch {}
+          this.errorLog.createErrorLog(
             error,
-            Object.getOwnPropertyNames(error),
+            'Purchase Invoice',
+            'Purchase Order',
           );
-          this.errorLog.createErrorLog(errorJson);
         },
       });
   }

@@ -90,7 +90,7 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
                     {
                       $set: {
                         docstatus: 2,
-                        status: PURCHASE_INVOICE_STATUS.RESETED,
+                        status: PURCHASE_INVOICE_STATUS.CANCELED,
                       },
                     },
                   ),
@@ -104,7 +104,7 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
                     {
                       $set: {
                         docstatus: 2,
-                        status: PURCHASE_INVOICE_STATUS.RESETED,
+                        status: PURCHASE_INVOICE_STATUS.CANCELED,
                       },
                     },
                   ),
@@ -122,6 +122,9 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
       switchMap(obj => {
         return from(Object.keys(docs)).pipe(
           concatMap((docType: string) => {
+            if (!docType[docType]?.length) {
+              return of(true);
+            }
             return from(docs[docType]).pipe(
               concatMap(doc => {
                 return this.cancelDoc(docType, doc, settings, req);
@@ -146,7 +149,7 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
                   {
                     $set: {
                       docstatus: 2,
-                      status: PURCHASE_INVOICE_STATUS.RESETED,
+                      status: PURCHASE_INVOICE_STATUS.CANCELED,
                     },
                   },
                 ),

@@ -6,9 +6,11 @@ import { ViewWarrantyClaimsPageModule } from './view-warranty-claims/view-warran
 import { WarrantyPageModule } from './warranty/warranty.module';
 import { AddWarrantyClaimPageModule } from './add-warranty-claim/add-warranty-claim.module';
 import { WarrantyService } from './warranty-tabs/warranty.service';
+import { AppCommonModule } from '../common/app-common.module';
 @NgModule({
   declarations: [],
   imports: [
+    AppCommonModule,
     CommonModule,
     MaterialModule,
     WarrantyTabsPageModule,
