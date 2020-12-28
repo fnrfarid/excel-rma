@@ -11,8 +11,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { StorageService } from 'src/app/api/storage/storage.service';
-import { CsvJsonService } from 'src/app/api/csv-json/csv-json.service';
+import { StorageService } from '../../api/storage/storage.service';
+import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 
 describe('WarrantyPage', () => {
   let component: WarrantyPage;
