@@ -119,7 +119,7 @@ export class SalesInvoiceResetPoliciesService {
       .pipe(
         switchMap((data: { _id: string; serials: string[] }[]) => {
           if (!data || !data.length) {
-            return of();
+            return of([]);
           }
           return this.serialHistoryPolicyService.validateLatestEventWithParent(
             invoice.name,
@@ -127,6 +127,9 @@ export class SalesInvoiceResetPoliciesService {
           );
         }),
         switchMap((response: OverlappingEventInterface[]) => {
+          if (response?.length === 0) {
+            return of(true);
+          }
           let message = `Found ${response.length} Events, please cancel Following events for serials
         `;
           response.forEach(value =>
@@ -136,10 +139,7 @@ export class SalesInvoiceResetPoliciesService {
                   .join(', ')}`)
               : null,
           );
-          if (response && response.length) {
-            return throwError(new BadRequestException(message));
-          }
-          return of(true);
+          return throwError(new BadRequestException(message));
         }),
       );
   }

@@ -61,39 +61,18 @@ export class SalesInvoiceResetAggregateService extends AggregateRoot {
         );
       }),
       switchMap(salesInvoice => {
-        const returned_serials = [];
-        salesInvoice.returned_items?.forEach(item =>
-          item.serial_no
-            ? returned_serials.push(...item.serial_no.split('\n'))
-            : null,
+        return this.getSalesInvoiceSerials(salesInvoice).pipe(
+          switchMap((data: { serials: string[] }) => {
+            if (!data || !data.serials) {
+              return of(true);
+            }
+            return this.resetSalesInvoiceSerialState(
+              salesInvoice,
+              data.serials,
+            );
+          }),
+          switchMap(success => of(salesInvoice)),
         );
-        return forkJoin({
-          resetSerialHistory: from(
-            this.serialNoHistoryService.deleteMany({
-              parent_document: salesInvoice.name,
-            }),
-          ),
-          resetSerialState: from(
-            this.serialNoService.updateMany(
-              {
-                $or: [
-                  { serial_no: { $in: returned_serials } },
-                  { sales_invoice_name: salesInvoice.name },
-                ],
-              },
-              {
-                $unset: {
-                  customer: undefined,
-                  'warranty.salesWarrantyDate': undefined,
-                  'warranty.soldOn': undefined,
-                  delivery_note: undefined,
-                  sales_invoice_name: undefined,
-                  sales_return_name: undefined,
-                },
-              },
-            ),
-          ),
-        }).pipe(switchMap(success => of(salesInvoice)));
       }),
       switchMap(salesInvoice => {
         return from(
@@ -109,6 +88,115 @@ export class SalesInvoiceResetAggregateService extends AggregateRoot {
         );
       }),
     );
+  }
+
+  resetSalesInvoiceSerialState(salesInvoice: SalesInvoice, serials: string[]) {
+    return forkJoin({
+      resetSerialHistory: from(
+        this.serialNoHistoryService.deleteMany({
+          parent_document: salesInvoice.name,
+        }),
+      ),
+      resetSerialState: from(
+        this.serialNoService.updateMany(
+          {
+            serial_no: { $in: serials },
+          },
+          {
+            $unset: {
+              customer: undefined,
+              'warranty.salesWarrantyDate': undefined,
+              'warranty.soldOn': undefined,
+              delivery_note: undefined,
+              sales_invoice_name: undefined,
+              sales_return_name: undefined,
+            },
+          },
+        ),
+      ),
+    }).pipe(switchMap(success => this.setSerialWarehouseState(serials)));
+  }
+
+  getSalesInvoiceSerials(salesInvoice) {
+    const returned_serials = [];
+    salesInvoice.returned_items?.forEach(item =>
+      item.serial_no
+        ? returned_serials.push(...item.serial_no.split('\n'))
+        : null,
+    );
+    return this.serialNoService
+      .asyncAggregate([
+        {
+          $match: {
+            $or: [
+              { sales_invoice_name: salesInvoice.name },
+              { serial_no: { $in: returned_serials } },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: 1,
+            serials: {
+              $push: '$serial_no',
+            },
+          },
+        },
+      ])
+      .pipe(map((data: any) => (data?.length ? data[0] : undefined)));
+  }
+
+  setSerialWarehouseState(serials: string[]) {
+    if (!serials?.length) {
+      return of(true);
+    }
+    return this.serialNoHistoryService
+      .asyncAggregate([
+        {
+          $match: {
+            serial_no: {
+              $in: serials,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: '$serial_no',
+            warehouse: {
+              $last: '$$ROOT.transaction_to',
+            },
+          },
+        },
+        {
+          $group: {
+            _id: '$warehouse',
+            serials: {
+              $push: '$_id',
+            },
+          },
+        },
+      ])
+      .pipe(
+        switchMap((data: { _id: string; serials: string[] }[]) => {
+          if (!data?.length) {
+            return of(true);
+          }
+          return from(data).pipe(
+            switchMap(serialData => {
+              return from(
+                this.serialNoService.updateMany(
+                  {
+                    serial_no: { $in: serialData.serials },
+                  },
+                  { $set: { warehouse: serialData._id } },
+                ),
+              );
+            }),
+            toArray(),
+          );
+        }),
+        switchMap(success => of(true)),
+      );
   }
 
   cancelERPNextSalesInvoice(salesInvoice: SalesInvoice, settings, req) {
