@@ -53,12 +53,7 @@ export class PurchaseOrderPoliciesService {
             new BadRequestException('Purchase Invoice Not found'),
           );
         }
-        if (
-          [
-            PURCHASE_INVOICE_STATUS.RESETED,
-            PURCHASE_INVOICE_STATUS.CANCELED,
-          ].includes(invoice.status)
-        ) {
+        if ([PURCHASE_INVOICE_STATUS.CANCELED].includes(invoice.status)) {
           return throwError(
             new BadRequestException(
               `Purchase Invoice with status ${invoice.status} cannot be reseted.`,

@@ -453,6 +453,7 @@ export class MaterialTransferComponent implements OnInit {
         item_name: row.item_name,
         qty: 1,
         transferWarehouse: this.transferWarehouse,
+        warranty_date: await this.getWarrantyDate(row),
         s_warehouse: this.warehouseState.s_warehouse.value,
         t_warehouse: this.warehouseState.t_warehouse.value,
         has_serial_no: row.has_serial_no,
@@ -531,6 +532,7 @@ export class MaterialTransferComponent implements OnInit {
       qty: serials.length,
       has_serial_no: row.has_serial_no,
       transferWarehouse: this.transferWarehouse,
+      warranty_date: await this.getWarrantyDate(row),
       s_warehouse: this.warehouseState.s_warehouse.value,
       t_warehouse: this.warehouseState.t_warehouse.value,
       serial_no: serials,
@@ -566,6 +568,7 @@ export class MaterialTransferComponent implements OnInit {
         item_code: row.item_code,
         item_name: row.item_name,
         qty: assignValue,
+        warranty_date: await this.getWarrantyDate(row),
         has_serial_no: row.has_serial_no,
         transferWarehouse: this.transferWarehouse,
         s_warehouse: this.warehouseState.s_warehouse.value,
@@ -997,9 +1000,9 @@ export class MaterialTransferComponent implements OnInit {
 }
 
 export class ItemInterface {
-  item_code: string;
-  item_name: string;
-  has_serial_no: number;
-  purchaseWarrantyMonths: number;
-  salesWarrantyMonths: number;
+  item_code?: string;
+  item_name?: string;
+  has_serial_no?: number;
+  purchaseWarrantyMonths?: number;
+  salesWarrantyMonths?: number;
 }
