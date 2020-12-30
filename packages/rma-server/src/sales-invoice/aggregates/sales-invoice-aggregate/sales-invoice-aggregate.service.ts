@@ -17,7 +17,7 @@ import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-
 import { SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, toArray } from 'rxjs/operators';
 import { throwError, of, from, forkJoin } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -207,6 +207,8 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
                 ),
               );
             }),
+            toArray(),
+            switchMap(success => of(true)),
             switchMap(() => {
               return this.syncSubmittedSalesInvoice(
                 salesInvoice,
