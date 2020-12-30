@@ -561,7 +561,6 @@ export class SerialsComponent implements OnInit {
         });
       },
     });
-    loading.dismiss();
   }
 
   resetRangeState() {
