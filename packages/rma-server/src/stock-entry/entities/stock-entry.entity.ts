@@ -92,6 +92,7 @@ export class StockEntryItem {
   item_name: string;
   excel_serials?: string;
   qty: number;
+  basic_rate?: number;
   has_serial_no: number;
   transfer_qty: number;
   warranty_date?: string;

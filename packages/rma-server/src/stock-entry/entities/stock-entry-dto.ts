@@ -62,6 +62,10 @@ export class StockEntryItemDto {
   @IsString()
   s_warehouse: string;
 
+  @IsOptional()
+  @IsString()
+  basic_rate?: number;
+
   @IsNotEmpty()
   @IsString()
   t_warehouse: string;

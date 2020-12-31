@@ -410,27 +410,27 @@ export class MaterialTransferComponent implements OnInit {
       return;
     }
 
-    this.salesService.getItemStock(items, warehouse).subscribe({
-      next: (res: any) => {
-        this.itemDataSource.loadingSubject.next(false);
-        const existing_items = this.itemDataSource.data();
-        if (res && res.data) {
-          res.data.forEach(element => {
-            existing_items.filter(item => {
-              if (item.item_code === element.item_code) {
-                item.available_stock = element.actual_qty;
-              }
-              return item;
-            });
-            this.itemDataSource.update(existing_items);
+    this.salesService
+      .getItemStock(
+        items,
+        warehouse,
+        this.getParsedDate(this.form.controls.posting_date.value),
+      )
+      .subscribe({
+        next: (res: { [key: string]: number }) => {
+          this.itemDataSource.loadingSubject.next(false);
+          const existing_items = this.itemDataSource.data();
+          existing_items.filter(item => {
+            item.available_stock = res[item.item_code] || 0;
+            return item;
           });
-        }
-      },
-      error: err => {
-        this.itemDataSource.loadingSubject.next(false);
-        this.getMessage('Error occurred in fetching stock for items');
-      },
-    });
+          this.itemDataSource.update(existing_items);
+        },
+        error: err => {
+          this.itemDataSource.loadingSubject.next(false);
+          this.getMessage('Error occurred in fetching stock for items');
+        },
+      });
   }
 
   updateProductState(item_code, assigned) {
@@ -911,6 +911,13 @@ export class MaterialTransferComponent implements OnInit {
         0,
         'warranty_date',
       );
+      if (value === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+        this.materialTransferDisplayedColumns.splice(
+          this.materialTransferDisplayedColumns.length - 1,
+          0,
+          'basic_rate',
+        );
+      }
     }
     this.setDeliveredSerialState(value);
   }

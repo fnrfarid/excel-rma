@@ -117,6 +117,7 @@
                               [matDatepicker]="postingDate"
                               placeholder="Due Date"
                               formControlName="posting_date"
+                              (dateChange)="updateItemStock()"
                             />
                             <mat-datepicker-toggle
                               matSuffix
@@ -194,8 +195,8 @@
                                 [formControl]="warehouseState.s_warehouse" 
                                 (focusout)="validateInput(warehouseState.s_warehouse, filteredWarehouseList1)" 
                                 [matAutocomplete]="from_warehouse" />
-                            <mat-autocomplete autoActiveFirstOption #from_warehouse="matAutocomplete">
-                                <mat-option (onSelectionChange)="updateItemStock($event.source.value)" *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse">
+                            <mat-autocomplete (optionSelected)="updateItemStock($event.source.value)" autoActiveFirstOption #from_warehouse="matAutocomplete">
+                                <mat-option *ngFor="let s_warehouse of filteredWarehouseList1 | async" [value]="s_warehouse">
                                     {{ s_warehouse }}
                                 </mat-option>
                             </mat-autocomplete>
@@ -378,6 +379,15 @@
                         <p *ngIf="row.serial_no.length === 1 ? false : true">
                             {{ getSerialsInputValue(row) }}
                         </p>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="basic_rate">
+                    <mat-header-cell *matHeaderCellDef>Base Rate</mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <ng-container>
+                            <input matInput [disabled]="readonly && status !=='Draft'" [(ngModel)]="row.basic_rate" />
+                        </ng-container>
                     </mat-cell>
                 </ng-container>
 

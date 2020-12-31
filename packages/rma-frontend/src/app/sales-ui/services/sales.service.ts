@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of, from } from 'rxjs';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   SalesInvoice,
   Item,
@@ -42,10 +42,10 @@ import {
   GET_CUSTOMER_ENDPOINT,
   CUSTOMER_ENDPOINT,
   GET_DOCTYPE_COUNT_METHOD,
-  RELAY_GET_ITEM_STOCK_ENDPOINT,
   GET_PRODUCT_BUNDLE_ITEMS,
   REMOVE_SALES_INVOICE_ENDPOINT,
   RELAY_GET_ITEM_GROUP_ENDPOINT,
+  RELAY_GET_DATE_WISE_STOCK_BALANCE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -372,18 +372,38 @@ export class SalesService {
     );
   }
 
-  getItemStock(item_names: string[], warehouse: string) {
-    const url = RELAY_GET_ITEM_STOCK_ENDPOINT;
-    const params = new HttpParams({
-      fromObject: {
-        fields: `["actual_qty","item_code"]`,
-        filters: `[["warehouse","=","${warehouse}"],["item_code","in","${item_names.join()}"]]`,
-      },
-    });
+  getItemStock(item_codes: string[], warehouse: string, date: string) {
+    return from(item_codes).pipe(
+      mergeMap(code => {
+        return this.getStockBalance(code, warehouse, date).pipe(
+          switchMap(data =>
+            of({
+              ...data,
+              item_code: data.item,
+            }),
+          ),
+        );
+      }),
+      toArray(),
+      switchMap((response: { [key: string]: any }[]) => {
+        const out = {};
+        response.forEach(element => {
+          out[element.item_code] = element.qty;
+        });
+        return of(out);
+      }),
+    );
+  }
+
+  getStockBalance(item_code: string, warehouse: string, date) {
+    const url = RELAY_GET_DATE_WISE_STOCK_BALANCE_ENDPOINT;
+    const body = { item: item_code, warehouse, date };
+
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get(url, { headers, params });
+        return this.http.post<any>(url, body, { headers });
       }),
+      map(data => data.message),
     );
   }
 
