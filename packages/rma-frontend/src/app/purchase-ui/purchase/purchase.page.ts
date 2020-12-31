@@ -5,9 +5,9 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { PurchaseInvoice } from '../../common/interfaces/purchase.interface';
 import { Location } from '@angular/common';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, startWith, switchMap } from 'rxjs/operators';
 import {
   DateAdapter,
   MAT_DATE_LOCALE,
@@ -15,6 +15,8 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
+import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-purchase',
@@ -45,22 +47,21 @@ export class PurchasePage implements OnInit {
     'created_by',
     'delivered_by',
   ];
-  invoiceStatus: string[] = [
-    'Completed',
-    'Canceled',
-    'Submitted',
-    'All',
-    'Reseted',
-  ];
+  invoiceStatus: string[] = ['Completed', 'Canceled', 'Submitted', 'All'];
   supplier: any;
   status: string = 'All';
-  name: string = '';
+  invoice_number: string = '';
   search: string = '';
   total: number = 0;
   supplierList = [];
-  fromDateFormControl = new FormControl();
-  toDateFormControl = new FormControl();
-  singleDateFormControl = new FormControl();
+  purchaseForm: FormGroup;
+  validateInput: any = ValidateInputSelected;
+  filteredSupplierList: Observable<any[]>;
+
+  get f() {
+    return this.purchaseForm.controls;
+  }
+
   constructor(
     private location: Location,
     private readonly purchaseService: PurchaseService,
@@ -69,6 +70,7 @@ export class PurchasePage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
@@ -89,36 +91,56 @@ export class PurchasePage implements OnInit {
         },
         error: err => {},
       });
-    this.getSupplierList();
+
+    this.filteredSupplierList = this.purchaseForm
+      .get('supplier')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.purchaseService.getSupplierList(value);
+        }),
+      );
+  }
+
+  createFormGroup() {
+    this.purchaseForm = new FormGroup({
+      invoice_number: new FormControl(),
+      supplier: new FormControl(),
+      status: new FormControl(),
+      fromDateFormControl: new FormControl(),
+      toDateFormControl: new FormControl(),
+      singleDateFormControl: new FormControl(),
+    });
   }
 
   getUpdate(event) {
     const query: any = {};
     if (this.supplier) query.supplier_name = this.supplier.name;
     if (this.status) query.status = this.status;
-    if (this.name) query.name = this.name;
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+    if (this.invoice_number) query.name = this.invoice_number;
+
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
         23,
         59,
         59,
         59,
       );
     }
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
         23,
         59,
         59,
@@ -142,37 +164,39 @@ export class PurchasePage implements OnInit {
   }
 
   dateFilter() {
-    this.singleDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.setFilter();
   }
 
   setFilter(event?) {
     const query: any = {};
-    if (this.supplier) query.supplier_name = this.supplier.name;
-    if (this.status) query.status = this.status;
-    if (this.name) query.name = this.name;
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+
+    if (this.f.supplier.value) query.supplier = this.f.supplier.value.name;
+    if (this.f.status.value) query.status = this.f.status.value;
+    if (this.f.invoice_number.value) query.name = this.f.invoice_number.value;
+
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
         23,
         59,
         59,
         59,
       );
     }
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
         23,
         59,
         59,
@@ -201,43 +225,35 @@ export class PurchasePage implements OnInit {
     );
   }
 
-  statusChange(status) {
-    if (status === 'All') {
-      this.dataSource.loadItems();
-    } else {
-      this.status = status;
-      this.setFilter();
-    }
-  }
-
   singleDateFilter() {
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
     this.setFilter();
   }
 
   clearFilters() {
     this.supplier = '';
-    this.name = '';
+    this.invoice_number = '';
     this.status = 'All';
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
-    this.singleDateFormControl.setValue('');
+    this.f.invoice_number.setValue('');
+    this.f.status.setValue('All');
+    this.f.supplier.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.dataSource.loadItems();
   }
 
   navigateBack() {
     this.location.back();
   }
-  getSupplierList() {
-    this.purchaseService.getSupplierList().subscribe({
-      next: res => {
-        this.supplierList = res;
-      },
-    });
-  }
 
   getSupplierOption(option) {
-    if (option) return option.name;
+    if (option) {
+      if (option.supplier_name) {
+        return `${option.supplier_name} (${option.name})`;
+      }
+      return option.name;
+    }
   }
 }
