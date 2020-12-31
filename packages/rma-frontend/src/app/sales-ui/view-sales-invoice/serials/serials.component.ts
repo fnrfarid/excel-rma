@@ -481,6 +481,7 @@ export class SerialsComponent implements OnInit {
   async submitDeliveryNote() {
     if (!this.validateState()) return;
 
+    this.mergeDuplicateItems();
     const loading = await this.loadingController.create({
       message: 'Creating Delivery Note..',
     });
@@ -561,6 +562,19 @@ export class SerialsComponent implements OnInit {
         });
       },
     });
+  }
+
+  mergeDuplicateItems() {
+    const map = {};
+    this.serialDataSource.data().forEach(item => {
+      if (map[item.item_code]) {
+        map[item.item_code].qty += item.qty;
+        map[item.item_code].serial_no.push(...item.serial_no);
+      } else {
+        map[item.item_code] = item;
+      }
+    });
+    this.serialDataSource.update(Object.values(map));
   }
 
   resetRangeState() {
