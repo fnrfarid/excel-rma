@@ -134,11 +134,18 @@ export class PurchaseService {
     );
   }
 
-  getSupplierList() {
+  getSupplierList(filter?: string) {
     const url = RELAY_LIST_SUPPLIER_ENDPOINT;
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: `[["supplier_name","like","%${filter}%"]]`,
+      },
+    });
+
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get<any>(url, { headers });
+        return this.http.get<any>(url, { params, headers });
       }),
       map(res => res.data),
     );
