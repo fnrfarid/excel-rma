@@ -79,6 +79,8 @@ export class SalesInvoicePoliciesService {
           }),
         );
       }),
+      toArray(),
+      switchMap(success => of(true)),
     );
   }
   validateItemsTotal(items: ItemDto[]) {
@@ -231,12 +233,12 @@ export class SalesInvoicePoliciesService {
                   }
                   return of(true);
                 }),
-                toArray(),
-                switchMap(success => of(true)),
               );
           }),
         );
       }),
+      toArray(),
+      switchMap(success => of(true)),
     );
   }
 

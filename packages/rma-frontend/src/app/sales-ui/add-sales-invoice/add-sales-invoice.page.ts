@@ -8,7 +8,14 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { Observable, throwError, of, from, forkJoin } from 'rxjs';
-import { startWith, switchMap, filter, map, mergeMap } from 'rxjs/operators';
+import {
+  startWith,
+  switchMap,
+  filter,
+  map,
+  mergeMap,
+  toArray,
+} from 'rxjs/operators';
 import { Location } from '@angular/common';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
@@ -639,6 +646,8 @@ export class AddSalesInvoicePage implements OnInit {
         }
         return of(info);
       }),
+      toArray(),
+      switchMap(success => of(true)),
     );
   }
 
