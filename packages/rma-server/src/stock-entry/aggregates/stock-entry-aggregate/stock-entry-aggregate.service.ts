@@ -61,6 +61,7 @@ export class StockEntryAggregateService {
   ) {}
 
   createStockEntry(payload: StockEntryDto, req) {
+    payload = this.parseStockEntryPayload(payload);
     if (payload.status === STOCK_ENTRY_STATUS.draft || !payload.uuid) {
       return this.saveDraft(payload, req);
     }
@@ -136,6 +137,30 @@ export class StockEntryAggregateService {
         );
       }),
     );
+  }
+
+  parseStockEntryPayload(payload: StockEntryDto) {
+    switch (payload.stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return payload;
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        payload.items.filter(item => {
+          delete item.basic_rate;
+          return item;
+        });
+        return payload;
+
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        payload.items.filter(item => {
+          delete item.basic_rate;
+          return item;
+        });
+        return payload;
+
+      default:
+        return payload;
+    }
   }
 
   getStockEntryMongoSerials(stockEntry) {
