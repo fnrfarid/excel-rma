@@ -1,6 +1,5 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-import { map, catchError, finalize } from 'rxjs/operators';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { SalesService } from '../sales-ui/services/sales.service';
 import { DEFAULT_COMPANY } from '../constants/storage';
 
@@ -44,29 +43,20 @@ export class CreditLimitDataSource extends DataSource<ListingData> {
     this.loadingSubject.next(true);
     this.salesService
       .getCustomerList(filter, sortOrder, pageIndex, pageSize)
-      .pipe(
-        map(res => {
-          this.data = res.docs;
-          this.length = res.length;
-          this.offset = res.offset;
-          return res.docs;
-        }),
-        catchError(() => of([])),
-        finalize(() => this.loadingSubject.next(false)),
-      )
       .subscribe(async items => {
         const defaultCompany = await this.salesService
           .getStore()
           .getItem(DEFAULT_COMPANY);
 
         items.forEach(customer => {
-          customer.credit_limits = customer.credit_limits.filter(limit => {
+          customer.credit_limits = customer.credit_limits?.filter(limit => {
             if (limit.company === defaultCompany) {
               return limit;
             }
           });
         });
         this.itemSubject.next(items);
+        this.loadingSubject.next(false);
       });
   }
 

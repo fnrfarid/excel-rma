@@ -8,7 +8,6 @@ import {
   mergeMap,
   toArray,
   catchError,
-  map,
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
@@ -217,9 +216,7 @@ export class MaterialTransferComponent implements OnInit {
     this.filteredCustomerList = this.form.get('customer').valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService
-          .getCustomerList(value)
-          .pipe(map(res => res.docs));
+        return this.salesService.getCustomerList(value);
       }),
     );
 

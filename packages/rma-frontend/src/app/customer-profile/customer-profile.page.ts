@@ -71,9 +71,7 @@ export class CustomerProfilePage implements OnInit {
       .valueChanges.pipe(
         startWith(''),
         switchMap(value => {
-          return this.salesService
-            .getCustomerList(value)
-            .pipe(map(res => res.docs));
+          return this.salesService.getCustomerList(value);
         }),
       );
   }
