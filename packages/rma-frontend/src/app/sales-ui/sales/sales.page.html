@@ -71,9 +71,7 @@
                     [value]="option"
                   >
                     {{ option.customer_name }}
-                    <small class="text-muted">
-                      {{ option.name}}
-                    </small>
+                    
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('falseValse')">
@@ -86,19 +84,18 @@
               <mat-form-field class="full-width">
                 <input
                   matInput
-                  type="text"
                   placeholder="Branch"
                   [matAutocomplete]="territory"
                   formControlName="branch"
-                  (optionSelected)="setFilter()"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
                   #territory="matAutocomplete"
                   [displayWith]="getOption"
+                  (optionSelected)="setFilter()"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of filteredterritoryList | async"
                     [value]="option"
                   >
                     {{ option }}

@@ -83,7 +83,7 @@ export class SalesPage implements OnInit {
 
   filteredCustomerList: Observable<any>;
   customerList: any;
-  territoryList: any;
+  filteredterritoryList: Observable<any>;
   statusColor = {
     Draft: 'blue',
     'To Deliver': '#4d2500',
@@ -147,8 +147,6 @@ export class SalesPage implements OnInit {
         this.disableRefresh = res;
       },
     });
-    this.getCustomerList();
-    this.getTerritory();
 
     this.filteredCustomerList = this.salesForm
       .get('customer_name')
@@ -158,6 +156,13 @@ export class SalesPage implements OnInit {
           return this.salesService.getCustomerList(value);
         }),
       );
+
+    this.filteredterritoryList = this.salesForm.get('branch').valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        return this.salesService.getStore().getItemAsync('territory', value);
+      }),
+    );
   }
 
   createFormGroup() {
@@ -297,7 +302,7 @@ export class SalesPage implements OnInit {
     if (this.f.salesPersonControl.value)
       query.sales_team = this.f.salesPersonControl.value;
     if (this.name) query.name = this.name;
-    if (this.branch) query.territory = this.branch;
+    if (this.f.branch) query.territory = this.f.branch.value;
     if (this.campaign) {
       if (this.campaign === 'Yes') {
         query.isCampaign = true;
@@ -390,31 +395,13 @@ export class SalesPage implements OnInit {
     }
   }
 
-  getCustomerList() {
-    this.salesService.customerList().subscribe({
-      next: response => {
-        this.customerList = response;
-      },
-      error: error => {},
-    });
-  }
-
   getCustomerOption(option) {
     if (option) {
       if (option.customer_name) {
-        return `${option.customer_name} (${option.name})`;
+        return `${option.customer_name}`;
       }
-      return option.name;
+      return option.customer_name;
     }
-  }
-
-  getTerritory() {
-    this.salesService
-      .getStore()
-      .getItem('territory')
-      .then(territory => {
-        this.territoryList = territory;
-      });
   }
 
   getStatusColor(status: string) {
