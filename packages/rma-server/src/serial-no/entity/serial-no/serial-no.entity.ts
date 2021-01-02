@@ -60,6 +60,7 @@ export class SerialNo extends BaseEntity {
   serial_no: string;
 
   @Column()
+  @Index()
   item_code: string;
 
   @Column()
@@ -84,6 +85,7 @@ export class SerialNo extends BaseEntity {
   customer: string;
 
   @Column()
+  @Index()
   warehouse: string;
 
   @Column()

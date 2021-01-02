@@ -40,9 +40,7 @@ describe('CreditLimitPage', () => {
           provide: SalesService,
           useValue: {
             customerList: (...args) => of([{}]),
-            getCustomerList: (...args) => {
-              return of({ docs: [], length: 0, offset: 0 });
-            },
+            getCustomerList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

@@ -46,9 +46,7 @@
                 [value]="option"
               >
                 {{ option.customer_name }}
-                <small class="text-muted">
-                  {{ option.name}}
-                </small>
+                
               </mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="f.customer.hasError('falseValse')">

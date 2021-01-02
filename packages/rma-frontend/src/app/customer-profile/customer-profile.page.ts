@@ -71,9 +71,7 @@ export class CustomerProfilePage implements OnInit {
       .valueChanges.pipe(
         startWith(''),
         switchMap(value => {
-          return this.salesService
-            .getCustomerList(value)
-            .pipe(map(res => res.docs));
+          return this.salesService.getCustomerList(value);
         }),
       );
   }
@@ -87,9 +85,9 @@ export class CustomerProfilePage implements OnInit {
   getCustomerOption(option) {
     if (option) {
       if (option.customer_name) {
-        return `${option.customer_name} (${option.name})`;
+        return `${option.customer_name}`;
       }
-      return option.name;
+      return option.customer_name;
     }
   }
 

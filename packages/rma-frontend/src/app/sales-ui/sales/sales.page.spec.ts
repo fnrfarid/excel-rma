@@ -45,9 +45,11 @@ describe('SalesPage', () => {
           useValue: {
             getSalesInvoiceList: (...args) => of({}),
             customerList: (...args) => of([{}]),
+            getCustomerList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
+              getItemAsync: (...args) => Promise.resolve({}),
             }),
             getSalesPersonList: (...args) => of([]),
           },

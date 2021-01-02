@@ -3,7 +3,7 @@ import { IonicModule } from '@ionic/angular';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { empty } from 'rxjs';
+import { empty, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { SerialSearchPage } from './serial-search.page';
@@ -21,9 +21,11 @@ describe('SerialSearchPage', () => {
   beforeEach(async(() => {
     serialSearchService = jasmine.createSpyObj([
       'getSerialsList',
+      'getItemList',
       'relayDocTypeOperation',
     ]);
     serialSearchService.getSerialsList.and.returnValue(empty());
+    serialSearchService.getItemList.and.returnValue(of([]));
     serialSearchService.relayDocTypeOperation.and.returnValue(
       switchMap(() => empty()),
     );
