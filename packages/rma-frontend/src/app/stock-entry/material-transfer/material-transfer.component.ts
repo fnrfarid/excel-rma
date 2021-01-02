@@ -343,10 +343,8 @@ export class MaterialTransferComponent implements OnInit {
     if (item) {
       const data = this.itemDataSource.data();
       data.push({
-        item_code: item.item_code,
-        item_name: item.item_name,
+        ...item,
         assigned: 0,
-        has_serial_no: item.has_serial_no,
       });
       this.itemDataSource.update(data);
       this.updateItemStock();

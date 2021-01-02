@@ -43,16 +43,35 @@
               </mat-form-field>
             </ion-col>
             <ion-col>
-              <mat-form-field class="full-width">
-                <input matInput formControlName="item_code" placeholder="Item Code" (keyup.enter)="setFilter()" />
-              </mat-form-field>
+              <mat-form-field style="width: 100%;">
+                <input
+                type="text"
+                placeholder="Select Item"
+                matInput
+                (focusout)="validateInput(f.item_code, filteredItemList)"
+                formControlName="item_code"
+                [matAutocomplete]="item_code"
+                required
+              />
+              <mat-autocomplete
+                #item_code="matAutocomplete"
+                autoActiveFirstOption
+                [displayWith]="getOptionText">
+                <mat-option
+                  *ngFor="let option of filteredItemList | async"
+                  [value]="option">
+                  {{ option.item_name }}
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="f.item_code.hasError('falseValse')">
+                You should select a value from dropdown only. 
+                <strong>'{{f.item_code.value}}'</strong> is not allowed.
+              </mat-error>
+            </mat-form-field>
             </ion-col>
-            <ion-col>
-              <mat-form-field class="full-width">
-                <input matInput formControlName="item_name" placeholder="Item Name" (keyup.enter)="setFilter()" />
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size-md="6">
               <mat-form-field class="full-width">
                 <input matInput placeholder="Warehouse" formControlName="warehouse" (keyup.enter)="setFilter()"
                   [matAutocomplete]="autoWarehouse" />
@@ -63,41 +82,11 @@
                 </mat-option>
               </mat-autocomplete>
             </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col>
-              <mat-form-field class="full-width">
-                <input matInput placeholder="Purchase Receipt" formControlName="purchase_document_no"
-                  (keyup.enter)="setFilter()" />
-              </mat-form-field>
+            <ion-col size-md="3">
+              <mat-checkbox formControlName="sales_invoice_name">Sold</mat-checkbox>
             </ion-col>
-            <ion-col>
-              <mat-form-field class="full-width">
-                <input matInput placeholder="Delivery Note" formControlName="delivery_note"
-                  (keyup.enter)="setFilter()" />
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="full-width">
-                <input matInput placeholder="Customer" formControlName="customer" (keyup.enter)="setFilter()"
-                  [matAutocomplete]="autoCustomer" />
-              </mat-form-field>
-              <mat-autocomplete #autoCustomer="matAutocomplete">
-                <mat-option *ngFor="let customer of customerList | async" [value]="customer.name">
-                  <span>{{customer.name}}</span>
-                </mat-option>
-              </mat-autocomplete>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="full-width">
-                <input matInput placeholder="Supplier" formControlName="supplier" (keyup.enter)="setFilter()"
-                  [matAutocomplete]="autoSupplier" />
-              </mat-form-field>
-              <mat-autocomplete #autoSupplier="matAutocomplete">
-                <mat-option *ngFor="let supplier of supplierList | async" [value]="supplier.name">
-                  <span>{{supplier.name}}</span>
-                </mat-option>
-              </mat-autocomplete>
+            <ion-col size-md="3">
+              <mat-checkbox formControlName="purchase_invoice_name">Purchased</mat-checkbox>
             </ion-col>
           </ion-row>
         </form>

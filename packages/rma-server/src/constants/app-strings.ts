@@ -360,3 +360,10 @@ export function PARSE_REGEX(value: string) {
     value.slice(state.last + 1, value.length)
   );
 }
+export const SERIAL_FILTER_KEYS = [
+  'item_code',
+  'warehouse',
+  'serial_no',
+  'sales_invoice_name',
+  'purchase_invoice_name',
+];

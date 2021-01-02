@@ -56,9 +56,7 @@ export class SerialNoController {
     @Query('sort') sort,
     @Query('query') query,
   ) {
-    if (sort !== 'ASC') {
-      sort = 'DESC';
-    }
+    query = decodeURIComponent(query);
     return this.queryBus.execute(
       new RetrieveSerialNoListQuery(offset, limit, sort, query),
     );

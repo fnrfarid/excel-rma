@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { switchMap, map } from 'rxjs/operators';
-import { from } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
+import { from, of } from 'rxjs';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
@@ -14,8 +14,10 @@ import {
   GET_DIRECT_SERIAL_ENDPOINT,
   API_INFO_ENDPOINT,
   GET_SERIAL_HISTORY_ENDPOINT,
+  LIST_ITEMS_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
+import { APIResponse } from 'src/app/common/interfaces/sales.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +29,7 @@ export class SerialSearchService {
   ) {}
 
   getSerialsList(
-    sortOrder: SerialSearchFields | string,
+    sortOrder: SerialSearchFields | any,
     pageNumber: number,
     pageSize: number,
     query: SerialSearchFields,
@@ -44,7 +46,7 @@ export class SerialSearchService {
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
       .set('sort', sortOrder)
-      .set('query', JSON.stringify(query));
+      .set('query', encodeURIComponent(JSON.stringify(query)));
 
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -56,6 +58,46 @@ export class SerialSearchService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  getItemList(
+    filter: any = {},
+    sortOrder: any = { item_name: 'asc' },
+    pageIndex = 0,
+    pageSize = 30,
+    query?: { [key: string]: any },
+  ) {
+    try {
+      sortOrder = JSON.stringify(sortOrder);
+    } catch {
+      sortOrder = JSON.stringify({ item_name: 'asc' });
+    }
+    const url = LIST_ITEMS_ENDPOINT;
+    query = query ? query : {};
+    query.item_name = filter?.item_name ? filter.item_name : filter;
+
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageIndex * pageSize).toString())
+      .set('search', encodeURIComponent(JSON.stringify(query)))
+      .set('sort', sortOrder);
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http
+          .get<APIResponse>(url, {
+            params,
+            headers,
+          })
+          .pipe(
+            switchMap(response => {
+              return of(response.docs);
+            }),
+            catchError(err => {
+              return of([]);
+            }),
+          );
       }),
     );
   }
