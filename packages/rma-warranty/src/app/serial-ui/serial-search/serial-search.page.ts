@@ -11,10 +11,10 @@ import { SerialSearchFields } from './search-fields.interface';
 import { SerialSearchDataSource } from './serial-search-datasource';
 import { SerialSearchService } from './serial-search.service';
 import { FormGroup, FormControl } from '@angular/forms';
-import { debounceTime, startWith } from 'rxjs/operators';
+import { debounceTime, startWith, switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { SerialsService } from '../../common/helpers/serials/serials.service';
-
+import { ValidateInputSelected } from '../../common/pipes/validators';
 @Component({
   selector: 'app-serial-search',
   templateUrl: './serial-search.page.html',
@@ -40,34 +40,34 @@ export class SerialSearchPage implements OnInit {
   filtersForm = new FormGroup({
     serial_no: new FormControl(),
     item_code: new FormControl(),
-    item_name: new FormControl(),
     warehouse: new FormControl(),
-    purchase_document_no: new FormControl(),
-    delivery_note: new FormControl(),
-    customer: new FormControl(),
-    supplier: new FormControl(),
+    purchase_invoice_name: new FormControl(),
+    sales_invoice_name: new FormControl(),
   });
+  validateInput: any = ValidateInputSelected;
 
-  customerList: Observable<
-    unknown[]
-  > = this.filtersForm.controls.customer.valueChanges.pipe(
-    debounceTime(500),
-    startWith(''),
-    this.serialSearchService.relayDocTypeOperation('Customer'),
-  );
-  supplierList: Observable<
-    unknown[]
-  > = this.filtersForm.controls.supplier.valueChanges.pipe(
-    debounceTime(500),
-    startWith(''),
-    this.serialSearchService.relayDocTypeOperation('Supplier'),
-  );
   warehouseList: Observable<
     unknown[]
   > = this.filtersForm.controls.warehouse.valueChanges.pipe(
     debounceTime(500),
     startWith(''),
     this.serialSearchService.relayDocTypeOperation('Warehouse'),
+  );
+
+  filteredItemList: Observable<
+    any[]
+  > = this.filtersForm.controls.item_code.valueChanges.pipe(
+    debounceTime(500),
+    startWith(''),
+    switchMap(value =>
+      this.serialSearchService.getItemList(
+        value,
+        undefined,
+        undefined,
+        undefined,
+        { bundle_items: { $exists: false }, has_serial_no: 1 },
+      ),
+    ),
   );
 
   constructor(
@@ -82,6 +82,14 @@ export class SerialSearchPage implements OnInit {
       this.paginator.firstPage();
     });
     this.dataSource = new SerialSearchDataSource(this.serialSearchService);
+  }
+
+  getOptionText(option) {
+    return option && option.item_name ? option.item_name : '';
+  }
+
+  get f() {
+    return this.filtersForm.controls;
   }
 
   getUpdate(event) {
@@ -126,7 +134,28 @@ export class SerialSearchPage implements OnInit {
     const query: SerialSearchFields = {};
     Object.keys(this.filtersForm.controls).forEach(key => {
       if (this.filtersForm.controls[key].value) {
-        query[key] = this.filtersForm.controls[key].value;
+        switch (key) {
+          case 'serial_no':
+            query[key] = {
+              $regex: this.filtersForm.controls[key].value,
+              $options: 'i',
+            };
+            break;
+
+          case 'purchase_invoice_name':
+            query[key] = { $exists: true };
+            break;
+
+          case 'sales_invoice_name':
+            query[key] = { $exists: true };
+            break;
+
+          default:
+            query[key] =
+              this.filtersForm.controls[key].value?.item_code ||
+              this.filtersForm.controls[key].value;
+            break;
+        }
       }
     });
     return query;
@@ -135,12 +164,9 @@ export class SerialSearchPage implements OnInit {
   clearFilters() {
     this.filtersForm.controls.serial_no.setValue('');
     this.filtersForm.controls.item_code.setValue('');
-    this.filtersForm.controls.item_name.setValue('');
     this.filtersForm.controls.warehouse.setValue('');
-    this.filtersForm.controls.purchase_document_no.setValue('');
-    this.filtersForm.controls.delivery_note.setValue('');
-    this.filtersForm.controls.customer.setValue('');
-    this.filtersForm.controls.supplier.setValue('');
+    this.filtersForm.controls.purchase_invoice_name.setValue('');
+    this.filtersForm.controls.sales_invoice_name.setValue('');
     this.dataSource.loadItems(undefined, undefined, undefined, undefined);
   }
 
