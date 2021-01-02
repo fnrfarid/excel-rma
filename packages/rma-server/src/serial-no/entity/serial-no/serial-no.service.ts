@@ -4,7 +4,7 @@ import { MongoRepository } from 'typeorm';
 import { SerialNo } from './serial-no.entity';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { PARSE_REGEX } from '../../../constants/app-strings';
+import { SERIAL_FILTER_KEYS } from '../../../constants/app-strings';
 
 @Injectable()
 export class SerialNoService {
@@ -33,15 +33,11 @@ export class SerialNoService {
     try {
       order = JSON.parse(sort);
     } catch (error) {
-      order = { serial_no: 'asc' };
+      order = { _id: -1 };
     }
 
     if (Object.keys(order).length === 0) {
-      order = { serial_no: 'asc' };
-    }
-
-    for (const key of Object.keys(order)) {
-      order[key] = order[key].toUpperCase();
+      order = { _id: -1 };
     }
 
     try {
@@ -50,11 +46,9 @@ export class SerialNoService {
       filterQuery = {};
     }
 
-    const $and: unknown[] = [
-      filterQuery ? this.getFilterQuery(filterQuery) : {},
-    ];
-
-    const where: { $and: unknown[] } = { $and };
+    const where: { [key: string]: any } = filterQuery
+      ? this.parseSerialFilterQuery(filterQuery)
+      : {};
     const results = await this.serialNoRepository.findAndCount({
       skip,
       take,
@@ -69,16 +63,13 @@ export class SerialNoService {
     };
   }
 
-  getFilterQuery(query: unknown) {
-    const keys = Object.keys(query);
-    keys.forEach(key => {
-      if (typeof query[key] === 'string') {
-        query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
-      } else {
-        delete query[key];
+  parseSerialFilterQuery(filterQuery: { [key: string]: any }) {
+    Object.keys(filterQuery).forEach(key => {
+      if (!SERIAL_FILTER_KEYS.includes(key)) {
+        delete filterQuery[key];
       }
     });
-    return query;
+    return filterQuery;
   }
 
   async listPurchasedSerial(purchase_invoice_name, skip, take, search = '') {
