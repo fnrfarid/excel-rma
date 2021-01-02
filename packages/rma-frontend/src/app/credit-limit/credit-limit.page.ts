@@ -78,9 +78,9 @@ export class CreditLimitPage implements OnInit {
   getCustomerOption(option) {
     if (option) {
       if (option.customer_name) {
-        return `${option.customer_name} (${option.name})`;
+        return `${option.customer_name}`;
       }
-      return option.name;
+      return option.customer_name;
     }
   }
 
