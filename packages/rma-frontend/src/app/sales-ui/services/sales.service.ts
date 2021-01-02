@@ -436,6 +436,7 @@ export class SalesService {
           headers,
         });
       }),
+      map(res => res.docs),
     );
   }
 

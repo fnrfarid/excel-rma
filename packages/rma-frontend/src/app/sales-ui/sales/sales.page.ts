@@ -13,7 +13,7 @@ import {
   ADD_SALES_INVOICE_PAGE_URL,
 } from '../../constants/url-strings';
 import { map, filter, startWith, switchMap } from 'rxjs/operators';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import {
   DateAdapter,
   MAT_DATE_LOCALE,
@@ -77,12 +77,11 @@ export class SalesPage implements OnInit {
   dueTotal: number = 0;
   disableRefresh: boolean = false;
   campaign: string = 'All';
-  fromDateFormControl = new FormControl();
-  toDateFormControl = new FormControl();
-  singleDateFormControl = new FormControl();
-  salesPersonControl = new FormControl('');
+  salesForm: FormGroup;
   sortQuery: any = {};
   filteredSalesPersonList: Observable<any[]>;
+
+  filteredCustomerList: Observable<any>;
   customerList: any;
   territoryList: any;
   statusColor = {
@@ -93,7 +92,11 @@ export class SalesPage implements OnInit {
     Submitted: '#4d2500',
     Canceled: 'red',
   };
-  validateInput = ValidateInputSelected;
+  validateInput: any = ValidateInputSelected;
+
+  get f() {
+    return this.salesForm.controls;
+  }
 
   constructor(
     private readonly salesService: SalesService,
@@ -104,10 +107,11 @@ export class SalesPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
-    this.filteredSalesPersonList = this.salesPersonControl.valueChanges.pipe(
+    this.filteredSalesPersonList = this.f.salesPersonControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
         return this.salesService.getSalesPersonList(value);
@@ -145,6 +149,29 @@ export class SalesPage implements OnInit {
     });
     this.getCustomerList();
     this.getTerritory();
+
+    this.filteredCustomerList = this.salesForm
+      .get('customer_name')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getCustomerList(value);
+        }),
+      );
+  }
+
+  createFormGroup() {
+    this.salesForm = new FormGroup({
+      customer_name: new FormControl(),
+      fromDateFormControl: new FormControl(),
+      toDateFormControl: new FormControl(),
+      singleDateFormControl: new FormControl(),
+      salesPersonControl: new FormControl(),
+      invoice_number: new FormControl(),
+      branch: new FormControl(),
+      campaign: new FormControl(),
+      status: new FormControl(),
+    });
   }
 
   getTotal() {
@@ -171,8 +198,8 @@ export class SalesPage implements OnInit {
     if (this.customer_name) query.customer = this.customer_name.name;
     if (this.status) query.status = this.status;
     if (this.name) query.name = this.name;
-    if (this.salesPersonControl.value)
-      query.sales_team = this.salesPersonControl.value;
+    if (this.f.salesPersonControl.value)
+      query.sales_team = this.f.salesPersonControl.value;
     if (this.campaign) {
       if (this.campaign === 'Yes') {
         query.isCampaign = true;
@@ -180,28 +207,28 @@ export class SalesPage implements OnInit {
         query.isCampaign = false;
       }
     }
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
         23,
         59,
         59,
         59,
       );
     }
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
         23,
         59,
         59,
@@ -222,13 +249,13 @@ export class SalesPage implements OnInit {
   }
 
   dateFilter() {
-    this.singleDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.setFilter();
   }
 
   singleDateFilter() {
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
     this.setFilter();
   }
 
@@ -250,19 +277,25 @@ export class SalesPage implements OnInit {
     this.name = '';
     this.branch = '';
     this.campaign = 'All';
-    this.fromDateFormControl.setValue('');
-    this.salesPersonControl.setValue('');
-    this.toDateFormControl.setValue('');
-    this.singleDateFormControl.setValue('');
+    this.f.customer_name.setValue('');
+    this.f.invoice_number.setValue('');
+    this.f.branch.setValue('');
+    this.f.campaign.setValue('');
+    this.f.status.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.salesPersonControl.setValue('');
+    this.f.toDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.dataSource.loadItems();
   }
 
   setFilter(event?) {
     const query: any = {};
-    if (this.customer_name) query.customer = this.customer_name.name;
+    if (this.f.customer_name.value)
+      query.customer = this.f.customer_name.value.name;
     if (this.status) query.status = this.status;
-    if (this.salesPersonControl.value)
-      query.sales_team = this.salesPersonControl.value;
+    if (this.f.salesPersonControl.value)
+      query.sales_team = this.f.salesPersonControl.value;
     if (this.name) query.name = this.name;
     if (this.branch) query.territory = this.branch;
     if (this.campaign) {
@@ -272,28 +305,28 @@ export class SalesPage implements OnInit {
         query.isCampaign = false;
       }
     }
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
         23,
         59,
         59,
         59,
       );
     }
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
         23,
         59,
         59,
@@ -367,7 +400,12 @@ export class SalesPage implements OnInit {
   }
 
   getCustomerOption(option) {
-    if (option) return option.name;
+    if (option) {
+      if (option.customer_name) {
+        return `${option.customer_name} (${option.name})`;
+      }
+      return option.name;
+    }
   }
 
   getTerritory() {

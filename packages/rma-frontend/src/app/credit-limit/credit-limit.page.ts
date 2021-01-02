@@ -10,7 +10,7 @@ import { DEFAULT_COMPANY } from '../constants/storage';
 import { StorageService } from '../api/storage/storage.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { map, startWith, switchMap } from 'rxjs/operators';
+import { startWith, switchMap } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ValidateInputSelected } from '../common/pipes/validators';
 
@@ -64,9 +64,7 @@ export class CreditLimitPage implements OnInit {
       .valueChanges.pipe(
         startWith(''),
         switchMap(value => {
-          return this.salesService
-            .getCustomerList(value)
-            .pipe(map(res => res.docs));
+          return this.salesService.getCustomerList(value);
         }),
       );
   }
