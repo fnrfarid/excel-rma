@@ -251,9 +251,9 @@ export class PurchasePage implements OnInit {
   getSupplierOption(option) {
     if (option) {
       if (option.supplier_name) {
-        return `${option.supplier_name} (${option.name})`;
+        return `${option.supplier_name}`;
       }
-      return option.name;
+      return option.supplier_name;
     }
   }
 }
