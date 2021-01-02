@@ -86,19 +86,18 @@
               <mat-form-field class="full-width">
                 <input
                   matInput
-                  type="text"
                   placeholder="Branch"
                   [matAutocomplete]="territory"
                   formControlName="branch"
-                  (optionSelected)="setFilter()"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
                   #territory="matAutocomplete"
                   [displayWith]="getOption"
+                  (optionSelected)="setFilter()"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of filteredterritoryList | async"
                     [value]="option"
                   >
                     {{ option }}
