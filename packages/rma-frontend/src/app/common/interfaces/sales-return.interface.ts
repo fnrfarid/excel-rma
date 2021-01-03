@@ -29,6 +29,7 @@ export interface SalesReturnDetails {
 export interface SalesReturnItem {
   item_code?: string;
   item_name?: string;
+  excel_serials?: string;
   qty?: number;
   rate?: number;
   amount?: number;

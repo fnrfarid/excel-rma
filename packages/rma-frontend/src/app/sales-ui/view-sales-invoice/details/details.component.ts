@@ -139,12 +139,13 @@ export class DetailsComponent implements OnInit {
         },
         error: err => {
           loading.dismiss();
-          const errMessage = err?.error?.message?.split('\\n') || err;
-          this.snackBar.open(
-            errMessage[errMessage.length - 2]?.split(':')[1],
-            CLOSE,
-            { duration: 4500 },
-          );
+          let errMessage = err?.error?.message?.split('\\n') || err;
+          try {
+            errMessage = errMessage[errMessage.length - 2]?.split(':');
+            errMessage = errMessage[1] || errMessage[0] || undefined;
+          } catch {}
+          errMessage = errMessage ? errMessage : err?.error?.message || err;
+          this.snackBar.open(errMessage, CLOSE, { duration: 4500 });
         },
       });
   }
