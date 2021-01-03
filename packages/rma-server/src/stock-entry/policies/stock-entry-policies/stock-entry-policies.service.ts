@@ -1,10 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
 import {
   StockEntryDto,
   StockEntryItemDto,
 } from '../../entities/stock-entry-dto';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
-import { switchMap, mergeMap, toArray } from 'rxjs/operators';
+import { switchMap, mergeMap, toArray, map } from 'rxjs/operators';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import {
@@ -15,6 +15,7 @@ import {
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
+import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class StockEntryPoliciesService {
@@ -23,6 +24,8 @@ export class StockEntryPoliciesService {
     private readonly settingsService: SettingsService,
     private readonly serialNoHistoryPolicy: SerialNoHistoryPoliciesService,
     private readonly agendaJob: AgendaJobService,
+    private readonly http: HttpService,
+    private readonly settings: SettingsService,
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
@@ -35,8 +38,53 @@ export class StockEntryPoliciesService {
           clientHttpRequest,
         );
       }),
+      switchMap(() => {
+        return this.validateItemStock(payload, clientHttpRequest);
+      }),
     );
   }
+
+  validateItemStock(payload: StockEntryDto, req) {
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        if (payload?.items?.length === 0) {
+          return of(true);
+        }
+        return from(payload.items).pipe(
+          switchMap(item => {
+            const body = {
+              item_code: item.item_code,
+              warehouse: item.s_warehouse,
+            };
+            const headers = this.settings.getAuthorizationHeaders(req.token);
+            return this.http
+              .post(
+                settings.authServerURL + RELAY_GET_STOCK_BALANCE_ENDPOINT,
+                body,
+                { headers },
+              )
+              .pipe(
+                map(data => data.data.message),
+                switchMap(message => {
+                  if (message < item.qty) {
+                    return throwError(
+                      new BadRequestException(`
+                  Only ${message} available in stock for item ${item.item_name}, 
+                  at warehouse ${item.s_warehouse}.
+                  `),
+                    );
+                  }
+                  return of(true);
+                }),
+              );
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(success => of(true)),
+    );
+  }
+
   validateStockEntryCancel(stockEntry: StockEntry): Observable<StockEntry> {
     if (stockEntry.status !== STOCK_ENTRY_STATUS.delivered) {
       return throwError(

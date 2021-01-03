@@ -406,11 +406,7 @@ export class MaterialTransferComponent implements OnInit {
     }
 
     this.salesService
-      .getItemStock(
-        items,
-        warehouse,
-        this.getParsedDate(this.form.controls.posting_date.value),
-      )
+      .getItemStock(items, warehouse, this.getParsedDate(new Date()))
       .subscribe({
         next: (res: { [key: string]: number }) => {
           this.itemDataSource.loadingSubject.next(false);

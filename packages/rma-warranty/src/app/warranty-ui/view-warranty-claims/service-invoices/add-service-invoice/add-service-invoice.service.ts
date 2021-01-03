@@ -77,6 +77,8 @@ export class AddServiceInvoiceService {
     const url = LIST_ITEMS_ENDPOINT;
     const query: any = {};
     query.item_name = filter;
+    query.disabled = 0;
+
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageIndex * pageSize).toString())
