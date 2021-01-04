@@ -6,7 +6,12 @@
       </ion-button>
     </ion-buttons>
     <ion-title>Sales Return</ion-title>
-  </ion-toolbar>
+  <ion-buttons slot="end" *ngIf="salesReturnDetails?.name">
+    <ion-button (click)="print()" color="primary">
+      <ion-icon slot="icon-only" name="print-outline"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
 </ion-header>
 
 <ion-content color="light">
@@ -28,7 +33,7 @@
                 placeholder="Customer"
                 readonly="true"
                 type="string"
-                [value]="salesReturnDetials?.customer ? salesReturnDetials?.customer : '' "
+                [value]="salesReturnDetails?.customer ? salesReturnDetails?.customer : '' "
               ></ion-input>
             </ion-item>
           </ion-col>
@@ -38,7 +43,7 @@
               <ion-input
                 readonly="true"
                 type="string"
-                [value]="salesReturnDetials?.name ? salesReturnDetials.name : ''"
+                [value]="salesReturnDetails?.name ? salesReturnDetails.name : ''"
               ></ion-input>
             </ion-item>
           </ion-col>
@@ -50,7 +55,7 @@
               <ion-input
                 readonly="true"
                 type="string"
-                [value]="salesReturnDetials?.territory ? salesReturnDetials?.territory : '' "
+                [value]="salesReturnDetails?.territory ? salesReturnDetails?.territory : '' "
               ></ion-input>
             </ion-item>
           </ion-col>
@@ -61,7 +66,7 @@
                 readonly
                 placeholder="Posting Date"
                 display-format="DD-MM-YYYY"
-                [value]="salesReturnDetials?.posting_date ? salesReturnDetials.posting_date : ''"
+                [value]="salesReturnDetails?.posting_date ? salesReturnDetails.posting_date : ''"
               ></ion-datetime>
             </ion-item>
           </ion-col>
@@ -73,7 +78,7 @@
               <ion-input
                 readonly="true"
                 type="string"
-                [value]="salesReturnDetials?.set_warehouse ? salesReturnDetials?.set_warehouse : '' "
+                [value]="salesReturnDetails?.set_warehouse ? salesReturnDetails?.set_warehouse : '' "
               ></ion-input>
             </ion-item>
           </ion-col>

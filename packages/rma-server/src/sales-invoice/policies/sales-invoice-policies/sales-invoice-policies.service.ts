@@ -34,7 +34,7 @@ import {
   RELAY_GET_STOCK_BALANCE_ENDPOINT,
 } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
-import { SalesInvoice } from 'src/sales-invoice/entity/sales-invoice/sales-invoice.entity';
+import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
 
 @Injectable()
 export class SalesInvoicePoliciesService {

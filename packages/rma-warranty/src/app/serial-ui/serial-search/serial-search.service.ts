@@ -17,7 +17,7 @@ import {
   LIST_ITEMS_ENDPOINT,
 } from '../../constants/url-strings';
 import { StorageService } from '../../api/storage/storage.service';
-import { APIResponse } from 'src/app/common/interfaces/sales.interface';
+import { APIResponse } from '../../common/interfaces/sales.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -77,6 +77,7 @@ export class SerialSearchService {
     const url = LIST_ITEMS_ENDPOINT;
     query = query ? query : {};
     query.item_name = filter?.item_name ? filter.item_name : filter;
+    query.disabled = 0;
 
     const params = new HttpParams()
       .set('limit', pageSize.toString())
