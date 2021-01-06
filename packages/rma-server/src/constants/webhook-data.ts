@@ -641,6 +641,10 @@ export function getItemAfterInsertWebhookData(
         fieldname: 'min_order_qty',
         key: 'min_order_qty',
       },
+      {
+        fieldname: 'brand',
+        key: 'brand',
+      },
     ],
   };
 }
@@ -741,6 +745,10 @@ export function getItemOnUpdateWebhookData(
         fieldname: 'min_order_qty',
         key: 'min_order_qty',
       },
+      {
+        fieldname: 'brand',
+        key: 'brand',
+      },
     ],
   };
 }
@@ -840,6 +848,10 @@ export function getItemOnTrashWebhookData(
       {
         fieldname: 'min_order_qty',
         key: 'min_order_qty',
+      },
+      {
+        fieldname: 'brand',
+        key: 'brand',
       },
     ],
   };

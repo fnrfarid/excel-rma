@@ -66,22 +66,22 @@
                   (focusout)="validateInput(f.itemGroup, filteredItemGroupList)"
                 />
                 <mat-autocomplete
-              autoActiveFirstOption
-              #itemGroupAutocomplete="matAutocomplete"
-              [displayWith]="getItemGroupOption"
-              (optionSelected)="setFilter($event.option.value)"
-            >
-              <mat-option
-                *ngFor="let option of filteredItemGroupList | async"
-                [value]="option"
-              >
-                {{ option.item_group_name }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="f.itemGroup.hasError('falseValse')">
-              You should select a value from dropdown only.
-              <strong>'{{f.itemGroup.value}}'</strong> is not allowed.
-            </mat-error>
+                  autoActiveFirstOption
+                  #itemGroupAutocomplete="matAutocomplete"
+                  [displayWith]="getItemGroupOption"
+                  (optionSelected)="setFilter($event.option.value)"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredItemGroupList | async"
+                    [value]="option"
+                  >
+                    {{ option.item_group_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.itemGroup.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.itemGroup.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -91,15 +91,27 @@
                 <input
                   matInput
                   placeholder="Brand"
-                  (keyup.enter)="setFilter()"
+                  [matAutocomplete]="itemBrandAutocomplete"
+                  formControlName="itemBrand"
+                  (focusout)="validateInput(f.itemBrand, filteredItemBrandList)"
                 />
-                <button
-                  mat-button
-                  matSuffix
-                  (click)="setFilter($event.option.value)"
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #itemBrandAutocomplete="matAutocomplete"
+                  [displayWith]="getItemBrandOption"
+                  (optionSelected)="setFilter($event.option.value)"
                 >
-                  <mat-icon>search</mat-icon>
-                </button>
+                  <mat-option
+                    *ngFor="let option of filteredItemBrandList | async"
+                    [value]="option"
+                  >
+                    {{ option.brand }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.itemBrand.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.itemBrand.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
               <ion-button
                 color="tertiary"
