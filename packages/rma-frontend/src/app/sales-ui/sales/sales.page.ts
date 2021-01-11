@@ -71,7 +71,8 @@ export class SalesPage implements OnInit {
   campaignStatus: string[] = ['Yes', 'No', 'All'];
   customer_name: any;
   status: string = 'All';
-  name: string = '';
+  invoice_number: string = '';
+  sales_person: string = '';
   branch: string = '';
   total: number = 0;
   dueTotal: number = 0;
@@ -111,7 +112,7 @@ export class SalesPage implements OnInit {
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
-    this.filteredSalesPersonList = this.f.salesPersonControl.valueChanges.pipe(
+    this.filteredSalesPersonList = this.f.salesPerson.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
         return this.salesService.getSalesPersonList(value);
@@ -171,7 +172,7 @@ export class SalesPage implements OnInit {
       fromDateFormControl: new FormControl(),
       toDateFormControl: new FormControl(),
       singleDateFormControl: new FormControl(),
-      salesPersonControl: new FormControl(),
+      salesPerson: new FormControl(),
       invoice_number: new FormControl(),
       branch: new FormControl(),
       campaign: new FormControl(),
@@ -200,11 +201,13 @@ export class SalesPage implements OnInit {
 
   getUpdate(event) {
     const query: any = {};
-    if (this.customer_name) query.customer = this.customer_name.name;
-    if (this.status) query.status = this.status;
-    if (this.name) query.name = this.name;
-    if (this.f.salesPersonControl.value)
-      query.sales_team = this.f.salesPersonControl.value;
+    if (this.f.customer_name.value)
+      query.customer = this.f.customer_name.value.name;
+    if (this.f.status.value) query.status = this.f.status.value;
+    if (this.f.invoice_number.value)
+      query.invoice_number = this.f.invoice_number.value;
+    if (this.f.salesPerson.value) query.sales_team = this.f.salesPerson.value;
+    if (this.f.branch.value) query.territory = this.f.branch.value;
     if (this.campaign) {
       if (this.campaign === 'Yes') {
         query.isCampaign = true;
@@ -244,7 +247,6 @@ export class SalesPage implements OnInit {
     this.paginator.pageIndex = event?.pageIndex || 0;
     this.paginator.pageSize = event?.pageSize || 30;
 
-    if (this.branch) query.territory = this.branch;
     this.dataSource.loadItems(
       this.sortQuery,
       event?.pageIndex || undefined,
@@ -279,16 +281,17 @@ export class SalesPage implements OnInit {
   clearFilters() {
     this.customer_name = '';
     this.status = 'All';
-    this.name = '';
+    this.invoice_number = '';
     this.branch = '';
     this.campaign = 'All';
+    this.sales_person = '';
     this.f.customer_name.setValue('');
     this.f.invoice_number.setValue('');
     this.f.branch.setValue('');
     this.f.campaign.setValue('');
     this.f.status.setValue('');
     this.f.fromDateFormControl.setValue('');
-    this.f.salesPersonControl.setValue('');
+    this.f.salesPerson.setValue('');
     this.f.toDateFormControl.setValue('');
     this.f.singleDateFormControl.setValue('');
     this.dataSource.loadItems();
@@ -299,9 +302,8 @@ export class SalesPage implements OnInit {
     if (this.f.customer_name.value)
       query.customer = this.f.customer_name.value.name;
     if (this.status) query.status = this.status;
-    if (this.f.salesPersonControl.value)
-      query.sales_team = this.f.salesPersonControl.value;
-    if (this.name) query.name = this.name;
+    if (this.f.salesPerson.value) query.sales_team = this.f.salesPerson.value;
+    if (this.f.invoice_number.value) query.name = this.f.invoice_number.value;
     if (this.f.branch) query.territory = this.f.branch.value;
     if (this.campaign) {
       if (this.campaign === 'Yes') {

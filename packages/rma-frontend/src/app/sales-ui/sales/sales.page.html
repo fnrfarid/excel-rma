@@ -71,7 +71,6 @@
                     [value]="option"
                   >
                     {{ option.customer_name }}
-                    
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('falseValse')">
@@ -142,13 +141,13 @@
                 <input
                   matInput
                   placeholder="Select Sales Person"
-                  formControlName="salesPersonControl"
-                  (focusout)="validateInput(f.salesPersonControl, filteredSalesPersonList)"
-                  [matAutocomplete]="auto"
+                  formControlName="salesPerson"
+                  (focusout)="validateInput(f.salesPerson, filteredSalesPersonList)"
+                  [matAutocomplete]="salesPerson"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
-                  #auto="matAutocomplete"
+                  #salesPerson="matAutocomplete"
                   (optionSelected)="setFilter()"
                 >
                   <mat-option
@@ -158,10 +157,9 @@
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.salesPersonControl.hasError('falseValse')">
+                <mat-error *ngIf="f.salesPerson.hasError('falseValse')">
                   You should select a value from dropdown only.
-                  <strong>'{{ f.salesPersonControl.value }}'</strong> is not
-                  allowed.
+                  <strong>'{{ f.salesPerson.value }}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
