@@ -34,6 +34,7 @@ import { StockEntryModule } from './stock-entry/stock-entry.module';
 import { ProblemModule } from './problem/problem.module';
 import { SyncEntitiesModule } from './sync/entities/sync-entity.module';
 import { ServiceInvoiceModule } from './service-invoice/service-invoice.module';
+import { PrintModule } from './print/print-module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ServiceInvoiceModule } from './service-invoice/service-invoice.module';
     }),
     ConfigModule,
     AuthModule,
+    PrintModule,
     SystemSettingsModule,
     DirectModule,
     SyncModule,

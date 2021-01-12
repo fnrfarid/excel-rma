@@ -4,11 +4,12 @@ import { SalesService } from './sales.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { STORAGE_TOKEN } from '../../api/storage/storage.service';
 import { of } from 'rxjs';
+import { MaterialModule } from '../../material/material.module';
 
 describe('SalesService', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, MaterialModule],
       providers: [
         {
           provide: STORAGE_TOKEN,

@@ -35,6 +35,18 @@ export class ServerSettings extends BaseEntity {
   profileURL: string;
 
   @Column()
+  headerImageURL: string;
+
+  @Column()
+  footerImageURL: string;
+
+  @Column()
+  headerWidth: number;
+
+  @Column()
+  footerWidth: number;
+
+  @Column()
   tokenURL: string;
 
   @Column()
