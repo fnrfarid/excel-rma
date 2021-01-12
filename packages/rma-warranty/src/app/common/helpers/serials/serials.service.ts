@@ -2,11 +2,16 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../../constants/app-string';
 import * as _ from 'lodash';
+import { SelectDumpHeadersDialog } from 'src/app/api/csv-json/csv-json.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Injectable()
 export class SerialsService {
   DEFAULT_SERIAL_RANGE = { start: 0, end: 0, prefix: '', serialPadding: 0 };
-  constructor(private readonly snackBar: MatSnackBar) {}
+  constructor(
+    private readonly snackBar: MatSnackBar,
+    private readonly dialog: MatDialog,
+  ) {}
 
   getSerialsFromRange(startSerial: string, endSerial: string) {
     const { start, end, prefix, serialPadding } = this.getSerialPrefix(
@@ -110,18 +115,43 @@ export class SerialsService {
     return prefix || '';
   }
 
-  downloadAsCSV(data: any[], fields: string[], filename) {
-    const replacer = function (key, value) {
-      return value === null ? '' : value;
-    };
+  async downloadAsCSV(data: any[], fields: string[], filename) {
+    const parsedFields = {};
+    Object.keys(data[0]).forEach(key => {
+      parsedFields[key] = false;
+      if (fields.includes(key)) {
+        parsedFields[key] = true;
+      }
+      if (!['string', 'number'].includes(typeof data[0][key])) {
+        delete parsedFields[key];
+      }
+    });
+
+    const dialogRef = this.dialog.open(SelectDumpHeadersDialog, {
+      width: '250px',
+      data: parsedFields,
+    });
+
+    let selectedFields = await dialogRef.afterClosed().toPromise();
+    if (!selectedFields) {
+      return;
+    }
+    selectedFields = Object.keys(selectedFields).filter(key => {
+      if (selectedFields[key]) {
+        return key;
+      }
+    });
+
     let csv: any = data.map(function (row) {
-      return fields
+      return selectedFields
         .map(function (fieldName) {
-          return JSON.stringify(row[fieldName], replacer);
+          return JSON.stringify(row[fieldName], (key, value) => {
+            return value === null ? '' : value;
+          });
         })
         .join(',');
     });
-    csv.unshift(fields.join(',')); // add header column
+    csv.unshift(selectedFields.join(',')); // add header column
     csv = csv.join('\r\n');
     return this.downloadFile(csv, filename);
   }

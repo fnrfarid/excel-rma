@@ -24,7 +24,7 @@
           <ion-button class="ion-text-right" [disabled]="!this.dataSource.length" color="tertiary" (click)="downloadSerials()">
             Download CSV
           </ion-button>
-          <ion-button color="tertiary" (click)="setFilter()">
+          <ion-button [disabled]="filtersForm.invalid" color="tertiary" (click)="setFilter()">
             Search
           </ion-button>
         </ion-col>
@@ -51,7 +51,6 @@
                 (focusout)="validateInput(f.item_code, filteredItemList)"
                 formControlName="item_code"
                 [matAutocomplete]="item_code"
-                required
               />
               <mat-autocomplete
                 #item_code="matAutocomplete"
@@ -74,7 +73,7 @@
             <ion-col size-md="6">
               <mat-form-field class="full-width">
                 <input matInput placeholder="Warehouse" formControlName="warehouse" (keyup.enter)="setFilter()"
-                  [matAutocomplete]="autoWarehouse" />
+                  [matAutocomplete]="autoWarehouse" required />
               </mat-form-field>
               <mat-autocomplete #autoWarehouse="matAutocomplete">
                 <mat-option *ngFor="let warehouse of warehouseList | async" [value]="warehouse.name">
@@ -86,7 +85,7 @@
               <mat-checkbox formControlName="sales_invoice_name">Sold</mat-checkbox>
             </ion-col>
             <ion-col size-md="3">
-              <mat-checkbox formControlName="purchase_invoice_name">Purchased</mat-checkbox>
+              <mat-checkbox formControlName="purchase_invoice_name" >Purchased</mat-checkbox>
             </ion-col>
           </ion-row>
         </form>

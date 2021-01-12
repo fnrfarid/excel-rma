@@ -17,7 +17,7 @@
     color="light"
     horizontal="end"
   >
-    <ion-fab-button class="fab-position" (click)="submitSalesReturn()">
+    <ion-fab-button class="fab-position" [disabled]="submitting" (click)="submitSalesReturn()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

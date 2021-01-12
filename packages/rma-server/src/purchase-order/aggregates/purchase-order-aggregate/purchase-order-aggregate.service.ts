@@ -57,6 +57,13 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
               return this.cancelERPNextDocs(docs, req, settings);
             }),
             switchMap(success => {
+              return this.cancelERPNextDocs(
+                { [DOC_NAMES.PURCHASE_INVOICE]: [name] },
+                req,
+                settings,
+              );
+            }),
+            switchMap(success => {
               return this.purchaseOrderService.findOne({
                 purchase_invoice_name: name,
               });
