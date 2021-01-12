@@ -39,7 +39,6 @@ export class PrintComponent implements OnInit {
     const doctype = 'Sales Invoice';
     const name = `name=${this.invoice_name}`;
     const no_letterhead = 'no_letterhead=0';
-    // If kept in single line, npm run format gives this error : This line has a length of 158. Maximum allowed is 150
     this.printSalesInvoiceURL = `${url}?doctype=${doctype}&${name}&format=${
       PRINT_FORMAT_PREFIX + doctype
     }&${no_letterhead}`;

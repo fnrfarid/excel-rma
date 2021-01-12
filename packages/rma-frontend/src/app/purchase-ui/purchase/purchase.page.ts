@@ -15,7 +15,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable } from 'rxjs';
 
 @Component({

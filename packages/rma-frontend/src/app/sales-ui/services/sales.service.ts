@@ -272,6 +272,7 @@ export class SalesService {
     const url = LIST_ITEMS_ENDPOINT;
     query = query ? query : {};
     query.item_name = filter?.item_name ? filter.item_name : filter;
+    query.disabled = 0;
 
     const params = new HttpParams()
       .set('limit', pageSize.toString())
