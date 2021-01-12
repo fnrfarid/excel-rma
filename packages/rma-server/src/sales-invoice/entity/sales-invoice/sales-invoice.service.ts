@@ -137,7 +137,7 @@ export class SalesInvoiceService {
           delete query[key];
         } else if (key === 'isCampaign' && query[key] === true) {
           query[key] = true;
-        } else if (key === 'territory' && query[key] === null) {
+        } else if (key === 'territory' && !query[key]) {
           delete query[key];
         } else if (key === 'sales_team') {
           delete query[key];
