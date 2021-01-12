@@ -103,6 +103,7 @@ export class AddSalesReturnPage implements OnInit {
   serialDataSource: SerialDataSource;
   filteredItemList = [];
   deliveryNoteNames = [];
+  submitting: boolean = false;
   initial: { [key: string]: number } = {
     warehouse: 0,
   };
@@ -473,6 +474,7 @@ export class AddSalesReturnPage implements OnInit {
   }
 
   async submitSalesReturn() {
+    this.submitting = true;
     const credit_note_items = [];
     if (this.salesInvoiceItems?.length) {
       const dialogRef = this.dialog.open(EditSalesReturnTableComponent, {
@@ -484,6 +486,7 @@ export class AddSalesReturnPage implements OnInit {
 
       if (!response) {
         this.getMessage('Please select items for Credit Note');
+        this.submitting = false;
         return;
       }
 
@@ -510,7 +513,10 @@ export class AddSalesReturnPage implements OnInit {
         credit_note_items.push(data);
       });
 
-      if (!valid) return;
+      if (!valid) {
+        this.submitting = false;
+        return;
+      }
     }
     const loading = await this.loadingController.create({
       message: 'Creating Delivery Note..',
@@ -519,6 +525,7 @@ export class AddSalesReturnPage implements OnInit {
 
     if (!this.validateState()) {
       loading.dismiss();
+      this.submitting = false;
       return;
     }
 
@@ -571,8 +578,10 @@ export class AddSalesReturnPage implements OnInit {
         this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 4500 });
         loading.dismiss();
         this.location.back();
+        this.submitting = false;
       },
       error: err => {
+        this.submitting = false;
         loading.dismiss();
         if (err.status === 400) {
           this.snackBar.open(
