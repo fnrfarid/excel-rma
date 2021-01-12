@@ -151,12 +151,10 @@ export class PrintAggregateService {
     doc
       .fontSize(13)
       .text('Received with good condition by', 50, cord.y, { underline: true });
-    doc
-      .fontSize(13)
-      .text(`For ${invoice.company}`, cord.x, cord.y, {
-        underline: true,
-        align: 'right',
-      });
+    doc.fontSize(13).text(`For ${invoice.company}`, cord.x, cord.y, {
+      underline: true,
+      align: 'right',
+    });
   }
 
   async generateFooter(doc, settings: ServerSettings) {
