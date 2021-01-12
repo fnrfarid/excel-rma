@@ -247,6 +247,69 @@
             {{hideSAApiSecret ? 'visibility' : 'visibility_off'}}
           </mat-icon>
         </mat-form-field>
+        
+        <ion-card-header>
+          <ion-card-title>
+            <ion-text>
+              Print Settings
+            </ion-text>
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-grid class="ion-padding">
+          <ion-row>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Header Image"
+                  type="text"
+                  formControlName="headerImageURL"
+                />
+              </mat-form-field>
+            </ion-col>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Header Width"
+                  type="number"
+                  formControlName="headerWidth"
+                />
+              </mat-form-field>
+            </ion-col>
+
+          </ion-row>
+
+          <ion-row>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Footer Image"
+                  type="text"
+                  formControlName="footerImageURL"
+                />
+              </mat-form-field>
+            </ion-col>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Footer Width"
+                  type="number"
+                  formControlName="footerWidth"
+                />
+              </mat-form-field>
+            </ion-col>
+            
+          </ion-row>
+        </ion-grid>
+
       </form>
       <ion-grid class="ion-padding">
         <ion-row>

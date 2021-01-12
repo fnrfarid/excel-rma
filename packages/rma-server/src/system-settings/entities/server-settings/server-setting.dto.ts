@@ -147,4 +147,32 @@ export class ServerSettingsDto {
     type: 'string',
   })
   posProfile: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Print Header Image',
+    type: 'string',
+  })
+  headerImageURL: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Print Header width',
+    type: 'number',
+  })
+  headerWidth: number;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Print Footer Image',
+    type: 'string',
+  })
+  footerImageURL: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Print Header width',
+    type: 'number',
+  })
+  footerWidth: number;
 }

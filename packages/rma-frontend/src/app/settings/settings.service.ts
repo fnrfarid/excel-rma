@@ -127,6 +127,10 @@ export class SettingsService {
     serviceAccountApiSecret: string,
     warrantyAppURL: string,
     posProfile: string,
+    headerImageURL: string,
+    headerWidth: string,
+    footerImageURL: string,
+    footerWidth: string,
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -149,6 +153,10 @@ export class SettingsService {
             serviceAccountApiSecret,
             warrantyAppURL,
             posProfile,
+            headerImageURL,
+            headerWidth,
+            footerImageURL,
+            footerWidth,
           },
           { headers },
         );
