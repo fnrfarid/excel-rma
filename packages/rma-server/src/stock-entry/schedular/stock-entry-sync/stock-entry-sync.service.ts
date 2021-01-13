@@ -1,4 +1,4 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { Injectable, HttpService, BadRequestException } from '@nestjs/common';
 import { switchMap, mergeMap, catchError, retry, map } from 'rxjs/operators';
 import {
   VALIDATE_AUTH_STRING,
@@ -8,6 +8,7 @@ import {
   CREATE_STOCK_ENTRY_JOB,
   ACCEPT_STOCK_ENTRY_JOB,
   REJECT_STOCK_ENTRY_JOB,
+  STOCK_ENTRY_STATUS,
 } from '../../../constants/app-strings';
 import {
   POST_DELIVERY_NOTE_ENDPOINT,
@@ -47,11 +48,97 @@ export class StockEntrySyncService {
   }
 
   resetState(job) {
-    this.updateStockEntryState(job.attrs.data.payload.uuid, {
+    this.updateStockEntryState(job.data.payload.uuid, {
       isSynced: false,
       inQueue: false,
     });
-    return;
+    return from(
+      this.stockEntryService.findOne({ uuid: job.data.payload.uuid }),
+    ).pipe(
+      switchMap(stockEntry => {
+        switch (stockEntry.stock_entry_type) {
+          case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+            return this.resetMaterialIssue(stockEntry);
+
+          case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+            return this.resetMaterialReceipt(stockEntry);
+
+          case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+            return this.resetMaterialTransfer(stockEntry);
+
+          case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+            return this.resetMaterialIssue(stockEntry);
+
+          default:
+            return throwError(
+              new BadRequestException('Invalid StockEntry type'),
+            );
+        }
+      }),
+    );
+  }
+
+  resetMaterialReceipt(stockEntry: StockEntry) {
+    const serialHash = this.getStockEntrySerials(stockEntry);
+    const serials = [];
+    Object.values(serialHash).forEach(hash => serials.push(...hash.serials));
+    return forkJoin({
+      updateStockEntry: from(
+        this.stockEntryService.updateOne(
+          { uuid: stockEntry.uuid },
+          { $set: { status: STOCK_ENTRY_STATUS.draft } },
+        ),
+      ),
+      updateSerials: from(
+        this.serialNoService.deleteMany({ serial_no: { $in: serials } }),
+      ),
+    });
+  }
+
+  resetMaterialIssue(stockEntry: StockEntry) {
+    const serialHash = this.getStockEntrySerials(stockEntry);
+    const serials = [];
+    Object.values(serialHash).forEach(hash => serials.push(...hash.serials));
+    return forkJoin({
+      updateStockEntry: from(
+        this.stockEntryService.updateOne(
+          { uuid: stockEntry.uuid },
+          { $set: { status: STOCK_ENTRY_STATUS.draft } },
+        ),
+      ),
+      updateSerials: from(
+        this.serialNoService.updateMany(
+          { serial_no: { $in: serials } },
+          {
+            $unset: {
+              queue_state: {
+                stock_entry: null,
+              },
+            },
+          },
+        ),
+      ),
+    });
+  }
+
+  resetMaterialTransfer(stockEntry: StockEntry) {
+    return throwError(
+      new BadRequestException(
+        `Reset for ${stockEntry.stock_entry_type}, not available.`,
+      ),
+    );
+  }
+
+  getStockEntrySerials(stockEntry: StockEntry) {
+    const serialHash: { [key: string]: { serials: string[] } } = {};
+    stockEntry.items.forEach(item => {
+      if (serialHash[item.item_code]) {
+        serialHash[item.item_code].serials.push(...item.serial_no);
+      } else {
+        serialHash[item.item_code] = { serials: item.serial_no };
+      }
+    });
+    return serialHash;
   }
 
   createStockEntry(job: {
