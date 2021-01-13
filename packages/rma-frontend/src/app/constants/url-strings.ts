@@ -32,6 +32,8 @@ export const RELAY_GET_ITEMPRICE_ENDPOINT =
   '/api/command/user/api/resource/Item Price';
 export const RELAY_GET_ITEM_GROUP_ENDPOINT =
   '/api/command/user/api/resource/Item Group';
+export const RELAY_GET_ITEM_BRAND_ENDPOINT =
+  '/api/command/user/api/resource/Brand';
 export const RELAY_GET_DELIVERY_NOTE_ENDPOINT =
   '/api/command/user/api/resource/Delivery Note';
 export const RELAY_GET_STOCK_BALANCE_ENDPOINT =

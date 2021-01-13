@@ -34,13 +34,14 @@ export class ItemPricePage implements OnInit {
     'selling_price',
   ];
   itemName: string = '';
-  itemBrand: string = '';
   itemGroup: string = '';
+  itemBrand: string = '';
   purchaseWarrantyMonths: string = '';
   itemsForm: FormGroup;
   validateInput: any = ValidateInputSelected;
   filteredItemNameList: Observable<any[]>;
   filteredItemGroupList: Observable<any>;
+  filteredItemBrandList: Observable<any>;
 
   get f() {
     return this.itemsForm.controls;
@@ -92,12 +93,25 @@ export class ItemPricePage implements OnInit {
           return of(data);
         }),
       );
+
+    this.filteredItemBrandList = this.itemsForm
+      .get('itemBrand')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getItemBrandList(value);
+        }),
+        switchMap(data => {
+          return of(data);
+        }),
+      );
   }
 
   createFormGroup() {
     this.itemsForm = new FormGroup({
       itemName: new FormControl(),
       itemGroup: new FormControl(),
+      itemBrand: new FormControl(),
     });
   }
 
@@ -116,6 +130,15 @@ export class ItemPricePage implements OnInit {
         return `${option.item_group_name}`;
       }
       return option.item_group_name;
+    }
+  }
+
+  getItemBrandOption(option) {
+    if (option) {
+      if (option.brand) {
+        return `${option.brand}`;
+      }
+      return option.brand;
     }
   }
 
@@ -167,8 +190,11 @@ export class ItemPricePage implements OnInit {
 
   setFilter(item?) {
     const query: any = {};
-    if (item.item_group_name) query.item_group = item.item_group_name;
-    if (item.item_name) query.item_name = item.item_name;
+    if (this.f.itemName.value)
+      query.item_name = this.f.itemName.value.item_name;
+    if (this.f.itemGroup.value)
+      query.item_group = this.f.itemGroup.value.item_group_name;
+    if (this.f.itemBrand.value) query.brand = this.f.itemBrand.value.brand;
 
     const sortQuery = {};
     if (item) {
@@ -187,6 +213,7 @@ export class ItemPricePage implements OnInit {
     this.itemGroup = '';
     this.f.itemName.setValue('');
     this.f.itemGroup.setValue('');
+    this.f.itemBrand.setValue('');
     this.dataSource.loadItems();
   }
 
