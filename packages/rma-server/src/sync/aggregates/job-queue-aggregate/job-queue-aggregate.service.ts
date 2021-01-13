@@ -15,6 +15,9 @@ import {
   FRAPPE_JOB_SELECT_FIELDS,
   BEARER_HEADER_VALUE_PREFIX,
   DELIVERY_NOTE_DOCTYPE_NAMES,
+  ACCEPT_STOCK_ENTRY_JOB,
+  REJECT_STOCK_ENTRY_JOB,
+  CREATE_STOCK_ENTRY_JOB,
 } from '../../../constants/app-strings';
 import { from, throwError, of } from 'rxjs';
 import { switchMap, map, catchError, retry, delay } from 'rxjs/operators';
@@ -36,6 +39,9 @@ export class JobQueueAggregateService {
   resetJobs: string[] = [
     'CREATE_PURCHASE_RECEIPT_JOB',
     'CREATE_DELIVERY_NOTE_JOB',
+    CREATE_STOCK_ENTRY_JOB,
+    ACCEPT_STOCK_ENTRY_JOB,
+    REJECT_STOCK_ENTRY_JOB,
   ];
   constructor(
     @Inject(AGENDA_TOKEN)

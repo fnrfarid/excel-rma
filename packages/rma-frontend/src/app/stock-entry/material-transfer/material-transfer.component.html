@@ -38,13 +38,13 @@
                         <ion-button *ngIf="!readonly" color="light" (click)="saveDraft()">
                             Save
                         </ion-button>
-                        <ion-button *ngIf="!readonly" [disabled]="!uuid" color="medium" (click)="createMaterialTransfer()">
+                        <ion-button *ngIf="!readonly" [disabled]="!uuid || submit" color="medium" (click)="createMaterialTransfer()">
                             Submit
                         </ion-button>
-                        <ion-button *ngIf="readonly && status === 'In Transit'" color="tertiary" (click)="acceptTransfer()">
+                        <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="tertiary" (click)="acceptTransfer()">
                             Accept Transfer
                         </ion-button>
-                        <ion-button *ngIf="readonly && status === 'In Transit'" color="danger" (click)="rejectTransfer()">
+                        <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="danger" (click)="rejectTransfer()">
                             Return Transfer
                         </ion-button>
                         <ion-text *ngIf="readonly && status !== 'In Transit' && status !== 'Draft'" [ngStyle]="{ color:  ['Returned','Reseted'].includes(status) ? 'red' : 'green' }">

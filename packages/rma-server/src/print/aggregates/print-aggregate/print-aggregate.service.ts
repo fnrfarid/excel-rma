@@ -4,12 +4,13 @@ import * as fetch from 'node-fetch';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { DeliveryChalanDto } from 'src/print/entities/print/print.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class PrintAggregateService {
   constructor(private readonly settings: ServerSettingsService) {}
 
-  async getDeliveryChalan(invoice: DeliveryChalanDto, res) {
+  async getDeliveryChalan(invoice: DeliveryChalanDto, res: Response) {
     let buffer;
     try {
       buffer = await this.appendPDFSections(invoice);
