@@ -53,7 +53,8 @@ describe('SerialSearchPage', () => {
 
     fixture = TestBed.createComponent(SerialSearchPage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    // Note : you can call fixture.detectChanges() as per needed on individual test's
+    // this component has updated form values hence it cannot be called as default.
   }));
 
   it('should create', () => {

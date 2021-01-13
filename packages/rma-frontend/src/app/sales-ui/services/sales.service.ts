@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { of, from } from 'rxjs';
+import { of, from, forkJoin, Observable } from 'rxjs';
 import { switchMap, catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   SalesInvoice,
@@ -46,11 +46,19 @@ import {
   REMOVE_SALES_INVOICE_ENDPOINT,
   RELAY_GET_ITEM_GROUP_ENDPOINT,
   RELAY_GET_DATE_WISE_STOCK_BALANCE_ENDPOINT,
+  PRINT_DELIVERY_INVOICE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
 import { SalesReturn } from '../../common/interfaces/sales-return.interface';
-import { JSON_BODY_MAX_SIZE, TERRITORY } from '../../constants/app-string';
+import {
+  CLOSE,
+  JSON_BODY_MAX_SIZE,
+  NON_SERIAL_ITEM,
+  TERRITORY,
+} from '../../constants/app-string';
+import { DeliveryNoteItemInterface } from '../view-sales-invoice/serials/serials-datasource';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +67,11 @@ export class SalesService {
   salesInvoiceList: Array<SalesInvoice>;
   itemList: Array<Item>;
 
-  constructor(private http: HttpClient, private storage: StorageService) {
+  constructor(
+    private http: HttpClient,
+    private storage: StorageService,
+    private readonly snackBar: MatSnackBar,
+  ) {
     this.salesInvoiceList = [];
 
     this.itemList = [];
@@ -577,6 +589,28 @@ export class SalesService {
     );
   }
 
+  getDeliveryNoteWithItems(
+    names: string[],
+  ): Observable<{ [key: string]: any }> {
+    const request = {};
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        names.forEach(name => {
+          request[name] = this.http
+            .get<any>(RELAY_GET_DELIVERY_NOTE_ENDPOINT + `/${name}`, {
+              headers,
+            })
+            .pipe(map(res => res.data));
+        });
+        return of(true);
+      }),
+      toArray(),
+      switchMap(success => {
+        return forkJoin(request);
+      }),
+    );
+  }
+
   getAddress(name: string) {
     const getAddressNameURL = RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT;
 
@@ -685,5 +719,70 @@ export class SalesService {
 
   getApiInfo() {
     return this.http.get<any>(API_INFO_ENDPOINT);
+  }
+
+  getAggregatedDocument(
+    res: {
+      items: DeliveryNoteItemInterface[];
+      total?: number;
+      total_qty?: number;
+    }[],
+  ) {
+    const itemsHashMap = {};
+    const doc = res[0];
+    res.forEach(document => {
+      document.items.forEach(item => {
+        if (itemsHashMap[item.item_code]) {
+          itemsHashMap[item.item_code].qty += item.qty;
+          itemsHashMap[item.item_code].amount += item.amount;
+          if (
+            item.excel_serials &&
+            !item.excel_serials.includes(NON_SERIAL_ITEM)
+          ) {
+            itemsHashMap[
+              item.item_code
+            ].excel_serials += `\n${item.excel_serials}`;
+          } else {
+            delete itemsHashMap[item.item_code].excel_serials;
+          }
+        } else {
+          itemsHashMap[item.item_code] = item;
+        }
+        doc.total_qty += item.qty;
+        doc.total += item.amount;
+      });
+    });
+    doc.items = Object.values(itemsHashMap);
+    return doc;
+  }
+
+  printDocument(doc, invoice_name) {
+    const blob = new Blob([JSON.stringify(doc)], {
+      type: 'application/json',
+    });
+    const uploadData = new FormData();
+    uploadData.append('file', blob, 'purchase_receipts');
+
+    return this.http
+      .post(PRINT_DELIVERY_INVOICE_ENDPOINT, uploadData, {
+        responseType: 'arraybuffer',
+      })
+      .subscribe({
+        next: success => {
+          const file = new Blob([success], { type: 'application/pdf' });
+          const fileURL = URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = fileURL;
+          a.target = '_blank';
+          a.download = invoice_name + '.pdf';
+          document.body.appendChild(a);
+          a.click();
+        },
+        error: err => {
+          this.snackBar.open(err?.message || err?.error?.message, CLOSE, {
+            duration: 4500,
+          });
+        },
+      });
   }
 }

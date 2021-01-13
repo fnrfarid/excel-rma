@@ -41,7 +41,7 @@ export class SerialSearchPage implements OnInit {
     serial_no: new FormControl(),
     item_code: new FormControl(),
     warehouse: new FormControl(),
-    purchase_invoice_name: new FormControl(),
+    purchase_invoice_name: new FormControl({ value: true }),
     sales_invoice_name: new FormControl(),
   });
   validateInput: any = ValidateInputSelected;
@@ -133,29 +133,33 @@ export class SerialSearchPage implements OnInit {
   getFilterQuery() {
     const query: SerialSearchFields = {};
     Object.keys(this.filtersForm.controls).forEach(key => {
-      if (this.filtersForm.controls[key].value) {
-        switch (key) {
-          case 'serial_no':
-            query[key] = {
-              $regex: this.filtersForm.controls[key].value,
-              $options: 'i',
-            };
-            break;
+      switch (key) {
+        case 'serial_no':
+          this.filtersForm.controls[key].value
+            ? (query[key] = {
+                $regex: this.filtersForm.controls[key].value,
+                $options: 'i',
+              })
+            : null;
+          break;
 
-          case 'purchase_invoice_name':
-            query[key] = { $exists: true };
-            break;
+        case 'purchase_invoice_name':
+          query[key] = {
+            $exists: this.filtersForm.controls[key].value ? true : false,
+          };
+          break;
 
-          case 'sales_invoice_name':
-            query[key] = { $exists: true };
-            break;
+        case 'sales_invoice_name':
+          query[key] = {
+            $exists: this.filtersForm.controls[key].value ? true : false,
+          };
+          break;
 
-          default:
-            query[key] =
-              this.filtersForm.controls[key].value?.item_code ||
-              this.filtersForm.controls[key].value;
-            break;
-        }
+        default:
+          query[key] =
+            this.filtersForm.controls[key].value?.item_code ||
+            this.filtersForm.controls[key].value;
+          break;
       }
     });
     return query;

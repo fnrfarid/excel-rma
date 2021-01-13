@@ -39,7 +39,7 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="f.defaultCompany.hasError('falseValse')">
-            You should select a value from dropdown only. 
+            You should select a value from dropdown only.
             <strong>'{{f.defaultCompany.value}}'</strong> is not allowed.
           </mat-error>
         </mat-form-field>
@@ -62,7 +62,7 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="f.timeZone.hasError('falseValse')">
-            You should select a value from dropdown only. 
+            You should select a value from dropdown only.
             <strong>'{{f.timeZone.value}}'</strong> is not allowed.
           </mat-error>
         </mat-form-field>
@@ -85,7 +85,7 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="f.sellingPriceList.hasError('falseValse')">
-            You should select a value from dropdown only. 
+            You should select a value from dropdown only.
             <strong>'{{f.sellingPriceList.value}}'</strong> is not allowed.
           </mat-error>
         </mat-form-field>
@@ -107,7 +107,7 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="f.debtorAccount.hasError('falseValse')">
-            You should select a value from dropdown only. 
+            You should select a value from dropdown only.
             <strong>'{{f.debtorAccount.value}}'</strong> is not allowed.
           </mat-error>
         </mat-form-field>
@@ -129,14 +129,13 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="f.transferWarehouse.hasError('falseValse')">
-            You should select a value from dropdown only. 
+            You should select a value from dropdown only.
             <strong>'{{f.transferWarehouse.value}}'</strong> is not allowed.
           </mat-error>
         </mat-form-field>
         <mat-form-field class="mat-input-wrapper">
           <input
             matInput
-            required
             placeholder="POS Profile"
             aria-label="POS Profile"
             (focusout)="validateInput(f.posProfile, posProfiles)"
@@ -152,7 +151,7 @@
             </mat-option>
           </mat-autocomplete>
           <mat-error *ngIf="f.posProfile.hasError('falseValse')">
-            You should select a value from dropdown only. 
+            You should select a value from dropdown only.
             <strong>'{{f.posProfile.value}}'</strong> is not allowed.
           </mat-error>
         </mat-form-field>
@@ -248,6 +247,69 @@
             {{hideSAApiSecret ? 'visibility' : 'visibility_off'}}
           </mat-icon>
         </mat-form-field>
+        
+        <ion-card-header>
+          <ion-card-title>
+            <ion-text>
+              Print Settings
+            </ion-text>
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-grid class="ion-padding">
+          <ion-row>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Header Image"
+                  type="text"
+                  formControlName="headerImageURL"
+                />
+              </mat-form-field>
+            </ion-col>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Header Width"
+                  type="number"
+                  formControlName="headerWidth"
+                />
+              </mat-form-field>
+            </ion-col>
+
+          </ion-row>
+
+          <ion-row>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Footer Image"
+                  type="text"
+                  formControlName="footerImageURL"
+                />
+              </mat-form-field>
+            </ion-col>
+
+            <ion-col size-md="6">
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Footer Width"
+                  type="number"
+                  formControlName="footerWidth"
+                />
+              </mat-form-field>
+            </ion-col>
+            
+          </ion-row>
+        </ion-grid>
+
       </form>
       <ion-grid class="ion-padding">
         <ion-row>
