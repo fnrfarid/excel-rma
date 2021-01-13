@@ -77,6 +77,7 @@ export class SerialSearchService {
     const url = LIST_ITEMS_ENDPOINT;
     query = query ? query : {};
     query.item_name = filter?.item_name ? filter.item_name : filter;
+    query.has_serial_no = 1;
     query.disabled = 0;
 
     const params = new HttpParams()

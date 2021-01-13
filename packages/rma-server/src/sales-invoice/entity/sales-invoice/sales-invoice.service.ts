@@ -63,7 +63,9 @@ export class SalesInvoiceService {
     }
 
     const salesTeamQuery = filter_query.sales_team
-      ? { sales_team: filter_query.sales_team }
+      ? {
+          sales_team: { $elemMatch: { sales_person: filter_query.sales_team } },
+        }
       : {};
 
     const customerQuery =
@@ -135,6 +137,8 @@ export class SalesInvoiceService {
           delete query[key];
         } else if (key === 'isCampaign' && query[key] === true) {
           query[key] = true;
+        } else if (key === 'territory' && !query[key]) {
+          delete query[key];
         } else if (key === 'sales_team') {
           delete query[key];
         } else if (key === 'isCampaign' && query[key] === false) {

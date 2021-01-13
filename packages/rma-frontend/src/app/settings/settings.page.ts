@@ -44,6 +44,10 @@ export class SettingsPage implements OnInit {
     serviceAccountApiKey: new FormControl(),
     serviceAccountApiSecret: new FormControl(),
     posProfile: new FormControl(),
+    headerImageURL: new FormControl(),
+    headerWidth: new FormControl(),
+    footerImageURL: new FormControl(),
+    footerWidth: new FormControl(),
   });
   validateInput: any = ValidateInputSelected;
 
@@ -154,6 +158,14 @@ export class SettingsPage implements OnInit {
           .get('warrantyAppURL')
           .setValue(res.warrantyAppURL);
         this.companySettingsForm.get('posProfile').setValue(res.posProfile);
+        this.companySettingsForm
+          .get('headerImageURL')
+          .setValue(res.headerImageURL);
+        this.companySettingsForm.get('headerWidth').setValue(res.headerWidth);
+        this.companySettingsForm
+          .get('footerImageURL')
+          .setValue(res.headerImageURL);
+        this.companySettingsForm.get('footerWidth').setValue(res.headerWidth);
       },
     });
 
@@ -194,6 +206,10 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('serviceAccountApiSecret').value,
         this.companySettingsForm.get('warrantyAppURL').value,
         this.companySettingsForm.get('posProfile').value,
+        this.companySettingsForm.get('headerImageURL').value,
+        this.companySettingsForm.get('headerWidth').value,
+        this.companySettingsForm.get('footerImageURL').value,
+        this.companySettingsForm.get('footerWidth').value,
       )
       .subscribe({
         next: success => {

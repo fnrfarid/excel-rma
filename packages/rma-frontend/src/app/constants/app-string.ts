@@ -93,3 +93,4 @@ export const DELIVERED_SERIALS_BY = {
   sales_invoice_name: 'sales_invoice_name',
   purchase_invoice_name: 'purchase_invoice_name',
 };
+export const NON_SERIAL_ITEM = 'Non serial Item';

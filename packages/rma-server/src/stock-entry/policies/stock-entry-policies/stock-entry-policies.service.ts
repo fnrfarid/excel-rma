@@ -39,6 +39,9 @@ export class StockEntryPoliciesService {
         );
       }),
       switchMap(() => {
+        if (payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+          return of(true);
+        }
         return this.validateItemStock(payload, clientHttpRequest);
       }),
     );

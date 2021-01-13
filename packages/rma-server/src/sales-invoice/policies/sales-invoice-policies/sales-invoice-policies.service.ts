@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { from, throwError, of, forkJoin } from 'rxjs';
-import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
+import { switchMap, map, mergeMap, toArray, concatMap } from 'rxjs/operators';
 import {
   SALES_INVOICE_NOT_FOUND,
   CUSTOMER_AND_CONTACT_INVALID,
@@ -205,7 +205,7 @@ export class SalesInvoicePoliciesService {
           return of(true);
         }
         return from(sales_invoice.items).pipe(
-          switchMap(item => {
+          concatMap(item => {
             if (item.has_bundle_item) {
               return of(true);
             }
