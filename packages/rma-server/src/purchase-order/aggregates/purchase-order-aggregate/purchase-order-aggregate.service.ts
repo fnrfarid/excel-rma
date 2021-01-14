@@ -1,4 +1,4 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { PurchaseOrderPoliciesService } from '../../policies/purchase-order-policies/purchase-order-policies.service';
 import { PurchaseOrderService } from '../../entity/purchase-order/purchase-order.service';
@@ -129,7 +129,7 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
       switchMap(obj => {
         return from(Object.keys(docs)).pipe(
           concatMap((docType: string) => {
-            if (!docType[docType]?.length) {
+            if (!docs[docType]?.length) {
               return of(true);
             }
             return from(docs[docType]).pipe(
@@ -140,29 +140,17 @@ export class PurchaseOrderAggregateService extends AggregateRoot {
             );
           }),
           catchError(err => {
-            const doc: { doctype: string; name: string } = JSON.parse(
-              err.config.data,
-            );
             if (
               err?.response?.data?.exc &&
               err?.response?.data?.exc.includes(
                 'Cannot edit cancelled document',
-              ) &&
-              doc.doctype === DOC_NAMES.PURCHASE_ORDER
+              )
             ) {
-              return from(
-                this.purchaseOrderService.updateOne(
-                  { name: doc.name },
-                  {
-                    $set: {
-                      docstatus: 2,
-                      status: PURCHASE_INVOICE_STATUS.CANCELED,
-                    },
-                  },
-                ),
-              );
+              return of(true);
             }
-            return throwError(err);
+            return throwError(
+              new BadRequestException(err?.response?.data?.exc),
+            );
           }),
         );
       }),
