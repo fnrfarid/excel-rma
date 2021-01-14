@@ -69,6 +69,7 @@ export class MaterialTransferComponent implements OnInit {
     toRange: '',
     serials: [],
   };
+  submit: boolean = false;
   stock_receipt_names = [];
   readonly: boolean = false;
   company: string;
@@ -318,12 +319,15 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   rejectTransfer() {
+    this.submit = true;
     this.stockEntryService.rejectMaterialTransfer(this.uuid).subscribe({
       next: success => {
+        this.submit = false;
         this.router.navigateByUrl('stock-entry');
         this.getMessage('Stock entry returned successfully');
       },
       error: err => {
+        this.submit = false;
         this.getMessage(
           err.error && err.error.message
             ? err.error.message
@@ -576,12 +580,15 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   acceptTransfer() {
+    this.submit = true;
     this.stockEntryService.acceptMaterialTransfer(this.uuid).subscribe({
       next: success => {
+        this.submit = false;
         this.router.navigateByUrl('stock-entry');
         this.getMessage('Stock entry accepted successfully');
       },
       error: err => {
+        this.submit = false;
         this.getMessage(
           err.error && err.error.message
             ? err.error.message
@@ -644,15 +651,18 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   async createMaterialTransfer() {
+    this.submit = true;
     const body = await this.getStockEntryBody();
     this.stockEntryService.createMaterialTransfer(body).subscribe({
       next: response => {
+        this.submit = false;
         this.getMessage('Stock Entry Created');
         this.resetRangeState();
         this.materialTransferDataSource.update([]);
         this.router.navigateByUrl('stock-entry');
       },
       error: err => {
+        this.submit = false;
         this.getMessage(err.error.message);
       },
     });

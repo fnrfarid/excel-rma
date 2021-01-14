@@ -3,9 +3,13 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { SalesReturnListDataSource } from './sales-return-list.datasource';
 import { SalesReturnService } from '../view-sales-invoice/sales-return/sales-return.service';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { SalesService } from '../services/sales.service';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs/internal/Observable';
+import { startWith } from 'rxjs/internal/operators/startWith';
+import { switchMap } from 'rxjs/operators';
+import { ValidateInputSelected } from 'src/app/common/pipes/validators';
 
 @Component({
   selector: 'app-sales-return',
@@ -15,13 +19,8 @@ import { ActivatedRoute } from '@angular/router';
 export class SalesReturnPage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-  fromDateFormControl = new FormControl();
-  toDateFormControl = new FormControl();
-  name: string = '';
-  status: string = '';
   statusList = ['Draft', 'To Bill', 'Completed'];
   total = 0;
-  customer: any;
   dataSource: SalesReturnListDataSource;
   customerList: any;
   displayedColumns = [
@@ -35,6 +34,14 @@ export class SalesReturnPage implements OnInit {
   ];
   filters: any = [['is_return', '=', '1']];
   countFilter: any = { is_return: ['=', '1'] };
+  salesReturnForm: FormGroup;
+  filteredCustomerList: Observable<any>;
+  validateInput: any = ValidateInputSelected;
+
+  get f() {
+    return this.salesReturnForm.controls;
+  }
+
   constructor(
     private readonly salesReturnService: SalesReturnService,
     private readonly salesService: SalesService,
@@ -42,6 +49,7 @@ export class SalesReturnPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
@@ -60,7 +68,24 @@ export class SalesReturnPage implements OnInit {
         this.total = total;
       },
     });
-    this.getCustomerList();
+    this.filteredCustomerList = this.salesReturnForm
+      .get('customer')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getCustomerList(value);
+        }),
+      );
+  }
+
+  createFormGroup() {
+    this.salesReturnForm = new FormGroup({
+      fromDateFormControl: new FormControl(),
+      toDateFormControl: new FormControl(),
+      customer: new FormControl(),
+      name: new FormControl(),
+      status: new FormControl(),
+    });
   }
 
   getUpdate(event) {
@@ -77,32 +102,35 @@ export class SalesReturnPage implements OnInit {
     this.countFilter = {};
     this.filters.push(['is_return', '=', '1']);
     this.countFilter.is_return = ['=', '1'];
-    if (this.customer) {
-      this.filters.push(['customer', 'like', `%${this.customer.name}%`]);
-      this.countFilter.customer = ['like', `%${this.customer.name}%`];
+    if (this.f.customer.value) {
+      this.filters.push([
+        'customer',
+        'like',
+        `%${this.f.customer.value.name}%`,
+      ]);
+      this.countFilter.customer = ['like', `%${this.f.customer.value.name}%`];
     }
-    if (this.name) {
-      this.filters.push(['name', 'like', `%${this.name}%`]);
-      this.countFilter.name = ['like', `%${this.name}%`];
+    if (this.f.name.value) {
+      this.filters.push(['name', 'like', `%${this.f.name.value}%`]);
+      this.countFilter.name = ['like', `%${this.f.name.value}%`];
     }
 
-    if (this.status) {
-      this.filters.push(['status', '=', this.status]);
-      this.countFilter.status = ['=', this.status];
+    if (this.f.status) {
+      this.filters.push(['status', '=', this.f.status.value]);
+      this.countFilter.status = ['=', this.f.status.value];
     }
 
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      const fromDate = this.getParsedDate(this.fromDateFormControl.value);
-      const toDate = this.getParsedDate(this.toDateFormControl.value);
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      const fromDate = this.getParsedDate(this.f.fromDateFormControl.value);
+      const toDate = this.getParsedDate(this.f.toDateFormControl.value);
       this.filters.push(['creation', 'Between', [fromDate, toDate]]);
       this.countFilter.creation = ['Between', `${fromDate} ${toDate}`];
     }
-
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }
 
   dateFilter() {
-    if (this.fromDateFormControl.value && this.toDateFormControl.value)
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value)
       this.setFilter();
   }
 
@@ -117,24 +145,14 @@ export class SalesReturnPage implements OnInit {
   }
 
   clearFilters() {
-    this.status = '';
-    this.name = '';
-    this.customer = '';
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
+    this.f.customer.setValue('');
+    this.f.name.setValue('');
     this.setFilter();
   }
 
-  getCustomerList() {
-    this.salesService.customerList().subscribe({
-      next: response => {
-        this.customerList = response;
-      },
-      error: error => {},
-    });
-  }
-
   getCustomerOption(option) {
-    if (option) return option.name;
+    if (option) return option.customer_name;
   }
 }

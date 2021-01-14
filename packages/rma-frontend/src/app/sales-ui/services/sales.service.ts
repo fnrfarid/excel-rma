@@ -46,6 +46,7 @@ import {
   REMOVE_SALES_INVOICE_ENDPOINT,
   RELAY_GET_ITEM_GROUP_ENDPOINT,
   RELAY_GET_DATE_WISE_STOCK_BALANCE_ENDPOINT,
+  RELAY_GET_ITEM_BRAND_ENDPOINT,
   PRINT_DELIVERY_INVOICE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
@@ -311,6 +312,25 @@ export class SalesService {
 
   getItemGroupList(value: string, pageIndex = 0, pageSize = 30) {
     const url = RELAY_GET_ITEM_GROUP_ENDPOINT;
+
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: `[["name","like","%${value}%"]]`,
+        limit_page_length: pageSize.toString(),
+        limit_start: (pageIndex * pageSize).toString(),
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, { headers, params });
+      }),
+      map((data: any) => data.data),
+    );
+  }
+
+  getItemBrandList(value: string, pageIndex = 0, pageSize = 30) {
+    const url = RELAY_GET_ITEM_BRAND_ENDPOINT;
 
     const params = new HttpParams({
       fromObject: {

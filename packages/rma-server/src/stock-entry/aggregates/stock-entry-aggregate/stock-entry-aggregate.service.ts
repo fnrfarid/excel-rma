@@ -97,7 +97,7 @@ export class StockEntryAggregateService {
           return of(stockEntry);
         }
         return from(Object.keys(mongoSerials)).pipe(
-          switchMap(key => {
+          mergeMap(key => {
             return from(
               this.serialNoService.updateOne(
                 { serial_no: { $in: mongoSerials[key].serial_no } },
