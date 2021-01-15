@@ -27,6 +27,8 @@ export class StockEntryService {
   async list(skip, take, sort, filter_query?) {
     let sortQuery;
     const query: any = {};
+    const s_warehouseQuery: any = {};
+    const t_warehouseQuery: any = {};
 
     try {
       sortQuery = JSON.parse(sort);
@@ -42,6 +44,20 @@ export class StockEntryService {
       } else {
         sortQuery[key] = sortQuery[key].toUpperCase();
       }
+    }
+
+    if (filter_query.s_warehouse) {
+      s_warehouseQuery.items = {
+        $elemMatch: { s_warehouse: filter_query.s_warehouse },
+      };
+      delete filter_query.s_warehouse;
+    }
+
+    if (filter_query.t_warehouse) {
+      t_warehouseQuery.items = {
+        $elemMatch: { t_warehouse: filter_query.t_warehouse },
+      };
+      delete filter_query.t_warehouse;
     }
 
     if (filter_query?.fromDate && filter_query?.toDate) {
@@ -61,6 +77,8 @@ export class StockEntryService {
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},
       query,
+      s_warehouseQuery,
+      t_warehouseQuery,
     ];
 
     const where: { $and: any } = { $and };
