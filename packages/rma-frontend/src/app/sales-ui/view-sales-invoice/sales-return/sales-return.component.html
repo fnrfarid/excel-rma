@@ -72,7 +72,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr mat-row [routerLink]="['/sales-return/details',row.name]" *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
     <mat-card-actions>
