@@ -64,7 +64,7 @@ export class StockEntrySyncService {
             return this.resetMaterialReceipt(stockEntry);
 
           case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
-            return this.resetMaterialTransfer(stockEntry);
+            return this.resetMaterialTransfer(stockEntry, job.data.type);
 
           case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
             return this.resetMaterialIssue(stockEntry);
@@ -95,7 +95,7 @@ export class StockEntrySyncService {
     });
   }
 
-  resetMaterialIssue(stockEntry: StockEntry) {
+  resetMaterialIssue(stockEntry: StockEntry, status?) {
     const serialHash = this.getStockEntrySerials(stockEntry);
     const serials = [];
     Object.values(serialHash).forEach(hash => serials.push(...hash.serials));
@@ -103,7 +103,7 @@ export class StockEntrySyncService {
       updateStockEntry: from(
         this.stockEntryService.updateOne(
           { uuid: stockEntry.uuid },
-          { $set: { status: STOCK_ENTRY_STATUS.draft } },
+          { $set: { status: status || STOCK_ENTRY_STATUS.draft } },
         ),
       ),
       updateSerials: from(
@@ -121,12 +121,28 @@ export class StockEntrySyncService {
     });
   }
 
-  resetMaterialTransfer(stockEntry: StockEntry) {
-    return throwError(
-      new BadRequestException(
-        `Reset for ${stockEntry.stock_entry_type}, not available.`,
-      ),
-    );
+  resetMaterialTransfer(stockEntry: StockEntry, type: string) {
+    switch (type) {
+      case ACCEPT_STOCK_ENTRY_JOB:
+        return this.resetMaterialIssue(
+          stockEntry,
+          STOCK_ENTRY_STATUS.in_transit,
+        );
+
+      case REJECT_STOCK_ENTRY_JOB:
+        return this.resetMaterialIssue(
+          stockEntry,
+          STOCK_ENTRY_STATUS.in_transit,
+        );
+
+      case CREATE_STOCK_ENTRY_JOB:
+        return this.resetMaterialIssue(stockEntry);
+
+      default:
+        return throwError(
+          new BadRequestException(`Reset for ${type}, not available.`),
+        );
+    }
   }
 
   getStockEntrySerials(stockEntry: StockEntry) {
@@ -195,13 +211,10 @@ export class StockEntrySyncService {
           frappePayload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
             ? POST_DELIVERY_NOTE_ENDPOINT
             : STOCK_ENTRY_API_ENDPOINT;
-        return this.http.post(
-          settings.authServerURL + endpoint,
-          frappePayload,
-          {
-            headers: this.settingsService.getAuthorizationHeaders(job.token),
-          },
-        );
+        this.http.post(settings.authServerURL + endpoint, frappePayload, {
+          headers: this.settingsService.getAuthorizationHeaders(job.token),
+        });
+        return throwError(new BadRequestException('eerrrrrrrrrrrr'));
       }),
       catchError(err => {
         payload.items.filter((item: any) => {
