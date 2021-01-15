@@ -89,7 +89,13 @@ export class StockEntryPoliciesService {
   }
 
   validateStockEntryCancel(stockEntry: StockEntry): Observable<StockEntry> {
-    if (stockEntry.status !== STOCK_ENTRY_STATUS.delivered) {
+    if (
+      ![
+        STOCK_ENTRY_STATUS.delivered,
+        STOCK_ENTRY_STATUS.returned,
+        STOCK_ENTRY_STATUS.in_transit,
+      ].includes(stockEntry.status)
+    ) {
       return throwError(
         new BadRequestException(
           `${stockEntry.status} stock entry cannot be canceled`,
@@ -97,11 +103,9 @@ export class StockEntryPoliciesService {
       );
     }
 
-    const message = `${stockEntry.stock_entry_type} stock entry with status ${stockEntry.status} cannot be canceled.`;
-
     switch (stockEntry.stock_entry_type) {
       case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
-        return throwError(new BadRequestException(message));
+        return this.validateMaterialTransferReset(stockEntry);
 
       case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
         return this.validateMaterialIssueReset(stockEntry);
@@ -114,6 +118,24 @@ export class StockEntryPoliciesService {
 
       default:
         return throwError(new BadRequestException('Invalid Stock Entry'));
+    }
+  }
+
+  validateMaterialTransferReset(stockEntry: StockEntry) {
+    const message = `Stock Entry with status ${stockEntry.status}, cannot be reseted`;
+    switch (stockEntry.status) {
+      case STOCK_ENTRY_STATUS.draft:
+        return throwError(new BadRequestException(message));
+
+      case STOCK_ENTRY_STATUS.reseted:
+        return throwError(new BadRequestException(message));
+
+      default:
+        return forkJoin({
+          validateSerialState: this.validateSerialState(stockEntry),
+          validateSerials: this.validateMaterialReceiptSerials(stockEntry),
+          validateQueueState: this.validateStockEntryQueue(stockEntry),
+        }).pipe(switchMap(valid => of(stockEntry)));
     }
   }
 
