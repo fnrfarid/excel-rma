@@ -36,13 +36,10 @@ export class CustomerProfilePage implements OnInit {
     'remaining_balance',
     'remaining_credit',
   ];
-  customer_name: any;
-  name: any;
   filters: any = [];
   countFilter: any = {};
   customerProfileForm: FormGroup;
   filteredCustomerList: Observable<any[]>;
-  address = {} as any;
   validateInput: any = ValidateInputSelected;
 
   get f() {
@@ -92,8 +89,6 @@ export class CustomerProfilePage implements OnInit {
   }
 
   clearFilters() {
-    this.customer_name = '';
-    this.name = '';
     this.f.customer.setValue('');
     this.dataSource.loadItems();
   }

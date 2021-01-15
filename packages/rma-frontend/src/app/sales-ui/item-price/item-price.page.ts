@@ -33,9 +33,6 @@ export class ItemPricePage implements OnInit {
     'mrp',
     'selling_price',
   ];
-  itemName: string = '';
-  itemGroup: string = '';
-  itemBrand: string = '';
   purchaseWarrantyMonths: string = '';
   itemsForm: FormGroup;
   validateInput: any = ValidateInputSelected;
@@ -208,9 +205,6 @@ export class ItemPricePage implements OnInit {
   }
 
   clearFilters() {
-    this.itemName = '';
-    this.itemBrand = '';
-    this.itemGroup = '';
     this.f.itemName.setValue('');
     this.f.itemGroup.setValue('');
     this.f.itemBrand.setValue('');
@@ -259,15 +253,11 @@ export class ItemPricePage implements OnInit {
   getUpdate(event) {
     this.dataSource.loadItems(
       {
-        brand: this.itemsForm.controls.brand.value
-          ? this.itemsForm.controls.brand.value
+        brand: this.f.itemBrand.value ? this.f.itemBrand.value.brand : '',
+        item_group: this.f.itemGroup.value
+          ? this.f.itemGroup.value.item_group_name
           : '',
-        item_group: this.itemsForm.controls.brand.value
-          ? this.itemsForm.controls.item_group.value
-          : '',
-        item_name: this.itemsForm.controls.brand.value
-          ? this.itemsForm.controls.item_name.value
-          : '',
+        item_name: this.f.itemName.value ? this.f.itemName.value.item_name : '',
       },
       this.sort.direction,
       event.pageIndex,
