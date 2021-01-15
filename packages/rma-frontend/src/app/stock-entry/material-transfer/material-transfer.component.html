@@ -42,15 +42,15 @@
                             Submit
                         </ion-button>
                         <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="tertiary" (click)="acceptTransfer()">
-                            Accept Transfer
+                            Accept
                         </ion-button>
-                        <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="danger" (click)="rejectTransfer()">
-                            Return Transfer
+                        <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="light" (click)="rejectTransfer()">
+                            Return
                         </ion-button>
                         <ion-text *ngIf="readonly && status !== 'In Transit' && status !== 'Draft'" [ngStyle]="{ color:  ['Returned','Reseted'].includes(status) ? 'red' : 'green' }">
                             <h1>Stock Transfer {{ status }}</h1>
                         </ion-text>
-                        <ion-button *ngIf="readonly && status === 'Delivered'" color="danger" (click)="resetStockEntry()">
+                        <ion-button *ngIf="readonly && ['In Transit','Delivered','Returned'].includes(status)" color="danger" (click)="resetStockEntry()">
                             Cancel
                         </ion-button>
                     </ion-col>

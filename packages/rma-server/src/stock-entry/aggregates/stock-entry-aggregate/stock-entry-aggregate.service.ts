@@ -402,6 +402,16 @@ export class StockEntryAggregateService {
 
   rejectStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        return forkJoin({
+          validateSerialState: this.stockEntryPolicies.validateSerialState(
+            stockEntry,
+          ),
+          validateJobState: this.stockEntryPolicies.validateStockEntryQueue(
+            stockEntry,
+          ),
+        }).pipe(switchMap(success => of(stockEntry)));
+      }),
       mergeMap(stockEntry => {
         if (!stockEntry) {
           return throwError(new BadRequestException('Stock Entry not found.'));
@@ -441,6 +451,16 @@ export class StockEntryAggregateService {
 
   acceptStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        return forkJoin({
+          validateSerialState: this.stockEntryPolicies.validateSerialState(
+            stockEntry,
+          ),
+          validateJobState: this.stockEntryPolicies.validateStockEntryQueue(
+            stockEntry,
+          ),
+        }).pipe(switchMap(success => of(stockEntry)));
+      }),
       mergeMap(stockEntry => {
         if (!stockEntry) {
           return throwError(new BadRequestException('Stock Entry not found.'));
@@ -513,11 +533,31 @@ export class StockEntryAggregateService {
         return this.resetMaterialIssueSerials(stockEntry);
 
       case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
-        return of({});
+        return this.resetMaterialTransfer(stockEntry);
 
       default:
         return throwError(new BadRequestException('Invalid Stock Entry type.'));
     }
+  }
+
+  resetMaterialTransfer(stockEntry: StockEntry) {
+    return from(stockEntry.items).pipe(
+      concatMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
+        return from(
+          this.serialNoService.updateMany(
+            {
+              serial_no: { $in: item.serial_no },
+            },
+            {
+              $set: { warehouse: item.s_warehouse },
+            },
+          ),
+        );
+      }),
+    );
   }
 
   resetMaterialIssueSerials(stockEntry: StockEntry) {
@@ -573,7 +613,11 @@ export class StockEntryAggregateService {
         );
 
       case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
-        return of({});
+        return from(
+          this.serialHistoryService.deleteMany({
+            parent_document: stockEntry.uuid,
+          }),
+        );
 
       default:
         return throwError(new BadRequestException('Invalid Stock Entry type.'));
