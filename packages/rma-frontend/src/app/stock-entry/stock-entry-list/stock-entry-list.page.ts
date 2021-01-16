@@ -16,7 +16,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { STOCK_TRANSFER_STATUS } from '../../constants/app-string';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 
@@ -52,15 +52,17 @@ export class StockEntryListPage implements OnInit {
     'posting_time',
   ];
   warehouses = [];
-  fromDateFormControl = new FormControl();
-  toDateFormControl = new FormControl();
-  singleDateFormControl = new FormControl();
   filterState: any = {};
   permissionState = PERMISSION_STATE;
   invoiceStatus: string[] = Object.keys(STOCK_TRANSFER_STATUS).map(
     key => STOCK_TRANSFER_STATUS[key],
   );
   search: string = '';
+  stockEntryForm: FormGroup;
+
+  get f() {
+    return this.stockEntryForm.controls;
+  }
   constructor(
     private location: Location,
     private readonly stockEntryService: StockEntryService,
@@ -69,6 +71,7 @@ export class StockEntryListPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
@@ -89,6 +92,18 @@ export class StockEntryListPage implements OnInit {
     this.getWarehouses();
   }
 
+  createFormGroup() {
+    this.stockEntryForm = new FormGroup({
+      fromDateFormControl: new FormControl(),
+      toDateFormControl: new FormControl(),
+      singleDateFormControl: new FormControl(),
+      status: new FormControl(),
+      from_warehouse: new FormControl(),
+      to_warehouse: new FormControl(),
+      names: new FormControl(),
+    });
+  }
+
   statusChange(status) {
     if (status === 'All') {
       delete this.filterState.status;
@@ -100,34 +115,34 @@ export class StockEntryListPage implements OnInit {
   }
 
   dateFilter() {
-    this.singleDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.setFilter();
   }
 
   getUpdate(event) {
     const query: any = this.filterState;
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
         23,
         59,
         59,
         59,
       );
     }
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
         23,
         59,
         59,
@@ -154,16 +169,20 @@ export class StockEntryListPage implements OnInit {
   }
 
   singleDateFilter() {
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
     this.setFilter();
   }
 
   clearFilters() {
     this.filterState = {};
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
-    this.singleDateFormControl.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
+    this.f.status.setValue('');
+    this.f.names.setValue('');
+    this.f.from_warehouse.setValue('');
+    this.f.to_warehouse.setValue('');
     this.dataSource.loadItems();
   }
 
@@ -171,28 +190,28 @@ export class StockEntryListPage implements OnInit {
     const query: any = this.filterState;
     let sortQuery = {};
 
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
         23,
         59,
         59,
         59,
       );
     }
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
         0,
         0,
         0,
         0,
       );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
         23,
         59,
         59,
