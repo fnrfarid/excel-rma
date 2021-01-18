@@ -42,7 +42,7 @@
                   autoActiveFirstOption
                   #itemName="matAutocomplete"
                   [displayWith]="getStockAvailabilityOption"
-                  (optionSelected)="setFilter($event.option.value)"
+                  (optionSelected)="setFilter()"
                 >
                   <mat-option
                     *ngFor="let option of filteredStockAvailabilityList | async"
@@ -70,7 +70,7 @@
                   autoActiveFirstOption
                   #warehouse="matAutocomplete"
                   [displayWith]="getWarehouseOption"
-                  (optionSelected)="setFilter($event.option.value)"
+                  (optionSelected)="setFilter()"
                 >
                   <mat-option
                     *ngFor="let option of filteredWarehouseList | async"
