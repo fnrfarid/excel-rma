@@ -141,6 +141,13 @@ const routes: Routes = [
         m => m.CustomerProfilePageModule,
       ),
   },
+  {
+    path: 'stock-availability',
+    loadChildren: () =>
+      import('./stock-entry/stock-availability/stock-availability.module').then(
+        m => m.StockAvailabilityPageModule,
+      ),
+  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];
