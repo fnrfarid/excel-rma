@@ -211,10 +211,13 @@ export class StockEntrySyncService {
           frappePayload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
             ? POST_DELIVERY_NOTE_ENDPOINT
             : STOCK_ENTRY_API_ENDPOINT;
-        this.http.post(settings.authServerURL + endpoint, frappePayload, {
-          headers: this.settingsService.getAuthorizationHeaders(job.token),
-        });
-        return throwError(new BadRequestException('eerrrrrrrrrrrr'));
+        return this.http.post(
+          settings.authServerURL + endpoint,
+          frappePayload,
+          {
+            headers: this.settingsService.getAuthorizationHeaders(job.token),
+          },
+        );
       }),
       catchError(err => {
         payload.items.filter((item: any) => {
