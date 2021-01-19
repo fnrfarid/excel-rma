@@ -50,7 +50,7 @@ Note:
 
 #### VS Code Configuration
 
-Note: App catches custom url `frappe://` it cannot be emulated in browser.
+Note: App catches custom url `excel-rma://` it cannot be emulated in browser.
 
 `launch.json` file, replace as per your operating system:
 

@@ -9,9 +9,7 @@ import { switchMap } from 'rxjs/operators';
 export class PurchaseInvoiceService {
   constructor(
     @InjectRepository(PurchaseInvoice)
-    private readonly purchaseInvoiceRepository: MongoRepository<
-      PurchaseInvoice
-    >,
+    private readonly purchaseInvoiceRepository: MongoRepository<PurchaseInvoice>,
   ) {}
 
   async find(query?) {

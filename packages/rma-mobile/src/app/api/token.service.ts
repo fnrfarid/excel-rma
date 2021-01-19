@@ -3,7 +3,6 @@ import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { stringify } from 'querystring';
 import { switchMap, catchError, retry } from 'rxjs/operators';
-import { parse } from 'url';
 import {
   InAppBrowser,
   InAppBrowserObject,
@@ -129,7 +128,7 @@ export class TokenService {
         },
       })
       .pipe(
-        switchMap(bearerToken => {
+        switchMap((bearerToken) => {
           this.revokeToken(bearerToken.access_token, bearerToken.refresh_token);
           const expirationTime = new Date();
           const expiresIn =
@@ -142,7 +141,7 @@ export class TokenService {
           return of(bearerToken.access_token);
         }),
         retry(3),
-        catchError(error => {
+        catchError((error) => {
           this.revokeToken();
           this.storage.clear(LOGGED_IN);
           return of();
@@ -156,7 +155,7 @@ export class TokenService {
     this.http
       .post(revocationURL, stringify({ token: oldAccessToken }))
       .subscribe({
-        next: success => {
+        next: (success) => {
           if (accessToken) {
             this.storage.store(ACCESS_TOKEN, accessToken);
           }
@@ -164,7 +163,7 @@ export class TokenService {
             this.storage.store(REFRESH_TOKEN, refreshToken);
           }
         },
-        error: error => {},
+        error: (error) => {},
       });
   }
 
@@ -172,11 +171,11 @@ export class TokenService {
     const savedState = localStorage.getItem(STATE);
     localStorage.removeItem(STATE);
 
-    const urlParts = parse(url, true);
-    const query = urlParts.query;
-    const code = query.code as string;
-    const state = query.state as string;
-    const error = query.error;
+    const urlParts = new URL(url);
+    const query = new URLSearchParams(urlParts.searchParams);
+    const code = query.get('code') as string;
+    const state = query.get('state') as string;
+    const error = query.get('error');
 
     if (savedState !== state) {
       return;
@@ -202,7 +201,7 @@ export class TokenService {
         },
       })
       .subscribe({
-        next: response => {
+        next: (response) => {
           const expiresIn = response.expires_in || ONE_HOUR_IN_SECONDS_STRING;
           const expirationTime = new Date();
           expirationTime.setSeconds(
@@ -216,7 +215,7 @@ export class TokenService {
           this.storage.store(LOGGED_IN, 'true');
           this.refreshCordova();
         },
-        error: tokenError => {
+        error: (tokenError) => {
           this.storage.clear(LOGGED_IN);
           this.refreshCordova();
         },
@@ -225,9 +224,9 @@ export class TokenService {
 
   processAuthorizeWindow() {
     this.generateAuthUrl().subscribe({
-      next: url => {
+      next: (url) => {
         if (this.platform.is('cordova')) {
-          this.browserTab.isAvailable().then(isAvailable => {
+          this.browserTab.isAvailable().then((isAvailable) => {
             if (isAvailable) {
               this.browserTab.openUrl(url);
             } else {

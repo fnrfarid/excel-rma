@@ -20,7 +20,7 @@ import {
   ITEM_METADATA_FILTER_FIELDS,
 } from '../../../constants/app-strings';
 import { Item } from '../../entity/item/item.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { FRAPPE_API_GET_ITEM_ENDPOINT } from '../../../constants/routes';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
 

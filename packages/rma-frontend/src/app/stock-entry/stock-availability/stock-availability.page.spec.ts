@@ -9,9 +9,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../material/material.module';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
-import { SalesService } from 'src/app/sales-ui/services/sales.service';
+import { SalesService } from '../../sales-ui/services/sales.service';
 
 describe('StockAvailabilityComponent', () => {
   let component: StockAvailabilityPage;

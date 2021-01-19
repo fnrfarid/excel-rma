@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { SerialNoService } from '../../entity/serial-no/serial-no.service';
 import {
   SerialNoDto,

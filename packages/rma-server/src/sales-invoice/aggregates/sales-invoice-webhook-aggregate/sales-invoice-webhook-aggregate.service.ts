@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { from, of } from 'rxjs';
 import { switchMap, mergeMap, toArray } from 'rxjs/operators';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
 import {
   SUBMITTED_STATUS,

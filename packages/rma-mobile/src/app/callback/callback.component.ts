@@ -54,7 +54,7 @@ export class CallbackComponent implements OnInit {
         },
       })
       .subscribe({
-        next: response => {
+        next: (response) => {
           const expiresIn = response.expires_in || ONE_HOUR_IN_SECONDS_STRING;
           const expirationTime = new Date();
           expirationTime.setSeconds(
@@ -67,7 +67,7 @@ export class CallbackComponent implements OnInit {
           this.store.store(LOGGED_IN, 'true');
           this.router.navigateByUrl('/home');
         },
-        error: err => this.failure(),
+        error: (err) => this.failure(),
       });
   }
 

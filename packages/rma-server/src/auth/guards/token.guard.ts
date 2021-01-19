@@ -23,7 +23,7 @@ import { ClientTokenManagerService } from '../aggregates/client-token-manager/cl
 import { FRAPPE_API_GET_OAUTH_BEARER_TOKEN_ENDPOINT } from '../../constants/routes';
 import { FrappeGetBearerTokenResponseInterface } from '../entities/token-cache/frappe-get-bearer-token-response.interface';
 import { TokenCache } from '../entities/token-cache/token-cache.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { ConnectService } from '../aggregates/connect/connect.service';
 
 @Injectable()

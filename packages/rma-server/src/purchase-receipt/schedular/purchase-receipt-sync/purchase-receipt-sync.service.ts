@@ -24,7 +24,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
-import * as uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { PURCHASE_RECEIPT_DOCTYPE_NAME } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { PurchaseReceipt } from '../../entity/purchase-receipt.entity';
@@ -144,7 +144,7 @@ export class PurchaseReceiptSyncService {
           job.payload,
           job.settings,
         );
-        job.uuid = uuid();
+        job.uuid = uuidv4();
         const csv_payload = this.jsonToCsv.mapJsonToCsv(
           payload,
           CSV_TEMPLATE_HEADERS.purchase_receipt_legacy,

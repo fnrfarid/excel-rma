@@ -6,7 +6,7 @@ import { from, throwError, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { SUPPLIER_ALREADY_EXISTS } from '../../../constants/app-strings';
 import { Supplier } from '../../entity/supplier/supplier.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class SupplierWebhookAggregateService extends AggregateRoot {
