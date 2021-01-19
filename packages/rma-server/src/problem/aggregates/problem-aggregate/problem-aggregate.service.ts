@@ -6,7 +6,7 @@ import {
   UpdateProblemDto,
 } from '../../entity/problem/problem-dto';
 import { Problem } from '../../entity/problem/problem-entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ProblemAggregateService extends AggregateRoot {

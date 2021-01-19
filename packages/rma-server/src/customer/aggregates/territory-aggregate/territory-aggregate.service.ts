@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { switchMap, catchError, mergeMap, map, toArray } from 'rxjs/operators';
 import { throwError, from, of, Observable, empty } from 'rxjs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { TerritoryService } from '../../entity/territory/territory.service';
 import { Territory } from '../../entity/territory/territory.entity';
 import { TerritoryDto } from '../../entity/territory/territory-dto';

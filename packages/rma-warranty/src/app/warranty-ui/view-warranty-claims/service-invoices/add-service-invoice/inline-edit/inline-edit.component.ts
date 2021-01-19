@@ -28,7 +28,7 @@ export class InlineEditComponent {
   column: string;
 
   @Input()
-  minimumPrice: number;
+  minimumPrice: number = 0;
 
   private _value = '';
 

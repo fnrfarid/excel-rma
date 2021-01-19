@@ -38,7 +38,7 @@ import {
   DELIVERY_NOTE_FILTER_BY_SALES_INVOICE_QUERY,
 } from '../../../constants/query';
 import { DeliveryNote } from '../../../delivery-note/entity/delivery-note-service/delivery-note.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { DeliveryNoteDeletedEvent } from '../../events/delivery-note-deleted/delivery-note-deleted-event';
 import { DeliveryNoteCreatedEvent } from '../../events/delivery-note-created/delivery-note-created-event';
 import { CreateDeliveryNoteDto } from '../../entity/delivery-note-service/create-delivery-note.dto';

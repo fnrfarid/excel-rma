@@ -62,4 +62,3 @@ export const DELIVERED_SERIALS_DISPLAYED_COLUMNS = {
     'soldOn',
   ],
 };
-export const BASIC_RATE = 'basic_rate';

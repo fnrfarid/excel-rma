@@ -24,7 +24,7 @@ import { FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
 import Agenda = require('agenda');
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import { DeliveryNoteJobHelperService } from '../delivery-note-job-helper/delivery-note-job-helper.service';
-import * as uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import {
@@ -180,7 +180,7 @@ export class DeliveryNoteJobService {
       retry(3),
       switchMap((success: DataImportSuccessResponse) => {
         job.dataImport = success;
-        job.uuid = uuid();
+        job.uuid = uuidv4();
         this.addToExportedQueue(job);
         return of({});
       }),

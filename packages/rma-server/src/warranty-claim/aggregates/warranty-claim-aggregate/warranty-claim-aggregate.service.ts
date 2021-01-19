@@ -5,7 +5,7 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { WarrantyClaim } from '../../entity/warranty-claim/warranty-claim.entity';
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/warranty-claim-removed.event';

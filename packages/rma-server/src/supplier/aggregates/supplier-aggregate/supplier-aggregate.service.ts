@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { SupplierAddedEvent } from '../../event/supplier-added/supplier-added.event';
 import { SupplierService } from '../../entity/supplier/supplier.service';
 import { SupplierDto } from '../../entity/supplier/supplier-dto';

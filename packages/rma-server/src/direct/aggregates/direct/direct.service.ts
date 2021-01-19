@@ -9,7 +9,7 @@ import {
 import { Response } from 'express';
 import { switchMap, map, catchError } from 'rxjs/operators';
 import { from, throwError, of } from 'rxjs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { stringify } from 'querystring';
 import {
   INVALID_STATE,

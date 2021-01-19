@@ -4,9 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDetails } from './add-service-invoice/service-invoice-interface';
 
-export class ServiceInvoiceDataSource extends DataSource<
-  ServiceInvoiceDetails
-> {
+export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> {
   data: ServiceInvoiceDetails[];
   length: number;
   offset: number;
