@@ -11,6 +11,7 @@ import { Location } from '@angular/common';
 
 import { of } from 'rxjs';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
+import { SalesService } from 'src/app/sales-ui/services/sales.service';
 
 @Pipe({ name: 'curFormat' })
 class MockCurrencyFormatPipe implements PipeTransform {
@@ -19,7 +20,7 @@ class MockCurrencyFormatPipe implements PipeTransform {
   }
 }
 
-describe('PurchasePage', () => {
+describe('StockEntryListPage', () => {
   let component: StockEntryListPage;
   let fixture: ComponentFixture<StockEntryListPage>;
 
@@ -48,6 +49,14 @@ describe('PurchasePage', () => {
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
+            }),
+          },
+        },
+        {
+          provide: SalesService,
+          useValue: {
+            getStore: () => ({
+              getItemAsync: (...args) => of([{}]),
             }),
           },
         },

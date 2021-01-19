@@ -7,7 +7,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { Location } from '@angular/common';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, startWith, switchMap } from 'rxjs/operators';
 import {
   DateAdapter,
   MAT_DATE_LOCALE,
@@ -17,8 +17,11 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { FormControl, FormGroup } from '@angular/forms';
-import { STOCK_TRANSFER_STATUS } from '../../constants/app-string';
+import { STOCK_TRANSFER_STATUS, WAREHOUSES } from '../../constants/app-string';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
+import { Observable } from 'rxjs';
+import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { SalesService } from 'src/app/sales-ui/services/sales.service';
 
 @Component({
   selector: 'app-stock-entry-list',
@@ -51,8 +54,10 @@ export class StockEntryListPage implements OnInit {
     'posting_date',
     'posting_time',
   ];
-  warehouses = [];
   filterState: any = {};
+  filteredFromWarehouseList: Observable<any[]>;
+  filteredToWarehouseList: Observable<any[]>;
+  validateInput: any = ValidateInputSelected;
   permissionState = PERMISSION_STATE;
   invoiceStatus: string[] = Object.keys(STOCK_TRANSFER_STATUS).map(
     key => STOCK_TRANSFER_STATUS[key],
@@ -66,6 +71,7 @@ export class StockEntryListPage implements OnInit {
   constructor(
     private location: Location,
     private readonly stockEntryService: StockEntryService,
+    private readonly salesService: SalesService,
     private router: Router,
     private route: ActivatedRoute,
   ) {}
@@ -88,8 +94,22 @@ export class StockEntryListPage implements OnInit {
         next: res => {},
         error: err => {},
       });
-
-    this.getWarehouses();
+    this.filteredFromWarehouseList = this.stockEntryForm
+      .get('from_warehouse')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
+        }),
+      );
+    this.filteredToWarehouseList = this.stockEntryForm
+      .get('to_warehouse')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
+        }),
+      );
   }
 
   createFormGroup() {
@@ -159,12 +179,12 @@ export class StockEntryListPage implements OnInit {
   }
 
   fromWarehouseChange(value) {
-    this.filterState.s_warehouse = value.name;
+    this.filterState.s_warehouse = value;
     this.setFilter();
   }
 
   toWarehouseChange(value) {
-    this.filterState.t_warehouse = value.name;
+    this.filterState.t_warehouse = value;
     this.setFilter();
   }
 
@@ -241,14 +261,6 @@ export class StockEntryListPage implements OnInit {
 
   navigateBack() {
     this.location.back();
-  }
-
-  getWarehouses() {
-    this.stockEntryService.getWarehouseList().subscribe({
-      next: res => {
-        this.warehouses = res;
-      },
-    });
   }
 
   getOption(option) {
