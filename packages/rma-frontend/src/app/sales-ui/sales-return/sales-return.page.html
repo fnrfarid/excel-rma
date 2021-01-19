@@ -160,8 +160,8 @@
             <!-- Status Column -->
             <ng-container matColumnDef="status">
               <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-              <mat-cell *matCellDef="let row" [ngStyle]="{color: 'red'}">
-                Returned
+              <mat-cell *matCellDef="let row" [ngStyle]="{color: row.docstatus === 1 ? 'red' : 'brown'}">
+                {{ row.docstatus === 1 ? 'Returned' : 'Canceled' }}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>

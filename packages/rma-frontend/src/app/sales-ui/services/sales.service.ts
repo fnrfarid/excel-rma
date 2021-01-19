@@ -81,7 +81,7 @@ export class SalesService {
   getBundleItem(item_codes: { [key: string]: number }) {
     const params = new HttpParams().set(
       'item_codes',
-      JSON.stringify(item_codes),
+      encodeURIComponent(JSON.stringify(item_codes)),
     );
     return this.getHeaders().pipe(
       switchMap(headers => {

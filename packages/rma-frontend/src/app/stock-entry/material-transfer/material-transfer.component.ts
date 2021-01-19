@@ -34,6 +34,7 @@ import {
   DEFAULT_COMPANY,
   TRANSFER_WAREHOUSE,
   AUTH_SERVER_URL,
+  BASIC_RATE,
   PRINT_FORMAT_PREFIX,
   DELIVERED_SERIALS_DISPLAYED_COLUMNS,
 } from '../../constants/storage';
@@ -444,14 +445,12 @@ export class MaterialTransferComponent implements OnInit {
     const serials = this.materialTransferDataSource.data();
     Array.from({ length: serialCount }, async (x, i) => {
       serials.push({
-        item_code: row.item_code,
-        item_name: row.item_name,
+        ...row,
         qty: 1,
         transferWarehouse: this.transferWarehouse,
         warranty_date: await this.getWarrantyDate(row),
         s_warehouse: this.warehouseState.s_warehouse.value,
         t_warehouse: this.warehouseState.t_warehouse.value,
-        has_serial_no: row.has_serial_no,
         serial_no: [''],
       });
       this.materialTransferDataSource.update(serials);
@@ -522,10 +521,8 @@ export class MaterialTransferComponent implements OnInit {
   async assignRangeSerial(row: Item, serials: string[]) {
     const data = this.materialTransferDataSource.data();
     data.push({
-      item_code: row.item_code,
-      item_name: row.item_name,
+      ...row,
       qty: serials.length,
-      has_serial_no: row.has_serial_no,
       transferWarehouse: this.transferWarehouse,
       warranty_date: await this.getWarrantyDate(row),
       s_warehouse: this.warehouseState.s_warehouse.value,
@@ -560,11 +557,9 @@ export class MaterialTransferComponent implements OnInit {
     if (assignValue) {
       const serials = this.materialTransferDataSource.data();
       serials.push({
-        item_code: row.item_code,
-        item_name: row.item_name,
+        ...row,
         qty: assignValue,
         warranty_date: await this.getWarrantyDate(row),
-        has_serial_no: row.has_serial_no,
         transferWarehouse: this.transferWarehouse,
         s_warehouse: this.warehouseState.s_warehouse.value,
         t_warehouse: this.warehouseState.t_warehouse.value,
@@ -903,6 +898,12 @@ export class MaterialTransferComponent implements OnInit {
     this.materialTransferDisplayedColumns = [
       ...MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
     ];
+    if (this.itemDisplayedColumns.includes(BASIC_RATE)) {
+      this.itemDisplayedColumns.splice(
+        this.itemDisplayedColumns.indexOf(BASIC_RATE),
+        1,
+      );
+    }
     if (value !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
       this.materialTransferDisplayedColumns = [
         ...MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
@@ -913,13 +914,19 @@ export class MaterialTransferComponent implements OnInit {
         'warranty_date',
       );
       if (value === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+        this.itemDisplayedColumns.splice(
+          this.itemDisplayedColumns.length - 2,
+          0,
+          BASIC_RATE,
+        );
         this.materialTransferDisplayedColumns.splice(
           this.materialTransferDisplayedColumns.length - 1,
           0,
-          'basic_rate',
+          BASIC_RATE,
         );
       }
     }
+
     this.setDeliveredSerialState(value);
   }
 
