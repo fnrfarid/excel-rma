@@ -13,7 +13,7 @@ import {
   STOCK_ENTRY_STATUS,
   VERDICT,
 } from '../../../constants/app-strings';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';

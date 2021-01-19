@@ -61,7 +61,7 @@ test_rma_mobile:
     - export DISPLAY=:99
     - Xvfb :0 -ac -screen 0 1024x768x24 &
     - npm run test
-    - npm run e2e
+    # - npm run e2e
   tags:
     - docker
 
@@ -122,59 +122,50 @@ test_rma_server:
   tags:
     - docker
 
-pack_rma_server:
+pack_rma_server_staging:
   image: docker
   stage: pack
   only:
     refs:
-      - master
+      - develop
     changes:
       - packages/rma-server/**/*
   before_script:
-    - apk add git
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
-    - export VERSION=$(git tag --list "rma-server@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
     - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-server packages/rma-server
-    # - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION
     - docker tag rma-server $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:latest
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:latest
 
-pack_rma_frontend:
+pack_rma_frontend_staging:
   image: docker
   stage: pack
   only:
     refs:
-      - master
+      - develop
     changes:
       - packages/rma-frontend/**/*
   before_script:
-    - apk add git
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
-    - export VERSION=$(git tag --list "rma-frontend@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
     - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-frontend packages/rma-frontend
-    # - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
     - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
 
-pack_rma_warranty:
+pack_rma_warranty_staging:
   image: docker
   stage: pack
   only:
     refs:
-      - master
+      - develop
     changes:
       - packages/rma-warranty/**/*
   before_script:
-    - apk add git
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
-    - export VERSION=$(git tag --list "rma-warranty@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
     - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-warranty packages/rma-warranty
-    # - docker tag rma-warranty $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:$VERSION
     - docker tag rma-warranty $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:latest
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:latest
 
 deploy_staging_frontend:
   image: alpine:latest
@@ -194,7 +185,7 @@ deploy_staging_server:
   stage: deploy
   only:
     refs:
-      - master
+      - develop
     changes:
       - packages/rma-server/**/*
   before_script:
@@ -207,10 +198,58 @@ deploy_staging_warranty:
   stage: deploy
   only:
     refs:
-      - master
+      - develop
     changes:
       - packages/rma-warranty/**/*
   before_script:
     - apk add curl bash
   script:
     - curl -Ss -X POST $WARRANTY_UPDATE_KEY
+
+pack_rma_server_prod:
+  image: docker
+  stage: pack
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-server/**/*
+  before_script:
+    - apk add git
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - export VERSION=$(git tag --list "rma-server@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION packages/rma-server
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-server:$VERSION
+
+pack_rma_frontend_prod:
+  image: docker
+  stage: pack
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-frontend/**/*
+  before_script:
+    - apk add git
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - export VERSION=$(git tag --list "rma-frontend@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION packages/rma-frontend
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
+
+pack_rma_warranty_prod:
+  image: docker
+  stage: pack
+  only:
+    refs:
+      - master
+    changes:
+      - packages/rma-warranty/**/*
+  before_script:
+    - apk add git
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  script:
+    - export VERSION=$(git tag --list "rma-warranty@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:$VERSION packages/rma-warranty
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-warranty:$VERSION

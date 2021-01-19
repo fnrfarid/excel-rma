@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorLog } from './error-log.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { PARSE_REGEX } from '../../constants/app-strings';
 
 @Injectable()

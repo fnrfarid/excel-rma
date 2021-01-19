@@ -26,7 +26,7 @@ export class HomePage implements OnInit {
 
   ngOnInit() {
     this.store.changes.subscribe({
-      next: event => {
+      next: (event) => {
         if (event.key === LOGGED_IN) {
           this.loggedIn = event.value ? true : false;
         }
@@ -34,7 +34,7 @@ export class HomePage implements OnInit {
           this.accessToken = event.value;
         }
       },
-      error: error => {},
+      error: (error) => {},
     });
     this.loggedIn = localStorage.getItem(LOGGED_IN) ? true : false;
     this.accessToken = localStorage.getItem(ACCESS_TOKEN);
@@ -42,7 +42,7 @@ export class HomePage implements OnInit {
     this.token
       .getToken()
       .pipe(
-        switchMap(token => {
+        switchMap((token) => {
           return this.http.get<any>(
             OAuthProviderClientCredentials.authServerUrl +
               '/api/method/frappe.integrations.oauth2.openid_profile',
@@ -51,12 +51,12 @@ export class HomePage implements OnInit {
         }),
       )
       .subscribe({
-        next: profile => {
+        next: (profile) => {
           this.name = profile.name;
           this.email = profile.email;
           this.picture = profile.picture;
         },
-        error: error => {},
+        error: (error) => {},
       });
   }
 }

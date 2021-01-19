@@ -1,5 +1,5 @@
 import { Entity, BaseEntity, ObjectIdColumn, Column, ObjectID } from 'typeorm';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class TokenCache extends BaseEntity {

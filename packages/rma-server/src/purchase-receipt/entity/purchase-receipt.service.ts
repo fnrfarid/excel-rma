@@ -8,9 +8,7 @@ import { PARSE_REGEX } from '../../constants/app-strings';
 export class PurchaseReceiptService {
   constructor(
     @InjectRepository(PurchaseReceipt)
-    private readonly purchaseReceiptRepository: MongoRepository<
-      PurchaseReceipt
-    >,
+    private readonly purchaseReceiptRepository: MongoRepository<PurchaseReceipt>,
   ) {}
 
   async find() {

@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { ServiceInvoiceDto } from '../../entity/service-invoice/service-invoice-dto';
 import { ServiceInvoice } from '../../entity/service-invoice/service-invoice.entity';
 import { ServiceInvoiceService } from '../../entity/service-invoice/service-invoice.service';

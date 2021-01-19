@@ -16,9 +16,7 @@ export interface ListResponse {
   length: number;
   offset: number;
 }
-export class WarrantyClaimsDataSource extends DataSource<
-  WarrantyClaimsListingData
-> {
+export class WarrantyClaimsDataSource extends DataSource<WarrantyClaimsListingData> {
   data: WarrantyClaimsListingData[];
   length: number;
   offset: number;

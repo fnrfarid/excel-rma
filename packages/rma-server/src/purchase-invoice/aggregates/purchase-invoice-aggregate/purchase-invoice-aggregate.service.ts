@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { PurchaseInvoiceDto } from '../../entity/purchase-invoice/purchase-invoice-dto';
 import { PurchaseInvoice } from '../../entity/purchase-invoice/purchase-invoice.entity';
 import { PurchaseInvoiceAddedEvent } from '../../event/purchase-invoice-added/purchase-invoice-added.event';

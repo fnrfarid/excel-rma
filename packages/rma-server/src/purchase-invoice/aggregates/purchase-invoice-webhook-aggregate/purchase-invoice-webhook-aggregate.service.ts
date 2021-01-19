@@ -7,7 +7,7 @@ import { PurchaseInvoiceService } from '../../entity/purchase-invoice/purchase-i
 import { PurchaseInvoice } from '../../entity/purchase-invoice/purchase-invoice.entity';
 import { from, of, forkJoin, Observable } from 'rxjs';
 import { switchMap, map, toArray, mergeMap } from 'rxjs/operators';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { PURCHASE_INVOICE_ALREADY_EXIST } from '../../../constants/messages';
 import {
   SUBMITTED_STATUS,

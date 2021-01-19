@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 import * as dotenv from 'dotenv';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 export interface EnvConfig {
   [prop: string]: string;
@@ -46,12 +46,12 @@ export class ConfigService {
       AGENDA_JOBS_CONCURRENCY: Joi.string().optional(),
     });
 
-    const { error, value: validatedEnvConfig } = Joi.validate(
+    const { error, value: validatedEnvConfig } = envVarsSchema.validate(
       envConfig,
-      envVarsSchema,
     );
     if (error) {
-      throw new Error(`Config validation error: ${error.message}`);
+      Logger.error(error, error.stack, this.constructor.name);
+      process.exit(1);
     }
     return validatedEnvConfig;
   }

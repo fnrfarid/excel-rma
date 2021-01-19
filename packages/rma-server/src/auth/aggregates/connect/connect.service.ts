@@ -7,7 +7,7 @@ import {
 import { TokenCacheService } from '../../entities/token-cache/token-cache.service';
 import { FrappeBearerTokenWebhookInterface } from '../../entities/token-cache/frappe-bearer-token-webhook.interface';
 import { TokenCache } from '../../entities/token-cache/token-cache.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { ClientTokenManagerService } from '../client-token-manager/client-token-manager.service';
 import { switchMap, map, mergeMap, toArray } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
