@@ -248,7 +248,7 @@
             <ng-container matColumnDef="sr_no">
               <mat-header-cell *matHeaderCellDef>No. </mat-header-cell>
               <mat-cell *matCellDef="let row;let i=index ">
-                {{i+1}}
+                {{ paginator.pageIndex * paginator.pageSize + 1 + i }}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -397,7 +397,7 @@
             class="mat-paginator-sticky"
             (page)="getUpdate($event)"
             [length]="dataSource.length"
-            [pageSizeOptions]="[30, 50, 100, 500]"
+            [pageSizeOptions]="[0, 50, 100, 500]"
           >
           </mat-paginator>
         </mat-card-actions>
