@@ -69,36 +69,58 @@
             </ion-col>
           </ion-row>
           <ion-row>
-            <ion-col>
+            <ion-col>             
               <mat-form-field class="full-width">
-                <mat-label>From Warehouse</mat-label>
-                <mat-select
+                <input
+                  matInput
+                  placeholder="From Warehouse"
+                  [matAutocomplete]="from_warehouse"
                   formControlName="from_warehouse"
-                  (selectionChange)="fromWarehouseChange($event.value)"
+                  (focusout)="validateInput(f.from_warehouse, filteredFromWarehouseList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #from_warehouse="matAutocomplete"
+                  (optionSelected)="fromWarehouseChange($event.option.value)"
                 >
-                  <mat-option
-                    *ngFor="let f_warehouse of warehouses"
-                    [value]="f_warehouse"
-                  >
-                    {{f_warehouse.name}}
-                  </mat-option>
-                </mat-select>
+                <mat-option
+                *ngFor="let from_warehouse of filteredFromWarehouseList | async"
+                [value]="from_warehouse"
+              >
+                {{from_warehouse}}
+              </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.from_warehouse.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.from_warehouse.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
+            <ion-col>             
               <mat-form-field class="full-width">
-                <mat-label>To Warehouse</mat-label>
-                <mat-select
+                <input
+                  matInput
+                  placeholder="To Warehouse"
+                  [matAutocomplete]="to_warehouse"
                   formControlName="to_warehouse"
-                  (selectionChange)="toWarehouseChange($event.value)"
+                  (focusout)="validateInput(f.to_warehouse, filteredToWarehouseList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #to_warehouse="matAutocomplete"
+                  (optionSelected)="toWarehouseChange($event.option.value)"
                 >
-                  <mat-option
-                    *ngFor="let t_warehouse of warehouses"
-                    [value]="t_warehouse"
-                  >
-                    {{t_warehouse.name}}
-                  </mat-option>
-                </mat-select>
+                <mat-option
+                *ngFor="let to_warehouse of filteredToWarehouseList | async"
+                [value]="to_warehouse"
+              >
+                {{to_warehouse}}
+              </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.to_warehouse.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.to_warehouse.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
