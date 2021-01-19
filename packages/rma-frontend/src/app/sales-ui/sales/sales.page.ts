@@ -80,7 +80,6 @@ export class SalesPage implements OnInit {
   campaign: string = 'All';
   salesForm: FormGroup;
   sortQuery: any = {};
-  startIndex: number = 1;
   filteredSalesPersonList: Observable<any[]>;
 
   filteredCustomerList: Observable<any>;
@@ -245,7 +244,6 @@ export class SalesPage implements OnInit {
       );
     }
 
-    this.startIndex = event.pageIndex * event.pageSize + 1;
     this.paginator.pageIndex = event?.pageIndex || 0;
     this.paginator.pageSize = event?.pageSize || 30;
 
