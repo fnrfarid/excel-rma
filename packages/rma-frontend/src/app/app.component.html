@@ -200,8 +200,8 @@
               <ion-item
                 *ngIf="loggedIn && permissionState?.stock_entry?.read"
                 lines="none"
-                [href]="binListURL"
-                target="_blank"
+                routerLink="/stock-availability"
+                routerLinkActive="active"
               >
                 <ion-icon
                   slot="start"

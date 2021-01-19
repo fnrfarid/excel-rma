@@ -48,6 +48,7 @@ import {
   RELAY_GET_DATE_WISE_STOCK_BALANCE_ENDPOINT,
   RELAY_GET_ITEM_BRAND_ENDPOINT,
   PRINT_DELIVERY_INVOICE_ENDPOINT,
+  STOCK_AVAILABILITY_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -271,7 +272,7 @@ export class SalesService {
 
   getItemList(
     filter: any = {},
-    sortOrder: any = { item_name: 'asc' },
+    sortOrder: any = { item_code: 'asc' },
     pageIndex = 0,
     pageSize = 30,
     query?: { [key: string]: any },
@@ -279,11 +280,11 @@ export class SalesService {
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch {
-      sortOrder = JSON.stringify({ item_name: 'asc' });
+      sortOrder = JSON.stringify({ item_code: 'asc' });
     }
     const url = LIST_ITEMS_ENDPOINT;
     query = query ? query : {};
-    query.item_name = filter?.item_name ? filter.item_name : filter;
+    query.item_code = filter?.item_code ? filter.item_code : filter;
     query.disabled = 0;
 
     const params = new HttpParams()
@@ -497,6 +498,25 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
+  }
+
+  relayStockAvailabilityList(pageIndex = 0, pageSize = 30, filters) {
+    const url = STOCK_AVAILABILITY_ENDPOINT;
+
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["*"]',
+        filters: JSON.stringify(filters),
+        limit_page_length: pageSize.toString(),
+        limit_start: (pageIndex * pageSize).toString(),
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers, params });
       }),
       map(res => res.data),
     );
