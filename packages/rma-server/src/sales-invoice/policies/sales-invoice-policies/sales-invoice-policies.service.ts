@@ -74,7 +74,7 @@ export class SalesInvoicePoliciesService {
       }),
       switchMap(() => {
         return from(items).pipe(
-          switchMap(item => {
+          mergeMap(item => {
             return this.assignSerialPolicyService.validateItemRate(item);
           }),
         );
@@ -226,7 +226,7 @@ export class SalesInvoicePoliciesService {
                   if (message < item.qty) {
                     return throwError(
                       new BadRequestException(`
-                  Only ${message} available in stock for item ${item.item_name}, 
+                  Only ${message} quantity available in stock for item ${item.item_name}, 
                   at warehouse ${sales_invoice.delivery_warehouse}.
                   `),
                     );

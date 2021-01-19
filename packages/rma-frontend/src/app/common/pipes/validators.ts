@@ -1,11 +1,12 @@
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 export function ValidateInputSelected(
   formControl: FormControl,
   options: Observable<any[]>,
 ) {
-  options.subscribe({
+  options.pipe(debounceTime(1000)).subscribe({
     next: (data: any[]) => {
       if (!data) return;
       if (typeof formControl.value === 'object') {

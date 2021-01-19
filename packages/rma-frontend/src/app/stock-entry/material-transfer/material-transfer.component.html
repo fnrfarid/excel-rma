@@ -289,6 +289,15 @@
                     </mat-cell>
                 </ng-container>
 
+                <ng-container matColumnDef="basic_rate">
+                        <mat-header-cell *matHeaderCellDef>Base Rate</mat-header-cell>
+                        <mat-cell *matCellDef="let row">
+                            <ng-container >
+                                <input matInput [(ngModel)]="row.basic_rate" />
+                            </ng-container>
+                        </mat-cell>
+                </ng-container>
+
                 <ng-container matColumnDef="has_serial_no">
                     <mat-header-cell *matHeaderCellDef>Has Serial</mat-header-cell>
                     <mat-cell *matCellDef="let row">

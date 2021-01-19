@@ -178,6 +178,11 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           .validateCustomer(salesInvoice)
           .pipe(
             switchMap(() => {
+              return this.validateSalesInvoicePolicy.validateItems(
+                salesInvoice.items,
+              );
+            }),
+            switchMap(() => {
               return this.validateSalesInvoicePolicy.validateCustomerCreditLimit(
                 salesInvoice,
               );
@@ -208,7 +213,6 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               );
             }),
             toArray(),
-            switchMap(success => of(true)),
             switchMap(() => {
               return this.syncSubmittedSalesInvoice(
                 salesInvoice,
