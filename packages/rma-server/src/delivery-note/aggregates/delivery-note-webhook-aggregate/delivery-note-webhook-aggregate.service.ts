@@ -13,7 +13,7 @@ import { DeliveryNoteService } from '../../../delivery-note/entity/delivery-note
 import { from, throwError } from 'rxjs';
 import { switchMap, map, retry } from 'rxjs/operators';
 import { DeliveryNote } from '../../../delivery-note/entity/delivery-note-service/delivery-note.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { LIST_DELIVERY_NOTE_ENDPOINT } from '../../../constants/routes';

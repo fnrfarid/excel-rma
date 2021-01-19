@@ -3,7 +3,7 @@ import { from, of, Observable, throwError } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { TokenCache } from '../../entities/token-cache/token-cache.entity';
 import { TokenCacheService } from '../../entities/token-cache/token-cache.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';

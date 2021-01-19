@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CLOSE } from '../../../constants/app-string';
 import * as _ from 'lodash';
-import { SelectDumpHeadersDialog } from 'src/app/api/csv-json/csv-json.service';
+import { SelectDumpHeadersDialog } from '../../../api/csv-json/csv-json.service';
 import { MatDialog } from '@angular/material/dialog';
 
 @Injectable()

@@ -20,8 +20,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { STOCK_TRANSFER_STATUS, WAREHOUSES } from '../../constants/app-string';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import { Observable } from 'rxjs';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
-import { SalesService } from 'src/app/sales-ui/services/sales.service';
+import { ValidateInputSelected } from '../../common/pipes/validators';
+import { SalesService } from '../../sales-ui/services/sales.service';
 
 @Component({
   selector: 'app-stock-entry-list',

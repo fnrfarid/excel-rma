@@ -13,7 +13,7 @@ import { from, throwError, of } from 'rxjs';
 import { switchMap, map, retry } from 'rxjs/operators';
 import { CUSTOMER_ALREADY_EXISTS } from '../../../constants/app-strings';
 import { Customer } from '../../entity/customer/customer.entity';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { FRAPPE_API_GET_PAYMENT_TERM_TEMPLATE_ENDPOINT } from '../../../constants/routes';

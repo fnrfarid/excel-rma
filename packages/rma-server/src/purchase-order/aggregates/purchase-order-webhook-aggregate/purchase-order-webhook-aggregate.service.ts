@@ -4,7 +4,7 @@ import { PurchaseOrderService } from '../../entity/purchase-order/purchase-order
 import { PurchaseOrder } from '../../entity/purchase-order/purchase-order.entity';
 import { from, of, forkJoin } from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
 import {
   SUBMITTED_STATUS,

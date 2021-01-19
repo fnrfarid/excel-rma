@@ -29,7 +29,7 @@ import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
 } from '../../../constants/app-strings';
-import * as uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import * as Agenda from 'agenda';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
 import {

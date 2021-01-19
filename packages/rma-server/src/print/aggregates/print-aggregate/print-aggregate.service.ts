@@ -3,7 +3,7 @@ import * as pdfkit from 'pdfkit';
 import * as fetch from 'node-fetch';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
-import { DeliveryChalanDto } from 'src/print/entities/print/print.dto';
+import { DeliveryChalanDto } from '../../../print/entities/print/print.dto';
 import { Response } from 'express';
 
 @Injectable()

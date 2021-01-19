@@ -66,7 +66,7 @@ export class ItemController {
     // here item_codes will be hash like item-0001 : 11, where 11 is qty of item.
     let query = {};
     try {
-      query = JSON.parse(decodeURIComponent(item_codes));
+      query = JSON.parse(item_codes);
     } catch {
       throw new BadRequestException(`Please provide item_code as an array.`);
     }

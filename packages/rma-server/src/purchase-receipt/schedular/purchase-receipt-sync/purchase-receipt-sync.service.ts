@@ -24,7 +24,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { PurchaseReceiptService } from '../../entity/purchase-receipt.service';
 import { PurchaseInvoiceService } from '../../../purchase-invoice/entity/purchase-invoice/purchase-invoice.service';
 import { PurchaseReceiptDto } from '../../entity/purchase-receipt-dto';
-import * as uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import { PURCHASE_RECEIPT_DOCTYPE_NAME } from '../../../constants/app-strings';
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { PurchaseReceipt } from '../../entity/purchase-receipt.entity';
@@ -144,7 +144,7 @@ export class PurchaseReceiptSyncService {
           job.payload,
           job.settings,
         );
-        job.uuid = uuid();
+        job.uuid = uuidv4();
         const csv_payload = this.jsonToCsv.mapJsonToCsv(
           payload,
           CSV_TEMPLATE_HEADERS.purchase_receipt_legacy,
@@ -272,11 +272,10 @@ export class PurchaseReceiptSyncService {
       .catch(err => {});
     const warrantyPurchasedOn = new DateTime(settings.timeZone).toJSDate();
 
-    if (!Object.keys(hash_map).length)
-      return this.updateInvoiceDeliveredState(doc.name, token.fullName);
+    if (!Object.keys(hash_map).length) return of(true);
 
     return from(Object.keys(hash_map)).pipe(
-      mergeMap(key => {
+      switchMap(key => {
         const serialHistory: SerialNoHistoryInterface = {};
         serialHistory.created_by = token.fullName;
         serialHistory.created_on = warrantyPurchasedOn;
@@ -312,22 +311,18 @@ export class PurchaseReceiptSyncService {
           }),
         );
       }),
-      toArray(),
-      switchMap(done =>
-        this.updateInvoiceDeliveredState(doc.name, token.fullName),
-      ),
-    );
-  }
-
-  updateInvoiceDeliveredState(docName, fullName) {
-    return from(
-      this.purchaseInvoiceService.updateOne(
-        { name: parent },
-        {
-          $push: { purchase_receipt_names: docName },
-          $addToSet: { deliveredBy: fullName },
-        },
-      ),
+      switchMap(done => {
+        return from(
+          this.purchaseInvoiceService.updateOne(
+            { name: parent },
+            {
+              $push: { purchase_receipt_names: doc.name },
+              $addToSet: { deliveredBy: token.fullName },
+            },
+          ),
+        );
+      }),
+      retry(2),
     );
   }
 

@@ -37,10 +37,10 @@ export class UpdateCreditLimitComponent implements OnInit {
   expiryDate: string;
 
   creditLimitForm = new FormGroup({
-    customer: new FormControl(this.customer),
-    baseLimit: new FormControl(this.baseCreditLimit),
-    erpnextLimit: new FormControl(this.currentCreditLimit),
-    expiryDate: new FormControl(this.expiryDate),
+    customer: new FormControl(),
+    baseLimit: new FormControl(),
+    erpnextLimit: new FormControl(),
+    expiryDate: new FormControl(),
   });
 
   constructor(
