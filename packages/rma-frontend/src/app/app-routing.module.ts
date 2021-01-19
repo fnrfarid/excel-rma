@@ -88,7 +88,7 @@ const routes: Routes = [
       ).then(m => m.ViewPurchaseInvoicePageModule),
   },
   {
-    path: 'sales/add-sales-return/:invoiceUuid/:returnName',
+    path: 'sales/add-sales-return/:invoiceUuid',
     loadChildren: () =>
       import('./sales-ui/add-sales-return/add-sales-return.module').then(
         m => m.AddSalesReturnPageModule,

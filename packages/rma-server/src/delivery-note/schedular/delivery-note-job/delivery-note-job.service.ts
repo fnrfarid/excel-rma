@@ -98,7 +98,18 @@ export class DeliveryNoteJobService {
 
     this.salesInvoiceService
       .updateOne({ name: job.data.sales_invoice_name }, { $inc: query })
-      .then(success => {})
+      .then(success => {
+        this.salesInvoiceService
+          .findOne({ name: job.data.sales_invoice_name })
+          .then(salesInvoice => {
+            const status = this.getStatus(salesInvoice);
+            this.salesInvoiceService
+              .updateOne({ name: salesInvoice.name }, { $set: { status } })
+              .then(updated => {})
+              .catch(err => {});
+          })
+          .catch(err => {});
+      })
       .catch(err => {});
 
     this.serialNoService
@@ -340,46 +351,6 @@ export class DeliveryNoteJobService {
     return of(true);
   }
 
-  resetSerialsMap(
-    deliveryNotePayload: CreateDeliveryNoteInterface,
-    sales_invoice_name: string,
-  ) {
-    const delivered_items_map = {};
-    deliveryNotePayload.items.forEach(item => {
-      delivered_items_map[Buffer.from(item.item_code).toString('base64')] =
-        item.qty;
-    });
-
-    this.salesInvoiceService
-      .findOne({
-        name: sales_invoice_name,
-      })
-      .then(sales_invoice => {
-        for (const key of Object.keys(delivered_items_map)) {
-          if (sales_invoice.delivered_items_map[key]) {
-            sales_invoice.delivered_items_map[key] -= delivered_items_map[key];
-          } else {
-            sales_invoice.delivered_items_map[key] = delivered_items_map[key];
-          }
-        }
-
-        const status = this.getStatus(sales_invoice);
-        this.salesInvoiceService
-          .updateMany(
-            { name: sales_invoice_name },
-            {
-              $set: {
-                status,
-                delivered_items_map: sales_invoice.delivered_items_map,
-              },
-            },
-          )
-          .then(success => {})
-          .catch(error => {});
-      })
-      .catch(error => {});
-  }
-
   getStatus(sales_invoice: SalesInvoice) {
     const total = sales_invoice.has_bundle_item
       ? Object.values(sales_invoice.bundle_items_map).reduce(
@@ -392,8 +363,7 @@ export class DeliveryNoteJobService {
       sales_invoice.delivered_items_map,
     ).reduce((a: number, b: number) => a + b, 0);
 
-    if (total === delivered_qty) return COMPLETED_STATUS;
-    else return TO_DELIVER_STATUS;
+    return total === delivered_qty ? COMPLETED_STATUS : TO_DELIVER_STATUS;
   }
 
   addToQueueNow(data: {

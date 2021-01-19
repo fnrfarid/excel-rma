@@ -273,15 +273,19 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
     sales_invoice: SalesInvoice,
     incrementMap: { [key: string]: number },
   ) {
-    let total = 0;
-    Object.keys(incrementMap).forEach(key => (total += incrementMap[key]));
+    const total = sales_invoice.has_bundle_item
+      ? this.getMapTotal(sales_invoice.bundle_items_map)
+      : sales_invoice.total_qty;
 
-    for (const key of Object.keys(sales_invoice.delivered_items_map)) {
-      total += sales_invoice.delivered_items_map[key];
-    }
+    const delivered_qty =
+      this.getMapTotal(incrementMap) +
+      this.getMapTotal(sales_invoice.delivered_items_map);
 
-    if (total === sales_invoice.total_qty) return COMPLETED_STATUS;
-    else return TO_DELIVER_STATUS;
+    return total === delivered_qty ? COMPLETED_STATUS : TO_DELIVER_STATUS;
+  }
+
+  getMapTotal(hashMap: { [key: string]: number }) {
+    return Object.values(hashMap).reduce((a: number, b: number) => a + b, 0);
   }
 
   mapCreateDeliveryNote(
