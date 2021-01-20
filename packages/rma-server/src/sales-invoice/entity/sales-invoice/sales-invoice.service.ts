@@ -69,11 +69,9 @@ export class SalesInvoiceService {
       : {};
 
     const customerQuery =
-      territories &&
-      territories.length !== 0 &&
-      !territories.includes(ALL_TERRITORIES)
-        ? { territory: { $in: territories } }
-        : {};
+      territories?.length !== 0 && !territories.includes(ALL_TERRITORIES)
+      ? { territory: { $in: territories } }
+      : {};
 
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},

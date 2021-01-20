@@ -300,20 +300,29 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
       if (typeof item.serial_no === 'string') {
         item.serial_no = item.serial_no.split('\n');
       }
-      const warrantyPurchasedOn = new DateTime(settings.timeZone).toJSDate();
       this.serialNoService
         .updateMany(
           { serial_no: { $in: item.serial_no } },
           {
             $set: {
               'warranty.purchaseWarrantyDate': item.warranty_date,
-              'warranty.purchasedOn': warrantyPurchasedOn,
+              'warranty.purchasedOn': DateTime.fromJSDate(this.getDate(payload))
+              .setZone(settings.timeZone)
+              .toJSDate(),
             },
           },
         )
         .then(updated => {})
         .catch(err => {});
     });
+  }
+
+  getDate(payload){
+    try{
+      return new Date(`${payload.posting_date} ${payload.posting_time}`)
+    }catch{
+      return new Date()
+    }
   }
 
   createBatchedFrappeSerials(

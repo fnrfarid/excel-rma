@@ -25,7 +25,6 @@ import {
 import {
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
-  ALL_TERRITORIES,
 } from '../../../constants/app-strings';
 import { HUNDRED_NUMBERSTRING } from '../../../constants/app-strings';
 import { ErrorLogService } from '../../../error-log/error-log-service/error-log.service';
@@ -245,7 +244,6 @@ export class ConnectService {
         map(data => data.data.data),
         switchMap((userTerritory: { for_value: string }[]) => {
           const territory = [
-            ALL_TERRITORIES,
             ...this.mapUserTerritory(userTerritory),
           ];
           return this.getTerritoryWarehouse(territory).pipe(

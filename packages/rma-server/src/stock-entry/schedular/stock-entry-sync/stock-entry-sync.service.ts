@@ -365,20 +365,30 @@ export class StockEntrySyncService {
           purchase_document_no: doc_name,
           purchase_document_type: payload.stock_entry_type,
           'warranty.purchaseWarrantyDate': item.warranty_date,
-          'warranty.purchasedOn': new Date(payload.posting_date),
+          'warranty.purchasedOn': DateTime.fromJSDate(this.getDate(payload))
+          .setZone(settings.timeZone)
+          .toJSDate(),
           purchase_invoice_name: payload.uuid,
           item_name: item.item_name,
         }
       : {
           ...update,
           'warranty.salesWarrantyDate': item.warranty_date,
-          'warranty.soldOn': DateTime.fromJSDate(new Date(payload.posting_date))
+          'warranty.soldOn': DateTime.fromJSDate(this.getDate(payload))
             .setZone(settings.timeZone)
             .toJSDate(),
           sales_document_type: payload.stock_entry_type,
           sales_document_no: doc_name,
           sales_invoice_name: payload.uuid,
         };
+  }
+
+  getDate(payload){
+    try{
+      return new Date(`${payload.posting_date} ${payload.posting_time}`)
+    }catch{
+      return new Date()
+    }
   }
 
   getEventType(type: string, payload: StockEntry) {

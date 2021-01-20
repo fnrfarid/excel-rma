@@ -270,7 +270,9 @@ export class PurchaseReceiptSyncService {
       .insertMany(purchase_receipts)
       .then(success => {})
       .catch(err => {});
-    const warrantyPurchasedOn = new DateTime(settings.timeZone).toJSDate();
+    const warrantyPurchasedOn = DateTime.fromJSDate(this.getDate(payload))
+                                .setZone(settings.timeZone)
+                                .toJSDate()
 
     if (!Object.keys(hash_map).length) return of(true);
 
@@ -326,6 +328,14 @@ export class PurchaseReceiptSyncService {
     );
   }
 
+  getDate(payload){
+    try{
+      return new Date(`${payload.posting_date} ${payload.posting_time}`)
+    }catch{
+      return new Date()
+    }
+  }
+  
   addToQueueNow(data: {
     payload: any;
     token: any;

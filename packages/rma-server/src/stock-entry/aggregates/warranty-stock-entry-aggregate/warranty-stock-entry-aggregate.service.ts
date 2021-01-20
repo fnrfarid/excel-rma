@@ -157,7 +157,9 @@ export class WarrantyStockEntryAggregateService {
                 customer: serialItem.customer,
                 'warranty.salesWarrantyDate':
                   serialItem.warranty.salesWarrantyDate,
-                'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
+                'warranty.soldOn': DateTime.fromJSDate(this.getDate(payload))
+                .setZone(settings.timeZone)
+                .toJSDate(),
                 sales_invoice_name: serialItem.sales_invoice_name,
                 delivery_note: payload.delivery_note,
               },
@@ -166,6 +168,14 @@ export class WarrantyStockEntryAggregateService {
         );
       }),
     );
+  }
+
+  getDate(payload){
+    try{
+      return new Date(`${payload.posting_date} ${payload.posting_time}`)
+    }catch{
+      return new Date()
+    }
   }
 
   mapErpItem(payload) {
