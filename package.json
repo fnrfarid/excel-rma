@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "cypress": "cypress",
-    "version": "lerna clean --yes && lerna bootstrap --ignore-scripts -- --package-lock-only --no-audit && git add packages/*/package-lock.json"
+    "version": "lerna clean --yes && lerna bootstrap --ignore-scripts -- --package-lock-only --no-audit && git add ."
   },
   "devDependencies": {
     "cypress": "^6.2.1",
