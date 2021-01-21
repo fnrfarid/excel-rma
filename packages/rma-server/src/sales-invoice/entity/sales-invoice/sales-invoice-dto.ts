@@ -195,7 +195,7 @@ export class ItemDto {
 
   @IsNotEmpty()
   @IsNumber()
-  has_serial_no: number;
+  has_serial_no?: number;
 
   @IsNotEmpty()
   @IsNumber()
