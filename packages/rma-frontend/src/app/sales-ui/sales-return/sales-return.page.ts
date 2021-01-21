@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/internal/Observable';
 import { startWith } from 'rxjs/internal/operators/startWith';
 import { switchMap } from 'rxjs/operators';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { ValidateInputSelected } from '../../../common/pipes/validators';
 
 @Component({
   selector: 'app-sales-return',
