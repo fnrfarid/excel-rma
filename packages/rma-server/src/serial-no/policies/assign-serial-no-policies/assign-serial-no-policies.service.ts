@@ -14,11 +14,13 @@ import {
   INVALID_ITEM,
   INVALID_ITEM_CODE,
 } from '../../../constants/messages';
+import { DateTime } from 'luxon';
 import { AssignSerialDto } from '../../entity/serial-no/assign-serial-dto';
 import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ItemService } from '../../../item/entity/item/item.service';
 import { ItemDto } from '../../../sales-invoice/entity/sales-invoice/sales-invoice-dto';
+import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
 
 @Injectable()
 export class AssignSerialNoPoliciesService {
@@ -93,13 +95,12 @@ export class AssignSerialNoPoliciesService {
                   this.serialNoService.count({
                     serial_no: { $in: serial_hash[item_code].serials },
                     item_code,
-                    $or: [
-                      { warehouse: serialProvider.set_warehouse },
-                      {
-                        'queue_state.purchase_receipt.warehouse':
-                          serialProvider.set_warehouse,
-                      },
-                    ],
+                    warehouse: serialProvider.set_warehouse,
+                    'warranty.purchasedOn': {
+                      $lte: DateTime.fromJSDate(this.getDate(salesInvoice))
+                        .setZone(settings.timeZone)
+                        .toJSDate(),
+                    },
                   }),
                 ).pipe(
                   switchMap(count => {
@@ -126,6 +127,14 @@ export class AssignSerialNoPoliciesService {
         );
       }),
     );
+  }
+
+  getDate(payload: SalesInvoice) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
+    }
   }
 
   validateItem(item: string[]) {

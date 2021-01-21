@@ -79,14 +79,7 @@ export class StockEntryAggregateService {
 
         if (stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
           if (mongoSerials && mongoSerials.length) {
-            return from(
-              this.serialNoService.insertMany(mongoSerials, { ordered: false }),
-            ).pipe(
-              switchMap(success => {
-                this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
-                return of(stockEntry);
-              }),
-            );
+            return this.createMongoSerials(stockEntry, mongoSerials, req);
           }
           this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
           return of(stockEntry);
@@ -134,6 +127,41 @@ export class StockEntryAggregateService {
               },
             },
           ),
+        );
+      }),
+    );
+  }
+
+  createMongoSerials(stockEntry: StockEntry, mongoSerials: any, req) {
+    return of({}).pipe(
+      switchMap(obj => {
+        return from(
+          this.serialNoService.insertMany(mongoSerials, { ordered: false }),
+        ).pipe(
+          switchMap(success => {
+            this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+            return of(stockEntry);
+          }),
+        );
+      }),
+      catchError(err => {
+        return this.stockEntryPolicies.validateStockEntryQueue(stockEntry).pipe(
+          switchMap(() => {
+            const serials = [];
+            mongoSerials.forEach(entry => serials.push(entry.serial_no));
+            this.serialNoService
+              .deleteMany({
+                serial_no: { $in: serials },
+                'queue_state.stock_entry.parent': stockEntry.uuid,
+              })
+              .then(success => {})
+              .catch(err => {});
+            return throwError(
+              new BadRequestException(
+                'Error occurred while adding serials to mongo, please try again.',
+              ),
+            );
+          }),
         );
       }),
     );

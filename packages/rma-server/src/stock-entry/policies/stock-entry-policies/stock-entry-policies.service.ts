@@ -29,21 +29,49 @@ export class StockEntryPoliciesService {
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        return this.validateStockSerials(
-          payload.items,
-          payload.stock_entry_type,
-          settings,
-          clientHttpRequest,
+    return this.validateStockEntryItems(payload).pipe(
+      switchMap(done => {
+        return this.settingsService.find().pipe(
+          switchMap(settings => {
+            return this.validateStockSerials(
+              payload.items,
+              payload.stock_entry_type,
+              settings,
+              clientHttpRequest,
+            );
+          }),
+          switchMap(() => {
+            if (
+              payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+            ) {
+              return of(true);
+            }
+            return this.validateItemStock(payload, clientHttpRequest);
+          }),
         );
       }),
-      switchMap(() => {
-        if (payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+    );
+  }
+
+  validateStockEntryItems(payload: StockEntryDto) {
+    return from(payload.items).pipe(
+      mergeMap(item => {
+        if (!item.has_serial_no) {
           return of(true);
         }
-        return this.validateItemStock(payload, clientHttpRequest);
+        const serialSet = new Set();
+        item.serial_no.forEach(no => serialSet.add(no));
+        if (Array.from(serialSet).length !== item.serial_no.length) {
+          return throwError(
+            new BadRequestException(
+              `Found duplicate serials for ${item.item_name}.`,
+            ),
+          );
+        }
+        return of(true);
       }),
+      toArray(),
+      switchMap(success => of(true)),
     );
   }
 
@@ -281,7 +309,6 @@ export class StockEntryPoliciesService {
           $or: [
             {
               'warranty.soldOn': { $exists: false },
-              'queue_state.delivery_note': { $exists: false },
             },
             {
               'warranty.claim_no': { $exists: true },

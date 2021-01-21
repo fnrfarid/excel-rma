@@ -444,7 +444,8 @@ export class AddSalesInvoicePage implements OnInit {
           item.amount = item.qty * item.rate;
           salesInvoiceDetails.total_qty += item.qty;
           salesInvoiceDetails.total += item.amount;
-          item.has_bundle_item = item.bundle_items ? true : false;
+          item.has_bundle_item =
+            item.has_bundle_item || item.bundle_items ? true : false;
           return item;
         }
       });
@@ -536,7 +537,8 @@ export class AddSalesInvoicePage implements OnInit {
           item.amount = item.qty * item.rate;
           salesInvoiceDetails.total_qty += item.qty;
           salesInvoiceDetails.total += item.amount;
-          item.has_bundle_item = item.bundle_items ? true : false;
+          item.has_bundle_item =
+            item.has_bundle_item || item.bundle_items ? true : false;
           return item;
         }
       });

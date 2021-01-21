@@ -29,6 +29,7 @@ import {
   SYSTEM_MANAGER,
   DELIVERY_NOTE,
   SALES_INVOICE_STATUS,
+  ALL_TERRITORIES,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -107,8 +108,13 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   }
 
   async retrieveSalesInvoice(uuid: string, req) {
+    let filter = {};
+    const territory = this.getUserTerritories(req);
+    if (!territory.includes(ALL_TERRITORIES)) {
+      filter = { territory: { $in: territory } };
+    }
     const provider = await this.salesInvoiceService.findOne(
-      { uuid },
+      { uuid, ...filter },
       undefined,
       true,
     );
@@ -123,10 +129,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     filter_query,
     clientHttpRequest: { token: TokenCache },
   ) {
-    let territory = clientHttpRequest.token.territory;
-    if (clientHttpRequest.token.roles.includes(SYSTEM_MANAGER + '!')) {
-      territory = [];
-    }
+    const territory = this.getUserTerritories(clientHttpRequest);
     return await this.salesInvoiceService.list(
       offset || 0,
       limit || 10,
@@ -134,6 +137,12 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       filter_query,
       territory,
     );
+  }
+
+  getUserTerritories(clientHttpRequest: { token: TokenCache }) {
+    return clientHttpRequest.token.roles.includes(SYSTEM_MANAGER)
+      ? [ALL_TERRITORIES]
+      : clientHttpRequest.token.territory;
   }
 
   async remove(uuid: string) {

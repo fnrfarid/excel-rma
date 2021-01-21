@@ -69,9 +69,7 @@ export class SalesInvoiceService {
       : {};
 
     const customerQuery =
-      territories &&
-      territories.length !== 0 &&
-      !territories.includes(ALL_TERRITORIES)
+      territories?.length !== 0 && !territories.includes(ALL_TERRITORIES)
         ? { territory: { $in: territories } }
         : {};
 

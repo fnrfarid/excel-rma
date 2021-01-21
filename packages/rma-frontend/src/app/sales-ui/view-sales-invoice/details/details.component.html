@@ -36,8 +36,8 @@
   horizontal="end"
   slot="fixed"
   *ngIf="
-    salesInvoiceDetails?.status === 'To Deliver' ||
-    salesInvoiceDetails?.status === 'Completed'
+    permissionState.sales_invoice.delete && (salesInvoiceDetails?.status === 'To Deliver' ||
+    salesInvoiceDetails?.status === 'Completed')
   "
   class="ion-margin-end"
 >
