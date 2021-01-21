@@ -272,10 +272,11 @@ export class PurchaseReceiptSyncService {
       .catch(err => {});
     const warrantyPurchasedOn = new DateTime(settings.timeZone).toJSDate();
 
-    if (!Object.keys(hash_map).length) return of(true);
+    if (!Object.keys(hash_map).length)
+      return this.updateInvoiceDeliveredState(doc.name, token.fullName);
 
     return from(Object.keys(hash_map)).pipe(
-      switchMap(key => {
+      mergeMap(key => {
         const serialHistory: SerialNoHistoryInterface = {};
         serialHistory.created_by = token.fullName;
         serialHistory.created_on = warrantyPurchasedOn;
@@ -311,18 +312,22 @@ export class PurchaseReceiptSyncService {
           }),
         );
       }),
-      switchMap(done => {
-        return from(
-          this.purchaseInvoiceService.updateOne(
-            { name: parent },
-            {
-              $push: { purchase_receipt_names: doc.name },
-              $addToSet: { deliveredBy: token.fullName },
-            },
-          ),
-        );
-      }),
-      retry(2),
+      toArray(),
+      switchMap(done =>
+        this.updateInvoiceDeliveredState(doc.name, token.fullName),
+      ),
+    );
+  }
+
+  updateInvoiceDeliveredState(docName, fullName) {
+    return from(
+      this.purchaseInvoiceService.updateOne(
+        { name: parent },
+        {
+          $push: { purchase_receipt_names: docName },
+          $addToSet: { deliveredBy: fullName },
+        },
+      ),
     );
   }
 
