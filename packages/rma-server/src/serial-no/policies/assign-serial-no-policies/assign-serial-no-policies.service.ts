@@ -162,7 +162,7 @@ export class AssignSerialNoPoliciesService {
         if (existingItem.minimumPrice > item.rate) {
           return throwError(
             new BadRequestException(
-              `Item: ${item.item_name}, has minimum price of ${existingItem.minimumPrice}.`,
+              `Price for Item: ${item.item_name}, is not acceptable.`,
             ),
           );
         }
