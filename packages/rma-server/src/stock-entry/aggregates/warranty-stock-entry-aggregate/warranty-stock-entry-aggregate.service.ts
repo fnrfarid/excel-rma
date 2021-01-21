@@ -158,8 +158,8 @@ export class WarrantyStockEntryAggregateService {
                 'warranty.salesWarrantyDate':
                   serialItem.warranty.salesWarrantyDate,
                 'warranty.soldOn': DateTime.fromJSDate(this.getDate(payload))
-                .setZone(settings.timeZone)
-                .toJSDate(),
+                  .setZone(settings.timeZone)
+                  .toJSDate(),
                 sales_invoice_name: serialItem.sales_invoice_name,
                 delivery_note: payload.delivery_note,
               },
@@ -170,11 +170,11 @@ export class WarrantyStockEntryAggregateService {
     );
   }
 
-  getDate(payload){
-    try{
-      return new Date(`${payload.posting_date} ${payload.posting_time}`)
-    }catch{
-      return new Date()
+  getDate(payload) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
     }
   }
 

@@ -111,7 +111,10 @@ export class StockAvailabilityPage implements OnInit {
         'like',
         `%${this.f.itemName.value.item_code}%`,
       ]);
-      this.countFilter.name = ['like', `%${this.f.itemName.value.item_code}%`];
+      this.countFilter.item_code = [
+        'like',
+        `%${this.f.itemName.value.item_code}%`,
+      ];
     }
 
     if (this.f.warehouse.value) {
@@ -120,7 +123,7 @@ export class StockAvailabilityPage implements OnInit {
         'like',
         `%${this.f.warehouse.value.name}%`,
       ]);
-      this.countFilter.name = ['like', `%${this.f.warehouse.value.name}%`];
+      this.countFilter.warehouse = ['like', `%${this.f.warehouse.value.name}%`];
     }
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }

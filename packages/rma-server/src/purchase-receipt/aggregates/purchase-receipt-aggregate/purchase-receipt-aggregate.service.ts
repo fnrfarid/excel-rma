@@ -307,8 +307,8 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
             $set: {
               'warranty.purchaseWarrantyDate': item.warranty_date,
               'warranty.purchasedOn': DateTime.fromJSDate(this.getDate(payload))
-              .setZone(settings.timeZone)
-              .toJSDate(),
+                .setZone(settings.timeZone)
+                .toJSDate(),
             },
           },
         )
@@ -317,11 +317,11 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
     });
   }
 
-  getDate(payload){
-    try{
-      return new Date(`${payload.posting_date} ${payload.posting_time}`)
-    }catch{
-      return new Date()
+  getDate(payload) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
     }
   }
 

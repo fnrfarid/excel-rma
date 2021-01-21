@@ -79,7 +79,7 @@ export class StockEntryAggregateService {
 
         if (stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
           if (mongoSerials && mongoSerials.length) {
-            return this.createMongoSerials(stockEntry,mongoSerials,req)
+            return this.createMongoSerials(stockEntry, mongoSerials, req);
           }
           this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
           return of(stockEntry);
@@ -132,7 +132,7 @@ export class StockEntryAggregateService {
     );
   }
 
-  createMongoSerials(stockEntry:StockEntry,  mongoSerials:SerialHash , req){
+  createMongoSerials(stockEntry: StockEntry, mongoSerials: any, req) {
     return of({}).pipe(
       switchMap(obj => {
         return from(
@@ -147,18 +147,24 @@ export class StockEntryAggregateService {
       catchError(err => {
         return this.stockEntryPolicies.validateStockEntryQueue(stockEntry).pipe(
           switchMap(() => {
-            const serials = []
-            Object.keys(mongoSerials).forEach(key => serials.push(...mongoSerials[key].serial_no));
-            this.serialNoService.deleteMany(
-              { serial_no : { $in : serials }, 
-              "queue_state.stock_entry.parent": stockEntry.uuid }
-            ).then(success => {})    
-            .catch(err => {})
-            return throwError("Error occurred while adding serials to mongo, please try again.")
-          })
-        )
-      })
-      )
+            const serials = [];
+            mongoSerials.forEach(entry => serials.push(entry.serial_no));
+            this.serialNoService
+              .deleteMany({
+                serial_no: { $in: serials },
+                'queue_state.stock_entry.parent': stockEntry.uuid,
+              })
+              .then(success => {})
+              .catch(err => {});
+            return throwError(
+              new BadRequestException(
+                'Error occurred while adding serials to mongo, please try again.',
+              ),
+            );
+          }),
+        );
+      }),
+    );
   }
 
   parseStockEntryPayload(payload: StockEntryDto) {

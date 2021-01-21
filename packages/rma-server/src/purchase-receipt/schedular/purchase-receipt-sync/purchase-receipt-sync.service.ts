@@ -271,8 +271,8 @@ export class PurchaseReceiptSyncService {
       .then(success => {})
       .catch(err => {});
     const warrantyPurchasedOn = DateTime.fromJSDate(this.getDate(payload))
-                                .setZone(settings.timeZone)
-                                .toJSDate()
+      .setZone(settings.timeZone)
+      .toJSDate();
 
     if (!Object.keys(hash_map).length)
       return this.updateInvoiceDeliveredState(doc.name, token.fullName);
@@ -333,14 +333,14 @@ export class PurchaseReceiptSyncService {
     );
   }
 
-  getDate(payload){
-    try{
-      return new Date(`${payload.posting_date} ${payload.posting_time}`)
-    }catch{
-      return new Date()
+  getDate(payload) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
     }
   }
-  
+
   addToQueueNow(data: {
     payload: any;
     token: any;

@@ -96,11 +96,11 @@ export class AssignSerialNoPoliciesService {
                     serial_no: { $in: serial_hash[item_code].serials },
                     item_code,
                     warehouse: serialProvider.set_warehouse,
-                    "warranty.purchasedOn" : { 
-                        $lte  : DateTime.fromJSDate(this.getDate(salesInvoice))
-                                        .setZone(settings.timeZone)
-                                        .toJSDate()
-                                      }
+                    'warranty.purchasedOn': {
+                      $lte: DateTime.fromJSDate(this.getDate(salesInvoice))
+                        .setZone(settings.timeZone)
+                        .toJSDate(),
+                    },
                   }),
                 ).pipe(
                   switchMap(count => {
@@ -129,11 +129,11 @@ export class AssignSerialNoPoliciesService {
     );
   }
 
-  getDate(payload: SalesInvoice){
-    try{
-      return new Date(`${payload.posting_date} ${payload.posting_time}`)
-    }catch{
-      return new Date()
+  getDate(payload: SalesInvoice) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
     }
   }
 

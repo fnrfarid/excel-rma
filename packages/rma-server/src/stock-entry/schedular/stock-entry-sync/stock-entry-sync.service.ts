@@ -366,8 +366,8 @@ export class StockEntrySyncService {
           purchase_document_type: payload.stock_entry_type,
           'warranty.purchaseWarrantyDate': item.warranty_date,
           'warranty.purchasedOn': DateTime.fromJSDate(this.getDate(payload))
-          .setZone(settings.timeZone)
-          .toJSDate(),
+            .setZone(settings.timeZone)
+            .toJSDate(),
           purchase_invoice_name: payload.uuid,
           item_name: item.item_name,
         }
@@ -383,11 +383,11 @@ export class StockEntrySyncService {
         };
   }
 
-  getDate(payload){
-    try{
-      return new Date(`${payload.posting_date} ${payload.posting_time}`)
-    }catch{
-      return new Date()
+  getDate(payload) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
     }
   }
 

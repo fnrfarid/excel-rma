@@ -276,8 +276,8 @@ export class DeliveryNoteJobService {
                 sales_invoice_name,
                 'warranty.salesWarrantyDate': item.warranty_date,
                 'warranty.soldOn': DateTime.fromJSDate(this.getDate(payload))
-                                  .setZone(settings.timeZone)
-                                  .toJSDate(),
+                  .setZone(settings.timeZone)
+                  .toJSDate(),
                 delivery_note: response.name,
                 warehouse: payload.set_warehouse,
                 customer: payload.customer,
@@ -353,11 +353,11 @@ export class DeliveryNoteJobService {
     return of(true);
   }
 
-  getDate(payload){
-    try{
-      return new Date(`${payload.posting_date} ${payload.posting_time}`)
-    }catch{
-      return new Date()
+  getDate(payload) {
+    try {
+      return new Date(`${payload.posting_date} ${payload.posting_time}`);
+    } catch {
+      return new Date();
     }
   }
 

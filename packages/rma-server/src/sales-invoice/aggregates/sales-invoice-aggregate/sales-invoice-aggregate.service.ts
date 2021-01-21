@@ -109,12 +109,12 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
 
   async retrieveSalesInvoice(uuid: string, req) {
     let filter = {};
-    const territory = this.getUserTerritories(req)
-    if(!territory.includes(ALL_TERRITORIES)){
-      filter =  {territory : {$in : territory} }
+    const territory = this.getUserTerritories(req);
+    if (!territory.includes(ALL_TERRITORIES)) {
+      filter = { territory: { $in: territory } };
     }
     const provider = await this.salesInvoiceService.findOne(
-      { uuid , ...filter },
+      { uuid, ...filter },
       undefined,
       true,
     );
@@ -129,7 +129,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     filter_query,
     clientHttpRequest: { token: TokenCache },
   ) {
-    let territory = this.getUserTerritories(clientHttpRequest)
+    const territory = this.getUserTerritories(clientHttpRequest);
     return await this.salesInvoiceService.list(
       offset || 0,
       limit || 10,
@@ -139,10 +139,10 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     );
   }
 
-  getUserTerritories(clientHttpRequest: { token : TokenCache}){
-    return clientHttpRequest.token.roles.includes(SYSTEM_MANAGER) ?
-    [ALL_TERRITORIES] : 
-    clientHttpRequest.token.territory;
+  getUserTerritories(clientHttpRequest: { token: TokenCache }) {
+    return clientHttpRequest.token.roles.includes(SYSTEM_MANAGER)
+      ? [ALL_TERRITORIES]
+      : clientHttpRequest.token.territory;
   }
 
   async remove(uuid: string) {

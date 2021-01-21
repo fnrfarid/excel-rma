@@ -243,9 +243,7 @@ export class ConnectService {
       .pipe(
         map(data => data.data.data),
         switchMap((userTerritory: { for_value: string }[]) => {
-          const territory = [
-            ...this.mapUserTerritory(userTerritory),
-          ];
+          const territory = [...this.mapUserTerritory(userTerritory)];
           return this.getTerritoryWarehouse(territory).pipe(
             switchMap((warehouses: string[]) => {
               if (!warehouses || !warehouses.length) {
