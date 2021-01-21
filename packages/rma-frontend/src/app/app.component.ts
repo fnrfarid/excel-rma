@@ -221,11 +221,13 @@ export class AppComponent implements OnInit {
                 .getStorage()
                 .setItem(STATE, state)
                 .then(savedState => {
-                  const url = this.appService.getEncodedFrappeLoginUrl(
-                    response.authorizationURL,
-                    frappe_auth_config,
-                    savedState,
-                  );
+                  const url = this.appService
+                    .getEncodedFrappeLoginUrl(
+                      response.authorizationURL,
+                      frappe_auth_config,
+                      savedState,
+                    )
+                    .replace(/^http:\/\//i, 'https://');
 
                   const existingIframe = document.getElementsByClassName(
                     'silent-iframe',
