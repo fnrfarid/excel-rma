@@ -68,6 +68,12 @@ export class SerialNoService {
       if (!SERIAL_FILTER_KEYS.includes(key)) {
         delete filterQuery[key];
       }
+      if (key === 'item_code' && !filterQuery[key]) {
+        delete filterQuery[key];
+      }
+      if (key === 'warehouse' && !filterQuery[key]) {
+        delete filterQuery[key];
+      }
     });
     return filterQuery;
   }
