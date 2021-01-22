@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpService,
+  ForbiddenException,
+} from '@nestjs/common';
 import {
   StockEntryDto,
   StockEntryItemDto,
@@ -11,6 +16,8 @@ import {
   STOCK_ENTRY_STATUS,
   STOCK_ENTRY_TYPE,
   AGENDA_JOB_STATUS,
+  STOCK_ENTRY_PERMISSIONS,
+  SYSTEM_MANAGER,
 } from '../../../constants/app-strings';
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
@@ -73,6 +80,54 @@ export class StockEntryPoliciesService {
       toArray(),
       switchMap(success => of(true)),
     );
+  }
+
+  validateStockPermission(stock_entry_type: string, operation: string, req) {
+    const message = new ForbiddenException(
+      `User has no permissions for ${operation} operation, on ${stock_entry_type}`,
+    );
+
+    switch (stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry_receipt[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry_rnd[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry_issue[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      default:
+        return throwError(new BadRequestException('Invalid StockEntry type'));
+    }
+  }
+
+  validateStockRoles(permissions: string[], req) {
+    permissions.push(SYSTEM_MANAGER);
+    return permissions.some(p => req.token.roles.indexOf(p) >= 0);
   }
 
   validateItemStock(payload: StockEntryDto, req) {

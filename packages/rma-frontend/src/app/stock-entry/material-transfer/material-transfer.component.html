@@ -41,7 +41,7 @@
                         <ion-button *ngIf="!readonly" [disabled]="!uuid || submit" color="medium" (click)="createMaterialTransfer()">
                             Submit
                         </ion-button>
-                        <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="tertiary" (click)="acceptTransfer()">
+                        <ion-button *ngIf="readonly && status === 'In Transit' && permissionState?.stock_entry?.accept" [disabled]="submit" color="tertiary" (click)="acceptTransfer()">
                             Accept
                         </ion-button>
                         <ion-button *ngIf="readonly && status === 'In Transit'" [disabled]="submit" color="light" (click)="rejectTransfer()">
@@ -394,7 +394,7 @@
                 <ng-container matColumnDef="basic_rate">
                     <mat-header-cell *matHeaderCellDef>Base Rate</mat-header-cell>
                     <mat-cell *matCellDef="let row">
-                        <ng-container>
+                        <ng-container *ngIf="permissionState?.stock_entry_receipt?.read">
                             <input matInput [disabled]="readonly && status !=='Draft'" [(ngModel)]="row.basic_rate" />
                         </ng-container>
                     </mat-cell>

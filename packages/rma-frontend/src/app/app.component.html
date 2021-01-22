@@ -98,49 +98,6 @@
                 <ion-icon slot="start" name="list-outline"></ion-icon>
                 <ion-label>Sales Return</ion-label>
               </ion-item>
-              <ion-item
-                *ngIf="loggedIn && permissionState?.rd_products?.active"
-                (click)="isRnDMenuVisible = !isRnDMenuVisible"
-                lines="none"
-              >
-                <ion-icon slot="start" name="flask-outline"></ion-icon>
-                <ion-icon
-                  name="chevron-down-outline"
-                  *ngIf="!isRnDMenuVisible"
-                  slot="end"
-                ></ion-icon>
-                <ion-icon
-                  name="chevron-up-outline"
-                  *ngIf="isRnDMenuVisible"
-                  slot="end"
-                ></ion-icon>
-                <ion-label>R&D Products</ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-menu-toggle>
-          <ion-menu-toggle auto-hide="false">
-            <ion-list
-              *ngIf="isRnDMenuVisible"
-              class="ion-margin-start ion-no-padding"
-            >
-              <ion-item
-                *ngIf="loggedIn && permissionState?.rd_products?.create"
-                lines="none"
-                [href]="newDNUrl"
-                target="_blank"
-              >
-                <ion-icon slot="start" name="list-outline"></ion-icon>
-                <ion-label>New Delivery Note</ion-label>
-              </ion-item>
-              <ion-item
-                *ngIf="loggedIn && permissionState?.rd_products?.read"
-                lines="none"
-                [href]="listRnDURL"
-                target="_blank"
-              >
-                <ion-icon slot="start" name="list-outline"></ion-icon>
-                <ion-label>R&D List</ion-label>
-              </ion-item>
             </ion-list>
           </ion-menu-toggle>
           <ion-menu-toggle auto-hide="false">
@@ -205,6 +162,7 @@
               >
                 <ion-icon
                   slot="start"
+                  *ngIf="loggedIn && permissionState?.stock_history?.read"
                   name="information-circle-outline"
                 ></ion-icon>
                 <ion-label>Stock Availability</ion-label>

@@ -56,6 +56,7 @@ import { SettingsService } from '../../settings/settings.service';
 import { ConfirmationDialog } from '../../sales-ui/item-price/item-price.page';
 import { LoadingController } from '@ionic/angular';
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 
 @Component({
   selector: 'app-material-transfer',
@@ -82,6 +83,7 @@ export class MaterialTransferComponent implements OnInit {
     s_warehouse: new FormControl(''),
     t_warehouse: new FormControl(''),
   };
+  permissionState: any = PERMISSION_STATE;
   validateInput: any = ValidateInputSelected;
   state = {
     component: 'Material',
