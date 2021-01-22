@@ -4,7 +4,7 @@ export const PermissionRoles = {
   sales_invoice: {
     read: [
       'Branch Sales Creator',
-      'Branch Sales User',
+      'Branch Sales Approver',
       'Branch Sales Manager',
       'Branch Sales Return User',
       'Branch Stock User',
@@ -14,30 +14,31 @@ export const PermissionRoles = {
     ],
     create: [
       'Branch Sales Creator',
-      'Branch Sales User',
+      'Branch Sales Approver',
       'Branch Sales Manager',
       'Branch Sales Return User',
       'General Admin',
     ],
     update: [
       'Branch Sales Creator',
-      'Branch Sales User',
+      'Branch Sales Approver',
       'Branch Sales Manager',
       'Branch Sales Return User',
       'General Admin',
     ],
     submit: [
-      'Branch Sales User',
+      'Branch Sales Approver',
       'Branch Sales Manager',
       'Branch Sales Return User',
       'General Admin',
     ],
-    delete: [],
+    delete: ['General Admin'],
   },
+
   sales_return: {
     read: [
       'Branch Sales Creator',
-      'Branch Sales User',
+      'Branch Sales Approver',
       'Branch Sales Manager',
       'Branch Sales Return User',
       'Branch Stock User',
@@ -47,13 +48,34 @@ export const PermissionRoles = {
     ],
     create: ['Branch Sales Return User', 'General Admin'],
     update: ['Branch Sales Return User', 'General Admin'],
-    delete: [],
+    delete: ['General Admin'],
   },
 
-  purchase_invoice: {
-    read: ['Branch Purchase User', 'Branch Purchase Manager', 'General Admin'],
-    submit: ['Branch Purchase Manager', 'General Admin'],
-    delete: [],
+  credit_note: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales Approver',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+  },
+
+  campaign_return: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales Approver',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    create: ['General Admin'],
   },
 
   delivery_note: {
@@ -89,9 +111,31 @@ export const PermissionRoles = {
       'Branch Stock Manager',
       'General Admin',
     ],
+    delete: ['General Admin'],
+  },
+
+  purchase_invoice: {
+    read: ['Branch Purchase User', 'Branch Purchase Manager', 'General Admin'],
+    create: ['Branch Purchase Manager', 'General Admin'],
+    update: ['Branch Purchase Manager', 'General Admin'],
+    submit: ['Branch Purchase Manager', 'General Admin'],
     delete: [],
   },
 
+  purchase_receipt: {
+    read: ['Branch Purchase User', 'Branch Purchase Manager', 'General Admin'],
+    create: ['Branch Purchase Manager', 'General Admin'],
+    update: ['Branch Purchase Manager', 'General Admin'],
+    submit: ['Branch Purchase Manager', 'General Admin'],
+    delete: [],
+  },
+
+  /**
+   * We need to split permissions for stock entry types
+   * Material Transfer Acceptance should be allowed to specific role
+   * Material Receipt, Issue, RnD has different roles permission
+   */
+  // Material Transfer
   stock_entry: {
     read: [
       'Branch Sales Manager',
@@ -106,38 +150,119 @@ export const PermissionRoles = {
       'Branch Stock Manager',
       'General Admin',
     ],
+    update: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
     submit: [
       'Branch Stock User',
       'Branch Stock Supervisor',
       'Branch Stock Manager',
       'General Admin',
     ],
-    delete: [],
-  },
-
-  customer_profile: {
-    read: [
-      'Branch Sales Creator',
-      'Branch Sales User',
-      'Branch Sales Manager',
-      'Branch Sales Return User',
+    // This accept action needs to be added
+    accept: [
+      'Branch Stock Supervisor',
       'Branch Stock Manager',
       'General Admin',
     ],
+    delete: ['General Admin'],
   },
-  rd_products: {
-    read: [],
-    create: [],
+
+  // Material Receipt
+  stock_entry_receipt: {
+    read: [
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'General Admin',
+    ],
+    submit: ['Branch Stock Receipt Approver', 'General Admin'],
+    delete: ['General Admin'],
   },
+
+  // Material Issue
+  stock_entry_issue: {
+    read: [
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'General Admin',
+    ],
+    submit: ['Branch Stock Issue Approver', 'General Admin'],
+    delete: ['General Admin'],
+  },
+
+  // Material RnD
+  stock_entry_rnd: {
+    read: [
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+    submit: ['Branch Stock RnD Approver', 'General Admin'],
+    delete: ['General Admin'],
+  },
+
+  // Is this Stock Availability??
   stock_history: {
     read: [
       'Branch Sales Creator',
-      'Branch Sales User',
+      'Branch Sales Approver',
       'Branch Sales Manager',
       'Branch Sales Return User',
       'Branch Stock User',
       'Branch Stock Supervisor',
       'Branch Stock Manager',
+      'Item Price Manager',
+      'Branch Stock Receipt Approver',
+      'Branch Stock Receipt Creator',
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+  },
+
+  customer_profile: {
+    read: [
+      'Branch Sales Creator',
+      'Branch Sales Approver',
+      'Branch Sales Manager',
+      'Branch Sales Return User',
+      'Branch Stock Manager',
+      'Credit Limit Manager',
       'General Admin',
     ],
   },
@@ -162,53 +287,118 @@ export const PermissionRoles = {
   },
 
   settings: {
-    read: ['General Admin'],
-    update: ['General Admin'],
+    read: [],
+    update: [],
+  },
+  // warranty starts here
+  warranty_claim: {
+    read: [
+      'RMA Claim Creator',
+      'RMA Claim Manager',
+      'RMA Verdict Manager',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Creator',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
+    create: ['RMA Claim Creator', 'RMA Claim Manager', 'General Admin'],
+    update: ['RMA Claim Creator', 'RMA Claim Manager', 'General Admin'],
+    submit: ['RMA Claim Creator', 'RMA Claim Manager', 'General Admin'],
+    delete: ['RMA Invoice Manager', 'General Admin'],
   },
 
-  credit_note: {
+  claim_verdict: {
     read: [
-      'Branch Sales Creator',
-      'Branch Sales User',
-      'Branch Sales Manager',
-      'Branch Sales Return User',
-      'Branch Stock User',
-      'Branch Stock Supervisor',
-      'Branch Stock Manager',
+      'RMA Claim Creator',
+      'RMA Claim Manager',
+      'RMA Verdict Manager',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Creator',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
+    create: [
+      'RMA Claim Manager',
+      'RMA Verdict Manager',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Creator',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
+    delete: [
+      'RMA Verdict Manager',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Creator',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
       'General Admin',
     ],
   },
 
-  purchase_receipt: {
-    read: ['Branch Purchase User', 'Branch Purchase Manager', 'General Admin'],
-    create: ['Branch Purchase Manager', 'General Admin'],
-    update: ['Branch Purchase Manager', 'General Admin'],
-    submit: ['Branch Purchase Manager', 'General Admin'],
-    delete: [],
-  },
-
-  warranty_claim: {
-    create: [],
-    read: [],
-    update: [],
-    delete: [],
+  rma_stock_entry: {
+    create: [
+      'RMA Stock Manager',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
+    cancel: [
+      'RMA Stock Manager',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
   },
 
   service_invoice: {
-    create: [],
-    read: [],
-  },
+    create: ['RMA Invoice Creator', 'RMA Invoice Manager', 'General Admin'],
+    update: ['RMA Invoice Creator', 'RMA Invoice Manager', 'General Admin'],
+    submit: ['RMA Invoice Manager', 'General Admin'],
+    cancel: ['RMA Invoice Manager', 'General Admin'],
 
-  status_history: {
-    create: [],
-    read: [],
-    update: [],
-    delete: [],
-  },
-
-  campaign_return: {
-    create: [],
-    read: [],
+    purchase_claim: {
+      create: ['RMA Purchase Claim Manager', 'General Admin'],
+      update: ['RMA Purchase Claim Manager', 'General Admin'],
+      submit: ['RMA Purchase Claim Manager', 'General Admin'],
+      cancel: ['RMA Purchase Claim Manager', 'General Admin'],
+    },
+    // considering this as serial search feature, single serial search should be available to all roles
+    // but for serial dump selecting item,warehouse should be restricted
+    status_history: {
+      read: [],
+      create: [],
+      update: [],
+      delete: [],
+    },
+    serial_dump: {
+      read: [
+        'Branch Stock User',
+        'Branch Stock Supervisor',
+        'Branch Stock Manager',
+        'Branch Purchase User',
+        'Branch Purchase Manager',
+        'Branch Stock Receipt Creator',
+        'Branch Stock Receipt Approver',
+        'Branch Stock Issue Approver',
+        'Branch Stock RnD Creator',
+        'Branch Stock RnD Approver',
+        'General Admin',
+        'RMA Stock Creator',
+        'RMA Stock Manager',
+        'RMA Invoice Manager',
+      ],
+      create: [],
+      update: [],
+      delete: [],
+    },
+    // warranty ends here
   },
 };
 
@@ -253,12 +443,6 @@ export const PERMISSION_STATE: PermissionStateInterface = {
     active: false,
   },
 
-  rd_products: {
-    read: false,
-    create: false,
-    active: false,
-  },
-
   credit_note: {
     read: false,
     active: false,
@@ -306,6 +490,10 @@ export const PERMISSION_STATE: PermissionStateInterface = {
   stock_entry: {
     create: false,
     read: false,
+    update: false,
+    accept: false,
+    delete: false,
+    submit: false,
     active: false,
   },
 
@@ -328,5 +516,30 @@ export const PERMISSION_STATE: PermissionStateInterface = {
   campaign_return: {
     create: false,
     read: false,
+  },
+  stock_entry_receipt: {
+    read: false,
+    create: false,
+    update: false,
+    submit: false,
+    delete: false,
+  },
+
+  // Material Issue
+  stock_entry_issue: {
+    read: false,
+    create: false,
+    update: false,
+    submit: false,
+    delete: false,
+  },
+
+  // Material RnD
+  stock_entry_rnd: {
+    read: false,
+    create: false,
+    update: false,
+    submit: false,
+    delete: false,
   },
 };

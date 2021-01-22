@@ -28,6 +28,7 @@ import {
   REJECT_STOCK_ENTRY_JOB,
   AUTHORIZATION,
   BEARER_HEADER_VALUE_PREFIX,
+  STOCK_OPERATION,
 } from '../../../constants/app-strings';
 import { v4 as uuidv4 } from 'uuid';
 import * as Agenda from 'agenda';
@@ -63,73 +64,90 @@ export class StockEntryAggregateService {
   createStockEntry(payload: StockEntryDto, req) {
     payload = this.parseStockEntryPayload(payload);
     if (payload.status === STOCK_ENTRY_STATUS.draft || !payload.uuid) {
-      return this.saveDraft(payload, req);
+      return this.stockEntryPolicies
+        .validateStockPermission(
+          payload.stock_entry_type,
+          STOCK_OPERATION.create,
+          req,
+        )
+        .pipe(switchMap(() => this.saveDraft(payload, req)));
     }
-    return this.stockEntryPolicies.validateStockEntry(payload, req).pipe(
-      switchMap(valid => {
-        return from(this.stockEntryService.findOne({ uuid: payload.uuid }));
-      }),
-      switchMap(stockEntry => {
-        if (!stockEntry) {
-          return throwError(new BadRequestException('Stock Entry not found'));
-        }
-        const mongoSerials: SerialHash = this.getStockEntryMongoSerials(
-          stockEntry,
-        );
-
-        if (stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
-          if (mongoSerials && mongoSerials.length) {
-            return this.createMongoSerials(stockEntry, mongoSerials, req);
+    return this.stockEntryPolicies
+      .validateStockPermission(
+        payload.stock_entry_type,
+        STOCK_OPERATION.submit,
+        req,
+      )
+      .pipe(
+        switchMap(() =>
+          this.stockEntryPolicies.validateStockEntry(payload, req),
+        ),
+        switchMap(valid => {
+          return from(this.stockEntryService.findOne({ uuid: payload.uuid }));
+        }),
+        switchMap(stockEntry => {
+          if (!stockEntry) {
+            return throwError(new BadRequestException('Stock Entry not found'));
           }
-          this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
-          return of(stockEntry);
-        }
+          const mongoSerials: SerialHash = this.getStockEntryMongoSerials(
+            stockEntry,
+          );
 
-        this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
-        if (!mongoSerials) {
-          return of(stockEntry);
-        }
-        return from(Object.keys(mongoSerials)).pipe(
-          mergeMap(key => {
-            return from(
-              this.serialNoService.updateOne(
-                { serial_no: { $in: mongoSerials[key].serial_no } },
-                {
-                  $set: {
-                    queue_state: {
-                      stock_entry: {
-                        parent: stockEntry.uuid,
-                        warehouse: mongoSerials[key].t_warehouse,
+          if (
+            stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+          ) {
+            if (mongoSerials && mongoSerials.length) {
+              return this.createMongoSerials(stockEntry, mongoSerials, req);
+            }
+            this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+            return of(stockEntry);
+          }
+
+          this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+          if (!mongoSerials) {
+            return of(stockEntry);
+          }
+          return from(Object.keys(mongoSerials)).pipe(
+            mergeMap(key => {
+              return from(
+                this.serialNoService.updateOne(
+                  { serial_no: { $in: mongoSerials[key].serial_no } },
+                  {
+                    $set: {
+                      queue_state: {
+                        stock_entry: {
+                          parent: stockEntry.uuid,
+                          warehouse: mongoSerials[key].t_warehouse,
+                        },
                       },
                     },
                   },
+                ),
+              );
+            }),
+            toArray(),
+            switchMap(success => {
+              return of(stockEntry);
+            }),
+          );
+        }),
+        switchMap(stockEntry => {
+          return from(
+            this.stockEntryService.updateOne(
+              { uuid: stockEntry.uuid },
+              {
+                $set: {
+                  status:
+                    payload.stock_entry_type ===
+                    STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+                      ? STOCK_ENTRY_STATUS.in_transit
+                      : STOCK_ENTRY_STATUS.delivered,
                 },
-              ),
-            );
-          }),
-          toArray(),
-          switchMap(success => {
-            return of(stockEntry);
-          }),
-        );
-      }),
-      switchMap(stockEntry => {
-        return from(
-          this.stockEntryService.updateOne(
-            { uuid: stockEntry.uuid },
-            {
-              $set: {
-                status:
-                  payload.stock_entry_type ===
-                  STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
-                    ? STOCK_ENTRY_STATUS.in_transit
-                    : STOCK_ENTRY_STATUS.delivered,
               },
-            },
-          ),
-        );
-      }),
-    );
+            ),
+          );
+        }),
+      );
   }
 
   createMongoSerials(stockEntry: StockEntry, mongoSerials: any, req) {
@@ -224,7 +242,7 @@ export class StockEntryAggregateService {
     return mongoSerials;
   }
 
-  async deleteDraft(uuid: string) {
+  async deleteDraft(uuid: string, req) {
     const stockEntry = await this.stockEntryService.findOne({ uuid });
     if (!stockEntry) {
       throw new BadRequestException('Stock Entry Not Found');
@@ -234,12 +252,28 @@ export class StockEntryAggregateService {
         `Stock Entry with status ${stockEntry.status}, cannot be deleted.`,
       );
     }
+    await this.stockEntryPolicies
+      .validateStockPermission(
+        stockEntry.stock_entry_type,
+        STOCK_OPERATION.delete,
+        req,
+      )
+      .toPromise();
     await this.stockEntryService.deleteOne({ uuid });
     return true;
   }
 
   resetStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        return this.stockEntryPolicies
+          .validateStockPermission(
+            stockEntry.stock_entry_type,
+            STOCK_OPERATION.delete,
+            req,
+          )
+          .pipe(switchMap(() => of(stockEntry)));
+      }),
       switchMap(stockEntry => {
         if (!stockEntry) {
           return throwError(new NotFoundException('Stock Entry not found'));
@@ -409,8 +443,17 @@ export class StockEntryAggregateService {
     return this.stockEntryService.list(offset, limit, sort, filter_query);
   }
 
-  getStockEntry(uuid: string) {
+  getStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        return this.stockEntryPolicies
+          .validateStockPermission(
+            stockEntry.stock_entry_type,
+            STOCK_OPERATION.delete,
+            req,
+          )
+          .pipe(switchMap(() => of(stockEntry)));
+      }),
       switchMap(stockEntry => {
         if (stockEntry.status !== STOCK_ENTRY_STATUS.draft) {
           stockEntry.items.filter(item => {
@@ -430,6 +473,15 @@ export class StockEntryAggregateService {
 
   rejectStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        return this.stockEntryPolicies
+          .validateStockPermission(
+            stockEntry.stock_entry_type,
+            STOCK_OPERATION.delete,
+            req,
+          )
+          .pipe(switchMap(() => of(stockEntry)));
+      }),
       switchMap(stockEntry => {
         return forkJoin({
           validateSerialState: this.stockEntryPolicies.validateSerialState(
@@ -479,6 +531,15 @@ export class StockEntryAggregateService {
 
   acceptStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        return this.stockEntryPolicies
+          .validateStockPermission(
+            stockEntry.stock_entry_type,
+            STOCK_OPERATION.accept,
+            req,
+          )
+          .pipe(switchMap(() => of(stockEntry)));
+      }),
       switchMap(stockEntry => {
         return forkJoin({
           validateSerialState: this.stockEntryPolicies.validateSerialState(

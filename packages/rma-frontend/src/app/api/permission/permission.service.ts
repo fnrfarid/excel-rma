@@ -103,6 +103,7 @@ export class PermissionStateInterface {
     read?: boolean;
     update?: boolean;
     active?: boolean;
+    accept?: boolean;
     delete?: boolean;
     submit?: boolean;
   };

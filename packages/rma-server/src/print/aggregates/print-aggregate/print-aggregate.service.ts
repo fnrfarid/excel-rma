@@ -71,7 +71,9 @@ export class PrintAggregateService {
     doc
       .fillColor('#444444')
       .fontSize(20)
-      .text(invoice.print.print_type, { align: 'center' });
+      .text(invoice.print?.print_type || 'Delivery Chalan', {
+        align: 'center',
+      });
     doc.moveDown();
     const cord = { x: doc.x, y: doc.y };
     doc
@@ -126,10 +128,9 @@ export class PrintAggregateService {
 
     for (i = 0; i < invoice.items.length; i++) {
       const item = invoice.items[i];
-      const position = doc.y;
       this.generateTableRow(
         doc,
-        position,
+        doc.y,
         i + 1,
         {
           name: item.item_name,
@@ -137,10 +138,10 @@ export class PrintAggregateService {
         },
         item.qty,
       );
+      this.checkPagePagination(doc);
       doc.moveDown();
       this.generateHr(doc, doc.y);
     }
-
     doc.moveDown();
 
     this.generateTableRow(doc, doc.y, '', { name: 'Total' }, invoice.total_qty);
@@ -148,6 +149,8 @@ export class PrintAggregateService {
     doc.moveDown();
     doc.moveDown();
     doc.moveDown();
+    this.checkPagePagination(doc);
+
     const cord = { x: doc.x, y: doc.y };
     doc
       .fontSize(13)
@@ -171,17 +174,26 @@ export class PrintAggregateService {
     item: { name: string; serials?: string },
     quantity,
   ) {
-    doc.fontSize(10).text(id, 50, y);
-    doc.text(quantity, 450, y, { align: 'right' });
-    doc.text(item.serials ? this.getSerialKeys(item) : `${item.name}`, 100, y, {
-      width: 390,
-    });
+    doc.moveDown();
+    const height = doc.y;
+    doc.fontSize(10).text(id, 50, height);
+    doc.text(item.name, 100, height, { width: 390 });
+    doc.text(quantity, 450, height, { align: 'right' });
+    if (item.serials) {
+      doc.text(this.getSerialKeys(item), 100, doc.y, { width: 390 });
+    }
   }
 
   getSerialKeys(item: { name: string; serials?: string }) {
-    return `${item.name}
-     Serials: ${item.serials?.split('\n').join(' ')}`;
+    return `Serials: ${item.serials?.split('\n').join(' ')}`;
   }
+
+  checkPagePagination(doc) {
+    if (doc.y > 680) {
+      doc.addPage();
+    }
+  }
+
   generateHr(doc, y) {
     doc
       .strokeColor('#aaaaaa')
