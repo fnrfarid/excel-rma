@@ -29,15 +29,16 @@ export class MaterialTransferDataSource extends DataSource<StockEntryRow> {
 }
 
 export class StockEntryRow {
-  s_warehouse: string;
-  t_warehouse: string;
+  s_warehouse?: string;
+  t_warehouse?: string;
   warranty_date?: string;
   item_code: string;
-  transferWarehouse: string;
-  has_serial_no: number;
+  transferWarehouse?: string;
+  has_serial_no?: number;
   item_name: string;
   qty: number;
-  serial_no: any;
+  serial_no?: any;
+  [key: string]: any;
 }
 
 export class MaterialTransferDto {

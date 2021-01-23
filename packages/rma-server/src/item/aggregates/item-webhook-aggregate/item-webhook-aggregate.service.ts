@@ -189,6 +189,7 @@ export class ItemWebhookAggregateService extends AggregateRoot {
           return of();
         }
         itemPayload.isSynced = true;
+        delete itemPayload.has_serial_no;
         this.itemService
           .updateOne({ uuid: item.uuid }, { $set: itemPayload })
           .then(success => {})

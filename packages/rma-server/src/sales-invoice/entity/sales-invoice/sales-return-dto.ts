@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  ValidateNested,
+  Max,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateSalesReturnDto {
   @IsNotEmpty()
@@ -56,6 +63,8 @@ export class CreateSalesReturnDto {
   sales_team: any[];
 
   @IsOptional()
+  @ValidateNested()
+  @Type(() => SalesReturnItemDto)
   credit_note_items: SalesReturnItemDto[];
 }
 
@@ -64,6 +73,7 @@ export class SalesReturnItemDto {
   item_code: string;
 
   @IsNotEmpty()
+  @Max(-1)
   qty: number;
 
   @IsNotEmpty()
@@ -76,10 +86,9 @@ export class SalesReturnItemDto {
   @IsNumber()
   has_serial_no: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   against_sales_invoice: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   serial_no: any;
-  // "12348\n12349\n12350"
 }

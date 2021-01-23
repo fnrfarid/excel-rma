@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, HttpService } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  HttpService,
+  ForbiddenException,
+} from '@nestjs/common';
 import {
   StockEntryDto,
   StockEntryItemDto,
@@ -11,6 +16,8 @@ import {
   STOCK_ENTRY_STATUS,
   STOCK_ENTRY_TYPE,
   AGENDA_JOB_STATUS,
+  STOCK_ENTRY_PERMISSIONS,
+  SYSTEM_MANAGER,
 } from '../../../constants/app-strings';
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
@@ -29,22 +36,98 @@ export class StockEntryPoliciesService {
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        return this.validateStockSerials(
-          payload.items,
-          payload.stock_entry_type,
-          settings,
-          clientHttpRequest,
+    return this.validateStockEntryItems(payload).pipe(
+      switchMap(done => {
+        return this.settingsService.find().pipe(
+          switchMap(settings => {
+            return this.validateStockSerials(
+              payload.items,
+              payload.stock_entry_type,
+              settings,
+              clientHttpRequest,
+            );
+          }),
+          switchMap(() => {
+            if (
+              payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+            ) {
+              return of(true);
+            }
+            return this.validateItemStock(payload, clientHttpRequest);
+          }),
         );
       }),
-      switchMap(() => {
-        if (payload.stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+    );
+  }
+
+  validateStockEntryItems(payload: StockEntryDto) {
+    return from(payload.items).pipe(
+      mergeMap(item => {
+        if (!item.has_serial_no) {
           return of(true);
         }
-        return this.validateItemStock(payload, clientHttpRequest);
+        const serialSet = new Set();
+        item.serial_no.forEach(no => serialSet.add(no));
+        if (Array.from(serialSet).length !== item.serial_no.length) {
+          return throwError(
+            new BadRequestException(
+              `Found duplicate serials for ${item.item_name}.`,
+            ),
+          );
+        }
+        return of(true);
       }),
+      toArray(),
+      switchMap(success => of(true)),
     );
+  }
+
+  validateStockPermission(stock_entry_type: string, operation: string, req) {
+    const message = new ForbiddenException(
+      `User has no permissions for ${operation} operation, on ${stock_entry_type}`,
+    );
+
+    switch (stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry_receipt[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry_rnd[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return this.validateStockRoles(
+          STOCK_ENTRY_PERMISSIONS.stock_entry_issue[operation],
+          req,
+        )
+          ? of(true)
+          : throwError(message);
+
+      default:
+        return throwError(new BadRequestException('Invalid StockEntry type'));
+    }
+  }
+
+  validateStockRoles(permissions: string[], req) {
+    permissions.push(SYSTEM_MANAGER);
+    return permissions.some(p => req.token.roles.indexOf(p) >= 0);
   }
 
   validateItemStock(payload: StockEntryDto, req) {
@@ -281,7 +364,6 @@ export class StockEntryPoliciesService {
           $or: [
             {
               'warranty.soldOn': { $exists: false },
-              'queue_state.delivery_note': { $exists: false },
             },
             {
               'warranty.claim_no': { $exists: true },

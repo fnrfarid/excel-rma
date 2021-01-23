@@ -367,3 +367,109 @@ export const SERIAL_FILTER_KEYS = [
   'sales_invoice_name',
   'purchase_invoice_name',
 ];
+export const STOCK_ENTRY_PERMISSIONS = {
+  stock_entry: {
+    read: [
+      'Branch Sales Manager',
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    submit: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    accept: [
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'General Admin',
+    ],
+    delete: ['General Admin'],
+  },
+
+  // Material Receipt
+  stock_entry_receipt: {
+    read: [
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'General Admin',
+    ],
+    submit: ['Branch Stock Receipt Approver', 'General Admin'],
+    delete: ['General Admin'],
+  },
+
+  // Material Issue
+  stock_entry_issue: {
+    read: [
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'General Admin',
+    ],
+    submit: ['Branch Stock Issue Approver', 'General Admin'],
+    delete: ['General Admin'],
+  },
+
+  // Material RnD
+  stock_entry_rnd: {
+    read: [
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+    create: [
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+    update: [
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+    ],
+    submit: ['Branch Stock RnD Approver', 'General Admin'],
+    delete: ['General Admin'],
+  },
+};
+export const STOCK_OPERATION = {
+  read: 'read',
+  create: 'create',
+  update: 'update',
+  submit: 'submit',
+  delete: 'delete',
+  accept: 'accept',
+};

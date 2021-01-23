@@ -12,7 +12,6 @@ import {
   SCOPES_OPENID_ALL,
   TWENTY_MINUTES_IN_SECONDS,
   LOGGED_IN,
-  AUTH_SERVER_URL,
   ALL_TERRITORIES,
   WARRANTY_APP_URL,
 } from './constants/storage';
@@ -35,13 +34,9 @@ export class AppComponent implements OnInit {
   subscription: Subscription;
   isSettingMenuVisible: boolean = false;
   isSalesMenuVisible: boolean = false;
-  isRnDMenuVisible: boolean = false;
   isStockMenuVisible: boolean = false;
   isRelayMenuVisible: boolean = false;
 
-  newDNUrl: string = '';
-  listRnDURL: string = '';
-  binListURL: string = '';
   fullName: string = '';
   imageURL: string = '';
   constructor(
@@ -115,7 +110,6 @@ export class AppComponent implements OnInit {
   }
 
   loadProfile(token: string) {
-    this.getRnDUrls();
     this.appService.loadProfile(token).subscribe({
       error: error => {
         this.loggedIn = false;
@@ -170,17 +164,6 @@ export class AppComponent implements OnInit {
       });
   }
 
-  getRnDUrls() {
-    this.appService
-      .getStorage()
-      .getItem(AUTH_SERVER_URL)
-      .then(auth_url => {
-        this.newDNUrl = `${auth_url}/desk#Form/Delivery Note/New Delivery Note 1`;
-        this.listRnDURL = `${auth_url}/desk#List/Delivery Note/List?against_sales_invoice=["is","not set"]`;
-        this.binListURL = `${auth_url}/desk#List/Bin/List`;
-      });
-  }
-
   setupSilentRefresh() {
     const source = interval(TEN_MINUTES_IN_MS);
     this.subscription = source.subscribe(val => this.silentRefresh());
@@ -221,11 +204,13 @@ export class AppComponent implements OnInit {
                 .getStorage()
                 .setItem(STATE, state)
                 .then(savedState => {
-                  const url = this.appService.getEncodedFrappeLoginUrl(
-                    response.authorizationURL,
-                    frappe_auth_config,
-                    savedState,
-                  );
+                  const url = this.appService
+                    .getEncodedFrappeLoginUrl(
+                      response.authorizationURL,
+                      frappe_auth_config,
+                      savedState,
+                    )
+                    .replace(/^http:\/\//i, 'https://');
 
                   const existingIframe = document.getElementsByClassName(
                     'silent-iframe',

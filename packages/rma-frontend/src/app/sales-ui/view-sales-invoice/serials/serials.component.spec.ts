@@ -1,4 +1,8 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  NO_ERRORS_SCHEMA,
+  Renderer2,
+} from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SerialsComponent } from './serials.component';
@@ -47,6 +51,10 @@ describe('SerialsComponent', () => {
         },
         {
           provide: ViewSalesInvoicePage,
+          useValue: {},
+        },
+        {
+          provide: Renderer2,
           useValue: {},
         },
         {

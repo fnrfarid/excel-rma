@@ -82,7 +82,7 @@ export class SalesService {
   getBundleItem(item_codes: { [key: string]: number }) {
     const params = new HttpParams().set(
       'item_codes',
-      JSON.stringify(item_codes),
+      encodeURIComponent(JSON.stringify(item_codes)),
     );
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -272,7 +272,7 @@ export class SalesService {
 
   getItemList(
     filter: any = {},
-    sortOrder: any = { item_code: 'asc' },
+    sortOrder: any = { item_name: 'asc' },
     pageIndex = 0,
     pageSize = 30,
     query?: { [key: string]: any },
@@ -280,11 +280,11 @@ export class SalesService {
     try {
       sortOrder = JSON.stringify(sortOrder);
     } catch {
-      sortOrder = JSON.stringify({ item_code: 'asc' });
+      sortOrder = JSON.stringify({ item_name: 'asc' });
     }
     const url = LIST_ITEMS_ENDPOINT;
     query = query ? query : {};
-    query.item_code = filter?.item_code ? filter.item_code : filter;
+    query.item_name = filter?.item_name ? filter.item_name : filter;
     query.disabled = 0;
 
     const params = new HttpParams()
@@ -617,7 +617,7 @@ export class SalesService {
     const url = RELAY_GET_DELIVERY_NOTE_ENDPOINT;
     const params = new HttpParams({
       fromObject: {
-        filters: `[["against_sales_invoice","=","${invoice_name}"],["status","!=","Cancelled"]]`,
+        filters: `[["against_sales_invoice","=","${invoice_name}"],["is_return","=","0"]]`,
       },
     });
     return this.getHeaders().pipe(

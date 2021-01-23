@@ -172,7 +172,7 @@ deploy_staging_frontend:
   stage: deploy
   only:
     refs:
-      - master
+      - develop
     changes:
       - packages/rma-frontend/**/*
   before_script:

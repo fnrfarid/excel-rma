@@ -4,6 +4,7 @@ import {
   Inject,
   ViewChild,
   ElementRef,
+  Renderer2,
 } from '@angular/core';
 import { SalesService } from '../../services/sales.service';
 import { FormControl, Validators } from '@angular/forms';
@@ -151,6 +152,7 @@ export class SerialsComponent implements OnInit {
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
     private readonly timeService: TimeService,
+    private readonly renderer: Renderer2,
     private readonly viewSalesInvoicePage: ViewSalesInvoicePage,
     private readonly loadingController: LoadingController,
   ) {}
@@ -443,6 +445,17 @@ export class SerialsComponent implements OnInit {
     });
 
     this.itemDataSource.update(itemData);
+  }
+
+  onSerialKepUp(i) {
+    let element;
+    try {
+      element = this.renderer.selectRootElement(`#serials${i + 1}`);
+    } catch {
+      return;
+    }
+
+    element?.focus();
   }
 
   getSerialsInputValue(row) {

@@ -19,7 +19,7 @@ import { ValidateInputSelected } from '../../common/pipes/validators';
 export class SalesReturnPage implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-  statusList = ['Draft', 'To Bill', 'Completed'];
+  statusList = ['Canceled', 'Returned'];
   total = 0;
   dataSource: SalesReturnListDataSource;
   customerList: any;
@@ -115,9 +115,9 @@ export class SalesReturnPage implements OnInit {
       this.countFilter.name = ['like', `%${this.f.name.value}%`];
     }
 
-    if (this.f.status) {
-      this.filters.push(['status', '=', this.f.status.value]);
-      this.countFilter.status = ['=', this.f.status.value];
+    if (this.f.status.value) {
+      this.filters.push(['docstatus', '=', this.getStatus()]);
+      this.countFilter.docstatus = ['=', this.getStatus()];
     }
 
     if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
@@ -127,6 +127,10 @@ export class SalesReturnPage implements OnInit {
       this.countFilter.creation = ['Between', `${fromDate} ${toDate}`];
     }
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
+  }
+
+  getStatus() {
+    return this.f.status.value === 'Canceled' ? 2 : 1;
   }
 
   dateFilter() {
