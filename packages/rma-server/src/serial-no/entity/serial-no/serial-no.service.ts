@@ -68,7 +68,7 @@ export class SerialNoService {
       if (!SERIAL_FILTER_KEYS.includes(key)) {
         delete filterQuery[key];
       }
-      if (['item_code','warehouse'].includes(key) && !filterQuery[key]) {
+      if (['item_code', 'warehouse'].includes(key) && !filterQuery[key]) {
         delete filterQuery[key];
       }
     });
