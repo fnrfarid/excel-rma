@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import {
   SERIAL_DOWNLOAD_HEADERS,
   CSV_FILE_TYPE,
+  CLOSE,
 } from '../../constants/app-string';
 import { SerialSearchFields } from './search-fields.interface';
 import { SerialSearchDataSource } from './serial-search-datasource';
@@ -15,6 +16,7 @@ import { debounceTime, startWith, switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { SerialsService } from '../../common/helpers/serials/serials.service';
 import { ValidateInputSelected } from '../../common/pipes/validators';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-serial-search',
   templateUrl: './serial-search.page.html',
@@ -75,6 +77,7 @@ export class SerialSearchPage implements OnInit {
     private readonly serialSearchService: SerialSearchService,
     private readonly route: ActivatedRoute,
     private readonly serialService: SerialsService,
+    private readonly snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -122,12 +125,29 @@ export class SerialSearchPage implements OnInit {
       }
     }
 
-    this.dataSource.loadItems(
-      sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-      query,
+    if (this.validateState()) {
+      this.dataSource.loadItems(
+        sortQuery,
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        query,
+      );
+    }
+  }
+
+  validateState() {
+    if (this.f.serial_no.value) {
+      return true;
+    }
+    if (this.f.item_code.value && this.f.warehouse.value) {
+      return true;
+    }
+    this.snackBar.open(
+      'Either Serial number or Warehosue and Item are mandatory for Serial Search',
+      CLOSE,
+      { duration: 3000 },
     );
+    return false;
   }
 
   getFilterQuery() {
