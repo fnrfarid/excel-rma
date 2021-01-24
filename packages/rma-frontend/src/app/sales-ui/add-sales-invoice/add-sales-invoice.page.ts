@@ -383,7 +383,7 @@ export class AddSalesInvoicePage implements OnInit {
   customerChanged(customer, postingDate?) {
     if (customer.credit_days) {
       let date;
-      postingDate ? date = new Date(postingDate) : date = new Date();
+      postingDate ? (date = new Date(postingDate)) : (date = new Date());
       date.setDate(date.getDate() + customer.credit_days);
       this.salesInvoiceForm.get('dueDate').setValue(date);
     }
