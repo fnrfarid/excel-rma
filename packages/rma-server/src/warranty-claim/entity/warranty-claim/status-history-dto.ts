@@ -48,4 +48,8 @@ export class StatusHistoryDto {
   @IsOptional()
   @IsString()
   doc_name: string;
+
+  @IsOptional()
+  @IsString()
+  created_by: string;
 }
