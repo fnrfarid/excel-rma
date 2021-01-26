@@ -118,6 +118,12 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   status_history: StatusHistory[];
+
+  @Column()
+  progress_state: any[];
+
+  @Column()
+  completed_delivery_note: any[];
 }
 
 export class StatusHistory {

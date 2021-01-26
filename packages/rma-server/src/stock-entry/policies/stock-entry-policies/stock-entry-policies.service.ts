@@ -3,6 +3,7 @@ import {
   BadRequestException,
   HttpService,
   ForbiddenException,
+  NotImplementedException,
 } from '@nestjs/common';
 import {
   StockEntryDto,
@@ -23,22 +24,23 @@ import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
-
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { DateTime } from 'luxon';
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
     private readonly serialNoService: SerialNoService,
-    private readonly settingsService: SettingsService,
     private readonly serialNoHistoryPolicy: SerialNoHistoryPoliciesService,
     private readonly agendaJob: AgendaJobService,
     private readonly http: HttpService,
     private readonly settings: SettingsService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
     return this.validateStockEntryItems(payload).pipe(
       switchMap(done => {
-        return this.settingsService.find().pipe(
+        return this.settings.find().pipe(
           switchMap(settings => {
             return this.validateStockSerials(
               payload.items,
@@ -401,6 +403,97 @@ export class StockEntryPoliciesService {
               return of(true);
             }
             return throwError(new BadRequestException(message));
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(isValid => {
+        return of(true);
+      }),
+    );
+  }
+
+  validateCancelWarrantyStockEntry(stockVoucherNumber) {
+    return from(
+      this.serialNoHistoryService.findOne({ document_no: stockVoucherNumber }),
+    ).pipe(
+      switchMap(serialHistory => {
+        return from(
+          this.serialNoHistoryService.find({
+            serial_no: serialHistory.serial_no,
+            created_on: { $gt: DateTime.fromJSDate(serialHistory.created_on) },
+          }),
+        );
+      }),
+      switchMap(serialHistory => {
+        if (serialHistory.length) {
+          return throwError(
+            new NotImplementedException('First Cancel Other documents'),
+          );
+        }
+        return of(true);
+      }),
+    );
+  }
+
+  validateWarrantyStockEntry(payload: StockEntryDto, clientHttpRequest) {
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        return this.validateWarrantyStockSerials(
+          payload.items,
+          settings,
+          clientHttpRequest,
+        );
+      }),
+    );
+  }
+
+  validateWarrantyStockSerials(
+    items: StockEntryItemDto[],
+    settings,
+    clientHttpRequest,
+  ) {
+    return from(items).pipe(
+      mergeMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
+        return from(
+          this.serialNoService.count({
+            serial_no: { $in: item.serial_no },
+            item_code: item.item_code,
+            $or: [
+              {
+                $or: [
+                  { warehouse: item.s_warehouse },
+                  {
+                    'queue_state.purchase_receipt.warehouse': item.s_warehouse,
+                  },
+                ],
+              },
+              {
+                $or: [
+                  {
+                    'warranty.soldOn': { $exists: false },
+                    'queue_state.delivery_note': { $exists: false },
+                  },
+                  {
+                    'warranty.claim_no': { $exists: true },
+                  },
+                ],
+              },
+            ],
+          }),
+        ).pipe(
+          mergeMap(count => {
+            if (count === item.serial_no.length) {
+              return of(true);
+            }
+            return throwError(
+              new BadRequestException(
+                `Expected ${item.serial_no.length} serials for Item: ${item.item_name} at warehouse: ${item.s_warehouse}, found ${count}.`,
+              ),
+            );
           }),
         );
       }),

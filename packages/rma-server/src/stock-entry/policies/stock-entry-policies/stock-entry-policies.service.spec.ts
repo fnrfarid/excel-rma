@@ -5,6 +5,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { HttpService } from '@nestjs/common';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 
 describe('StockEntryPoliciesService', () => {
   let service: StockEntryPoliciesService;
@@ -31,6 +32,10 @@ describe('StockEntryPoliciesService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: SerialNoHistoryService,
           useValue: {},
         },
       ],

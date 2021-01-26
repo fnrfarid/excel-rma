@@ -25,7 +25,7 @@ import {
 } from '../../../../constants/messages';
 import { LoadingController } from '@ionic/angular';
 import { mergeMap, switchMap, toArray } from 'rxjs/operators';
-import { from } from 'rxjs';
+import { from, of } from 'rxjs';
 
 @Component({
   selector: 'app-add-stock-entry',
@@ -94,25 +94,42 @@ export class AddStockEntryPage implements OnInit {
     this.location.back();
   }
 
-  async submitDraft() {
+  async createDeliveryNotes() {
     const loading = await this.loadingController.create({
-      message: 'fetching data...!',
+      message: 'making stock entries...!',
     });
-    await loading.present();
+    loading.present();
     from(this.dataSource.data())
       .pipe(
         mergeMap(item => {
-          if (item.stock_entry_type === STOCK_ENTRY_ITEM_TYPE.RETURNED) {
-            loading.message = 'making stock entry...!';
-            item.qty = -item.qty;
-            return this.createReturnDeliveryNotes(item);
-          }
-          if (item.stock_entry_type === STOCK_ENTRY_ITEM_TYPE.DELIVERED) {
-            loading.message = 'making stock entry...!';
-            return this.createReturnDeliveryNotes(item);
+          let selectedItem = {} as StockEntryDetails;
+          selectedItem.items = [];
+          if (item.has_serial_no) {
+            return this.addServiceInvoiceService
+              .getSerialItemFromRMAServer(item.serial_no)
+              .pipe(
+                switchMap(res => {
+                  selectedItem = this.mapStockData(res, item);
+                  selectedItem.items = [item];
+                  return of(selectedItem);
+                }),
+              );
+          } else {
+            return this.addServiceInvoiceService
+              .getItemFromRMAServer(item.item_code)
+              .pipe(
+                switchMap(res => {
+                  selectedItem = this.mapStockData(res, item);
+                  selectedItem.items = [item];
+                  return of(selectedItem);
+                }),
+              );
           }
         }),
         toArray(),
+        switchMap(success => {
+          return this.addServiceInvoiceService.createStockEntry(success);
+        }),
       )
       .subscribe({
         next: success => {
@@ -125,40 +142,14 @@ export class AddStockEntryPage implements OnInit {
             this.activatedRoute.snapshot.params.uuid,
           ]);
         },
-        error: err => {
+        error: ({ message }) => {
           loading.dismiss();
-          this.snackbar.open(STOCK_ENTRY_CREATE_FAILURE, 'Close', {
+          if (!message) message = STOCK_ENTRY_CREATE_FAILURE;
+          this.snackbar.open(message, 'Close', {
             duration: DURATION,
           });
         },
       });
-  }
-
-  createReturnDeliveryNotes(item) {
-    let selectedItem = {} as StockEntryDetails;
-    selectedItem.items = [];
-
-    if (item.has_serial_no) {
-      return this.addServiceInvoiceService
-        .getSerialItemFromRMAServer(item.serial_no)
-        .pipe(
-          switchMap(res => {
-            selectedItem = this.mapStockData(res, item);
-            selectedItem.items = [item];
-            return this.addServiceInvoiceService.createStockEntry(selectedItem);
-          }),
-        );
-    } else {
-      return this.addServiceInvoiceService
-        .getItemFromRMAServer(item.item_code)
-        .pipe(
-          switchMap(res => {
-            selectedItem = this.mapStockData(res, item);
-            selectedItem.items = [item];
-            return this.addServiceInvoiceService.createStockEntry(selectedItem);
-          }),
-        );
-    }
   }
 
   mapStockData(res, item) {
@@ -167,6 +158,7 @@ export class AddStockEntryPage implements OnInit {
     selectedItem.set_warehouse = item.s_warehouse;
     selectedItem.customer = this.warrantyObject.customer;
     selectedItem.salesWarrantyDate = res?.warranty?.salesWarrantyDate;
+    selectedItem.soldOn = res?.warranty?.soldOn;
     selectedItem.delivery_note = res?.delivery_note;
     selectedItem.sales_invoice_name = res?.sales_invoice_name;
     selectedItem.company = this.company;
