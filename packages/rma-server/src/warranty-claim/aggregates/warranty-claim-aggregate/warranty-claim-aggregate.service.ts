@@ -398,15 +398,62 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   removeStatusHistory(uuid) {
-    return from(
-      this.warrantyClaimService.updateOne(uuid, {
-        $set: {
-          delivery_branch: '',
-          delivery_date: '',
-        },
-        $pop: {
-          status_history: 1,
-        },
+    let setting;
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        setting = settings;
+        return from(
+          this.warrantyClaimService.updateOne(uuid, {
+            $set: {
+              delivery_branch: '',
+              delivery_date: '',
+            },
+            $pop: {
+              status_history: 1,
+            },
+          }),
+        );
+      }),
+      switchMap(res => {
+        return this.warrantyClaimService.findOne(uuid, {
+          status_history: { $slice: -1 },
+        });
+      }),
+      switchMap(res => {
+        const statusHistory = {} as StatusHistoryDto;
+        Object.assign(statusHistory, res.status_history.splice(-1)[0]);
+        statusHistory.doc_name = res.claim_no;
+        if (statusHistory.verdict === VERDICT.RECEIVED_FROM_CUSTOMER) {
+          statusHistory.transfer_branch = statusHistory.status_from;
+          statusHistory.status_from = res.customer;
+        }
+        const verdict_key = Object.keys(VERDICT).find(
+          key => VERDICT[key] === statusHistory.verdict,
+        );
+        const eventType = EventType[verdict_key];
+        const serialNoHistory: SerialNoHistoryInterface = {};
+        serialNoHistory.created_by = statusHistory.created_by;
+        serialNoHistory.created_on = statusHistory.posting_date;
+        serialNoHistory.document_no = statusHistory.doc_name;
+        serialNoHistory.document_type = WARRANTY_CLAIM_DOCTYPE;
+        serialNoHistory.eventDate = DateTime.fromISO(
+          statusHistory.posting_date,
+        ).setZone(setting.timeZone);
+        serialNoHistory.eventType = eventType;
+        serialNoHistory.parent_document = res.uuid;
+        serialNoHistory.transaction_from = statusHistory.status_from;
+        serialNoHistory.transaction_to = !statusHistory.transfer_branch
+          ? statusHistory.status_from
+          : statusHistory.transfer_branch;
+        return this.serialNoHistoryService.updateOne(
+          {
+            serial_no: res.serial_no,
+            document_type: WARRANTY_CLAIM_DOCTYPE,
+          },
+          {
+            $set: serialNoHistory,
+          },
+        );
       }),
     );
   }
@@ -526,9 +573,20 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         serialHistory.transaction_to = !statusHistoryPayload.transfer_branch
           ? statusHistoryPayload.status_from
           : statusHistoryPayload.transfer_branch;
-        return this.serialNoHistoryService.addSerialHistory(
-          serialArray,
-          serialHistory,
+        if (statusHistoryPayload.verdict === VERDICT.RECEIVED_FROM_CUSTOMER) {
+          return this.serialNoHistoryService.addSerialHistory(
+            serialArray,
+            serialHistory,
+          );
+        }
+        return this.serialNoHistoryService.updateOne(
+          {
+            serial_no: serialArray[0],
+            document_type: WARRANTY_CLAIM_DOCTYPE,
+          },
+          {
+            $set: serialHistory,
+          },
         );
       }),
     );
