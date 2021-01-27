@@ -3,7 +3,12 @@
     <ion-menu contentId="main-content" type="overlay">
       <ion-header>
         <ion-toolbar>
-          <ion-title>Menu</ion-title>
+          <ion-title> 
+            Menu  
+          </ion-title>
+          <ion-text (click)="startTimer()" slot="end" color="primary">
+            {{counter | formatTime}}
+          </ion-text>
         </ion-toolbar>
       </ion-header>
       <ion-content>

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.2.0...rma-server@1.2.1) (2021-01-27)
+
+
+### Bug Fixes
+
+* **excel-rma:** Add fixes for item-price, stock, webhooks ([ce7c597](https://gitlab.com/castlecraft/excel-rma/commit/ce7c597cfd14691cabd0cba66a0cfec080ada4df))
+
+
+
+
+
 # [1.2.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.1.0...rma-server@1.2.0) (2021-01-23)
 
 

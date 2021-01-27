@@ -100,8 +100,8 @@ export class StockEntryController {
   @Post('v1/create_warranty_stock')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  createWarrantyStock(@Body() body: WarrantyStockEntryDto, @Req() req) {
-    return this.warrantyStockAggregate.createStockEntry(body, req);
+  createWarrantyStock(@Body() body: WarrantyStockEntryDto[], @Req() req) {
+    return this.warrantyStockAggregate.createDeliveryNote(body, req);
   }
 
   @Get('v1/get_warranty_stock/:warrantyClaimUuid')
@@ -119,12 +119,5 @@ export class StockEntryController {
       stockVoucherNumber,
       req,
     );
-  }
-
-  @Post('v1/create_return')
-  @UseGuards(TokenGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  returnStock(@Body() payload, @Req() req) {
-    return this.warrantyStockAggregate.returnStock(payload, req);
   }
 }

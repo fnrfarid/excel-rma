@@ -20,7 +20,7 @@
     <ion-fab-button
       class="fab-position"
       [disabled]="stockEntryForm.invalid"
-      (click)="submitDraft()"
+      (click)="createDeliveryNotes()"
     >
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
@@ -28,9 +28,7 @@
   <form [formGroup]="stockEntryForm">
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
@@ -108,9 +106,7 @@
       <ion-row class="align">
         <ion-col>
           <ion-card-title>
-            <ion-text color="tertiary">
-              Items
-            </ion-text>
+            <ion-text color="tertiary"> Items </ion-text>
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right" size="auto">
@@ -131,7 +127,7 @@
     </ion-card-header>
     <ion-card-content class="ion-no-padding">
       <ion-item lines="none">
-        <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+        <mat-table #table [dataSource]="dataSource" style="width: 100%">
           <ng-container matColumnDef="stock_entry_type">
             <mat-header-cell *matHeaderCellDef
               >Stock Entry Type</mat-header-cell
@@ -157,7 +153,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  style="width: 400px !important;"
+                  style="width: 400px !important"
                   [value]="row.stock_entry_type"
                   column="stock_entry_type"
                 ></inline-edit>
@@ -189,7 +185,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  style="width: 400px !important;"
+                  style="width: 400px !important"
                   [value]="row.item_name"
                   column="item"
                   [minimumPrice]="row.minimumPrice"
@@ -222,7 +218,7 @@
               >
                 <inline-edit
                   *ngIf="row.has_serial_no"
-                  style="width: 400px !important;"
+                  style="width: 400px !important"
                   [value]="row.serial_no"
                   column="serial_no"
                   [minimumPrice]="row.minimumPrice"
@@ -257,7 +253,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  style="width: 400px !important;"
+                  style="width: 400px !important"
                   [value]="row.s_warehouse"
                   column="warehouse"
                 ></inline-edit>
@@ -274,9 +270,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container>
-                {{row.qty}}
-              </ng-container>
+              <ng-container> {{row.qty}} </ng-container>
 
               <sat-popover
                 #p

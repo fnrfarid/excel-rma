@@ -380,9 +380,10 @@ export class AddSalesInvoicePage implements OnInit {
     this.dataSource.update(this.dataSource.data());
   }
 
-  customerChanged(customer) {
+  customerChanged(customer, postingDate?) {
     if (customer.credit_days) {
-      const date = new Date();
+      let date;
+      postingDate ? (date = new Date(postingDate)) : (date = new Date());
       date.setDate(date.getDate() + customer.credit_days);
       this.salesInvoiceForm.get('dueDate').setValue(date);
     }
@@ -597,6 +598,7 @@ export class AddSalesInvoicePage implements OnInit {
 
   selectedPostingDate($event) {
     this.postingDate = this.getParsedDate($event.value);
+    this.customerChanged(this.f.customer.value, $event.value);
   }
 
   selectedDueDate($event) {

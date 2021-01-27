@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseOrderWebhookController } from './purchase-order-webhook.controller';
 import { PurchaseOrderWebhookAggregateService } from '../../aggregates/purchase-order-webhook-aggregate/purchase-order-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
 describe('PurchaseOrderWebhook Controller', () => {
@@ -16,6 +18,8 @@ describe('PurchaseOrderWebhook Controller', () => {
       ],
     })
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(FrappeWebhookPipe)
       .useValue({})
       .compile();
 

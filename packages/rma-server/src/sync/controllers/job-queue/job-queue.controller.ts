@@ -15,6 +15,7 @@ import {
 } from '../../../constants/listing-dto/job-queue-list-query.dto';
 import { JobQueueAggregateService } from '../../aggregates/job-queue-aggregate/job-queue-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
 
 @Controller('job_queue')
 export class JobQueueController {
@@ -51,7 +52,7 @@ export class JobQueueController {
   }
 
   @Post('v1/webhook')
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   async jobUpdated(@Body() jobPayload: ExcelDataImportWebhookDto) {
     return await this.aggregate.jobUpdated(jobPayload);
   }

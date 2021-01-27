@@ -3,6 +3,7 @@ import {
   BadRequestException,
   HttpService,
   ForbiddenException,
+  NotImplementedException,
 } from '@nestjs/common';
 import {
   StockEntryDto,
@@ -23,22 +24,25 @@ import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
-
+import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
+import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { DateTime } from 'luxon';
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
     private readonly serialNoService: SerialNoService,
-    private readonly settingsService: SettingsService,
     private readonly serialNoHistoryPolicy: SerialNoHistoryPoliciesService,
+    private readonly serialNoPolicy: SerialNoPoliciesService,
     private readonly agendaJob: AgendaJobService,
     private readonly http: HttpService,
     private readonly settings: SettingsService,
+    private readonly serialNoHistoryService: SerialNoHistoryService,
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
     return this.validateStockEntryItems(payload).pipe(
       switchMap(done => {
-        return this.settingsService.find().pipe(
+        return this.settings.find().pipe(
           switchMap(settings => {
             return this.validateStockSerials(
               payload.items,
@@ -67,11 +71,16 @@ export class StockEntryPoliciesService {
           return of(true);
         }
         const serialSet = new Set();
-        item.serial_no.forEach(no => serialSet.add(no));
+        const duplicateSerials = [];
+        item.serial_no.forEach(no => {
+          serialSet.has(no) ? duplicateSerials.push(no) : null;
+          serialSet.add(no);
+        });
         if (Array.from(serialSet).length !== item.serial_no.length) {
           return throwError(
             new BadRequestException(
-              `Found duplicate serials for ${item.item_name}.`,
+              `Found following as duplicate serials for ${item.item_name}. 
+              ${duplicateSerials.splice(0, 50).join(', ')}...`,
             ),
           );
         }
@@ -385,22 +394,150 @@ export class StockEntryPoliciesService {
           mergeMap(count => {
             const message = `Found ${count} Qty for Item : ${item.item_name} at warehouse: ${item.s_warehouse}.`;
             if (
-              count === item.serial_no.length &&
               [
                 STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
                 STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
                 STOCK_ENTRY_TYPE.RnD_PRODUCTS,
               ].includes(stock_entry_type)
             ) {
-              return of(true);
+              return count === item.serial_no.length
+                ? of(true)
+                : this.getDeliveryNoteInvalidSerials(item, count);
             }
-            if (
-              count === 0 &&
-              stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
-            ) {
-              return of(true);
+            if (stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+              return count === 0
+                ? of(true)
+                : this.getReceiptInvalidSerials(query, count);
             }
             return throwError(new BadRequestException(message));
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(isValid => {
+        return of(true);
+      }),
+    );
+  }
+
+  getDeliveryNoteInvalidSerials(item, count) {
+    return this.serialNoPolicy
+      .validateSerials({
+        item_code: item.item_code,
+        serials: item.serial_no,
+        warehouse: item.s_warehouse,
+        validateFor: 'delivery_note',
+      })
+      .pipe(
+        switchMap(data => {
+          return throwError(
+            new BadRequestException(`Found ${data?.notFoundSerials.length}
+        Invalid Serials: ${data?.notFoundSerials.splice(0, 50).join(', ')}`),
+          );
+        }),
+      );
+  }
+
+  getReceiptInvalidSerials(query, count) {
+    return from(
+      this.serialNoService.find({
+        where: query,
+        limit: 50,
+      }),
+    ).pipe(
+      switchMap(serials => {
+        return throwError(
+          new BadRequestException(
+            `Found ${count} invalid serials. ${serials
+              .map(s => s.serial_no)
+              .join(', ')}`,
+          ),
+        );
+      }),
+    );
+  }
+
+  validateCancelWarrantyStockEntry(stockVoucherNumber) {
+    return from(
+      this.serialNoHistoryService.findOne({ document_no: stockVoucherNumber }),
+    ).pipe(
+      switchMap(serialHistory => {
+        return from(
+          this.serialNoHistoryService.find({
+            serial_no: serialHistory.serial_no,
+            created_on: { $gt: DateTime.fromJSDate(serialHistory.created_on) },
+          }),
+        );
+      }),
+      switchMap(serialHistory => {
+        if (serialHistory.length) {
+          return throwError(
+            new NotImplementedException('First Cancel Other documents'),
+          );
+        }
+        return of(true);
+      }),
+    );
+  }
+
+  validateWarrantyStockEntry(payload: StockEntryDto, clientHttpRequest) {
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        return this.validateWarrantyStockSerials(
+          payload.items,
+          settings,
+          clientHttpRequest,
+        );
+      }),
+    );
+  }
+
+  validateWarrantyStockSerials(
+    items: StockEntryItemDto[],
+    settings,
+    clientHttpRequest,
+  ) {
+    return from(items).pipe(
+      mergeMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
+        return from(
+          this.serialNoService.count({
+            serial_no: { $in: item.serial_no },
+            item_code: item.item_code,
+            $or: [
+              {
+                $or: [
+                  { warehouse: item.s_warehouse },
+                  {
+                    'queue_state.purchase_receipt.warehouse': item.s_warehouse,
+                  },
+                ],
+              },
+              {
+                $or: [
+                  {
+                    'warranty.soldOn': { $exists: false },
+                    'queue_state.delivery_note': { $exists: false },
+                  },
+                  {
+                    'warranty.claim_no': { $exists: true },
+                  },
+                ],
+              },
+            ],
+          }),
+        ).pipe(
+          mergeMap(count => {
+            if (count === item.serial_no.length) {
+              return of(true);
+            }
+            return throwError(
+              new BadRequestException(
+                `Expected ${item.serial_no.length} serials for Item: ${item.item_name} at warehouse: ${item.s_warehouse}, found ${count}.`,
+              ),
+            );
           }),
         );
       }),

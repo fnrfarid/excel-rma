@@ -96,7 +96,7 @@ export class AddWarrantyService {
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
+      .set('search', encodeURIComponent(filter))
       .set('sort', sortOrder);
 
     return this.getHeaders().pipe(

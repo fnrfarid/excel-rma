@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectController } from './connect.controller';
 import { ConnectService } from '../../aggregates/connect/connect.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
 
 describe('ConnectController', () => {
   let module: TestingModule;
@@ -16,6 +17,8 @@ describe('ConnectController', () => {
       ],
     })
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(FrappeWebhookPipe)
       .useValue({})
       .compile();
   });

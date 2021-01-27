@@ -9,6 +9,7 @@ import { TokenCache } from './entities/token-cache/token-cache.entity';
 import { TOKEN_CACHE_CONNECTION } from '../constants/typeorm.connection';
 import { AuthSchedulers } from './schedulers';
 import { CustomerEntitiesModule } from '../customer/entity/entity.module';
+import { FrappeWebhookPipe } from './guards/webhook.pipe';
 
 @Global()
 @Module({
@@ -20,10 +21,17 @@ import { CustomerEntitiesModule } from '../customer/entity/entity.module';
     TokenCacheService,
     RoleGuard,
     TokenGuard,
+    FrappeWebhookPipe,
     ...AuthSchedulers,
     ...AuthAggregates,
   ],
-  exports: [TokenCacheService, RoleGuard, TokenGuard, ...AuthAggregates],
+  exports: [
+    TokenCacheService,
+    RoleGuard,
+    TokenGuard,
+    FrappeWebhookPipe,
+    ...AuthAggregates,
+  ],
   controllers: [...AuthControllers],
 })
 export class AuthModule {}
