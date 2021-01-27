@@ -49,7 +49,7 @@ export class CsvJsonService {
   // give a file buffer from file-input as event.target.files[0]
 
   csvToJSON(csvPayload) {
-    return of(CSVTOJSON.csv2json(csvPayload, { parseNumbers: true }));
+    return of(CSVTOJSON.csv2json(csvPayload, { parseNumbers: false }));
   }
 
   validateHeaders(licenseHeaders: string[]) {
@@ -75,11 +75,11 @@ export class CsvJsonService {
         out[element.item_name].serial_no.push(
           element.serial_no.toString().toUpperCase(),
         );
-        return;
+      } else {
+        out[element.item_name] = {
+          serial_no: [element.serial_no.toString().toUpperCase()],
+        };
       }
-      out[element.item_name] = {
-        serial_no: [element.serial_no.toString().toUpperCase()],
-      };
     });
     return out;
   }

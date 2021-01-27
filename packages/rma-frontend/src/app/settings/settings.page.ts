@@ -164,8 +164,8 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('headerWidth').setValue(res.headerWidth);
         this.companySettingsForm
           .get('footerImageURL')
-          .setValue(res.headerImageURL);
-        this.companySettingsForm.get('footerWidth').setValue(res.headerWidth);
+          .setValue(res.footerImageURL);
+        this.companySettingsForm.get('footerWidth').setValue(res.footerWidth);
       },
     });
 
