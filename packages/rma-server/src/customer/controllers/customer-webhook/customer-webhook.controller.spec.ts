@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CustomerWebhookController } from './customer-webhook.controller';
 import { CustomerWebhookAggregateService } from '../../aggregates/customer-webhook-aggregate/customer-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
 
 describe('CustomerWebhook Controller', () => {
   let controller: CustomerWebhookController;
@@ -17,6 +18,8 @@ describe('CustomerWebhook Controller', () => {
       ],
     })
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(FrappeWebhookPipe)
       .useValue({})
       .compile();
 

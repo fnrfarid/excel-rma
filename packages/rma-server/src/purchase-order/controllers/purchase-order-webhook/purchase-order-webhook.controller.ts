@@ -7,6 +7,8 @@ import {
   Body,
 } from '@nestjs/common';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+
 import { PurchaseOrderWebhookAggregateService } from '../../aggregates/purchase-order-webhook-aggregate/purchase-order-webhook-aggregate.service';
 import { PurchaseOrderWebhookDto } from '../../entity/purchase-order/purchase-order-webhook-dto';
 
@@ -17,7 +19,7 @@ export class PurchaseOrderWebhookController {
   ) {}
   @Post('webhook/v1/create')
   @UsePipes(ValidationPipe)
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   purchaseInvoiceCreated(
     @Body() purchaseOrderPayload: PurchaseOrderWebhookDto,
   ) {

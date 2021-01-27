@@ -82,7 +82,7 @@ export class AddServiceInvoiceService {
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageIndex * pageSize).toString())
-      .set('search', JSON.stringify(query))
+      .set('search', encodeURIComponent(JSON.stringify(query)))
       .set('sort', sortOrder);
     return this.getHeaders().pipe(
       switchMap(headers => {

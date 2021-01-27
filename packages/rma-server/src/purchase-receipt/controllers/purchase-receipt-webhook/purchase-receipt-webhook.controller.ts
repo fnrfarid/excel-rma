@@ -7,6 +7,8 @@ import {
   Body,
 } from '@nestjs/common';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+
 import { PurchaseReceiptAggregateService } from '../../aggregates/purchase-receipt-aggregate/purchase-receipt-aggregate.service';
 
 @Controller('purchase_receipt')
@@ -16,7 +18,7 @@ export class PurchaseReceiptWebhookController {
   ) {}
   @Post('webhook/v1/cancel')
   @UsePipes(ValidationPipe)
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   async purchaseInvoiceCreated(@Body() purchaseReceiptPayload) {
     return await this.purchaseReceiptAggregate.purchaseReceiptCancelled(
       purchaseReceiptPayload,

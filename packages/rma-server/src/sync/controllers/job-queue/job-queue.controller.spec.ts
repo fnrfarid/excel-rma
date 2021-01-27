@@ -5,6 +5,7 @@ import { JobQueueAggregateService } from '../../aggregates/job-queue-aggregate/j
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
 
 describe('JobQueue Controller', () => {
   let controller: JobQueueController;
@@ -27,6 +28,8 @@ describe('JobQueue Controller', () => {
       .overrideGuard(TokenGuard)
       .useValue({})
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(FrappeWebhookPipe)
       .useValue({})
       .compile();
 

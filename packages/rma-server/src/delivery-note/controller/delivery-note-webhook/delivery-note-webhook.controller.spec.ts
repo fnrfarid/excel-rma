@@ -4,6 +4,7 @@ import { DeliveryNoteWebhookController } from './delivery-note-webhook.controlle
 import { DeliveryNoteWebhookAggregateService } from '../../../delivery-note/aggregates/delivery-note-webhook-aggregate/delivery-note-webhook-aggregate.service';
 /* eslint-enable */
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
 
 describe('DeliveryNoteWebhook Controller', () => {
   let controller: DeliveryNoteWebhookController;
@@ -19,6 +20,8 @@ describe('DeliveryNoteWebhook Controller', () => {
       ],
     })
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(FrappeWebhookPipe)
       .useValue({})
       .compile();
 

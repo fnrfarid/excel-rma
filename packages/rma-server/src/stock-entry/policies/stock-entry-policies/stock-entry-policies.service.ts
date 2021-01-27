@@ -24,6 +24,7 @@ import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
+import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { DateTime } from 'luxon';
 @Injectable()
@@ -31,6 +32,7 @@ export class StockEntryPoliciesService {
   constructor(
     private readonly serialNoService: SerialNoService,
     private readonly serialNoHistoryPolicy: SerialNoHistoryPoliciesService,
+    private readonly serialNoPolicy: SerialNoPoliciesService,
     private readonly agendaJob: AgendaJobService,
     private readonly http: HttpService,
     private readonly settings: SettingsService,
@@ -69,11 +71,16 @@ export class StockEntryPoliciesService {
           return of(true);
         }
         const serialSet = new Set();
-        item.serial_no.forEach(no => serialSet.add(no));
+        const duplicateSerials = [];
+        item.serial_no.forEach(no => {
+          serialSet.has(no) ? duplicateSerials.push(no) : null;
+          serialSet.add(no);
+        });
         if (Array.from(serialSet).length !== item.serial_no.length) {
           return throwError(
             new BadRequestException(
-              `Found duplicate serials for ${item.item_name}.`,
+              `Found following as duplicate serials for ${item.item_name}. 
+              ${duplicateSerials.splice(0, 50).join(', ')}...`,
             ),
           );
         }
@@ -387,20 +394,20 @@ export class StockEntryPoliciesService {
           mergeMap(count => {
             const message = `Found ${count} Qty for Item : ${item.item_name} at warehouse: ${item.s_warehouse}.`;
             if (
-              count === item.serial_no.length &&
               [
                 STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
                 STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
                 STOCK_ENTRY_TYPE.RnD_PRODUCTS,
               ].includes(stock_entry_type)
             ) {
-              return of(true);
+              return count === item.serial_no.length
+                ? of(true)
+                : this.getDeliveryNoteInvalidSerials(item, count);
             }
-            if (
-              count === 0 &&
-              stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
-            ) {
-              return of(true);
+            if (stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+              return count === 0
+                ? of(true)
+                : this.getReceiptInvalidSerials(query, count);
             }
             return throwError(new BadRequestException(message));
           }),
@@ -409,6 +416,43 @@ export class StockEntryPoliciesService {
       toArray(),
       switchMap(isValid => {
         return of(true);
+      }),
+    );
+  }
+
+  getDeliveryNoteInvalidSerials(item, count) {
+    return this.serialNoPolicy
+      .validateSerials({
+        item_code: item.item_code,
+        serials: item.serial_no,
+        warehouse: item.s_warehouse,
+        validateFor: 'delivery_note',
+      })
+      .pipe(
+        switchMap(data => {
+          return throwError(
+            new BadRequestException(`Found ${data?.notFoundSerials.length}
+        Invalid Serials: ${data?.notFoundSerials.splice(0, 50).join(', ')}`),
+          );
+        }),
+      );
+  }
+
+  getReceiptInvalidSerials(query, count) {
+    return from(
+      this.serialNoService.find({
+        where: query,
+        limit: 50,
+      }),
+    ).pipe(
+      switchMap(serials => {
+        return throwError(
+          new BadRequestException(
+            `Found ${count} invalid serials. ${serials
+              .map(s => s.serial_no)
+              .join(', ')}`,
+          ),
+        );
       }),
     );
   }
