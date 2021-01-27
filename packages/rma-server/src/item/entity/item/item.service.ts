@@ -45,10 +45,6 @@ export class ItemService {
       }
     }
 
-    if (filterQuery?.disabled !== 0) {
-      filterQuery;
-    }
-
     const $and: any[] = [filterQuery ? this.getFilterQuery(filterQuery) : {}];
 
     const where: { $and: any } = { $and };
