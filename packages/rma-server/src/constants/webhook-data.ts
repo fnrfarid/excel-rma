@@ -474,7 +474,7 @@ export function dataImportLegacyAfterInsertWebhookData(
 ) {
   return {
     webhook_doctype: 'Data Import Legacy',
-    webhook_docevent: 'after_insert',
+    webhook_docevent: 'on_update',
     request_url: webhookURL,
     request_structure: 'Form URL-Encoded',
     doctype: 'Webhook',

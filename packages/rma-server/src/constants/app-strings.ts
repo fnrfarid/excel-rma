@@ -195,8 +195,7 @@ export const ONE_MINUTE_IN_MILLISECONDS = 60000;
 export const DATA_IMPORT_DELAY = 1339;
 export const SYNC_PURCHASE_RECEIPT_JOB = 'SYNC_PURCHASE_RECEIPT_JOB';
 export const DEFAULT_CURRENCY = 'BDT';
-// export const DEFAULT_CURRENCY = 'INR';
-// console.log('unComment IT local testing');
+// export const DEFAULT_CURRENCY = 'INR';console.log('unComment IT local testing');
 export const DEFAULT_NAMING_SERIES = {
   sales_order: 'SO-.YYYY.-',
   sales_invoice: 'SINV-.YYYY.-',
@@ -337,28 +336,12 @@ export const STOCK_ENTRY_NAMING_SERIES = {
 };
 export const INVALID_REGEX = ['+', '(', ')'];
 export function PARSE_REGEX(value: string) {
-  const indices = new Set();
-  INVALID_REGEX.forEach(key => {
-    if (value.includes(key)) {
-      indices.add(value.indexOf(key));
-      indices.add(value.lastIndexOf(key));
-    }
-  });
-  if (!Array.from(indices).length) {
-    return value;
-  }
-  const array: any[] = Array.from(indices);
-  const state = {
-    first: Math.min(...array),
-    last: Math.max(...array),
-  };
-  return (
-    value.slice(0, state.first) +
-    '[' +
-    value.slice(state.first, state.last + 1) +
-    ']' +
-    value.slice(state.last + 1, value.length)
-  );
+  return value
+    .split('')
+    .map(char => {
+      return INVALID_REGEX.includes(char) ? `\\${char}` : char;
+    })
+    .join('');
 }
 export const SERIAL_FILTER_KEYS = [
   'item_code',
