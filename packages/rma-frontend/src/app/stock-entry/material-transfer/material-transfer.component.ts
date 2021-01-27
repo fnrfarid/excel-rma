@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { Subject, Observable, of, from } from 'rxjs';
 import { Location } from '@angular/common';
 import {
@@ -152,6 +152,7 @@ export class MaterialTransferComponent implements OnInit {
     public dialog: MatDialog,
     private readonly stockEntryService: StockEntryService,
     private activatedRoute: ActivatedRoute,
+    private readonly renderer: Renderer2,
     private router: Router,
     private readonly service: SettingsService,
     private readonly loadingController: LoadingController,
@@ -607,6 +608,7 @@ export class MaterialTransferComponent implements OnInit {
     materialTransferRow.qty = serials.length;
     materialTransferRow.serial_no = serials;
     materialTransferRow.has_serial_no = item.has_serial_no;
+    materialTransferRow[BASIC_RATE] = this.getBasicRate(item.item_code);
     this.resetRangeState();
     this.updateProductState(item.item_code, serials?.length || 0);
     materialTransferData.push(materialTransferRow);
@@ -666,6 +668,7 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   async getStockEntryBody(): Promise<MaterialTransferDto> {
+    this.mergeItems();
     if (!this.transferWarehouse) {
       this.getMessage(
         'Please select a transfer warehouse in settings, for material transfer.',
@@ -709,7 +712,6 @@ export class MaterialTransferComponent implements OnInit {
     body.posting_time = date.time;
     body.stock_entry_type = this.form.controls.stock_entry_type.value;
     body.items = this.materialTransferDataSource.data();
-    body.items = this.mergeItems(body.items);
     body.uuid = this.uuid;
     if (
       this.form.controls.stock_entry_type.value ===
@@ -777,10 +779,15 @@ export class MaterialTransferComponent implements OnInit {
       : this.form.controls.customer.enable();
   }
 
-  mergeItems(items: Item[]) {
-    const hash = {};
-    const merged_items = [];
-    items.forEach(item => {
+  mergeItems() {
+    const map: any = {};
+    this.materialTransferDataSource.data().forEach(item => {
+      if (map[item.item_code]) {
+        map[item.item_code].qty += item.qty;
+        map[item.item_code].serial_no.push(...item.serial_no);
+      } else {
+        map[item.item_code] = item;
+      }
       if (
         [
           STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
@@ -788,21 +795,11 @@ export class MaterialTransferComponent implements OnInit {
           STOCK_ENTRY_TYPE.RnD_PRODUCTS,
         ].includes(this.form.controls.stock_entry_type.value)
       ) {
-        item.expense_account = this.form.controls.accounts.value;
+        map[item.item_code].expense_account = this.form.controls.accounts.value;
       }
-      if (hash[item.item_code]) {
-        hash[item.item_code].qty += item.qty;
-        if (item.has_serial_no) {
-          hash[item.item_code].serial_no.push(...item.serial_no);
-        }
-        return;
-      }
-      hash[item.item_code] = item;
     });
-    Object.keys(hash).forEach(key => {
-      merged_items.push(hash[key]);
-    });
-    return merged_items;
+    this.materialTransferDataSource.update(Object.values(map));
+    return;
   }
 
   validateWarehouseState() {
@@ -864,6 +861,17 @@ export class MaterialTransferComponent implements OnInit {
       });
   }
 
+  onSerialKepUp(i) {
+    let element;
+    try {
+      element = this.renderer.selectRootElement(`#serials${i + 1}`);
+    } catch {
+      return;
+    }
+
+    element?.focus();
+  }
+
   addItemCodeToCsvJson(csvJsonObj: CsvJsonObj, items: ItemInterface[]) {
     items.forEach(item => {
       if (item.has_serial_no) {
@@ -894,6 +902,16 @@ export class MaterialTransferComponent implements OnInit {
       STOCK_ENTRY_TYPE.RnD_PRODUCTS
       ? `Delivery Note`
       : `Stock Entry`;
+  }
+
+  getBasicRate(item_code) {
+    let base_rate;
+    this.itemDataSource.data().forEach(element => {
+      if (element.item_code === item_code) {
+        base_rate = element[BASIC_RATE];
+      }
+    });
+    return base_rate;
   }
 
   typeChange(value) {

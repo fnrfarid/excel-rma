@@ -7,6 +7,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+
 import { SalesInvoiceWebhookAggregateService } from '../../aggregates/sales-invoice-webhook-aggregate/sales-invoice-webhook-aggregate.service';
 import { SalesInvoiceWebhookDto } from '../../entity/sales-invoice/sales-invoice-webhook-dto';
 
@@ -18,7 +20,7 @@ export class SalesInvoiceWebhookController {
 
   @Post('webhook/v1/create')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   purchaseInvoiceCreated(
     @Body() purchaseInvoicePayload: SalesInvoiceWebhookDto,
   ) {
@@ -31,7 +33,7 @@ export class SalesInvoiceWebhookController {
 
   @Post('webhook/v1/cancel')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   purchaseInvoiceCanceled(@Body() purchaseInvoicePayload: { name: string }) {
     return this.salesInvoiceWebhookAggregate.salesInvoiceCanceled(
       purchaseInvoicePayload,

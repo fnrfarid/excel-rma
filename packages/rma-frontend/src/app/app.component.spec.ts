@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { TestBed, async } from '@angular/core/testing';
 
 import { Platform } from '@ionic/angular';
@@ -10,10 +10,17 @@ import { Subscription, of } from 'rxjs';
 import { AppService } from './app.service';
 import { STORAGE_TOKEN } from './api/storage/storage.service';
 
+@Pipe({ name: 'formatTime' })
+class MockPipe implements PipeTransform {
+  transform(value: string) {
+    return value;
+  }
+}
+
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
+      declarations: [AppComponent, MockPipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         {

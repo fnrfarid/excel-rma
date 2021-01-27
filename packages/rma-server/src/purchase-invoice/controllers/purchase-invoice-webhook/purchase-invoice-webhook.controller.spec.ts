@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseInvoiceWebhookController } from './purchase-invoice-webhook.controller';
 import { PurchaseInvoiceWebhookAggregateService } from '../../../purchase-invoice/aggregates/purchase-invoice-webhook-aggregate/purchase-invoice-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+
 /* eslint-enable */
 
 describe('PurchaseInvoiceWebhook Controller', () => {
@@ -19,6 +21,8 @@ describe('PurchaseInvoiceWebhook Controller', () => {
       controllers: [PurchaseInvoiceWebhookController],
     })
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(FrappeWebhookPipe)
       .useValue({})
       .compile();
 

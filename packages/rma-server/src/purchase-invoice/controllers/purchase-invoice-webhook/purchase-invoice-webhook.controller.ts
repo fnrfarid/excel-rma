@@ -10,6 +10,8 @@ import {
 import { PurchaseInvoiceWebhookDto } from '../../entity/purchase-invoice/purchase-invoice-webhook-dto';
 import { PurchaseInvoiceWebhookAggregateService } from '../../aggregates/purchase-invoice-webhook-aggregate/purchase-invoice-webhook-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
+import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+
 /* eslint-enable */
 
 @Controller('purchase_invoice')
@@ -19,7 +21,7 @@ export class PurchaseInvoiceWebhookController {
   ) {}
   @Post('webhook/v1/create')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   purchaseInvoiceCreated(
     @Body() purchaseInvoicePayload: PurchaseInvoiceWebhookDto,
   ) {
@@ -29,7 +31,7 @@ export class PurchaseInvoiceWebhookController {
   }
 
   @Post('webhook/v1/cancel')
-  @UseGuards(FrappeWebhookGuard)
+  @UseGuards(FrappeWebhookGuard, FrappeWebhookPipe)
   purchaseInvoiceCancelled(@Body('name') name: string) {
     return this.purchaseInvoiceWebhookAggregate.cancelPurchaseInvoice(name);
   }
