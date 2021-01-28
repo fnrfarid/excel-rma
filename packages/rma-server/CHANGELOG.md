@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.2.1...rma-server@1.2.2) (2021-01-28)
+
+
+### Bug Fixes
+
+* **excel-rma:** Add fix for serial event, UI ([5735fe2](https://gitlab.com/castlecraft/excel-rma/commit/5735fe226361cbca47d10850c8f608a5611ec7e8))
+* **excel-rma:** Fix print, file, webhook, item bugs ([9f05ea1](https://gitlab.com/castlecraft/excel-rma/commit/9f05ea13dbfead3bddd8c094886c6999fb1f4c83))
+
+
+
+
+
 ## [1.2.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.2.0...rma-server@1.2.1) (2021-01-27)
 
 

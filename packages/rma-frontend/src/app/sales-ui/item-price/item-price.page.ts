@@ -3,7 +3,13 @@ import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import {
+  debounceTime,
+  filter,
+  map,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
 import { ItemPriceDataSource, ListingData } from './item-price.datasource';
 import { ItemPriceService } from '../services/item-price.service';
 import { SalesService } from '../services/sales.service';
@@ -74,6 +80,7 @@ export class ItemPricePage implements OnInit {
       .get('itemName')
       .valueChanges.pipe(
         startWith(''),
+        debounceTime(1000),
         switchMap(value => {
           return this.salesService.getItemList(value);
         }),
@@ -187,12 +194,15 @@ export class ItemPricePage implements OnInit {
 
   setFilter(item?) {
     const query: any = {};
-    if (this.f.itemName.value)
+    if (this.f.itemName.value) {
       query.item_name = this.f.itemName.value.item_name;
-    if (this.f.itemGroup.value)
+    }
+    if (this.f.itemGroup.value) {
       query.item_group = this.f.itemGroup.value.item_group_name;
-    if (this.f.itemBrand.value) query.brand = this.f.itemBrand.value.brand;
-
+    }
+    if (this.f.itemBrand.value) {
+      query.brand = this.f.itemBrand.value.brand;
+    }
     const sortQuery = {};
     if (item) {
       for (const key of Object.keys(item)) {

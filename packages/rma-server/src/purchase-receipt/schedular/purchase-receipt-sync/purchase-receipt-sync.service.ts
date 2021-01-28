@@ -270,12 +270,13 @@ export class PurchaseReceiptSyncService {
       .insertMany(purchase_receipts)
       .then(success => {})
       .catch(err => {});
-    const warrantyPurchasedOn = DateTime.fromJSDate(this.getDate(payload))
+    const warrantyPurchasedOn = DateTime.fromJSDate(this.getDate(payload[0]))
       .setZone(settings.timeZone)
       .toJSDate();
 
-    if (!Object.keys(hash_map).length)
-      return this.updateInvoiceDeliveredState(doc.name, token.fullName);
+    if (!Object.keys(hash_map).length) {
+      return this.updateInvoiceDeliveredState(doc.name, token.fullName, parent);
+    }
 
     return from(Object.keys(hash_map)).pipe(
       mergeMap(key => {
@@ -315,13 +316,17 @@ export class PurchaseReceiptSyncService {
         );
       }),
       toArray(),
-      switchMap(done =>
-        this.updateInvoiceDeliveredState(doc.name, token.fullName),
-      ),
+      switchMap(done => {
+        return this.updateInvoiceDeliveredState(
+          doc.name,
+          token.fullName,
+          parent,
+        );
+      }),
     );
   }
 
-  updateInvoiceDeliveredState(docName, fullName) {
+  updateInvoiceDeliveredState(docName, fullName, parent) {
     return from(
       this.purchaseInvoiceService.updateOne(
         { name: parent },
@@ -334,11 +339,23 @@ export class PurchaseReceiptSyncService {
   }
 
   getDate(payload) {
+    let date: Date;
     try {
-      return new Date(`${payload.posting_date} ${payload.posting_time}`);
-    } catch {
-      return new Date();
+      date = new Date(
+        `${this.parsePostingDate(payload.posting_date)} ${
+          payload.posting_time
+        }`,
+      );
+    } catch {}
+    if (date && isNaN(date?.getMilliseconds())) {
+      date = new Date();
     }
+    return date;
+  }
+
+  parsePostingDate(posting_date) {
+    const splitDate = posting_date.split('-');
+    return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
   }
 
   addToQueueNow(data: {
