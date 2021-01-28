@@ -21,7 +21,7 @@ export class StockAvailabilityPage implements OnInit {
 
   dataSource: StockAvailabilityDataSource;
   defaultCompany: string;
-  displayedColumns = ['item', 'warehouse', 'actual_qty', 'ordered_qty'];
+  displayedColumns = ['item', 'warehouse', 'actual_qty'];
   filters: any = [];
   countFilter: any = {};
   stockAvailabilityForm: FormGroup;
