@@ -34,6 +34,7 @@ export const STOCK_TRANSFER_STATUS = {
   in_transit: 'In Transit',
   draft: 'Draft',
   all: 'All',
+  reseted: 'Reseted'
 };
 export const CURRENT_STATUS_VERDICT = {
   RECEIVED_FROM_CUSTOMER: 'Received from Customer',
