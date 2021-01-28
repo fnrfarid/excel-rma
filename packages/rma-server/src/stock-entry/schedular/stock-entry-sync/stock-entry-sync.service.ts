@@ -384,11 +384,23 @@ export class StockEntrySyncService {
   }
 
   getDate(payload) {
+    let date: Date;
     try {
-      return new Date(`${payload.posting_date} ${payload.posting_time}`);
-    } catch {
-      return new Date();
+      date = new Date(
+        `${this.parsePostingDate(payload.posting_date)} ${
+          payload.posting_time
+        }`,
+      );
+    } catch {}
+    if (date && isNaN(date?.getMilliseconds())) {
+      date = new Date();
     }
+    return date;
+  }
+
+  parsePostingDate(posting_date) {
+    const splitDate = posting_date.split('-');
+    return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
   }
 
   getEventType(type: string, payload: StockEntry) {

@@ -82,7 +82,7 @@ export class AppComponent implements OnInit {
         this.counter =
           Number(item) -
           Math.floor(Date.now() / 1000) -
-          TEN_MINUTES_IN_MS / 1000;
+          TEN_MINUTES_IN_MS / 500;
       });
   }
 
@@ -139,6 +139,7 @@ export class AppComponent implements OnInit {
         this.loggedIn = true;
         this.fullName = profile.name;
         this.imageURL = profile.picture;
+        this.startTimer();
       },
     });
   }
@@ -166,6 +167,7 @@ export class AppComponent implements OnInit {
           warehouses: string[];
           territory: string[];
         }) => {
+          this.startTimer();
           this.loggedIn = true;
           if (res) {
             this.appService.getStorage().setItem(USER_ROLE, res.roles || []);
