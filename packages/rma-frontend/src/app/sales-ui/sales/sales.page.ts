@@ -5,13 +5,8 @@ import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
-import { SettingsService } from '../../settings/settings.service';
-import { SYSTEM_MANAGER } from '../../constants/app-string';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import {
-  VIEW_SALES_INVOICE_PAGE_URL,
-  ADD_SALES_INVOICE_PAGE_URL,
-} from '../../constants/url-strings';
+import { VIEW_SALES_INVOICE_PAGE_URL } from '../../constants/url-strings';
 import { map, filter, startWith, switchMap } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
 import {
@@ -102,7 +97,6 @@ export class SalesPage implements OnInit {
   constructor(
     private readonly salesService: SalesService,
     private location: Location,
-    private readonly settingService: SettingsService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
   ) {}
@@ -357,18 +351,9 @@ export class SalesPage implements OnInit {
   }
 
   navigateBasedOnRoles(row) {
-    this.settingService.checkUserProfile().subscribe({
-      next: res => {
-        let navUrl: string;
-        if (res && res.roles.length > 0 && res.roles.includes(SYSTEM_MANAGER)) {
-          navUrl = `/sales/${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`;
-          this.router.navigateByUrl(navUrl);
-        } else {
-          navUrl = `/sales/${ADD_SALES_INVOICE_PAGE_URL}/edit/${row.uuid}`;
-          this.router.navigateByUrl(navUrl);
-        }
-      },
-    });
+    this.router.navigateByUrl(
+      `/sales/${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`,
+    );
   }
 
   navigateBack() {

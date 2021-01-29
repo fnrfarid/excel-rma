@@ -80,7 +80,8 @@ export class PrintAggregateService {
       .fontSize(10)
       .text(invoice.name, cord.x, cord.y, { align: 'left' })
       .text(invoice.territory, cord.x, cord.y, { align: 'right' });
-    this.generateHr(doc, 155);
+    doc.moveDown();
+    this.generateHr(doc, doc.y);
 
     const customerInformationTop = doc.y;
 

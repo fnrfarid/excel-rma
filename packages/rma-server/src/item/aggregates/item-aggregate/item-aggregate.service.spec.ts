@@ -1,6 +1,9 @@
+import { HttpService } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { ItemService } from '../../entity/item/item.service';
 import { ItemAggregateService } from './item-aggregate.service';
+
 describe('ItemAggregateService', () => {
   let service: ItemAggregateService;
 
@@ -10,6 +13,14 @@ describe('ItemAggregateService', () => {
         ItemAggregateService,
         {
           provide: ItemService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: ServerSettingsService,
           useValue: {},
         },
       ],

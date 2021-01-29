@@ -1,16 +1,42 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpService,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { ItemService } from '../../entity/item/item.service';
 import { MinimumItemPriceSetEvent } from '../../events/minimum-item-price-set/minimum-item-price-set.event';
 import { WarrantyMonthsSetEvent } from '../../events/purchase-warranty-days-set/purchase-warranty-days-set.event';
 import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
 import { ITEM_NOT_FOUND } from '../../../constants/messages';
-import { from, Observable, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
+import {
+  bufferCount,
+  catchError,
+  concatMap,
+  map,
+  mergeMap,
+  switchMap,
+  toArray,
+} from 'rxjs/operators';
+import { Item } from '../../entity/item/item.entity';
+import {
+  INVALID_FILE,
+  AUTHORIZATION,
+  BEARER_HEADER_VALUE_PREFIX,
+  ITEM_SYNC_BUFFER_COUNT,
+} from '../../../constants/app-strings';
+import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
+import { FRAPPE_API_GET_ITEM_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class ItemAggregateService extends AggregateRoot {
-  constructor(private readonly itemService: ItemService) {
+  constructor(
+    private readonly itemService: ItemService,
+    private readonly http: HttpService,
+    private readonly settingService: ServerSettingsService,
+  ) {
     super();
   }
 
@@ -101,5 +127,77 @@ export class ItemAggregateService extends AggregateRoot {
         return of([...Object.values(items)]);
       }),
     );
+  }
+
+  syncItems(file, req) {
+    return from(this.getJsonData(file)).pipe(
+      switchMap((data: Item[]) => {
+        if (!data) {
+          return throwError(new BadRequestException(INVALID_FILE));
+        }
+        return forkJoin({
+          settings: this.settingService.find(),
+          data: of(data),
+        });
+      }),
+      switchMap(({ settings, data }) => {
+        return from(data).pipe(
+          bufferCount(ITEM_SYNC_BUFFER_COUNT),
+          concatMap(items => {
+            return this.batchSyncFrappeItems(items, settings, req);
+          }),
+          toArray(),
+          switchMap(() => of(true)),
+        );
+      }),
+    );
+  }
+
+  batchSyncFrappeItems(data: Item[], settings, req) {
+    return from(data).pipe(
+      mergeMap(item => {
+        return of({}).pipe(
+          switchMap(() => {
+            return this.http.get(
+              `${settings.authServerURL}${FRAPPE_API_GET_ITEM_ENDPOINT}${item.item_code}`,
+              {
+                headers: {
+                  [AUTHORIZATION]:
+                    BEARER_HEADER_VALUE_PREFIX + req.token.accessToken,
+                },
+              },
+            );
+          }),
+          map(data => data.data.data),
+          switchMap((item: Item) => {
+            delete item.has_serial_no;
+            return from(
+              this.itemService.updateOne(
+                { item_code: item.item_code },
+                { $set: item },
+              ),
+            );
+          }),
+          catchError(err => {
+            if (err?.response?.data?.exc?.includes('not found')) {
+              return from(
+                this.itemService.deleteOne({ item_code: item.item_code }),
+              );
+            }
+            return throwError(
+              new BadRequestException(
+                `Error in fetching item: ${item.item_name}.`,
+              ),
+            );
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(() => of(true)),
+    );
+  }
+
+  getJsonData(file) {
+    return of(JSON.parse(file.buffer));
   }
 }

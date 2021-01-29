@@ -19,6 +19,8 @@ import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable, of } from 'rxjs';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-item-price',
@@ -41,6 +43,7 @@ export class ItemPricePage implements OnInit {
   ];
   purchaseWarrantyMonths: string = '';
   itemsForm: FormGroup;
+  permissionState: any = PERMISSION_STATE;
   validateInput: any = ValidateInputSelected;
   filteredItemNameList: Observable<any[]>;
   filteredItemGroupList: Observable<any>;
@@ -58,6 +61,7 @@ export class ItemPricePage implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly dialog: MatDialog,
     private route: ActivatedRoute,
+    private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
@@ -293,6 +297,31 @@ export class ItemPricePage implements OnInit {
           );
         },
       });
+  }
+
+  async syncItems() {
+    const loading = await this.loadingController.create({
+      message: `Syncing ${this.dataSource.data.length} items, this may take a while...!`,
+    });
+    await loading.present();
+
+    return this.itemPriceService.syncItems(this.dataSource.data).subscribe({
+      next: success => {
+        loading.dismiss();
+        this.clearFilters();
+        this.snackBar.open('Items successfully synced.', CLOSE, {
+          duration: 4500,
+        });
+      },
+      error: err => {
+        loading.dismiss();
+        this.snackBar.open(
+          `Failed to sync items: ${err?.error?.message || ''}`,
+          CLOSE,
+          { duration: 4500 },
+        );
+      },
+    });
   }
 }
 export interface DialogData {

@@ -13,6 +13,7 @@ import {
   API_ITEM_SET_MIN_PRICE,
   RELAY_GET_STOCK_BALANCE_ENDPOINT,
   GET_BALANCE_ON_ENDPOINT,
+  SYNC_FRAPPE_ITEMS_ENDPOINT,
   RELAY_API_RES_COMPANY,
   UPDATE_ITEM_HAS_SERIAL_UPDATE_ENDPOINT,
   API_ITEM_SET_PURCHASE_WARRANTY_DAYS,
@@ -162,6 +163,21 @@ export class ItemPriceService {
         return {
           [AUTHORIZATION]: BEARER_TOKEN_PREFIX + token,
         };
+      }),
+    );
+  }
+
+  syncItems(items: any[]) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        const blob = new Blob([JSON.stringify(items)], {
+          type: 'application/json',
+        });
+        const uploadData = new FormData();
+        uploadData.append('file', blob, 'payload');
+        return this.http.post(SYNC_FRAPPE_ITEMS_ENDPOINT, uploadData, {
+          headers,
+        });
       }),
     );
   }
