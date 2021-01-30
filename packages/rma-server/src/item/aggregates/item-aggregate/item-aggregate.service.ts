@@ -179,7 +179,10 @@ export class ItemAggregateService extends AggregateRoot {
             );
           }),
           catchError(err => {
-            if (err?.response?.data?.exc?.includes('not found')) {
+            if (
+              err?.response?.statusText === 'NOT FOUND' ||
+              err?.response?.data?._server_messages?.includes('not found')
+            ) {
               return from(
                 this.itemService.deleteOne({ item_code: item.item_code }),
               );

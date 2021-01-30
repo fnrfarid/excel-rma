@@ -7,6 +7,7 @@ import {
   JOB_QUEUE_RESET_ENDPOINT,
   GET_EXPORTED_JOB_ENDPOINT,
   JOB_QUEUE_RESYNC_ENDPOINT,
+  DELETE_EMPTY_JOBS_ENDPOINT,
 } from '../../constants/url-strings';
 import { switchMap, map } from 'rxjs/operators';
 import {
@@ -102,6 +103,21 @@ export class JobsService {
             headers,
           },
         );
+      }),
+    );
+  }
+
+  deleteEmptyJobs(data) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        const blob = new Blob([JSON.stringify(data)], {
+          type: 'application/json',
+        });
+        const uploadData = new FormData();
+        uploadData.append('file', blob, 'payload');
+        return this.http.post(DELETE_EMPTY_JOBS_ENDPOINT, uploadData, {
+          headers,
+        });
       }),
     );
   }

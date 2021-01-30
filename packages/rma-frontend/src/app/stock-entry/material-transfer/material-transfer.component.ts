@@ -1014,8 +1014,19 @@ export class MaterialTransferComponent implements OnInit {
   }
 
   printDeliveryNote(docType?: string) {
+    const names = [];
+    if (
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+    ) {
+      this.stock_receipt_names.forEach(name =>
+        name.includes('TROUT') ? names.push(name) : null,
+      );
+    } else {
+      names.push(...this.stock_receipt_names);
+    }
     this.salesService
-      .getDeliveryNoteWithItems(this.stock_receipt_names, docType)
+      .getDeliveryNoteWithItems(names, docType)
       .pipe(
         switchMap((data: any) => {
           data = Object.values(data);

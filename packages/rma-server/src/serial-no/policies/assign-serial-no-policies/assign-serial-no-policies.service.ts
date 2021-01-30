@@ -20,7 +20,7 @@ import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ItemService } from '../../../item/entity/item/item.service';
 import { ItemDto } from '../../../sales-invoice/entity/sales-invoice/sales-invoice-dto';
-import { SalesInvoice } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.entity';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 
 @Injectable()
 export class AssignSerialNoPoliciesService {
@@ -97,7 +97,9 @@ export class AssignSerialNoPoliciesService {
                     item_code,
                     warehouse: serialProvider.set_warehouse,
                     'warranty.purchasedOn': {
-                      $lte: DateTime.fromJSDate(this.getDate(salesInvoice))
+                      $lte: DateTime.fromJSDate(
+                        getParsedPostingDate(serialProvider),
+                      )
                         .setZone(settings.timeZone)
                         .toJSDate(),
                     },
@@ -127,14 +129,6 @@ export class AssignSerialNoPoliciesService {
         );
       }),
     );
-  }
-
-  getDate(payload: SalesInvoice) {
-    try {
-      return new Date(`${payload.posting_date} ${payload.posting_time}`);
-    } catch {
-      return new Date();
-    }
   }
 
   validateItem(item: string[]) {

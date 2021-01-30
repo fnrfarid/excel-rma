@@ -57,6 +57,16 @@
             </mat-form-field>
           </ion-col>
         </ion-row>
+        <ion-row>
+          <ion-button
+                *ngIf="permissionState?.jobs?.update"
+                color="warning"
+                (click)="deleteEmptyJobs()"
+                fill="outline"
+              >
+                Clean Jobs
+            </ion-button>
+        </ion-row>
       </ion-grid>
       <div class="example-container mat-elevation-z8">
         <mat-table matSort [dataSource]="dataSource">

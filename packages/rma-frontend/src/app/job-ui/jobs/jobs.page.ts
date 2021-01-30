@@ -8,6 +8,10 @@ import { ViewSingleJobPage } from '../view-single-job/view-single-job.page';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
+import { CLOSE } from '../../constants/app-string';
+import { LoadingController } from '@ionic/angular';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-jobs',
@@ -29,6 +33,7 @@ export class JobsPage implements OnInit {
   size: number = 10;
   parent: string;
   status: string = 'Failed';
+  permissionState = PERMISSION_STATE;
   jobStatus = [
     'Successful',
     'Failed',
@@ -44,6 +49,8 @@ export class JobsPage implements OnInit {
     private location: Location,
     private router: Router,
     private route: ActivatedRoute,
+    private readonly snackBar: MatSnackBar,
+    private readonly loadingController: LoadingController,
     public dialog: MatDialog,
   ) {}
 
@@ -179,6 +186,30 @@ export class JobsPage implements OnInit {
       this.status = status;
       this.setFilter();
     }
+  }
+
+  async deleteEmptyJobs() {
+    const loading = await this.loadingController.create({
+      message: `Syncing ${this.dataSource.data.length} items, this may take a while...!`,
+    });
+    await loading.present();
+    return this.jobsService.deleteEmptyJobs(this.dataSource.data).subscribe({
+      next: success => {
+        loading.dismiss();
+        this.setFilter();
+        this.snackBar.open('Items successfully synced.', CLOSE, {
+          duration: 4500,
+        });
+      },
+      error: err => {
+        loading.dismiss();
+        this.snackBar.open(
+          `Failed to sync items: ${err?.error?.message || ''}`,
+          CLOSE,
+          { duration: 4500 },
+        );
+      },
+    });
   }
 }
 

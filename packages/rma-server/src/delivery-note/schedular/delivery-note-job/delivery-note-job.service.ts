@@ -42,6 +42,7 @@ import {
   EventType,
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 export const CREATE_STOCK_ENTRY_JOB = 'CREATE_STOCK_ENTRY_JOB';
 
 @Injectable()
@@ -275,7 +276,9 @@ export class DeliveryNoteJobService {
               $set: {
                 sales_invoice_name,
                 'warranty.salesWarrantyDate': item.warranty_date,
-                'warranty.soldOn': DateTime.fromJSDate(this.getDate(payload))
+                'warranty.soldOn': DateTime.fromJSDate(
+                  getParsedPostingDate(payload),
+                )
                   .setZone(settings.timeZone)
                   .toJSDate(),
                 delivery_note: response.name,
@@ -351,26 +354,6 @@ export class DeliveryNoteJobService {
       .catch(error => {});
 
     return of(true);
-  }
-
-  getDate(payload) {
-    let date: Date;
-    try {
-      date = new Date(
-        `${this.parsePostingDate(payload.posting_date)} ${
-          payload.posting_time
-        }`,
-      );
-    } catch {}
-    if (date && isNaN(date?.getMilliseconds())) {
-      date = new Date();
-    }
-    return date;
-  }
-
-  parsePostingDate(posting_date) {
-    const splitDate = posting_date.split('-');
-    return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
   }
 
   getStatus(sales_invoice: SalesInvoice) {

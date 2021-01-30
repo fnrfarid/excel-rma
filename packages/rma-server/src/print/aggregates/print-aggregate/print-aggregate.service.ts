@@ -145,7 +145,13 @@ export class PrintAggregateService {
     }
     doc.moveDown();
 
-    this.generateTableRow(doc, doc.y, '', { name: 'Total' }, invoice.total_qty);
+    this.generateTableRow(
+      doc,
+      doc.y,
+      '',
+      { name: 'Total' },
+      invoice.total_qty || this.getItemTotal(invoice.items),
+    );
     doc.moveDown();
     doc.moveDown();
     doc.moveDown();
@@ -183,6 +189,12 @@ export class PrintAggregateService {
     if (item.serials) {
       doc.text(this.getSerialKeys(item), 100, doc.y, { width: 390 });
     }
+  }
+
+  getItemTotal(items: any[]) {
+    let total = 0;
+    items.forEach(item => (total += item.qty));
+    return total;
   }
 
   getSerialKeys(item: { name: string; serials?: string }) {

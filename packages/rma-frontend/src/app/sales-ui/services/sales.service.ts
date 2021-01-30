@@ -774,6 +774,8 @@ export class SalesService {
   ) {
     const itemsHashMap = {};
     const doc = res[0];
+    doc.total = 0;
+    doc.total_qty = 0;
     res.forEach(document => {
       document.items.forEach(item => {
         if (itemsHashMap[item.item_code]) {

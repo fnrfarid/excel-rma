@@ -437,4 +437,22 @@ export class JobQueueAggregateService {
         },
       });
   }
+
+  deleteEmptyJobs(file, req) {
+    return of(JSON.parse(file.buffer)).pipe(
+      switchMap((data: AgendaJob[]) => {
+        const id = [];
+        data.forEach(job => id.push(new ObjectId(job._id)));
+        return from(
+          this.jobService.deleteMany({
+            _id: { $in: id },
+            'data.status': {
+              $in: [AGENDA_JOB_STATUS.reset, AGENDA_JOB_STATUS.success],
+            },
+          }),
+        );
+      }),
+      switchMap(() => of(true)),
+    );
+  }
 }
