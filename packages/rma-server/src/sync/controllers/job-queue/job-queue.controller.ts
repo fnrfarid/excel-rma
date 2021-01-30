@@ -7,6 +7,9 @@ import {
   Query,
   Param,
   Req,
+  BadRequestException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import {
@@ -16,6 +19,11 @@ import {
 import { JobQueueAggregateService } from '../../aggregates/job-queue-aggregate/job-queue-aggregate.service';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+import { Roles } from '../../../auth/decorators/roles.decorator';
+import { RoleGuard } from '../../../auth/guards/role.guard';
+import { SYSTEM_MANAGER } from '../../../constants/app-strings';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { throwError } from 'rxjs';
 
 @Controller('job_queue')
 export class JobQueueController {
@@ -74,5 +82,20 @@ export class JobQueueController {
       filter_query,
       req.token,
     );
+  }
+
+  @Post('v1/delete_empty_jobs')
+  @Roles(SYSTEM_MANAGER)
+  @UseGuards(TokenGuard, RoleGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  validateSerialNo(@UploadedFile('file') file, @Req() req) {
+    if (!file) {
+      return throwError(
+        new BadRequestException(
+          'Items file is mandatory, please provide list of items to sync.',
+        ),
+      );
+    }
+    return this.aggregate.deleteEmptyJobs(file, req);
   }
 }

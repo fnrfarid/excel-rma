@@ -71,6 +71,7 @@ export class CreateSalesReturnDto {
 export class SalesReturnItemDto {
   @IsNotEmpty()
   item_code: string;
+  item_name?: string;
 
   @IsNotEmpty()
   @Max(-1)
