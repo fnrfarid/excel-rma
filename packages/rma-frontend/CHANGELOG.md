@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.2.1...rma-frontend@1.3.0) (2021-01-31)
+
+
+### Bug Fixes
+
+* **rma-frontend:** Add permission link to settings ([d2450bc](https://gitlab.com/castlecraft/excel-rma/commit/d2450bc34c7a5ee9c95cdf9c1cf53c7feddd686a))
+
+
+### Features
+
+* **excel-rma:** Add aggregated print for stock entry ([3c3cfb9](https://gitlab.com/castlecraft/excel-rma/commit/3c3cfb95b4e54a4c11fac46c6596554b0949e7d5))
+* **excel-rma:** Updated sales return, job cleanup, serial date, print ([7cf98cc](https://gitlab.com/castlecraft/excel-rma/commit/7cf98ccf54da049b6b4cf280be60af08beb9fb53))
+* **Excel-rma:** Validate sales return based on posting date ([3441e4a](https://gitlab.com/castlecraft/excel-rma/commit/3441e4acad2bd079706250269d95c3795979cec1))
+* **rma-frontend:** Ordered Qty column removed from table in Stock Availability Page ([69fca2a](https://gitlab.com/castlecraft/excel-rma/commit/69fca2a79d7c29a43feabdd771ac08f85a5e4d72))
+* **rma-frontend:** Reseted filter added and Pagination fixed on Stock Entry Page ([96f7035](https://gitlab.com/castlecraft/excel-rma/commit/96f70356fb6a35decbd3d0d5676568d8ed707949))
+
+
+
+
+
 ## [1.2.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.2.0...rma-frontend@1.2.1) (2021-01-28)
 
 
