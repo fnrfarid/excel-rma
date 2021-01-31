@@ -20,7 +20,7 @@ export class PrintAggregateService {
 
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename=${invoice.name}.pdf`,
+      'Content-Disposition': `attachment; filename=${invoice.print.print_type}.pdf`,
       'Content-Length': buffer.length,
     });
 
@@ -105,10 +105,34 @@ export class PrintAggregateService {
       .text('Created By:', 300, customerInformationTop + 45)
       .text(invoice.created_by, 420, customerInformationTop + 45)
       .text('Approved By:', 300, customerInformationTop + 60)
-      .text(invoice.modified_by, 420, customerInformationTop + 60)
-      .moveDown()
-      .moveDown()
-      .moveDown();
+      .text(invoice.modified_by, 420, customerInformationTop + 60);
+
+    if (invoice?.print?.s_warehouse || invoice?.print?.t_warehouse) {
+      if (invoice?.print?.s_warehouse) {
+        doc
+          .fontSize(11)
+          .fillColor('#000000')
+          .text(
+            `From Warehouse: ${invoice.print.s_warehouse}`,
+            50,
+            customerInformationTop + 95,
+          );
+      }
+
+      if (invoice?.print?.t_warehouse) {
+        doc
+          .fontSize(11)
+          .fillColor('#000000')
+          .text(
+            `To Warehouse: ${invoice.print.t_warehouse}`,
+            300,
+            customerInformationTop + 95,
+            { align: 'right' },
+          );
+      }
+    }
+
+    doc.moveDown().moveDown();
   }
 
   generatePrintTable(doc, invoice: DeliveryChalanDto) {
@@ -183,11 +207,13 @@ export class PrintAggregateService {
   ) {
     doc.moveDown();
     const height = doc.y;
-    doc.fontSize(10).text(id, 50, height);
+    doc.fontSize(10).fillColor('#000000').text(id, 50, height);
     doc.text(item.name, 100, height, { width: 390 });
     doc.text(quantity, 450, height, { align: 'right' });
     if (item.serials) {
-      doc.text(this.getSerialKeys(item), 100, doc.y, { width: 390 });
+      doc
+        .fillColor('#444444')
+        .text(this.getSerialKeys(item), 100, doc.y, { width: 390 });
     }
   }
 

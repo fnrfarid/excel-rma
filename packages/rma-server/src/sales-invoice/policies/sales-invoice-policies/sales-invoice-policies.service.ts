@@ -35,6 +35,7 @@ import {
 } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
 import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -272,6 +273,23 @@ export class SalesInvoicePoliciesService {
     );
   }
 
+  validateReturnPostingDate(
+    createReturnPayload: CreateSalesReturnDto,
+    salesInvoice,
+  ) {
+    if (
+      getParsedPostingDate(salesInvoice) >
+      getParsedPostingDate(createReturnPayload)
+    ) {
+      return throwError(
+        new BadRequestException(
+          'posting date cannot be before sales invoice posting.',
+        ),
+      );
+    }
+    return of(salesInvoice);
+  }
+
   validateSalesReturn(createReturnPayload: CreateSalesReturnDto) {
     const items = createReturnPayload.items;
     const data = new Set();
@@ -284,7 +302,10 @@ export class SalesInvoicePoliciesService {
         this.salesInvoiceService.findOne({ name: salesInvoiceName[0] }),
       ).pipe(
         switchMap(salesInvoice => {
-          return of(salesInvoice);
+          return this.validateReturnPostingDate(
+            createReturnPayload,
+            salesInvoice,
+          );
         }),
       );
     }

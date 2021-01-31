@@ -392,6 +392,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           ),
         }).pipe(
           switchMap(({ salesInvoice }) => {
+            if (salesInvoice) return throwError('err');
             delete createReturnPayload.delivery_note_names;
             const serialMap = this.getSerialMap(createReturnPayload);
             let deliveryNote = new DeliveryNote();

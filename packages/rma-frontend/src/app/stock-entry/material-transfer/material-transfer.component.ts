@@ -1033,12 +1033,16 @@ export class MaterialTransferComponent implements OnInit {
           const aggregatedDeliveryNotes = this.salesService.getAggregatedDocument(
             data,
           );
+          const warehouses: {
+            [ket: string]: string;
+          } = this.getPrintWarehouse();
           this.salesService.printDocument(
             {
               ...aggregatedDeliveryNotes,
-              name: this.uuid,
+              name: names.join(', '),
               print: {
                 print_type: this.form.controls.stock_entry_type.value,
+                ...warehouses,
               },
             },
             this.uuid,
@@ -1048,10 +1052,32 @@ export class MaterialTransferComponent implements OnInit {
       )
       .subscribe({
         next: success => {},
-        error: err => {
-          err;
-        },
+        error: err => {},
       });
+  }
+
+  getPrintWarehouse() {
+    switch (this.form.controls.stock_entry_type.value) {
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return {
+          s_warehouse: this.materialTransferDataSource.data()[0].s_warehouse,
+          t_warehouse: this.materialTransferDataSource.data()[0].t_warehouse,
+        };
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return {
+          t_warehouse: this.materialTransferDataSource.data()[0].t_warehouse,
+        };
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return {
+          s_warehouse: this.materialTransferDataSource.data()[0].s_warehouse,
+        };
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return {
+          s_warehouse: this.materialTransferDataSource.data()[0].s_warehouse,
+        };
+      default:
+        return {};
+    }
   }
 
   async getPrint() {
