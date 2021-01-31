@@ -110,6 +110,10 @@ export class AgendaJobService {
     return await this.agendaJobRepository.deleteOne(query);
   }
 
+  async deleteMany(query) {
+    return await this.agendaJobRepository.deleteMany(query);
+  }
+
   getFilterQuery(query) {
     try {
       return JSON.parse(query);

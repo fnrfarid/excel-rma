@@ -9,6 +9,8 @@ import {
 export class Print {
   @IsString()
   print_type: string;
+  t_warehouse: string;
+  s_warehouse: string;
 }
 
 export class DeliveryChalanDto {

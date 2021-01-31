@@ -381,6 +381,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           return throwError(new NotImplementedException());
         }
         return forkJoin({
+          items: this.validateSalesInvoicePolicy.validateSalesReturnItems(
+            createReturnPayload,
+          ),
           salesInvoice: this.validateSalesInvoicePolicy.validateSalesReturn(
             createReturnPayload,
           ),

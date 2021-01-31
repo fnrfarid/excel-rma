@@ -120,6 +120,14 @@
               >
                 Clear
               </ion-button>
+              <ion-button
+                *ngIf="permissionState?.item_price?.update"
+                color="warning"
+                (click)="syncItems()"
+                fill="outline"
+              >
+                Sync All
+              </ion-button>
             </ion-col>
           </ion-row>
         </form>

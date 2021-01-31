@@ -30,6 +30,7 @@ import {
 import { TokenCache } from '../../../auth/entities/token-cache/token-cache.entity';
 import { StockEntryItem } from '../../entities/stock-entry.entity';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 
 @Injectable()
 export class StockEntrySyncService {
@@ -365,7 +366,9 @@ export class StockEntrySyncService {
           purchase_document_no: doc_name,
           purchase_document_type: payload.stock_entry_type,
           'warranty.purchaseWarrantyDate': item.warranty_date,
-          'warranty.purchasedOn': DateTime.fromJSDate(this.getDate(payload))
+          'warranty.purchasedOn': DateTime.fromJSDate(
+            getParsedPostingDate(payload),
+          )
             .setZone(settings.timeZone)
             .toJSDate(),
           purchase_invoice_name: payload.uuid,
@@ -374,33 +377,13 @@ export class StockEntrySyncService {
       : {
           ...update,
           'warranty.salesWarrantyDate': item.warranty_date,
-          'warranty.soldOn': DateTime.fromJSDate(this.getDate(payload))
+          'warranty.soldOn': DateTime.fromJSDate(getParsedPostingDate(payload))
             .setZone(settings.timeZone)
             .toJSDate(),
           sales_document_type: payload.stock_entry_type,
           sales_document_no: doc_name,
           sales_invoice_name: payload.uuid,
         };
-  }
-
-  getDate(payload) {
-    let date: Date;
-    try {
-      date = new Date(
-        `${this.parsePostingDate(payload.posting_date)} ${
-          payload.posting_time
-        }`,
-      );
-    } catch {}
-    if (date && isNaN(date?.getMilliseconds())) {
-      date = new Date();
-    }
-    return date;
-  }
-
-  parsePostingDate(posting_date) {
-    const splitDate = posting_date.split('-');
-    return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
   }
 
   getEventType(type: string, payload: StockEntry) {

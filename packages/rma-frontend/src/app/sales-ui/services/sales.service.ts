@@ -631,15 +631,19 @@ export class SalesService {
 
   getDeliveryNoteWithItems(
     names: string[],
+    doctype?: string,
   ): Observable<{ [key: string]: any }> {
     const request = {};
     return this.getHeaders().pipe(
       switchMap(headers => {
         names.forEach(name => {
           request[name] = this.http
-            .get<any>(RELAY_GET_DELIVERY_NOTE_ENDPOINT + `/${name}`, {
-              headers,
-            })
+            .get<any>(
+              (doctype
+                ? `api/command/user/api/resource/${doctype}`
+                : RELAY_GET_DELIVERY_NOTE_ENDPOINT) + `/${name}`,
+              { headers },
+            )
             .pipe(map(res => res.data));
         });
         return of(true);
@@ -770,6 +774,8 @@ export class SalesService {
   ) {
     const itemsHashMap = {};
     const doc = res[0];
+    doc.total = 0;
+    doc.total_qty = 0;
     res.forEach(document => {
       document.items.forEach(item => {
         if (itemsHashMap[item.item_code]) {

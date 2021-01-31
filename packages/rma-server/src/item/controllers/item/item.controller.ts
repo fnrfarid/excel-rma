@@ -10,6 +10,8 @@ import {
   BadRequestException,
   UsePipes,
   ValidationPipe,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { QueryBus, CommandBus } from '@nestjs/cqrs';
 import { RetrieveItemQuery } from '../../query/get-item/retrieve-item.query';
@@ -25,6 +27,8 @@ import { INVALID_ITEM_NAME_QUERY } from '../../../constants/messages';
 import { SetWarrantyMonthsCommand } from '../../commands/set-purchase-warranty-days/set-purchase-warranty-days.command';
 import { SetWarrantyMonthsDto } from '../../entity/item/set-warranty-months-dto';
 import { ItemAggregateService } from '../../aggregates/item-aggregate/item-aggregate.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { throwError } from 'rxjs';
 
 @Controller('item')
 export class ItemController {
@@ -135,5 +139,20 @@ export class ItemController {
     return await this.commandBus.execute(
       new SetWarrantyMonthsCommand(uuid, payload),
     );
+  }
+
+  @Post('v1/sync_items')
+  @Roles(SYSTEM_MANAGER)
+  @UseGuards(TokenGuard, RoleGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  validateSerialNo(@UploadedFile('file') file, @Req() req) {
+    if (!file) {
+      return throwError(
+        new BadRequestException(
+          'Items file is mandatory, please provide list of items to sync.',
+        ),
+      );
+    }
+    return this.aggregate.syncItems(file, req);
   }
 }

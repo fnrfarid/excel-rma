@@ -149,3 +149,5 @@ export const GET_PRODUCT_BUNDLE_ITEMS = '/api/item/v1/get_bundle_items';
 export const STOCK_ENTRY_RESET_ENDPOINT = '/api/stock_entry/v1/reset/';
 export const REMOVE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/remove';
 export const PRINT_DELIVERY_INVOICE_ENDPOINT = 'api/print/v1/delivery_invoice';
+export const SYNC_FRAPPE_ITEMS_ENDPOINT = '/api/item/v1/sync_items';
+export const DELETE_EMPTY_JOBS_ENDPOINT = '/api/job_queue/v1/delete_empty_jobs';

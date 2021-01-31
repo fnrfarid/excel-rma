@@ -6,6 +6,7 @@ import { TokenCacheService } from '../../../auth/entities/token-cache/token-cach
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { FrappeWebhookGuard } from '../../../auth/guards/frappe-webhook.guard';
 import { FrappeWebhookPipe } from '../../../auth/guards/webhook.pipe';
+import { RoleGuard } from '../../../auth/guards/role.guard';
 
 describe('JobQueue Controller', () => {
   let controller: JobQueueController;
@@ -28,6 +29,8 @@ describe('JobQueue Controller', () => {
       .overrideGuard(TokenGuard)
       .useValue({})
       .overrideGuard(FrappeWebhookGuard)
+      .useValue({})
+      .overrideGuard(RoleGuard)
       .useValue({})
       .overrideGuard(FrappeWebhookPipe)
       .useValue({})

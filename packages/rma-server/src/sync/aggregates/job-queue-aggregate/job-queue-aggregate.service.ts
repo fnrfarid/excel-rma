@@ -33,6 +33,7 @@ import { PURCHASE_RECEIPT_DOCTYPE_NAMES } from '../../../constants/app-strings';
 import { DeliveryNoteJobService } from '../../../delivery-note/schedular/delivery-note-job/delivery-note-job.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { LEGACY_DATA_IMPORT_API_ENDPOINT } from '../../../constants/routes';
+import { AgendaJob } from '../../entities/agenda-job/agenda-job.entity';
 
 @Injectable()
 export class JobQueueAggregateService {
@@ -68,32 +69,9 @@ export class JobQueueAggregateService {
   resetJob(jobId) {
     return from(this.jobService.findOne({ _id: new ObjectId(jobId) })).pipe(
       switchMap(job => {
-        if (!job) {
-          return throwError(new BadRequestException('Job not found.'));
-        }
-        if (
-          job.data.status === AGENDA_JOB_STATUS.reset ||
-          job.data.status === AGENDA_JOB_STATUS.success
-        ) {
-          return throwError(
-            new BadRequestException(
-              `Jobs with status ${job.data.status}, cannot be reseted.`,
-            ),
-          );
-        }
-        // remove after new feature added
-        if (!this.resetJobs.includes(job.data.type)) {
-          return throwError(
-            new BadRequestException(
-              `Reset State currently available for
-              ${this.resetJobs
-                .filter(elem => elem.replace('_', ' ').toLocaleLowerCase())
-                .join(', ')}, coming soon for
-              ${job.data.type.replace('_', ' ').toLocaleLowerCase()}`,
-            ),
-          );
-        }
-
+        return this.validateJobReset(job).pipe(switchMap(() => of(job)));
+      }),
+      switchMap(job => {
         return this.frappeQueueService.resetState(job).pipe(
           switchMap(success => {
             const $or: any[] = [{ _id: new ObjectId(jobId) }];
@@ -119,6 +97,62 @@ export class JobQueueAggregateService {
         );
       }),
     );
+  }
+
+  validateJobReset(job: AgendaJob) {
+    return this.validateJobState(job).pipe(
+      switchMap(() => {
+        return from(
+          this.jobService.findOne({
+            'data.parent': job.data.parent,
+            _id: { $gt: job._id },
+            'data.status': {
+              $nin: [AGENDA_JOB_STATUS.reset, AGENDA_JOB_STATUS.success],
+            },
+          }),
+        ).pipe(
+          switchMap(job => {
+            if (job) {
+              return throwError(
+                new BadRequestException(
+                  'Please cancel the job that is created before the current job.',
+                ),
+              );
+            }
+            return of(true);
+          }),
+        );
+      }),
+    );
+  }
+
+  validateJobState(job: AgendaJob) {
+    if (!job) {
+      return throwError(new BadRequestException('Job not found.'));
+    }
+    if (
+      job.data.status === AGENDA_JOB_STATUS.reset ||
+      job.data.status === AGENDA_JOB_STATUS.success
+    ) {
+      return throwError(
+        new BadRequestException(
+          `Jobs with status ${job.data.status}, cannot be reseted.`,
+        ),
+      );
+    }
+    // remove after new feature added
+    if (!this.resetJobs.includes(job.data.type)) {
+      return throwError(
+        new BadRequestException(
+          `Reset State currently available for
+          ${this.resetJobs
+            .filter(elem => elem.replace('_', ' ').toLocaleLowerCase())
+            .join(', ')}, coming soon for
+          ${job.data.type.replace('_', ' ').toLocaleLowerCase()}`,
+        ),
+      );
+    }
+    return of(true);
   }
 
   async retryJob(jobId) {
@@ -402,5 +436,23 @@ export class JobQueueAggregateService {
             .catch(err => {});
         },
       });
+  }
+
+  deleteEmptyJobs(file, req) {
+    return of(JSON.parse(file.buffer)).pipe(
+      switchMap((data: AgendaJob[]) => {
+        const id = [];
+        data.forEach(job => id.push(new ObjectId(job._id)));
+        return from(
+          this.jobService.deleteMany({
+            _id: { $in: id },
+            'data.status': {
+              $in: [AGENDA_JOB_STATUS.reset, AGENDA_JOB_STATUS.success],
+            },
+          }),
+        );
+      }),
+      switchMap(() => of(true)),
+    );
   }
 }

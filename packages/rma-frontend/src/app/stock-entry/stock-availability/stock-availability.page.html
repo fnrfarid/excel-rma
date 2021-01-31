@@ -118,13 +118,6 @@
             <mat-cell *matCellDef="let row">{{ row.actual_qty }}</mat-cell>
           </ng-container>
 
-          <ng-container matColumnDef="ordered_qty">
-            <mat-header-cell *matHeaderCellDef
-              >Ordered quantity</mat-header-cell
-            >
-            <mat-cell *matCellDef="let row">{{ row.ordered_qty }}</mat-cell>
-          </ng-container>
-
           <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true">
           </mat-header-row>
 

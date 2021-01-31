@@ -224,7 +224,7 @@
           </ion-menu-toggle>
 
           <ion-item
-            *ngIf="loggedIn && permissionState?.settings?.active"
+            *ngIf="loggedIn"
             (click)="isSettingMenuVisible = !isSettingMenuVisible"
             lines="none"
           >
@@ -268,7 +268,7 @@
                 <ion-label> Item Price</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn && permissionState?.settings?.active"
+                *ngIf="loggedIn && permissionState?.credit_limit?.active"
                 routerLink="/settings/credit-limit"
                 lines="none"
                 routerLinkActive="active"
@@ -277,7 +277,7 @@
                 <ion-label>Credit Limit</ion-label>
               </ion-item>
               <ion-item
-                *ngIf="loggedIn && permissionState?.settings?.active"
+                *ngIf="loggedIn"
                 routerLink="/settings/problem"
                 lines="none"
                 routerLinkActive="active"

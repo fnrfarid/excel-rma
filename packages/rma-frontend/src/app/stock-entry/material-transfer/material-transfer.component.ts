@@ -35,7 +35,6 @@ import {
   TRANSFER_WAREHOUSE,
   AUTH_SERVER_URL,
   BASIC_RATE,
-  PRINT_FORMAT_PREFIX,
   DELIVERED_SERIALS_DISPLAYED_COLUMNS,
 } from '../../constants/storage';
 import { TimeService } from '../../api/time/time.service';
@@ -51,12 +50,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { Item } from '../../common/interfaces/sales.interface';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { AddItemDialog } from './add-item-dialog';
-import { PRINT_DELIVERY_NOTE_PDF_METHOD } from '../../constants/url-strings';
 import { SettingsService } from '../../settings/settings.service';
 import { ConfirmationDialog } from '../../sales-ui/item-price/item-price.page';
 import { LoadingController } from '@ionic/angular';
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../constants/permission-roles';
 
 @Component({
   selector: 'app-material-transfer',
@@ -1015,18 +1013,80 @@ export class MaterialTransferComponent implements OnInit {
     });
   }
 
+  printDeliveryNote(docType?: string) {
+    const names = [];
+    if (
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.MATERIAL_TRANSFER
+    ) {
+      this.stock_receipt_names.forEach(name =>
+        name.includes('TROUT') ? names.push(name) : null,
+      );
+    } else {
+      names.push(...this.stock_receipt_names);
+    }
+    this.salesService
+      .getDeliveryNoteWithItems(names, docType)
+      .pipe(
+        switchMap((data: any) => {
+          data = Object.values(data);
+          const aggregatedDeliveryNotes = this.salesService.getAggregatedDocument(
+            data,
+          );
+          const warehouses: {
+            [ket: string]: string;
+          } = this.getPrintWarehouse();
+          this.salesService.printDocument(
+            {
+              ...aggregatedDeliveryNotes,
+              name: names.join(', '),
+              print: {
+                print_type: this.form.controls.stock_entry_type.value,
+                ...warehouses,
+              },
+            },
+            this.uuid,
+          );
+          return of({});
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
+  }
+
+  getPrintWarehouse() {
+    switch (this.form.controls.stock_entry_type.value) {
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        return {
+          s_warehouse: this.materialTransferDataSource.data()[0].s_warehouse,
+          t_warehouse: this.materialTransferDataSource.data()[0].t_warehouse,
+        };
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return {
+          t_warehouse: this.materialTransferDataSource.data()[0].t_warehouse,
+        };
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return {
+          s_warehouse: this.materialTransferDataSource.data()[0].s_warehouse,
+        };
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return {
+          s_warehouse: this.materialTransferDataSource.data()[0].s_warehouse,
+        };
+      default:
+        return {};
+    }
+  }
+
   async getPrint() {
-    const authURL = await this.salesService.getStore().getItem(AUTH_SERVER_URL);
-    const url = `${authURL}${PRINT_DELIVERY_NOTE_PDF_METHOD}`;
-    const doctype = this.getStockEntryDoctype();
-    const name = `name=${JSON.stringify(this.stock_receipt_names)}`;
-    const no_letterhead = 'no_letterhead=0';
-    window.open(
-      `${url}?doctype=${doctype}&${name}&format=${
-        PRINT_FORMAT_PREFIX + doctype
-      }&${no_letterhead}`,
-      '_blank',
-    );
+    const doc =
+      this.form.controls.stock_entry_type.value ===
+      STOCK_ENTRY_TYPE.RnD_PRODUCTS
+        ? `Delivery Note`
+        : `Stock Entry`;
+    this.printDeliveryNote(doc);
   }
 
   showJobs() {

@@ -41,6 +41,7 @@ import {
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { SerialNoHistoryInterface } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { EventType } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 
 export const CREATE_PURCHASE_RECEIPT_JOB = 'CREATE_PURCHASE_RECEIPT_JOB';
 
@@ -270,7 +271,9 @@ export class PurchaseReceiptSyncService {
       .insertMany(purchase_receipts)
       .then(success => {})
       .catch(err => {});
-    const warrantyPurchasedOn = DateTime.fromJSDate(this.getDate(payload[0]))
+    const warrantyPurchasedOn = DateTime.fromJSDate(
+      getParsedPostingDate(payload[0]),
+    )
       .setZone(settings.timeZone)
       .toJSDate();
 
@@ -336,26 +339,6 @@ export class PurchaseReceiptSyncService {
         },
       ),
     );
-  }
-
-  getDate(payload) {
-    let date: Date;
-    try {
-      date = new Date(
-        `${this.parsePostingDate(payload.posting_date)} ${
-          payload.posting_time
-        }`,
-      );
-    } catch {}
-    if (date && isNaN(date?.getMilliseconds())) {
-      date = new Date();
-    }
-    return date;
-  }
-
-  parsePostingDate(posting_date) {
-    const splitDate = posting_date.split('-');
-    return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
   }
 
   addToQueueNow(data: {

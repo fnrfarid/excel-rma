@@ -47,6 +47,7 @@ import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.s
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { PurchaseReceiptSyncService } from '../../schedular/purchase-receipt-sync/purchase-receipt-sync.service';
 import { PurchaseOrderService } from '../../../purchase-order/entity/purchase-order/purchase-order.service';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 
 @Injectable()
 export class PurchaseReceiptAggregateService extends AggregateRoot {
@@ -306,7 +307,9 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
           {
             $set: {
               'warranty.purchaseWarrantyDate': item.warranty_date,
-              'warranty.purchasedOn': DateTime.fromJSDate(this.getDate(payload))
+              'warranty.purchasedOn': DateTime.fromJSDate(
+                getParsedPostingDate(payload),
+              )
                 .setZone(settings.timeZone)
                 .toJSDate(),
             },
@@ -315,26 +318,6 @@ export class PurchaseReceiptAggregateService extends AggregateRoot {
         .then(updated => {})
         .catch(err => {});
     });
-  }
-
-  getDate(payload) {
-    let date: Date;
-    try {
-      date = new Date(
-        `${this.parsePostingDate(payload.posting_date)} ${
-          payload.posting_time
-        }`,
-      );
-    } catch {}
-    if (date && isNaN(date?.getMilliseconds())) {
-      date = new Date();
-    }
-    return date;
-  }
-
-  parsePostingDate(posting_date) {
-    const splitDate = posting_date.split('-');
-    return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
   }
 
   createBatchedFrappeSerials(

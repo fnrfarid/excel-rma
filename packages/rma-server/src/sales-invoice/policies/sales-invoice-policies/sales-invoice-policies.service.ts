@@ -35,6 +35,7 @@ import {
 } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
 import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 
 @Injectable()
 export class SalesInvoicePoliciesService {
@@ -242,11 +243,58 @@ export class SalesInvoicePoliciesService {
     );
   }
 
+  validateSalesReturnItems(payload: CreateSalesReturnDto) {
+    return from(payload.items).pipe(
+      mergeMap(item => {
+        if (!item.has_serial_no) {
+          return of(true);
+        }
+        const serialSet = new Set();
+        const duplicateSerials = [];
+        const serials = item.serial_no.split('\n');
+        serials.forEach(no => {
+          serialSet.has(no) ? duplicateSerials.push(no) : null;
+          serialSet.add(no);
+        });
+        if (Array.from(serialSet).length !== serials.length) {
+          return throwError(
+            new BadRequestException(
+              `Found following as duplicate serials for ${
+                item.item_name || item.item_code
+              }. 
+              ${duplicateSerials.splice(0, 50).join(', ')}...`,
+            ),
+          );
+        }
+        return of(true);
+      }),
+      toArray(),
+      switchMap(success => of(true)),
+    );
+  }
+
+  validateReturnPostingDate(
+    createReturnPayload: CreateSalesReturnDto,
+    salesInvoice,
+  ) {
+    if (
+      getParsedPostingDate(salesInvoice) >
+      getParsedPostingDate(createReturnPayload)
+    ) {
+      return throwError(
+        new BadRequestException(
+          'posting date cannot be before sales invoice posting.',
+        ),
+      );
+    }
+    return of(salesInvoice);
+  }
+
   validateSalesReturn(createReturnPayload: CreateSalesReturnDto) {
-    const test = createReturnPayload.items;
+    const items = createReturnPayload.items;
     const data = new Set();
-    test.forEach(element => {
-      data.add(element.against_sales_invoice);
+    items.forEach(item => {
+      data.add(item.against_sales_invoice);
     });
     const salesInvoiceName: any[] = Array.from(data);
     if (salesInvoiceName.length === 1) {
@@ -254,7 +302,10 @@ export class SalesInvoicePoliciesService {
         this.salesInvoiceService.findOne({ name: salesInvoiceName[0] }),
       ).pipe(
         switchMap(salesInvoice => {
-          return of(salesInvoice);
+          return this.validateReturnPostingDate(
+            createReturnPayload,
+            salesInvoice,
+          );
         }),
       );
     }

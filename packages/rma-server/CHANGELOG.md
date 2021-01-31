@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.2.2...rma-server@1.3.0) (2021-01-31)
+
+
+### Features
+
+* **excel-rma:** Add aggregated print for stock entry ([3c3cfb9](https://gitlab.com/castlecraft/excel-rma/commit/3c3cfb95b4e54a4c11fac46c6596554b0949e7d5))
+* **excel-rma:** Updated sales return, job cleanup, serial date, print ([7cf98cc](https://gitlab.com/castlecraft/excel-rma/commit/7cf98ccf54da049b6b4cf280be60af08beb9fb53))
+* **Excel-rma:** Validate sales return based on posting date ([3441e4a](https://gitlab.com/castlecraft/excel-rma/commit/3441e4acad2bd079706250269d95c3795979cec1))
+
+
+
+
+
 ## [1.2.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.2.1...rma-server@1.2.2) (2021-01-28)
 
 
