@@ -3,7 +3,6 @@ import {
   BadRequestException,
   HttpService,
   ForbiddenException,
-  NotImplementedException,
 } from '@nestjs/common';
 import {
   StockEntryDto,
@@ -26,7 +25,6 @@ import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.s
 import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
-import { DateTime } from 'luxon';
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
@@ -459,23 +457,26 @@ export class StockEntryPoliciesService {
 
   validateCancelWarrantyStockEntry(stockVoucherNumber) {
     return from(
-      this.serialNoHistoryService.findOne({ document_no: stockVoucherNumber }),
+      this.serialNoHistoryService.asyncAggregate([
+        {
+          $match: {
+            serial_no: stockVoucherNumber.items[0].serial_no,
+          },
+        },
+        { $sort: { _id: -1 } },
+        { $limit: 1 },
+      ]),
     ).pipe(
       switchMap(serialHistory => {
-        return from(
-          this.serialNoHistoryService.find({
-            serial_no: serialHistory.serial_no,
-            created_on: { $gt: DateTime.fromJSDate(serialHistory.created_on) },
-          }),
-        );
-      }),
-      switchMap(serialHistory => {
-        if (serialHistory.length) {
-          return throwError(
-            new NotImplementedException('First Cancel Other documents'),
-          );
+        if (
+          serialHistory[0].document_no ===
+          stockVoucherNumber.stock_voucher_number
+        ) {
+          return of(true);
         }
-        return of(true);
+        return throwError(
+          new BadRequestException('First Cancel Other documents'),
+        );
       }),
     );
   }

@@ -4,12 +4,20 @@
       <ion-row>
         <ion-col class="ion-text-left">
           <ion-card-title>
-            <ion-text color="tertiary">
-              Stock Entry
-            </ion-text>
+            <ion-text color="tertiary"> Stock Entry </ion-text>
           </ion-card-title>
         </ion-col>
-        <ion-col class="ion-text-right" *ngIf="!dataSource?.data?.length">
+        <ion-col
+          class="ion-text-right"
+          *ngIf="
+            warrantyObject?.status_history &&
+            !(
+              warrantyObject?.status_history[
+                warrantyObject?.status_history.length - 1
+              ]?.verdict === 'Deliver to Customer'
+            )
+          "
+        >
           <ion-button
             *ngIf="permissionState.warranty_claim.create"
             color="tertiary"

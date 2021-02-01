@@ -4,9 +4,7 @@
       <ion-row class="align">
         <ion-col>
           <ion-card-title>
-            <ion-text color="tertiary">
-              Details
-            </ion-text>
+            <ion-text color="tertiary"> Details </ion-text>
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right" size="auto">
@@ -179,9 +177,7 @@
       <ion-row>
         <ion-col class="ion-text-left">
           <ion-card-title>
-            <ion-text color="tertiary">
-              Status History
-            </ion-text>
+            <ion-text color="tertiary"> Status History </ion-text>
           </ion-card-title>
         </ion-col>
       </ion-row>
@@ -191,7 +187,7 @@
   <ion-card-content class="ion-no-padding">
     <mat-table
       #table
-      style="width: 100%;"
+      style="width: 100%"
       [dataSource]="warrantyObject?.status_history"
     >
       <ng-container matColumnDef="posting_date">
@@ -362,7 +358,10 @@
             "
           >
             <input
-              [value]="(stockEntry?.items)[0].s_warehouse"
+              [value]="
+                warrantyObject?.replace_warehouse &&
+                warrantyObject?.replace_warehouse[0]
+              "
               matInput
               type="text"
               disabled
@@ -374,7 +373,10 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="warrantyObject?.receiving_branch"
+              [value]="
+                warrantyObject?.damage_warehouse &&
+                warrantyObject?.damage_warehouse[0]
+              "
               type="text"
               disabled
               placeholder="Damaged Warehouse"
@@ -388,7 +390,10 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="(stockEntry?.items)[0].item_name"
+              [value]="
+                warrantyObject?.replace_product &&
+                warrantyObject?.replace_product[0]
+              "
               type="text"
               disabled
               placeholder="Replaced Product"
@@ -399,7 +404,10 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="warrantyObject?.item_name"
+              [value]="
+                warrantyObject?.damage_product &&
+                warrantyObject?.damage_product[0]
+              "
               type="text"
               disabled
               placeholder="Damaged Product"
@@ -413,7 +421,10 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="(stockEntry?.items)[0].serial_no[0]"
+              [value]="
+                warrantyObject?.replace_serial &&
+                warrantyObject?.replace_serial[0]
+              "
               type="text"
               disabled
               placeholder="Replace Serial"

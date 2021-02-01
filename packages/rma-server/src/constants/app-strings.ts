@@ -216,6 +216,7 @@ export const DEFAULT_NAMING_SERIES = {
   rnd_products: 'RND-.YYYY.-',
   stock_transfer_internal: 'TRO-.YYYY.-',
   warranty_claim: 'WAR-00',
+  service_invoice: 'WINV-.YYYY.-',
 };
 export const MAX_SERIAL_BODY_COUNT = 100000;
 export enum VERDICT {

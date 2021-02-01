@@ -9,6 +9,7 @@ import { StockEntryService } from '../../entities/stock-entry.service';
 import { from, throwError, of, forkJoin } from 'rxjs';
 import {
   DEFAULT_NAMING_SERIES,
+  DELIVERY_STATUS,
   STOCK_ENTRY,
   STOCK_ENTRY_STATUS,
   VERDICT,
@@ -30,6 +31,7 @@ import {
   SerialNoHistoryInterface,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { StockEntryPoliciesService } from '../../../stock-entry/policies/stock-entry-policies/stock-entry-policies.service';
+import { WarrantyClaimAggregateService } from '../../../warranty-claim/aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -41,6 +43,7 @@ export class WarrantyStockEntryAggregateService {
     private warrantyService: WarrantyClaimService,
     private serialNoHistoryService: SerialNoHistoryService,
     private readonly stockEntryPoliciesService: StockEntryPoliciesService,
+    private readonly warrantyAggregateService: WarrantyClaimAggregateService,
   ) {}
 
   createDeliveryNote(deliveryNotes: WarrantyStockEntryDto[], req) {
@@ -131,6 +134,38 @@ export class WarrantyStockEntryAggregateService {
         );
       }),
       switchMap(() => {
+        const statusHistoryDetails = {} as any;
+        statusHistoryDetails.uuid = warrantyPayload.warrantyClaimUuid;
+        statusHistoryDetails.time = new DateTime(
+          settingState.timeZone,
+        ).toJSDate();
+        statusHistoryDetails.posting_date = new DateTime(
+          settingState.timeZone,
+        ).toJSDate();
+        statusHistoryDetails.status_from = req.token.territory[0];
+        statusHistoryDetails.verdict = VERDICT.DELIVER_TO_CUSTOMER;
+        statusHistoryDetails.description = warrantyPayload.description;
+        statusHistoryDetails.created_by_email = req.token.email;
+        statusHistoryDetails.created_by = req.token.name;
+        switch (warrantyPayload.type) {
+          case 'Replace':
+            statusHistoryDetails.delivery_status = DELIVERY_STATUS.REPLACED;
+            break;
+          case 'Upgrade':
+            statusHistoryDetails.delivery_status = DELIVERY_STATUS.UPGRADED;
+            break;
+          case 'Repair':
+            statusHistoryDetails.delivery_status = DELIVERY_STATUS.REPAIRED;
+            break;
+          default:
+            break;
+        }
+        return this.warrantyAggregateService.addStatusHistory(
+          statusHistoryDetails,
+          req,
+        );
+      }),
+      switchMap(() => {
         return from(deliveryNotesList).pipe(
           concatMap(deliveryNote => {
             return this.createSerialNoHistory(deliveryNote, settingState, req);
@@ -138,6 +173,7 @@ export class WarrantyStockEntryAggregateService {
           toArray(),
         );
       }),
+
       switchMap(() => {
         return from(deliveryNotesList).pipe(
           concatMap(deliveryNote => {
@@ -169,14 +205,34 @@ export class WarrantyStockEntryAggregateService {
   updateProgressState(deliveryNote, erpDN) {
     deliveryNote.stock_voucher_number = erpDN.name;
     deliveryNote.isSync = false;
+    let serialData = {} as any;
+    switch (deliveryNote.stock_entry_type) {
+      case 'Returned':
+        serialData = {
+          progress_state: deliveryNote,
+          completed_delivery_note: erpDN,
+          damaged_serial: deliveryNote.items[0].serial_no,
+          damage_warehouse: deliveryNote.items[0].warehouse,
+          damage_product: deliveryNote.items[0].item_name,
+        };
+        break;
+      case 'Delivered':
+        serialData = {
+          progress_state: deliveryNote,
+          completed_delivery_note: erpDN,
+          replace_serial: deliveryNote.items[0].serial_no,
+          replace_warehouse: deliveryNote.items[0].warehouse,
+          replace_product: deliveryNote.items[0].item_name,
+        };
+        break;
+      default:
+        break;
+    }
     return from(
       this.warrantyService.updateOne(
         { uuid: deliveryNote.warrantyClaimUuid },
         {
-          $push: {
-            progress_state: deliveryNote,
-            completed_delivery_note: erpDN,
-          },
+          $push: serialData,
         },
       ),
     );
@@ -419,7 +475,7 @@ export class WarrantyStockEntryAggregateService {
   removeStockEntry(stockEntry, req) {
     let set: any;
     return this.stockEntryPoliciesService
-      .validateCancelWarrantyStockEntry(stockEntry.stock_voucher_number)
+      .validateCancelWarrantyStockEntry(stockEntry)
       .pipe(
         switchMap(() => {
           return this.settingService.find();
@@ -449,18 +505,6 @@ export class WarrantyStockEntryAggregateService {
           });
         }),
         map(res => res.data.data),
-        switchMap(canceledDeliveryNote => {
-          return this.stockEntryService.deleteOne({
-            stock_voucher_number: canceledDeliveryNote.name,
-          });
-        }),
-        switchMap(() => {
-          return from(
-            this.serialService.findOne({
-              serial_no: stockEntry.items[0]?.serial_no,
-            }),
-          );
-        }),
         switchMap(serialItem => {
           if (stockEntry.stock_entry_type === 'Delivered') {
             return from(
@@ -479,22 +523,25 @@ export class WarrantyStockEntryAggregateService {
             );
           }
           if (stockEntry.stock_entry_type === 'Returned') {
-            return from(
-              this.serialService.updateOne(
-                { serial_no: stockEntry.items[0]?.serial_no },
-                {
-                  $set: {
-                    delivery_note: serialItem.retrieve_delivery_note,
-                  },
-                  $unset: {
-                    retrieve_delivery_note: '',
-                  },
-                },
-              ),
+            return this.resetCancelledSerialItem(
+              stockEntry.stock_voucher_number,
             );
           }
           return of();
         }),
+        switchMap(() => {
+          return this.stockEntryService.deleteOne({
+            stock_voucher_number: stockEntry.stock_voucher_number,
+          });
+        }),
+        switchMap(() => {
+          return from(
+            this.serialService.findOne({
+              serial_no: stockEntry.items[0]?.serial_no,
+            }),
+          );
+        }),
+
         switchMap(() => {
           return this.warrantyService.updateOne(
             { uuid: stockEntry.warrantyClaimUuid },
@@ -516,5 +563,31 @@ export class WarrantyStockEntryAggregateService {
           });
         }),
       );
+  }
+
+  resetCancelledSerialItem(stock_voucher_number: string) {
+    return from(this.stockEntryService.findOne({ stock_voucher_number })).pipe(
+      switchMap((stockEntry: any) => {
+        return from(
+          this.serialService.updateOne(
+            { serial_no: stockEntry.items[0]?.serial_no },
+            {
+              $set: {
+                customer: stockEntry.items[0].customer,
+                warehouse: stockEntry.items[0].warehouse,
+                'warranty.salesWarrantyDate':
+                  stockEntry.items[0].warranty.salesWarrantyDate,
+                'warranty.soldOn': stockEntry.items[0].warranty.soldOn,
+                sales_invoice_name: stockEntry.items[0].sales_invoice_name,
+                delivery_note: stockEntry.items[0].delivery_note,
+              },
+              $unset: {
+                retrieve_delivery_note: '',
+              },
+            },
+          ),
+        );
+      }),
+    );
   }
 }

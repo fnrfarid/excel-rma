@@ -126,6 +126,10 @@ export class ServiceInvoiceDto {
   pos_profile: string;
 
   @IsOptional()
+  @IsString()
+  naming_series: string;
+
+  @IsOptional()
   payments: Payments[];
 }
 
