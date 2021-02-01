@@ -46,6 +46,11 @@ export class StockEntryService {
       }
     }
 
+    if (filter_query.names) {
+      query.names = filter_query.names;
+      delete filter_query.names;
+    }
+
     if (filter_query.s_warehouse) {
       s_warehouseQuery.items = {
         $elemMatch: { s_warehouse: filter_query.s_warehouse },
