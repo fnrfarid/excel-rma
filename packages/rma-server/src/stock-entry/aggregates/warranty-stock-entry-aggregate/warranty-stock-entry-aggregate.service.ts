@@ -136,13 +136,13 @@ export class WarrantyStockEntryAggregateService {
       switchMap(() => {
         const statusHistoryDetails = {} as any;
         statusHistoryDetails.uuid = warrantyPayload.warrantyClaimUuid;
-        statusHistoryDetails.time = new DateTime(
+        (statusHistoryDetails.time = new DateTime(
           settingState.timeZone,
-        ).toJSDate();
-        statusHistoryDetails.posting_date = new DateTime(
-          settingState.timeZone,
-        ).toJSDate();
-        statusHistoryDetails.status_from = req.token.territory[0];
+        ).toFormat('HH:mm:ss')),
+          (statusHistoryDetails.posting_date = new DateTime(
+            settingState.timeZone,
+          ).toFormat('yyyy-MM-dd')),
+          (statusHistoryDetails.status_from = req.token.territory[0]);
         statusHistoryDetails.verdict = VERDICT.DELIVER_TO_CUSTOMER;
         statusHistoryDetails.description = warrantyPayload.description;
         statusHistoryDetails.created_by_email = req.token.email;
@@ -307,18 +307,15 @@ export class WarrantyStockEntryAggregateService {
       deliveryNote.items[0].excel_serials &&
       deliveryNote.stock_entry_type === 'Delivered'
     ) {
-      deliveryNote.retrieve_delivery_note = deliveryNote.delivery_note;
       deliveryNote.delivery_note = deliveryNote.stock_voucher_number;
       return this.updateSerialItem(deliveryNote, serial_no, settings);
     }
-    deliveryNote.retrieve_delivery_note = deliveryNote.delivery_note;
     deliveryNote.delivery_note = deliveryNote.stock_voucher_number;
     return from(
       this.serialService.updateOne(
         { serial_no: deliveryNote.items[0].excel_serials },
         {
           $set: {
-            retrieve_delivery_note: deliveryNote.retrieve_delivery_note,
             delivery_note: deliveryNote.stock_voucher_number,
             warehouse: deliveryNote.set_warehouse,
           },
@@ -535,13 +532,8 @@ export class WarrantyStockEntryAggregateService {
           });
         }),
         switchMap(() => {
-          return from(
-            this.serialService.findOne({
-              serial_no: stockEntry.items[0]?.serial_no,
-            }),
-          );
+          return this.revertStatusHistory(stockEntry.warrantyClaimUuid);
         }),
-
         switchMap(() => {
           return this.warrantyService.updateOne(
             { uuid: stockEntry.warrantyClaimUuid },
@@ -565,6 +557,22 @@ export class WarrantyStockEntryAggregateService {
       );
   }
 
+  revertStatusHistory(uuid: string) {
+    return from(
+      this.warrantyService.findOne({
+        uuid,
+        status_history: { $elemMatch: { verdict: 'Deliver to Customer' } },
+      }),
+    ).pipe(
+      switchMap(res => {
+        if (!res) {
+          return of({});
+        }
+        return this.warrantyAggregateService.removeStatusHistory({ uuid });
+      }),
+    );
+  }
+
   resetCancelledSerialItem(stock_voucher_number: string) {
     return from(this.stockEntryService.findOne({ stock_voucher_number })).pipe(
       switchMap((stockEntry: any) => {
@@ -580,9 +588,6 @@ export class WarrantyStockEntryAggregateService {
                 'warranty.soldOn': stockEntry.items[0].warranty.soldOn,
                 sales_invoice_name: stockEntry.items[0].sales_invoice_name,
                 delivery_note: stockEntry.items[0].delivery_note,
-              },
-              $unset: {
-                retrieve_delivery_note: '',
               },
             },
           ),
