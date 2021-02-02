@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { interval, Subscription, of, throwError, timer } from 'rxjs';
+import { interval, Subscription, of, throwError, timer, from } from 'rxjs';
 import {
   TOKEN,
   ACCESS_TOKEN,
@@ -14,6 +14,7 @@ import {
   LOGGED_IN,
   ALL_TERRITORIES,
   WARRANTY_APP_URL,
+  AUTH_SERVER_URL,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
@@ -42,6 +43,8 @@ export class AppComponent implements OnInit {
 
   fullName: string = '';
   imageURL: string = '';
+  authServerUrl = '';
+
   constructor(
     private readonly appService: AppService,
     private readonly loginService: LoginService,
@@ -196,11 +199,20 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
-    this.loggedIn = false;
-    this.appService
-      .getStorage()
-      .clear()
-      .then(() => this.loginService.logout());
+    from(this.appService.getStorage().getItem(AUTH_SERVER_URL))
+      .pipe(
+        switchMap(url => {
+          this.authServerUrl = url;
+          return from(this.appService.getStorage().clear());
+        }),
+      )
+      .subscribe({
+        next: success => {
+          this.loggedIn = false;
+          window.location.href = this.authServerUrl + '?cmd=web_logout';
+        },
+        error: error => {},
+      });
   }
 
   silentRefresh() {
