@@ -15,7 +15,7 @@
                 </ion-card-title>
             </ion-col>
             <ion-col class="ion-text-right">
-                <ion-button class="ion-text-right" [disabled]="!deliveredSerialsDataSource?.length" color="tertiary" (click)="downloadSerials()">
+                <ion-button class="ion-text-right" [disabled]="!deliveredSerialsDataSource?.length || permissionState?.serial_dump?.active" color="tertiary" (click)="downloadSerials()">
                     Download CSV
                 </ion-button>
                 <ion-button class="ion-text-right" color="tertiary" (click)="getDeliveredSerials()">

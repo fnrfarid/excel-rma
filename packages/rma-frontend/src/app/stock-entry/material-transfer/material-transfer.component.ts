@@ -55,11 +55,26 @@ import { ConfirmationDialog } from '../../sales-ui/item-price/item-price.page';
 import { LoadingController } from '@ionic/angular';
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import {
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import { MY_FORMATS } from '../../constants/date-format';
 
 @Component({
   selector: 'app-material-transfer',
   templateUrl: './material-transfer.component.html',
   styleUrls: ['./material-transfer.component.scss'],
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: MomentDateAdapter,
+      deps: [MAT_DATE_LOCALE],
+    },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ],
 })
 export class MaterialTransferComponent implements OnInit {
   value: string;

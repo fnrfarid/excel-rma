@@ -3,7 +3,7 @@ export const MY_FORMATS = {
     dateInput: 'LL',
   },
   display: {
-    dateInput: 'DD-MM-YYYY',
+    dateInput: 'YYYY-MM-DD',
     monthYearLabel: 'YYYY',
     dateA11yLabel: 'LL',
     monthYearA11yLabel: 'YYYY',
