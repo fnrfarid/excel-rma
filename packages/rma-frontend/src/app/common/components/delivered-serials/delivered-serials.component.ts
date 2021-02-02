@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import {
   CSV_FILE_TYPE,
@@ -20,6 +21,7 @@ export class DeliveredSerialsComponent implements OnInit {
   };
   index: number = 0;
   size: number = 10;
+  permissionState = PERMISSION_STATE;
   deliveredSerialsSearch: string;
   deliveredSerialsDataSource: CommonDeliveredSerialsDataSource;
   constructor(
