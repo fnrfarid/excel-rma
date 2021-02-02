@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { interval, Subscription, of, throwError } from 'rxjs';
+import { interval, Subscription, of, throwError, from } from 'rxjs';
 import {
   TOKEN,
   ACCESS_TOKEN,
@@ -43,6 +43,8 @@ export class AppComponent implements OnInit {
   binListURL: string = '';
   fullName: string = '';
   imageURL: string = '';
+  authServerUrl = '';
+
   constructor(
     private readonly appService: AppService,
     private readonly loginService: LoginService,
@@ -190,11 +192,20 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
-    this.loggedIn = false;
-    this.appService
-      .getStorage()
-      .clear()
-      .then(() => this.loginService.logout());
+    from(this.appService.getStorage().getItem(AUTH_SERVER_URL))
+      .pipe(
+        switchMap(url => {
+          this.authServerUrl = url;
+          return from(this.appService.getStorage().clear());
+        }),
+      )
+      .subscribe({
+        next: success => {
+          this.loggedIn = false;
+          window.location.href = this.authServerUrl + '?cmd=web_logout';
+        },
+        error: error => {},
+      });
   }
 
   silentRefresh() {
