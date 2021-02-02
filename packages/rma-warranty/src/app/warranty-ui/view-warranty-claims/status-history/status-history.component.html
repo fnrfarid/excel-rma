@@ -324,10 +324,10 @@
       class="ion-no-padding"
       *ngIf="
         (warrantyObject?.status_history)[
-          warrantyObject?.status_history.length - 1
+          warrantyObject?.status_history?.length - 1
         ]?.delivery_status === 'Upgraded' ||
         (warrantyObject?.status_history)[
-          warrantyObject?.status_history.length - 1
+          warrantyObject?.status_history?.length - 1
         ]?.delivery_status === 'Replaced'
       "
     >
@@ -337,7 +337,7 @@
             class="example-full-width"
             *ngIf="
               (warrantyObject?.status_history)[
-                warrantyObject?.status_history.length - 1
+                warrantyObject?.status_history?.length - 1
               ]?.delivery_status === 'Upgraded'
             "
           >
@@ -346,7 +346,7 @@
               type="text"
               placeholder="Upgrade Warehouse"
               disabled
-              [value]="(stockEntry?.items)[0].s_warehouse"
+              [value]="(stockEntry?.items)[0]?.s_warehouse"
             />
           </mat-form-field>
           <mat-form-field
@@ -359,7 +359,7 @@
           >
             <input
               [value]="
-                warrantyObject?.replace_warehouse &&
+                warrantyObject?.replace_warehouse?.length &&
                 warrantyObject?.replace_warehouse[0]
               "
               matInput
@@ -374,7 +374,7 @@
             <input
               matInput
               [value]="
-                warrantyObject?.damage_warehouse &&
+                warrantyObject?.damage_warehouse?.length &&
                 warrantyObject?.damage_warehouse[0]
               "
               type="text"
@@ -391,7 +391,7 @@
             <input
               matInput
               [value]="
-                warrantyObject?.replace_product &&
+                warrantyObject?.replace_product?.length &&
                 warrantyObject?.replace_product[0]
               "
               type="text"
@@ -405,7 +405,7 @@
             <input
               matInput
               [value]="
-                warrantyObject?.damage_product &&
+                warrantyObject?.damage_product?.length &&
                 warrantyObject?.damage_product[0]
               "
               type="text"
@@ -422,7 +422,7 @@
             <input
               matInput
               [value]="
-                warrantyObject?.replace_serial &&
+                warrantyObject?.replace_serial?.length &&
                 warrantyObject?.replace_serial[0]
               "
               type="text"
