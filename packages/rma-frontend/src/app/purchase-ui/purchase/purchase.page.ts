@@ -41,6 +41,7 @@ export class PurchasePage implements OnInit {
     'sr_no',
     'purchase_invoice_number',
     'status',
+    'delivered_percent',
     'date',
     'supplier',
     'total',

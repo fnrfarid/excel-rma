@@ -90,6 +90,7 @@ export const MATERIAL_TRANSFER_DISPLAYED_COLUMNS = [
   'serial_no',
   'delete',
 ];
+export const DELIVERED_SERIALS_DATE_FIELDS = ['purchasedOn', 'soldOn'];
 export const DELIVERED_SERIALS_BY = {
   sales_invoice_name: 'sales_invoice_name',
   purchase_invoice_name: 'purchase_invoice_name',

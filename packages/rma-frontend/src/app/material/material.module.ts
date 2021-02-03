@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -38,6 +39,7 @@ import { MatChipsModule } from '@angular/material/chips';
     MatProgressSpinnerModule,
     MatProgressBarModule,
     MatToolbarModule,
+    MatSliderModule,
     MatSidenavModule,
     MatIconModule,
     MatListModule,
@@ -72,6 +74,7 @@ import { MatChipsModule } from '@angular/material/chips';
     MatListModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSliderModule,
     MatCheckboxModule,
     MatCardModule,
     MatSnackBarModule,

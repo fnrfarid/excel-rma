@@ -48,12 +48,14 @@ export class SalesPage implements OnInit {
     'posting_time',
     'customer_name',
     'total',
+    'delivered_percent',
     'due_amount',
     'remarks',
     'territory',
     'created_by',
     'delivered_by',
   ];
+  bufferValue = 70;
   invoiceStatus: string[] = [
     'Draft',
     'Completed',
