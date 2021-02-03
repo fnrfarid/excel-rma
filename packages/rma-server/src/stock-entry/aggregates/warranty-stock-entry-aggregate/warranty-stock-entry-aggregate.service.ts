@@ -32,7 +32,6 @@ import {
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { StockEntryPoliciesService } from '../../../stock-entry/policies/stock-entry-policies/stock-entry-policies.service';
 import { WarrantyClaimAggregateService } from '../../../warranty-claim/aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
-import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -44,7 +43,6 @@ export class WarrantyStockEntryAggregateService {
     private warrantyService: WarrantyClaimService,
     private serialNoHistoryService: SerialNoHistoryService,
     private readonly stockEntryPoliciesService: StockEntryPoliciesService,
-    private readonly serialNoHistoryPolicyService: SerialNoHistoryPoliciesService,
     private readonly warrantyAggregateService: WarrantyClaimAggregateService,
   ) {}
 
@@ -472,108 +470,107 @@ export class WarrantyStockEntryAggregateService {
 
   removeStockEntry(stockEntry, req) {
     let set: any;
-    return this.checkValidEventState(stockEntry.warrantyClaimUuid, [
-      stockEntry.items[0]?.serial_no,
-    ]).pipe(
-      switchMap(() => {
-        return this.settingService.find();
-      }),
-      switchMap(settings => {
-        if (!settings.authServerURL) {
-          return throwError(new NotImplementedException());
-        }
-        set = settings;
-        const url = `${settings.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
-        return this.http.get(url, {
-          headers: this.settingService.getAuthorizationHeaders(req.token),
-        });
-      }),
-      map(res => res.data.data),
-      switchMap(response => {
-        if (!response) {
-          return throwError(new NotFoundException());
-        }
-        const url = `${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
-        response.docstatus = 2;
-        response.items.forEach(item => {
-          item.docstatus = 2;
-        });
-        return this.http.put(url, response, {
-          headers: this.settingService.getAuthorizationHeaders(req.token),
-        });
-      }),
-      map(res => res.data.data),
-      switchMap(serialItem => {
-        if (stockEntry.stock_entry_type === 'Delivered') {
-          return from(
-            this.serialService.updateOne(
-              { serial_no: stockEntry.items[0]?.serial_no },
-              {
-                $unset: {
-                  customer: '',
-                  'warranty.salesWarrantyDate': '',
-                  'warranty.soldOn': '',
-                  delivery_note: '',
-                  sales_invoice_name: '',
+    return this.stockEntryPoliciesService
+      .validateCancelWarrantyStockEntry(stockEntry.warrantyClaimUuid, [
+        stockEntry.items[0]?.serial_no,
+      ])
+      .pipe(
+        switchMap(() => {
+          return this.settingService.find();
+        }),
+        switchMap(settings => {
+          if (!settings.authServerURL) {
+            return throwError(new NotImplementedException());
+          }
+          set = settings;
+          const url = `${settings.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
+          return this.http.get(url, {
+            headers: this.settingService.getAuthorizationHeaders(req.token),
+          });
+        }),
+        map(res => res.data.data),
+        switchMap(response => {
+          if (!response) {
+            return throwError(new NotFoundException());
+          }
+          const url = `${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
+          response.docstatus = 2;
+          response.items.forEach(item => {
+            item.docstatus = 2;
+          });
+          return this.http.put(url, response, {
+            headers: this.settingService.getAuthorizationHeaders(req.token),
+          });
+        }),
+        map(res => res.data.data),
+        switchMap(serialItem => {
+          if (stockEntry.stock_entry_type === 'Delivered') {
+            return from(
+              this.serialService.updateOne(
+                { serial_no: stockEntry.items[0]?.serial_no },
+                {
+                  $unset: {
+                    customer: '',
+                    'warranty.salesWarrantyDate': '',
+                    'warranty.soldOn': '',
+                    delivery_note: '',
+                    sales_invoice_name: '',
+                  },
+                },
+              ),
+            );
+          }
+          if (stockEntry.stock_entry_type === 'Returned') {
+            return this.resetCancelledSerialItem(
+              stockEntry.stock_voucher_number,
+            );
+          }
+          return of();
+        }),
+        switchMap(() => {
+          if (stockEntry.stock_entry_type === 'Delivered') {
+            return from(
+              this.warrantyService.updateOne(
+                { uuid: stockEntry.warrantyClaimUuid },
+                {
+                  $unset: {
+                    replace_warehouse: '',
+                    replace_product: '',
+                    replace_serial: '',
+                  },
+                },
+              ),
+            );
+          }
+          return of([]);
+        }),
+        switchMap(() => {
+          return this.stockEntryService.deleteOne({
+            stock_voucher_number: stockEntry.stock_voucher_number,
+          });
+        }),
+        switchMap(() => {
+          return this.revertStatusHistory(stockEntry.warrantyClaimUuid);
+        }),
+        switchMap(() => {
+          return this.warrantyService.updateOne(
+            { uuid: stockEntry.warrantyClaimUuid },
+            {
+              $pull: {
+                completed_delivery_note: {
+                  name: stockEntry.stock_voucher_number,
+                },
+                progress_state: {
+                  stock_voucher_number: stockEntry.stock_voucher_number,
                 },
               },
-            ),
-          );
-        }
-        if (stockEntry.stock_entry_type === 'Returned') {
-          return this.resetCancelledSerialItem(stockEntry.stock_voucher_number);
-        }
-        return of();
-      }),
-      switchMap(() => {
-        return this.stockEntryService.deleteOne({
-          stock_voucher_number: stockEntry.stock_voucher_number,
-        });
-      }),
-      switchMap(() => {
-        return this.revertStatusHistory(stockEntry.warrantyClaimUuid);
-      }),
-      switchMap(() => {
-        return this.warrantyService.updateOne(
-          { uuid: stockEntry.warrantyClaimUuid },
-          {
-            $pull: {
-              completed_delivery_note: {
-                name: stockEntry.stock_voucher_number,
-              },
-              progress_state: {
-                stock_voucher_number: stockEntry.stock_voucher_number,
-              },
             },
-          },
-        );
-      }),
-      switchMap(() => {
-        return this.serialNoHistoryService.deleteOne({
-          document_no: stockEntry.stock_voucher_number,
-        });
-      }),
-    );
-  }
-
-  checkValidEventState(parent_document: string, serial_no: string[]) {
-    return this.serialNoHistoryPolicyService
-      .validateLatestEventWithParent(parent_document, serial_no)
-      .pipe(
-        switchMap(response => {
-          let message = `Found ${response.length} Events, please cancel Following events for serials
-      `;
-          response.forEach(value =>
-            value
-              ? (message += `${value._id} : ${value.serials
-                  .splice(0, 50)
-                  .join(', ')}`)
-              : null,
           );
-          if (response && response.length) {
-            return throwError(message);
-          }
-          return of(true);
+        }),
+        switchMap(() => {
+          return this.serialNoHistoryService.deleteOne({
+            document_no: stockEntry.stock_voucher_number,
+          });
         }),
       );
   }
