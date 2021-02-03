@@ -5,7 +5,7 @@ import {
   StockEntryItems,
 } from '../../../common/interfaces/warranty.interface';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { debounceTime, startWith, switchMap, map } from 'rxjs/operators';
+import { debounceTime, startWith } from 'rxjs/operators';
 import { StatusHistoryService } from './status-history.service';
 import { TimeService } from '../../../api/time/time.service';
 import {
@@ -67,6 +67,10 @@ export class StatusHistoryComponent implements OnInit {
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
     this.setStockEntryStatusFields();
+    this.statusHistoryForm.controls.transfer_branch.disable();
+    this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
+    this.statusHistoryForm.controls.delivery_status.disable();
+    this.statusHistoryForm.controls.delivery_status.updateValueAndValidity();
   }
 
   createFormGroup() {
@@ -85,10 +89,7 @@ export class StatusHistoryComponent implements OnInit {
     this.territoryList = this.statusHistoryForm.controls.transfer_branch.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      switchMap(value => {
-        return this.statusHistoryService.getTerritoryList(value);
-      }),
-      map(res => res.docs),
+      this.statusHistoryService.getTerritoryList(),
     );
 
     this.statusHistoryService
@@ -211,8 +212,20 @@ export class StatusHistoryComponent implements OnInit {
         this.statusHistoryForm.controls.transfer_branch.setValidators(
           Validators.required,
         );
+        this.statusHistoryForm.controls.transfer_branch.enable();
         this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
+        this.statusHistoryForm.controls.delivery_status.disable();
+        this.statusHistoryForm.controls.delivery_status.updateValueAndValidity();
+
         break;
+      case CURRENT_STATUS_VERDICT.DELIVER_TO_CUSTOMER:
+        this.statusHistoryForm.controls.delivery_status.setValidators(
+          Validators.required,
+        );
+        this.statusHistoryForm.controls.transfer_branch.disable();
+        this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
+        this.statusHistoryForm.controls.delivery_status.enable();
+        this.statusHistoryForm.controls.delivery_status.updateValueAndValidity();
       default:
         this.statusHistoryForm.controls.transfer_branch.clearValidators();
         this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();

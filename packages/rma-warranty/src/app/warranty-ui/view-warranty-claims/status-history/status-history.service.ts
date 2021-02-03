@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import {
-  LIST_TERRITORIES_ENDPOINT,
   ADD_STATUS_HISTORY_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   REMOVE_STATUS_HISTORY_ENDPOINT,
   GET_WARRANTY_STOCK_ENTRY,
+  RELAY_LIST_TERRITORIES_ENDPOINT,
 } from '../../../constants/url-strings';
 import { switchMap, map } from 'rxjs/operators';
-import { APIResponse } from '../../../common/interfaces/sales.interface';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { from } from 'rxjs';
+import { from, of } from 'rxjs';
 import {
   ACCESS_TOKEN,
   BEARER_TOKEN_PREFIX,
@@ -26,27 +25,31 @@ export class StatusHistoryService {
     private readonly storage: StorageService,
   ) {}
 
-  getTerritoryList(
-    filter = '',
-    sortOrder = 'asc',
-    pageNumber = 0,
-    pageSize = 30,
-  ) {
-    const url = LIST_TERRITORIES_ENDPOINT;
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
-
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<APIResponse>(url, {
-          params,
-          headers,
-        });
-      }),
-    );
+  getTerritoryList(value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_LIST_TERRITORIES_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(
+              map(res => res.data),
+              switchMap(res => {
+                return of(res);
+              }),
+            );
+        }),
+      );
+    });
   }
 
   getHeaders() {

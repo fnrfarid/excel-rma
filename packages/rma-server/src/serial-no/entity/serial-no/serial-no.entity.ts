@@ -126,8 +126,5 @@ export class SerialNo extends BaseEntity {
   brand: string;
 
   @Column()
-  retrieve_delivery_note: string;
-
-  @Column()
   claim_no: string;
 }

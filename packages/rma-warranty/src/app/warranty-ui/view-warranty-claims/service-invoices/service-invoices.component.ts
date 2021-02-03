@@ -77,7 +77,6 @@ export class ServiceInvoicesComponent implements OnInit {
     const loading = await this.loadingController.create();
     await loading.present();
     row.docstatus = 1;
-    row.is_pos = 1;
     this.serviceInvoice
       .getStore()
       .getItem('pos_profile')
@@ -85,12 +84,16 @@ export class ServiceInvoicesComponent implements OnInit {
         row.pos_profile = profile;
       });
     row.payments = [];
-    row.status = SERVICE_INVOICE_STATUS.PAID;
     row.payments.push({
       account: row.pos_profile,
       mode_of_payment: 'Cash',
       amount: row.total,
     });
+    if (row.is_pos) {
+      row.status = SERVICE_INVOICE_STATUS.PAID;
+    }
+    row.status = SERVICE_INVOICE_STATUS.UNPAID;
+
     this.serviceInvoice.submitInvoice(row).subscribe({
       next: () => {
         loading.dismiss();
