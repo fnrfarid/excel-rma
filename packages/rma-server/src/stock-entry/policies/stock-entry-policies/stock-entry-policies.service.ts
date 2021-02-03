@@ -24,7 +24,6 @@ import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/seri
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
-import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { DateTime } from 'luxon';
 import { getParsedPostingDate } from '../../../constants/agenda-job';
 @Injectable()
@@ -36,8 +35,8 @@ export class StockEntryPoliciesService {
     private readonly agendaJob: AgendaJobService,
     private readonly http: HttpService,
     private readonly settings: SettingsService,
-    private readonly serialNoHistoryService: SerialNoHistoryService,
-  ) { }
+    private serialNoHistoryPolicyService: SerialNoHistoryPoliciesService,
+  ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
     return this.validateStockEntryItems(payload).pipe(
@@ -264,8 +263,8 @@ export class StockEntryPoliciesService {
           response.forEach(value =>
             value
               ? (message += `${value._id} : ${value.serials
-                .splice(0, 50)
-                .join(', ')}`)
+                  .splice(0, 50)
+                  .join(', ')}`)
               : null,
           );
           if (response && response.length) {
@@ -322,8 +321,8 @@ export class StockEntryPoliciesService {
           response.forEach(value =>
             value
               ? (message += `${value._id} : ${value.serials
-                .splice(0, 50)
-                .join(', ')}`)
+                  .splice(0, 50)
+                  .join(', ')}`)
               : null,
           );
           if (response && response.length) {
@@ -439,17 +438,17 @@ export class StockEntryPoliciesService {
         switchMap(data => {
           return data.notFoundSerials?.length
             ? throwError(
-              new BadRequestException(`
+                new BadRequestException(`
             Found ${data?.notFoundSerials.length}
             Invalid Serials: ${data?.notFoundSerials
-                  ?.splice(0, 50)
-                  .join(', ')}`),
-            )
+              ?.splice(0, 50)
+              .join(', ')}`),
+              )
             : throwError(
-              new BadRequestException(
-                `Please check purchased date and related fields for provided serials.`,
-              ),
-            );
+                new BadRequestException(
+                  `Please check purchased date and related fields for provided serials.`,
+                ),
+              );
         }),
       );
   }
@@ -473,30 +472,29 @@ export class StockEntryPoliciesService {
     );
   }
 
-  validateCancelWarrantyStockEntry(stockVoucherNumber) {
-    return from(
-      this.serialNoHistoryService.asyncAggregate([
-        {
-          $match: {
-            serial_no: stockVoucherNumber.items[0].serial_no,
-          },
-        },
-        { $sort: { _id: -1 } },
-        { $limit: 1 },
-      ]),
-    ).pipe(
-      switchMap(serialHistory => {
-        if (
-          serialHistory[0].document_no ===
-          stockVoucherNumber.stock_voucher_number
-        ) {
+  validateCancelWarrantyStockEntry(
+    parent_document: string,
+    serial_no: string[],
+  ) {
+    return this.serialNoHistoryPolicyService
+      .validateLatestEventWithParent(parent_document, serial_no)
+      .pipe(
+        switchMap(response => {
+          let message = `Found ${response.length} Events, please cancel Following events for serials
+      `;
+          response.forEach(value =>
+            value
+              ? (message += `${value._id} : ${value.serials
+                  .splice(0, 50)
+                  .join(', ')}`)
+              : null,
+          );
+          if (response && response.length) {
+            return throwError(message);
+          }
           return of(true);
-        }
-        return throwError(
-          new BadRequestException('First Cancel Other documents'),
-        );
-      }),
-    );
+        }),
+      );
   }
 
   validateWarrantyStockEntry(payload: StockEntryDto, clientHttpRequest) {

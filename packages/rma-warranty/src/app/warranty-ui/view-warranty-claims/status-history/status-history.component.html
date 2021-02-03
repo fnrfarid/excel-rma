@@ -346,7 +346,11 @@
               type="text"
               placeholder="Upgrade Warehouse"
               disabled
-              [value]="(stockEntry?.items)[0]?.s_warehouse"
+              [value]="
+                stockEntry?.items?.length
+                  ? (stockEntry?.items)[0].s_warehouse
+                  : ''
+              "
             />
           </mat-form-field>
           <mat-form-field
@@ -359,8 +363,9 @@
           >
             <input
               [value]="
-                warrantyObject?.replace_warehouse?.length &&
-                warrantyObject?.replace_warehouse[0]
+                warrantyObject?.replace_warehouse?.length
+                  ? warrantyObject.replace_warehouse[0]
+                  : ''
               "
               matInput
               type="text"
@@ -374,8 +379,9 @@
             <input
               matInput
               [value]="
-                warrantyObject?.damage_warehouse?.length &&
-                warrantyObject?.damage_warehouse[0]
+                warrantyObject?.damage_warehouse?.length
+                  ? warrantyObject.damage_warehouse[0]
+                  : ''
               "
               type="text"
               disabled
@@ -391,8 +397,9 @@
             <input
               matInput
               [value]="
-                warrantyObject?.replace_product?.length &&
-                warrantyObject?.replace_product[0]
+                warrantyObject?.replace_product?.length
+                  ? warrantyObject.replace_product[0]
+                  : ''
               "
               type="text"
               disabled
@@ -405,8 +412,9 @@
             <input
               matInput
               [value]="
-                warrantyObject?.damage_product?.length &&
-                warrantyObject?.damage_product[0]
+                warrantyObject?.damage_product?.length
+                  ? warrantyObject.damage_product[0]
+                  : ''
               "
               type="text"
               disabled
@@ -422,8 +430,9 @@
             <input
               matInput
               [value]="
-                warrantyObject?.replace_serial?.length &&
-                warrantyObject?.replace_serial[0]
+                warrantyObject?.replace_serial?.length
+                  ? warrantyObject.replace_serial[0]
+                  : ''
               "
               type="text"
               disabled
