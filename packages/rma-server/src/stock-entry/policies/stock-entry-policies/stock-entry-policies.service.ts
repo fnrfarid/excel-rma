@@ -36,7 +36,7 @@ export class StockEntryPoliciesService {
     private readonly http: HttpService,
     private readonly settings: SettingsService,
     private serialNoHistoryPolicyService: SerialNoHistoryPoliciesService,
-  ) { }
+  ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
     return this.validateStockEntryItems(payload).pipe(
@@ -263,8 +263,8 @@ export class StockEntryPoliciesService {
           response.forEach(value =>
             value
               ? (message += `${value._id} : ${value.serials
-                .splice(0, 50)
-                .join(', ')}`)
+                  .splice(0, 50)
+                  .join(', ')}`)
               : null,
           );
           if (response && response.length) {
@@ -321,8 +321,8 @@ export class StockEntryPoliciesService {
           response.forEach(value =>
             value
               ? (message += `${value._id} : ${value.serials
-                .splice(0, 50)
-                .join(', ')}`)
+                  .splice(0, 50)
+                  .join(', ')}`)
               : null,
           );
           if (response && response.length) {
@@ -438,17 +438,17 @@ export class StockEntryPoliciesService {
         switchMap(data => {
           return data.notFoundSerials?.length
             ? throwError(
-              new BadRequestException(`
+                new BadRequestException(`
             Found ${data?.notFoundSerials.length}
             Invalid Serials: ${data?.notFoundSerials
-                  ?.splice(0, 50)
-                  .join(', ')}`),
-            )
+              ?.splice(0, 50)
+              .join(', ')}`),
+              )
             : throwError(
-              new BadRequestException(
-                `Please check purchased date and related fields for provided serials.`,
-              ),
-            );
+                new BadRequestException(
+                  `Please check purchased date and related fields for provided serials.`,
+                ),
+              );
         }),
       );
   }
@@ -485,8 +485,8 @@ export class StockEntryPoliciesService {
           response.forEach(value =>
             value
               ? (message += `${value._id} : ${value.serials
-                .splice(0, 50)
-                .join(', ')}`)
+                  .splice(0, 50)
+                  .join(', ')}`)
               : null,
           );
           if (response && response.length) {
