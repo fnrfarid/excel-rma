@@ -54,9 +54,23 @@ export class PurchaseInvoiceDataSource extends DataSource<ListingData> {
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe(items => {
+        items.filter(item => {
+          item.delivered_percent = this.getDeliveryProgress(item);
+          return item;
+        });
         this.calculateTotal(items);
         this.itemSubject.next(items);
       });
+  }
+
+  getDeliveryProgress(row: any) {
+    return (
+      (this.getHashSum(row.purchase_receipt_items_map) * 100) / row.total_qty
+    );
+  }
+
+  getHashSum(hash: { [key: string]: number }) {
+    return Object.values(hash)?.reduce((a, b) => a + b, 0) || 0;
   }
 
   calculateTotal(purchaseInvoices: ListingData[]) {

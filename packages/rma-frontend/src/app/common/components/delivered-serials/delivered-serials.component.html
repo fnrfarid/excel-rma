@@ -44,7 +44,11 @@
     <div *ngFor="let cell of deliveredSerialsState?.deliveredSerialsDisplayedColumns">
         <ng-container  *ngIf="cell !== 'sr_no'" [matColumnDef]="cell">
                 <mat-header-cell *matHeaderCellDef > {{cell}}</mat-header-cell>
-                <mat-cell *matCellDef="let row">{{row[cell]}}</mat-cell>
+                <mat-cell *matCellDef="let row">
+                    <div>
+                        {{ getDateCell(cell) ? (row[cell] | date: 'd MMM, y') : row[cell]}}
+                    </div>
+                </mat-cell>
         </ng-container>
     </div>
         

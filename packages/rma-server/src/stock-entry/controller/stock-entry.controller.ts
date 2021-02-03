@@ -51,7 +51,10 @@ export class StockEntryController {
   @Get('v1/list')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ forbidNonWhitelisted: true }))
-  getPurchaseInvoiceList(@Query() query: PurchaseInvoiceListQueryDto) {
+  getPurchaseInvoiceList(
+    @Query() query: PurchaseInvoiceListQueryDto,
+    @Req() req,
+  ) {
     const { offset, limit, sort, filter_query } = query;
     let filter;
     try {
@@ -64,6 +67,7 @@ export class StockEntryController {
       Number(limit) || 10,
       sort,
       filter,
+      req,
     );
   }
 

@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { STOCK_ENTRY_LIST_ITEM_SELECT_KEYS } from '../../constants/app-strings';
 import { PARSE_REGEX } from '../../constants/app-strings';
+import { PermissionStateInterface } from '../../constants/agenda-job';
 
 @Injectable()
 export class StockEntryService {
@@ -24,11 +25,20 @@ export class StockEntryService {
     return await this.stockEntryRepository.findOne(param, options);
   }
 
-  async list(skip, take, sort, filter_query?) {
+  async list(
+    skip,
+    take,
+    sort,
+    permissionState: PermissionStateInterface,
+    filter_query?,
+  ) {
     let sortQuery;
     const query: any = {};
-    const s_warehouseQuery: any = {};
-    const t_warehouseQuery: any = {};
+    const permissionQuery: any = {
+      items: {
+        $elemMatch: {},
+      },
+    };
 
     try {
       sortQuery = JSON.parse(sort);
@@ -52,17 +62,28 @@ export class StockEntryService {
     }
 
     if (filter_query.s_warehouse) {
-      s_warehouseQuery.items = {
-        $elemMatch: { s_warehouse: filter_query.s_warehouse },
+      permissionQuery.items.$elemMatch.s_warehouse = {
+        $in: [filter_query.s_warehouse],
       };
       delete filter_query.s_warehouse;
     }
 
     if (filter_query.t_warehouse) {
-      t_warehouseQuery.items = {
-        $elemMatch: { t_warehouse: filter_query.t_warehouse },
+      permissionQuery.items.$elemMatch.t_warehouse = {
+        $in: [filter_query.t_warehouse],
       };
       delete filter_query.t_warehouse;
+    }
+
+    if (permissionState.warehouses) {
+      permissionQuery.items.$elemMatch.$or = [
+        { t_warehouse: { $in: permissionState.warehouses } },
+        { s_warehouse: { $in: permissionState.warehouses } },
+      ];
+    }
+
+    if (permissionState.territories) {
+      permissionQuery.territory = { $in: permissionState.territories };
     }
 
     if (filter_query?.fromDate && filter_query?.toDate) {
@@ -82,8 +103,7 @@ export class StockEntryService {
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},
       query,
-      s_warehouseQuery,
-      t_warehouseQuery,
+      permissionQuery,
     ];
 
     const where: { $and: any } = { $and };
