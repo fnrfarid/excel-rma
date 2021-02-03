@@ -34,6 +34,7 @@ import { DeliveryNoteJobService } from '../../../delivery-note/schedular/deliver
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { LEGACY_DATA_IMPORT_API_ENDPOINT } from '../../../constants/routes';
 import { AgendaJob } from '../../entities/agenda-job/agenda-job.entity';
+import { FRAPPE_QUEUE_JOB } from '../../../constants/app-strings';
 
 @Injectable()
 export class JobQueueAggregateService {
@@ -104,6 +105,7 @@ export class JobQueueAggregateService {
       switchMap(() => {
         return from(
           this.jobService.findOne({
+            name: FRAPPE_QUEUE_JOB,
             'data.parent': job.data.parent,
             _id: { $gt: job._id },
             'data.status': {

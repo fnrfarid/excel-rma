@@ -142,6 +142,16 @@ export const PermissionRoles = {
       'Branch Stock User',
       'Branch Stock Supervisor',
       'Branch Stock Manager',
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'Branch Sales Creator',
+      'Branch Sales Approver',
+      'Branch Sales Return User',
+      'Item Price Manager',
       'General Admin',
     ],
     create: [
@@ -358,49 +368,77 @@ export const PermissionRoles = {
   },
 
   service_invoice: {
+    read: [
+      'RMA Claim Creator',
+      'RMA Claim Manager',
+      'RMA Verdict Manager',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Creator',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
     create: ['RMA Invoice Creator', 'RMA Invoice Manager', 'General Admin'],
     update: ['RMA Invoice Creator', 'RMA Invoice Manager', 'General Admin'],
     submit: ['RMA Invoice Manager', 'General Admin'],
     cancel: ['RMA Invoice Manager', 'General Admin'],
-
-    purchase_claim: {
-      create: ['RMA Purchase Claim Manager', 'General Admin'],
-      update: ['RMA Purchase Claim Manager', 'General Admin'],
-      submit: ['RMA Purchase Claim Manager', 'General Admin'],
-      cancel: ['RMA Purchase Claim Manager', 'General Admin'],
-    },
-    // considering this as serial search feature, single serial search should be available to all roles
-    // but for serial dump selecting item,warehouse should be restricted
-    status_history: {
-      read: [],
-      create: [],
-      update: [],
-      delete: [],
-    },
-    serial_dump: {
-      read: [
-        'Branch Stock User',
-        'Branch Stock Supervisor',
-        'Branch Stock Manager',
-        'Branch Purchase User',
-        'Branch Purchase Manager',
-        'Branch Stock Receipt Creator',
-        'Branch Stock Receipt Approver',
-        'Branch Stock Issue Approver',
-        'Branch Stock RnD Creator',
-        'Branch Stock RnD Approver',
-        'General Admin',
-        'RMA Stock Creator',
-        'RMA Stock Manager',
-        'RMA Invoice Manager',
-      ],
-      create: [],
-      update: [],
-      delete: [],
-    },
-    // warranty ends here
+  },
+  // the problem list should be accesible to this roles only
+  problems: {
+    read: [
+      'RMA Claim Creator',
+      'RMA Claim Manager',
+      'RMA Verdict Manager',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Creator',
+      'RMA Invoice Manager',
+      'RMA Purchase Claim Manager',
+      'General Admin',
+    ],
+    create: ['RMA Invoice Creator', 'RMA Invoice Manager', 'General Admin'],
+    update: ['RMA Invoice Creator', 'RMA Invoice Manager', 'General Admin'],
+    submit: ['RMA Invoice Manager', 'General Admin'],
+    cancel: ['RMA Invoice Manager', 'General Admin'],
+  },
+  purchase_claim: {
+    create: ['RMA Purchase Claim Manager', 'General Admin'],
+    update: ['RMA Purchase Claim Manager', 'General Admin'],
+    submit: ['RMA Purchase Claim Manager', 'General Admin'],
+    cancel: ['RMA Purchase Claim Manager', 'General Admin'],
+  },
+  // considering this as serial search feature, single serial search should be available to all roles
+  // but for serial dump = download csv of serials selecting item,warehouse should be restricted
+  status_history: {
+    read: [],
+    create: [],
+    update: [],
+    delete: [],
+  },
+  serial_dump: {
+    read: [
+      'Branch Stock User',
+      'Branch Stock Supervisor',
+      'Branch Stock Manager',
+      'Branch Purchase User',
+      'Branch Purchase Manager',
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'Branch Stock Issue Approver',
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'General Admin',
+      'RMA Stock Creator',
+      'RMA Stock Manager',
+      'RMA Invoice Manager',
+    ],
+    create: [],
+    update: [],
+    delete: [],
   },
 };
+// warranty ends here
 
 export const PERMISSION_STATE: PermissionStateInterface = {
   sales_invoice: {
