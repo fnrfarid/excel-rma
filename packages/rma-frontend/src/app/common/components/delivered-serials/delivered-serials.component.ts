@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import {
   CSV_FILE_TYPE,
