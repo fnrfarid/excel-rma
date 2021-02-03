@@ -18,23 +18,20 @@ export function getParsedPostingDate(payload) {
   let date: Date;
   try {
     date = new Date(
-      `${payload.posting_date} ${payload.posting_time || '00:00:00'}`,
-    );
-  } catch {}
-  if (date && isNaN(date?.getMilliseconds())) {
-    date = new Date(
-      `${this.parsePostingDate(payload.posting_date)} ${
+      `${reversePosingDate(payload.posting_date)} ${
         payload.posting_time || '00:00:00'
       }`,
     );
-  }
+  } catch {}
   if (date && isNaN(date?.getMilliseconds())) {
     date = new Date();
   }
   return date;
 }
 
-export function parsePostingDate(posting_date) {
-  const splitDate = posting_date.split('-');
-  return `${splitDate[1]}-${splitDate[0]}-${splitDate[2]}`;
+export function reversePosingDate(date: string) {
+  const splitDate = date.split('-');
+  return splitDate[0].length === 4
+    ? splitDate.join()
+    : splitDate.reverse().join('-');
 }

@@ -3,7 +3,6 @@ import {
   BadRequestException,
   HttpService,
   ForbiddenException,
-  NotImplementedException,
 } from '@nestjs/common';
 import {
   StockEntryDto,
@@ -25,8 +24,8 @@ import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/seri
 import { AgendaJobService } from '../../../sync/entities/agenda-job/agenda-job.service';
 import { RELAY_GET_STOCK_BALANCE_ENDPOINT } from '../../../constants/routes';
 import { SerialNoPoliciesService } from '../../../serial-no/policies/serial-no-policies/serial-no-policies.service';
-import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
 import { DateTime } from 'luxon';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 @Injectable()
 export class StockEntryPoliciesService {
   constructor(
@@ -36,7 +35,7 @@ export class StockEntryPoliciesService {
     private readonly agendaJob: AgendaJobService,
     private readonly http: HttpService,
     private readonly settings: SettingsService,
-    private readonly serialNoHistoryService: SerialNoHistoryService,
+    private serialNoHistoryPolicyService: SerialNoHistoryPoliciesService,
   ) {}
 
   validateStockEntry(payload: StockEntryDto, clientHttpRequest) {
@@ -45,7 +44,7 @@ export class StockEntryPoliciesService {
         return this.settings.find().pipe(
           switchMap(settings => {
             return this.validateStockSerials(
-              payload.items,
+              payload,
               payload.stock_entry_type,
               settings,
               clientHttpRequest,
@@ -355,12 +354,12 @@ export class StockEntryPoliciesService {
   }
 
   validateStockSerials(
-    items: StockEntryItemDto[],
+    payload: StockEntryDto,
     stock_entry_type: string,
     settings,
     clientHttpRequest,
   ) {
-    return from(items).pipe(
+    return from(payload.items).pipe(
       mergeMap(item => {
         if (!item.has_serial_no) {
           return of(true);
@@ -387,6 +386,13 @@ export class StockEntryPoliciesService {
               { 'queue_state.stock_entry': { $exists: true } },
               { purchase_document_no: { $exists: true } },
             ],
+          };
+        }
+        if (stock_entry_type !== STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+          query['warranty.purchasedOn'] = {
+            $lte: DateTime.fromJSDate(getParsedPostingDate(payload))
+              .setZone(settings.timeZone)
+              .toJSDate(),
           };
         }
 
@@ -430,10 +436,19 @@ export class StockEntryPoliciesService {
       })
       .pipe(
         switchMap(data => {
-          return throwError(
-            new BadRequestException(`Found ${data?.notFoundSerials.length}
-        Invalid Serials: ${data?.notFoundSerials.splice(0, 50).join(', ')}`),
-          );
+          return data.notFoundSerials?.length
+            ? throwError(
+                new BadRequestException(`
+            Found ${data?.notFoundSerials.length}
+            Invalid Serials: ${data?.notFoundSerials
+              ?.splice(0, 50)
+              .join(', ')}`),
+              )
+            : throwError(
+                new BadRequestException(
+                  `Please check purchased date and related fields for provided serials.`,
+                ),
+              );
         }),
       );
   }
@@ -457,27 +472,29 @@ export class StockEntryPoliciesService {
     );
   }
 
-  validateCancelWarrantyStockEntry(stockVoucherNumber) {
-    return from(
-      this.serialNoHistoryService.findOne({ document_no: stockVoucherNumber }),
-    ).pipe(
-      switchMap(serialHistory => {
-        return from(
-          this.serialNoHistoryService.find({
-            serial_no: serialHistory.serial_no,
-            created_on: { $gt: DateTime.fromJSDate(serialHistory.created_on) },
-          }),
-        );
-      }),
-      switchMap(serialHistory => {
-        if (serialHistory.length) {
-          return throwError(
-            new NotImplementedException('First Cancel Other documents'),
+  validateCancelWarrantyStockEntry(
+    parent_document: string,
+    serial_no: string[],
+  ) {
+    return this.serialNoHistoryPolicyService
+      .validateLatestEventWithParent(parent_document, serial_no)
+      .pipe(
+        switchMap(response => {
+          let message = `Found ${response.length} Events, please cancel Following events for serials
+      `;
+          response.forEach(value =>
+            value
+              ? (message += `${value._id} : ${value.serials
+                  .splice(0, 50)
+                  .join(', ')}`)
+              : null,
           );
-        }
-        return of(true);
-      }),
-    );
+          if (response && response.length) {
+            return throwError(message);
+          }
+          return of(true);
+        }),
+      );
   }
 
   validateWarrantyStockEntry(payload: StockEntryDto, clientHttpRequest) {

@@ -7,8 +7,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { SalesService } from '../services/sales.service';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/internal/Observable';
-import { startWith } from 'rxjs/internal/operators/startWith';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, startWith } from 'rxjs/operators';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 
 @Component({

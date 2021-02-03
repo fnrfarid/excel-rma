@@ -99,6 +99,12 @@ export interface WarrantyClaimsDetails {
   status_history?: StatusHistoryDetails[];
   posting_time: Date;
   uuid?: string;
+  replace_serial: string[];
+  replace_product: string[];
+  replace_warehouse: string[];
+  damaged_serial: string[];
+  damage_warehouse: string[];
+  damage_product: string[];
 }
 
 export class WarrantyState {

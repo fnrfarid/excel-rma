@@ -301,7 +301,7 @@ export class StockEntryAggregateService {
   }
 
   cancelERPNextDocument(stockEntry: StockEntry, settings: ServerSettings, req) {
-    return from(stockEntry.names).pipe(
+    return from(stockEntry.names.reverse()).pipe(
       concatMap(docName => {
         const doctypeName =
           stockEntry.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS

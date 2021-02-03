@@ -3,11 +3,16 @@
     <ion-menu contentId="main-content" type="overlay">
       <ion-header>
         <ion-toolbar>
-          <ion-title> 
-            Menu  
+          <ion-title>
+            Menu
           </ion-title>
-          <ion-text class="ion-margin-end" (click)="startTimer()" slot="end" color="primary">
-            {{counter | formatTime}}
+          <ion-text class="ion-margin-end" slot="end" color="primary">
+            <ng-container *ngIf="counter > 0" >
+              {{counter | formatTime}}
+            </ng-container>
+            <ion-button *ngIf="counter <= 0" (click)="login()" size="small" fill="clear">
+              <ion-icon slot="end" name="refresh">Refresh Session</ion-icon>
+            </ion-button>
           </ion-text>
         </ion-toolbar>
       </ion-header>

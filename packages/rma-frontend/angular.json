@@ -46,7 +46,11 @@
               }
             ],
             "scripts": [],
-            "aot": false
+            "aot": false,
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "hammerjs"
+            ]
           },
           "configurations": {
             "production": {

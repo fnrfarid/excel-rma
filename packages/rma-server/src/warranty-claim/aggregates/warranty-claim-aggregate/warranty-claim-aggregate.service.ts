@@ -492,7 +492,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         });
         break;
       default:
-        break;
+        return throwError(new BadRequestException(`verdict invalid`));
     }
     return of(status);
   }
@@ -512,7 +512,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         delivery_status = CLAIM_STATUS.UNSOLVED;
         break;
       default:
-        break;
+        return throwError(new BadRequestException(`Invalid Delivery Status`));
     }
     return of(delivery_status);
   }

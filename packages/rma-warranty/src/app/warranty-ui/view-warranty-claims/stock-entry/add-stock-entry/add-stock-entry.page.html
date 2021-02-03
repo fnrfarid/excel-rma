@@ -153,6 +153,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
+                  *ngIf="i"
                   style="width: 400px !important"
                   [value]="row.stock_entry_type"
                   column="stock_entry_type"
@@ -185,6 +186,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
+                  *ngIf="i"
                   style="width: 400px !important"
                   [value]="row.item_name"
                   column="item"
@@ -217,7 +219,7 @@
                 (closed)="updateSerial(i,$event)"
               >
                 <inline-edit
-                  *ngIf="row.has_serial_no"
+                  *ngIf="row.has_serial_no && i"
                   style="width: 400px !important"
                   [value]="row.serial_no"
                   column="serial_no"
@@ -253,6 +255,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
+                  *ngIf="i"
                   style="width: 400px !important"
                   [value]="row.s_warehouse"
                   column="warehouse"
@@ -280,6 +283,7 @@
                 (closed)="updateItem(i, $event)"
               >
                 <inline-edit
+                  *ngIf="i"
                   [value]="row.qty"
                   column="quantity"
                   [minimumPrice]="row.minimumPrice"

@@ -23,6 +23,7 @@ import {
   APPLICATION_JSON_CONTENT_TYPE,
   BEARER_HEADER_VALUE_PREFIX,
   AUTHORIZATION,
+  DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
 
 @Injectable()
@@ -54,6 +55,7 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
           return throwError(new NotImplementedException());
         }
         const URL = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}`;
+        serviceInvoice.naming_series = DEFAULT_NAMING_SERIES.service_invoice;
         const body = serviceInvoice;
         return this.http.post(URL, JSON.stringify(body), {
           headers: {

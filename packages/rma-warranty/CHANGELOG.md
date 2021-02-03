@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.1.1...rma-warranty@1.2.0) (2021-02-03)
+
+
+### Features
+
+* **rma-warranty:** logout from erp on logout from custom app ([d7303e3](https://gitlab.com/castlecraft/excel-rma/commit/d7303e3fa01d653cdd3e9f6d635b376e6dfa4693))
+
+
+
+
+
 ## [1.1.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.1.0...rma-warranty@1.1.1) (2021-01-27)
 
 

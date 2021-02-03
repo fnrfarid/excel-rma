@@ -7,6 +7,7 @@ import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-hist
 import { StockEntryService } from '../../entities/stock-entry.service';
 import { WarrantyClaimService } from '../../../warranty-claim/entity/warranty-claim/warranty-claim.service';
 import { StockEntryPoliciesService } from '../../../stock-entry/policies/stock-entry-policies/stock-entry-policies.service';
+import { WarrantyClaimAggregateService } from '../../../warranty-claim/aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
 
 describe('WarrantyStockEntryAggregateService', () => {
   let service: WarrantyStockEntryAggregateService;
@@ -38,6 +39,10 @@ describe('WarrantyStockEntryAggregateService', () => {
         },
         {
           provide: StockEntryPoliciesService,
+          useValue: {},
+        },
+        {
+          provide: WarrantyClaimAggregateService,
           useValue: {},
         },
       ],

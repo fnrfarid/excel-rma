@@ -124,6 +124,24 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   completed_delivery_note: any[];
+
+  @Column()
+  replace_serial: string;
+
+  @Column()
+  replace_product: string;
+
+  @Column()
+  replace_warehouse: string;
+
+  @Column()
+  damaged_serial: string;
+
+  @Column()
+  damage_warehouse: string;
+
+  @Column()
+  damage_product: string;
 }
 
 export class StatusHistory {

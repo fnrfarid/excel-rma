@@ -168,52 +168,7 @@ export class AddServiceInvoicePage implements OnInit {
       this.dataSource.data().map(item => item.item_code),
     );
     if (isValid) {
-      const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
-      serviceInvoiceDetails.warrantyClaimUuid = this.activatedRoute.snapshot.params.uuid;
-      serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value.name;
-      serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
-      serviceInvoiceDetails.total_qty = 0;
-      serviceInvoiceDetails.total = 0;
-      serviceInvoiceDetails.due_date = this.serviceInvoiceForm.controls.posting_date.value;
-      serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
-      serviceInvoiceDetails.date = this.serviceInvoiceForm.controls.posting_date.value;
-      serviceInvoiceDetails.customer_third_party = this.warrantyDetails.claim_type;
-      serviceInvoiceDetails.branch = this.serviceInvoiceForm.controls.branch.value.name;
-      serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.controls.posting_date.value;
-      serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value.name;
-      serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value.name;
-      serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
-      serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
-      serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
-      serviceInvoiceDetails.docstatus = 0;
-      if (this.serviceInvoiceForm.controls.is_pos.value) {
-        serviceInvoiceDetails.is_pos = 1;
-        this.serviceInvoiceService
-          .getStore()
-          .getItem('pos_profile')
-          .then(profile => {
-            serviceInvoiceDetails.pos_profile = profile;
-          });
-        serviceInvoiceDetails.payments = [];
-        serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.PAID;
-        serviceInvoiceDetails.payments.push({
-          account: this.serviceInvoiceForm.controls.account.value.name,
-          mode_of_payment: 'Cash',
-          amount: serviceInvoiceDetails.total,
-        });
-      } else {
-        serviceInvoiceDetails.is_pos = 0;
-        serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.UNPAID;
-      }
-      const itemList = this.dataSource.data().filter(item => {
-        if (item.item_name !== '') {
-          item.amount = item.qty * item.rate;
-          serviceInvoiceDetails.total_qty += item.qty;
-          serviceInvoiceDetails.total += item.amount;
-          return item;
-        }
-      });
-      serviceInvoiceDetails.items = itemList;
+      const serviceInvoiceDetails = this.mapInvoiceData();
       const loading = await this.loadingController.create();
       await loading.present();
       this.serviceInvoiceService
@@ -239,6 +194,56 @@ export class AddServiceInvoicePage implements OnInit {
         duration: DURATION,
       });
     }
+  }
+
+  mapInvoiceData() {
+    const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
+    serviceInvoiceDetails.warrantyClaimUuid = this.activatedRoute.snapshot.params.uuid;
+    serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value.name;
+    serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
+    serviceInvoiceDetails.total_qty = 0;
+    serviceInvoiceDetails.total = 0;
+    serviceInvoiceDetails.due_date = this.serviceInvoiceForm.controls.posting_date.value;
+    serviceInvoiceDetails.remarks = this.warrantyDetails.remarks;
+    serviceInvoiceDetails.date = this.serviceInvoiceForm.controls.posting_date.value;
+    serviceInvoiceDetails.customer_third_party = this.warrantyDetails.claim_type;
+    serviceInvoiceDetails.branch = this.serviceInvoiceForm.controls.branch.value.name;
+    serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.controls.posting_date.value;
+    serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value.name;
+    serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value.name;
+    serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
+    serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
+    serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
+    serviceInvoiceDetails.docstatus = 0;
+    const itemList = this.dataSource.data().filter(item => {
+      if (item.item_name !== '') {
+        item.amount = item.qty * item.rate;
+        serviceInvoiceDetails.total_qty += item.qty;
+        serviceInvoiceDetails.total += item.amount;
+        return item;
+      }
+    });
+    serviceInvoiceDetails.items = itemList;
+    if (this.serviceInvoiceForm.controls.is_pos.value) {
+      serviceInvoiceDetails.is_pos = 1;
+      this.serviceInvoiceService
+        .getStore()
+        .getItem('pos_profile')
+        .then(profile => {
+          serviceInvoiceDetails.pos_profile = profile;
+        });
+      serviceInvoiceDetails.payments = [];
+      serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.PAID;
+      serviceInvoiceDetails.payments.push({
+        account: this.serviceInvoiceForm.controls.account.value.name,
+        mode_of_payment: 'Cash',
+        amount: serviceInvoiceDetails.total,
+      });
+      return serviceInvoiceDetails;
+    }
+    serviceInvoiceDetails.is_pos = 0;
+    serviceInvoiceDetails.status = SERVICE_INVOICE_STATUS.UNPAID;
+    return serviceInvoiceDetails;
   }
 
   addItem() {

@@ -239,6 +239,7 @@ export class StockEntryListPage implements OnInit {
       );
     }
 
+    if (this.f.names.value) query.names = this.f.names.value;
     sortQuery = { _id: -1 };
 
     if (event) {
