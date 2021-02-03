@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.3.0...rma-frontend@1.4.0) (2021-02-03)
+
+
+### Bug Fixes
+
+* **excel-rma:** Handle different date formats for sync ([d7a4c6b](https://gitlab.com/castlecraft/excel-rma/commit/d7a4c6b8650b7e212bb7da13f09c374abb651f30))
+
+
+### Features
+
+* **excel-rma:** Add date parsing for posting date ([1dc480c](https://gitlab.com/castlecraft/excel-rma/commit/1dc480c531b666470229f8467ef3a4c1fc0b5b31))
+* **rma-frontend:** logout from erp on logout from custom app ([ea4d44a](https://gitlab.com/castlecraft/excel-rma/commit/ea4d44a975107203465b40054035ca16262faeed))
+* **rma-frontend:** refresh button on session expiry ([41c36da](https://gitlab.com/castlecraft/excel-rma/commit/41c36da869bd4a551cdda932b28d87d09b3ddede))
+* **rma-frontend:** Stock ID search filter fixed on Stock Entry Page ([f71e64e](https://gitlab.com/castlecraft/excel-rma/commit/f71e64ebf4b6faddce5dd5cf403e7664fa700df6))
+
+
+
+
+
 # [1.3.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.2.1...rma-frontend@1.3.0) (2021-01-31)
 
 
