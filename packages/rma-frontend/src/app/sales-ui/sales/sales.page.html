@@ -272,7 +272,7 @@
                 Invoice No
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                {{row.name}}
+                <a [routerLink]="[]" >{{row.name}}</a>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
