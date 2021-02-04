@@ -88,6 +88,17 @@
               <mat-checkbox formControlName="purchase_invoice_name" >Purchased</mat-checkbox>
             </ion-col>
           </ion-row>
+          <ion-row>
+            <ion-col>
+            <ion-button
+                color="tertiary"
+                (click)="clearFilters()"
+                fill="outline"
+              >
+                Clear
+              </ion-button>
+            </ion-col>
+          </ion-row>
         </form>
       </ion-grid>
 
