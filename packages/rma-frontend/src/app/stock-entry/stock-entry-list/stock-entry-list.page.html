@@ -264,7 +264,7 @@
           <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{ (row.names && row.names.length) ? row.names[0] : '' }}
+              <a [routerLink]="['/material-transfer/',row.uuid]" >{{ (row.names && row.names.length) ? row.names[0] : '' }}</a>
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
