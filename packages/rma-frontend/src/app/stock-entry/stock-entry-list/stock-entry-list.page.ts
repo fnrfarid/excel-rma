@@ -17,7 +17,11 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { FormControl, FormGroup } from '@angular/forms';
-import { STOCK_TRANSFER_STATUS, WAREHOUSES } from '../../constants/app-string';
+import {
+  STOCK_ENTRY_TYPE,
+  STOCK_TRANSFER_STATUS,
+  WAREHOUSES,
+} from '../../constants/app-string';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import { Observable } from 'rxjs';
 import { ValidateInputSelected } from '../../common/pipes/validators';
@@ -52,6 +56,7 @@ export class StockEntryListPage implements OnInit {
     'remarks',
     'territory',
     'posting_date',
+    'stockEntryType',
     'posting_time',
   ];
   filterState: any = {};
@@ -64,6 +69,9 @@ export class StockEntryListPage implements OnInit {
   );
   search: string = '';
   stockEntryForm: FormGroup;
+  stockEntryType: string[] = Object.keys(STOCK_ENTRY_TYPE).map(
+    key => STOCK_ENTRY_TYPE[key],
+  );
 
   get f() {
     return this.stockEntryForm.controls;
@@ -118,6 +126,7 @@ export class StockEntryListPage implements OnInit {
       toDateFormControl: new FormControl(),
       singleDateFormControl: new FormControl(),
       status: new FormControl(),
+      stockEntryType: new FormControl(),
       from_warehouse: new FormControl(),
       to_warehouse: new FormControl(),
       names: new FormControl(),
@@ -132,6 +141,11 @@ export class StockEntryListPage implements OnInit {
       this.filterState.status = status;
       this.setFilter();
     }
+  }
+
+  setStockEntryType(type) {
+    this.filterState.stock_entry_type = type;
+    this.setFilter();
   }
 
   dateFilter() {
@@ -200,6 +214,7 @@ export class StockEntryListPage implements OnInit {
     this.f.toDateFormControl.setValue('');
     this.f.singleDateFormControl.setValue('');
     this.f.status.setValue('');
+    this.f.stockEntryType.setValue('');
     this.f.names.setValue('');
     this.f.from_warehouse.setValue('');
     this.f.to_warehouse.setValue('');
