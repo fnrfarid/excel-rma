@@ -101,7 +101,7 @@
                   autoActiveFirstOption
                   #itemGroupAutocomplete="matAutocomplete"
                   [displayWith]="getItemGroupOption"
-                  (optionSelected)="setFilter($event.option.value)"
+                  (optionSelected)="setFilter()"
                 >
                   <mat-option
                     *ngFor="let option of filteredItemGroupList | async"
