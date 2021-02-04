@@ -10,10 +10,9 @@ import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from '../../material/material.module';
-import { StockEntryService } from '../services/stock-entry/stock-entry.service';
 import { SalesService } from '../../sales-ui/services/sales.service';
 
-describe('StockAvailabilityComponent', () => {
+describe('StockAvailabilityPage', () => {
   let component: StockAvailabilityPage;
   let fixture: ComponentFixture<StockAvailabilityPage>;
 
@@ -37,12 +36,11 @@ describe('StockAvailabilityComponent', () => {
             getItemList: () => of([{}]),
             getDoctypeCount: (...args) => of(0),
             relayStockAvailabilityList: () => of([{}]),
-          },
-        },
-        {
-          provide: StockEntryService,
-          useValue: {
-            getWarehouseList: () => of([{}]),
+            getStore: () => ({
+              getItemAsync: (...args) => of([]),
+            }),
+            getItemGroupList: (...args) => of([]),
+            getItemBrandList: (...args) => of([]),
           },
         },
       ],

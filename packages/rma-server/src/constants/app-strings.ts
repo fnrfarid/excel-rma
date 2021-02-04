@@ -359,6 +359,16 @@ export const STOCK_ENTRY_PERMISSIONS = {
       'Branch Stock User',
       'Branch Stock Supervisor',
       'Branch Stock Manager',
+      'Branch Stock Receipt Creator',
+      'Branch Stock Receipt Approver',
+      'Branch Stock Issue Creator',
+      'Branch Stock Issue Approver',
+      'Branch Stock RnD Creator',
+      'Branch Stock RnD Approver',
+      'Branch Sales Creator',
+      'Branch Sales Approver',
+      'Branch Sales Return User',
+      'Item Price Manager',
       'General Admin',
     ],
     create: [
@@ -379,6 +389,7 @@ export const STOCK_ENTRY_PERMISSIONS = {
       'Branch Stock Manager',
       'General Admin',
     ],
+    // This accept action needs to be added
     accept: [
       'Branch Stock Supervisor',
       'Branch Stock Manager',

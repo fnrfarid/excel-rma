@@ -453,10 +453,13 @@ export class StockEntryAggregateService {
   getStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
       switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry Not Found'));
+        }
         return this.stockEntryPolicies
           .validateStockPermission(
             stockEntry.stock_entry_type,
-            STOCK_OPERATION.delete,
+            STOCK_OPERATION.read,
             req,
           )
           .pipe(switchMap(() => of(stockEntry)));
@@ -481,6 +484,9 @@ export class StockEntryAggregateService {
   rejectStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
       switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry Not Found'));
+        }
         return this.stockEntryPolicies
           .validateStockPermission(
             stockEntry.stock_entry_type,

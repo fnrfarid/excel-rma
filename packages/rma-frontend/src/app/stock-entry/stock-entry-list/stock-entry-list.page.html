@@ -20,7 +20,10 @@
         </ion-col>
         <ion-col class="ion-text-right">
           <ion-button
-            [disabled]="!permissionState.stock_entry.create"
+            [disabled]="!permissionState.stock_entry.create || 
+            !permissionState.stock_entry_receipt.create || 
+            !permissionState.stock_entry_issue.create || 
+            !permissionState.stock_entry_rnd.create"
             color="tertiary"
             [routerLink]="['/material-transfer']"
           >
@@ -292,7 +295,6 @@
           ></mat-header-row>
           <mat-row
             *matRowDef="let row; columns: displayedColumns;"
-            [routerLink]="['/material-transfer/',row.uuid]"
           >
           </mat-row>
           <mat-footer-row

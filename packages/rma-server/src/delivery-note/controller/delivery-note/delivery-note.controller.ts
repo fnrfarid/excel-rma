@@ -11,12 +11,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
-import { Roles } from '../../../auth/decorators/roles.decorator';
-import {
-  SYSTEM_MANAGER,
-  SALES_USER,
-  SALES_MANAGER,
-} from '../../../constants/app-strings';
 import { RoleGuard } from '../../../auth/guards/role.guard';
 import { DeliveryNoteAggregateService } from '../../aggregates/delivery-note-aggregate/delivery-note-aggregate.service';
 import { CreateDeliveryNoteCommand } from '../../command/create-delivery-note/create-delivery-note.command';
@@ -52,7 +46,6 @@ export class DeliveryNoteController {
   }
 
   @Get('v1/relay_list_warehouses')
-  @Roles(SYSTEM_MANAGER, SALES_MANAGER, SALES_USER)
   @UseGuards(TokenGuard, RoleGuard)
   relayListCompanies(@Query() query) {
     return this.deliveryNoteAggregate.relayListWarehouses(query);
