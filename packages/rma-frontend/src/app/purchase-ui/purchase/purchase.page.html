@@ -271,7 +271,6 @@
             ></mat-header-row>
             <mat-row
               *matRowDef="let row; columns: displayedColumns;"
-              [routerLink]="['/purchase/view-purchase-invoice',row.uuid]"
             ></mat-row>
             <mat-footer-row
               class="footer"

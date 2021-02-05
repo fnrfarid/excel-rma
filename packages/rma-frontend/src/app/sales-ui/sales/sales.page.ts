@@ -6,7 +6,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SalesInvoiceDataSource } from './sales-invoice-datasource';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { VIEW_SALES_INVOICE_PAGE_URL } from '../../constants/url-strings';
 import { map, filter, startWith, switchMap } from 'rxjs/operators';
 import { FormControl, FormGroup } from '@angular/forms';
 import {
@@ -350,12 +349,6 @@ export class SalesPage implements OnInit {
         : this.sortQuery;
 
     this.dataSource.loadItems(this.sortQuery, undefined, undefined, query);
-  }
-
-  navigateBasedOnRoles(row) {
-    this.router.navigateByUrl(
-      `/sales/${VIEW_SALES_INVOICE_PAGE_URL}/${row.uuid}`,
-    );
   }
 
   navigateBack() {
