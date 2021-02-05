@@ -69,9 +69,7 @@ export class StockEntryListPage implements OnInit {
   );
   search: string = '';
   stockEntryForm: FormGroup;
-  stockEntryType: string[] = Object.keys(STOCK_ENTRY_TYPE).map(
-    key => STOCK_ENTRY_TYPE[key],
-  );
+  stockEntryType: string[] = Object.values(STOCK_ENTRY_TYPE);
 
   get f() {
     return this.stockEntryForm.controls;
