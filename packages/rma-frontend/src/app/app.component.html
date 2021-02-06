@@ -121,17 +121,6 @@
               <ion-label>Purchase</ion-label>
             </ion-item>
           </ion-menu-toggle>
-          <ion-menu-toggle auto-hide="false">
-            <ion-item
-              *ngIf="loggedIn"
-              (click)="openWarrantyApp()"
-              lines="none"
-              routerLinkActive="active"
-            >
-              <ion-icon slot="start" name="repeat"></ion-icon>
-              <ion-label>Warranty</ion-label>
-            </ion-item>
-          </ion-menu-toggle>
           <ion-item
             *ngIf="loggedIn && permissionState?.stock_entry?.active"
             (click)="isStockMenuVisible = !isStockMenuVisible"
@@ -193,6 +182,17 @@
               <ion-label>Jobs</ion-label>
             </ion-item>
           </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item
+                *ngIf="loggedIn && permissionState?.customer_profile?.read"
+                routerLink="/customer-profile"
+                lines="none"
+                routerLinkActive="active"
+              >
+                <ion-icon slot="start" name="people-outline"></ion-icon>
+                <ion-label>Customer Profile</ion-label>
+              </ion-item>
+          </ion-menu-toggle>
           <ion-item
             *ngIf="loggedIn"
             (click)="isRelayMenuVisible = !isRelayMenuVisible"
@@ -216,15 +216,29 @@
               *ngIf="isRelayMenuVisible"
               class="ion-margin-start ion-no-padding"
             >
-              <ion-item
-                *ngIf="loggedIn && permissionState?.customer_profile?.read"
-                routerLink="/customer-profile"
-                lines="none"
-                routerLinkActive="active"
-              >
-                <ion-icon slot="start" name="people-outline"></ion-icon>
-                <ion-label>Customer Profile</ion-label>
-              </ion-item>
+            <ion-item
+            *ngIf="loggedIn"
+            (click)="openWarrantyApp()"
+            lines="none"
+            routerLinkActive="active"
+          >
+            <ion-icon slot="start" name="repeat"></ion-icon>
+            <ion-label>Warranty</ion-label>
+          </ion-item>
+            </ion-list>
+            <ion-list
+              *ngIf="isRelayMenuVisible"
+              class="ion-margin-start ion-no-padding"
+            >
+            <ion-item
+            *ngIf="loggedIn"
+            (click)="openSerialSearch()"
+            lines="none"
+            routerLinkActive="active"
+          >
+            <ion-icon slot="start" name="barcode"></ion-icon>
+            <ion-label>Serial Search</ion-label>
+          </ion-item>
             </ion-list>
           </ion-menu-toggle>
 

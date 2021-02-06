@@ -299,6 +299,15 @@ export class AppComponent implements OnInit {
       });
   }
 
+  openSerialSearch() {
+    this.appService
+      .getStorage()
+      .getItem(WARRANTY_APP_URL)
+      .then(warrantyUrl => {
+        window.open(`${warrantyUrl}/serial-search`, '_blank');
+      });
+  }
+
   ngOnDestroy() {
     this.subscription && this.subscription.unsubscribe();
   }
