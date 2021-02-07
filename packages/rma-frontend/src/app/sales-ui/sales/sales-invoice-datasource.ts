@@ -71,7 +71,6 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
             concatMap(item => {
               if (!item.name || item.status === 'Canceled') {
                 item.outstanding_amount = 0;
-                console.log(items)
                 return of(item);
               }
               if (
