@@ -125,7 +125,7 @@
             <ng-container matColumnDef="name">
               <mat-header-cell *matHeaderCellDef>DN name</mat-header-cell>
               <mat-cell *matCellDef="let row"
-                ><a [routerLink]="['/sales-return/details',row.uuid]"
+                ><a [routerLink]="['/sales-return/details',row.name]"
                   >{{row.name}}</a
                 ></mat-cell
               >
