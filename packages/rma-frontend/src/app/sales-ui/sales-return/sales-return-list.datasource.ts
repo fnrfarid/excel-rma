@@ -46,6 +46,7 @@ export class SalesReturnListDataSource extends DataSource<ListingData> {
       .pipe(
         map((items: ListingData[]) => {
           this.data = items;
+          console.log(items)
           return items;
         }),
         catchError(() => of([])),
