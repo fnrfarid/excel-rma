@@ -23,6 +23,7 @@ export class StockAvailabilityPage implements OnInit {
   defaultCompany: string;
   displayedColumns = [
     'excel_item_name',
+    'item_code',
     'excel_item_group',
     'excel_item_brand',
     'warehouse',
@@ -118,7 +119,7 @@ export class StockAvailabilityPage implements OnInit {
 
   getStockAvailabilityOption(option) {
     if (option) {
-      return option.name;
+      return option.item_name;
     }
   }
 
