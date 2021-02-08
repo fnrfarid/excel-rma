@@ -48,7 +48,7 @@
                     *ngFor="let option of filteredStockAvailabilityList | async"
                     [value]="option"
                   >
-                    {{ option.name }}
+                    {{ option.item_name }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.itemName.hasError('falseValse')">
@@ -166,6 +166,11 @@
           <ng-container matColumnDef="excel_item_name">
             <mat-header-cell *matHeaderCellDef>Item name</mat-header-cell>
             <mat-cell *matCellDef="let row">{{ row.excel_item_name }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="item_code">
+            <mat-header-cell *matHeaderCellDef>Item code</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.item_code }}</mat-cell>
           </ng-container>
 
           <ng-container matColumnDef="excel_item_group">
