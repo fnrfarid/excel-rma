@@ -4,6 +4,14 @@
       <ion-header>
         <ion-toolbar>
           <ion-title>Menu</ion-title>
+          <ion-button slot="end" (click)="login()" size="small" fill="clear">
+            <ion-icon name="refresh">Refresh Session</ion-icon>
+          </ion-button>
+          <ion-text class="ion-margin-end" slot="end" color="primary">
+            <ng-container *ngIf="counter > 0" >
+              {{counter | formatTime}}
+            </ng-container>
+          </ion-text>
         </ion-toolbar>
       </ion-header>
       <ion-content>
