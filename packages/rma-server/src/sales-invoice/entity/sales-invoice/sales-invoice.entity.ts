@@ -1,5 +1,8 @@
 import { Column, ObjectIdColumn, BaseEntity, ObjectID, Entity } from 'typeorm';
 
+export class Timestamp {
+  created_on: Date;
+}
 @Entity()
 export class SalesInvoice extends BaseEntity {
   @ObjectIdColumn()
@@ -148,6 +151,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   credit_note: string;
+
+  @Column()
+  timeStamp: Timestamp;
 
   @Column()
   inQueue: boolean;

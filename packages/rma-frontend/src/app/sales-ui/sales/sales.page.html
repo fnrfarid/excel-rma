@@ -272,7 +272,7 @@
                 Invoice No
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                <a [routerLink]="['/sales/view-sales-invoice', row.uuid]" >{{row.name}}</a>
+                <a [routerLink]="['/sales/view-sales-invoice', row.uuid]" >{{row.name || 'Draft'}}</a>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
