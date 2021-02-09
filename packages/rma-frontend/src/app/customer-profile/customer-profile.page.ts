@@ -18,6 +18,7 @@ import { CLOSE } from '../constants/app-string';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ValidateInputSelected } from '../common/pipes/validators';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-customer-profile',
@@ -41,6 +42,8 @@ export class CustomerProfilePage implements OnInit {
   customerProfileForm: FormGroup;
   filteredCustomerList: Observable<any[]>;
   validateInput: any = ValidateInputSelected;
+  from_date = DateTime.local().plus({ months: 1 }).toISODate();
+  to_date = DateTime.local().toISODate();
 
   get f() {
     return this.customerProfileForm.controls;
