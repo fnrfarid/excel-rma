@@ -20,7 +20,10 @@
         </ion-col>
         <ion-col class="ion-text-right">
           <ion-button
-            [disabled]="!permissionState.stock_entry.create"
+            [disabled]="!(permissionState.stock_entry.create || 
+            permissionState.stock_entry_receipt.create || 
+            permissionState.stock_entry_issue.create || 
+            permissionState.stock_entry_rnd.create)"
             color="tertiary"
             [routerLink]="['/material-transfer']"
           >
@@ -119,6 +122,24 @@
                   You should select a value from dropdown only.
                   <strong>'{{f.to_warehouse.value}}'</strong> is not allowed.
                 </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <mat-label>Stock Entry Type</mat-label>
+                <mat-select
+                  formControlName="status"
+                  (selectionChange)="setStockEntryType($event.value)"
+                >
+                  <mat-option
+                    *ngFor="let type of stockEntryType"
+                    [value]="type"
+                  >
+                    {{type}}
+                  </mat-option>
+                </mat-select>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -230,11 +251,21 @@
               Posting Date
             </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{row.posting_date | date:'dd-MM-yyyy'}}
+              {{row.posting_date | date: 'd MMM, y'}}
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
+          <ng-container matColumnDef="stockEntryType">
+            <mat-header-cell *matHeaderCellDef mat-sort-header="stockEntryType">
+              Type
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              {{row.stock_entry_type}}
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          
           <ng-container matColumnDef="createdBy">
             <mat-header-cell *matHeaderCellDef mat-sort-header="supplier">
               Created By
@@ -264,7 +295,7 @@
           <ng-container matColumnDef="name">
             <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{ (row.names && row.names.length) ? row.names[0] : '' }}
+              <a [routerLink]="['/material-transfer/',row.uuid]" >{{ (row.names && row.names.length) ? row.names[0] : 'Draft' }}</a>
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
@@ -292,7 +323,6 @@
           ></mat-header-row>
           <mat-row
             *matRowDef="let row; columns: displayedColumns;"
-            [routerLink]="['/material-transfer/',row.uuid]"
           >
           </mat-row>
           <mat-footer-row

@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.4.0...rma-frontend@1.5.0) (2021-02-09)
+
+
+### Bug Fixes
+
+* **rma-frontend:** created class hash in css ([875afcf](https://gitlab.com/castlecraft/excel-rma/commit/875afcf2d8ac13d180e29f895ba74007733590f3))
+
+
+### Features
+
+* **Excel-rma:** Add creation time stamp migration from posting date ([b259fd3](https://gitlab.com/castlecraft/excel-rma/commit/b259fd3782fe944e4a0ea1069ab3c7c1162257b5))
+* **Excel-rma:** Add territory and warehouse permission to stock ([b2cf0cd](https://gitlab.com/castlecraft/excel-rma/commit/b2cf0cd198835c1af4621972435b1030abe2882f))
+* **Excel-rma:** Update permissions for backend and UI components ([493ac92](https://gitlab.com/castlecraft/excel-rma/commit/493ac92cf6a324c5abfd1421509b55ed157574df))
+* **rma-frontend:** Item Code column added and item name changed to item code in autocomplete on Stock Availability Page ([93cf749](https://gitlab.com/castlecraft/excel-rma/commit/93cf74999b332040ffe2ab447f24e800457173e2))
+* **rma-frontend:** Sales Return voucher route fixed ([4c43ea6](https://gitlab.com/castlecraft/excel-rma/commit/4c43ea6bb15cfd99f0fc2ac22e896e0efb175f96))
+* **rma-frontend:** Sales Return voucher route fixed ([4dad2c4](https://gitlab.com/castlecraft/excel-rma/commit/4dad2c4d7b21dea4f244fce4a24195a3492184bd))
+* **rma-frontend:** Vouchers now have option to open in new tab on Purchase page, Sales Return page and Stock Entry List page ([c752ba4](https://gitlab.com/castlecraft/excel-rma/commit/c752ba41b3aac02c1f7c46e359e624543582594f))
+* **rma-warranty:** Token Generation added on Warranty page and updated on Frontend page ([6fe3a8a](https://gitlab.com/castlecraft/excel-rma/commit/6fe3a8a1914e3dde070052c47b69dfdb924bf24d))
+* **rma-warranty:** type filter added on Stock Entry page and Serial Search added on home nav ([880d5d3](https://gitlab.com/castlecraft/excel-rma/commit/880d5d3580881607804aa8e5c701348b00dcc8a5))
+* **rma-warranty:** type filter added on Stock Entry page(fixed) and Serial Search added on home nav ([713408f](https://gitlab.com/castlecraft/excel-rma/commit/713408fae9e861f3abca47e9677705318ffc64b5))
+
+
+
+
+
 # [1.4.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.3.0...rma-frontend@1.4.0) (2021-02-03)
 
 

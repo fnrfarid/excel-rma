@@ -95,9 +95,27 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
         }),
       )
       .subscribe(items => {
+        items.filter(item => {
+          item.delivered_percent = this.getDeliveryProgress(item) || 0;
+          return item;
+        });
         this.itemSubject.next(items);
         this.calculateTotal(items);
       });
+  }
+
+  getDeliveryProgress(row: SalesInvoiceListInterface) {
+    if (row.bundle_items_map && Object.keys(row.bundle_items_map).length) {
+      return (
+        (this.getHashSum(row.delivered_items_map) * 100) /
+        this.getHashSum(row.bundle_items_map)
+      );
+    }
+    return (this.getHashSum(row.delivered_items_map) * 100) / row.total_qty;
+  }
+
+  getHashSum(hash: { [key: string]: number }) {
+    return Object.values(hash)?.reduce((a, b) => a + b, 0);
   }
 
   syncOutstandingAmount() {
@@ -134,4 +152,10 @@ export class SalesInvoiceDataSource extends DataSource<ListingData> {
     this.total.next(sum);
     this.dueAmountTotal.next(due_total);
   }
+}
+
+export interface SalesInvoiceListInterface {
+  bundle_items_map: { [key: string]: number };
+  delivered_items_map: { [key: string]: number };
+  total_qty: 12;
 }

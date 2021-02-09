@@ -3,6 +3,7 @@ import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import {
   CSV_FILE_TYPE,
+  DELIVERED_SERIALS_DATE_FIELDS,
   SERIAL_DOWNLOAD_HEADERS,
 } from '../../../constants/app-string';
 import { PurchaseService } from '../../../purchase-ui/services/purchase.service';
@@ -66,6 +67,10 @@ export class DeliveredSerialsComponent implements OnInit {
       this.index,
       this.size,
     );
+  }
+
+  getDateCell(cell) {
+    return DELIVERED_SERIALS_DATE_FIELDS.includes(cell) ? true : false;
   }
 }
 

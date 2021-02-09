@@ -36,10 +36,12 @@ export class SalesInvoiceService {
     try {
       sortQuery = JSON.parse(sort);
     } catch (error) {
-      sortQuery = { created_on: 'desc' };
+      sortQuery = { 'timeStamp.created_on': 'desc' };
     }
     sortQuery =
-      Object.keys(sortQuery).length === 0 ? { created_on: 'desc' } : sortQuery;
+      Object.keys(sortQuery).length === 0
+        ? { 'timeStamp.created_on': 'desc' }
+        : sortQuery;
     for (const key of Object.keys(sortQuery)) {
       sortQuery[key] = sortQuery[key].toUpperCase();
       if (sortQuery[key] === 'ASC') {
@@ -55,7 +57,7 @@ export class SalesInvoiceService {
 
     if (filter_query?.fromDate && filter_query?.toDate) {
       dateQuery = {
-        created_on: {
+        'timeStamp.created_on': {
           $gte: new Date(filter_query.fromDate),
           $lte: new Date(filter_query.toDate),
         },

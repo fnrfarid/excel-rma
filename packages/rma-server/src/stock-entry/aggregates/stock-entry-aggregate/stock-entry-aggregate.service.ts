@@ -46,6 +46,7 @@ import { ServerSettings } from '../../../system-settings/entities/server-setting
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { FRAPPE_CLIENT_CANCEL } from '../../../constants/routes';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { getUserPermissions } from '../../../constants/agenda-job';
 
 @Injectable()
 export class StockEntryAggregateService {
@@ -439,17 +440,26 @@ export class StockEntryAggregateService {
     return of(JSON.parse(file.buffer));
   }
 
-  getStockEntryList(offset, limit, sort, filter_query) {
-    return this.stockEntryService.list(offset, limit, sort, filter_query);
+  getStockEntryList(offset, limit, sort, filter_query, req) {
+    return this.stockEntryService.list(
+      offset,
+      limit,
+      sort,
+      getUserPermissions(req),
+      filter_query,
+    );
   }
 
   getStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
       switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry Not Found'));
+        }
         return this.stockEntryPolicies
           .validateStockPermission(
             stockEntry.stock_entry_type,
-            STOCK_OPERATION.delete,
+            STOCK_OPERATION.read,
             req,
           )
           .pipe(switchMap(() => of(stockEntry)));
@@ -474,6 +484,9 @@ export class StockEntryAggregateService {
   rejectStockEntry(uuid: string, req) {
     return from(this.stockEntryService.findOne({ uuid })).pipe(
       switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new BadRequestException('Stock Entry Not Found'));
+        }
         return this.stockEntryPolicies
           .validateStockPermission(
             stockEntry.stock_entry_type,

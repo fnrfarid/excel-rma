@@ -124,7 +124,11 @@
             <!-- DN Name Column -->
             <ng-container matColumnDef="name">
               <mat-header-cell *matHeaderCellDef>DN name</mat-header-cell>
-              <mat-cell *matCellDef="let row">{{ row.name }}</mat-cell>
+              <mat-cell *matCellDef="let row"
+                ><a [routerLink]="['/sales-return/details',row.name]"
+                  >{{row.name}}</a
+                ></mat-cell
+              >
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
 
@@ -132,7 +136,7 @@
             <ng-container matColumnDef="posting_date">
               <mat-header-cell *matHeaderCellDef>Posting Date</mat-header-cell>
               <mat-cell *matCellDef="let row">
-                {{ row.posting_date | date:'dd-MM-yyyy' }}
+                {{ row.posting_date | date: 'd MMM, y' }}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -141,9 +145,7 @@
             <ng-container matColumnDef="title">
               <mat-header-cell *matHeaderCellDef>Title</mat-header-cell>
               <mat-cell *matCellDef="let row">{{ row.title }}</mat-cell>
-              <mat-footer-cell *matFooterCellDef>
-                Total
-              </mat-footer-cell>
+              <mat-footer-cell *matFooterCellDef> Total </mat-footer-cell>
             </ng-container>
 
             <!-- Total Column -->
@@ -160,7 +162,10 @@
             <!-- Status Column -->
             <ng-container matColumnDef="status">
               <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
-              <mat-cell *matCellDef="let row" [ngStyle]="{color: row.docstatus === 1 ? 'red' : 'brown'}">
+              <mat-cell
+                *matCellDef="let row"
+                [ngStyle]="{color: row.docstatus === 1 ? 'red' : 'brown'}"
+              >
                 {{ row.docstatus === 1 ? 'Returned' : 'Canceled' }}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
@@ -185,7 +190,6 @@
             ></mat-header-row>
             <mat-row
               *matRowDef="let row; columns: displayedColumns"
-              [routerLink]="['/sales-return/details',row.name]"
             ></mat-row>
             <mat-footer-row
               class="footer"

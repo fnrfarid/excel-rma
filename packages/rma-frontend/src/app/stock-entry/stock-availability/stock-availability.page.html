@@ -48,7 +48,7 @@
                     *ngFor="let option of filteredStockAvailabilityList | async"
                     [value]="option"
                   >
-                    {{ option.name }}
+                    {{ option.item_name }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.itemName.hasError('falseValse')">
@@ -69,14 +69,13 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #warehouse="matAutocomplete"
-                  [displayWith]="getWarehouseOption"
                   (optionSelected)="setFilter()"
                 >
                   <mat-option
                     *ngFor="let option of filteredWarehouseList | async"
                     [value]="option"
                   >
-                    {{ option.name }}
+                    {{ option }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.warehouse.hasError('falseValse')">
@@ -84,13 +83,74 @@
                   <strong>'{{f.warehouse.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+
+            <ion-col>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Item Group"
+                  [matAutocomplete]="itemGroupAutocomplete"
+                  formControlName="excel_item_group"
+                  (focusout)="validateInput(f.excel_item_group, filteredItemGroupList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #itemGroupAutocomplete="matAutocomplete"
+                  [displayWith]="getItemGroupOption"
+                  (optionSelected)="setFilter()"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredItemGroupList | async"
+                    [value]="option"
+                  >
+                    {{ option.item_group_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.excel_item_group.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.excel_item_group.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+
+            <ion-col>
+              <mat-form-field class="mat-input-wrapper">
+                <input
+                  matInput
+                  placeholder="Brand"
+                  [matAutocomplete]="itemBrandAutocomplete"
+                  formControlName="excel_item_brand"
+                  (focusout)="validateInput(f.excel_item_brand, filteredItemBrandList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #itemBrandAutocomplete="matAutocomplete"
+                  [displayWith]="getItemBrandOption"
+                  (optionSelected)="setFilter()"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredItemBrandList | async"
+                    [value]="option"
+                  >
+                    {{ option.brand }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.excel_item_brand.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.excel_item_brand.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
               <ion-button
-                color="tertiary"
-                (click)="clearFilters()"
-                fill="outline"
-              >
-                Clear
-              </ion-button>
+              color="tertiary"
+              (click)="clearFilters()"
+              fill="outline"
+            >
+              Clear
+            </ion-button>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -103,9 +163,24 @@
           [dataSource]="dataSource"
           matSort
         >
-          <ng-container matColumnDef="item">
+          <ng-container matColumnDef="excel_item_name">
             <mat-header-cell *matHeaderCellDef>Item name</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.excel_item_name }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="item_code">
+            <mat-header-cell *matHeaderCellDef>Item code</mat-header-cell>
             <mat-cell *matCellDef="let row">{{ row.item_code }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="excel_item_group">
+            <mat-header-cell *matHeaderCellDef>Item group</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.excel_item_group }}</mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="excel_item_brand">
+            <mat-header-cell *matHeaderCellDef>Item brand</mat-header-cell>
+            <mat-cell *matCellDef="let row">{{ row.excel_item_brand }}</mat-cell>
           </ng-container>
 
           <ng-container matColumnDef="warehouse">

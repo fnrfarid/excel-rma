@@ -174,7 +174,7 @@
                 Invoice No.
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                {{row.name}}
+                <a [routerLink]="['/purchase/view-purchase-invoice',row.uuid]" >{{row.name}}</a>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -197,12 +197,22 @@
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
 
+            <ng-container matColumnDef="delivered_percent">
+              <mat-header-cell *matHeaderCellDef>
+                Delivered
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <mat-progress-bar class="right-margin" [color]="row.delivered_percent === 100 ? 'primary' : 'warn'" mode="determinate" [value]="row.delivered_percent"></mat-progress-bar>
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+
             <ng-container matColumnDef="date">
               <mat-header-cell *matHeaderCellDef mat-sort-header="created_on">
                 Date
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                {{row.posting_date | date:'dd-MM-yyyy'}}
+                {{row.posting_date | date: 'd MMM, y'}}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -261,7 +271,6 @@
             ></mat-header-row>
             <mat-row
               *matRowDef="let row; columns: displayedColumns;"
-              [routerLink]="['/purchase/view-purchase-invoice',row.uuid]"
             ></mat-row>
             <mat-footer-row
               class="footer"

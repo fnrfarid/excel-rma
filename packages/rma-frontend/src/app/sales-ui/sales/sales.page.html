@@ -272,7 +272,7 @@
                 Invoice No
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                <a [routerLink]="['/sales/view-sales-invoice', row.uuid]" >{{row.name}}</a>
+                <a [routerLink]="['/sales/view-sales-invoice', row.uuid]" >{{row.name || 'Draft'}}</a>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -302,7 +302,7 @@
                 Date
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                {{( getDate(row.posting_date) | date:'dd-MM-yyyy' )}}
+                {{( getDate(row.posting_date) | date: 'd MMM, y' )}}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -323,6 +323,16 @@
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
                 {{row.remarks}}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+
+            <ng-container matColumnDef="delivered_percent">
+              <mat-header-cell *matHeaderCellDef>
+                Delivered
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <mat-progress-bar class="right-margin" [color]="row.delivered_percent === 100 ? 'primary' : 'warn'" mode="determinate" [value]="row.delivered_percent"></mat-progress-bar>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -383,7 +393,6 @@
             ></mat-header-row>
             <mat-row
               *matRowDef="let row; columns: displayedColumns;"
-              (click)="navigateBasedOnRoles(row)"
             ></mat-row>
             <mat-footer-row
               class="footer"
