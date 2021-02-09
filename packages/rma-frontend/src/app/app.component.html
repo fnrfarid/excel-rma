@@ -6,13 +6,13 @@
           <ion-title>
             Menu
           </ion-title>
+          <ion-button slot="end" (click)="login()" size="small" fill="clear">
+            <ion-icon name="refresh">Refresh Session</ion-icon>
+          </ion-button>
           <ion-text class="ion-margin-end" slot="end" color="primary">
             <ng-container *ngIf="counter > 0" >
               {{counter | formatTime}}
             </ng-container>
-            <ion-button *ngIf="counter <= 0" (click)="login()" size="small" fill="clear">
-              <ion-icon slot="end" name="refresh">Refresh Session</ion-icon>
-            </ion-button>
           </ion-text>
         </ion-toolbar>
       </ion-header>

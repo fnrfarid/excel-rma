@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { interval, Subscription, of, throwError, from } from 'rxjs';
+import { interval, Subscription, of, throwError, from, timer } from 'rxjs';
 import {
   TOKEN,
   ACCESS_TOKEN,
@@ -44,6 +44,9 @@ export class AppComponent implements OnInit {
   fullName: string = '';
   imageURL: string = '';
   authServerUrl = '';
+  countDown: Subscription;
+  counter = 0;
+  tick = 1000;
 
   constructor(
     private readonly appService: AppService,
@@ -70,8 +73,23 @@ export class AppComponent implements OnInit {
               (now + Number(query.get(EXPIRES_IN))).toString(),
             );
         })
-        .then(saved => this.loginService.login());
+        .then(saved => {
+          this.startTimer();
+          this.loginService.login();
+        });
     }
+  }
+
+  startTimer() {
+    this.appService
+      .getStorage()
+      .getItem(ACCESS_TOKEN_EXPIRY)
+      .then(item => {
+        this.counter =
+          Number(item) -
+          Math.floor(Date.now() / 1000) -
+          TEN_MINUTES_IN_MS / 500;
+      });
   }
 
   ngOnInit() {
@@ -79,9 +97,11 @@ export class AppComponent implements OnInit {
     this.setupSilentRefresh();
     this.appService.getGlobalDefault();
     this.permissionManager.setupPermissions();
+    this.countDown = timer(0, this.tick).subscribe(() => --this.counter);
   }
 
   setUserSession() {
+    this.startTimer();
     this.loginService.changes.subscribe({
       next: event => {
         if (event.key === LOGGED_IN && event.value === true) {
@@ -126,6 +146,7 @@ export class AppComponent implements OnInit {
         this.loggedIn = true;
         this.fullName = profile.name;
         this.imageURL = profile.picture;
+        this.startTimer();
       },
     });
   }
@@ -153,6 +174,7 @@ export class AppComponent implements OnInit {
           warehouses: string[];
           territory: string[];
         }) => {
+          this.startTimer();
           this.loggedIn = true;
           if (res) {
             this.appService.getStorage().setItem(USER_ROLE, res.roles || []);
