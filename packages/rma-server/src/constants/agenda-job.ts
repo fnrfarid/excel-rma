@@ -16,7 +16,10 @@ export const AGENDA_JOB_METADATA = {
   lastFinishedAt: new Date(),
 };
 
-export function getParsedPostingDate(payload) {
+export function getParsedPostingDate(payload: {
+  posting_date?: string;
+  posting_time?: string;
+}) {
   let date: Date;
   try {
     date = new Date(

@@ -58,6 +58,7 @@ import {
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { ItemService } from '../../../item/entity/item/item.service';
 import { ItemAggregateService } from '../../../item/aggregates/item-aggregate/item-aggregate.service';
+import { getParsedPostingDate } from '../../../constants/agenda-job';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -95,6 +96,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               salesInvoice.created_on = new DateTime(
                 settings.timeZone,
               ).toJSDate();
+              salesInvoice.timeStamp = {
+                created_on: getParsedPostingDate(salesInvoice),
+              };
               salesInvoice.isSynced = false;
               salesInvoice.inQueue = false;
               this.apply(
@@ -274,7 +278,12 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             this.salesInvoiceService
               .updateOne(
                 { uuid: salesInvoice.uuid },
-                { $set: { inQueue: false } },
+                {
+                  $set: {
+                    inQueue: false,
+                    'timeStamp.created_on': getParsedPostingDate(salesInvoice),
+                  },
+                },
               )
               .then(success => {})
               .catch(error => {});
