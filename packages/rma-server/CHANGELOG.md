@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.4.0...rma-server@1.5.0) (2021-02-09)
+
+
+### Features
+
+* **Excel-rma:** Add creation time stamp migration from posting date ([b259fd3](https://gitlab.com/castlecraft/excel-rma/commit/b259fd3782fe944e4a0ea1069ab3c7c1162257b5))
+* **Excel-rma:** Add territory and warehouse permission to stock ([b2cf0cd](https://gitlab.com/castlecraft/excel-rma/commit/b2cf0cd198835c1af4621972435b1030abe2882f))
+* **Excel-rma:** Update permissions for backend and UI components ([493ac92](https://gitlab.com/castlecraft/excel-rma/commit/493ac92cf6a324c5abfd1421509b55ed157574df))
+
+
+
+
+
 # [1.4.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.3.0...rma-server@1.4.0) (2021-02-03)
 
 

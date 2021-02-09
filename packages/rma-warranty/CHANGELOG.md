@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.2.0...rma-warranty@1.3.0) (2021-02-09)
+
+
+### Features
+
+* **rma-warranty:** Clear filter button added on Serial Search page ([fa24983](https://gitlab.com/castlecraft/excel-rma/commit/fa2498327fa035158c3a5e74039dc9eff17f1731))
+* **rma-warranty:** Token Generation added on Warranty page and updated on Frontend page ([6fe3a8a](https://gitlab.com/castlecraft/excel-rma/commit/6fe3a8a1914e3dde070052c47b69dfdb924bf24d))
+
+
+
+
+
 # [1.2.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.1.1...rma-warranty@1.2.0) (2021-02-03)
 
 
