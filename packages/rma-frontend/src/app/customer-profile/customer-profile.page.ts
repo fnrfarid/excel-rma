@@ -195,13 +195,20 @@ export class CustomerProfilePage implements OnInit {
   }
 
   openVoucher(row: any) {
-    window.open(
-      `${AUTH_SERVER_URL}/desk#Form/Excel%20Script%20Runner?customer=${
-        row.name
-      }&fromDate=${DateTime.local()
-        .plus({ months: 1 })
-        .toISODate()}&toDate=${DateTime.local().toISODate()}`,
-    );
+    this.salesService
+      .getStore()
+      .getItem(AUTH_SERVER_URL)
+      .then(auth_url => {
+        if (auth_url) {
+          window.open(
+            `${auth_url}/desk#Form/Excel%20Script%20Runner?customer=${
+              row.name
+            }&fromDate=${DateTime.local()
+              .plus({ months: 1 })
+              .toISODate()}&toDate=${DateTime.local().toISODate()}`,
+          );
+        }
+      });
   }
 
   setDefaultCompany() {
