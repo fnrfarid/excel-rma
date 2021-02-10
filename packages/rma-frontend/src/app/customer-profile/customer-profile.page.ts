@@ -202,8 +202,8 @@ export class CustomerProfilePage implements OnInit {
         window.open(
           `${auth_url}/desk#Form/Excel%20Script%20Runner?customer=${
             row.name
-          }&fromDate=${DateTime.local().plus({ months: 1 }).toISODate()
-          }&toDate=${DateTime.local().toISODate()}`,
+          }&fromDate=${DateTime.local().plus({ months: 1 }).toISODate()}
+           &toDate=${DateTime.local().toISODate()}`,
         );
       });
   }
