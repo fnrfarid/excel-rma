@@ -10,6 +10,7 @@ import { map, switchMap, retry, startWith } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
+  AUTH_SERVER_URL,
   BEARER_TOKEN_PREFIX,
   DEFAULT_COMPANY,
 } from '../constants/storage';
@@ -18,6 +19,7 @@ import { CLOSE } from '../constants/app-string';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ValidateInputSelected } from '../common/pipes/validators';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-customer-profile',
@@ -190,6 +192,20 @@ export class CustomerProfilePage implements OnInit {
       return row.credit_limit - row.remaining_balance;
     }
     return;
+  }
+
+  openVoucher(row: any) {
+    this.salesService
+      .getStore()
+      .getItem(AUTH_SERVER_URL)
+      .then(auth_url => {
+        window.open(
+          `${auth_url}/desk#Form/Excel%20Script%20Runner?customer=${
+            row.name
+          }&fromDate=${DateTime.local().plus({ months: 1 }).toISODate()}
+           &toDate=${DateTime.local().toISODate()}`,
+        );
+      });
   }
 
   setDefaultCompany() {
