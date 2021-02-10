@@ -69,11 +69,9 @@
             <!-- Custoemr Name Column -->
             <ng-container matColumnDef="customer">
               <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
-              <mat-cell *matCellDef="let row">
-                <a
-                  href="https://testerp.excelbd.com/desk#Form/Excel%20Script%20Runner?customer={{row.name}}&fromDate={{from_date}}&toDate={{to_date}}" target="_blank"
-                  >{{ row.customer_name }}</a
-                >
+              <mat-cell *matCellDef="let row" >
+                <a (click)="openVoucher(row)">
+                  {{ row.customer_name }}</a>
               </mat-cell>
             </ng-container>
 

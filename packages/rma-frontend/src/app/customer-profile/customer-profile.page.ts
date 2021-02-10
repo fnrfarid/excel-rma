@@ -10,6 +10,7 @@ import { map, switchMap, retry, startWith } from 'rxjs/operators';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
+  AUTH_SERVER_URL,
   BEARER_TOKEN_PREFIX,
   DEFAULT_COMPANY,
 } from '../constants/storage';
@@ -42,8 +43,6 @@ export class CustomerProfilePage implements OnInit {
   customerProfileForm: FormGroup;
   filteredCustomerList: Observable<any[]>;
   validateInput: any = ValidateInputSelected;
-  from_date = DateTime.local().plus({ months: 1 }).toISODate();
-  to_date = DateTime.local().toISODate();
 
   get f() {
     return this.customerProfileForm.controls;
@@ -193,6 +192,16 @@ export class CustomerProfilePage implements OnInit {
       return row.credit_limit - row.remaining_balance;
     }
     return;
+  }
+
+  openVoucher(row: any) {
+    window.open(
+      `${AUTH_SERVER_URL}/desk#Form/Excel%20Script%20Runner?customer=${
+        row.name
+      }&fromDate=${DateTime.local()
+        .plus({ months: 1 })
+        .toISODate()}&toDate=${DateTime.local().toISODate()}`,
+    );
   }
 
   setDefaultCompany() {
