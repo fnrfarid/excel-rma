@@ -66,6 +66,7 @@ export class StatusHistoryComponent implements OnInit {
     Object.keys(DELIVERY_STATUS).forEach(status =>
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
+    this.resetWarrantyDetail(this.warrantyObject?.uuid);
     this.setStockEntryStatusFields();
     this.statusHistoryForm.controls.transfer_branch.disable();
     this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();

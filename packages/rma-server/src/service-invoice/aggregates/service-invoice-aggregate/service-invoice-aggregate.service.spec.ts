@@ -2,7 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ServiceInvoiceAggregateService } from './service-invoice-aggregate.service';
 import { ServiceInvoiceService } from '../../entity/service-invoice/service-invoice.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+
 import { HttpService } from '@nestjs/common';
+import { WarrantyClaimService } from '../../../warranty-claim/entity/warranty-claim/warranty-claim.service';
 
 describe('ServiceInvoiceAggregateService', () => {
   let service: ServiceInvoiceAggregateService;
@@ -21,6 +23,10 @@ describe('ServiceInvoiceAggregateService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: WarrantyClaimService,
           useValue: {},
         },
       ],

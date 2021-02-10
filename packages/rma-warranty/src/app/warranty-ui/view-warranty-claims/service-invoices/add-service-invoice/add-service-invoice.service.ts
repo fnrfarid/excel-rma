@@ -15,6 +15,7 @@ import {
   RELAY_LIST_ADDRESS_ENDPOINT,
   SUBMIT_SERVICE_INVOICE_ENDPOINT,
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
+  RELAY_LIST_BRANCH_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { APIResponse } from '../../../../common/interfaces/sales.interface';
@@ -61,6 +62,20 @@ export class AddServiceInvoiceService {
         });
       }),
     );
+  }
+
+  getBranch() {
+    return switchMap(value => {
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_LIST_BRANCH_ENDPOINT, {
+              headers,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getItemList(

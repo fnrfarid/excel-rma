@@ -142,6 +142,9 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   damage_product: string;
+
+  @Column()
+  billed_amount: number;
 }
 
 export class StatusHistory {

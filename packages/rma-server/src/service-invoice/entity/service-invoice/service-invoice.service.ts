@@ -2,6 +2,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceInvoice } from './service-invoice.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Injectable()
 export class ServiceInvoiceService {
@@ -58,5 +60,13 @@ export class ServiceInvoiceService {
 
   async updateOne(query, options?) {
     return await this.serviceInvoiceRepository.updateOne(query, options);
+  }
+
+  asyncAggregate(query) {
+    return of(this.serviceInvoiceRepository.aggregate(query)).pipe(
+      switchMap((aggregateData: any) => {
+        return aggregateData.toArray();
+      }),
+    );
   }
 }

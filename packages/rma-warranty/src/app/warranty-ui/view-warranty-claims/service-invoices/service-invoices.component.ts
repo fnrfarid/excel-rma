@@ -4,10 +4,7 @@ import { AddServiceInvoiceService } from './add-service-invoice/add-service-invo
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
 import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  DURATION,
-  SERVICE_INVOICE_STATUS,
-} from '../../../constants/app-string';
+import { DURATION } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { MatPaginator } from '@angular/material/paginator';
@@ -89,10 +86,6 @@ export class ServiceInvoicesComponent implements OnInit {
       mode_of_payment: 'Cash',
       amount: row.total,
     });
-    if (row.is_pos) {
-      row.status = SERVICE_INVOICE_STATUS.PAID;
-    }
-    row.status = SERVICE_INVOICE_STATUS.UNPAID;
 
     this.serviceInvoice.submitInvoice(row).subscribe({
       next: () => {

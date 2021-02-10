@@ -208,8 +208,6 @@ export class WarrantyStockEntryAggregateService {
     switch (deliveryNote.stock_entry_type) {
       case 'Returned':
         serialData = {
-          progress_state: deliveryNote,
-          completed_delivery_note: erpDN,
           damaged_serial: deliveryNote.items[0].serial_no,
           damage_warehouse: deliveryNote.items[0].warehouse,
           damage_product: deliveryNote.items[0].item_name,
@@ -217,8 +215,6 @@ export class WarrantyStockEntryAggregateService {
         break;
       case 'Delivered':
         serialData = {
-          progress_state: deliveryNote,
-          completed_delivery_note: erpDN,
           replace_serial: deliveryNote.items[0].serial_no,
           replace_warehouse: deliveryNote.items[0].warehouse,
           replace_product: deliveryNote.items[0].item_name,
@@ -231,7 +227,11 @@ export class WarrantyStockEntryAggregateService {
       this.warrantyService.updateOne(
         { uuid: deliveryNote.warrantyClaimUuid },
         {
-          $push: serialData,
+          $push: {
+            progress_state: deliveryNote,
+            completed_delivery_note: erpDN,
+          },
+          $set: serialData,
         },
       ),
     );
@@ -545,32 +545,38 @@ export class WarrantyStockEntryAggregateService {
           return of([]);
         }),
         switchMap(() => {
-          return this.stockEntryService.deleteOne({
-            stock_voucher_number: stockEntry.stock_voucher_number,
-          });
+          return from(
+            this.stockEntryService.deleteOne({
+              stock_voucher_number: stockEntry.stock_voucher_number,
+            }),
+          );
         }),
         switchMap(() => {
           return this.revertStatusHistory(stockEntry.warrantyClaimUuid);
         }),
         switchMap(() => {
-          return this.warrantyService.updateOne(
-            { uuid: stockEntry.warrantyClaimUuid },
-            {
-              $pull: {
-                completed_delivery_note: {
-                  name: stockEntry.stock_voucher_number,
-                },
-                progress_state: {
-                  stock_voucher_number: stockEntry.stock_voucher_number,
+          return from(
+            this.warrantyService.updateOne(
+              { uuid: stockEntry.warrantyClaimUuid },
+              {
+                $pull: {
+                  completed_delivery_note: {
+                    name: stockEntry.stock_voucher_number,
+                  },
+                  progress_state: {
+                    stock_voucher_number: stockEntry.stock_voucher_number,
+                  },
                 },
               },
-            },
+            ),
           );
         }),
         switchMap(() => {
-          return this.serialNoHistoryService.deleteOne({
-            document_no: stockEntry.stock_voucher_number,
-          });
+          return from(
+            this.serialNoHistoryService.deleteOne({
+              document_no: stockEntry.stock_voucher_number,
+            }),
+          );
         }),
       );
   }

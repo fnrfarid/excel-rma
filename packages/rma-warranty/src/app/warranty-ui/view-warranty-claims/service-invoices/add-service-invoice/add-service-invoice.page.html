@@ -27,9 +27,7 @@
   <form [formGroup]="serviceInvoiceForm">
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
@@ -202,10 +200,10 @@
                   [displayWith]="getBranchOption"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of territoryList | async"
                     [value]="option"
                   >
-                    {{ option}}
+                    {{ option.name}}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.branch.hasError('required')">
@@ -214,9 +212,7 @@
               </mat-form-field>
             </ion-col>
             <ion-col>
-              <mat-checkbox formControlName="is_pos">
-                Paid
-              </mat-checkbox>
+              <mat-checkbox formControlName="is_pos"> Paid </mat-checkbox>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -229,9 +225,7 @@
       <ion-row class="align">
         <ion-col>
           <ion-card-title>
-            <ion-text color="tertiary">
-              Items
-            </ion-text>
+            <ion-text color="tertiary"> Items </ion-text>
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right" size="auto">
@@ -251,7 +245,7 @@
     </ion-card-header>
     <ion-card-content class="ion-no-padding">
       <ion-item lines="none">
-        <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+        <mat-table #table [dataSource]="dataSource" style="width: 100%">
           <ng-container matColumnDef="item_group">
             <mat-header-cell *matHeaderCellDef>Item Group</mat-header-cell>
             <mat-cell *matCellDef="let row;let i = index">
@@ -287,7 +281,7 @@
                 (closed)="updateItem(row,i,$event)"
               >
                 <inline-edit
-                  style="width: 400px !important;"
+                  style="width: 400px !important"
                   [value]="row.item_name"
                   column="item"
                   [minimumPrice]="row.minimumPrice"
@@ -305,9 +299,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container>
-                {{row.qty}}
-              </ng-container>
+              <ng-container> {{row.qty}} </ng-container>
 
               <sat-popover
                 #p
@@ -334,9 +326,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container>
-                {{row.rate}}
-              </ng-container>
+              <ng-container> {{row.rate}} </ng-container>
               <sat-popover
                 #p
                 hasBackdrop

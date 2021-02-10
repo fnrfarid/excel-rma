@@ -11,13 +11,11 @@
 
 <ion-content class="page-background">
   <ion-card>
-    <ion-card-header style="padding-bottom: 0;">
+    <ion-card-header style="padding-bottom: 0">
       <ion-row class="align">
         <ion-col>
           <ion-card-title>
-            <ion-text color="tertiary">
-              Warranty Claims
-            </ion-text>
+            <ion-text color="tertiary"> Warranty Claims </ion-text>
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right">
@@ -250,9 +248,7 @@
         >
           <ng-container matColumnDef="sr_no">
             <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let row;let i=index ">
-              {{i+1}}
-            </mat-cell>
+            <mat-cell *matCellDef="let row;let i=index "> {{i+1}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
@@ -260,9 +256,7 @@
             <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
               Claim no
             </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.claim_no}}
-            </mat-cell>
+            <mat-cell *matCellDef="let row"> {{row.claim_no}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
@@ -270,9 +264,7 @@
             <mat-header-cell *matHeaderCellDef mat-sort-header="claim_type">
               Claim Type
             </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.claim_type}}
-            </mat-cell>
+            <mat-cell *matCellDef="let row"> {{row.claim_type}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
@@ -280,9 +272,7 @@
             <mat-header-cell *matHeaderCellDef mat-sort-header="received_date">
               Received Date
             </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.received_on }}
-            </mat-cell>
+            <mat-cell *matCellDef="let row"> {{row.received_on }} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="customer_third_party">
@@ -295,12 +285,8 @@
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="customer_name">
-            <mat-header-cell *matHeaderCellDef>
-              Customer name
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.customer}}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef> Customer name </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.customer}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="third_party_name">
@@ -314,12 +300,8 @@
           </ng-container>
 
           <ng-container matColumnDef="item_code">
-            <mat-header-cell *matHeaderCellDef>
-              Item
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.item_code}}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef> Item </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.item_code}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
@@ -327,19 +309,39 @@
             <mat-header-cell *matHeaderCellDef>
               Claimed Serial
             </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.serial_no}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="product_brand">
+            <mat-header-cell *matHeaderCellDef> Brand </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.product_brand}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="problem">
+            <mat-header-cell *matHeaderCellDef> Problem </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.problem}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="remarks">
+            <mat-header-cell *matHeaderCellDef> Remarks </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.remarks}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="claim_status">
+            <mat-header-cell *matHeaderCellDef> Claim Status </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.claim_status}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="verdict">
+            <mat-header-cell *matHeaderCellDef> Verdict </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{row.serial_no}}
+              {{row.status_history?row.status_history[row.status_history.length-1].verdict:''}}
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
-
-          <ng-container matColumnDef="claim_status">
-            <mat-header-cell *matHeaderCellDef>
-              Claim Status
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.claim_status}}
-            </mat-cell>
+          <ng-container matColumnDef="billed_amount">
+            <mat-header-cell *matHeaderCellDef> Billed Amount </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.billed_amount}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="receiving_branch">
@@ -356,29 +358,38 @@
             <mat-header-cell *matHeaderCellDef>
               Delivery Branch
             </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.delivery_branch}}
-            </mat-cell>
+            <mat-cell *matCellDef="let row"> {{row.delivery_branch}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
           <ng-container matColumnDef="received_by">
+            <mat-header-cell *matHeaderCellDef> Received By </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.received_by}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="damaged_serial">
             <mat-header-cell *matHeaderCellDef>
-              Received By
+              Received Serial
             </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.received_by}}
-            </mat-cell>
+            <mat-cell *matCellDef="let row"> {{row.damaged_serial }} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="replace_serial">
+            <mat-header-cell *matHeaderCellDef>
+              Replaced Serial
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.replace_serial}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
           <ng-container matColumnDef="delivered_by">
-            <mat-header-cell *matHeaderCellDef>
-              Delivered by
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.delivered_by}}
-            </mat-cell>
+            <mat-header-cell *matHeaderCellDef> Delivered by </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.delivered_by}} </mat-cell>
+            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          </ng-container>
+          <ng-container matColumnDef="delivery_date">
+            <mat-header-cell *matHeaderCellDef> Delivery Date </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.delivery_date}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <mat-header-row

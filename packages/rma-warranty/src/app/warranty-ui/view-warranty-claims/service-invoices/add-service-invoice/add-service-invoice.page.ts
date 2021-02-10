@@ -70,12 +70,15 @@ export class AddServiceInvoicePage implements OnInit {
     this.serviceInvoiceForm.controls.posting_date.setValue(
       await this.getCurrentDate(),
     );
-    this.serviceInvoiceService
-      .getStore()
-      .getItem('territory')
-      .then(territory => {
-        this.territoryList = territory;
-      });
+
+    this.territoryList = this.serviceInvoiceForm
+      .get('branch')
+      .valueChanges.pipe(
+        debounceTime(500),
+        startWith(''),
+        this.serviceInvoiceService.getBranch(),
+      );
+
     this.serviceInvoiceService.getAccountList().subscribe({
       next: response => {
         this.accountList = response;
@@ -331,7 +334,7 @@ export class AddServiceInvoicePage implements OnInit {
   }
 
   getBranchOption(option) {
-    if (option) return option;
+    if (option) return option.name;
   }
 
   getSelectedOption(option) {}

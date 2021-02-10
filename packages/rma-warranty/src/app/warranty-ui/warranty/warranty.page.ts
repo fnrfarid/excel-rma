@@ -57,6 +57,14 @@ export class WarrantyPage implements OnInit {
     'delivery_branch',
     'received_by',
     'delivered_by',
+    'product_brand',
+    'damaged_serial',
+    'replace_serial',
+    'problem',
+    'verdict',
+    'delivery_date',
+    'billed_amount',
+    'remarks',
   ];
   claimList;
   customerList;
