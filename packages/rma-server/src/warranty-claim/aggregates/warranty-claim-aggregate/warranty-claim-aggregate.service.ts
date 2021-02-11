@@ -11,7 +11,7 @@ import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim
 import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/warranty-claim-removed.event';
 import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/warranty-claim-updated.event';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
-import { from, throwError, of } from 'rxjs';
+import { from, throwError, of, forkJoin } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 
 import {
@@ -329,15 +329,17 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.setClaimStatus(statusHistoryPayload);
       }),
       switchMap(state => {
-        return this.warrantyClaimService.updateOne(
-          {
-            uuid: statusHistoryPayload.uuid,
-          },
-          {
-            $set: {
-              claim_status: state,
+        return from(
+          this.warrantyClaimService.updateOne(
+            {
+              uuid: statusHistoryPayload.uuid,
             },
-          },
+            {
+              $set: {
+                claim_status: state,
+              },
+            },
+          ),
         );
       }),
       switchMap(() => {
@@ -445,20 +447,42 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         serialNoHistory.transaction_to = !statusHistory.transfer_branch
           ? statusHistory.status_from
           : statusHistory.transfer_branch;
-        return this.serialNoHistoryService.updateOne(
-          {
-            serial_no: res.serial_no,
-            document_type: WARRANTY_CLAIM_DOCTYPE,
-          },
-          {
-            $set: serialNoHistory,
-          },
+        return forkJoin({
+          updateResult: from(
+            this.serialNoHistoryService.updateOne(
+              {
+                serial_no: res.serial_no,
+                document_type: WARRANTY_CLAIM_DOCTYPE,
+              },
+              {
+                $set: serialNoHistory,
+              },
+            ),
+          ),
+          statusPayload: of(res.status_history.splice(-1)[0]),
+        });
+      }),
+      switchMap(state => {
+        return this.setClaimStatus(state.statusPayload);
+      }),
+      switchMap(state => {
+        return from(
+          this.warrantyClaimService.updateOne(
+            {
+              uuid,
+            },
+            {
+              $set: {
+                claim_status: state,
+              },
+            },
+          ),
         );
       }),
     );
   }
 
-  setClaimStatus(statusHistoryPayload: StatusHistoryDto) {
+  setClaimStatus(statusHistoryPayload) {
     let status = '';
     switch (statusHistoryPayload.verdict) {
       case VERDICT.RECEIVED_FROM_CUSTOMER:
@@ -468,6 +492,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         status = CLAIM_STATUS.IN_PROGRESS;
         break;
       case VERDICT.WORK_IN_PROGRESS:
+        status = CLAIM_STATUS.IN_PROGRESS;
+        break;
+      case VERDICT.SENT_TO_ENG_DEPT:
+        status = CLAIM_STATUS.IN_PROGRESS;
+        break;
+      case VERDICT.SENT_TO_REPAIR_DEPT:
         status = CLAIM_STATUS.IN_PROGRESS;
         break;
       case VERDICT.TRANSFERRED:

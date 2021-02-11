@@ -143,4 +143,25 @@ export class WarrantyClaimDto {
 
   @IsNotEmpty()
   posting_time: Date;
+
+  @IsOptional()
+  replace_serial: string;
+
+  @IsOptional()
+  replace_product: string;
+
+  @IsOptional()
+  replace_warehouse: string;
+
+  @IsOptional()
+  damaged_serial: string;
+
+  @IsOptional()
+  damage_warehouse: string;
+
+  @IsOptional()
+  damage_product: string;
+
+  @IsOptional()
+  billed_amount: string;
 }
