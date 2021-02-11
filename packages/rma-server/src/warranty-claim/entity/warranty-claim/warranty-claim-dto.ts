@@ -164,4 +164,10 @@ export class WarrantyClaimDto {
 
   @IsOptional()
   billed_amount: string;
+
+  @IsOptional()
+  print: any;
+
+  @IsOptional()
+  company: string;
 }

@@ -3,10 +3,20 @@
     <ion-row>
       <ion-col class="ion-text-left">
         <ion-card-title>
-          <ion-text color="tertiary">
-            Warranty Details
-          </ion-text>
+          <ion-text color="tertiary"> Warranty Details </ion-text>
         </ion-card-title>
+      </ion-col>
+      <ion-col class="ion-text-right">
+        <ion-button
+          (click)="getPrint()"
+          (ctrlM)="getPrint()"
+          color="primary"
+          matTooltip="print"
+          matTooltipPosition="above"
+          matTooltipClass="tooltip"
+        >
+          <ion-icon slot="icon-only" name="print-outline"></ion-icon>
+        </ion-button>
       </ion-col>
     </ion-row>
   </ion-card-header>
@@ -135,9 +145,7 @@
     <ion-row>
       <ion-col class="ion-text-left">
         <ion-card-title>
-          <ion-text color="tertiary">
-            Product Details
-          </ion-text>
+          <ion-text color="tertiary"> Product Details </ion-text>
         </ion-card-title>
       </ion-col>
     </ion-row>
@@ -281,9 +289,7 @@
     <ion-row>
       <ion-col class="ion-text-left">
         <ion-card-title>
-          <ion-text color="tertiary">
-            Customer Details
-          </ion-text>
+          <ion-text color="tertiary"> Customer Details </ion-text>
         </ion-card-title>
       </ion-col>
     </ion-row>

@@ -104,3 +104,11 @@ export const STOCK_ENTRY_ITEM_TYPE = {
   RETURNED: 'Returned',
   DELIVERED: 'Delivered',
 };
+
+export enum CLAIM_STATUS {
+  IN_PROGRESS = 'In Progress',
+  TO_DELIVER = 'To Deliver',
+  DELIVERED = 'Delivered',
+  UNSOLVED = 'Unsolved',
+  REJECTED = 'Rejected',
+}

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CLOSE } from '../../../constants/app-string';
+import { CLOSE, CLAIM_STATUS } from '../../../constants/app-string';
 import {
   WarrantyItem,
   WarrantyClaimsDetails,
@@ -8,6 +8,9 @@ import { WarrantyService } from '../../warranty-tabs/warranty.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { ERROR_FETCHING_WARRANTY_CLAIM } from '../../../constants/messages';
+import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { DEFAULT_COMPANY } from '../../../constants/storage';
 @Component({
   selector: 'claim-details',
   templateUrl: './claim-details.component.html',
@@ -34,6 +37,7 @@ export class ClaimDetailsComponent implements OnInit {
   dataSource: WarrantyItem[];
   invoiceUuid: string;
   viewWArrantyClaimUrl: string;
+  company: string;
   constructor(
     private readonly warrantyService: WarrantyService,
     private readonly snackBar: MatSnackBar,
@@ -41,6 +45,12 @@ export class ClaimDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.warrantyService
+      .getStorage()
+      .getItem(DEFAULT_COMPANY)
+      .then(company => {
+        this.company = company;
+      });
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.warrantyClaimsDetails = {} as WarrantyClaimsDetails;
     this.getWarrantyClaim(this.invoiceUuid);
@@ -68,5 +78,50 @@ export class ClaimDetailsComponent implements OnInit {
         );
       },
     });
+  }
+
+  printDeliveryNote(docType?: string) {
+    let print_type: string = '';
+    this.warrantyService
+      .getWarrantyClaim(this.invoiceUuid)
+      .pipe(
+        switchMap((data: any) => {
+          data.comany = this.company;
+          switch (data.claim_status) {
+            case CLAIM_STATUS.DELIVERED:
+              print_type = `Delivery Token`;
+              break;
+
+            default:
+              print_type = `Service Token`;
+              break;
+          }
+          const aggregatedWarrantyReciept = data;
+          const warehouses: {
+            [ket: string]: string;
+          } = {};
+          this.warrantyService.printDocument(
+            {
+              ...aggregatedWarrantyReciept,
+              name: data.claim_no,
+              print: {
+                print_type,
+                ...warehouses,
+              },
+            },
+            data.claim_no,
+          );
+          return of({});
+        }),
+      )
+      .subscribe({
+        next: success => {},
+        error: err => {},
+      });
+  }
+
+  async getPrint() {
+    const doc = `Warranty Claim`;
+    this.printDeliveryNote(doc);
   }
 }
