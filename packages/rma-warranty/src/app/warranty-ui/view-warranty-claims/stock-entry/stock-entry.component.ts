@@ -105,4 +105,36 @@ export class StockEntryComponent implements OnInit {
       },
     });
   }
+
+  async finalizeEntry() {
+    const loading = await this.loadingController.create({
+      message: 'Reverting Stock Entry...!',
+    });
+    await loading.present();
+    this.stockEntryService.finalizeEntry(this.warrantyClaimUuid).subscribe({
+      next: res => {
+        loading.dismiss();
+        this.snackbar.open('Stock Entries Finalized', 'Close', {
+          duration: DURATION,
+        });
+        this.dataSource.loadItems('asc', 0, 10, {
+          warrantyClaimUuid: this.warrantyClaimUuid,
+        });
+      },
+      error: err => {
+        loading.dismiss();
+        if (err && err.error && err.error.message) {
+          this.snackbar.open(err.error.message, 'Close', {
+            duration: DURATION,
+          });
+        }
+        this.snackbar.open('Failed to Finalize Stock Entry', 'Close', {
+          duration: DURATION,
+        });
+        this.dataSource.loadItems('asc', 0, 10, {
+          warrantyClaimUuid: this.warrantyClaimUuid,
+        });
+      },
+    });
+  }
 }

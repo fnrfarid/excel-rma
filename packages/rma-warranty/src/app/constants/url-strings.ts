@@ -145,3 +145,7 @@ export const SERIAL_LIST_API = '/api/serial_no/v1/list';
 export const RELAY_DOCTYPE_ENDPOINT_PREFIX = '/api/command/user/api/resource/';
 export const GET_LIST_PROBLEM_ENDPOINT = '/api/problem/v1/list';
 export const PRINT_DELIVERY_INVOICE_ENDPOINT = 'api/print/v1/delivery_invoice';
+export const FINALIZE_WARRANTY_STOCK_ENTRY =
+  '/api/stock_entry/v1/finalize_warranty_stock';
+export const SYNC_SERVICE_INVOICE_ENDPOINT =
+  '/api/service_invoice/v1/sync_invoice';

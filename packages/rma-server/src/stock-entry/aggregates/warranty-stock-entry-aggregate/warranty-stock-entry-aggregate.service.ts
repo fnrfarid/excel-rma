@@ -142,20 +142,43 @@ export class WarrantyStockEntryAggregateService {
         );
       }),
       switchMap(() => {
+        return from(deliveryNotesList).pipe(
+          concatMap(deliveryNote => {
+            return this.syncProgressState(
+              warrantyPayload.warrantyClaimUuid,
+              deliveryNote,
+            );
+          }),
+          toArray(),
+        );
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
+      }),
+    );
+  }
+
+  makeStatusHistory(uuid: string, req) {
+    return forkJoin({
+      warranty: this.warrantyService.findOne(uuid),
+      settingState: this.settingService.find(),
+    }).pipe(
+      switchMap(claim => {
         const statusHistoryDetails = {} as any;
-        statusHistoryDetails.uuid = warrantyPayload.warrantyClaimUuid;
+        statusHistoryDetails.uuid = claim.warranty.uuid;
         (statusHistoryDetails.time = new DateTime(
-          settingState.timeZone,
+          claim.settingState.timeZone,
         ).toFormat('HH:mm:ss')),
           (statusHistoryDetails.posting_date = new DateTime(
-            settingState.timeZone,
+            claim.settingState.timeZone,
           ).toFormat('yyyy-MM-dd')),
           (statusHistoryDetails.status_from = req.token.territory[0]);
         statusHistoryDetails.verdict = VERDICT.DELIVER_TO_CUSTOMER;
-        statusHistoryDetails.description = warrantyPayload.description;
+        statusHistoryDetails.description =
+          claim.warranty.progress_state[0].description;
         statusHistoryDetails.created_by_email = req.token.email;
         statusHistoryDetails.created_by = req.token.name;
-        switch (warrantyPayload.type) {
+        switch (claim.warranty.progress_state[0].type) {
           case 'Replace':
             statusHistoryDetails.delivery_status = DELIVERY_STATUS.REPLACED;
             break;
@@ -171,17 +194,6 @@ export class WarrantyStockEntryAggregateService {
         return this.warrantyAggregateService.addStatusHistory(
           statusHistoryDetails,
           req,
-        );
-      }),
-      switchMap(() => {
-        return from(deliveryNotesList).pipe(
-          concatMap(deliveryNote => {
-            return this.syncProgressState(
-              warrantyPayload.warrantyClaimUuid,
-              deliveryNote,
-            );
-          }),
-          toArray(),
         );
       }),
       catchError(err => {

@@ -83,15 +83,10 @@ export class ServiceInvoiceController {
     );
   }
 
-  @Post('v1/submit')
+  @Post('v1/sync_invoice')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  submitServiceInvoice(
-    @Body() updatePayload: UpdateServiceInvoiceDto,
-    @Req() req,
-  ) {
-    return this.commandBus.execute(
-      new SubmitServiceInvoiceCommand(updatePayload, req),
-    );
+  submitServiceInvoice(@Body() uuid: string, @Req() req) {
+    return this.commandBus.execute(new SubmitServiceInvoiceCommand(uuid, req));
   }
 }

@@ -37,6 +37,7 @@ describe('StockEntryComponent', () => {
           provide: StockEntryService,
           useValue: {
             getStockEntryList: (...args) => of([{}]),
+            finalizeEntry: (...args) => of([{}]),
           },
         },
         {
