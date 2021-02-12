@@ -79,7 +79,7 @@ export class ItemService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        if (key === 'bundle_items') {
+        if (key === 'bundle_items' || key === 'is_stock_item') {
           return;
         }
         if (key === 'status' && query[key] === 'All') {
