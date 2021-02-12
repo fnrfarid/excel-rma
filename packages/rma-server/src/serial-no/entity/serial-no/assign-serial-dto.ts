@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsArray,
   IsOptional,
+  ArrayNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -43,6 +44,7 @@ export class AssignSerialDto {
 
   @IsNotEmpty()
   @ValidateNested()
+  @ArrayNotEmpty()
   @Type(() => DeliveryNoteItemDto)
   items: DeliveryNoteItemDto[];
 }

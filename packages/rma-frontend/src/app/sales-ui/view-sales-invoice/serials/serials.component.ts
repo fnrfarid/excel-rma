@@ -79,6 +79,7 @@ export class SerialsComponent implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
+  submit: boolean = false;
   state = {
     component: DELIVERY_NOTE,
     warehouse: '',
@@ -493,7 +494,7 @@ export class SerialsComponent implements OnInit {
 
   async submitDeliveryNote() {
     if (!this.validateState()) return;
-
+    this.submit = true;
     this.mergeDuplicateItems();
     const loading = await this.loadingController.create({
       message: 'Creating Delivery Note..',
@@ -551,6 +552,7 @@ export class SerialsComponent implements OnInit {
 
     this.salesService.assignSerials(assignSerial).subscribe({
       next: success => {
+        this.submit = false;
         loading.dismiss();
         this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
           duration: 2500,
@@ -559,6 +561,7 @@ export class SerialsComponent implements OnInit {
       },
       error: err => {
         loading.dismiss();
+        this.submit = false;
         if (err.status === 406) {
           const errMessage = err.error.message.split('\\n');
           this.snackBar.open(

@@ -167,6 +167,12 @@ export class SalesInvoiceService {
     return await this.salesInvoiceRepository.count(query);
   }
 
+  async findAndModify(query, params) {
+    return await this.salesInvoiceRepository.findOneAndUpdate(query, params, {
+      sort: { 'timeStamp.created_no': 1 },
+    });
+  }
+
   getKeys() {
     const group: any = {};
     const keys = this.getColumns();
