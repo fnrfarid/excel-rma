@@ -136,6 +136,9 @@ export class Item extends BaseEntity {
   brand: string;
 
   @Column()
+  is_stock_item: number;
+
+  @Column()
   mrp: number;
 
   @Column()

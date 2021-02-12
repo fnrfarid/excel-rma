@@ -46,12 +46,13 @@ export class ItemPriceDataSource extends DataSource<ListingData> {
   }
 
   loadItems(
-    filter = {},
+    filter: any = {},
     sortOrder: any = { name: 'asc' },
     pageIndex = 0,
     pageSize = 30,
   ) {
     this.loadingSubject.next(true);
+    filter.is_stock_item = 1;
     try {
       filter = JSON.stringify(filter);
     } catch {
