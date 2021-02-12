@@ -70,36 +70,24 @@ export class ServiceInvoicesComponent implements OnInit {
     );
   }
 
-  async submitInvoice(row) {
+  async syncInvoice() {
     const loading = await this.loadingController.create();
     await loading.present();
-    row.docstatus = 1;
-    this.serviceInvoice
-      .getStore()
-      .getItem('pos_profile')
-      .then(profile => {
-        row.pos_profile = profile;
-      });
-    row.payments = [];
-    row.payments.push({
-      account: row.pos_profile,
-      mode_of_payment: 'Cash',
-      amount: row.total,
-    });
-
-    this.serviceInvoice.submitInvoice(row).subscribe({
+    this.serviceInvoice.syncInvoice(this.warrantyObject?.uuid).subscribe({
       next: () => {
         loading.dismiss();
-        this.snackbar.open('Invoice Submitted Sucessfully', 'Close', {
+        this.snackbar.open('Invoice Synced Sucessfully', 'Close', {
           duration: DURATION,
         });
+        this.dataSource.loadItems(this.invoiceUuid);
       },
       error: ({ message }) => {
         loading.dismiss();
-        if (!message) message = 'Failed to Submit Service Invoice';
+        if (!message) message = 'Failed to Sync Service Invoice';
         this.snackbar.open(message, 'Close', {
           duration: DURATION,
         });
+        this.dataSource.loadItems(this.invoiceUuid);
       },
     });
   }

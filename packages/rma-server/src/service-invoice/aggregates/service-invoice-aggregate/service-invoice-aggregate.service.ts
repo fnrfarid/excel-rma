@@ -13,8 +13,15 @@ import { ServiceInvoiceRemovedEvent } from '../../event/service-invoice-removed/
 import { ServiceInvoiceUpdatedEvent } from '../../event/service-invoice-updated/service-invoice-updated.event';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { throwError, of, from } from 'rxjs';
+import {
+  switchMap,
+  map,
+  catchError,
+  toArray,
+  mergeMap,
+  concatMap,
+} from 'rxjs/operators';
+import { throwError, of, from, forkJoin } from 'rxjs';
 import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
 import {
   CONTENT_TYPE,
@@ -159,5 +166,59 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
         return throwError(new BadRequestException(err));
       }),
     );
+  }
+
+  syncInvoice(uuid, req) {
+    return forkJoin({
+      Invoice: from(
+        this.serviceInvoiceService.find({ warrantyClaimUuid: uuid.uuid }),
+      ),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(res => {
+        return this.filterSubmittedInvoice(res.Invoice).pipe(
+          concatMap(invoice => {
+            return this.http.get(
+              `${res.settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice}`,
+              {
+                headers: this.settings.getAuthorizationHeaders(req.token),
+              },
+            );
+          }),
+          map(res => res.data.data),
+          toArray(),
+        );
+      }),
+      switchMap(array => {
+        return from(array).pipe(
+          mergeMap(doc => {
+            return from(
+              this.serviceInvoiceService.updateOne(
+                { invoice_no: doc.name },
+                {
+                  $set: {
+                    docstatus: doc.docstatus,
+                  },
+                },
+              ),
+            );
+          }),
+          toArray(),
+        );
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
+      }),
+    );
+  }
+
+  filterSubmittedInvoice(serviceInvoices: ServiceInvoice[]) {
+    const filteredInvoices = [];
+    serviceInvoices.forEach(invoice => {
+      if (!invoice.docstatus) {
+        filteredInvoices.push(invoice.invoice_no);
+      }
+    });
+    return of(filteredInvoices);
   }
 }

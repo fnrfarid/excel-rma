@@ -15,6 +15,14 @@
           >
             Add
           </ion-button>
+          <ion-button
+            *ngIf="dataSource.length && permissionState.warranty_claim.create"
+            color="tertiary"
+            fill="outline"
+            (click)="syncInvoice()"
+          >
+            Sync Invoices
+          </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -118,15 +126,10 @@
         <ng-container matColumnDef="submit">
           <mat-header-cell *matHeaderCellDef>Submit</mat-header-cell>
           <mat-cell *matCellDef="let row; let i = index">
-            <ion-button
-              *ngIf="!row.docstatus"
-              (click)="submitInvoice(row)"
-              fill="solid"
-              color="tertiary"
-            >
-              submit
-            </ion-button>
-            <label *ngIf="row.docstatus">Submitted</label>
+            <ion-text *ngIf="!row.docstatus" color="danger">
+              Not Submitted
+            </ion-text>
+            <ion-text *ngIf="row.docstatus" color="success">Submitted</ion-text>
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>

@@ -13,7 +13,7 @@ import {
   LIST_SERVICE_INVOICE_ENDPOINT,
   RELAY_LIST_ACCOUNT_ENDPOINT,
   RELAY_LIST_ADDRESS_ENDPOINT,
-  SUBMIT_SERVICE_INVOICE_ENDPOINT,
+  SYNC_SERVICE_INVOICE_ENDPOINT,
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
   RELAY_LIST_BRANCH_ENDPOINT,
 } from '../../../../constants/url-strings';
@@ -322,11 +322,11 @@ export class AddServiceInvoiceService {
     );
   }
 
-  submitInvoice(payload) {
-    const url = SUBMIT_SERVICE_INVOICE_ENDPOINT;
+  syncInvoice(uuid: string) {
+    const url = SYNC_SERVICE_INVOICE_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(url, payload, { headers });
+        return this.http.post(url, { uuid }, { headers });
       }),
     );
   }

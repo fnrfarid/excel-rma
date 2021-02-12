@@ -108,6 +108,13 @@ export class StockEntryController {
     return this.warrantyStockAggregate.createDeliveryNote(body, req);
   }
 
+  @Post('v1/finalize_warranty_stock')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  finalizeStockEntry(@Body() uuid: string, @Req() req) {
+    return this.warrantyStockAggregate.makeStatusHistory(uuid, req);
+  }
+
   @Get('v1/get_warranty_stock/:warrantyClaimUuid')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))

@@ -11,9 +11,9 @@ export class SubmitServiceInvoiceCommandHandler
   ) {}
 
   async execute(command: SubmitServiceInvoiceCommand) {
-    const { updatePayload, req } = command;
+    const { uuid, req } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await this.manager.submitInvoice(updatePayload, req).toPromise();
+    await this.manager.syncInvoice(uuid, req).toPromise();
     aggregate.commit();
   }
 }
