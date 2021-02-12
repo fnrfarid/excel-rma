@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MaterialModule } from '../../../material/material.module';
 import { RouterTestingModule } from '@angular/router/testing';
+import { STORAGE_TOKEN } from '../../../api/storage/storage.service';
 
 describe('ClaimDetailsComponent', () => {
   let component: ClaimDetailsComponent;
@@ -26,11 +27,15 @@ describe('ClaimDetailsComponent', () => {
           provide: WarrantyService,
           useValue: {
             getWarrantyClaim: () => of({}),
-            getStore: () => ({
+            getStorage: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
             }),
           },
+        },
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {},
         },
       ],
     }).compileComponents();

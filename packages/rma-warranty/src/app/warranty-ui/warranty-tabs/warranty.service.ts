@@ -9,11 +9,14 @@ import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
 import {
+  PRINT_DELIVERY_INVOICE_ENDPOINT,
   LIST_WARRANTY_INVOICE_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   CUSTOMER_ENDPOINT,
 } from '../../constants/url-strings';
 import { APIResponse } from '../../common/interfaces/sales.interface';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { CLOSE } from '../../constants/app-string';
 @Injectable({
   providedIn: 'root',
 })
@@ -21,6 +24,7 @@ export class WarrantyService {
   constructor(
     private http: HttpClient,
     private readonly storage: StorageService,
+    private readonly snackbar: MatSnackBar,
   ) {}
 
   findModels(
@@ -110,5 +114,34 @@ export class WarrantyService {
 
   getStorage() {
     return this.storage;
+  }
+
+  printDocument(doc, invoice_name) {
+    const blob = new Blob([JSON.stringify(doc)], {
+      type: 'application/json',
+    });
+    const uploadData = new FormData();
+    uploadData.append('file', blob, 'purchase_receipts');
+    return this.http
+      .post(PRINT_DELIVERY_INVOICE_ENDPOINT, uploadData, {
+        responseType: 'arraybuffer',
+      })
+      .subscribe({
+        next: success => {
+          const file = new Blob([success], { type: 'application/pdf' });
+          const fileURL = URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = fileURL;
+          a.target = '_blank';
+          a.download = invoice_name + '.pdf';
+          document.body.appendChild(a);
+          a.click();
+        },
+        error: err => {
+          this.snackbar.open(err?.message || err?.error?.message, CLOSE, {
+            duration: 4500,
+          });
+        },
+      });
   }
 }
