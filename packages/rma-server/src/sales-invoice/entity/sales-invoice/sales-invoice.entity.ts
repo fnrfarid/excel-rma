@@ -172,6 +172,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   modified: string;
+
+  @Column()
+  transactionLock: number;
 }
 
 export class Tax {

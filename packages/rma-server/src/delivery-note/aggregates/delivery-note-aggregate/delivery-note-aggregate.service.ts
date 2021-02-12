@@ -4,7 +4,7 @@ import {
   NotImplementedException,
   BadRequestException,
 } from '@nestjs/common';
-import { throwError, of, from } from 'rxjs';
+import { throwError, of, from, forkJoin } from 'rxjs';
 import { switchMap, map, catchError, concatMap, retry } from 'rxjs/operators';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
@@ -205,8 +205,7 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
               return of({});
             }),
             switchMap((response: any) => {
-              this.updateDeliveryNoteState(assignPayload);
-              return of();
+              return this.updateDeliveryNoteState(assignPayload);
             }),
             catchError(err => {
               return throwError(
@@ -232,41 +231,41 @@ export class DeliveryNoteAggregateService extends AggregateRoot {
       }
     });
 
-    this.salesInvoiceService
-      .findOne({
-        name: assignPayload.sales_invoice_name,
-      })
-      .then(sales_invoice => {
+    return forkJoin({
+      sales_invoice: from(
+        this.salesInvoiceService.findOne({
+          name: assignPayload.sales_invoice_name,
+        }),
+      ),
+      serial_no: from(
+        this.serialNoService.updateMany(
+          { serial_no: { $in: serials } },
+          {
+            $set: {
+              queue_state: {
+                delivery_note: {
+                  parent: assignPayload.sales_invoice_name,
+                  warehouse: assignPayload.set_warehouse,
+                },
+              },
+            },
+          },
+        ),
+      ),
+    }).pipe(
+      switchMap(({ sales_invoice }) => {
         const status = this.getStatus(sales_invoice, incrementMap);
-        this.salesInvoiceService
-          .updateMany(
+        return from(
+          this.salesInvoiceService.updateMany(
             { name: assignPayload.sales_invoice_name },
             {
               $set: { status },
               $inc: incrementMap,
             },
-          )
-          .then(success => {})
-          .catch(error => {});
-      })
-      .catch(error => {});
-
-    this.serialNoService
-      .updateMany(
-        { serial_no: { $in: serials } },
-        {
-          $set: {
-            queue_state: {
-              delivery_note: {
-                parent: assignPayload.sales_invoice_name,
-                warehouse: assignPayload.set_warehouse,
-              },
-            },
-          },
-        },
-      )
-      .then(updated => {})
-      .catch(error => {});
+          ),
+        );
+      }),
+    );
   }
 
   getStatus(
