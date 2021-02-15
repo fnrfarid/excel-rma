@@ -10,6 +10,7 @@ import { PurchaseService } from '../../../purchase-ui/services/purchase.service'
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { MaterialModule } from '../../../material/material.module';
 import { DeliveredSerialsComponent } from './delivered-serials.component';
+import { StockEntryService } from '../../../stock-entry/services/stock-entry/stock-entry.service';
 
 describe('DeliveredSerialsComponent', () => {
   let component: DeliveredSerialsComponent;
@@ -37,6 +38,10 @@ describe('DeliveredSerialsComponent', () => {
         },
         {
           provide: CsvJsonService,
+          useValue: {},
+        },
+        {
+          provide: StockEntryService,
           useValue: {},
         },
       ],

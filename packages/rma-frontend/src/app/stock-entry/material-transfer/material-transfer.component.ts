@@ -330,8 +330,13 @@ export class MaterialTransferComponent implements OnInit {
           ];
         this.deliveredSerialsState.uuid = this.uuid;
 
-      default:
-        break;
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        this.deliveredSerialsState.type = DELIVERED_SERIALS_BY.stock_entry_uuid;
+        this.deliveredSerialsState.deliveredSerialsDisplayedColumns =
+          DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+            DELIVERED_SERIALS_BY.purchase_invoice_name
+          ];
+        this.deliveredSerialsState.uuid = this.uuid;
     }
   }
 

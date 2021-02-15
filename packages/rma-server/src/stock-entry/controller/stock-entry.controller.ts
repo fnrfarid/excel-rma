@@ -131,4 +131,22 @@ export class StockEntryController {
       req,
     );
   }
+
+  @Get('v1/get_delivered_serials')
+  @UseGuards(TokenGuard)
+  getDeliveredSerials(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 10,
+    @Query('search') search = '',
+    @Query('find') find,
+    @Req() clientHttpRequest,
+  ) {
+    return this.aggregate.getStockEntryDeliveredSerials(
+      Number(offset),
+      Number(limit),
+      search,
+      find,
+      clientHttpRequest,
+    );
+  }
 }
