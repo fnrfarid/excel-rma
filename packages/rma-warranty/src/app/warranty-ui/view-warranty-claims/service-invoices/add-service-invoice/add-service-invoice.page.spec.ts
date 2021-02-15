@@ -59,7 +59,7 @@ describe('AddServiceInvoicePage', () => {
             getAccountList: (...args) => of([]),
             getCashAccount: (...args) => of([]),
             getAddressList: (...args) => of([]),
-            getBranch: (...args) => switchMap(res => of(res)),
+            getRelayList: (...args) => switchMap(res => of(res)),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

@@ -171,7 +171,7 @@
 </form>
 <!-- 1 this is for list -->
 
-<ion-card>
+<ion-card *ngIf="statusHistory">
   <ion-card-header>
     <ion-grid>
       <ion-row>
@@ -185,11 +185,7 @@
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
-    <mat-table
-      #table
-      style="width: 100%"
-      [dataSource]="warrantyObject?.status_history"
-    >
+    <mat-table #table style="width: 100%" [dataSource]="statusHistory">
       <ng-container matColumnDef="posting_date">
         <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -300,8 +296,8 @@
 
 <ion-card
   *ngIf="
-    (warrantyObject?.status_history)[warrantyObject?.status_history.length - 1]
-      .delivery_status.length
+    statusHistory.length &&
+    statusHistory[statusHistory.length - 1]?.delivery_status.length
   "
 >
   <ion-card-header>

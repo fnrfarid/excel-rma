@@ -112,7 +112,20 @@
                   matInput
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
+                  [matAutocomplete]="contact"
                 />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #contact="matAutocomplete"
+                  [displayWith]="getOption"
+                >
+                  <mat-option
+                    *ngFor="let option of customerContactList | async"
+                    [value]="option"
+                  >
+                    {{ option.name }}
+                  </mat-option>
+                </mat-autocomplete>
                 <mat-error *ngIf="f.customer_contact.hasError('required')">
                   Customer Contact is <strong>required</strong>
                 </mat-error>
@@ -200,10 +213,10 @@
                   [displayWith]="getBranchOption"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList | async"
+                    *ngFor="let option of territoryList"
                     [value]="option"
                   >
-                    {{ option.name}}
+                    {{ option}}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.branch.hasError('required')">
