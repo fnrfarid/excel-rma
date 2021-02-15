@@ -13,8 +13,8 @@
                 validateInput(warehouseFormControl, filteredWarehouseList)
               " [matAutocomplete]="auto" />
                         <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [displayWith]="getOptionText" (optionSelected)="warehouseOptionChanged($event.option.value)">
-                            <mat-option *ngFor="let option of filteredWarehouseList | async" [value]="option.name">
-                                {{ option.name }}
+                            <mat-option *ngFor="let option of filteredWarehouseList | async" [value]="option">
+                                {{ option }}
                             </mat-option>
                         </mat-autocomplete>
                         <mat-error *ngIf="warehouseFormControl.hasError('falseValse')">
