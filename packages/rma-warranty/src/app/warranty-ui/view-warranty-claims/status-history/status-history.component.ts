@@ -33,6 +33,7 @@ export class StatusHistoryComponent implements OnInit {
   territory: any = [];
   currentStatus: any = [];
   deliveryStatus: any = [];
+  statusHistory: any[] = [];
   posting_date: { date: string; time: string };
   stockEntry: StockEntryItems;
 
@@ -67,6 +68,9 @@ export class StatusHistoryComponent implements OnInit {
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
     this.resetWarrantyDetail(this.warrantyObject?.uuid);
+    this.statusHistory = this.warrantyObject?.status_history.length
+      ? this.warrantyObject.status_history
+      : [];
     this.setStockEntryStatusFields();
     this.statusHistoryForm.controls.transfer_branch.disable();
     this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();

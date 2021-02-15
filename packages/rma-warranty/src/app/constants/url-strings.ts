@@ -71,6 +71,7 @@ export const UPDATE_CREDIT_LIMIT_RMA_CUSTOMER_ENDPOINT =
 export const UPDATE_CUSTOMER_CREDIT_LIMIT_ENDPOINT =
   '/api/command/user/api/resource/Customer%20Credit%20Limit';
 export const CUSTOMER_ENDPOINT = '/api/command/user/api/resource/Customer';
+export const CONTACT_ENDPOINT = '/api/command/user/api/resource/Contact';
 export const GET_BALANCE_ON_ENDPOINT =
   '/api/command/user/api/method/erpnext.accounts.utils.get_balance_on';
 export const RELAY_API_RES_COMPANY = '/api/command/user/api/resource/Company';

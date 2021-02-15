@@ -4,7 +4,6 @@ import {
   LIST_ITEMS_ENDPOINT,
   API_ITEM_GET_BY_CODE,
   RELAY_GET_ITEMPRICE_ENDPOINT,
-  LIST_CUSTOMER_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   CREATE_SERVICE_INVOICE_ENDPOINT,
@@ -176,27 +175,26 @@ export class AddServiceInvoiceService {
     );
   }
 
-  getCustomerList(
-    filter = '',
-    sortOrder = 'asc',
-    pageNumber = 0,
-    pageSize = 30,
-  ) {
-    const url = LIST_CUSTOMER_ENDPOINT;
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
-
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<APIResponse>(url, {
-          params,
-          headers,
-        });
-      }),
-    );
+  getRelayList(url: string, value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(url, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getWarrantyDetail(uuid: string) {

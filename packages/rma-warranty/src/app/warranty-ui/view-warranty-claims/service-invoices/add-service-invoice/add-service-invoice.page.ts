@@ -8,7 +8,7 @@ import {
 } from '../../../../common/interfaces/warranty.interface';
 import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { Observable } from 'rxjs';
-import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
+import { startWith, debounceTime } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceInvoiceDetails } from './service-invoice-interface';
 import {
@@ -20,6 +20,10 @@ import {
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadingController } from '@ionic/angular';
 import { ItemsDataSource } from '../items-datasource';
+import {
+  CONTACT_ENDPOINT,
+  CUSTOMER_ENDPOINT,
+} from '../../../../constants/url-strings';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -40,6 +44,7 @@ export class AddServiceInvoicePage implements OnInit {
     'delete',
   ];
   filteredCustomerList: Observable<any[]>;
+  customerContactList: Observable<any[]>;
   territoryList: Observable<any[]>;
   warrantyDetails: WarrantyClaimsDetails;
   accountList: Observable<any[]>;
@@ -71,13 +76,12 @@ export class AddServiceInvoicePage implements OnInit {
       await this.getCurrentDate(),
     );
 
-    this.territoryList = this.serviceInvoiceForm
-      .get('branch')
-      .valueChanges.pipe(
-        debounceTime(500),
-        startWith(''),
-        this.serviceInvoiceService.getBranch(),
-      );
+    this.serviceInvoiceService
+      .getStore()
+      .getItem('territory')
+      .then(territory => {
+        this.territoryList = territory;
+      });
 
     this.serviceInvoiceService.getAccountList().subscribe({
       next: response => {
@@ -98,17 +102,23 @@ export class AddServiceInvoicePage implements OnInit {
       },
       error: error => {},
     });
+
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customer_name')
       .valueChanges.pipe(
         debounceTime(500),
         startWith(''),
-        switchMap(value => {
-          return this.serviceInvoiceService
-            .getCustomerList(value)
-            .pipe(map(res => res.docs));
-        }),
+        this.serviceInvoiceService.getRelayList(CUSTOMER_ENDPOINT),
       );
+
+    this.customerContactList = this.serviceInvoiceForm
+      .get('customer_contact')
+      .valueChanges.pipe(
+        debounceTime(500),
+        startWith(''),
+        this.serviceInvoiceService.getRelayList(CONTACT_ENDPOINT),
+      );
+
     this.serviceInvoiceService
       .getWarrantyDetail(this.activatedRoute.snapshot.params.uuid)
       .subscribe({
@@ -143,8 +153,8 @@ export class AddServiceInvoicePage implements OnInit {
   createFormGroup() {
     this.serviceInvoiceForm = new FormGroup({
       customer_name: new FormControl('', [Validators.required]),
-      customer_contact: new FormControl('', [Validators.required]),
-      customer_address: new FormControl('', [Validators.required]),
+      customer_contact: new FormControl(''),
+      customer_address: new FormControl(''),
       third_party_name: new FormControl(''),
       third_party_contact: new FormControl(''),
       third_party_address: new FormControl(''),
@@ -334,7 +344,7 @@ export class AddServiceInvoicePage implements OnInit {
   }
 
   getBranchOption(option) {
-    if (option) return option.name;
+    if (option) return option;
   }
 
   getSelectedOption(option) {}
