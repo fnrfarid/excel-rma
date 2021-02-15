@@ -5,6 +5,7 @@ import { SalesService } from '../../../sales-ui/services/sales.service';
 import { APIResponse } from '../../../purchase-ui/view-purchase-invoice/purchase-assign-serials/purchase-serials-datasource';
 import { DELIVERED_SERIALS_BY } from '../../../constants/app-string';
 import { PurchaseService } from '../../../purchase-ui/services/purchase.service';
+import { StockEntryService } from '../../../stock-entry/services/stock-entry/stock-entry.service';
 
 export class CommonDeliveredSerialsDataSource extends DataSource<any> {
   itemSubject = new BehaviorSubject<any[]>([]);
@@ -19,6 +20,7 @@ export class CommonDeliveredSerialsDataSource extends DataSource<any> {
   constructor(
     private readonly salesService: SalesService,
     private readonly purchaseService: PurchaseService,
+    private readonly stockService: StockEntryService,
   ) {
     super();
   }
@@ -85,20 +87,31 @@ export class CommonDeliveredSerialsDataSource extends DataSource<any> {
     pageIndex,
     pageSize,
   ) {
-    if (state.type === DELIVERED_SERIALS_BY.sales_invoice_name) {
-      return this.salesService.getDeliveredSerials(
-        state.uuid,
-        search,
-        pageIndex,
-        pageSize,
-      );
+    switch (state.type) {
+      case DELIVERED_SERIALS_BY.sales_invoice_name:
+        return this.salesService.getDeliveredSerials(
+          state.uuid,
+          search,
+          pageIndex,
+          pageSize,
+        );
+
+      case DELIVERED_SERIALS_BY.stock_entry_uuid:
+        return this.stockService.getDeliveredSerials(
+          state.uuid,
+          search,
+          pageIndex,
+          pageSize,
+        );
+
+      default:
+        return this.purchaseService.getDeliveredSerials(
+          state.uuid,
+          search,
+          pageIndex,
+          pageSize,
+        );
     }
-    return this.purchaseService.getDeliveredSerials(
-      state.uuid,
-      search,
-      pageIndex,
-      pageSize,
-    );
   }
 
   update(data) {

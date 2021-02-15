@@ -725,6 +725,41 @@ export class StockEntryAggregateService {
         return throwError(new BadRequestException('Invalid Stock Entry type.'));
     }
   }
+
+  getStockEntryDeliveredSerials(offset, limit, search, uuid, req) {
+    return from(this.stockEntryService.findOne({ uuid })).pipe(
+      switchMap(stockEntry => {
+        if (!stockEntry) {
+          return throwError(new NotFoundException('Stock Entry not found.'));
+        }
+        const serials = [];
+        const regex = new RegExp(search, 'i');
+        stockEntry.items.forEach(item => {
+          if (item.has_serial_no) {
+            if (search && search !== '') {
+              item.serial_no.forEach(eachSerial =>
+                regex.test(eachSerial) ? serials.push(eachSerial) : null,
+              );
+            } else {
+              serials.push(...item.serial_no);
+            }
+          }
+        });
+
+        const serialNoQuery: any = { serial_no: { $in: serials } };
+
+        return forkJoin({
+          docs: this.serialNoService.aggregateList(
+            offset,
+            limit,
+            serialNoQuery,
+          ),
+          length: of(serials.length),
+          offset: of(offset),
+        });
+      }),
+    );
+  }
 }
 
 export interface SerialHash {
