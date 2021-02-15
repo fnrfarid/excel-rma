@@ -22,6 +22,7 @@ import {
   DELIVERY_NOTE,
   ASSIGN_SERIAL_DIALOG_QTY,
   DELIVERED_SERIALS_BY,
+  WAREHOUSES,
 } from '../../../constants/app-string';
 import {
   ERROR_FETCHING_SALES_INVOICE,
@@ -165,7 +166,7 @@ export class SerialsComponent implements OnInit {
     this.filteredWarehouseList = this.warehouseFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getWarehouseList(value);
+        return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
       }),
     );
   }
