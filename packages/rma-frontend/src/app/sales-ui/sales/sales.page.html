@@ -136,7 +136,23 @@
                 </mat-select>
               </mat-form-field>
             </ion-col>
-            <ion-col size="6">
+            <ion-col>
+              <mat-form-field class="full-width">
+                <mat-label>Delivery Status</mat-label>
+                <mat-select
+                  formControlName="delivery_status"
+                  (selectionChange)="deliveryStatusChange($event.value)"
+                >
+                  <mat-option
+                    *ngFor="let delivery_status of delivery_statuses"
+                    [value]="delivery_status"
+                  >
+                    {{delivery_status}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
               <mat-form-field class="full-width">
                 <input
                   matInput
@@ -333,6 +349,17 @@
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
                 <mat-progress-bar class="right-margin" [color]="row.delivered_percent === 100 ? 'primary' : 'warn'" mode="determinate" [value]="row.delivered_percent"></mat-progress-bar>
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+
+            <!-- delivery status column -->
+            <ng-container matColumnDef="delivery_status">
+              <mat-header-cell *matHeaderCellDef>
+                Delivery Status
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{row.delivery_status}}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
