@@ -312,8 +312,9 @@ export class AddSalesInvoicePage implements OnInit {
     item_code: string;
     bundle_items?: any[];
     has_bundle_item?: boolean;
+    is_stock_item?: number;
   }) {
-    if (item.bundle_items || item.has_bundle_item) {
+    if (item.bundle_items || item.has_bundle_item || item.is_stock_item === 0) {
       return of({ message: 1000000 });
     }
     return this.itemPriceService.getStockBalance(
@@ -447,6 +448,7 @@ export class AddSalesInvoicePage implements OnInit {
           salesInvoiceDetails.total += item.amount;
           item.has_bundle_item =
             item.has_bundle_item || item.bundle_items ? true : false;
+          item.is_stock_item = item.is_stock_item;
           return item;
         }
       });
@@ -540,6 +542,7 @@ export class AddSalesInvoicePage implements OnInit {
           salesInvoiceDetails.total += item.amount;
           item.has_bundle_item =
             item.has_bundle_item || item.bundle_items ? true : false;
+          item.is_stock_item = item.is_stock_item;
           return item;
         }
       });

@@ -51,5 +51,6 @@ export class MaterialTransferDto {
   posting_date: string;
   posting_time: string;
   items: StockEntryRow[];
+  item_data: any;
   status?: string;
 }

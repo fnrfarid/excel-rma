@@ -207,7 +207,7 @@ export class SalesInvoicePoliciesService {
         }
         return from(sales_invoice.items).pipe(
           concatMap(item => {
-            if (item.has_bundle_item) {
+            if (item.has_bundle_item || item.is_stock_item === 0) {
               return of(true);
             }
             const body = {

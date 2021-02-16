@@ -289,6 +289,7 @@ export class StockEntrySyncService {
 
   parseFrappePayload(payload: StockEntry) {
     delete payload.names;
+    delete payload.item_data;
     switch (payload.stock_entry_type) {
       case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
         break;

@@ -80,7 +80,6 @@ export class ItemService {
     keys.forEach(key => {
       if (query[key]) {
         if (['bundle_items', 'is_stock_item'].includes(key)) {
-          delete query[key];
           return;
         }
         if (key === 'status' && query[key] === 'All') {

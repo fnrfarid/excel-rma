@@ -33,6 +33,7 @@ export class Item {
   bundle_items?: any[];
   assigned?: number;
   remaining?: number;
+  is_stock_item?: number;
   item_group?: string;
   item_defaults?: ItemDefaults;
   source_warehouse?: string;
