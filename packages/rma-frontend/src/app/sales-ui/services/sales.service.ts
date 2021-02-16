@@ -49,6 +49,7 @@ import {
   RELAY_GET_ITEM_BRAND_ENDPOINT,
   PRINT_DELIVERY_INVOICE_ENDPOINT,
   STOCK_AVAILABILITY_ENDPOINT,
+  UPDATE_DELIVERY_STATUS_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -244,6 +245,15 @@ export class SalesService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
+  updateDeliveryStatus(payload) {
+    const url = `${UPDATE_DELIVERY_STATUS_ENDPOINT}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, payload, { headers });
       }),
     );
   }

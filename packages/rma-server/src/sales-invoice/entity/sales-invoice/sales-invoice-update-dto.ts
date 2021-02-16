@@ -140,6 +140,9 @@ export class SalesInvoiceUpdateDto {
 
   @IsOptional()
   remarks: string;
+
+  @IsOptional()
+  delivery_status: string;
 }
 
 export class TaxDto {

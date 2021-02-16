@@ -174,6 +174,9 @@ export class SalesInvoice extends BaseEntity {
   modified: string;
 
   @Column()
+  delivery_status: string;
+
+  @Column()
   transactionLock: number;
 }
 

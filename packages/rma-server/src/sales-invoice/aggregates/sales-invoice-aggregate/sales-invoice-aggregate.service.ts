@@ -597,6 +597,25 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
     );
   }
 
+  async updateDeliveryStatus(payload) {
+    const salesInvoice = await this.salesInvoiceService.findOne(payload.uuid);
+    if (
+      salesInvoice.status !== SALES_INVOICE_STATUS.canceled ||
+      salesInvoice.status !== SALES_INVOICE_STATUS.rejected
+    ) {
+      this.salesInvoiceService
+        .updateOne(
+          { uuid: payload.uuid },
+          {
+            $set: { delivery_status: payload.delivery_status },
+          },
+        )
+        .then(success => {})
+        .catch(error => {});
+      return of({});
+    }
+  }
+
   createCreditNote(
     settings,
     assignPayload: CreateSalesReturnDto,
