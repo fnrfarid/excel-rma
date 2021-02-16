@@ -52,7 +52,6 @@ export class ItemPriceDataSource extends DataSource<ListingData> {
     pageSize = 30,
   ) {
     this.loadingSubject.next(true);
-    filter.is_stock_item = 1;
     try {
       filter = JSON.stringify(filter);
     } catch {

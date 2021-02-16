@@ -47,6 +47,9 @@ export class StockEntryDto {
   @IsString()
   territory: string;
 
+  @IsOptional()
+  item_data: any;
+
   @IsNotEmpty()
   @IsString()
   doctype: string = STOCK_ENTRY;
@@ -63,10 +66,10 @@ export class StockEntryItemDto {
   s_warehouse: string;
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   basic_rate?: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   t_warehouse: string;
 

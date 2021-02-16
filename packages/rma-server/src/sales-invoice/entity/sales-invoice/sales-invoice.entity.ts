@@ -193,6 +193,7 @@ export class Item {
   item_code: string;
   has_serial_no?: number;
   has_bundle_item?: boolean;
+  is_stock_item?: number;
   item_name: string;
   qty: number;
   rate: number;
