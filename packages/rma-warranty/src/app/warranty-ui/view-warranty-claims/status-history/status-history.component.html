@@ -1,5 +1,8 @@
 <form [formGroup]="statusHistoryForm">
-  <ion-card>
+  <ion-card-title class="ion-text-center" *ngIf="check()">
+    Delivered to Customer
+  </ion-card-title>
+  <ion-card *ngIf="!check()">
     <ion-card-header>
       <ion-row class="align">
         <ion-col>
@@ -296,8 +299,8 @@
 
 <ion-card
   *ngIf="
-    statusHistory.length &&
-    statusHistory[statusHistory.length - 1]?.delivery_status.length
+    statusHistory?.data?.length &&
+    statusHistory?.data[statusHistory?.data?.length - 1]?.delivery_status.length
   "
 >
   <ion-card-header>

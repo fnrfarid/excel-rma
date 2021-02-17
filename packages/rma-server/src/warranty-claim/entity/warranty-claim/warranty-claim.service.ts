@@ -69,6 +69,7 @@ export class WarrantyClaimService {
 
     const $and: any[] = [
       { $or },
+      { set: { $in: territory.set } },
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
     ];

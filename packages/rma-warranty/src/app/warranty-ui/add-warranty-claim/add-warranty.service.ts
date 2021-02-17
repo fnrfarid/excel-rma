@@ -2,15 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { switchMap, map } from 'rxjs/operators';
 import {
-  LIST_CUSTOMER_ENDPOINT,
   GET_DIRECT_SERIAL_ENDPOINT,
-  LIST_ITEMS_ENDPOINT,
-  CREATE_WARRANTY_CLAIM_ENDPOINT,
+  CREATE_BULK_WARRANTY_CLAIM_ENDPOINT,
   GET_ITEM_BY_ITEM_CODE_ENDPOINT,
   RELAY_GET_FULL_ITEM_ENDPOINT,
   GET_TERRITORY_BY_WAREHOUSE_ENDPOINT,
   CUSTOMER_ENDPOINT,
   GET_LIST_PROBLEM_ENDPOINT,
+  CREATE_WARRANTY_CLAIM_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -54,27 +53,26 @@ export class AddWarrantyService {
     );
   }
 
-  getCustomerList(
-    filter = '',
-    sortOrder = 'asc',
-    pageNumber = 0,
-    pageSize = 30,
-  ) {
-    const url = LIST_CUSTOMER_ENDPOINT;
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
-
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<APIResponse>(url, {
-          params,
-          headers,
-        });
-      }),
-    );
+  getCustomerList(value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["customer_name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(CUSTOMER_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getSerial(name: string) {
@@ -91,26 +89,30 @@ export class AddWarrantyService {
     );
   }
 
-  getItemList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 30) {
-    const url = LIST_ITEMS_ENDPOINT;
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageNumber * pageSize).toString())
-      .set('search', encodeURIComponent(filter))
-      .set('sort', sortOrder);
-
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<APIResponse>(url, {
-          params,
-          headers,
-        });
-      }),
-    );
+  getItemList(value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["item_name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_GET_FULL_ITEM_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getItemBrandFromERP(item_code: string) {
-    const url = `${RELAY_GET_FULL_ITEM_ENDPOINT}${item_code}`;
+    const url = `${RELAY_GET_FULL_ITEM_ENDPOINT}/${item_code}`;
     const params = new HttpParams();
 
     return this.getHeaders().pipe(
@@ -140,6 +142,21 @@ export class AddWarrantyService {
 
   createWarrantyClaim(warrantyClaimDetails: WarrantyClaimsDetails) {
     const url = CREATE_WARRANTY_CLAIM_ENDPOINT;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<WarrantyClaimsDetails>(
+          url,
+          warrantyClaimDetails,
+          {
+            headers,
+          },
+        );
+      }),
+    );
+  }
+
+  createBulkWarrantyClaim(warrantyClaimDetails: WarrantyClaimsDetails) {
+    const url = CREATE_BULK_WARRANTY_CLAIM_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post<WarrantyClaimsDetails>(

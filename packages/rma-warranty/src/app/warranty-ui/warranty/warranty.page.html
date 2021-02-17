@@ -23,6 +23,7 @@
             color="tertiary"
             [disabled]="!dataSource.length"
             (click)="downloadSerials()"
+            fill="outline"
           >
             Download CSV
           </ion-button>
@@ -234,6 +235,13 @@
             >
               Clear
             </ion-button>
+            <ion-button
+              color="tertiary"
+              (click)="getBulkClaims()"
+              fill="outline"
+            >
+              Bulk Claims
+            </ion-button>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -398,7 +406,10 @@
 
           <mat-row
             *matRowDef="let row; columns: displayedColumns;"
-            [routerLink]="['/warranty/view-warranty-claims',row.uuid]"
+            (click)="warrantyRoute(row)"
+            [ngStyle]="{'background-color':row.set==='Bulk'?'#F4F4FB':row.set==='Part'?'#FDFAE5':'rgb(255, 255, 255)'
+
+          }"
           ></mat-row>
           <mat-footer-row
             class="footer"

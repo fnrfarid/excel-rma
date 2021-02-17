@@ -7,9 +7,10 @@ import { DURATION } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { AddServiceInvoiceService } from '../service-invoices/add-service-invoice/add-service-invoice.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'stock-entry',
@@ -40,12 +41,18 @@ export class StockEntryComponent implements OnInit {
     private readonly loadingController: LoadingController,
     private readonly route: ActivatedRoute,
     private readonly addserviceInvoiceService: AddServiceInvoiceService,
-  ) {}
+    private readonly router: Router,
+  ) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(val => {
+        this.dataSource.loadItems(undefined, undefined, undefined, {
+          warrantyClaimUuid: this.route.snapshot.params.uuid,
+        });
+      });
+  }
 
   ngOnInit() {
-    this.route.params.subscribe(() => {
-      this.paginator.firstPage();
-    });
     this.addserviceInvoiceService
       .getWarrantyDetail(this.warrantyObject?.uuid)
       .subscribe({

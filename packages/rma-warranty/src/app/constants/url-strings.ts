@@ -118,8 +118,10 @@ export const GET_DIRECT_SERIAL_ENDPOINT = '/api/serial_no/v1/get_direct_serial';
 export const GET_SERIAL_HISTORY_ENDPOINT = '/api/serial_no/v1/get_history';
 export const GET_ITEM_BY_ITEM_CODE_ENDPOINT = '/api/item/v1/get_by_item_code';
 export const CREATE_WARRANTY_CLAIM_ENDPOINT = 'api/warranty_claim/v1/create';
+export const CREATE_BULK_WARRANTY_CLAIM_ENDPOINT =
+  'api/warranty_claim/v1/create_bulk';
 export const RELAY_GET_FULL_ITEM_ENDPOINT =
-  '/api/command/user/api/resource/Item/';
+  '/api/command/user/api/resource/Item';
 export const RELAY_GET_ITEM_STOCK_ENDPOINT =
   '/api/command/user/api/resource/Bin';
 export const ADD_STATUS_HISTORY_ENDPOINT =

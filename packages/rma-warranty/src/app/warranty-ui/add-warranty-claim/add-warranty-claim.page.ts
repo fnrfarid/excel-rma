@@ -10,9 +10,15 @@ import {
   SerialNoDetails,
   WarrantyItem,
   WarrantyClaimsDetails,
+  WarrantyBulkProducts,
 } from '../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DURATION, WARRANTY_TYPE } from './../../constants/app-string';
+import {
+  CATEGORY,
+  CLOSE,
+  DURATION,
+  WARRANTY_TYPE,
+} from './../../constants/app-string';
 import {
   SOMETHING_WENT_WRONG,
   ITEM_BRAND_FETCH_ERROR,
@@ -34,12 +40,24 @@ export class AddWarrantyClaimPage implements OnInit {
   contact = {} as any;
   filteredCustomerList: any;
   claimList: any;
+  categoryList: any;
   getSerialData: SerialNoDetails;
   warrantyState: WarrantyState;
+  bulkProducts: WarrantyBulkProducts[] = [];
   productList: any;
   territoryList: any;
   itemDetail: any;
   problemList: any;
+  displayedColumns = [
+    'serial_no',
+    'claim_type',
+    'invoice_no',
+    'warranty_end_date',
+    'item_name',
+    'product_brand',
+    'problem',
+    'item_code',
+  ];
 
   constructor(
     private location: Location,
@@ -52,6 +70,7 @@ export class AddWarrantyClaimPage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.categoryList = ['Bulk', 'Single'];
     this.claimList = [
       'Warranty',
       'Non Warranty',
@@ -70,6 +89,7 @@ export class AddWarrantyClaimPage implements OnInit {
       third_party_name: { disabled: true, active: true },
       third_party_contact: { disabled: true, active: true },
       third_party_address: { disabled: true, active: true },
+      category: { disabled: true, active: true },
     };
     this.createForm();
     this.warrantyClaimForm.controls.received_on.setValue(
@@ -82,20 +102,15 @@ export class AddWarrantyClaimPage implements OnInit {
     this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      switchMap(value => {
-        return this.warrantyService.getCustomerList(value);
-      }),
-      map(res => res.docs),
+      this.warrantyService.getCustomerList(),
     );
 
     this.productList = this.warrantyClaimForm.controls.product_name.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      switchMap(value => {
-        return this.warrantyService.getItemList(value);
-      }),
-      map(res => res.docs),
+      this.warrantyService.getItemList(),
     );
+
     this.warrantyService
       .getStorage()
       .getItem('territory')
@@ -129,6 +144,7 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_name: { disabled: true, active: true },
           third_party_contact: { disabled: true, active: true },
           third_party_address: { disabled: true, active: true },
+          category: { disabled: true, active: true },
         };
         this.isDisabled();
         this.clearAllValidators('Non Serial Warranty');
@@ -147,6 +163,7 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_name: { disabled: true, active: true },
           third_party_contact: { disabled: true, active: true },
           third_party_address: { disabled: true, active: true },
+          category: { disabled: true, active: true },
         };
         this.isDisabled();
         this.clearAllValidators('Third Party Warranty');
@@ -165,6 +182,7 @@ export class AddWarrantyClaimPage implements OnInit {
           third_party_name: { disabled: true, active: true },
           third_party_contact: { disabled: true, active: true },
           third_party_address: { disabled: true, active: true },
+          category: { disabled: true, active: true },
         };
         this.isDisabled();
         this.clearAllValidators('Warranty');
@@ -235,6 +253,27 @@ export class AddWarrantyClaimPage implements OnInit {
     const loading = await this.loadingController.create();
     await loading.present();
     const detail = await this.assignFields();
+    if (this.warrantyClaimForm.controls.category.value === CATEGORY.BULK) {
+      if (detail.bulk_products?.length > 1) {
+        return this.warrantyService.createBulkWarrantyClaim(detail).subscribe({
+          next: () => {
+            loading.dismiss();
+            this.router.navigate(['/warranty']);
+          },
+          error: ({ message }) => {
+            loading.dismiss();
+            if (!message) message = SOMETHING_WENT_WRONG;
+            this.snackbar.open(message, 'Close', {
+              duration: DURATION,
+            });
+          },
+        });
+      }
+      loading.dismiss();
+      this.snackbar.open(`Please use single claim for one product`, CLOSE, {
+        duration: DURATION,
+      });
+    }
 
     return this.warrantyService.createWarrantyClaim(detail).subscribe({
       next: () => {
@@ -253,23 +292,38 @@ export class AddWarrantyClaimPage implements OnInit {
 
   async assignFields() {
     const warrantyClaimDetails = {} as WarrantyClaimsDetails;
-    warrantyClaimDetails.claim_type = this.warrantyClaimForm.controls.claim_type.value;
     warrantyClaimDetails.received_on = this.warrantyClaimForm.controls.received_on.value;
     warrantyClaimDetails.delivery_date = this.warrantyClaimForm.controls.delivery_date.value;
     warrantyClaimDetails.receiving_branch = this.warrantyClaimForm.controls.receiving_branch.value;
     warrantyClaimDetails.delivery_branch = this.warrantyClaimForm.controls.delivery_branch.value;
-    warrantyClaimDetails.product_brand = this.warrantyClaimForm.controls.product_brand.value;
-    warrantyClaimDetails.problem = this.warrantyClaimForm.controls.problem.value.problem_name;
-    warrantyClaimDetails.problem_details = this.warrantyClaimForm.controls.problem_details.value;
+    warrantyClaimDetails.category = this.warrantyClaimForm.controls.category.value;
+    switch (this.warrantyClaimForm.controls.category.value) {
+      case CATEGORY.BULK:
+        warrantyClaimDetails.bulk_products = this.bulkProducts;
+        break;
+      case CATEGORY.SINGLE:
+        warrantyClaimDetails.set = CATEGORY.SINGLE;
+        warrantyClaimDetails.claim_type = this.warrantyClaimForm.controls.claim_type.value;
+        warrantyClaimDetails.product_brand = this.warrantyClaimForm.controls.product_brand.value;
+        warrantyClaimDetails.problem = this.warrantyClaimForm.controls.problem.value.problem_name;
+        warrantyClaimDetails.problem_details = this.warrantyClaimForm.controls.problem_details.value;
+        warrantyClaimDetails.item_name = this.warrantyClaimForm.controls.product_name.value.item_name;
+        warrantyClaimDetails.item_code = this.itemDetail.item_code;
+        break;
+
+      default:
+        this.snackbar.open(`Please select valid category`, CLOSE, {
+          duration: DURATION,
+        });
+        break;
+    }
     warrantyClaimDetails.remarks = this.warrantyClaimForm.controls.remarks.value;
     warrantyClaimDetails.customer_contact = this.warrantyClaimForm.controls.customer_contact.value;
     warrantyClaimDetails.customer_address = this.warrantyClaimForm.controls.customer_address.value;
     warrantyClaimDetails.third_party_name = this.warrantyClaimForm.controls.third_party_name.value;
     warrantyClaimDetails.third_party_contact = this.warrantyClaimForm.controls.third_party_contact.value;
     warrantyClaimDetails.third_party_address = this.warrantyClaimForm.controls.third_party_address.value;
-    warrantyClaimDetails.item_name = this.warrantyClaimForm.controls.product_name.value.item_name;
     warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.name;
-    warrantyClaimDetails.item_code = this.itemDetail.item_code;
     warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
     warrantyClaimDetails.posting_time = await (
       await this.getDateTime(new Date())
@@ -299,6 +353,7 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyClaimForm = new FormGroup({
       warranty_end_date: new FormControl(''),
       claim_type: new FormControl('', [Validators.required]),
+      category: new FormControl('', [Validators.required]),
       received_on: new FormControl(''),
       delivery_date: new FormControl(''),
       receiving_branch: new FormControl(''),
@@ -469,7 +524,6 @@ export class AddWarrantyClaimPage implements OnInit {
         this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
       },
       error: ({ message }) => {
-        this.openERPItem(option.item_code);
         if (!message) message = `${ITEM_NOT_FOUND}`;
         this.snackbar.open(message, 'Close', {
           duration: DURATION,
@@ -511,6 +565,46 @@ export class AddWarrantyClaimPage implements OnInit {
         window.open(`${auth_url}/desk#Form/Item/${item_code}`, '_blank');
       });
   }
+
+  appendProduct() {
+    if (this.validateProduct()) {
+      this.bulkProducts = this.bulkProducts.concat({
+        claim_type: this.warrantyClaimForm.controls.claim_type.value,
+        product_brand: this.warrantyClaimForm.controls.product_brand.value,
+        problem: this.warrantyClaimForm.controls.problem.value.problem_name,
+        problem_details: this.warrantyClaimForm.controls.problem_details.value,
+        item_name: this.warrantyClaimForm.controls.product_name.value.item_name,
+        item_code: this.itemDetail.item_code,
+        serial_no: this.warrantyClaimForm.controls.serial_no.value,
+        invoice_no: this.warrantyClaimForm.controls.invoice_no.value,
+        warranty_end_date: this.warrantyClaimForm.controls.warranty_end_date
+          .value,
+      });
+    }
+  }
+
+  validateProduct() {
+    let check: boolean;
+    if (this.bulkProducts.length) {
+      for (const product of this.bulkProducts) {
+        if (
+          product.serial_no === this.warrantyClaimForm.controls.serial_no.value
+        ) {
+          this.snackbar.open('Serial Already Exists', CLOSE, {
+            duration: DURATION,
+          });
+          check = false;
+        } else {
+          check = true;
+        }
+      }
+    } else {
+      check = true;
+    }
+    return check;
+  }
+
+  getUpdate(event) {}
 
   branchOptionChanged(option) {}
 }

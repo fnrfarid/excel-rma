@@ -30,6 +30,7 @@ import { WarrantyClaimsListQueryDto } from '../../../constants/listing-dto/warra
 import { StatusHistoryDto } from '../../entity/warranty-claim/status-history-dto';
 import { AddStatusHistoryCommand } from '../../command/add-status-history/add-status-history.command';
 import { RemoveStatusHistoryCommand } from '../../command/remove-status-history/remove-status-history.command';
+import { BulkWarrantyClaimDto } from '../../entity/warranty-claim/bulk-warranty-claim-dto';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
@@ -42,6 +43,18 @@ export class WarrantyClaimController {
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(@Body() warrantyClaimPayload: WarrantyClaimDto, @Req() req) {
+    return await this.commandBus.execute(
+      new AddWarrantyClaimCommand(warrantyClaimPayload, req),
+    );
+  }
+
+  @Post('v1/create_bulk')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async createBulk(
+    @Body() warrantyClaimPayload: BulkWarrantyClaimDto,
+    @Req() req,
+  ) {
     return await this.commandBus.execute(
       new AddWarrantyClaimCommand(warrantyClaimPayload, req),
     );

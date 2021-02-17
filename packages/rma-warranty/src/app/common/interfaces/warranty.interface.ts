@@ -99,12 +99,29 @@ export interface WarrantyClaimsDetails {
   status_history?: StatusHistoryDetails[];
   posting_time: Date;
   uuid?: string;
-  replace_serial: string[];
-  replace_product: string[];
-  replace_warehouse: string[];
-  damaged_serial: string[];
-  damage_warehouse: string[];
-  damage_product: string[];
+  category?: string;
+  set?: string;
+  bulk_products: WarrantyBulkProducts[];
+  replace_serial: string;
+  replace_product: string;
+  replace_warehouse: string;
+  damaged_serial: string;
+  damage_warehouse: string;
+  damage_product: string;
+  parent?: string;
+}
+
+export class WarrantyBulkProducts {
+  serial_no?: string;
+  claim_type?: string;
+  invoice_no?: string;
+  warranty_end_date?: string;
+  item_name?: string;
+  product_brand?: string;
+  problem?: string;
+  problem_details?: string;
+  remarks?: string;
+  item_code?: string;
 }
 
 export class WarrantyState {
@@ -119,6 +136,7 @@ export class WarrantyState {
   third_party_name: { disabled: boolean; active: boolean };
   third_party_contact: { disabled: boolean; active: boolean };
   third_party_address: { disabled: boolean; active: boolean };
+  category: { disabled: boolean; active: boolean };
 }
 
 export class Warranty {

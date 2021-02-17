@@ -250,6 +250,12 @@ export enum CLAIM_STATUS {
   REJECTED = 'Rejected',
 }
 
+export enum CATEGORY {
+  BULK = 'Bulk',
+  SINGLE = 'Single',
+  PART = 'Part',
+}
+
 export const DELIVERY_STATUS = {
   REPAIRED: 'Repaired',
   REPLACED: 'Replaced',
