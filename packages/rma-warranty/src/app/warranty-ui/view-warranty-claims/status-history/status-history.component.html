@@ -299,8 +299,8 @@
 
 <ion-card
   *ngIf="
-    statusHistory.length &&
-    statusHistory[statusHistory.length - 1]?.delivery_status.length
+    statusHistory?.data?.length &&
+    statusHistory?.data[statusHistory?.data?.length - 1]?.delivery_status.length
   "
 >
   <ion-card-header>
