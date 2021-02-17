@@ -10,8 +10,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AddWarrantyService } from './add-warranty.service';
-import { of } from 'rxjs';
+import { empty, of } from 'rxjs';
 import { StorageService } from '../../api/storage/storage.service';
+import { switchMap } from 'rxjs/operators';
 
 describe('AddWarrantyClaimPage', () => {
   let component: AddWarrantyClaimPage;
@@ -46,9 +47,9 @@ describe('AddWarrantyClaimPage', () => {
           useValue: {
             getProblemList: (...args) => of([{}]),
             createWarrantyClaim: (...args) => of({}),
-            getCustomerList: (...args) => of([]),
-            getItemList: (...args) => of([]),
-            getItem: (...args) => of({}),
+            getCustomerList: (...args) => switchMap(res => empty()),
+            getItemList: (...args) => switchMap(res => empty()),
+            getItem: (...args) => switchMap(res => empty()),
             getSerial: (...args) => of({}),
             getTerritoryByWarehouse: (...args) => of({}),
             getStorage: () => ({

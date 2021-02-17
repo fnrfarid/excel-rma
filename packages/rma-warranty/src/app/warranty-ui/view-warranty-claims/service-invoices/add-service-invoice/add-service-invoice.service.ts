@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 import {
-  LIST_ITEMS_ENDPOINT,
   API_ITEM_GET_BY_CODE,
   RELAY_GET_ITEMPRICE_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
@@ -15,6 +14,7 @@ import {
   SYNC_SERVICE_INVOICE_ENDPOINT,
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
   RELAY_LIST_BRANCH_ENDPOINT,
+  RELAY_GET_FULL_ITEM_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { APIResponse } from '../../../../common/interfaces/sales.interface';
@@ -77,45 +77,28 @@ export class AddServiceInvoiceService {
     });
   }
 
-  getItemList(
-    filter = {},
-    sortOrder: any = { item_name: 'asc' },
-    pageIndex = 0,
-    pageSize = 30,
-  ) {
-    try {
-      sortOrder = JSON.stringify(sortOrder);
-    } catch {
-      sortOrder = JSON.stringify({ item_name: 'asc' });
-    }
-    const url = LIST_ITEMS_ENDPOINT;
-    const query: any = {};
-    query.item_name = filter;
-    query.disabled = 0;
-
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageIndex * pageSize).toString())
-      .set('search', encodeURIComponent(JSON.stringify(query)))
-      .set('sort', sortOrder);
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http
-          .get<APIResponse>(url, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.docs);
-            }),
-            catchError(err => {
-              return of(this.itemList);
-            }),
-          );
-      }),
-    );
+  getItemList(value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["item_name","like","%${value}%"],["item_group","like","RMA SERVICE"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_GET_FULL_ITEM_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
+
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {

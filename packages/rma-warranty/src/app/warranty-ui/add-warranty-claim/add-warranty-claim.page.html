@@ -28,9 +28,7 @@
   <form [formGroup]="warrantyClaimForm">
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Product Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Product Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
@@ -112,30 +110,30 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.product_name.active">
+            <ion-col>
               <mat-form-field class="example-full-width">
                 <input
                   matInput
                   type="text"
                   placeholder="Product Name"
                   formControlName="product_name"
-                  [matAutocomplete]="productName"
+                  [matAutocomplete]="product_name"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
-                  #productName="matAutocomplete"
+                  #product_name="matAutocomplete"
                   [displayWith]="getItemOption"
                   (optionSelected)="itemOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of productList |async"
+                    *ngFor="let option of productList | async"
                     [value]="option"
                   >
                     {{ option.item_name }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.product_name.hasError('required')">
-                  Product Name is <strong>required</strong>
+                  Product is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -202,16 +200,100 @@
                 />
               </mat-form-field>
             </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Claim Category"
+                  formControlName="category"
+                  [matAutocomplete]="claimCategory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #claimCategory="matAutocomplete"
+                  [displayWith]="getOption"
+                >
+                  <mat-option
+                    *ngFor="let option of categoryList"
+                    [value]="option"
+                  >
+                    {{ option }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.category.hasError('required')">
+                  Claim Category is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align">
+            <ion-col class="ion-text-left">
+              <ion-button
+                color="tertiary"
+                [disabled]="f.category.value !=='Bulk'"
+                (click)="appendProduct()"
+              >
+                Add
+              </ion-button>
+            </ion-col>
             <ion-col> </ion-col>
           </ion-row>
         </ion-grid>
       </ion-card-content>
     </ion-card>
+    <ion-card *ngIf="bulkProducts.length">
+      <ion-card-header>
+        <ion-grid>
+          <ion-row>
+            <ion-col class="ion-text-left">
+              <ion-card-title>
+                <ion-text color="tertiary">Bulk Product </ion-text>
+              </ion-card-title>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-header>
+      <ion-card-content class="ion-no-padding">
+        <div class="example-container mat-elevation-z8">
+          <mat-table [dataSource]="bulkProducts">
+            <ng-container
+              matColumnDef="{{column}}"
+              *ngFor="let column of displayedColumns"
+            >
+              <mat-header-cell *matHeaderCellDef>{{column}}</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <ng-container *ngIf="row[column]">
+                  {{ row[column] }}
+                </ng-container>
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+            <mat-footer-row
+              class="footer"
+              *matFooterRowDef="displayedColumns; sticky: true"
+            ></mat-footer-row>
+          </mat-table>
+        </div>
+        <mat-card-actions>
+          <mat-paginator
+            #paginator
+            class="mat-paginator-sticky"
+            (page)="getUpdate($event)"
+            [length]="bulkProducts.length"
+            [pageSizeOptions]="[30, 50, 100, 500]"
+          >
+          </mat-paginator>
+        </mat-card-actions>
+      </ion-card-content>
+    </ion-card>
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Customer Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Customer Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
@@ -236,9 +318,7 @@
                     [value]="option"
                   >
                     {{ option.customer_name }}
-                    <small class="text-muted">
-                      {{ option.name}}
-                    </small>
+                    <small class="text-muted"> {{ option.name}} </small>
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('required')">
@@ -321,9 +401,7 @@
     </ion-card>
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Company Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Company Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">

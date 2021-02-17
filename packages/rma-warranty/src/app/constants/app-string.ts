@@ -112,3 +112,8 @@ export enum CLAIM_STATUS {
   UNSOLVED = 'Unsolved',
   REJECTED = 'Rejected',
 }
+
+export enum CATEGORY {
+  BULK = 'Bulk',
+  SINGLE = 'Single',
+}

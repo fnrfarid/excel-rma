@@ -1,6 +1,12 @@
 import { Component, Input, Optional, Host } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { filter, switchMap, startWith, map } from 'rxjs/operators';
+import {
+  filter,
+  switchMap,
+  startWith,
+  map,
+  debounceTime,
+} from 'rxjs/operators';
 import { FormControl, Validators } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable } from 'rxjs';
@@ -57,10 +63,9 @@ export class InlineEditComponent {
 
   getItemList() {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
+      debounceTime(500),
       startWith(''),
-      switchMap(value => {
-        return this.serviceInvoiceService.getItemList(value);
-      }),
+      this.serviceInvoiceService.getItemList(),
     );
   }
 

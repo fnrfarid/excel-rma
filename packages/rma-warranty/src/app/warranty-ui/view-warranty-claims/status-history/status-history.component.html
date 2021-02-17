@@ -1,5 +1,8 @@
 <form [formGroup]="statusHistoryForm">
-  <ion-card>
+  <ion-card-title class="ion-text-center" *ngIf="check()">
+    Delivered to Customer
+  </ion-card-title>
+  <ion-card *ngIf="!check()">
     <ion-card-header>
       <ion-row class="align">
         <ion-col>

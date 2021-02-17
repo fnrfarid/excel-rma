@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
 import { StatusHistory, WarrantyBulkProducts } from './warranty-claim.entity';
 
-export class WarrantyClaimDto {
+export class BulkWarrantyClaimDto {
   @IsOptional()
   @IsString()
   uuid: string;
@@ -22,7 +22,7 @@ export class WarrantyClaimDto {
   @IsString()
   claim_no: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   claim_type: string;
 
@@ -122,23 +122,23 @@ export class WarrantyClaimDto {
   @IsString()
   delivery_date: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   item_name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   product_brand: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   problem: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   problem_details: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   remarks: string;
 

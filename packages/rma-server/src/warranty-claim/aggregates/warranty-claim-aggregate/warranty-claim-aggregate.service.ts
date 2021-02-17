@@ -6,19 +6,23 @@ import {
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
-import { WarrantyClaim } from '../../entity/warranty-claim/warranty-claim.entity';
+import {
+  WarrantyBulkProducts,
+  WarrantyClaim,
+} from '../../entity/warranty-claim/warranty-claim.entity';
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/warranty-claim-removed.event';
 import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/warranty-claim-updated.event';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 import { from, throwError, of, forkJoin } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
+import { switchMap, map, concatMap, toArray } from 'rxjs/operators';
 
 import {
   INVALID_FILE,
   VERDICT,
   CLAIM_STATUS,
   WARRANTY_CLAIM_DOCTYPE,
+  CATEGORY,
 } from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
@@ -52,6 +56,15 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   ) {
     super();
   }
+
+  createClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
+    if (warrantyClaimPayload.category === CATEGORY.BULK) {
+      return this.createBulkClaim(warrantyClaimPayload, clientHttpRequest);
+    } else {
+      return this.addWarrantyClaim(warrantyClaimPayload, clientHttpRequest);
+    }
+  }
+
   addWarrantyClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
     warrantyClaimPayload.status_history = [];
     warrantyClaimPayload.status_history.push({
@@ -104,6 +117,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         }
         const warrantyClaim = new WarrantyClaim();
         Object.assign(warrantyClaim, warrantyClaimPayload);
+        warrantyClaim._id = undefined;
         warrantyClaim.uuid = uuidv4();
         warrantyClaim.received_by = clientHttpRequest.token.fullName;
         warrantyClaim.claim_status = CLAIM_STATUS.IN_PROGRESS;
@@ -139,6 +153,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             clientHttpRequest.token,
           );
         }),
+        switchMap(nxt => {
+          return of(true);
+        }),
       );
   }
 
@@ -160,6 +177,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             clientHttpRequest.token,
           );
         }),
+        switchMap(nxt => {
+          return of(true);
+        }),
       );
   }
 
@@ -175,6 +195,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           [res.serial_no],
           clientHttpRequest.token,
         );
+      }),
+      switchMap(nxt => {
+        return of(true);
       }),
     );
   }
@@ -221,6 +244,58 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     const update = Object.assign(provider, updatePayload);
     update.modifiedOn = new Date();
     this.apply(new WarrantyClaimUpdatedEvent(update));
+  }
+
+  createBulkClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
+    return this.assignFields(claimsPayload, clientHttpRequest).pipe(
+      switchMap(warrantyBulkClaim => {
+        warrantyBulkClaim.set = CATEGORY.BULK;
+        warrantyBulkClaim.status_history = [];
+        warrantyBulkClaim.status_history.push({
+          status: clientHttpRequest.token.fullName,
+          posting_date: claimsPayload.received_on,
+          time: claimsPayload.posting_time,
+          verdict: VERDICT.RECEIVED_FROM_CUSTOMER,
+          status_from: warrantyBulkClaim.receiving_branch,
+          transfer_branch: '',
+          description: '',
+          delivery_status: '',
+          created_by_email: clientHttpRequest.token.email,
+          created_by: clientHttpRequest.token.fullName,
+        });
+        return from(this.warrantyClaimService.create(warrantyBulkClaim));
+      }),
+      map(res => res.ops[0]),
+      switchMap((bulkClaim: WarrantyClaimDto) => {
+        return from(bulkClaim.bulk_products).pipe(
+          concatMap((product: WarrantyBulkProducts) => {
+            const singularClaimPayload = this.mapSingularClaim(
+              bulkClaim,
+              product,
+            );
+            return this.addWarrantyClaim(
+              singularClaimPayload,
+              clientHttpRequest,
+            );
+          }),
+          toArray(),
+        );
+      }),
+      switchMap(nxt => {
+        return of(true);
+      }),
+    );
+  }
+
+  mapSingularClaim(
+    claimsPayload: WarrantyClaimDto,
+    product: WarrantyBulkProducts,
+  ) {
+    Object.assign(claimsPayload, product);
+    claimsPayload.parent = claimsPayload.uuid;
+    claimsPayload.set = CATEGORY.PART;
+    claimsPayload.bulk_products = undefined;
+    return claimsPayload;
   }
 
   addBulkClaims(claimsPayload: File, clientHttpRequest) {

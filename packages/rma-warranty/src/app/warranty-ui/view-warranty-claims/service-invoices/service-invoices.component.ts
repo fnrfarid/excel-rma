@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
 import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
@@ -10,6 +10,7 @@ import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'service-invoices',
@@ -42,12 +43,16 @@ export class ServiceInvoicesComponent implements OnInit {
     private readonly serviceInvoice: AddServiceInvoiceService,
     private readonly snackbar: MatSnackBar,
     private readonly loadingController: LoadingController,
-  ) {}
+    private readonly router: Router,
+  ) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(val => {
+        this.dataSource.loadItems(this.route.snapshot.params.uuid);
+      });
+  }
 
   ngOnInit() {
-    this.route.params.subscribe(() => {
-      this.paginator.firstPage();
-    });
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoiceDataSource(this.serviceInvoice);
     this.dataSource.loadItems(this.invoiceUuid);

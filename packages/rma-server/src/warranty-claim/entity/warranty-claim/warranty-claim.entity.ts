@@ -145,6 +145,31 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   billed_amount: number;
+
+  @Column()
+  category: string;
+
+  @Column()
+  set: string;
+
+  @Column()
+  bulk_products: WarrantyBulkProducts[];
+
+  @Column()
+  parent: string;
+}
+
+export class WarrantyBulkProducts {
+  serial_no: string;
+  claim_type: string;
+  invoice_no: string;
+  warranty_end_date: string;
+  item_name: string;
+  product_brand: string;
+  problem: string;
+  problem_details: string;
+  remarks: string;
+  item_code: string;
 }
 
 export class StatusHistory {
