@@ -30,7 +30,7 @@
           <ion-button
             *ngIf="permissionState.warranty_claim.create"
             color="tertiary"
-            [routerLink]="['/warranty/add-warranty-claim', 'add']"
+            [routerLink]="['/warranty/warranty-claim', 'add']"
           >
             Add
           </ion-button>
@@ -260,11 +260,29 @@
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
+          <ng-container matColumnDef="edit">
+            <mat-header-cell *matHeaderCellDef>Edit</mat-header-cell>
+            <mat-cell *matCellDef="let row; let i = index">
+              <ion-button
+                [disabled]="row.set ==='Bulk'|| row.status_history[row.status_history.length-1].verdict !=='Received from Customer'"
+                fill="clear"
+                class="ion-no-padding"
+                color="danger"
+                [routerLink]="['/warranty/warranty-claim', 'edit',row.uuid]"
+              >
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+            </mat-cell>
+            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
+          </ng-container>
+
           <ng-container matColumnDef="claim_no">
             <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
               Claim no
             </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.claim_no}} </mat-cell>
+            <mat-cell *matCellDef="let row">
+              <a (click)="warrantyRoute(row)">{{row.claim_no || 'Draft'}}</a>
+            </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
@@ -406,7 +424,6 @@
 
           <mat-row
             *matRowDef="let row; columns: displayedColumns;"
-            (click)="warrantyRoute(row)"
             [ngStyle]="{'background-color':row.set==='Bulk'?'#F4F4FB':row.set==='Part'?'#FDFAE5':'rgb(255, 255, 255)'
 
           }"

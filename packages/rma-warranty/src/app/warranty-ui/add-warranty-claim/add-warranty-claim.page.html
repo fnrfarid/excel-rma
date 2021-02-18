@@ -5,7 +5,10 @@
         <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title color="tertiary">Warranty Claim Creation Form</ion-title>
+    <ion-title color="tertiary" *ngIf="route ==='add'"
+      >Warranty Claim Creation Form</ion-title
+    >
+    <ion-title color="tertiary" *ngIf="route ==='edit'">Update Claim</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -18,11 +21,20 @@
     horizontal="end"
   >
     <ion-fab-button
+      *ngIf="route ==='add'"
       class="fab-position"
       (click)="createClaim()"
       [disabled]="warrantyClaimForm.invalid"
     >
       <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button
+      *ngIf="route ==='edit'"
+      class="fab-position"
+      (click)="updateClaim()"
+      [disabled]="warrantyClaimForm.invalid"
+    >
+      <ion-icon name="pencil"></ion-icon>
     </ion-fab-button>
   </ion-fab>
   <form [formGroup]="warrantyClaimForm">
@@ -33,7 +45,7 @@
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.serial_no.active">
+            <ion-col *ngIf="warrantyState?.serial_no?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -73,7 +85,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.invoice_no.active">
+            <ion-col *ngIf="warrantyState?.invoice_no?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -86,7 +98,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.warranty_end_date.active">
+            <ion-col *ngIf="warrantyState?.warranty_end_date?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -137,7 +149,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.product_brand.active">
+            <ion-col *ngIf="warrantyState?.product_brand?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -201,7 +213,7 @@
               </mat-form-field>
             </ion-col>
             <ion-col>
-              <mat-form-field class="example-full-width">
+              <mat-form-field class="example-full-width" *ngIf="route ==='add'">
                 <input
                   matInput
                   type="text"
@@ -227,7 +239,7 @@
               </mat-form-field>
             </ion-col>
           </ion-row>
-          <ion-row class="align">
+          <ion-row class="align" *ngIf="route ==='add'">
             <ion-col class="ion-text-left">
               <ion-button
                 color="tertiary"
@@ -298,7 +310,7 @@
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.customer_name.active">
+            <ion-col *ngIf="warrantyState?.customer_name?.active">
               <mat-form-field class="example-full-width">
                 <input
                   type="text"
@@ -326,7 +338,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.third_party_name.active">
+            <ion-col *ngIf="warrantyState?.third_party_name?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -341,7 +353,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.customer_contact.active">
+            <ion-col *ngIf="warrantyState?.customer_contact?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -354,7 +366,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.third_party_contact.active">
+            <ion-col *ngIf="warrantyState?.third_party_contact?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -369,7 +381,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.customer_address.active">
+            <ion-col *ngIf="warrantyState?.customer_address?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -382,7 +394,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.third_party_address.active">
+            <ion-col *ngIf="warrantyState?.third_party_address?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -399,7 +411,7 @@
         </ion-grid>
       </ion-card-content>
     </ion-card>
-    <ion-card>
+    <ion-card *ngIf="route ==='add'">
       <ion-card-header>
         <ion-card-title color="tertiary"> Company Details </ion-card-title>
       </ion-card-header>
