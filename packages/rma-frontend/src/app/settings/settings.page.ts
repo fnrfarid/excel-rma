@@ -48,6 +48,7 @@ export class SettingsPage implements OnInit {
     headerWidth: new FormControl(),
     footerImageURL: new FormControl(),
     footerWidth: new FormControl(),
+    faviconURL: new FormControl(),
   });
   validateInput: any = ValidateInputSelected;
 
@@ -166,6 +167,12 @@ export class SettingsPage implements OnInit {
           .get('footerImageURL')
           .setValue(res.footerImageURL);
         this.companySettingsForm.get('footerWidth').setValue(res.footerWidth);
+        if (res.brand?.faviconURL) {
+          this.companySettingsForm
+            .get('faviconURL')
+            .setValue(res.brand.faviconURL);
+          this.service.setFavicon(res.brand.faviconURL);
+        }
       },
     });
 
@@ -210,9 +217,13 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('headerWidth').value,
         this.companySettingsForm.get('footerImageURL').value,
         this.companySettingsForm.get('footerWidth').value,
+        {
+          faviconURL: this.companySettingsForm.get('faviconURL').value,
+        },
       )
       .subscribe({
         next: success => {
+          this.service.setFavicon(this.f.faviconURL.value);
           this.toastController
             .create({
               message: UPDATE_SUCCESSFUL,
