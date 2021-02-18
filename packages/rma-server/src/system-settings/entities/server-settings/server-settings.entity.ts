@@ -103,8 +103,15 @@ export class ServerSettings extends BaseEntity {
   @Column()
   posProfile: string;
 
+  @Column()
+  brand: BrandSettings;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();
   }
+}
+
+export interface BrandSettings {
+  faviconURL: string;
 }

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="in.castlecraft.excelrma" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Excel RMA Mobile</name>
-    <description>Mobile app for Excel RMA</description>
+    <name>Sales Portal Mobile</name>
+    <description>Mobile app for Sales Portal</description>
     <author email="support@castlecraft.in" href="https://castlecraft.in/">Castlecraft Team</author>
     <content src="index.html" />
     <access origin="*" />

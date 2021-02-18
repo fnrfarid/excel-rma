@@ -1,6 +1,14 @@
 import { IsUrl, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+export class BrandSettingsDTO {
+  @IsOptional()
+  @ApiProperty({
+    description: 'Favicon URL',
+    type: 'string',
+  })
+  faviconURL: string;
+}
 export class ServerSettingsDto {
   uuid?: string;
 
@@ -175,4 +183,11 @@ export class ServerSettingsDto {
     type: 'number',
   })
   footerWidth: number;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Brand Settings',
+    type: 'object',
+  })
+  brand: BrandSettingsDTO;
 }

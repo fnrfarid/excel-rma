@@ -26,6 +26,7 @@ import {
   WARRANTY_APP_URL,
   POS_PROFILE,
   ACCESS_TOKEN,
+  BRAND,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -36,6 +37,7 @@ import {
 } from './constants/url-strings';
 import { IDTokenClaims } from './common/interfaces/id-token-claims.interfaces';
 import { map, switchMap } from 'rxjs/operators';
+import { BrandSettings, SettingsService } from './settings/settings.service';
 
 @Injectable()
 export class AppService {
@@ -44,6 +46,7 @@ export class AppService {
   constructor(
     private readonly http: HttpClient,
     private readonly storage: StorageService,
+    private readonly settings: SettingsService,
   ) {}
 
   /** GET message from the server */
@@ -106,11 +109,16 @@ export class AppService {
         country: string;
         time_zone: string;
         transferWarehouse: string;
+        brand: BrandSettings;
       }) => {
+        if (success?.brand?.faviconURL) {
+          this.settings.setFavicon(success.brand.faviconURL);
+        }
         this.storage
           .setItem(DEFAULT_CURRENCY_KEY, success.default_currency)
           .then(() => this.storage.setItem(COUNTRY, success.country))
           .then(() => this.storage.setItem(TIME_ZONE, success.time_zone))
+          .then(() => this.storage.setItem(BRAND, success.brand))
           .then(() =>
             this.storage.setItem(TRANSFER_WAREHOUSE, success.transferWarehouse),
           );
@@ -131,7 +139,6 @@ export class AppService {
         ) {
           return;
         }
-
         this.setInfoLocalStorage(response);
         const frappe_auth_config = {
           client_id: response.frontendClientId,
