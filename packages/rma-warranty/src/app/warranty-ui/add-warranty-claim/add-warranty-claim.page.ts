@@ -93,10 +93,10 @@ export class AddWarrantyClaimPage implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly storage: StorageService,
     private readonly warrantyClaim: WarrantyService,
-  ) { }
+  ) {}
 
   async ngOnInit() {
-    this.route = this.activatedRoute.snapshot.params.name
+    this.route = this.activatedRoute.snapshot.params.name;
     this.categoryList = ['Bulk', 'Single'];
     this.claimList = [
       'Warranty',
@@ -345,7 +345,7 @@ export class AddWarrantyClaimPage implements OnInit {
       'received_on',
       'delivery_date',
       'receiving_branch',
-      'category'
+      'category',
     ];
     this.clearAllControlValidators();
     common_control.forEach(element => {
@@ -481,9 +481,7 @@ export class AddWarrantyClaimPage implements OnInit {
     return warrantyClaimDetails;
   }
 
-  createForm() {
-
-  }
+  createForm() {}
 
   async customerChanged(customer) {
     const loading = await this.loadingController.create();
@@ -715,7 +713,7 @@ export class AddWarrantyClaimPage implements OnInit {
     return check;
   }
 
-  getUpdate(event) { }
+  getUpdate(event) {}
 
-  branchOptionChanged(option) { }
+  branchOptionChanged(option) {}
 }
