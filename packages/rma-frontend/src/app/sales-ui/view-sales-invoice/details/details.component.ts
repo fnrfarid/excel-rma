@@ -2,7 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE, REJECTED, UPDATE_ERROR } from '../../../constants/app-string';
+import {
+  CANCELED_STATUS,
+  CLOSE,
+  INVOICE_DELIVERY_STATUS,
+  REJECTED,
+  REJECTED_STATUS,
+  UPDATE_ERROR,
+} from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
@@ -35,7 +42,7 @@ export class DetailsComponent implements OnInit {
     Submitted: '#4d2500',
     Canceled: 'red',
   };
-  delivery_statuses: string[] = ['Delivered to Customer', 'Kept in Warehouse'];
+  delivery_statuses: string[] = Object.values(INVOICE_DELIVERY_STATUS);
   permissionState = PERMISSION_STATE;
   total = 0;
   total_qty = 0;
@@ -110,8 +117,9 @@ export class DetailsComponent implements OnInit {
         this.salesInvoiceDetails = success;
         this.delivery_status.setValue(this.salesInvoiceDetails.delivery_status);
         if (
-          this.salesInvoiceDetails.status === 'Canceled' ||
-          this.salesInvoiceDetails.status === 'Rejected'
+          [CANCELED_STATUS, REJECTED_STATUS].includes(
+            this.salesInvoiceDetails.status,
+          )
         )
           this.delivery_status.disable();
         this.salesInvoiceDetails.address_display = this.salesInvoiceDetails

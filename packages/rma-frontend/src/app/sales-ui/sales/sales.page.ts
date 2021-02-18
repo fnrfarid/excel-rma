@@ -15,6 +15,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
+import { INVOICE_DELIVERY_STATUS } from '../../constants/app-string';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import { Observable, of } from 'rxjs';
 import { ValidateInputSelected } from '../../common/pipes/validators';
@@ -66,10 +67,9 @@ export class SalesPage implements OnInit {
     'All',
   ];
   campaignStatus: string[] = ['Yes', 'No', 'All'];
-  delivery_statuses: string[] = ['Delivered to Customer', 'Kept in Warehouse'];
+  delivery_statuses: string[] = Object.values(INVOICE_DELIVERY_STATUS);
   customer_name: any;
   status: string = 'All';
-  delivery_status: string;
   invoice_number: string = '';
   sales_person: string = '';
   branch: string = '';
@@ -305,7 +305,8 @@ export class SalesPage implements OnInit {
     if (this.f.salesPerson.value) query.sales_team = this.f.salesPerson.value;
     if (this.f.invoice_number.value) query.name = this.f.invoice_number.value;
     if (this.f.branch) query.territory = this.f.branch.value;
-    if (this.delivery_status) query.delivery_status = this.delivery_status;
+    if (this.f.delivery_status)
+      query.delivery_status = this.f.delivery_status.value;
     if (this.campaign) {
       if (this.campaign === 'Yes') {
         query.isCampaign = true;
@@ -368,11 +369,6 @@ export class SalesPage implements OnInit {
       this.status = status;
       this.setFilter();
     }
-  }
-
-  deliveryStatusChange(delivery_status) {
-    this.delivery_status = delivery_status;
-    this.setFilter();
   }
 
   getDate(date: string) {

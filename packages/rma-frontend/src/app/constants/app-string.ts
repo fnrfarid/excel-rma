@@ -20,6 +20,8 @@ export const MATERIAL_TRANSFER = 'Material Transfer';
 export const PURCHASE_USER = 'Purchase User';
 export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
 export const EXCEL_SALES_USER = 'Excel Sales User';
+export const CANCELED_STATUS = 'Canceled';
+export const REJECTED_STATUS = 'Rejected';
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
 };
@@ -45,6 +47,11 @@ export const CURRENT_STATUS_VERDICT = {
   REJECTED: 'Rejected',
   TO_REPLACE: 'To Replace',
   WORK_IN_PROGRESS: 'Work in Progress',
+};
+
+export const INVOICE_DELIVERY_STATUS = {
+  DELIVERED_TO_CUSTOMER: 'Delivered to Customer',
+  KEPT_IN_WAREHOUSE: 'Kept in Warehouse',
 };
 
 export const DELIVERY_STATUS = {

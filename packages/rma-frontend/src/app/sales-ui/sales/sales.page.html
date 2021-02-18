@@ -141,7 +141,7 @@
                 <mat-label>Delivery Status</mat-label>
                 <mat-select
                   formControlName="delivery_status"
-                  (selectionChange)="deliveryStatusChange($event.value)"
+                  (selectionChange)="setFilter()"
                 >
                   <mat-option
                     *ngFor="let delivery_status of delivery_statuses"
