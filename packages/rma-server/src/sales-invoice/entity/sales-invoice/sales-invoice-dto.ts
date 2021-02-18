@@ -132,6 +132,10 @@ export class SalesInvoiceDto {
 
   @IsOptional()
   remarks: string;
+
+  @IsOptional()
+  @IsString()
+  delivery_status: string;
 }
 
 export class TaxDto {

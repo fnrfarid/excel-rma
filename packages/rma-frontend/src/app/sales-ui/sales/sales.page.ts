@@ -15,6 +15,7 @@ import {
 } from '@angular/material/core';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
+import { INVOICE_DELIVERY_STATUS } from '../../constants/app-string';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import { Observable, of } from 'rxjs';
 import { ValidateInputSelected } from '../../common/pipes/validators';
@@ -48,6 +49,7 @@ export class SalesPage implements OnInit {
     'customer_name',
     'total',
     'delivered_percent',
+    'delivery_status',
     'due_amount',
     'remarks',
     'territory',
@@ -65,6 +67,7 @@ export class SalesPage implements OnInit {
     'All',
   ];
   campaignStatus: string[] = ['Yes', 'No', 'All'];
+  delivery_statuses: string[] = Object.values(INVOICE_DELIVERY_STATUS);
   customer_name: any;
   status: string = 'All';
   invoice_number: string = '';
@@ -172,6 +175,7 @@ export class SalesPage implements OnInit {
       branch: new FormControl(),
       campaign: new FormControl(),
       status: new FormControl(),
+      delivery_status: new FormControl(),
     });
   }
 
@@ -280,6 +284,7 @@ export class SalesPage implements OnInit {
     this.branch = '';
     this.campaign = 'All';
     this.sales_person = '';
+    this.f.delivery_status.setValue('');
     this.f.customer_name.setValue('');
     this.f.invoice_number.setValue('');
     this.f.branch.setValue('');
@@ -300,6 +305,9 @@ export class SalesPage implements OnInit {
     if (this.f.salesPerson.value) query.sales_team = this.f.salesPerson.value;
     if (this.f.invoice_number.value) query.name = this.f.invoice_number.value;
     if (this.f.branch) query.territory = this.f.branch.value;
+    if (this.f.delivery_status) {
+      query.delivery_status = this.f.delivery_status.value;
+    }
     if (this.campaign) {
       if (this.campaign === 'Yes') {
         query.isCampaign = true;

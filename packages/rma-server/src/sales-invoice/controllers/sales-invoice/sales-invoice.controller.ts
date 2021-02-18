@@ -113,4 +113,11 @@ export class SalesInvoiceController {
       .updateOutstandingAmount(invoice_name)
       .toPromise();
   }
+
+  @Post('v1/update_delivery_status')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async updateDeliveryStatus(@Body() payload) {
+    return await this.salesInvoiceAggregate.updateDeliveryStatus(payload);
+  }
 }

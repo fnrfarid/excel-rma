@@ -2,7 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE, REJECTED, UPDATE_ERROR } from '../../../constants/app-string';
+import {
+  CLOSE,
+  INVOICE_DELIVERY_STATUS,
+  REJECTED,
+  SALES_INVOICE_STATUS,
+  UPDATE_ERROR,
+} from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
 import { Location } from '@angular/common';
 import { Item } from '../../../common/interfaces/sales.interface';
@@ -13,6 +19,7 @@ import { ViewSalesInvoiceSubjectService } from '../view-sales-invoice-subject.se
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { ConfirmationDialog } from '../../item-price/item-price.page';
 import { MatDialog } from '@angular/material/dialog';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'sales-invoice-details',
@@ -34,9 +41,11 @@ export class DetailsComponent implements OnInit {
     Submitted: '#4d2500',
     Canceled: 'red',
   };
+  delivery_statuses: string[] = Object.values(INVOICE_DELIVERY_STATUS);
   permissionState = PERMISSION_STATE;
   total = 0;
   total_qty = 0;
+  delivery_status = new FormControl('');
   constructor(
     private readonly salesService: SalesService,
     private readonly snackBar: MatSnackBar,
@@ -65,6 +74,24 @@ export class DetailsComponent implements OnInit {
       });
   }
 
+  async deliveryStatusChanged(delivery_status) {
+    const loading = await this.loadingController.create({
+      message: 'Updating Delivery Status in Invoice...!',
+    });
+    await loading.present();
+    const payload = {} as SalesInvoiceDetails;
+    payload.uuid = this.route.snapshot.params.invoiceUuid;
+    payload.delivery_status = delivery_status;
+    this.salesService.updateDeliveryStatus(payload).subscribe({
+      next: success => {
+        loading.dismiss();
+      },
+      error: err => {
+        loading.dismiss();
+      },
+    });
+  }
+
   deleteSalesInvoice() {
     return this.salesService.deleteSalesInvoice(this.invoiceUuid).subscribe({
       next: success => {
@@ -87,6 +114,15 @@ export class DetailsComponent implements OnInit {
       next: (success: any) => {
         this.campaign = success.isCampaign;
         this.salesInvoiceDetails = success;
+        this.delivery_status.setValue(this.salesInvoiceDetails.delivery_status);
+        if (
+          [
+            SALES_INVOICE_STATUS.CANCELED,
+            SALES_INVOICE_STATUS.REJECTED,
+          ].includes(this.salesInvoiceDetails.status)
+        ) {
+          this.delivery_status.disable();
+        }
         this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
           .address_display
           ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')
@@ -259,6 +295,7 @@ export class SalesInvoiceDetails {
   isCampaign?: boolean;
   remarks?: string;
   sales_team?: any[];
+  delivery_status: string;
 }
 
 export class SalesInvoiceItem {

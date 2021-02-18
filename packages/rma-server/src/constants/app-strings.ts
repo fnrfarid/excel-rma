@@ -108,6 +108,10 @@ export const STOCK_ENTRY_STATUS = {
   reseted: 'Reseted',
   draft: 'Draft',
 };
+export const INVOICE_DELIVERY_STATUS = {
+  DELIVERED_TO_CUSTOMER: 'Delivered to Customer',
+  KEPT_IN_WAREHOUSE: 'Kept in Warehouse',
+};
 export const SALES_USER = 'Sales User';
 export const SALES_MANAGER = 'Sales Manager';
 export const SALES_INVOICE_STATUS_ENUM = [

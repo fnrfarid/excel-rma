@@ -36,6 +36,11 @@ export const STOCK_TRANSFER_STATUS = {
   all: 'All',
   reseted: 'Reseted',
 };
+
+export const SALES_INVOICE_STATUS = {
+  CANCELED: 'Canceled',
+  REJECTED: 'Rejected',
+};
 export const CURRENT_STATUS_VERDICT = {
   RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   TRANSFERRED: 'Transferred',
@@ -45,6 +50,11 @@ export const CURRENT_STATUS_VERDICT = {
   REJECTED: 'Rejected',
   TO_REPLACE: 'To Replace',
   WORK_IN_PROGRESS: 'Work in Progress',
+};
+
+export const INVOICE_DELIVERY_STATUS = {
+  DELIVERED_TO_CUSTOMER: 'Delivered to Customer',
+  KEPT_IN_WAREHOUSE: 'Kept in Warehouse',
 };
 
 export const DELIVERY_STATUS = {

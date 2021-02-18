@@ -30,6 +30,9 @@ import {
   DELIVERY_NOTE,
   SALES_INVOICE_STATUS,
   ALL_TERRITORIES,
+  INVOICE_DELIVERY_STATUS,
+  CANCELED_STATUS,
+  REJECTED_STATUS,
 } from '../../../constants/app-strings';
 import { ACCEPT } from '../../../constants/app-strings';
 import { APP_WWW_FORM_URLENCODED } from '../../../constants/app-strings';
@@ -93,6 +96,8 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
               salesInvoice.createdByEmail = clientHttpRequest.token.email;
               salesInvoice.createdBy = clientHttpRequest.token.fullName;
               salesInvoice.uuid = uuidv4();
+              salesInvoice.delivery_status =
+                INVOICE_DELIVERY_STATUS.DELIVERED_TO_CUSTOMER;
               salesInvoice.created_on = new DateTime(
                 settings.timeZone,
               ).toJSDate();
@@ -595,6 +600,21 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         );
       }),
     );
+  }
+
+  async updateDeliveryStatus(payload) {
+    const salesInvoice = await this.salesInvoiceService.findOne(payload.uuid);
+    if (!salesInvoice) {
+      throw new BadRequestException('Failed to fetch Sales Invoice.');
+    }
+    if ([CANCELED_STATUS, REJECTED_STATUS].includes(salesInvoice.status)) {
+      this.salesInvoiceService.updateOne(
+        { uuid: payload.uuid },
+        {
+          $set: { delivery_status: payload.delivery_status },
+        },
+      );
+    }
   }
 
   createCreditNote(

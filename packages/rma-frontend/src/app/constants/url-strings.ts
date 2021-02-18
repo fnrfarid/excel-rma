@@ -15,6 +15,8 @@ export const UPDATE_OUTSTANDING_AMOUNT_ENDPOINT =
 export const SALES_INVOICE_GET_ONE_ENDPOINT = '/api/sales_invoice/v1/get/';
 export const CREATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/create';
 export const UPDATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/update';
+export const UPDATE_DELIVERY_STATUS_ENDPOINT =
+  'api/sales_invoice/v1/update_delivery_status';
 export const SUBMIT_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/submit';
 export const CANCEL_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/cancel';
 export const CREATE_SALES_RETURN_ENDPOINT =
