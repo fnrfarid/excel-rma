@@ -604,8 +604,9 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
 
   async updateDeliveryStatus(payload) {
     const salesInvoice = await this.salesInvoiceService.findOne(payload.uuid);
-    if (!salesInvoice)
+    if (!salesInvoice){
       throw new BadRequestException('Failed to fetch Sales Invoice.');
+    }
     if ([CANCELED_STATUS, REJECTED_STATUS].includes(salesInvoice.status)) {
       this.salesInvoiceService.updateOne(
         { uuid: payload.uuid },

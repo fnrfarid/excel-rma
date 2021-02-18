@@ -3,11 +3,10 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { SalesService } from '../../services/sales.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
-  CANCELED_STATUS,
   CLOSE,
   INVOICE_DELIVERY_STATUS,
   REJECTED,
-  REJECTED_STATUS,
+  SALES_INVOICE_STATUS,
   UPDATE_ERROR,
 } from '../../../constants/app-string';
 import { ERROR_FETCHING_SALES_INVOICE } from '../../../constants/messages';
@@ -117,11 +116,13 @@ export class DetailsComponent implements OnInit {
         this.salesInvoiceDetails = success;
         this.delivery_status.setValue(this.salesInvoiceDetails.delivery_status);
         if (
-          [CANCELED_STATUS, REJECTED_STATUS].includes(
-            this.salesInvoiceDetails.status,
-          )
-        )
+          [
+            SALES_INVOICE_STATUS.CANCELED,
+            SALES_INVOICE_STATUS.REJECTED,
+          ].includes(this.salesInvoiceDetails.status)
+        ) {
           this.delivery_status.disable();
+        }
         this.salesInvoiceDetails.address_display = this.salesInvoiceDetails
           .address_display
           ? this.salesInvoiceDetails.address_display.replace(/<br>/g, '\n')

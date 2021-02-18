@@ -20,8 +20,6 @@ export const MATERIAL_TRANSFER = 'Material Transfer';
 export const PURCHASE_USER = 'Purchase User';
 export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
 export const EXCEL_SALES_USER = 'Excel Sales User';
-export const CANCELED_STATUS = 'Canceled';
-export const REJECTED_STATUS = 'Rejected';
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
 };
@@ -37,6 +35,11 @@ export const STOCK_TRANSFER_STATUS = {
   draft: 'Draft',
   all: 'All',
   reseted: 'Reseted',
+};
+
+export const SALES_INVOICE_STATUS = {
+  CANCELED: 'Canceled',
+  REJECTED: 'Rejected',
 };
 export const CURRENT_STATUS_VERDICT = {
   RECEIVED_FROM_CUSTOMER: 'Received from Customer',
