@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.3.0...rma-warranty@1.4.0) (2021-02-18)
+
+
+### Features
+
+* **Excel-rma:** Add brand settings and favicon in global defaults ([7aa4c8f](https://gitlab.com/castlecraft/excel-rma/commit/7aa4c8f7f4a05ea3db72bfba7c4c46fe688d9d4a))
+
+
+
+
+
 # [1.3.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.2.0...rma-warranty@1.3.0) (2021-02-09)
 
 
