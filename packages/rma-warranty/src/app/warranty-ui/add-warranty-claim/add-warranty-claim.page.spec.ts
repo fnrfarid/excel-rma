@@ -47,6 +47,7 @@ describe('AddWarrantyClaimPage', () => {
           useValue: {
             getProblemList: (...args) => of([{}]),
             createWarrantyClaim: (...args) => of({}),
+            updateWarrantyClaim: (...args) => of({}),
             getCustomerList: (...args) => switchMap(res => empty()),
             getItemList: (...args) => switchMap(res => empty()),
             getItem: (...args) => switchMap(res => empty()),

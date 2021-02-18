@@ -45,6 +45,7 @@ export class WarrantyPage implements OnInit {
   dataSource: WarrantyClaimsDataSource;
   displayedColumns = [
     'sr_no',
+    'edit',
     'claim_no',
     'claim_type',
     'received_date',
