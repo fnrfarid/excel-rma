@@ -58,7 +58,7 @@ export class ServiceInvoiceDto {
   date: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   customer_third_party: string;
 
   @IsNumber()
@@ -90,7 +90,7 @@ export class ServiceInvoiceDto {
   customer_name: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   customer_address: string;
 
   @IsString()

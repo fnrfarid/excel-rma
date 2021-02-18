@@ -69,7 +69,10 @@
             <!-- Custoemr Name Column -->
             <ng-container matColumnDef="customer">
               <mat-header-cell *matHeaderCellDef>Customer name</mat-header-cell>
-              <mat-cell *matCellDef="let row">{{ row.customer_name }}</mat-cell>
+              <mat-cell *matCellDef="let row" >
+                <a (click)="openVoucher(row)">
+                  {{ row.customer_name }}</a>
+              </mat-cell>
             </ng-container>
 
             <ng-container matColumnDef="credit_limit">

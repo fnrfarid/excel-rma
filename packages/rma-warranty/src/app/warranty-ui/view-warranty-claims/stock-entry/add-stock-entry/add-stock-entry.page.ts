@@ -179,7 +179,7 @@ export class AddStockEntryPage implements OnInit {
       type: new FormControl('', [Validators.required]),
       date: new FormControl('', Validators.required),
       time: new FormControl(),
-      description: new FormControl('', Validators.required),
+      description: new FormControl(''),
       items: new FormArray([]),
     });
     this.itemsControl = this.stockEntryForm.controls.items as FormArray;

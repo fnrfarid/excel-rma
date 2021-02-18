@@ -46,6 +46,14 @@ export const WARRANTY_CLAIMS_DOWNLOAD_HEADERS = [
   'delivery_branch',
   'received_by',
   'delivered_by',
+  'product_brand',
+  'received_serial',
+  'replaced_serial',
+  'problem',
+  'verdict',
+  'delivery_date',
+  'billed_amount',
+  'remarks',
 ];
 export const WARRANTY_CLAIMS_CSV_FILE = 'warranty-claim-list.csv';
 export const CSV_FILE_TYPE = ' serials.csv';
@@ -60,6 +68,8 @@ export const CURRENT_STATUS_VERDICT = {
   RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   RECEIVED_FROM_BRANCH: 'Received from Branch',
   WORK_IN_PROGRESS: 'Work in Progress',
+  SENT_TO_ENG_DEPT: 'Sent to Eng. Dept',
+  SENT_TO_REPAIR_DEPT: 'Sent to Repair Dept',
   TRANSFERRED: 'Transferred',
   SOLVED: 'Solved - Repairing done',
   TO_REPLACE: 'Unsolved - To Replace',
@@ -88,8 +98,22 @@ export const ITEM_COLUMN = {
 export const STOCK_ENTRY_STATUS = {
   REPLACE: 'Replace',
   UPGRADE: 'Upgrade',
+  REPAIR: 'Repair',
 };
 export const STOCK_ENTRY_ITEM_TYPE = {
   RETURNED: 'Returned',
   DELIVERED: 'Delivered',
 };
+
+export enum CLAIM_STATUS {
+  IN_PROGRESS = 'In Progress',
+  TO_DELIVER = 'To Deliver',
+  DELIVERED = 'Delivered',
+  UNSOLVED = 'Unsolved',
+  REJECTED = 'Rejected',
+}
+
+export enum CATEGORY {
+  BULK = 'Bulk',
+  SINGLE = 'Single',
+}

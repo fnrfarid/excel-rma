@@ -36,6 +36,11 @@ export const STOCK_TRANSFER_STATUS = {
   all: 'All',
   reseted: 'Reseted',
 };
+
+export const SALES_INVOICE_STATUS = {
+  CANCELED: 'Canceled',
+  REJECTED: 'Rejected',
+};
 export const CURRENT_STATUS_VERDICT = {
   RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   TRANSFERRED: 'Transferred',
@@ -45,6 +50,11 @@ export const CURRENT_STATUS_VERDICT = {
   REJECTED: 'Rejected',
   TO_REPLACE: 'To Replace',
   WORK_IN_PROGRESS: 'Work in Progress',
+};
+
+export const INVOICE_DELIVERY_STATUS = {
+  DELIVERED_TO_CUSTOMER: 'Delivered to Customer',
+  KEPT_IN_WAREHOUSE: 'Kept in Warehouse',
 };
 
 export const DELIVERY_STATUS = {
@@ -94,5 +104,6 @@ export const DELIVERED_SERIALS_DATE_FIELDS = ['purchasedOn', 'soldOn'];
 export const DELIVERED_SERIALS_BY = {
   sales_invoice_name: 'sales_invoice_name',
   purchase_invoice_name: 'purchase_invoice_name',
+  stock_entry_uuid: 'stock_entry_uuid',
 };
 export const NON_SERIAL_ITEM = 'Non serial Item';

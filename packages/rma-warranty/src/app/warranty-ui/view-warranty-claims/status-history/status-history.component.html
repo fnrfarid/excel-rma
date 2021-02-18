@@ -1,5 +1,8 @@
 <form [formGroup]="statusHistoryForm">
-  <ion-card>
+  <ion-card-title class="ion-text-center" *ngIf="check()">
+    Delivered to Customer
+  </ion-card-title>
+  <ion-card *ngIf="!check()">
     <ion-card-header>
       <ion-row class="align">
         <ion-col>
@@ -171,7 +174,7 @@
 </form>
 <!-- 1 this is for list -->
 
-<ion-card>
+<ion-card *ngIf="statusHistory">
   <ion-card-header>
     <ion-grid>
       <ion-row>
@@ -185,11 +188,7 @@
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
-    <mat-table
-      #table
-      style="width: 100%"
-      [dataSource]="warrantyObject?.status_history"
-    >
+    <mat-table #table style="width: 100%" [dataSource]="statusHistory">
       <ng-container matColumnDef="posting_date">
         <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -300,8 +299,8 @@
 
 <ion-card
   *ngIf="
-    (warrantyObject?.status_history)[warrantyObject?.status_history.length - 1]
-      .delivery_status.length
+    statusHistory?.data?.length &&
+    statusHistory?.data[statusHistory?.data?.length - 1]?.delivery_status.length
   "
 >
   <ion-card-header>
@@ -362,11 +361,7 @@
             "
           >
             <input
-              [value]="
-                warrantyObject?.replace_warehouse?.length
-                  ? warrantyObject.replace_warehouse[0]
-                  : ''
-              "
+              [value]="warrantyObject?.replace_warehouse"
               matInput
               type="text"
               disabled
@@ -378,11 +373,7 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="
-                warrantyObject?.damage_warehouse?.length
-                  ? warrantyObject.damage_warehouse[0]
-                  : ''
-              "
+              [value]="warrantyObject?.damage_warehouse"
               type="text"
               disabled
               placeholder="Damaged Warehouse"
@@ -396,11 +387,7 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="
-                warrantyObject?.replace_product?.length
-                  ? warrantyObject.replace_product[0]
-                  : ''
-              "
+              [value]="warrantyObject?.replace_product"
               type="text"
               disabled
               placeholder="Replaced Product"
@@ -411,11 +398,7 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="
-                warrantyObject?.damage_product?.length
-                  ? warrantyObject.damage_product[0]
-                  : ''
-              "
+              [value]="warrantyObject?.damage_product"
               type="text"
               disabled
               placeholder="Damaged Product"
@@ -429,11 +412,7 @@
           <mat-form-field class="example-full-width">
             <input
               matInput
-              [value]="
-                warrantyObject?.replace_serial?.length
-                  ? warrantyObject.replace_serial[0]
-                  : ''
-              "
+              [value]="warrantyObject?.replace_serial"
               type="text"
               disabled
               placeholder="Replace Serial"

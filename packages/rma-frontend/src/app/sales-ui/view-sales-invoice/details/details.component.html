@@ -207,6 +207,26 @@
           </ion-item>
         </ion-col>
       </ion-row>
+      <ion-row>
+        <ion-col size-md="6">
+          <ion-item lines="none">
+            <mat-form-field class="full-width">
+              <mat-label>Delivery Status</mat-label>
+              <mat-select
+                [formControl]="delivery_status"
+                (selectionChange)="deliveryStatusChanged($event.value)"
+              >
+                <mat-option
+                  *ngFor="let delivery_status of delivery_statuses"
+                  [value]="delivery_status"
+                >
+                  {{ delivery_status }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ion-item>
+        </ion-col>
+      </ion-row>
     </ion-grid>
   </ion-card-content>
 </ion-card>

@@ -13,6 +13,7 @@ import {
   STOCK_ENTRY_CREATE_FROM_FILE_ENDPOINT,
   ERPNEXT_WAREHOUSE_ENDPOINT,
   STOCK_ENTRY_RESET_ENDPOINT,
+  GET_STOCK_ENTRY_DELIVERED_SERIALS,
 } from '../../../constants/url-strings';
 import { MaterialTransferDto } from '../../material-transfer/material-transfer.datasource';
 import { JSON_BODY_MAX_SIZE } from '../../../constants/app-string';
@@ -135,6 +136,23 @@ export class StockEntryService {
           {},
           { headers },
         );
+      }),
+    );
+  }
+
+  getDeliveredSerials(uuid: string, search: string, offset, limit) {
+    const url = GET_STOCK_ENTRY_DELIVERED_SERIALS;
+    const params = new HttpParams()
+      .set('limit', limit.toString())
+      .set('offset', (offset * limit).toString())
+      .set('find', uuid)
+      .set('search', search);
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(url, {
+          params,
+          headers,
+        });
       }),
     );
   }

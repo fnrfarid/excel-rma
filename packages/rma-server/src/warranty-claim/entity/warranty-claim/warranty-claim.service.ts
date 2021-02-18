@@ -4,12 +4,17 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
 import { PARSE_REGEX } from '../../../constants/app-strings';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { DateTime } from 'luxon';
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class WarrantyClaimService {
   constructor(
     @InjectRepository(WarrantyClaim)
     private readonly warrantyClaimRepository: MongoRepository<WarrantyClaim>,
+    private readonly settings: SettingsService,
   ) {}
 
   async find(query?) {
@@ -69,6 +74,7 @@ export class WarrantyClaimService {
 
     const $and: any[] = [
       { $or },
+      { set: { $in: territory.set } },
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
     ];
@@ -125,9 +131,24 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.count(query);
   }
 
+  asyncAggregate(query) {
+    return of(this.warrantyClaimRepository.aggregate(query)).pipe(
+      switchMap((aggregateData: any) => {
+        return aggregateData.toArray();
+      }),
+    );
+  }
+
   async generateNamingSeries() {
-    let res = await this.count({});
-    res += 1;
-    return DEFAULT_NAMING_SERIES.warranty_claim + res;
+    const settings = await this.settings.find().toPromise();
+    const date = new DateTime(settings.timeZone).year;
+    let count;
+    count = await this.asyncAggregate([
+      { $project: { year: { $year: '$createdOn' } } },
+      { $match: { year: date } },
+      { $count: 'total' },
+    ]).toPromise();
+    count = count[0].total + 1;
+    return DEFAULT_NAMING_SERIES.warranty_claim + date + '-' + count;
   }
 }

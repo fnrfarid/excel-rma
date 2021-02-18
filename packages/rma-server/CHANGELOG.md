@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.5.0...rma-server@1.6.0) (2021-02-18)
+
+
+### Features
+
+* **excel-rma:** Add transaction lock for sales invoice ([3cfa0a5](https://gitlab.com/castlecraft/excel-rma/commit/3cfa0a5aebeb96602a08a1a9583d7dbf4bae2acc))
+* **Excel-rma:** Add brand settings and favicon in global defaults ([7aa4c8f](https://gitlab.com/castlecraft/excel-rma/commit/7aa4c8f7f4a05ea3db72bfba7c4c46fe688d9d4a))
+* **Excel-rma:** Add logic to fetch delivered serials for transfer ([87246b4](https://gitlab.com/castlecraft/excel-rma/commit/87246b44083c195ce5bcd031be4a7eef94a8c9ef))
+* **Excel-rma:** Add stock item and table optimizations ([2ccfab7](https://gitlab.com/castlecraft/excel-rma/commit/2ccfab7b2d37a45d07434789d6031a281a2637df))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 4 ([60e1274](https://gitlab.com/castlecraft/excel-rma/commit/60e1274f4c94e245898ca15abef2efcbabab4440))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 5 ([25d7523](https://gitlab.com/castlecraft/excel-rma/commit/25d7523e76f23f2090d6349990d5918cbaa6cb4b))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 6 ([635f9c7](https://gitlab.com/castlecraft/excel-rma/commit/635f9c788044ea04f2b409629e5e11d2a1e55ba0))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 7 ([2f36e61](https://gitlab.com/castlecraft/excel-rma/commit/2f36e619f74d5df5022cd5caf49742c80f3f4df8))
+* **rma-frontend:** Only items with is_stock_item will be displayed ([80e92e5](https://gitlab.com/castlecraft/excel-rma/commit/80e92e5a2f706f6f34c09372a941bf32e189fe3c))
+* **rma-frontend:** Only items with is_stock_item will be displayed fixed ([95d0950](https://gitlab.com/castlecraft/excel-rma/commit/95d0950e8abd607fe67ab5fbd283810b9589848e))
+
+
+
+
+
 # [1.5.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.4.0...rma-server@1.5.0) (2021-02-09)
 
 

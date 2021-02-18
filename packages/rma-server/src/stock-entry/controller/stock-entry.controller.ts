@@ -108,6 +108,13 @@ export class StockEntryController {
     return this.warrantyStockAggregate.createDeliveryNote(body, req);
   }
 
+  @Post('v1/finalize_warranty_stock')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  finalizeStockEntry(@Body() uuid: string, @Req() req) {
+    return this.warrantyStockAggregate.makeStatusHistory(uuid, req);
+  }
+
   @Get('v1/get_warranty_stock/:warrantyClaimUuid')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
@@ -122,6 +129,24 @@ export class StockEntryController {
     return this.warrantyStockAggregate.removeStockEntry(
       stockVoucherNumber,
       req,
+    );
+  }
+
+  @Get('v1/get_delivered_serials')
+  @UseGuards(TokenGuard)
+  getDeliveredSerials(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 10,
+    @Query('search') search = '',
+    @Query('find') find,
+    @Req() clientHttpRequest,
+  ) {
+    return this.aggregate.getStockEntryDeliveredSerials(
+      Number(offset),
+      Number(limit),
+      search,
+      find,
+      clientHttpRequest,
     );
   }
 }

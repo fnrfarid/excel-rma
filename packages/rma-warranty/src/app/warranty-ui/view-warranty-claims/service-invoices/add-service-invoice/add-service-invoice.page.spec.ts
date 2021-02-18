@@ -15,6 +15,7 @@ import { AddServiceInvoiceService } from './add-service-invoice.service';
 import { of } from 'rxjs';
 import { TimeService } from '../../../../api/time/time.service';
 import { STORAGE_TOKEN } from '../../../../api/storage/storage.service';
+import { switchMap } from 'rxjs/operators';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {
@@ -58,6 +59,7 @@ describe('AddServiceInvoicePage', () => {
             getAccountList: (...args) => of([]),
             getCashAccount: (...args) => of([]),
             getAddressList: (...args) => of([]),
+            getRelayList: (...args) => switchMap(res => of(res)),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

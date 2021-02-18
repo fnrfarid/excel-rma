@@ -4,6 +4,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AssignClaimsComponent } from './assign-claims.component';
 import { MaterialModule } from '../../../material/material.module';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { STORAGE_TOKEN } from '../../../api/storage/storage.service';
 
 describe('AssignClaimsComponent', () => {
   let component: AssignClaimsComponent;
@@ -17,6 +18,10 @@ describe('AssignClaimsComponent', () => {
       providers: [
         {
           provide: MatSnackBar,
+          useValue: {},
+        },
+        {
+          provide: STORAGE_TOKEN,
           useValue: {},
         },
       ],

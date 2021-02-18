@@ -28,6 +28,8 @@ export const VIEW_SALES_INVOICE_PAGE_URL = 'view-sales-invoice';
 export const ADD_SALES_INVOICE_PAGE_URL = 'add-sales-invoice';
 export const RELAY_LIST_PRICELIST_ENDPOINT =
   '/api/command/user/api/resource/Price%20List';
+export const RELAY_LIST_BRANCH_ENDPOINT =
+  '/api/command/user/api/resource/Branch';
 export const RELAY_GET_ITEMPRICE_ENDPOINT =
   '/api/command/user/api/resource/Item Price';
 export const RELAY_GET_DELIVERY_NOTE_ENDPOINT =
@@ -69,6 +71,7 @@ export const UPDATE_CREDIT_LIMIT_RMA_CUSTOMER_ENDPOINT =
 export const UPDATE_CUSTOMER_CREDIT_LIMIT_ENDPOINT =
   '/api/command/user/api/resource/Customer%20Credit%20Limit';
 export const CUSTOMER_ENDPOINT = '/api/command/user/api/resource/Customer';
+export const CONTACT_ENDPOINT = '/api/command/user/api/resource/Contact';
 export const GET_BALANCE_ON_ENDPOINT =
   '/api/command/user/api/method/erpnext.accounts.utils.get_balance_on';
 export const RELAY_API_RES_COMPANY = '/api/command/user/api/resource/Company';
@@ -115,8 +118,11 @@ export const GET_DIRECT_SERIAL_ENDPOINT = '/api/serial_no/v1/get_direct_serial';
 export const GET_SERIAL_HISTORY_ENDPOINT = '/api/serial_no/v1/get_history';
 export const GET_ITEM_BY_ITEM_CODE_ENDPOINT = '/api/item/v1/get_by_item_code';
 export const CREATE_WARRANTY_CLAIM_ENDPOINT = 'api/warranty_claim/v1/create';
+export const UPDATE_WARRANTY_CLAIM_ENDPOINT = 'api/warranty_claim/v1/update';
+export const CREATE_BULK_WARRANTY_CLAIM_ENDPOINT =
+  'api/warranty_claim/v1/create_bulk';
 export const RELAY_GET_FULL_ITEM_ENDPOINT =
-  '/api/command/user/api/resource/Item/';
+  '/api/command/user/api/resource/Item';
 export const RELAY_GET_ITEM_STOCK_ENDPOINT =
   '/api/command/user/api/resource/Bin';
 export const ADD_STATUS_HISTORY_ENDPOINT =
@@ -142,3 +148,8 @@ export const RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT =
 export const SERIAL_LIST_API = '/api/serial_no/v1/list';
 export const RELAY_DOCTYPE_ENDPOINT_PREFIX = '/api/command/user/api/resource/';
 export const GET_LIST_PROBLEM_ENDPOINT = '/api/problem/v1/list';
+export const PRINT_DELIVERY_INVOICE_ENDPOINT = 'api/print/v1/delivery_invoice';
+export const FINALIZE_WARRANTY_STOCK_ENTRY =
+  '/api/stock_entry/v1/finalize_warranty_stock';
+export const SYNC_SERVICE_INVOICE_ENDPOINT =
+  '/api/service_invoice/v1/sync_invoice';

@@ -293,7 +293,7 @@
                         <mat-header-cell *matHeaderCellDef>Base Rate</mat-header-cell>
                         <mat-cell *matCellDef="let row">
                             <ng-container >
-                                <input matInput [(ngModel)]="row.basic_rate" />
+                                <input matInput type="number" [(ngModel)]="row.basic_rate" />
                             </ng-container>
                         </mat-cell>
                 </ng-container>
@@ -395,7 +395,7 @@
                     <mat-header-cell *matHeaderCellDef>Base Rate</mat-header-cell>
                     <mat-cell *matCellDef="let row">
                         <ng-container *ngIf="permissionState?.stock_entry_receipt?.read">
-                            <input matInput [disabled]="readonly && status !=='Draft'" [(ngModel)]="row.basic_rate" />
+                            <input matInput type="number" [disabled]="readonly && status !=='Draft'" [(ngModel)]="row.basic_rate" />
                         </ng-container>
                     </mat-cell>
                 </ng-container>

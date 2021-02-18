@@ -15,7 +15,7 @@ import {
 } from '../../entity/serial-no/serial-no-dto';
 import { SerialNo } from '../../entity/serial-no/serial-no.entity';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, retry } from 'rxjs/operators';
+import { switchMap, retry, finalize } from 'rxjs/operators';
 import { throwError, of, from } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -38,6 +38,11 @@ import { ErrorLogService } from '../../../error-log/error-log-service/error-log.
 import { INVALID_FILE } from '../../../constants/app-strings';
 import { SERIAL_NO_NOT_FOUND } from '../../../constants/messages';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import {
+  lockDocumentTransaction,
+  unlockDocumentTransaction,
+} from '../../../constants/transaction-helper';
+import { SalesInvoiceService } from '../../../sales-invoice/entity/sales-invoice/sales-invoice.service';
 
 @Injectable()
 export class SerialNoAggregateService extends AggregateRoot {
@@ -50,6 +55,7 @@ export class SerialNoAggregateService extends AggregateRoot {
     private readonly assignSerialNoPolicyService: AssignSerialNoPoliciesService,
     private readonly deliveryNoteAggregateService: DeliveryNoteAggregateService,
     private readonly errorLogService: ErrorLogService,
+    private readonly salesInvoiceService: SalesInvoiceService,
   ) {
     super();
   }
@@ -203,11 +209,30 @@ export class SerialNoAggregateService extends AggregateRoot {
   }
 
   assignSerial(assignPayload: AssignSerialDto, clientHttpRequest) {
-    return this.assignSerialNoPolicyService.validateSerial(assignPayload).pipe(
-      switchMap(isValid => {
-        return this.deliveryNoteAggregateService.createDeliveryNote(
-          assignPayload,
-          clientHttpRequest,
+    return lockDocumentTransaction(this.salesInvoiceService, {
+      name: assignPayload.sales_invoice_name,
+    }).pipe(
+      switchMap(obj => {
+        return of(obj).pipe(
+          switchMap(() => {
+            return this.assignSerialNoPolicyService.validateSerial(
+              assignPayload,
+            );
+          }),
+          switchMap(isValid => {
+            return this.deliveryNoteAggregateService.createDeliveryNote(
+              assignPayload,
+              clientHttpRequest,
+            );
+          }),
+          // note: Finalize is a bit tricky it will get triggered on success+failure for
+          // the same level pipe as well as its parent.
+          // eg. here it will trigger on both validateSerial, createDeliveryNote fail+success and also for of(obj);
+          finalize(() =>
+            unlockDocumentTransaction(this.salesInvoiceService, {
+              name: assignPayload.sales_invoice_name,
+            }),
+          ),
         );
       }),
     );

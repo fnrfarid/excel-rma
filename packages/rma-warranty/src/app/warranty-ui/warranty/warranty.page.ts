@@ -17,6 +17,7 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { map, filter } from 'rxjs/operators';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import {
+  CATEGORY,
   WARRANTY_CLAIMS_CSV_FILE,
   WARRANTY_CLAIMS_DOWNLOAD_HEADERS,
 } from '../../constants/app-string';
@@ -44,6 +45,7 @@ export class WarrantyPage implements OnInit {
   dataSource: WarrantyClaimsDataSource;
   displayedColumns = [
     'sr_no',
+    'edit',
     'claim_no',
     'claim_type',
     'received_date',
@@ -57,6 +59,14 @@ export class WarrantyPage implements OnInit {
     'delivery_branch',
     'received_by',
     'delivered_by',
+    'product_brand',
+    'damaged_serial',
+    'replace_serial',
+    'problem',
+    'verdict',
+    'delivery_date',
+    'billed_amount',
+    'remarks',
   ];
   claimList;
   customerList;
@@ -124,8 +134,8 @@ export class WarrantyPage implements OnInit {
           undefined,
           undefined,
           undefined,
-          {},
-          { territory },
+          { set: { $ne: 'Part' } },
+          { territory, set: [CATEGORY.BULK, CATEGORY.SINGLE] },
         );
       });
   }
@@ -145,7 +155,10 @@ export class WarrantyPage implements OnInit {
       event?.pageIndex || 0,
       event?.pageSize || 30,
       query,
-      { territory: this.territoryList },
+      {
+        territory: this.territoryList,
+        set: [CATEGORY.BULK, CATEGORY.SINGLE],
+      },
     );
   }
 
@@ -166,8 +179,18 @@ export class WarrantyPage implements OnInit {
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,
-      { territory: this.territoryList },
+      {
+        territory: this.territoryList,
+        set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
+      },
     );
+  }
+
+  getBulkClaims() {
+    this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
+      territory: this.territoryList,
+      set: [CATEGORY.BULK],
+    });
   }
 
   getFilterQuery() {
@@ -218,6 +241,7 @@ export class WarrantyPage implements OnInit {
     if (status === 'All') {
       this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
         territory: this.territoryList,
+        set: [CATEGORY.BULK, CATEGORY.SINGLE],
       });
     } else {
       this.claim_status = status;
@@ -250,6 +274,7 @@ export class WarrantyPage implements OnInit {
     this.singleDateFormControl.setValue('');
     this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
       territory: this.territoryList,
+      set: [CATEGORY.BULK, CATEGORY.SINGLE],
     });
   }
 
@@ -271,6 +296,26 @@ export class WarrantyPage implements OnInit {
   }
 
   getOption() {}
+
+  warrantyRoute(row) {
+    switch (row.set) {
+      case CATEGORY.BULK:
+        this.dataSource.loadItems(
+          undefined,
+          undefined,
+          undefined,
+          { parent: row.uuid },
+          {
+            territory: this.territoryList,
+            set: ['Part'],
+          },
+        );
+        break;
+      default:
+        this.router.navigate(['/warranty/view-warranty-claims', row.uuid]);
+        break;
+    }
+  }
 
   downloadSerials() {
     this.csvService.downloadAsCSV(

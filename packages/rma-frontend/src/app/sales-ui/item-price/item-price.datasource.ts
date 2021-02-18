@@ -46,7 +46,7 @@ export class ItemPriceDataSource extends DataSource<ListingData> {
   }
 
   loadItems(
-    filter = {},
+    filter: any = {},
     sortOrder: any = { name: 'asc' },
     pageIndex = 0,
     pageSize = 30,

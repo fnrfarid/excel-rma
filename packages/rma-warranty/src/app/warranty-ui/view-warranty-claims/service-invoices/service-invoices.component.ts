@@ -1,18 +1,16 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
 import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  DURATION,
-  SERVICE_INVOICE_STATUS,
-} from '../../../constants/app-string';
+import { DURATION } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'service-invoices',
@@ -45,12 +43,16 @@ export class ServiceInvoicesComponent implements OnInit {
     private readonly serviceInvoice: AddServiceInvoiceService,
     private readonly snackbar: MatSnackBar,
     private readonly loadingController: LoadingController,
-  ) {}
+    private readonly router: Router,
+  ) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(val => {
+        this.dataSource.loadItems(this.route.snapshot.params.uuid);
+      });
+  }
 
   ngOnInit() {
-    this.route.params.subscribe(() => {
-      this.paginator.firstPage();
-    });
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoiceDataSource(this.serviceInvoice);
     this.dataSource.loadItems(this.invoiceUuid);
@@ -73,40 +75,24 @@ export class ServiceInvoicesComponent implements OnInit {
     );
   }
 
-  async submitInvoice(row) {
+  async syncInvoice() {
     const loading = await this.loadingController.create();
     await loading.present();
-    row.docstatus = 1;
-    this.serviceInvoice
-      .getStore()
-      .getItem('pos_profile')
-      .then(profile => {
-        row.pos_profile = profile;
-      });
-    row.payments = [];
-    row.payments.push({
-      account: row.pos_profile,
-      mode_of_payment: 'Cash',
-      amount: row.total,
-    });
-    if (row.is_pos) {
-      row.status = SERVICE_INVOICE_STATUS.PAID;
-    }
-    row.status = SERVICE_INVOICE_STATUS.UNPAID;
-
-    this.serviceInvoice.submitInvoice(row).subscribe({
+    this.serviceInvoice.syncInvoice(this.warrantyObject?.uuid).subscribe({
       next: () => {
         loading.dismiss();
-        this.snackbar.open('Invoice Submitted Sucessfully', 'Close', {
+        this.snackbar.open('Invoice Synced Sucessfully', 'Close', {
           duration: DURATION,
         });
+        this.dataSource.loadItems(this.invoiceUuid);
       },
       error: ({ message }) => {
         loading.dismiss();
-        if (!message) message = 'Failed to Submit Service Invoice';
+        if (!message) message = 'Failed to Sync Service Invoice';
         this.snackbar.open(message, 'Close', {
           duration: DURATION,
         });
+        this.dataSource.loadItems(this.invoiceUuid);
       },
     });
   }

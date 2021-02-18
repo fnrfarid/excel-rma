@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, map } from 'rxjs/operators';
 import {
-  LIST_ITEMS_ENDPOINT,
   API_ITEM_GET_BY_CODE,
   RELAY_GET_ITEMPRICE_ENDPOINT,
-  LIST_CUSTOMER_ENDPOINT,
   LIST_TERRITORIES_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   CREATE_SERVICE_INVOICE_ENDPOINT,
@@ -13,8 +11,10 @@ import {
   LIST_SERVICE_INVOICE_ENDPOINT,
   RELAY_LIST_ACCOUNT_ENDPOINT,
   RELAY_LIST_ADDRESS_ENDPOINT,
-  SUBMIT_SERVICE_INVOICE_ENDPOINT,
+  SYNC_SERVICE_INVOICE_ENDPOINT,
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
+  RELAY_LIST_BRANCH_ENDPOINT,
+  RELAY_GET_FULL_ITEM_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { APIResponse } from '../../../../common/interfaces/sales.interface';
@@ -63,45 +63,42 @@ export class AddServiceInvoiceService {
     );
   }
 
-  getItemList(
-    filter = {},
-    sortOrder: any = { item_name: 'asc' },
-    pageIndex = 0,
-    pageSize = 30,
-  ) {
-    try {
-      sortOrder = JSON.stringify(sortOrder);
-    } catch {
-      sortOrder = JSON.stringify({ item_name: 'asc' });
-    }
-    const url = LIST_ITEMS_ENDPOINT;
-    const query: any = {};
-    query.item_name = filter;
-    query.disabled = 0;
-
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageIndex * pageSize).toString())
-      .set('search', encodeURIComponent(JSON.stringify(query)))
-      .set('sort', sortOrder);
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http
-          .get<APIResponse>(url, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.docs);
-            }),
-            catchError(err => {
-              return of(this.itemList);
-            }),
-          );
-      }),
-    );
+  getBranch() {
+    return switchMap(value => {
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_LIST_BRANCH_ENDPOINT, {
+              headers,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
+
+  getItemList(value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["item_name","like","%${value}%"],["item_group","like","RMA SERVICE"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_GET_FULL_ITEM_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
+  }
+
   getHeaders() {
     return from(this.storage.getItem(ACCESS_TOKEN)).pipe(
       map(token => {
@@ -161,27 +158,26 @@ export class AddServiceInvoiceService {
     );
   }
 
-  getCustomerList(
-    filter = '',
-    sortOrder = 'asc',
-    pageNumber = 0,
-    pageSize = 30,
-  ) {
-    const url = LIST_CUSTOMER_ENDPOINT;
-    const params = new HttpParams()
-      .set('limit', pageSize.toString())
-      .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
-      .set('sort', sortOrder);
-
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<APIResponse>(url, {
-          params,
-          headers,
-        });
-      }),
-    );
+  getRelayList(url: string, value?) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(url, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getWarrantyDetail(uuid: string) {
@@ -307,11 +303,11 @@ export class AddServiceInvoiceService {
     );
   }
 
-  submitInvoice(payload) {
-    const url = SUBMIT_SERVICE_INVOICE_ENDPOINT;
+  syncInvoice(uuid: string) {
+    const url = SYNC_SERVICE_INVOICE_ENDPOINT;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(url, payload, { headers });
+        return this.http.post(url, { uuid }, { headers });
       }),
     );
   }

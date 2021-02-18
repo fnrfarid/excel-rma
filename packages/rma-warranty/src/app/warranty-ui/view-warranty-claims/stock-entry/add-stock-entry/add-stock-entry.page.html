@@ -153,7 +153,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  *ngIf="i"
+                  *ngIf="formControl.type.value === 'Repair' || i"
                   style="width: 400px !important"
                   [value]="row.stock_entry_type"
                   column="stock_entry_type"
@@ -186,7 +186,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  *ngIf="i"
+                  *ngIf="formControl.type.value === 'Repair' || i"
                   style="width: 400px !important"
                   [value]="row.item_name"
                   column="item"
@@ -219,7 +219,7 @@
                 (closed)="updateSerial(i,$event)"
               >
                 <inline-edit
-                  *ngIf="row.has_serial_no && i"
+                  *ngIf="row.has_serial_no && i || formControl.type.value === 'Repair'"
                   style="width: 400px !important"
                   [value]="row.serial_no"
                   column="serial_no"
@@ -255,7 +255,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  *ngIf="i"
+                  *ngIf="formControl.type.value === 'Repair' || i"
                   style="width: 400px !important"
                   [value]="row.s_warehouse"
                   column="warehouse"
@@ -274,7 +274,9 @@
               (click)="p.open()"
             >
               <ng-container> {{row.qty}} </ng-container>
-
+              <span class="add-comment" *ngIf="!row.s_warehouse">
+                Quantity
+              </span>
               <sat-popover
                 #p
                 hasBackdrop
@@ -283,7 +285,7 @@
                 (closed)="updateItem(i, $event)"
               >
                 <inline-edit
-                  *ngIf="i"
+                  *ngIf="formControl.type.value === 'Repair' || i"
                   [value]="row.qty"
                   column="quantity"
                   [minimumPrice]="row.minimumPrice"

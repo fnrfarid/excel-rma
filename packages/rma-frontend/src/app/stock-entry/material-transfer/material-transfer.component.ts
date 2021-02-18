@@ -207,7 +207,9 @@ export class MaterialTransferComponent implements OnInit {
           );
           this.form.controls.territory.disable();
           this.materialTransferDataSource.update(success.items);
+          this.itemDataSource.update(success.item_data);
           this.typeChange(success.stock_entry_type);
+          this.updateItemStock();
         },
         error: err => {},
       });
@@ -248,11 +250,13 @@ export class MaterialTransferComponent implements OnInit {
           .pipe(this.popWarehouse);
       }),
       switchMap(data => {
-        if (data && data.length) {
-          this.initial.s_warehouse
-            ? null
-            : (this.warehouseState.s_warehouse.setValue(data[0]),
-              this.initial.s_warehouse++);
+        if (data?.length) {
+          if (!this.initial.s_warehouse) {
+            this.materialTransferDataSource.data().length
+              ? null
+              : this.warehouseState.s_warehouse.setValue(data[0]);
+            this.initial.s_warehouse++;
+          }
           return of(data);
         }
         return of([]);
@@ -330,8 +334,13 @@ export class MaterialTransferComponent implements OnInit {
           ];
         this.deliveredSerialsState.uuid = this.uuid;
 
-      default:
-        break;
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        this.deliveredSerialsState.type = DELIVERED_SERIALS_BY.stock_entry_uuid;
+        this.deliveredSerialsState.deliveredSerialsDisplayedColumns =
+          DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+            DELIVERED_SERIALS_BY.purchase_invoice_name
+          ];
+        this.deliveredSerialsState.uuid = this.uuid;
     }
   }
 
@@ -412,14 +421,20 @@ export class MaterialTransferComponent implements OnInit {
     this.itemDataSource.loadingSubject.next(true);
     warehouse = warehouse ? warehouse : this.warehouseState.s_warehouse.value;
     if (!warehouse) {
+      this.itemDataSource.loadingSubject.next(false);
+      if (
+        this.form.controls.stock_entry_type.value ===
+        STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+      ) {
+        return;
+      }
       this.getMessage(
         'Please select a source warehouse to get available stock',
       );
-      this.itemDataSource.loadingSubject.next(false);
       return;
     }
     const items = [];
-    this.itemDataSource.data().forEach(item => items.push(item.item_code));
+    this.itemDataSource.data()?.forEach(item => items.push(item.item_code));
 
     if (!items.length) {
       this.itemDataSource.loadingSubject.next(false);
@@ -613,8 +628,8 @@ export class MaterialTransferComponent implements OnInit {
     const materialTransferData = this.materialTransferDataSource.data();
     const materialTransferRow = new StockEntryRow();
     materialTransferRow.transferWarehouse = this.transferWarehouse;
-    materialTransferRow.s_warehouse = this.warehouseState.s_warehouse.value;
-    materialTransferRow.t_warehouse = this.warehouseState.t_warehouse.value;
+    materialTransferRow.s_warehouse = this.getSourceWarehouse();
+    materialTransferRow.t_warehouse = this.getTargetWarehouse();
     materialTransferRow.item_code = item.item_code;
     materialTransferRow.item_name = item.item_name;
     materialTransferRow.warranty_date = await this.getWarrantyDate(item);
@@ -626,6 +641,29 @@ export class MaterialTransferComponent implements OnInit {
     this.updateProductState(item.item_code, serials?.length || 0);
     materialTransferData.push(materialTransferRow);
     this.materialTransferDataSource.update(materialTransferData);
+  }
+
+  getSourceWarehouse() {
+    switch (this.form.controls.stock_entry_type.value) {
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        return '';
+
+      default:
+        this.warehouseState.s_warehouse.value;
+    }
+  }
+
+  getTargetWarehouse() {
+    switch (this.form.controls.stock_entry_type.value) {
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        return '';
+
+      case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        return '';
+
+      default:
+        this.warehouseState.t_warehouse.value;
+    }
   }
 
   async getWarrantyDate(item: ItemInterface) {
@@ -725,6 +763,7 @@ export class MaterialTransferComponent implements OnInit {
     body.posting_time = date.time;
     body.stock_entry_type = this.form.controls.stock_entry_type.value;
     body.items = this.materialTransferDataSource.data();
+    body.item_data = this.itemDataSource.data();
     body.uuid = this.uuid;
     if (
       this.form.controls.stock_entry_type.value ===
@@ -817,14 +856,6 @@ export class MaterialTransferComponent implements OnInit {
 
   validateWarehouseState() {
     if (
-      !this.warehouseState.s_warehouse.value ||
-      !this.warehouseState.t_warehouse.value
-    ) {
-      this.getMessage('Please select source and target warehouse.');
-      return false;
-    }
-
-    if (
       this.warehouseState.s_warehouse.value ===
       this.warehouseState.t_warehouse.value
     ) {
@@ -838,6 +869,27 @@ export class MaterialTransferComponent implements OnInit {
       this.getMessage('Please select a stock entry type.');
       return false;
     }
+
+    if (
+      !this.warehouseState.s_warehouse.value &&
+      this.form.controls.stock_entry_type.value !==
+        STOCK_ENTRY_TYPE.MATERIAL_RECEIPT
+    ) {
+      this.getMessage('Please select source warehouse.');
+      return false;
+    }
+
+    if (
+      !this.warehouseState.t_warehouse.value &&
+      [
+        STOCK_ENTRY_TYPE.MATERIAL_RECEIPT,
+        STOCK_ENTRY_TYPE.MATERIAL_TRANSFER,
+      ].includes(this.form.controls.stock_entry_type.value)
+    ) {
+      this.getMessage('Please select target warehouse.');
+      return false;
+    }
+
     return true;
   }
 
@@ -927,7 +979,7 @@ export class MaterialTransferComponent implements OnInit {
     return base_rate;
   }
 
-  typeChange(value) {
+  typeChange(stock_entry_type) {
     this.materialTransferDisplayedColumns = [
       ...MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
     ];
@@ -937,7 +989,7 @@ export class MaterialTransferComponent implements OnInit {
         1,
       );
     }
-    if (value !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
+    if (stock_entry_type !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
       this.materialTransferDisplayedColumns = [
         ...MATERIAL_TRANSFER_DISPLAYED_COLUMNS,
       ];
@@ -946,7 +998,7 @@ export class MaterialTransferComponent implements OnInit {
         0,
         'warranty_date',
       );
-      if (value === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
+      if (stock_entry_type === STOCK_ENTRY_TYPE.MATERIAL_RECEIPT) {
         this.itemDisplayedColumns.splice(
           this.itemDisplayedColumns.length - 2,
           0,
@@ -959,8 +1011,49 @@ export class MaterialTransferComponent implements OnInit {
         );
       }
     }
+    this.disabledWarehouse(stock_entry_type);
+    this.setDeliveredSerialState(stock_entry_type);
+  }
 
-    this.setDeliveredSerialState(value);
+  disabledWarehouse(stock_entry_type) {
+    this.warehouseState.s_warehouse.enable();
+    this.warehouseState.t_warehouse.enable();
+    this.warehouseState.s_warehouse.reset();
+    this.warehouseState.t_warehouse.reset();
+    switch (stock_entry_type) {
+      case STOCK_ENTRY_TYPE.MATERIAL_TRANSFER:
+        this.warehouseState.s_warehouse.setValue(
+          this.materialTransferDataSource.data()[0]?.s_warehouse || '',
+        );
+        this.warehouseState.t_warehouse.setValue(
+          this.materialTransferDataSource.data()[0]?.t_warehouse || '',
+        );
+        return;
+
+      case STOCK_ENTRY_TYPE.MATERIAL_RECEIPT:
+        this.materialTransferDisplayedColumns.splice(
+          this.materialTransferDisplayedColumns.indexOf('s_warehouse'),
+          1,
+        );
+        this.warehouseState.s_warehouse.setValue('');
+        this.warehouseState.s_warehouse.disable();
+        this.warehouseState.t_warehouse.setValue(
+          this.materialTransferDataSource.data()[0]?.t_warehouse || '',
+        );
+        return;
+
+      default:
+        this.materialTransferDisplayedColumns.splice(
+          this.materialTransferDisplayedColumns.indexOf('t_warehouse'),
+          1,
+        );
+        this.warehouseState.t_warehouse.disable();
+        this.warehouseState.t_warehouse.setValue('');
+        this.warehouseState.s_warehouse.setValue(
+          this.materialTransferDataSource.data()[0]?.s_warehouse || '',
+        );
+        return;
+    }
   }
 
   assignPickerState(rangePickerState) {

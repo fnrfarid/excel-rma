@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.5.0...rma-frontend@1.6.0) (2021-02-18)
+
+
+### Features
+
+* **excel-rma:** Add transaction lock for sales invoice ([3cfa0a5](https://gitlab.com/castlecraft/excel-rma/commit/3cfa0a5aebeb96602a08a1a9583d7dbf4bae2acc))
+* **Excel-rma:** Add brand settings and favicon in global defaults ([7aa4c8f](https://gitlab.com/castlecraft/excel-rma/commit/7aa4c8f7f4a05ea3db72bfba7c4c46fe688d9d4a))
+* **Excel-rma:** Add logic to fetch delivered serials for transfer ([87246b4](https://gitlab.com/castlecraft/excel-rma/commit/87246b44083c195ce5bcd031be4a7eef94a8c9ef))
+* **Excel-rma:** Add stock item and table optimizations ([2ccfab7](https://gitlab.com/castlecraft/excel-rma/commit/2ccfab7b2d37a45d07434789d6031a281a2637df))
+* **rma-frontend:** Add updated waerhouse list for serial transfer ([1e91dfa](https://gitlab.com/castlecraft/excel-rma/commit/1e91dfa975aec365f7ee138c4046b10a96459b93))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 4 ([60e1274](https://gitlab.com/castlecraft/excel-rma/commit/60e1274f4c94e245898ca15abef2efcbabab4440))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 5 ([25d7523](https://gitlab.com/castlecraft/excel-rma/commit/25d7523e76f23f2090d6349990d5918cbaa6cb4b))
+* **rma-frontend:** Added Delivery Status tag for Sales Invoice voucher change 6 ([635f9c7](https://gitlab.com/castlecraft/excel-rma/commit/635f9c788044ea04f2b409629e5e11d2a1e55ba0))
+* **rma-frontend:** Customer name link added on Customer page ([a711f3f](https://gitlab.com/castlecraft/excel-rma/commit/a711f3f9ca6628cd1e2d58c6e768ddf8fe122cd3))
+* **rma-frontend:** Fixed URL and code ([c8eaede](https://gitlab.com/castlecraft/excel-rma/commit/c8eaede1c5228c9eb5f334dd3660417fdda65e22))
+* **rma-frontend:** Fixed URL and code again ([744c72a](https://gitlab.com/castlecraft/excel-rma/commit/744c72a1dceb7766030f27eb55f9ffc1564722bf))
+* **rma-frontend:** Fixed URL and code again and again and again ([47b4afa](https://gitlab.com/castlecraft/excel-rma/commit/47b4afa1887b9b2326d46e254665daa94e8e23cf))
+* **rma-frontend:** Fixed URL and code and again ([78a95c6](https://gitlab.com/castlecraft/excel-rma/commit/78a95c6fb62bda147d6fc663cb1f62eb43e772d5))
+* **rma-frontend:** Only items with is_stock_item will be displayed ([80e92e5](https://gitlab.com/castlecraft/excel-rma/commit/80e92e5a2f706f6f34c09372a941bf32e189fe3c))
+* **rma-frontend:** Optimized code and removed hardcoded link and variables ([0bb6c47](https://gitlab.com/castlecraft/excel-rma/commit/0bb6c47d94a126aafd30206a101017f0a608f65b))
+
+
+
+
+
 # [1.5.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.4.0...rma-frontend@1.5.0) (2021-02-09)
 
 

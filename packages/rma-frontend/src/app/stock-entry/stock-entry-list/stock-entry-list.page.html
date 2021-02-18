@@ -305,7 +305,7 @@
               From Warehouse
             </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{row?.items[0].s_warehouse }}
+              {{ ['Material Receipt'].includes(row.stock_entry_type) ?  '' : row?.items[0].s_warehouse  }}
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
@@ -313,7 +313,7 @@
           <ng-container matColumnDef="t_warehouse">
             <mat-header-cell *matHeaderCellDef> To Warehouse </mat-header-cell>
             <mat-cell *matCellDef="let row">
-              {{row?.items[0].t_warehouse }}
+              {{ !['Material Receipt','Material Transfer'].includes(row.stock_entry_type) ? '' : row?.items[0].t_warehouse  }}
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>

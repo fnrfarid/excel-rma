@@ -142,20 +142,43 @@ export class WarrantyStockEntryAggregateService {
         );
       }),
       switchMap(() => {
+        return from(deliveryNotesList).pipe(
+          concatMap(deliveryNote => {
+            return this.syncProgressState(
+              warrantyPayload.warrantyClaimUuid,
+              deliveryNote,
+            );
+          }),
+          toArray(),
+        );
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
+      }),
+    );
+  }
+
+  makeStatusHistory(uuid: string, req) {
+    return forkJoin({
+      warranty: this.warrantyService.findOne(uuid),
+      settingState: this.settingService.find(),
+    }).pipe(
+      switchMap(claim => {
         const statusHistoryDetails = {} as any;
-        statusHistoryDetails.uuid = warrantyPayload.warrantyClaimUuid;
+        statusHistoryDetails.uuid = claim.warranty.uuid;
         (statusHistoryDetails.time = new DateTime(
-          settingState.timeZone,
+          claim.settingState.timeZone,
         ).toFormat('HH:mm:ss')),
           (statusHistoryDetails.posting_date = new DateTime(
-            settingState.timeZone,
+            claim.settingState.timeZone,
           ).toFormat('yyyy-MM-dd')),
           (statusHistoryDetails.status_from = req.token.territory[0]);
         statusHistoryDetails.verdict = VERDICT.DELIVER_TO_CUSTOMER;
-        statusHistoryDetails.description = warrantyPayload.description;
+        statusHistoryDetails.description =
+          claim.warranty.progress_state[0].description;
         statusHistoryDetails.created_by_email = req.token.email;
         statusHistoryDetails.created_by = req.token.name;
-        switch (warrantyPayload.type) {
+        switch (claim.warranty.progress_state[0].type) {
           case 'Replace':
             statusHistoryDetails.delivery_status = DELIVERY_STATUS.REPLACED;
             break;
@@ -171,17 +194,6 @@ export class WarrantyStockEntryAggregateService {
         return this.warrantyAggregateService.addStatusHistory(
           statusHistoryDetails,
           req,
-        );
-      }),
-      switchMap(() => {
-        return from(deliveryNotesList).pipe(
-          concatMap(deliveryNote => {
-            return this.syncProgressState(
-              warrantyPayload.warrantyClaimUuid,
-              deliveryNote,
-            );
-          }),
-          toArray(),
         );
       }),
       catchError(err => {
@@ -208,8 +220,6 @@ export class WarrantyStockEntryAggregateService {
     switch (deliveryNote.stock_entry_type) {
       case 'Returned':
         serialData = {
-          progress_state: deliveryNote,
-          completed_delivery_note: erpDN,
           damaged_serial: deliveryNote.items[0].serial_no,
           damage_warehouse: deliveryNote.items[0].warehouse,
           damage_product: deliveryNote.items[0].item_name,
@@ -217,8 +227,6 @@ export class WarrantyStockEntryAggregateService {
         break;
       case 'Delivered':
         serialData = {
-          progress_state: deliveryNote,
-          completed_delivery_note: erpDN,
           replace_serial: deliveryNote.items[0].serial_no,
           replace_warehouse: deliveryNote.items[0].warehouse,
           replace_product: deliveryNote.items[0].item_name,
@@ -231,7 +239,11 @@ export class WarrantyStockEntryAggregateService {
       this.warrantyService.updateOne(
         { uuid: deliveryNote.warrantyClaimUuid },
         {
-          $push: serialData,
+          $push: {
+            progress_state: deliveryNote,
+            completed_delivery_note: erpDN,
+          },
+          $set: serialData,
         },
       ),
     );
@@ -545,32 +557,38 @@ export class WarrantyStockEntryAggregateService {
           return of([]);
         }),
         switchMap(() => {
-          return this.stockEntryService.deleteOne({
-            stock_voucher_number: stockEntry.stock_voucher_number,
-          });
+          return from(
+            this.stockEntryService.deleteOne({
+              stock_voucher_number: stockEntry.stock_voucher_number,
+            }),
+          );
         }),
         switchMap(() => {
           return this.revertStatusHistory(stockEntry.warrantyClaimUuid);
         }),
         switchMap(() => {
-          return this.warrantyService.updateOne(
-            { uuid: stockEntry.warrantyClaimUuid },
-            {
-              $pull: {
-                completed_delivery_note: {
-                  name: stockEntry.stock_voucher_number,
-                },
-                progress_state: {
-                  stock_voucher_number: stockEntry.stock_voucher_number,
+          return from(
+            this.warrantyService.updateOne(
+              { uuid: stockEntry.warrantyClaimUuid },
+              {
+                $pull: {
+                  completed_delivery_note: {
+                    name: stockEntry.stock_voucher_number,
+                  },
+                  progress_state: {
+                    stock_voucher_number: stockEntry.stock_voucher_number,
+                  },
                 },
               },
-            },
+            ),
           );
         }),
         switchMap(() => {
-          return this.serialNoHistoryService.deleteOne({
-            document_no: stockEntry.stock_voucher_number,
-          });
+          return from(
+            this.serialNoHistoryService.deleteOne({
+              document_no: stockEntry.stock_voucher_number,
+            }),
+          );
         }),
       );
   }

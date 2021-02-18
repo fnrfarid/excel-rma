@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { WarrantyClaimService } from './warranty-claim.service';
 import { WarrantyClaim } from './warranty-claim.entity';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
 describe('warrantyClaimService', () => {
   let service: WarrantyClaimService;
@@ -12,6 +13,10 @@ describe('warrantyClaimService', () => {
         WarrantyClaimService,
         {
           provide: getRepositoryToken(WarrantyClaim),
+          useValue: {},
+        },
+        {
+          provide: SettingsService,
           useValue: {},
         },
       ],

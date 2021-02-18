@@ -8,7 +8,10 @@ import {
   BEARER_TOKEN_PREFIX,
 } from '../../../../../constants/storage';
 import { map, switchMap } from 'rxjs/operators';
-import { CANCEL_STOCK_ENTRY_ENDPOINT } from '../../../../../constants/url-strings';
+import {
+  CANCEL_STOCK_ENTRY_ENDPOINT,
+  FINALIZE_WARRANTY_STOCK_ENTRY,
+} from '../../../../../constants/url-strings';
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +52,15 @@ export class StockEntryService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(URL, stockVoucherNumber, { headers });
+      }),
+    );
+  }
+
+  finalizeEntry(uuid: string) {
+    const URL = `${FINALIZE_WARRANTY_STOCK_ENTRY}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(URL, { uuid }, { headers });
       }),
     );
   }

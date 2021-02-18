@@ -5,6 +5,8 @@ import { ServerSettingsService } from '../../../system-settings/entities/server-
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { DeliveryChalanDto } from '../../../print/entities/print/print.dto';
 import { Response } from 'express';
+import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
+import { CLAIM_STATUS } from '../../../constants/app-strings';
 
 @Injectable()
 export class PrintAggregateService {
@@ -44,8 +46,13 @@ export class PrintAggregateService {
 
       const serverSettings = await this.settings.find();
       await this.generateHeader(doc, serverSettings);
-      this.generateCustomerInformation(doc, invoice);
-      this.generatePrintTable(doc, invoice);
+      if (invoice.claim_no) {
+        this.generateWarrantyCustomerInformation(doc, invoice);
+        this.generateWarrantyPrintTable(doc, invoice);
+      } else {
+        this.generateCustomerInformation(doc, invoice);
+        this.generatePrintTable(doc, invoice);
+      }
       await this.generateFooter(doc, serverSettings);
       doc.end();
     });
@@ -90,11 +97,11 @@ export class PrintAggregateService {
       .text('Customer:', 50, customerInformationTop)
       .text(invoice.customer_name, 100, customerInformationTop, { width: 200 })
       .text('Address:', 50, customerInformationTop + 15)
-      .text(invoice.address, 100, customerInformationTop)
+      .text(invoice.address, 100, customerInformationTop + 15)
       .text('Contact:', 50, customerInformationTop + 30)
       .text(invoice.contact, 100, customerInformationTop + 30)
       .text('Mobile No:', 50, customerInformationTop + 45)
-      .text(invoice.contact, 100, customerInformationTop + 15)
+      .text(invoice.contact, 100, customerInformationTop + 45)
 
       .text('Posting Date:', 300, customerInformationTop)
       .text(invoice.posting_date, 420, customerInformationTop)
@@ -253,5 +260,294 @@ export class PrintAggregateService {
     const year = date.getFullYear();
 
     return year + '/' + month + '/' + day;
+  }
+
+  generateWarrantyCustomerInformation(doc, invoice: WarrantyClaimDto) {
+    // this function is not updated if your working don't make changes unless your trying to make it dynamic.
+    // this customer section will be dynamic from a object instead of hardcoded.
+    doc.moveDown();
+    doc.moveDown();
+    doc
+      .fillColor('#444444')
+      .fontSize(20)
+      .text(invoice.print?.print_type || 'Delivery Chalan', {
+        align: 'center',
+      });
+    doc.moveDown();
+    const cord = { x: doc.x, y: doc.y };
+    doc
+      .fontSize(10)
+      .text(invoice.claim_no, cord.x, cord.y, { align: 'left' })
+      .text(invoice.receiving_branch, cord.x, cord.y, { align: 'right' });
+    doc.moveDown();
+    this.generateHr(doc, doc.y);
+
+    const customerInformationTop = doc.y;
+
+    doc
+      .fontSize(10)
+      .text('Contact Name:', 50, customerInformationTop)
+      .text(invoice.customer, 150, customerInformationTop, { width: 200 })
+      .text('Contact No', 50, customerInformationTop + 15)
+      .text(invoice.customer_contact, 150, customerInformationTop + 15)
+
+      .text('Remarks', 50, customerInformationTop + 45)
+      .text(invoice.remarks, 150, customerInformationTop + 45)
+      .text('Contact Address', 50, customerInformationTop + 60)
+      .text(invoice.customer_address, 150, customerInformationTop + 60)
+
+      .text('Claim No', 300, customerInformationTop)
+      .text(invoice.claim_no, 420, customerInformationTop)
+      .text('Claim Date:', 300, customerInformationTop + 15)
+      .text(invoice.received_on, 420, customerInformationTop + 15)
+      .text('Delivery Date', 300, customerInformationTop + 30)
+      .text(invoice.deliver_date, 420, customerInformationTop + 30)
+      .text('Claim Branch', 300, customerInformationTop + 45)
+      .text(invoice.receiving_branch, 420, customerInformationTop + 45);
+
+    switch (invoice.claim_status) {
+      case CLAIM_STATUS.DELIVERED:
+        doc
+          .fontSize(10)
+          .text('Delivered By:', 300, customerInformationTop + 60)
+          .text(invoice.delivered_by, 420, customerInformationTop + 60)
+          .text('Delivered To', 50, customerInformationTop + 30)
+          .text(invoice.customer, 150, customerInformationTop + 30);
+        break;
+      default:
+        doc
+          .fontSize(10)
+          .text('Received From', 50, customerInformationTop + 30)
+          .text(invoice.customer, 150, customerInformationTop + 30)
+          .text('Received By:', 300, customerInformationTop + 60)
+          .text(invoice.received_by, 420, customerInformationTop + 60);
+        break;
+    }
+
+    if (invoice?.print?.s_warehouse || invoice?.print?.t_warehouse) {
+      if (invoice?.print?.s_warehouse) {
+        doc
+          .fontSize(11)
+          .fillColor('#000000')
+          .text(
+            `From Warehouse: ${invoice.print.s_warehouse}`,
+            50,
+            customerInformationTop + 95,
+          );
+      }
+
+      if (invoice?.print?.t_warehouse) {
+        doc
+          .fontSize(11)
+          .fillColor('#000000')
+          .text(
+            `To Warehouse: ${invoice.print.t_warehouse}`,
+            300,
+            customerInformationTop + 95,
+            { align: 'right' },
+          );
+      }
+    }
+
+    doc.moveDown().moveDown();
+  }
+
+  generateWarrantyPrintTable(doc, invoice: WarrantyClaimDto) {
+    const invoiceTableTop = doc.y + 10;
+
+    doc.font('Helvetica-Bold');
+    switch (invoice.claim_status) {
+      case CLAIM_STATUS.DELIVERED:
+        this.generateWarrantyTableRow(
+          doc,
+          invoiceTableTop,
+          'Status',
+          { name: 'Claimed Product' },
+          { name: 'Replaced Product' },
+        );
+        break;
+
+      default:
+        this.generateWarrantyTableRow(doc, invoiceTableTop, 'Status', {
+          name: 'Claimed Product',
+        });
+        break;
+    }
+
+    doc.moveDown();
+    this.generateHr(doc, invoiceTableTop + 20);
+    doc.font('Helvetica');
+    switch (invoice.claim_status) {
+      case CLAIM_STATUS.DELIVERED:
+        this.generateWarrantyTableRow(
+          doc,
+          doc.y,
+          invoice.status_history.splice(-1)[0].delivery_status,
+          {
+            name: invoice.item_name,
+            serials: invoice.serial_no ? invoice.serial_no : undefined,
+            warranty_end_date: invoice.warranty_end_date,
+          },
+          {
+            name: invoice.replace_product,
+            serials: invoice.replace_serial
+              ? invoice.replace_serial
+              : undefined,
+            warranty_end_date: invoice.warranty_end_date,
+          },
+        );
+        break;
+      default:
+        this.generateWarrantyTableRow(
+          doc,
+          doc.y,
+
+          invoice.status_history.splice(-1)[0].delivery_status,
+          {
+            name: invoice.item_name,
+            serials: invoice.serial_no ? invoice.serial_no : undefined,
+            warranty_end_date: invoice.warranty_end_date,
+          },
+        );
+        break;
+    }
+    this.checkPagePagination(doc);
+    doc.moveDown();
+    this.generateHr(doc, doc.y);
+    doc.moveDown();
+
+    this.generateTableRow(doc, doc.y, '', { name: '' }, '');
+    doc.moveDown();
+    doc.moveDown();
+    this.checkPagePagination(doc);
+
+    if (invoice.billed_amount) {
+      let height = doc.y;
+      doc.font('Helvetica-Bold');
+      doc.text('Voucher Number', 50, height, { width: 100 });
+      doc.text('Product Description', 150, height, { width: 200 });
+      doc.text('Total', 250, height, { width: 100 });
+      doc.text('Paid Amount', 350, height, { width: 100 });
+      doc.text('Unpaid Amount', 450, height, { width: 100 });
+      doc.moveDown();
+      height = doc.y;
+      doc.font('Helvetica');
+      doc.text('', 50, height, { width: 50 });
+      doc.text(invoice.problem_details, 150, height, { width: 200 });
+      doc.text(invoice.billed_amount, 250, height, { width: 100 });
+      doc.text(invoice.billed_amount, 350, height, { width: 100 });
+      doc.text('0', 450, height, { width: 100 });
+    }
+
+    doc.moveDown();
+    doc.fontSize(10).text(`Terms:`, 50, doc.y);
+    doc
+      .fontSize(9)
+      .text(
+        `- Temporarily received for checking. Decision for warranty claim can be obtained on the next 3 working days.`,
+        50,
+        doc.y,
+      );
+    doc
+      .fontSize(9)
+      .text(
+        `- The RMA department will thoroughly inspect the product and will support as per company warranty policy.`,
+        50,
+        doc.y,
+      );
+    doc.fontSize(9).text(
+      `- The warranty is not applicable for power supply, adapter, remote-control, 
+    sticker removed items, burnt and physically damaged items, products
+    with tampered & missing serial numbers.`,
+      50,
+      doc.y,
+    );
+    doc.fontSize(9).text(
+      `- If any goods are not taken back within 30 days,
+    ETL authority will not be responsible for any damage or loss of the goods.`,
+      50,
+      doc.y,
+    );
+    doc
+      .fontSize(9)
+      .text(
+        `- For any Information, please call Hotline: +88 09606 - 999645`,
+        50,
+        doc.y,
+      );
+
+    doc.moveDown();
+    doc.moveDown();
+    doc.moveDown();
+    const cord = { x: doc.x, y: doc.y };
+    doc
+      .fontSize(13)
+      .text('Received with good condition by', 50, cord.y, { underline: true });
+    doc.fontSize(13).text(`For ${invoice.company} `, 250, cord.y, {
+      underline: true,
+      align: 'right',
+    });
+  }
+
+  generateWarrantyTableRow(
+    doc,
+    y,
+    status,
+    item: { name: string; serials?: string; warranty_end_date?: Date },
+    replaced_item?: {
+      name: string;
+      serials?: string;
+      warranty_end_date?: Date;
+    },
+  ) {
+    doc.moveDown();
+    const height = doc.y;
+    let hgt;
+    if (!replaced_item) {
+      hgt = doc.y - 10;
+    } else {
+      hgt = doc.y;
+    }
+    doc.fontSize(10).fillColor('#000000').text('', 20, height);
+    doc.text(item.name, 50, hgt, { width: 200 });
+    doc.text(status, 450, height, { align: 'right' });
+    if (item.serials) {
+      doc
+        .fillColor('#444444')
+        .text(this.getSerialKeys(item), 50, doc.y, { width: 200 });
+    }
+    if (item.warranty_end_date) {
+      doc
+        .fillColor('#444444')
+        .text(
+          this.getWarrantyDate(item.warranty_end_date.toString()),
+          50,
+          doc.y,
+          { width: 200 },
+        );
+    }
+    if (replaced_item) {
+      doc.fontSize(10).fillColor('#000000').text('', 20, height);
+      doc.text(replaced_item.name, 200, doc.y, { width: 200 });
+      if (replaced_item.serials) {
+        doc
+          .fillColor('#444444')
+          .text(this.getSerialKeys(replaced_item), 200, doc.y, { width: 200 });
+      }
+      if (replaced_item.warranty_end_date) {
+        doc
+          .fillColor('#444444')
+          .text(
+            this.getWarrantyDate(replaced_item.warranty_end_date.toString()),
+            200,
+            doc.y,
+            { width: 200 },
+          );
+      }
+    }
+  }
+
+  getWarrantyDate(warranty_date: string) {
+    return `Warranty End Date: ${warranty_date} `;
   }
 }

@@ -9,6 +9,7 @@ import {
 import { PurchaseService } from '../../../purchase-ui/services/purchase.service';
 import { SalesService } from '../../../sales-ui/services/sales.service';
 import { CommonDeliveredSerialsDataSource } from './delivered-serials-datasource';
+import { StockEntryService } from '../../../stock-entry/services/stock-entry/stock-entry.service';
 
 @Component({
   selector: 'app-delivered-serials',
@@ -27,6 +28,7 @@ export class DeliveredSerialsComponent implements OnInit {
   deliveredSerialsDataSource: CommonDeliveredSerialsDataSource;
   constructor(
     private readonly salesService: SalesService,
+    private readonly stockService: StockEntryService,
     private readonly purchaseService: PurchaseService,
     private readonly csvService: CsvJsonService,
   ) {}
@@ -35,6 +37,7 @@ export class DeliveredSerialsComponent implements OnInit {
     this.deliveredSerialsDataSource = new CommonDeliveredSerialsDataSource(
       this.salesService,
       this.purchaseService,
+      this.stockService,
     );
   }
   downloadSerials() {

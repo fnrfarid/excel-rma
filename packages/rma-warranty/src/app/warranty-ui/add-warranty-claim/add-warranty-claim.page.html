@@ -5,7 +5,10 @@
         <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title color="tertiary">Warranty Claim Creation Form</ion-title>
+    <ion-title color="tertiary" *ngIf="route ==='add'"
+      >Warranty Claim Creation Form</ion-title
+    >
+    <ion-title color="tertiary" *ngIf="route ==='edit'">Update Claim</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -18,24 +21,31 @@
     horizontal="end"
   >
     <ion-fab-button
+      *ngIf="route ==='add'"
       class="fab-position"
       (click)="createClaim()"
       [disabled]="warrantyClaimForm.invalid"
     >
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
+    <ion-fab-button
+      *ngIf="route ==='edit'"
+      class="fab-position"
+      (click)="updateClaim()"
+      [disabled]="warrantyClaimForm.invalid"
+    >
+      <ion-icon name="pencil"></ion-icon>
+    </ion-fab-button>
   </ion-fab>
   <form [formGroup]="warrantyClaimForm">
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Product Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Product Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.serial_no.active">
+            <ion-col *ngIf="warrantyState?.serial_no?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -75,7 +85,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.invoice_no.active">
+            <ion-col *ngIf="warrantyState?.invoice_no?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -88,7 +98,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.warranty_end_date.active">
+            <ion-col *ngIf="warrantyState?.warranty_end_date?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -112,34 +122,34 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.product_name.active">
+            <ion-col>
               <mat-form-field class="example-full-width">
                 <input
                   matInput
                   type="text"
                   placeholder="Product Name"
                   formControlName="product_name"
-                  [matAutocomplete]="productName"
+                  [matAutocomplete]="product_name"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
-                  #productName="matAutocomplete"
+                  #product_name="matAutocomplete"
                   [displayWith]="getItemOption"
                   (optionSelected)="itemOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of productList |async"
+                    *ngFor="let option of productList | async"
                     [value]="option"
                   >
                     {{ option.item_name }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.product_name.hasError('required')">
-                  Product Name is <strong>required</strong>
+                  Product is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.product_brand.active">
+            <ion-col *ngIf="warrantyState?.product_brand?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -202,21 +212,105 @@
                 />
               </mat-form-field>
             </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width" *ngIf="route ==='add'">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Claim Category"
+                  formControlName="category"
+                  [matAutocomplete]="claimCategory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #claimCategory="matAutocomplete"
+                  [displayWith]="getOption"
+                >
+                  <mat-option
+                    *ngFor="let option of categoryList"
+                    [value]="option"
+                  >
+                    {{ option }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.category.hasError('required')">
+                  Claim Category is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row class="align" *ngIf="route ==='add'">
+            <ion-col class="ion-text-left">
+              <ion-button
+                color="tertiary"
+                [disabled]="f.category.value !=='Bulk'"
+                (click)="appendProduct()"
+              >
+                Add
+              </ion-button>
+            </ion-col>
             <ion-col> </ion-col>
           </ion-row>
         </ion-grid>
       </ion-card-content>
     </ion-card>
+    <ion-card *ngIf="bulkProducts.length">
+      <ion-card-header>
+        <ion-grid>
+          <ion-row>
+            <ion-col class="ion-text-left">
+              <ion-card-title>
+                <ion-text color="tertiary">Bulk Product </ion-text>
+              </ion-card-title>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-header>
+      <ion-card-content class="ion-no-padding">
+        <div class="example-container mat-elevation-z8">
+          <mat-table [dataSource]="bulkProducts">
+            <ng-container
+              matColumnDef="{{column}}"
+              *ngFor="let column of displayedColumns"
+            >
+              <mat-header-cell *matHeaderCellDef>{{column}}</mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <ng-container *ngIf="row[column]">
+                  {{ row[column] }}
+                </ng-container>
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+            <mat-footer-row
+              class="footer"
+              *matFooterRowDef="displayedColumns; sticky: true"
+            ></mat-footer-row>
+          </mat-table>
+        </div>
+        <mat-card-actions>
+          <mat-paginator
+            #paginator
+            class="mat-paginator-sticky"
+            (page)="getUpdate($event)"
+            [length]="bulkProducts.length"
+            [pageSizeOptions]="[30, 50, 100, 500]"
+          >
+          </mat-paginator>
+        </mat-card-actions>
+      </ion-card-content>
+    </ion-card>
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Customer Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Customer Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.customer_name.active">
+            <ion-col *ngIf="warrantyState?.customer_name?.active">
               <mat-form-field class="example-full-width">
                 <input
                   type="text"
@@ -236,9 +330,7 @@
                     [value]="option"
                   >
                     {{ option.customer_name }}
-                    <small class="text-muted">
-                      {{ option.name}}
-                    </small>
+                    <small class="text-muted"> {{ option.name}} </small>
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('required')">
@@ -246,7 +338,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.third_party_name.active">
+            <ion-col *ngIf="warrantyState?.third_party_name?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -261,7 +353,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.customer_contact.active">
+            <ion-col *ngIf="warrantyState?.customer_contact?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -274,7 +366,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.third_party_contact.active">
+            <ion-col *ngIf="warrantyState?.third_party_contact?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -289,7 +381,7 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState.customer_address.active">
+            <ion-col *ngIf="warrantyState?.customer_address?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -302,7 +394,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col *ngIf="warrantyState.third_party_address.active">
+            <ion-col *ngIf="warrantyState?.third_party_address?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
@@ -319,11 +411,9 @@
         </ion-grid>
       </ion-card-content>
     </ion-card>
-    <ion-card>
+    <ion-card *ngIf="route ==='add'">
       <ion-card-header>
-        <ion-card-title color="tertiary">
-          Company Details
-        </ion-card-title>
+        <ion-card-title color="tertiary"> Company Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">

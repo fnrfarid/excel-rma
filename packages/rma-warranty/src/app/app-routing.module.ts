@@ -33,7 +33,14 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'warranty/add-warranty-claim/:uuid',
+    path: 'warranty/warranty-claim/:name/:uuid',
+    loadChildren: () =>
+      import('./warranty-ui/add-warranty-claim/add-warranty-claim.module').then(
+        m => m.AddWarrantyClaimPageModule,
+      ),
+  },
+  {
+    path: 'warranty/warranty-claim/:name',
     loadChildren: () =>
       import('./warranty-ui/add-warranty-claim/add-warranty-claim.module').then(
         m => m.AddWarrantyClaimPageModule,

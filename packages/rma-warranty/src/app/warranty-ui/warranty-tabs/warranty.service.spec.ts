@@ -4,6 +4,7 @@ import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { HttpErrorHandler } from '../../common/interfaces/services/http-error-handler/http-error-handler.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { STORAGE_TOKEN } from '../../api/storage/storage.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 describe('WarrantyService', () => {
   beforeEach(() =>
@@ -18,6 +19,10 @@ describe('WarrantyService', () => {
           },
         },
         { provide: STORAGE_TOKEN, useValue: {} },
+        {
+          provide: MatSnackBar,
+          useValue: {},
+        },
       ],
     }),
   );

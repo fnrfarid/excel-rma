@@ -9,22 +9,48 @@
         </ion-col>
         <ion-col
           class="ion-text-right"
-          *ngIf="
-            warrantyObject?.status_history &&
-            !(
-              warrantyObject?.status_history[
-                warrantyObject?.status_history.length - 1
-              ]?.verdict === 'Deliver to Customer'
-            )
-          "
+          *ngIf="permissionState.warranty_claim.create"
         >
           <ion-button
-            *ngIf="permissionState.warranty_claim.create"
+            *ngIf="
+              dataSource.length &&
+              !(
+                warrantyObject?.status_history[
+                  warrantyObject?.status_history.length - 1
+                ]?.verdict === 'Deliver to Customer'
+              )
+            "
+            color="danger"
+            fill="outline"
+            (click)="finalizeEntry()"
+          >
+            Finalize Stock Entry
+          </ion-button>
+          <ion-button
+            *ngIf="
+              !(
+                warrantyObject?.status_history[
+                  warrantyObject?.status_history.length - 1
+                ]?.verdict === 'Deliver to Customer'
+              )
+            "
             color="tertiary"
             [routerLink]="['/warranty/stock-entry', 'new', warrantyClaimUuid]"
           >
             Add
           </ion-button>
+
+          <ion-card-subtitle
+            *ngIf="
+              warrantyObject?.status_history[
+                warrantyObject?.status_history.length - 1
+              ]?.verdict === 'Deliver to Customer'
+            "
+            color="danger"
+            [routerLink]="['/warranty/stock-entry', 'new', warrantyClaimUuid]"
+          >
+            Revert Stock Entries To Recreate
+          </ion-card-subtitle>
         </ion-col>
       </ion-row>
     </ion-grid>

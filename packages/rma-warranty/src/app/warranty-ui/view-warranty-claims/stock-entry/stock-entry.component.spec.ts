@@ -13,6 +13,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StockEntryService } from './services/stock-entry/stock-entry.service';
 import { STORAGE_TOKEN } from '../../../api/storage/storage.service';
 import { of } from 'rxjs';
+import { AddServiceInvoiceService } from '../service-invoices/add-service-invoice/add-service-invoice.service';
 
 describe('StockEntryComponent', () => {
   let component: StockEntryComponent;
@@ -36,6 +37,13 @@ describe('StockEntryComponent', () => {
           provide: StockEntryService,
           useValue: {
             getStockEntryList: (...args) => of([{}]),
+            finalizeEntry: (...args) => of([{}]),
+          },
+        },
+        {
+          provide: AddServiceInvoiceService,
+          useValue: {
+            getWarrantyDetail: (...args) => of([{}]),
           },
         },
         {

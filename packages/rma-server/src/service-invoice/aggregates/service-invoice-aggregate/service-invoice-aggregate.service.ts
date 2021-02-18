@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  NotImplementedException,
   HttpService,
   BadRequestException,
 } from '@nestjs/common';
@@ -14,8 +13,15 @@ import { ServiceInvoiceRemovedEvent } from '../../event/service-invoice-removed/
 import { ServiceInvoiceUpdatedEvent } from '../../event/service-invoice-updated/service-invoice-updated.event';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { throwError, of, from } from 'rxjs';
+import {
+  switchMap,
+  map,
+  catchError,
+  toArray,
+  mergeMap,
+  concatMap,
+} from 'rxjs/operators';
+import { throwError, of, from, forkJoin } from 'rxjs';
 import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
 import {
   CONTENT_TYPE,
@@ -25,6 +31,7 @@ import {
   AUTHORIZATION,
   DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
+import { WarrantyClaimService } from '../../../warranty-claim/entity/warranty-claim/warranty-claim.service';
 
 @Injectable()
 export class ServiceInvoiceAggregateService extends AggregateRoot {
@@ -32,6 +39,7 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
     private readonly serviceInvoiceService: ServiceInvoiceService,
     private readonly settings: SettingsService,
     private readonly http: HttpService,
+    private readonly warrantyAggregateService: WarrantyClaimService,
   ) {
     super();
   }
@@ -51,9 +59,6 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
   addServiceInvoice(serviceInvoice: ServiceInvoiceDto, clientHttpRequest) {
     return this.settings.find().pipe(
       switchMap(settings => {
-        if (!settings) {
-          return throwError(new NotImplementedException());
-        }
         const URL = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}`;
         serviceInvoice.naming_series = DEFAULT_NAMING_SERIES.service_invoice;
         const body = serviceInvoice;
@@ -73,6 +78,32 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
       }),
       switchMap(data => {
         return from(this.serviceInvoiceService.create(data));
+      }),
+      switchMap(() => {
+        return this.serviceInvoiceService.asyncAggregate([
+          { $match: { warrantyClaimUuid: serviceInvoice.warrantyClaimUuid } },
+          {
+            $group: {
+              _id: '',
+              total: { $sum: '$total' },
+            },
+          },
+          {
+            $project: {
+              total: '$total',
+            },
+          },
+        ]);
+      }),
+      switchMap((res: any) => {
+        return this.warrantyAggregateService.updateOne(
+          { uuid: serviceInvoice.warrantyClaimUuid },
+          {
+            $set: {
+              billed_amount: res[0].total,
+            },
+          },
+        );
       }),
       catchError(err => {
         return throwError(new BadRequestException(err));
@@ -112,9 +143,6 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
   submitInvoice(payload: UpdateServiceInvoiceDto, clientHttpRequest) {
     return this.settings.find().pipe(
       switchMap(setting => {
-        if (!setting.authServerURL) {
-          return throwError(new NotImplementedException());
-        }
         const url = `${setting.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${payload.invoice_no}`;
         const body = payload;
         return this.http.put<any>(url, body, {
@@ -134,6 +162,63 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
           ),
         );
       }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
+      }),
     );
+  }
+
+  syncInvoice(uuid, req) {
+    return forkJoin({
+      Invoice: from(
+        this.serviceInvoiceService.find({ warrantyClaimUuid: uuid.uuid }),
+      ),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(res => {
+        return this.filterSubmittedInvoice(res.Invoice).pipe(
+          concatMap(invoice => {
+            return this.http.get(
+              `${res.settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice}`,
+              {
+                headers: this.settings.getAuthorizationHeaders(req.token),
+              },
+            );
+          }),
+          map(res => res.data.data),
+          toArray(),
+        );
+      }),
+      switchMap(array => {
+        return from(array).pipe(
+          mergeMap(doc => {
+            return from(
+              this.serviceInvoiceService.updateOne(
+                { invoice_no: doc.name },
+                {
+                  $set: {
+                    docstatus: doc.docstatus,
+                  },
+                },
+              ),
+            );
+          }),
+          toArray(),
+        );
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
+      }),
+    );
+  }
+
+  filterSubmittedInvoice(serviceInvoices: ServiceInvoice[]) {
+    const filteredInvoices = [];
+    serviceInvoices.forEach(invoice => {
+      if (!invoice.docstatus) {
+        filteredInvoices.push(invoice.invoice_no);
+      }
+    });
+    return of(filteredInvoices);
   }
 }

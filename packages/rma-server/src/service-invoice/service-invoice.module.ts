@@ -7,9 +7,15 @@ import { ServiceInvoiceCommandManager } from './command';
 import { ServiceInvoiceEventManager } from './event';
 import { ServiceInvoiceController } from './controllers/service-invoice/service-invoice.controller';
 import { ServiceInvoicePoliciesService } from './policies/service-invoice-policies/service-invoice-policies.service';
+import { WarrantyClaimEntitiesModule } from '../warranty-claim/entity/entity.module';
 
 @Module({
-  imports: [ServiceInvoiceEntitiesModule, CqrsModule, HttpModule],
+  imports: [
+    ServiceInvoiceEntitiesModule,
+    WarrantyClaimEntitiesModule,
+    CqrsModule,
+    HttpModule,
+  ],
   controllers: [ServiceInvoiceController],
   providers: [
     ...ServiceInvoiceAggregatesManager,

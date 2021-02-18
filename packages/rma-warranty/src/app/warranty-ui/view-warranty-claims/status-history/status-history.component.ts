@@ -19,6 +19,7 @@ import {
   STATUS_HISTORY_REMOVE_FAILURE,
   ERROR_FETCHING_DETAILS,
 } from '../../../constants/messages';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'status-history',
@@ -28,12 +29,21 @@ import {
 export class StatusHistoryComponent implements OnInit {
   @Input()
   warrantyObject: WarrantyClaimsDetails;
-  statusHistoryForm: FormGroup;
+  statusHistoryForm = new FormGroup({
+    posting_time: new FormControl('', [Validators.required]),
+    posting_date: new FormControl('', [Validators.required]),
+    status_from: new FormControl('', [Validators.required]),
+    transfer_branch: new FormControl(''),
+    current_status_verdict: new FormControl('', [Validators.required]),
+    description: new FormControl(''),
+    delivery_status: new FormControl(''),
+  });
   territoryList: any = [];
   territory: any = [];
   currentStatus: any = [];
   deliveryStatus: any = [];
-  posting_date: { date: string; time: string };
+  statusHistory = new MatTableDataSource<StatusHistoryDetails>();
+  date: { date: string; time: string };
   stockEntry: StockEntryItems;
 
   displayedColumns = [
@@ -58,7 +68,6 @@ export class StatusHistoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.createFormGroup();
     this.getTerritoryList();
     Object.keys(CURRENT_STATUS_VERDICT).forEach(verdict =>
       this.currentStatus.push(CURRENT_STATUS_VERDICT[verdict]),
@@ -66,6 +75,9 @@ export class StatusHistoryComponent implements OnInit {
     Object.keys(DELIVERY_STATUS).forEach(status =>
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
+    this.resetWarrantyDetail(this.warrantyObject?.uuid);
+
+    this.statusHistory.data = this.warrantyObject?.status_history;
     this.setStockEntryStatusFields();
     this.statusHistoryForm.controls.transfer_branch.disable();
     this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
@@ -113,10 +125,8 @@ export class StatusHistoryComponent implements OnInit {
   }
 
   async selectedPostingDate($event) {
-    this.posting_date = await this.time.getDateAndTime($event.value);
-    this.statusHistoryForm.controls.posting_date.setValue(
-      this.posting_date.date,
-    );
+    this.date = await this.time.getDateAndTime($event.value);
+    this.statusHistoryForm.controls.posting_date.setValue(this.date.date);
     this.statusHistoryForm.controls.posting_time.setValue(
       await (await this.time.getDateAndTime(new Date())).time,
     );
@@ -170,6 +180,7 @@ export class StatusHistoryComponent implements OnInit {
     this.statusHistoryService.getWarrantyDetail(uuid).subscribe({
       next: res => {
         this.warrantyObject = res;
+        this.statusHistory.data = this.warrantyObject.status_history;
       },
     });
   }
@@ -231,5 +242,16 @@ export class StatusHistoryComponent implements OnInit {
         this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
         break;
     }
+  }
+
+  check() {
+    let bool: boolean = false;
+    bool = this.statusHistory?.data?.length
+      ? this.statusHistory.data[this.statusHistory.data.length - 1].verdict ===
+        CURRENT_STATUS_VERDICT.DELIVER_TO_CUSTOMER
+        ? true
+        : false
+      : true;
+    return bool;
   }
 }

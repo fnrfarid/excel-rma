@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator';
+import { VERDICT } from '../../../constants/app-strings';
 
 export class StatusHistoryDto {
   @IsNotEmpty()
@@ -22,10 +23,10 @@ export class StatusHistoryDto {
   transfer_branch: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsEnum(VERDICT)
   verdict: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   description: string;
 

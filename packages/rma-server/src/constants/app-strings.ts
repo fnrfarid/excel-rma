@@ -108,6 +108,10 @@ export const STOCK_ENTRY_STATUS = {
   reseted: 'Reseted',
   draft: 'Draft',
 };
+export const INVOICE_DELIVERY_STATUS = {
+  DELIVERED_TO_CUSTOMER: 'Delivered to Customer',
+  KEPT_IN_WAREHOUSE: 'Kept in Warehouse',
+};
 export const SALES_USER = 'Sales User';
 export const SALES_MANAGER = 'Sales Manager';
 export const SALES_INVOICE_STATUS_ENUM = [
@@ -215,7 +219,7 @@ export const DEFAULT_NAMING_SERIES = {
   material_issue: 'PCM-.YYYY.-',
   rnd_products: 'RND-.YYYY.-',
   stock_transfer_internal: 'TRO-.YYYY.-',
-  warranty_claim: 'WAR-00',
+  warranty_claim: 'RMA-',
   service_invoice: 'WINV-.YYYY.-',
 };
 export const MAX_SERIAL_BODY_COUNT = 100000;
@@ -223,6 +227,8 @@ export enum VERDICT {
   RECEIVED_FROM_CUSTOMER = 'Received from Customer',
   RECEIVED_FROM_BRANCH = 'Received from Branch',
   WORK_IN_PROGRESS = 'Work in Progress',
+  SENT_TO_ENG_DEPT = 'Sent to Eng. Dept',
+  SENT_TO_REPAIR_DEPT = 'Sent to Repair Dept',
   TRANSFERRED = 'Transferred',
   SOLVED = 'Solved - Repairing done',
   TO_REPLACE = 'Unsolved - To Replace',
@@ -246,6 +252,12 @@ export enum CLAIM_STATUS {
   DELIVERED = 'Delivered',
   UNSOLVED = 'Unsolved',
   REJECTED = 'Rejected',
+}
+
+export enum CATEGORY {
+  BULK = 'Bulk',
+  SINGLE = 'Single',
+  PART = 'Part',
 }
 
 export const DELIVERY_STATUS = {
