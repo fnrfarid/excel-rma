@@ -138,6 +138,21 @@ export class AddServiceInvoiceService {
     );
   }
 
+  getItemBrandFromERP(item_code: string) {
+    const url = `${RELAY_GET_FULL_ITEM_ENDPOINT}/${item_code}`;
+    const params = new HttpParams();
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { params, headers });
+      }),
+      map(res => res.data),
+      switchMap(res => {
+        return of(res);
+      }),
+    );
+  }
+
   getItemFromRMAServer(code: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {

@@ -81,7 +81,7 @@ export class InlineEditComponent {
           .pipe(
             switchMap(priceListArray => {
               return this.serviceInvoiceService
-                .getItemFromRMAServer(this.itemFormControl.value.item_code)
+                .getItemBrandFromERP(this.itemFormControl.value.item_code)
                 .pipe(
                   map(item => {
                     return {
