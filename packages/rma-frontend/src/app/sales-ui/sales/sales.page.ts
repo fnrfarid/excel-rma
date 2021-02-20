@@ -355,7 +355,6 @@ export class SalesPage implements OnInit {
       Object.keys(this.sortQuery).length === 0
         ? { created_on: 'DESC' }
         : this.sortQuery;
-        console.log(query)
 
     this.dataSource.loadItems(this.sortQuery, undefined, undefined, query);
   }
