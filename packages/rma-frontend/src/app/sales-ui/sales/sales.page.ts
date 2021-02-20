@@ -305,7 +305,7 @@ export class SalesPage implements OnInit {
     if (this.f.salesPerson.value) query.sales_team = this.f.salesPerson.value;
     if (this.f.invoice_number.value) query.name = this.f.invoice_number.value;
     if (this.f.branch) query.territory = this.f.branch.value;
-    if (this.f.delivery_status) {
+    if (this.f.delivery_status.value) {
       query.delivery_status = this.f.delivery_status.value;
     }
     if (this.campaign) {
@@ -355,6 +355,7 @@ export class SalesPage implements OnInit {
       Object.keys(this.sortQuery).length === 0
         ? { created_on: 'DESC' }
         : this.sortQuery;
+        console.log(query)
 
     this.dataSource.loadItems(this.sortQuery, undefined, undefined, query);
   }
