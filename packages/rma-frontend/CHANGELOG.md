@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.6.0...rma-frontend@1.7.0) (2021-02-21)
+
+
+### Features
+
+* **rma-frontend:** Fixed delivery status filter on Sales Page ([eca3d3d](https://gitlab.com/castlecraft/excel-rma/commit/eca3d3d89ccb98f2e83b7bbd7f0f3856802ccb62))
+* **rma-frontend:** Fixed delivery status filter on Sales Page 1 ([2fbdbc9](https://gitlab.com/castlecraft/excel-rma/commit/2fbdbc9c667ba94d6e0c20a1bb4925455d5c202f))
+
+
+
+
+
 # [1.6.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.5.0...rma-frontend@1.6.0) (2021-02-18)
 
 
