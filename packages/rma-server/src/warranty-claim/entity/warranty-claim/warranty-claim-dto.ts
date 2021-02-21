@@ -186,4 +186,10 @@ export class WarrantyClaimDto {
 
   @IsOptional()
   parent: string;
+
+  @IsOptional()
+  service_vouchers: string[];
+
+  @IsOptional()
+  service_items: string[];
 }

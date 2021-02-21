@@ -197,6 +197,10 @@ export class ItemDto {
   @IsBoolean()
   has_bundle_item?: boolean;
 
+  @IsOptional()
+  @IsNumber()
+  is_stock_item?: number;
+
   @IsNotEmpty()
   @IsNumber()
   has_serial_no?: number;

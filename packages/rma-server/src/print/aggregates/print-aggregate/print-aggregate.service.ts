@@ -283,44 +283,59 @@ export class PrintAggregateService {
     this.generateHr(doc, doc.y);
 
     const customerInformationTop = doc.y;
+    let yAxis = 0;
+    // let xAxis = 50
+    const customerInfoObject = {
+      'Third Party Name': invoice.third_party_name,
+      'Third Party Contact': invoice.third_party_contact,
+      'Third Party Address': invoice.third_party_address,
+      'Contact Name:': invoice.customer,
+      'Contact No:': invoice.customer_contact,
+      'Remarks:': invoice.remarks,
+      'Contact Address:': invoice.customer_address,
+      'Claim No:': invoice.claim_no,
+      'Claim Date:': invoice.received_on,
+      'Delivery Date:': invoice.deliver_date,
+      'Claim Branch:': invoice.receiving_branch,
+    };
 
-    doc
-      .fontSize(10)
-      .text('Contact Name:', 50, customerInformationTop)
-      .text(invoice.customer, 150, customerInformationTop, { width: 200 })
-      .text('Contact No', 50, customerInformationTop + 15)
-      .text(invoice.customer_contact, 150, customerInformationTop + 15)
-
-      .text('Remarks', 50, customerInformationTop + 45)
-      .text(invoice.remarks, 150, customerInformationTop + 45)
-      .text('Contact Address', 50, customerInformationTop + 60)
-      .text(invoice.customer_address, 150, customerInformationTop + 60)
-
-      .text('Claim No', 300, customerInformationTop)
-      .text(invoice.claim_no, 420, customerInformationTop)
-      .text('Claim Date:', 300, customerInformationTop + 15)
-      .text(invoice.received_on, 420, customerInformationTop + 15)
-      .text('Delivery Date', 300, customerInformationTop + 30)
-      .text(invoice.deliver_date, 420, customerInformationTop + 30)
-      .text('Claim Branch', 300, customerInformationTop + 45)
-      .text(invoice.receiving_branch, 420, customerInformationTop + 45);
+    for (const key in customerInfoObject) {
+      if (Object.prototype.hasOwnProperty.call(customerInfoObject, key)) {
+        if (
+          Object.keys(customerInfoObject).indexOf(key) >=
+          Object.keys(customerInfoObject).length / 2
+        ) {
+          if (
+            Math.round(Object.keys(customerInfoObject).length / 2) ===
+            Object.keys(customerInfoObject).indexOf(key)
+          )
+            yAxis = 0;
+          doc.fontSize(10).text(key, 300, customerInformationTop + yAxis);
+          doc
+            .fontSize(10)
+            .text(customerInfoObject[key], 420, customerInformationTop + yAxis);
+        } else {
+          doc.fontSize(10).text(key, 50, customerInformationTop + yAxis);
+          doc
+            .fontSize(10)
+            .text(customerInfoObject[key], 150, customerInformationTop + yAxis);
+        }
+        yAxis += 15;
+      }
+    }
 
     switch (invoice.claim_status) {
       case CLAIM_STATUS.DELIVERED:
         doc
           .fontSize(10)
-          .text('Delivered By:', 300, customerInformationTop + 60)
-          .text(invoice.delivered_by, 420, customerInformationTop + 60)
-          .text('Delivered To', 50, customerInformationTop + 30)
-          .text(invoice.customer, 150, customerInformationTop + 30);
+          .text('Delivered By:', 300, customerInformationTop + yAxis)
+          .text(invoice.delivered_by, 420, customerInformationTop + yAxis);
         break;
       default:
         doc
           .fontSize(10)
-          .text('Received From', 50, customerInformationTop + 30)
-          .text(invoice.customer, 150, customerInformationTop + 30)
-          .text('Received By:', 300, customerInformationTop + 60)
-          .text(invoice.received_by, 420, customerInformationTop + 60);
+          .text('Received By:', 300, customerInformationTop + yAxis)
+          .text(invoice.received_by, 420, customerInformationTop + yAxis);
         break;
     }
 
@@ -375,7 +390,7 @@ export class PrintAggregateService {
     }
 
     doc.moveDown();
-    this.generateHr(doc, invoiceTableTop + 20);
+    this.generateHr(doc, doc.y + 10);
     doc.font('Helvetica');
     switch (invoice.claim_status) {
       case CLAIM_STATUS.DELIVERED:
@@ -401,7 +416,6 @@ export class PrintAggregateService {
         this.generateWarrantyTableRow(
           doc,
           doc.y,
-
           invoice.status_history.splice(-1)[0].delivery_status,
           {
             name: invoice.item_name,
@@ -421,24 +435,47 @@ export class PrintAggregateService {
     doc.moveDown();
     this.checkPagePagination(doc);
 
-    if (invoice.billed_amount) {
+    if (invoice.billed_amount !== undefined) {
+      const printObject = {
+        'Voucher Number': invoice.service_vouchers.toString(),
+        'Product Description': invoice.service_items.toString(),
+        Total: invoice.billed_amount,
+        'Paid Amount': invoice.billed_amount,
+        'Unpaid Amount': 0,
+      };
       let height = doc.y;
-      doc.font('Helvetica-Bold');
-      doc.text('Voucher Number', 50, height, { width: 100 });
-      doc.text('Product Description', 150, height, { width: 200 });
-      doc.text('Total', 250, height, { width: 100 });
-      doc.text('Paid Amount', 350, height, { width: 100 });
-      doc.text('Unpaid Amount', 450, height, { width: 100 });
+      // let xAxis = 50
+      for (const key in printObject) {
+        if (Object.prototype.hasOwnProperty.call(printObject, key)) {
+          doc.font('Helvetica-Bold');
+          doc.text(
+            key,
+            100 * Object.keys(printObject).indexOf(key) + 50,
+            height,
+            { width: 100 },
+          );
+        }
+      }
       doc.moveDown();
       height = doc.y;
-      doc.font('Helvetica');
-      doc.text('', 50, height, { width: 50 });
-      doc.text(invoice.problem_details, 150, height, { width: 200 });
-      doc.text(invoice.billed_amount, 250, height, { width: 100 });
-      doc.text(invoice.billed_amount, 350, height, { width: 100 });
-      doc.text('0', 450, height, { width: 100 });
+      for (const key in printObject) {
+        if (Object.prototype.hasOwnProperty.call(printObject, key)) {
+          doc.font('Helvetica');
+          doc.text(
+            printObject[key],
+            100 * Object.keys(printObject).indexOf(key) + 50,
+            height,
+            { width: 90 },
+            { align: 'center' },
+          );
+        }
+      }
     }
-
+    if (invoice.service_vouchers) {
+      invoice.service_vouchers.forEach(voucher => {
+        doc.moveDown();
+      });
+    }
     doc.moveDown();
     doc.fontSize(10).text(`Terms:`, 50, doc.y);
     doc
@@ -502,15 +539,16 @@ export class PrintAggregateService {
   ) {
     doc.moveDown();
     const height = doc.y;
-    let hgt;
-    if (!replaced_item) {
-      hgt = doc.y - 10;
-    } else {
-      hgt = doc.y;
-    }
     doc.fontSize(10).fillColor('#000000').text('', 20, height);
-    doc.text(item.name, 50, hgt, { width: 200 });
-    doc.text(status, 450, height, { align: 'right' });
+    if (status) {
+      doc
+        .text(item.name, 50, height, { width: 200 })
+        .text(status, 450, height, { align: 'right' });
+    }
+    doc
+      .text(item.name, 50, height, { width: 200 })
+      .text('-', 450, height, { align: 'right' });
+
     if (item.serials) {
       doc
         .fillColor('#444444')
@@ -526,20 +564,21 @@ export class PrintAggregateService {
           { width: 200 },
         );
     }
+
     if (replaced_item) {
       doc.fontSize(10).fillColor('#000000').text('', 20, height);
-      doc.text(replaced_item.name, 200, doc.y, { width: 200 });
+      doc.text(replaced_item.name, 300, doc.y, { width: 200 });
       if (replaced_item.serials) {
         doc
           .fillColor('#444444')
-          .text(this.getSerialKeys(replaced_item), 200, doc.y, { width: 200 });
+          .text(this.getSerialKeys(replaced_item), 300, doc.y, { width: 200 });
       }
       if (replaced_item.warranty_end_date) {
         doc
           .fillColor('#444444')
           .text(
             this.getWarrantyDate(replaced_item.warranty_end_date.toString()),
-            200,
+            300,
             doc.y,
             { width: 200 },
           );

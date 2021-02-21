@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.6.0...rma-server@1.6.1) (2021-02-21)
+
+
+### Bug Fixes
+
+* **Excel-rma:** Fix sales invoice for non stock items ([01f4ee9](https://gitlab.com/castlecraft/excel-rma/commit/01f4ee9ea431b392f5c36d4129e69de40e34c583))
+
+
+
+
+
 # [1.6.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.5.0...rma-server@1.6.0) (2021-02-18)
 
 

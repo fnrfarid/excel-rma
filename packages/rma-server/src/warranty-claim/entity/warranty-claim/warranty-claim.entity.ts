@@ -157,6 +157,12 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   parent: string;
+
+  @Column()
+  service_vouchers: string[];
+
+  @Column()
+  service_items: string[];
 }
 
 export class WarrantyBulkProducts {

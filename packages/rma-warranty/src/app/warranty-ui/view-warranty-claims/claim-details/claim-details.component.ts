@@ -86,7 +86,7 @@ export class ClaimDetailsComponent implements OnInit {
       .getWarrantyClaim(this.invoiceUuid)
       .pipe(
         switchMap((data: any) => {
-          data.comany = this.company;
+          data.company = this.company;
           switch (data.claim_status) {
             case CLAIM_STATUS.DELIVERED:
               print_type = `Delivery Token`;

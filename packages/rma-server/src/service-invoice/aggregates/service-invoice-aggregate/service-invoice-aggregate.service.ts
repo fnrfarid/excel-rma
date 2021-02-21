@@ -82,14 +82,26 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
       switchMap(() => {
         return this.serviceInvoiceService.asyncAggregate([
           { $match: { warrantyClaimUuid: serviceInvoice.warrantyClaimUuid } },
+          { $unwind: '$items' },
+          {
+            $project: {
+              invoice_no: 1,
+              total: 1,
+              item_name: '$items.item_name',
+            },
+          },
           {
             $group: {
               _id: '',
+              service_items: { $push: '$item_name' },
+              service_invoices: { $push: '$invoice_no' },
               total: { $sum: '$total' },
             },
           },
           {
             $project: {
+              service_items: '$service_items',
+              service_invoices: '$service_invoices',
               total: '$total',
             },
           },
@@ -100,6 +112,8 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
           { uuid: serviceInvoice.warrantyClaimUuid },
           {
             $set: {
+              service_items: res[0].service_items,
+              service_vouchers: res[0].service_invoices,
               billed_amount: res[0].total,
             },
           },
