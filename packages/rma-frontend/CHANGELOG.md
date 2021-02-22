@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.7.0...rma-frontend@1.7.1) (2021-02-22)
+
+
+### Bug Fixes
+
+* **Excel-rma:** Fix file upload for stock entry ([5074c66](https://gitlab.com/castlecraft/excel-rma/commit/5074c66a308fb3cad393e6c00ce0aabebbfcd71f))
+
+
+
+
+
 # [1.7.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.6.0...rma-frontend@1.7.0) (2021-02-21)
 
 
