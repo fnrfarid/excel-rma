@@ -34,7 +34,7 @@ export class StockEntryService {
   ) {
     let sortQuery;
     const query: any = {};
-    const permissionQuery: any = {
+    let permissionQuery: any = {
       items: {
         $elemMatch: {},
       },
@@ -100,6 +100,10 @@ export class StockEntryService {
       delete filter_query.warrantyClaimUuid;
     }
 
+    if (permissionQuery?.items) {
+      permissionQuery = this.getElementMatchCondition(permissionQuery);
+    }
+
     const $and: any[] = [
       filter_query ? this.getFilterQuery(filter_query) : {},
       query,
@@ -137,6 +141,12 @@ export class StockEntryService {
     );
     select.splice(select.indexOf('items'), 1);
     return select;
+  }
+
+  getElementMatchCondition(query: string) {
+    return {
+      $or: [query, { items: { $exists: true, $eq: [] } }],
+    };
   }
 
   getFilterQuery(query) {

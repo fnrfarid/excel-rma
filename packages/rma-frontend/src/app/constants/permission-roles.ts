@@ -290,7 +290,14 @@ export const PermissionRoles = {
     update: ['Item Price Manager', 'General Admin'],
     delete: ['Item Price Manager', 'General Admin'],
   },
-
+  erpnext: {
+    read: [
+      'Branch Sales Manager',
+      'Branch Stock Manager',
+      'Branch Sales Return User',
+      'General Admin',
+    ],
+  },
   jobs: {
     read: ['General Admin'],
     update: ['General Admin'],

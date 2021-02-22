@@ -64,6 +64,9 @@ export class StockEntryPoliciesService {
   }
 
   validateStockEntryItems(payload: StockEntryDto) {
+    if (!payload.items?.length) {
+      return throwError(new BadRequestException('Items cannot be empty.'));
+    }
     return from(payload.items).pipe(
       mergeMap(item => {
         if (!item.has_serial_no) {
