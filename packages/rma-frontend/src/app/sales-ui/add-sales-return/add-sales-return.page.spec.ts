@@ -2,7 +2,12 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { AddSalesReturnPage } from './add-sales-return.page';
-import { CUSTOM_ELEMENTS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  Pipe,
+  PipeTransform,
+  Renderer2,
+} from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MaterialModule } from '../../material/material.module';
@@ -49,6 +54,10 @@ describe('AddSalesReturnPage', () => {
         },
         {
           provide: CsvJsonService,
+          useValue: {},
+        },
+        {
+          provide: Renderer2,
           useValue: {},
         },
         {

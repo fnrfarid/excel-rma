@@ -287,6 +287,15 @@
     </ion-card-header>
     <ion-card-content class="ion-no-padding">
       <mat-table #table [dataSource]="serialDataSource" style="width: 100%;">
+
+        <ng-container matColumnDef="sr_no">
+          <mat-header-cell *matHeaderCellDef>No. </mat-header-cell>
+          <mat-cell *matCellDef="let row;let i=index ">
+            {{ i }}
+          </mat-cell>
+          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+        </ng-container>
+
         <ng-container matColumnDef="item_code">
           <mat-header-cell *matHeaderCellDef>Item Code</mat-header-cell>
           <mat-cell *matCellDef="let row">
@@ -316,9 +325,11 @@
 
         <ng-container matColumnDef="serial_no">
           <mat-header-cell *matHeaderCellDef>Serials</mat-header-cell>
-          <mat-cell *matCellDef="let row">
+          <mat-cell *matCellDef="let row;let i=index">
             <input
               matInput
+              (keyup.enter)="onSerialKepUp(i)"
+              id="serials{{i}}"
               oninput="this.value = this.value.toUpperCase()"
               *ngIf="!row.serial_no[1]"
               [disabled]="row.serial_no[0] === 'Non Serial Item' ? true : false"
