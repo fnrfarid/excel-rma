@@ -127,8 +127,9 @@ export class MaterialTransferComponent implements OnInit {
   itemDataSource: StockItemsDataSource = new StockItemsDataSource();
   itemDisplayedColumns = [
     'item_name',
-    'assigned',
     'available_stock',
+    'assigned',
+    'qty',
     'has_serial_no',
     'add_serial',
     'delete',
@@ -649,7 +650,7 @@ export class MaterialTransferComponent implements OnInit {
         return '';
 
       default:
-        this.warehouseState.s_warehouse.value;
+        return this.warehouseState.s_warehouse.value;
     }
   }
 
@@ -662,7 +663,7 @@ export class MaterialTransferComponent implements OnInit {
         return '';
 
       default:
-        this.warehouseState.t_warehouse.value;
+        return this.warehouseState.t_warehouse.value;
     }
   }
 
@@ -748,10 +749,6 @@ export class MaterialTransferComponent implements OnInit {
       return;
     }
 
-    if (this.materialTransferDataSource.data().length === 0) {
-      this.getMessage('Please Add serials for transfer');
-      return;
-    }
     const body = new MaterialTransferDto();
     const date = await this.timeService.getDateAndTime(new Date());
     body.company = this.company;
