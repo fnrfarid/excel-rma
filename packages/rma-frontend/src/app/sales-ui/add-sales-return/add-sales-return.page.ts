@@ -71,6 +71,7 @@ export class AddSalesReturnPage implements OnInit {
   warehouseFormControl = new FormControl();
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
+  remarks = new FormControl();
   getOptionText = '';
   validateInput: any = ValidateInputSelected;
   rangePickerState = {
@@ -538,6 +539,7 @@ export class AddSalesReturnPage implements OnInit {
     salesReturn.total = 0;
     salesReturn.total_qty = 0;
     salesReturn.items = [];
+    salesReturn.remarks = this.remarks.value;
     const filteredItemCodeList = [
       ...new Set(this.serialDataSource.data().map(item => item.item_code)),
     ];

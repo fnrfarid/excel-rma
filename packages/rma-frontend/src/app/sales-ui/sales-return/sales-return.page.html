@@ -171,6 +171,17 @@
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
 
+            <!-- Remarks Column -->
+            <ng-container matColumnDef="remarks">
+              <mat-header-cell *matHeaderCellDef>Remarks</mat-header-cell>
+              <mat-cell
+                *matCellDef="let row"
+              >
+                {{ row.instructions }}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+
             <!-- Created By Column -->
             <ng-container matColumnDef="owner">
               <mat-header-cell *matHeaderCellDef>Created By</mat-header-cell>

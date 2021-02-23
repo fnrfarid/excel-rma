@@ -63,6 +63,9 @@ export class CreateSalesReturnDto {
   sales_team: any[];
 
   @IsOptional()
+  remarks: string;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => SalesReturnItemDto)
   credit_note_items: SalesReturnItemDto[];

@@ -410,6 +410,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
             const serialMap = this.getSerialMap(createReturnPayload);
             let deliveryNote = new DeliveryNote();
             Object.assign(deliveryNote, createReturnPayload);
+            deliveryNote.instructions = createReturnPayload.remarks;
             delete deliveryNote.credit_note_items;
             deliveryNote = this.setDeliveryNoteDefaults(deliveryNote);
 
@@ -669,6 +670,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       posting_date: assignPayload.posting_date,
       return_against: salesInvoice.name,
       posting_time: assignPayload.posting_time,
+      remarks: assignPayload.remarks,
       items: assignPayload.items.map(item => {
         return {
           item_code: item.item_code,

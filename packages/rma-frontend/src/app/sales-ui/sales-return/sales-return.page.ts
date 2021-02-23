@@ -28,6 +28,7 @@ export class SalesReturnPage implements OnInit {
     'title',
     'total',
     'status',
+    'remarks',
     'owner',
     'modified_by',
   ];
