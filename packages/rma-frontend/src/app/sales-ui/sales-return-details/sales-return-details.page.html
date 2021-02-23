@@ -88,7 +88,7 @@
               <ion-input
               readonly="true"
               type="string"
-              [value]="salesReturnDetails?.instructions ? salesReturnDetails?.instructions : '' "
+              [value]="salesReturnDetails?.instructions || '' "
               ></ion-input>
             </ion-item>
           </ion-col>
