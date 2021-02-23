@@ -1,4 +1,10 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  ViewChild,
+  Renderer2,
+} from '@angular/core';
 import { Location } from '@angular/common';
 import { FormControl } from '@angular/forms';
 import { Observable, Subject, of, from } from 'rxjs';
@@ -95,6 +101,7 @@ export class AddSalesReturnPage implements OnInit {
   ];
   itemDataSource: ItemDataSource;
   serialDisplayedColumns = [
+    'sr_no',
     'item_code',
     'item_name',
     'qty',
@@ -116,6 +123,7 @@ export class AddSalesReturnPage implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly loadingController: LoadingController,
     public dialog: MatDialog,
+    private readonly renderer: Renderer2,
     private readonly csvService: CsvJsonService,
   ) {
     this.onFromRange(this.value);
@@ -237,6 +245,16 @@ export class AddSalesReturnPage implements OnInit {
     } catch {
       return this.DEFAULT_SERIAL_RANGE;
     }
+  }
+
+  onSerialKepUp(i) {
+    let element;
+    try {
+      element = this.renderer.selectRootElement(`#serials${i + 1}`);
+    } catch {
+      return;
+    }
+    element?.focus();
   }
 
   getStringPrefix(arr1: string[]) {
