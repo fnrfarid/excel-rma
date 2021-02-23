@@ -196,6 +196,15 @@ export class WarrantyStockEntryAggregateService {
           req,
         );
       }),
+      switchMap(res => {
+        return from(
+          this.warrantyService.updateOne(uuid, {
+            $set: {
+              delivery_branch: req.token.territory[0],
+            },
+          }),
+        );
+      }),
       catchError(err => {
         return throwError(new BadRequestException(err));
       }),

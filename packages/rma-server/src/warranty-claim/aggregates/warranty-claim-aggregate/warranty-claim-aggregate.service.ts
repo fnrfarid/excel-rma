@@ -15,7 +15,7 @@ import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/wa
 import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/warranty-claim-updated.event';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 import { from, throwError, of, forkJoin } from 'rxjs';
-import { switchMap, map, concatMap, toArray } from 'rxjs/operators';
+import { switchMap, map, concatMap, toArray, catchError } from 'rxjs/operators';
 
 import {
   INVALID_FILE,
@@ -477,13 +477,75 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   removeStatusHistory(uuid) {
     let setting;
     return this.settingsService.find().pipe(
-      switchMap(settings => {
-        setting = settings;
+      switchMap(res => {
+        setting = res;
+        return from(
+          this.warrantyClaimService.findOne(uuid, {
+            status_history: { $slice: -1 },
+          }),
+        );
+      }),
+      switchMap(res => {
+        if (res.status_history.length > 1) {
+          const statusHistory = {} as StatusHistoryDto;
+          Object.assign(
+            statusHistory,
+            res.status_history[res.status_history.length - 1],
+          );
+          statusHistory.doc_name = res.claim_no;
+          if (statusHistory.verdict === VERDICT.RECEIVED_FROM_CUSTOMER) {
+            statusHistory.transfer_branch = statusHistory.status_from;
+            statusHistory.status_from = res.customer;
+          }
+          const verdict_key = Object.keys(VERDICT).find(
+            key => VERDICT[key] === statusHistory.verdict,
+          );
+          const eventType = EventType[verdict_key];
+          const serialNoHistory: SerialNoHistoryInterface = {};
+          serialNoHistory.created_by = statusHistory.created_by;
+          serialNoHistory.created_on = statusHistory.posting_date;
+          serialNoHistory.document_no = statusHistory.doc_name;
+          serialNoHistory.document_type = WARRANTY_CLAIM_DOCTYPE;
+          serialNoHistory.eventDate = DateTime.fromISO(
+            statusHistory.posting_date,
+          ).setZone(setting.timeZone);
+          serialNoHistory.eventType = eventType;
+          serialNoHistory.parent_document = res.uuid;
+          serialNoHistory.transaction_from = statusHistory.status_from;
+          serialNoHistory.transaction_to = !statusHistory.transfer_branch
+            ? statusHistory.status_from
+            : statusHistory.transfer_branch;
+          return forkJoin({
+            updateResult: from(
+              this.serialNoHistoryService.updateOne(
+                {
+                  serial_no: res.serial_no,
+                  document_type: WARRANTY_CLAIM_DOCTYPE,
+                },
+                {
+                  $set: serialNoHistory,
+                },
+              ),
+            ),
+            statusPayload: of(
+              res.status_history[res.status_history.length - 1],
+            ),
+          });
+        }
+        return throwError(
+          new BadRequestException('cannot cancel single status'),
+        );
+      }),
+      switchMap(state => {
+        return this.setClaimStatus(state.statusPayload);
+      }),
+      switchMap(state => {
         return from(
           this.warrantyClaimService.updateOne(uuid, {
             $set: {
               delivery_branch: '',
               delivery_date: '',
+              claim_status: state,
             },
             $pop: {
               status_history: 1,
@@ -491,68 +553,8 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           }),
         );
       }),
-      switchMap(res => {
-        return this.warrantyClaimService.findOne(uuid, {
-          status_history: { $slice: -1 },
-        });
-      }),
-      switchMap(res => {
-        const statusHistory = {} as StatusHistoryDto;
-        Object.assign(statusHistory, res.status_history.splice(-1)[0]);
-        statusHistory.doc_name = res.claim_no;
-        if (statusHistory.verdict === VERDICT.RECEIVED_FROM_CUSTOMER) {
-          statusHistory.transfer_branch = statusHistory.status_from;
-          statusHistory.status_from = res.customer;
-        }
-        const verdict_key = Object.keys(VERDICT).find(
-          key => VERDICT[key] === statusHistory.verdict,
-        );
-        const eventType = EventType[verdict_key];
-        const serialNoHistory: SerialNoHistoryInterface = {};
-        serialNoHistory.created_by = statusHistory.created_by;
-        serialNoHistory.created_on = statusHistory.posting_date;
-        serialNoHistory.document_no = statusHistory.doc_name;
-        serialNoHistory.document_type = WARRANTY_CLAIM_DOCTYPE;
-        serialNoHistory.eventDate = DateTime.fromISO(
-          statusHistory.posting_date,
-        ).setZone(setting.timeZone);
-        serialNoHistory.eventType = eventType;
-        serialNoHistory.parent_document = res.uuid;
-        serialNoHistory.transaction_from = statusHistory.status_from;
-        serialNoHistory.transaction_to = !statusHistory.transfer_branch
-          ? statusHistory.status_from
-          : statusHistory.transfer_branch;
-        return forkJoin({
-          updateResult: from(
-            this.serialNoHistoryService.updateOne(
-              {
-                serial_no: res.serial_no,
-                document_type: WARRANTY_CLAIM_DOCTYPE,
-              },
-              {
-                $set: serialNoHistory,
-              },
-            ),
-          ),
-          statusPayload: of(res.status_history.splice(-1)[0]),
-        });
-      }),
-      switchMap(state => {
-        return this.setClaimStatus(state.statusPayload);
-      }),
-      switchMap(state => {
-        return from(
-          this.warrantyClaimService.updateOne(
-            {
-              uuid,
-            },
-            {
-              $set: {
-                claim_status: state,
-              },
-            },
-          ),
-        );
+      catchError(error => {
+        return throwError(new BadRequestException('Not a valid object'));
       }),
     );
   }
