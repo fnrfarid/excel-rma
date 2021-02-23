@@ -174,7 +174,7 @@
 </form>
 <!-- 1 this is for list -->
 
-<ion-card *ngIf="statusHistory">
+<ion-card *ngIf="dataSource">
   <ion-card-header>
     <ion-grid>
       <ion-row>
@@ -188,7 +188,7 @@
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
-    <mat-table #table style="width: 100%" [dataSource]="statusHistory">
+    <mat-table #table style="width: 100%" [dataSource]="dataSource">
       <ng-container matColumnDef="posting_date">
         <mat-header-cell *matHeaderCellDef>Date</mat-header-cell>
         <mat-cell *matCellDef="let row">
@@ -273,10 +273,7 @@
             fill="clear"
             class="ion-no-padding"
             color="danger"
-            *ngIf="
-              warrantyObject?.status_history.length > 1 &&
-              warrantyObject?.status_history.length === i + 1
-            "
+            *ngIf="i && this.dataSource?.data?.length === i + 1"
             (click)="removeRow()"
           >
             <ion-icon slot="icon-only" name="trash"></ion-icon>
@@ -299,8 +296,8 @@
 
 <ion-card
   *ngIf="
-    statusHistory?.data?.length &&
-    statusHistory?.data[statusHistory?.data?.length - 1]?.delivery_status.length
+    dataSource?.data?.length &&
+    dataSource?.data[dataSource?.data?.length - 1].delivery_status
   "
 >
   <ion-card-header>
@@ -309,9 +306,7 @@
         <ion-card-title>
           <ion-text color="tertiary">
             Delivery Status:{{
-              (warrantyObject?.status_history)[
-                warrantyObject?.status_history.length - 1
-              ].delivery_status
+              dataSource?.data[dataSource?.data?.length - 1].delivery_status
             }}
           </ion-text>
         </ion-card-title>
@@ -322,12 +317,10 @@
     <ion-grid
       class="ion-no-padding"
       *ngIf="
-        (warrantyObject?.status_history)[
-          warrantyObject?.status_history?.length - 1
-        ]?.delivery_status === 'Upgraded' ||
-        (warrantyObject?.status_history)[
-          warrantyObject?.status_history?.length - 1
-        ]?.delivery_status === 'Replaced'
+        dataSource?.data[dataSource?.data?.length - 1]?.delivery_status ===
+          'Upgraded' ||
+        dataSource?.data[dataSource?.data?.length - 1]?.delivery_status ===
+          'Replaced'
       "
     >
       <ion-row>
@@ -335,9 +328,8 @@
           <mat-form-field
             class="example-full-width"
             *ngIf="
-              (warrantyObject?.status_history)[
-                warrantyObject?.status_history?.length - 1
-              ]?.delivery_status === 'Upgraded'
+              dataSource?.data[dataSource?.data?.length - 1]
+                ?.delivery_status === 'Upgraded'
             "
           >
             <input
@@ -355,9 +347,8 @@
           <mat-form-field
             class="example-full-width"
             *ngIf="
-              (warrantyObject?.status_history)[
-                warrantyObject?.status_history.length - 1
-              ]?.delivery_status === 'Replaced'
+              dataSource?.data[dataSource?.data?.length - 1]
+                ?.delivery_status === 'Replaced'
             "
           >
             <input
