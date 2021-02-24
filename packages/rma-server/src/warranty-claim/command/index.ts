@@ -3,6 +3,7 @@ import { RemoveWarrantyClaimCommandHandler } from './remove-warranty-claim/remov
 import { UpdateWarrantyClaimCommandHandler } from './update-warranty-claim/update-warranty-claim.handler';
 import { AddStatusHistoryCommandHandler } from './add-status-history/add-status-history.handler';
 import { RemoveStatusHistoryCommandHandler } from './remove-status-history/remove-status-history.handler';
+import { ResetWarrantyClaimCommandHandler } from './reset-warranty-claim/reset-warranty-claim.handler';
 
 export const WarrantyClaimCommandManager = [
   AddWarrantyClaimCommandHandler,
@@ -10,4 +11,5 @@ export const WarrantyClaimCommandManager = [
   UpdateWarrantyClaimCommandHandler,
   AddStatusHistoryCommandHandler,
   RemoveStatusHistoryCommandHandler,
+  ResetWarrantyClaimCommandHandler,
 ];

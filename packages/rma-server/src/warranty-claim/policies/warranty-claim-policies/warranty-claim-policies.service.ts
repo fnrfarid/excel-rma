@@ -20,10 +20,11 @@ import {
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
-import { WARRANTY_STATUS } from '../../../constants/app-strings';
+import { VERDICT, WARRANTY_STATUS } from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNo } from '../../../serial-no/entity/serial-no/serial-no.entity';
 import { DateTime } from 'luxon';
+import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
@@ -31,6 +32,7 @@ export class WarrantyClaimPoliciesService {
     private readonly supplierService: SupplierService,
     private readonly customerService: CustomerService,
     private readonly serialNoService: SerialNoService,
+    private readonly warrantyService: WarrantyClaimService,
     private readonly settings: SettingsService,
   ) {}
 
@@ -124,6 +126,35 @@ export class WarrantyClaimPoliciesService {
         }
         claimsPayload.warranty_status = WARRANTY_STATUS.EXPIRED;
         return of(claimsPayload);
+      }),
+    );
+  }
+
+  validateCancelClaim(uuid: string) {
+    return from(
+      this.warrantyService.findOne(
+        { uuid },
+        {
+          $or: [
+            { service_vouchers: { $exists: true } },
+            { progress_state: { $exists: true } },
+          ],
+        },
+      ),
+    ).pipe(
+      switchMap(claim => {
+        if (claim) {
+          return throwError(
+            new BadRequestException('Claim Cannot be Cancelled'),
+          );
+        }
+        if (
+          claim.status_history[claim.status_history.length - 1].verdict ===
+          VERDICT.RECEIVED_FROM_CUSTOMER
+        ) {
+          return of(true);
+        }
+        return throwError(new BadRequestException('Claim Cannot be cancelled'));
       }),
     );
   }

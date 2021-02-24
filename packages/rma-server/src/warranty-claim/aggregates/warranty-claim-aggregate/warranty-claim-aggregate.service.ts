@@ -698,4 +698,20 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
     );
   }
+  cancelWarrantyClaim(uuid: string) {
+    return this.warrantyClaimsPoliciesService.validateCancelClaim(uuid).pipe(
+      switchMap(res => {
+        return from(
+          this.warrantyClaimService.updateOne(
+            { uuid },
+            {
+              $set: {
+                claim_status: 'Cancelled',
+              },
+            },
+          ),
+        );
+      }),
+    );
+  }
 }

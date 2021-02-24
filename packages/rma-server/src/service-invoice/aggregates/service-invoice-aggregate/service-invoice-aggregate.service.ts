@@ -190,7 +190,7 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
       settings: this.settings.find(),
     }).pipe(
       switchMap(res => {
-        return this.filterSubmittedInvoice(res.Invoice).pipe(
+        return from(this.filterSubmittedInvoice(res.Invoice)).pipe(
           concatMap(invoice => {
             return this.http.get(
               `${res.settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice}`,
@@ -227,12 +227,12 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
   }
 
   filterSubmittedInvoice(serviceInvoices: ServiceInvoice[]) {
-    const filteredInvoices = [];
+    const filteredInvoices: Array<string> = [];
     serviceInvoices.forEach(invoice => {
       if (!invoice.docstatus) {
         filteredInvoices.push(invoice.invoice_no);
       }
     });
-    return of(filteredInvoices);
+    return filteredInvoices;
   }
 }
