@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { switchMap, map } from 'rxjs/operators';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import {
@@ -20,12 +20,14 @@ import {
 } from '../constants/storage';
 import { from, forkJoin } from 'rxjs';
 import { StorageService } from '../api/storage/storage.service';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsService {
   constructor(
+    @Inject(DOCUMENT) private _document: HTMLDocument,
     private readonly http: HttpClient,
     private readonly storage: StorageService,
   ) {}
@@ -72,6 +74,21 @@ export class SettingsService {
         }),
       );
     });
+  }
+
+  setFavicon(faviconURL) {
+    if (faviconURL) {
+      const nodeList = this._document.getElementsByTagName('link');
+      for (const nodeIndex of Object.keys(nodeList)) {
+        if (
+          ['icon', 'shortcut_icon'].includes(
+            nodeList[nodeIndex].getAttribute('rel'),
+          )
+        ) {
+          nodeList[nodeIndex].setAttribute('href', faviconURL);
+        }
+      }
+    }
   }
 
   relayTimeZoneOperation() {
@@ -124,6 +141,7 @@ export class SettingsService {
     transferWarehouse: string,
     serviceAccountApiKey: string,
     serviceAccountApiSecret: string,
+    brand: { [key: string]: any },
   ) {
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -144,6 +162,7 @@ export class SettingsService {
             transferWarehouse,
             serviceAccountApiKey,
             serviceAccountApiSecret,
+            brand,
           },
           { headers },
         );
@@ -235,4 +254,8 @@ export class SettingsService {
       }),
     );
   }
+}
+
+export interface BrandSettings {
+  faviconURL: string;
 }

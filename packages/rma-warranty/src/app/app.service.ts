@@ -32,6 +32,7 @@ import {
   DIRECT_PROFILE_ENDPOINT,
 } from './constants/url-strings';
 import { IDTokenClaims } from './common/interfaces/id-token-claims.interfaces';
+import { BrandSettings, SettingsService } from './settings/settings.service';
 
 @Injectable()
 export class AppService {
@@ -40,6 +41,7 @@ export class AppService {
   constructor(
     private readonly http: HttpClient,
     private readonly storage: StorageService,
+    private readonly settings: SettingsService,
   ) {}
 
   /** GET message from the server */
@@ -102,7 +104,11 @@ export class AppService {
         country: string;
         time_zone: string;
         transferWarehouse: string;
+        brand: BrandSettings;
       }) => {
+        if (success?.brand?.faviconURL) {
+          this.settings.setFavicon(success.brand.faviconURL);
+        }
         this.storage
           .setItem(DEFAULT_CURRENCY_KEY, success.default_currency)
           .then(() => this.storage.setItem(COUNTRY, success.country))
