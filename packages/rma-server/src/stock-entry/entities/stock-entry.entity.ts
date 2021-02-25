@@ -92,6 +92,7 @@ export class StockEntry extends BaseEntity {
 export class StockEntryItem {
   s_warehouse: string;
   t_warehouse: string;
+  warehouse?: string;
   item_code: string;
   item_name: string;
   excel_serials?: string;
