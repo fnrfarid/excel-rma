@@ -174,9 +174,6 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('transferWarehouse').value,
         this.companySettingsForm.get('serviceAccountApiKey').value,
         this.companySettingsForm.get('serviceAccountApiSecret').value,
-        {
-          faviconURL: this.companySettingsForm.get('faviconURL').value,
-        },
       )
       .subscribe({
         next: success => {
