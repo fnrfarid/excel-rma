@@ -3,7 +3,6 @@ import { StockEntryAggregateService } from './stock-entry-aggregate.service';
 import { StockEntryService } from '../../entities/stock-entry.service';
 import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/stock-entry-policies.service';
 import { AGENDA_TOKEN } from '../../../system-settings/providers/agenda.provider';
-import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
@@ -22,10 +21,6 @@ describe('StockEntryAggregateService', () => {
         },
         {
           provide: StockEntryPoliciesService,
-          useValue: {},
-        },
-        {
-          provide: SerialBatchService,
           useValue: {},
         },
         {
