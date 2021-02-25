@@ -698,20 +698,37 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
     );
   }
-  cancelWarrantyClaim(uuid: string) {
-    return this.warrantyClaimsPoliciesService.validateCancelClaim(uuid).pipe(
-      switchMap(res => {
-        return from(
-          this.warrantyClaimService.updateOne(
-            { uuid },
-            {
-              $set: {
-                claim_status: 'Cancelled',
+  cancelWarrantyClaim(cancelPayload: { uuid: string; serial_no: string }) {
+    return this.warrantyClaimsPoliciesService
+      .validateCancelClaim(cancelPayload.uuid)
+      .pipe(
+        switchMap(res => {
+          return from(
+            this.warrantyClaimService.updateOne(
+              { uuid: cancelPayload.uuid },
+              {
+                $set: {
+                  claim_status: 'Cancelled',
+                },
               },
-            },
-          ),
-        );
-      }),
-    );
+            ),
+          );
+        }),
+        switchMap(res => {
+          if (cancelPayload.serial_no) {
+            return from(
+              this.serialNoService.updateOne(
+                { serial_no: cancelPayload.serial_no },
+                {
+                  $unset: {
+                    claim_no: '',
+                  },
+                },
+              ),
+            );
+          }
+          return of({});
+        }),
+      );
   }
 }

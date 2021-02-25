@@ -20,7 +20,7 @@ import {
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
-import { VERDICT, WARRANTY_STATUS } from '../../../constants/app-strings';
+import { WARRANTY_STATUS } from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNo } from '../../../serial-no/entity/serial-no/serial-no.entity';
 import { DateTime } from 'luxon';
@@ -144,17 +144,25 @@ export class WarrantyClaimPoliciesService {
     ).pipe(
       switchMap(claim => {
         if (claim) {
-          return throwError(
-            new BadRequestException('Claim Cannot be Cancelled'),
-          );
+          if (
+            claim.progress_state.length &&
+            claim.completed_delivery_note.length
+          ) {
+            return throwError(
+              new BadRequestException('Cancel the linked documents first'),
+            );
+          }
+          return of(true);
         }
         if (
           claim.status_history[claim.status_history.length - 1].verdict ===
-          VERDICT.RECEIVED_FROM_CUSTOMER
+          'Received from Customer'
         ) {
           return of(true);
         }
-        return throwError(new BadRequestException('Claim Cannot be cancelled'));
+        return throwError(
+          new BadRequestException('Claim Cannot be Canclled,revert the state'),
+        );
       }),
     );
   }
