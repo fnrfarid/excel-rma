@@ -202,7 +202,12 @@ export class PrintAggregateService {
   async generateFooter(doc, settings: ServerSettings) {
     doc.moveDown();
     const image = await this.getCDNImage(settings.footerImageURL);
-    doc.image(image, 30, doc.y, { width: settings.footerWidth });
+    doc.image(image, 20, doc.page.height - 50, {
+      lineBreak: false,
+      width: settings.footerWidth,
+    });
+    // replaced above line with below for footer needed at bottom of page incase if it breaks in sales changed it.
+    // doc.image(image, 30, doc.y, { width: settings.footerWidth });
   }
 
   generateTableRow(

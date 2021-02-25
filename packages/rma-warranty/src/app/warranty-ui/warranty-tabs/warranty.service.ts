@@ -147,12 +147,12 @@ export class WarrantyService {
       });
   }
 
-  resetClaim(uuid: string) {
+  resetClaim(uuid: string, serial_no?: string) {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post<any>(
-          `${RESET_WARRANTY_CLAIM_ENDPOINT}${uuid}`,
-          {},
+          `${RESET_WARRANTY_CLAIM_ENDPOINT}`,
+          { uuid, serial_no },
           { headers },
         );
       }),
