@@ -13,6 +13,8 @@ import {
   LIST_WARRANTY_INVOICE_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   CUSTOMER_ENDPOINT,
+  RESET_WARRANTY_CLAIM_ENDPOINT,
+  REMOVE_WARRANTY_CLAIM_ENDPOINT,
 } from '../../constants/url-strings';
 import { APIResponse } from '../../common/interfaces/sales.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -143,5 +145,29 @@ export class WarrantyService {
           });
         },
       });
+  }
+
+  resetClaim(uuid: string, serial_no?: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<any>(
+          `${RESET_WARRANTY_CLAIM_ENDPOINT}`,
+          { uuid, serial_no },
+          { headers },
+        );
+      }),
+    );
+  }
+
+  removeClaim(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<any>(
+          `${REMOVE_WARRANTY_CLAIM_ENDPOINT}${uuid}`,
+          {},
+          { headers },
+        );
+      }),
+    );
   }
 }

@@ -202,7 +202,12 @@ export class PrintAggregateService {
   async generateFooter(doc, settings: ServerSettings) {
     doc.moveDown();
     const image = await this.getCDNImage(settings.footerImageURL);
-    doc.image(image, 30, doc.y, { width: settings.footerWidth });
+    doc.image(image, 20, doc.page.height - 50, {
+      lineBreak: false,
+      width: settings.footerWidth,
+    });
+    // replaced above line with below for footer needed at bottom of page incase if it breaks in sales changed it.
+    // doc.image(image, 30, doc.y, { width: settings.footerWidth });
   }
 
   generateTableRow(
@@ -295,7 +300,7 @@ export class PrintAggregateService {
       'Contact Address:': invoice.customer_address,
       'Claim No:': invoice.claim_no,
       'Claim Date:': invoice.received_on,
-      'Delivery Date:': invoice.deliver_date,
+      'Delivery Date:': invoice.delivery_date,
       'Claim Branch:': invoice.receiving_branch,
     };
 
@@ -367,68 +372,66 @@ export class PrintAggregateService {
     doc.moveDown().moveDown();
   }
 
+  addRow(
+    doc,
+    invoice: {
+      item_name?: string;
+      serial_no?: string;
+      warranty_end_date?: Date;
+      delivery_status?: string;
+    },
+  ) {
+    this.generateHr(doc, doc.y + 10);
+    doc.font('Helvetica');
+    this.generateWarrantyTableRow(doc, doc.y, invoice.delivery_status, {
+      name: invoice.item_name,
+      serials: invoice.serial_no ? invoice.serial_no : undefined,
+      warranty_end_date: invoice.warranty_end_date,
+    });
+    this.checkPagePagination(doc);
+    doc.moveDown();
+    this.generateHr(doc, doc.y);
+    doc.moveDown();
+  }
+
   generateWarrantyPrintTable(doc, invoice: WarrantyClaimDto) {
     const invoiceTableTop = doc.y + 10;
 
     doc.font('Helvetica-Bold');
     switch (invoice.claim_status) {
       case CLAIM_STATUS.DELIVERED:
-        this.generateWarrantyTableRow(
-          doc,
-          invoiceTableTop,
-          'Status',
-          { name: 'Claimed Product' },
-          { name: 'Replaced Product' },
-        );
+        this.generateWarrantyTableRow(doc, invoiceTableTop, 'Status', {
+          name: 'Claimed Product',
+        });
+        this.addRow(doc, {
+          item_name: invoice.item_name,
+          serial_no: invoice.serial_no,
+          warranty_end_date: invoice.warranty_end_date,
+          delivery_status: invoice.status_history.splice(-1)[0].delivery_status,
+        });
+        this.generateWarrantyTableRow(doc, invoiceTableTop, '', {
+          name: 'Replaced Product',
+        });
+        this.addRow(doc, {
+          item_name: invoice.replace_product,
+          serial_no: invoice.replace_serial,
+          warranty_end_date: invoice.warranty_end_date,
+          delivery_status: invoice.status_history.splice(-1)[0].delivery_status,
+        });
         break;
 
       default:
         this.generateWarrantyTableRow(doc, invoiceTableTop, 'Status', {
           name: 'Claimed Product',
         });
+        this.addRow(doc, {
+          item_name: invoice.item_name,
+          serial_no: invoice.serial_no,
+          warranty_end_date: invoice.warranty_end_date,
+          delivery_status: invoice.status_history.splice(-1)[0].delivery_status,
+        });
         break;
     }
-
-    doc.moveDown();
-    this.generateHr(doc, doc.y + 10);
-    doc.font('Helvetica');
-    switch (invoice.claim_status) {
-      case CLAIM_STATUS.DELIVERED:
-        this.generateWarrantyTableRow(
-          doc,
-          doc.y,
-          invoice.status_history.splice(-1)[0].delivery_status,
-          {
-            name: invoice.item_name,
-            serials: invoice.serial_no ? invoice.serial_no : undefined,
-            warranty_end_date: invoice.warranty_end_date,
-          },
-          {
-            name: invoice.replace_product,
-            serials: invoice.replace_serial
-              ? invoice.replace_serial
-              : undefined,
-            warranty_end_date: invoice.warranty_end_date,
-          },
-        );
-        break;
-      default:
-        this.generateWarrantyTableRow(
-          doc,
-          doc.y,
-          invoice.status_history.splice(-1)[0].delivery_status,
-          {
-            name: invoice.item_name,
-            serials: invoice.serial_no ? invoice.serial_no : undefined,
-            warranty_end_date: invoice.warranty_end_date,
-          },
-        );
-        break;
-    }
-    this.checkPagePagination(doc);
-    doc.moveDown();
-    this.generateHr(doc, doc.y);
-    doc.moveDown();
 
     this.generateTableRow(doc, doc.y, '', { name: '' }, '');
     doc.moveDown();
@@ -531,28 +534,23 @@ export class PrintAggregateService {
     y,
     status,
     item: { name: string; serials?: string; warranty_end_date?: Date },
-    replaced_item?: {
-      name: string;
-      serials?: string;
-      warranty_end_date?: Date;
-    },
   ) {
     doc.moveDown();
     const height = doc.y;
     doc.fontSize(10).fillColor('#000000').text('', 20, height);
     if (status) {
       doc
-        .text(item.name, 50, height, { width: 200 })
+        .text(item.name, 50, height, { width: 400 })
         .text(status, 450, height, { align: 'right' });
     }
     doc
-      .text(item.name, 50, height, { width: 200 })
+      .text(item.name, 50, height, { width: 400 })
       .text('-', 450, height, { align: 'right' });
 
     if (item.serials) {
       doc
         .fillColor('#444444')
-        .text(this.getSerialKeys(item), 50, doc.y, { width: 200 });
+        .text(this.getSerialKeys(item), 50, doc.y, { width: 400 });
     }
     if (item.warranty_end_date) {
       doc
@@ -561,28 +559,8 @@ export class PrintAggregateService {
           this.getWarrantyDate(item.warranty_end_date.toString()),
           50,
           doc.y,
-          { width: 200 },
+          { width: 400 },
         );
-    }
-
-    if (replaced_item) {
-      doc.fontSize(10).fillColor('#000000').text('', 20, height);
-      doc.text(replaced_item.name, 300, doc.y, { width: 200 });
-      if (replaced_item.serials) {
-        doc
-          .fillColor('#444444')
-          .text(this.getSerialKeys(replaced_item), 300, doc.y, { width: 200 });
-      }
-      if (replaced_item.warranty_end_date) {
-        doc
-          .fillColor('#444444')
-          .text(
-            this.getWarrantyDate(replaced_item.warranty_end_date.toString()),
-            300,
-            doc.y,
-            { width: 200 },
-          );
-      }
     }
   }
 

@@ -6,11 +6,12 @@ import {
 } from '../../../common/interfaces/warranty.interface';
 import { WarrantyService } from '../../warranty-tabs/warranty.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ERROR_FETCHING_WARRANTY_CLAIM } from '../../../constants/messages';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { DEFAULT_COMPANY } from '../../../constants/storage';
+import { LoadingController } from '@ionic/angular';
 @Component({
   selector: 'claim-details',
   templateUrl: './claim-details.component.html',
@@ -42,6 +43,8 @@ export class ClaimDetailsComponent implements OnInit {
     private readonly warrantyService: WarrantyService,
     private readonly snackBar: MatSnackBar,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
@@ -80,7 +83,11 @@ export class ClaimDetailsComponent implements OnInit {
     });
   }
 
-  printDeliveryNote(docType?: string) {
+  async printDeliveryNote(docType?: string) {
+    const loading = await this.loadingController.create({
+      message: `Generating Print...!`,
+    });
+    await loading.present();
     let print_type: string = '';
     this.warrantyService
       .getWarrantyClaim(this.invoiceUuid)
@@ -115,13 +122,72 @@ export class ClaimDetailsComponent implements OnInit {
         }),
       )
       .subscribe({
-        next: success => {},
-        error: err => {},
+        next: success => {
+          loading.dismiss();
+        },
+        error: err => {
+          loading.dismiss();
+          this.snackBar.open(`Failed To Print`, CLOSE, { duration: 4500 });
+        },
       });
   }
 
   async getPrint() {
     const doc = `Warranty Claim`;
     this.printDeliveryNote(doc);
+  }
+
+  async resetEntry() {
+    const loading = await this.loadingController.create({
+      message: `Cancelling Claim Please Wait...!`,
+    });
+    await loading.present();
+
+    this.warrantyService
+      .resetClaim(
+        this.warrantyClaimsDetails?.uuid,
+        this.warrantyClaimsDetails?.serial_no,
+      )
+      .subscribe({
+        next: success => {
+          loading.dismiss();
+          this.router.navigate(['warranty']);
+        },
+        error: err => {
+          loading.dismiss();
+          this.snackBar.open(
+            err.error.message ? err.error.message : `Failed to Cancel Claim`,
+            CLOSE,
+            {
+              duration: 4500,
+            },
+          );
+        },
+      });
+  }
+
+  async removeEntry() {
+    const loading = await this.loadingController.create({
+      message: `Deleting Claim Please Wait...!`,
+    });
+    await loading.present();
+    this.warrantyService
+      .removeClaim(this.warrantyClaimsDetails?.uuid)
+      .subscribe({
+        next: success => {
+          loading.dismiss();
+          this.router.navigate(['warranty']);
+        },
+        error: err => {
+          loading.dismiss();
+          this.snackBar.open(
+            err.error.message ? err.error.message : `Failed to delete claim`,
+            CLOSE,
+            {
+              duration: 4500,
+            },
+          );
+        },
+      });
   }
 }

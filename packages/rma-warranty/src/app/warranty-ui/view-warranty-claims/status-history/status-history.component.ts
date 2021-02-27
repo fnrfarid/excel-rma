@@ -19,7 +19,7 @@ import {
   STATUS_HISTORY_REMOVE_FAILURE,
   ERROR_FETCHING_DETAILS,
 } from '../../../constants/messages';
-import { MatTableDataSource } from '@angular/material/table';
+import { StatusHistoryDataSource } from './status-history-datasource';
 
 @Component({
   selector: 'status-history',
@@ -42,7 +42,7 @@ export class StatusHistoryComponent implements OnInit {
   territory: any = [];
   currentStatus: any = [];
   deliveryStatus: any = [];
-  statusHistory = new MatTableDataSource<StatusHistoryDetails>();
+  dataSource: StatusHistoryDataSource;
   date: { date: string; time: string };
   stockEntry: StockEntryItems;
 
@@ -68,6 +68,7 @@ export class StatusHistoryComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.dataSource = new StatusHistoryDataSource(this.statusHistoryService);
     this.getTerritoryList();
     Object.keys(CURRENT_STATUS_VERDICT).forEach(verdict =>
       this.currentStatus.push(CURRENT_STATUS_VERDICT[verdict]),
@@ -76,8 +77,7 @@ export class StatusHistoryComponent implements OnInit {
       this.deliveryStatus.push(DELIVERY_STATUS[status]),
     );
     this.resetWarrantyDetail(this.warrantyObject?.uuid);
-
-    this.statusHistory.data = this.warrantyObject?.status_history;
+    this.dataSource.loadItems(this.warrantyObject?.uuid);
     this.setStockEntryStatusFields();
     this.statusHistoryForm.controls.transfer_branch.disable();
     this.statusHistoryForm.controls.transfer_branch.updateValueAndValidity();
@@ -158,7 +158,8 @@ export class StatusHistoryComponent implements OnInit {
     }
     this.statusHistoryService.addStatusHistory(statusHistoryDetails).subscribe({
       next: () => {
-        this.resetWarrantyDetail(this.warrantyObject.uuid);
+        this.dataSource.loadItems(this.warrantyObject?.uuid);
+        this.resetWarrantyDetail(this.warrantyObject?.uuid);
         this.setInitialFormValue();
         this.setStockEntryStatusFields();
       },
@@ -180,7 +181,6 @@ export class StatusHistoryComponent implements OnInit {
     this.statusHistoryService.getWarrantyDetail(uuid).subscribe({
       next: res => {
         this.warrantyObject = res;
-        this.statusHistory.data = this.warrantyObject.status_history;
       },
     });
   }
@@ -190,7 +190,8 @@ export class StatusHistoryComponent implements OnInit {
       .removeStatusHistory(this.warrantyObject.uuid)
       .subscribe({
         next: () => {
-          this.resetWarrantyDetail(this.warrantyObject.uuid);
+          this.dataSource.loadItems(this.warrantyObject?.uuid);
+          this.resetWarrantyDetail(this.warrantyObject?.uuid);
         },
         error: ({ message }) => {
           if (!message) message = STATUS_HISTORY_REMOVE_FAILURE;
@@ -246,8 +247,8 @@ export class StatusHistoryComponent implements OnInit {
 
   check() {
     let bool: boolean = false;
-    bool = this.statusHistory?.data?.length
-      ? this.statusHistory.data[this.statusHistory.data.length - 1].verdict ===
+    bool = this.dataSource?.data?.length
+      ? this.dataSource.data[this.dataSource.data.length - 1].verdict ===
         CURRENT_STATUS_VERDICT.DELIVER_TO_CUSTOMER
         ? true
         : false

@@ -11,7 +11,6 @@ import { StockEntryPoliciesService } from '../../policies/stock-entry-policies/s
 import {
   switchMap,
   mergeMap,
-  retry,
   concatMap,
   toArray,
   catchError,
@@ -21,7 +20,6 @@ import { from, throwError, of, forkJoin } from 'rxjs';
 import {
   STOCK_ENTRY,
   FRAPPE_QUEUE_JOB,
-  STOCK_ENTRY_SERIALS_BATCH_SIZE,
   STOCK_ENTRY_STATUS,
   CREATE_STOCK_ENTRY_JOB,
   ACCEPT_STOCK_ENTRY_JOB,
@@ -39,7 +37,6 @@ import {
   AGENDA_JOB_STATUS,
   DOC_NAMES,
 } from '../../../constants/app-strings';
-import { SerialBatchService } from '../../../sync/aggregates/serial-batch/serial-batch.service';
 import { DateTime } from 'luxon';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
@@ -55,7 +52,6 @@ export class StockEntryAggregateService {
     private readonly agenda: Agenda,
     private readonly stockEntryService: StockEntryService,
     private readonly stockEntryPolicies: StockEntryPoliciesService,
-    private readonly serialBatchService: SerialBatchService,
     private readonly http: HttpService,
     private readonly settingService: SettingsService,
     private readonly serialHistoryService: SerialNoHistoryService,
@@ -100,14 +96,36 @@ export class StockEntryAggregateService {
             if (mongoSerials && mongoSerials.length) {
               return this.createMongoSerials(stockEntry, mongoSerials, req);
             }
-            this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+            this.addToQueueNow(
+              {
+                payload: stockEntry,
+                token: req.token,
+                type: CREATE_STOCK_ENTRY_JOB,
+                parent: stockEntry.uuid,
+              },
+              stockEntry.uuid,
+            )
+              .then(success => {})
+              .catch(err => {});
             return of(stockEntry);
           }
 
-          this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+          this.addToQueueNow(
+            {
+              payload: stockEntry,
+              token: req.token,
+              type: CREATE_STOCK_ENTRY_JOB,
+              parent: stockEntry.uuid,
+            },
+            stockEntry.uuid,
+          )
+            .then(success => {})
+            .catch(err => {});
+
           if (!mongoSerials) {
             return of(stockEntry);
           }
+
           return from(Object.keys(mongoSerials)).pipe(
             mergeMap(key => {
               return from(
@@ -158,7 +176,17 @@ export class StockEntryAggregateService {
           this.serialNoService.insertMany(mongoSerials, { ordered: false }),
         ).pipe(
           switchMap(success => {
-            this.batchQueueStockEntry(stockEntry, req, stockEntry.uuid);
+            this.addToQueueNow(
+              {
+                payload: stockEntry,
+                token: req.token,
+                type: CREATE_STOCK_ENTRY_JOB,
+                parent: stockEntry.uuid,
+              },
+              stockEntry.uuid,
+            )
+              .then(success => {})
+              .catch(err => {});
             return of(stockEntry);
           }),
         );
@@ -346,48 +374,6 @@ export class StockEntryAggregateService {
     );
   }
 
-  batchQueueStockEntry(payload: StockEntryDto, req, uuid: string) {
-    this.serialBatchService
-      .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
-      .pipe(
-        switchMap((itemBatch: any) => {
-          this.batchAddToQueue(
-            itemBatch,
-            payload,
-            req,
-            CREATE_STOCK_ENTRY_JOB,
-            uuid,
-          );
-          return of({});
-        }),
-      )
-      .subscribe({
-        next: success => {},
-        error: err => {},
-      });
-  }
-
-  batchAddToQueue(itemBatch, payload, req, type, parentUuid: string) {
-    payload.items = [];
-    from(itemBatch)
-      .pipe(
-        concatMap(item => {
-          payload.items = [item];
-          return from(
-            this.addToQueueNow({ payload, token: req.token, type }, parentUuid),
-          );
-        }),
-        retry(3),
-        switchMap(success => {
-          return of();
-        }),
-      )
-      .subscribe({
-        next: success => {},
-        error: err => {},
-      });
-  }
-
   setStockEntryDefaults(
     payload: StockEntryDto,
     clientHttpRequest,
@@ -517,21 +503,18 @@ export class StockEntryAggregateService {
           )
           .catch(err => {})
           .then(success => {});
-        return this.serialBatchService
-          .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
-          .pipe(
-            switchMap((itemBatch: any) => {
-              payload.items = [itemBatch];
-              this.batchAddToQueue(
-                itemBatch,
-                payload,
-                req,
-                REJECT_STOCK_ENTRY_JOB,
-                stockEntry.uuid,
-              );
-              return of({});
-            }),
-          );
+        this.addToQueueNow(
+          {
+            payload: stockEntry,
+            token: req.token,
+            type: REJECT_STOCK_ENTRY_JOB,
+            parent: stockEntry.uuid,
+          },
+          payload.uuid,
+        )
+          .then(success => {})
+          .catch(err => {});
+        return of(stockEntry);
       }),
     );
   }
@@ -575,21 +558,18 @@ export class StockEntryAggregateService {
           )
           .catch(err => {})
           .then(success => {});
-        return this.serialBatchService
-          .batchItems(payload.items, STOCK_ENTRY_SERIALS_BATCH_SIZE)
-          .pipe(
-            switchMap((itemBatch: any) => {
-              payload.items = [itemBatch];
-              this.batchAddToQueue(
-                itemBatch,
-                payload,
-                req,
-                ACCEPT_STOCK_ENTRY_JOB,
-                stockEntry.uuid,
-              );
-              return of({});
-            }),
-          );
+        this.addToQueueNow(
+          {
+            payload: stockEntry,
+            token: req.token,
+            type: ACCEPT_STOCK_ENTRY_JOB,
+            parent: stockEntry.uuid,
+          },
+          payload.uuid,
+        )
+          .then(success => {})
+          .catch(err => {});
+        return of(stockEntry);
       }),
     );
   }

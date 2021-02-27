@@ -4,6 +4,7 @@ import { SupplierService } from '../../../supplier/entity/supplier/supplier.serv
 import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 
 describe('WarrantyClaimPoliciesService', () => {
   let service: WarrantyClaimPoliciesService;
@@ -26,6 +27,10 @@ describe('WarrantyClaimPoliciesService', () => {
         },
         {
           provide: SettingsService,
+          useValue: {},
+        },
+        {
+          provide: WarrantyClaimService,
           useValue: {},
         },
       ],

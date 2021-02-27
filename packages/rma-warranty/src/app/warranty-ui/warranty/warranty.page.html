@@ -260,22 +260,6 @@
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
 
-          <ng-container matColumnDef="edit">
-            <mat-header-cell *matHeaderCellDef>Edit</mat-header-cell>
-            <mat-cell *matCellDef="let row; let i = index">
-              <ion-button
-                [disabled]="row.set ==='Bulk'|| row.status_history[row.status_history.length-1].verdict !=='Received from Customer'"
-                fill="clear"
-                class="ion-no-padding"
-                color="danger"
-                [routerLink]="['/warranty/warranty-claim', 'edit',row.uuid]"
-              >
-                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-              </ion-button>
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-          </ng-container>
-
           <ng-container matColumnDef="claim_no">
             <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
               Claim no
@@ -299,15 +283,6 @@
               Received Date
             </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.received_on }} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="customer_third_party">
-            <mat-header-cell *matHeaderCellDef>
-              Customer Third Party
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.customer_third_party}}
-            </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="customer_name">
@@ -393,13 +368,6 @@
             <mat-cell *matCellDef="let row"> {{row.received_by}} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
-          <ng-container matColumnDef="damaged_serial">
-            <mat-header-cell *matHeaderCellDef>
-              Received Serial
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.damaged_serial }} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
           <ng-container matColumnDef="replace_serial">
             <mat-header-cell *matHeaderCellDef>
               Replaced Serial
@@ -424,7 +392,7 @@
 
           <mat-row
             *matRowDef="let row; columns: displayedColumns;"
-            [ngStyle]="{'background-color':row.set==='Bulk'?'#F4F4FB':row.set==='Part'?'#FDFAE5':'rgb(255, 255, 255)'
+            [ngStyle]="{'background-color':row.claim_status==='Cancelled'?'#F8DEDE':row.set==='Bulk'?'#F4F4FB':row.set==='Part'?'#FDFAE5':'rgb(255, 255, 255)'
 
           }"
           ></mat-row>

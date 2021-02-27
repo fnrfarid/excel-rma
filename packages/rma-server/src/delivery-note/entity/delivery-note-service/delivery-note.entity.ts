@@ -105,6 +105,9 @@ export class DeliveryNote extends BaseEntity {
   taxes: DeliveryNoteTaxes[];
 
   @Column()
+  instructions: string;
+
+  @Column()
   sales_team: DeliveryNoteSalesTeam[];
   credit_note_items?: any[];
 }

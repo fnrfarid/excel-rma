@@ -18,6 +18,7 @@ import { TokenGuard } from '../../../auth/guards/token.guard';
 import { WarrantyClaimDto } from '../../entity/warranty-claim/warranty-claim-dto';
 import { AddWarrantyClaimCommand } from '../../command/add-warranty-claim/add-warranty-claim.command';
 import { RemoveWarrantyClaimCommand } from '../../command/remove-warranty-claim/remove-warranty-claim.command';
+import { ResetWarrantyClaimCommand } from '../../command/reset-warranty-claim/reset-warranty-claim.command';
 import { UpdateWarrantyClaimCommand } from '../../command/update-warranty-claim/update-warranty-claim.command';
 import { RetrieveWarrantyClaimQuery } from '../../query/get-warranty-claim/retrieve-warranty-claim.query';
 import { RetrieveWarrantyClaimListQuery } from '../../query/list-warranty-claim/retrieve-warranty-claim-list.query';
@@ -62,8 +63,14 @@ export class WarrantyClaimController {
 
   @Post('v1/remove/:uuid')
   @UseGuards(TokenGuard)
-  remove(@Param('uuid') uuid: string) {
-    return this.commandBus.execute(new RemoveWarrantyClaimCommand(uuid));
+  async remove(@Param('uuid') uuid: string) {
+    return await this.commandBus.execute(new RemoveWarrantyClaimCommand(uuid));
+  }
+
+  @Post('v1/reset')
+  @UseGuards(TokenGuard)
+  async reset(@Body() body: { uuid: string; serial_no: string }) {
+    return await this.commandBus.execute(new ResetWarrantyClaimCommand(body));
   }
 
   @Get('v1/get/:uuid')

@@ -14,6 +14,7 @@ export interface SalesReturn {
   items: Item[];
   credit_note_items: Item[];
   delivery_note_names: string[];
+  remarks: string;
 }
 
 export interface SalesReturnDetails {
@@ -24,6 +25,7 @@ export interface SalesReturnDetails {
   posting_date?: string;
   territory?: string;
   set_warehouse?: string;
+  instructions?: string;
 }
 
 export interface SalesReturnItem {
