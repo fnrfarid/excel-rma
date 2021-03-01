@@ -132,7 +132,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     clientHttpRequest,
   ) {
     return this.warrantyClaimsPoliciesService
-      .validateWarrantyCustomer(claimsPayload.customer)
+      .validateWarrantyCustomer(claimsPayload.customer_code)
       .pipe(
         switchMap(() => {
           return this.warrantyClaimsPoliciesService.validateWarrantySerailNo(
@@ -161,7 +161,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
 
   createNonSerialClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
     return this.warrantyClaimsPoliciesService
-      .validateWarrantyCustomer(claimsPayload.customer)
+      .validateWarrantyCustomer(claimsPayload.customer_code)
       .pipe(
         switchMap(() => {
           return this.assignFields(claimsPayload, clientHttpRequest);
