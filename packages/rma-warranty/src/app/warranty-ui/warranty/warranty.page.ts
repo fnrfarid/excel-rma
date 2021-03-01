@@ -23,6 +23,7 @@ import {
 } from '../../constants/app-string';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
+import { APP_URL } from '../../constants/storage';
 
 @Component({
   selector: 'app-warranty',
@@ -309,7 +310,18 @@ export class WarrantyPage implements OnInit {
         );
         break;
       default:
-        this.router.navigate(['/warranty/view-warranty-claims', row.uuid]);
+        this.warrantyService
+          .getStorage()
+          .getItem(APP_URL)
+          .then(url => {
+            this.router.navigate([]).then(result => {
+              window.open(
+                `${url}/warranty/view-warranty-claims/${row.uuid}`,
+                '_blank',
+              );
+            });
+          });
+
         break;
     }
   }
