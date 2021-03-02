@@ -57,7 +57,7 @@ export class PrintComponent implements OnInit {
   }
 
   parseHTML(html) {
-    var template = document.createElement('lol');
+    const template = document.createElement('var');
     template.innerHTML = html;
     return template.textContent || template.innerText || '';
   }
