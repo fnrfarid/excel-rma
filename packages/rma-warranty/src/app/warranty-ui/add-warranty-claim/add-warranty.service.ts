@@ -55,23 +55,25 @@ export class AddWarrantyService {
   }
 
   getCustomerList(value?) {
-    if (!value) value = '';
-    const params = new HttpParams({
-      fromObject: {
-        fields: '["*"]',
-        filters: `[["name","like","%${''}%"]]`,
-      },
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["name","like","%${''}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(CUSTOMER_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
     });
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http
-          .get<{ data: unknown[] }>(CUSTOMER_ENDPOINT, {
-            headers,
-            params,
-          })
-          .pipe(map(res => res.data));
-      }),
-    );
   }
 
   getSerial(name: string) {

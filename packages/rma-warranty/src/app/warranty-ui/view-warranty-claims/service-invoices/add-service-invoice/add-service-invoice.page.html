@@ -39,7 +39,7 @@
                   [matDatepicker]="posting_date"
                   placeholder="Posting Date"
                   formControlName="posting_date"
-                  (dateChange)="selectedPostingDate($event)"
+                  (dateChange)="selectedPostingDate($event.option)"
                 />
                 <mat-datepicker-toggle
                   matSuffix
@@ -63,7 +63,8 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #customer="matAutocomplete"
-                  [displayWith]="getOption"
+                  [displayWith]="getCustOption"
+                  (optionSelected)="setCode($event.option.value)"
                 >
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async"
