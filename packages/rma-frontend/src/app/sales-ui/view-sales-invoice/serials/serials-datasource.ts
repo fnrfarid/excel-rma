@@ -76,6 +76,6 @@ export interface DeliveryNoteItemInterface {
   against_sales_invoice?: string;
   warranty_date?: string;
   amount?: number;
-  serial_no: any;
+  serial_no?: string[];
   excel_serials?: string;
 }

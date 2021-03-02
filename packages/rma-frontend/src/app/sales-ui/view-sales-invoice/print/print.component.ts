@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NavParams, PopoverController } from '@ionic/angular';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import {
+  AggregatedDocument,
+  SalesInvoice,
+} from 'src/app/common/interfaces/sales.interface';
 import { StorageService } from '../../../api/storage/storage.service';
 import {
   AUTH_SERVER_URL,
@@ -67,38 +71,44 @@ export class PrintComponent implements OnInit {
     this.salesService
       .getDeliveryNoteWithItems(this.deliveryNoteNames)
       .pipe(
-        switchMap((res: any) => {
+        switchMap((res: { [key: string]: any }) => {
           return forkJoin({
             data: of(res),
             salesInvoice: this.salesService.getSalesInvoice(
-              res[this.deliveryNoteNames[0]].items[0].against_sales_invoice,
+              res[this.deliveryNoteNames[0]]?.items[0]?.against_sales_invoice,
             ),
           });
         }),
-        switchMap((response: any) => {
-          response.data = Object.values(response.data);
-          const aggregatedDeliveryNotes = this.salesService.getAggregatedDocument(
-            response.data,
-          );
-          aggregatedDeliveryNotes.sales_person =
-            response.salesInvoice.sales_team[0].sales_person;
-          aggregatedDeliveryNotes.created_by = response.salesInvoice.createdBy;
-          aggregatedDeliveryNotes.address_display = this.parseHTML(
-            aggregatedDeliveryNotes.address_display,
-          );
+        switchMap(
+          (response: {
+            data: AggregatedDocument[];
+            salesInvoice: SalesInvoice;
+          }) => {
+            response.data = Object.values(response.data);
+            const aggregatedDeliveryNotes = this.salesService.getAggregatedDocument(
+              response.data,
+            );
+            aggregatedDeliveryNotes.sales_person =
+              response?.salesInvoice?.sales_team[0]?.sales_person;
+            aggregatedDeliveryNotes.created_by =
+              response?.salesInvoice?.createdBy;
+            aggregatedDeliveryNotes.address_display = this.parseHTML(
+              aggregatedDeliveryNotes.address_display,
+            );
 
-          this.salesService.printDocument(
-            {
-              ...aggregatedDeliveryNotes,
-              name: this.invoice_name,
-              print: {
-                print_type: 'Delivery Chalan',
+            this.salesService.printDocument(
+              {
+                ...aggregatedDeliveryNotes,
+                name: this.invoice_name,
+                print: {
+                  print_type: 'Delivery Chalan',
+                },
               },
-            },
-            this.invoice_name,
-          );
-          return of({});
-        }),
+              this.invoice_name,
+            );
+            return of({});
+          },
+        ),
       )
       .subscribe({
         next: success => {},
