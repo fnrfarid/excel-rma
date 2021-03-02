@@ -780,10 +780,12 @@ export class SalesService {
       items: DeliveryNoteItemInterface[];
       total?: number;
       total_qty?: number;
+      sales_person?: string;
+      created_by?: string;
     }[],
   ) {
     const itemsHashMap = {};
-    const doc = res[0];
+    const doc: any = res[0];
     doc.total = 0;
     doc.total_qty = 0;
     res.forEach(document => {

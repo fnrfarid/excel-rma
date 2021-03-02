@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavParams, PopoverController } from '@ionic/angular';
-import { of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { StorageService } from '../../../api/storage/storage.service';
 import {
@@ -56,16 +56,37 @@ export class PrintComponent implements OnInit {
     });
   }
 
+  parseHTML(html) {
+    var template = document.createElement('lol');
+    template.innerHTML = html;
+    return template.textContent || template.innerText || '';
+  }
+
   printDeliveryNote() {
     this.closePopover();
     this.salesService
       .getDeliveryNoteWithItems(this.deliveryNoteNames)
       .pipe(
-        switchMap((data: any) => {
-          data = Object.values(data);
+        switchMap((res: any) => {
+          return forkJoin({
+            data: of(res),
+            salesInvoice: this.salesService.getSalesInvoice(
+              res[this.deliveryNoteNames[0]].items[0].against_sales_invoice,
+            ),
+          });
+        }),
+        switchMap((response: any) => {
+          response.data = Object.values(response.data);
           const aggregatedDeliveryNotes = this.salesService.getAggregatedDocument(
-            data,
+            response.data,
           );
+          aggregatedDeliveryNotes.sales_person =
+            response.salesInvoice.sales_team[0].sales_person;
+          aggregatedDeliveryNotes.created_by = response.salesInvoice.createdBy;
+          aggregatedDeliveryNotes.address_display = this.parseHTML(
+            aggregatedDeliveryNotes.address_display,
+          );
+
           this.salesService.printDocument(
             {
               ...aggregatedDeliveryNotes,
