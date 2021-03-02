@@ -129,9 +129,7 @@ export class AddWarrantyClaimPage implements OnInit {
     this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      switchMap(value => {
-        return this.warrantyService.getCustomerList(value);
-      }),
+      this.warrantyService.getCustomerList(),
     );
 
     this.productList = this.warrantyClaimForm.controls.product_name.valueChanges.pipe(
