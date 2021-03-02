@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.4.1...rma-warranty@1.5.0) (2021-02-27)
+
+
+### Features
+
+* **rma-warranty:** Add favIcon to Warranty App ([7131bd2](https://gitlab.com/castlecraft/excel-rma/commit/7131bd2055e02185e60b38cad51ef8437334ec41))
+* **rma-warranty:** Add favIcon to Warranty App 1 ([d40dd26](https://gitlab.com/castlecraft/excel-rma/commit/d40dd26afdc584ae8834b539e632bc4447985d2c))
+
+
+
+
+
 ## [1.4.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.4.0...rma-warranty@1.4.1) (2021-02-21)
 
 **Note:** Version bump only for package rma-warranty

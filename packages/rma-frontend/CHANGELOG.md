@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.7.1...rma-frontend@1.8.0) (2021-02-27)
+
+
+### Features
+
+* **rma-frontend:** Remarks field added to Sales Return ([7a72417](https://gitlab.com/castlecraft/excel-rma/commit/7a724177ec6a4410543985bc68a41805bf2d58dc))
+* **rma-frontend:** Remarks field added to Sales Return 1 ([e2278df](https://gitlab.com/castlecraft/excel-rma/commit/e2278dfd0ef3d18a785af7ec1b812eb46e8337fa))
+
+
+
+
+
 ## [1.7.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.7.0...rma-frontend@1.7.1) (2021-02-22)
 
 

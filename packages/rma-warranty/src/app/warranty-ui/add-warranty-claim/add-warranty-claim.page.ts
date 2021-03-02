@@ -455,8 +455,9 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.third_party_name = this.warrantyClaimForm.controls.third_party_name.value;
     warrantyClaimDetails.third_party_contact = this.warrantyClaimForm.controls.third_party_contact.value;
     warrantyClaimDetails.third_party_address = this.warrantyClaimForm.controls.third_party_address.value;
-    warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.name;
+    warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.customer_name;
     warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
+    warrantyClaimDetails.customer_code = this.contact.name;
     warrantyClaimDetails.posting_time = await (
       await this.getDateTime(new Date())
     ).time;
@@ -526,7 +527,7 @@ export class AddWarrantyClaimPage implements OnInit {
     });
   }
   getOptionText(option) {
-    if (option) return option.name;
+    if (option) return option.customer_name;
   }
 
   getOption(option) {

@@ -192,4 +192,7 @@ export class BulkWarrantyClaimDto {
 
   @IsOptional()
   service_items: string[];
+
+  @IsOptional()
+  customer_code: string;
 }

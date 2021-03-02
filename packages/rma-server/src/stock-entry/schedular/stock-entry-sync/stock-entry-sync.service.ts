@@ -292,6 +292,9 @@ export class StockEntrySyncService {
     delete payload.item_data;
     switch (payload.stock_entry_type) {
       case STOCK_ENTRY_TYPE.RnD_PRODUCTS:
+        payload.items.filter(item => {
+          item.warehouse = item.s_warehouse;
+        });
         break;
 
       default:

@@ -60,7 +60,7 @@ export class AddWarrantyService {
       const params = new HttpParams({
         fromObject: {
           fields: '["*"]',
-          filters: `[["customer_name","like","%${value}%"]]`,
+          filters: `[["name","like","%${''}%"]]`,
         },
       });
       return this.getHeaders().pipe(
