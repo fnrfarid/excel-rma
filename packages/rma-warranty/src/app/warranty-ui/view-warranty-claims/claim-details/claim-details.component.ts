@@ -144,7 +144,10 @@ export class ClaimDetailsComponent implements OnInit {
     await loading.present();
 
     this.warrantyService
-      .resetClaim(this.warrantyClaimsDetails?.uuid)
+      .resetClaim(
+        this.warrantyClaimsDetails?.uuid,
+        this.warrantyClaimsDetails?.serial_no,
+      )
       .subscribe({
         next: success => {
           loading.dismiss();
@@ -152,9 +155,13 @@ export class ClaimDetailsComponent implements OnInit {
         },
         error: err => {
           loading.dismiss();
-          this.snackBar.open(`Failed to Cancel Claim`, CLOSE, {
-            duration: 4500,
-          });
+          this.snackBar.open(
+            err.error.message ? err.error.message : `Failed to Cancel Claim`,
+            CLOSE,
+            {
+              duration: 4500,
+            },
+          );
         },
       });
   }
@@ -173,9 +180,13 @@ export class ClaimDetailsComponent implements OnInit {
         },
         error: err => {
           loading.dismiss();
-          this.snackBar.open(`Failed to delete claim`, CLOSE, {
-            duration: 4500,
-          });
+          this.snackBar.open(
+            err.error.message ? err.error.message : `Failed to delete claim`,
+            CLOSE,
+            {
+              duration: 4500,
+            },
+          );
         },
       });
   }

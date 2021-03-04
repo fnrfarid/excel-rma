@@ -9,9 +9,9 @@ export class ResetWarrantyClaimCommandHandler
     private readonly manager: WarrantyClaimAggregateService,
   ) {}
   async execute(command: ResetWarrantyClaimCommand) {
-    const { uuid } = command;
+    const { payload } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    await this.manager.cancelWarrantyClaim(uuid).toPromise();
+    await this.manager.cancelWarrantyClaim(payload).toPromise();
     aggregate.commit();
   }
 }

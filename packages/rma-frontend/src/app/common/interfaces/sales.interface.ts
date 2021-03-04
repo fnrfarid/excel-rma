@@ -1,5 +1,7 @@
 // import { Customer } from './customer.interface';
 
+import { DeliveryNoteItemInterface } from 'src/app/sales-ui/view-sales-invoice/serials/serials-datasource';
+
 export class SalesInvoice {
   uuid: string;
   customer: string;
@@ -7,6 +9,8 @@ export class SalesInvoice {
   addressDisplay: string;
   total: number;
   items: Array<Item>;
+  sales_team: Array<any>;
+  createdBy: string;
 }
 
 export class Item {
@@ -71,4 +75,12 @@ export interface SerialNo {
   rate?: number;
   amount?: number;
   serial_no?: string[];
+}
+
+export interface AggregatedDocument {
+  items: DeliveryNoteItemInterface[];
+  total?: number;
+  total_qty?: number;
+  sales_person?: string;
+  created_by?: string;
 }

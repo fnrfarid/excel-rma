@@ -67,10 +67,10 @@ export class WarrantyClaimController {
     return await this.commandBus.execute(new RemoveWarrantyClaimCommand(uuid));
   }
 
-  @Post('v1/reset/:uuid')
+  @Post('v1/reset')
   @UseGuards(TokenGuard)
-  async reset(@Param('uuid') uuid: string) {
-    return await this.commandBus.execute(new ResetWarrantyClaimCommand(uuid));
+  async reset(@Body() body: { uuid: string; serial_no: string }) {
+    return await this.commandBus.execute(new ResetWarrantyClaimCommand(body));
   }
 
   @Get('v1/get/:uuid')

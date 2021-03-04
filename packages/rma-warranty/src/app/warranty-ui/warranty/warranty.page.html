@@ -285,15 +285,6 @@
             <mat-cell *matCellDef="let row"> {{row.received_on }} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
-          <ng-container matColumnDef="customer_third_party">
-            <mat-header-cell *matHeaderCellDef>
-              Customer Third Party
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.customer_third_party}}
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
           <ng-container matColumnDef="customer_name">
             <mat-header-cell *matHeaderCellDef> Customer name </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.customer}} </mat-cell>
@@ -375,13 +366,6 @@
           <ng-container matColumnDef="received_by">
             <mat-header-cell *matHeaderCellDef> Received By </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.received_by}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="damaged_serial">
-            <mat-header-cell *matHeaderCellDef>
-              Received Serial
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.damaged_serial }} </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
           <ng-container matColumnDef="replace_serial">

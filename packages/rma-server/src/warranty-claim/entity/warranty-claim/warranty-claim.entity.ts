@@ -66,6 +66,9 @@ export class WarrantyClaim extends BaseEntity {
   customer: string;
 
   @Column()
+  customer_code: string;
+
+  @Column()
   customer_contact: string;
 
   @Column()

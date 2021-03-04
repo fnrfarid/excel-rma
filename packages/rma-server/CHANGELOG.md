@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.6.2...rma-server@1.7.0) (2021-02-27)
+
+
+### Features
+
+* **rma-frontend:** Remarks field added to Sales Return ([7a72417](https://gitlab.com/castlecraft/excel-rma/commit/7a724177ec6a4410543985bc68a41805bf2d58dc))
+* **Rma-server:** Update flow for stock entry batching ([5ca9769](https://gitlab.com/castlecraft/excel-rma/commit/5ca9769b1e35eaedb0dbcb88ce02d52b5a62ce2c))
+
+
+
+
+
 ## [1.6.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.6.1...rma-server@1.6.2) (2021-02-22)
 
 

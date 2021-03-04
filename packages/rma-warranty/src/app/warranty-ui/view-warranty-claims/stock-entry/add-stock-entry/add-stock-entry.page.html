@@ -274,9 +274,7 @@
               (click)="p.open()"
             >
               <ng-container> {{row.qty}} </ng-container>
-              <span class="add-comment" *ngIf="!row.s_warehouse">
-                Quantity
-              </span>
+              <span class="add-comment" *ngIf="!row.qty"> Quantity </span>
               <sat-popover
                 #p
                 hasBackdrop
