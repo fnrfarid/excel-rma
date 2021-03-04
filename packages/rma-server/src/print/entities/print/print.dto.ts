@@ -62,6 +62,7 @@ export class DeliveryChalanDto {
   sold_by?: string;
   created_by?: string;
   modified_by?: string;
+  remarks?: string;
 }
 
 export class DeliveryChalanItemDto {

@@ -75,17 +75,14 @@ export class PrintAggregateService {
     // this customer section will be dynamic from a object instead of hardcoded.
     doc.moveDown();
     doc.moveDown();
-    doc
-      .fillColor('#444444')
-      .fontSize(20)
-      .text(invoice.print?.print_type || 'Delivery Chalan', {
-        align: 'center',
-      });
-    doc.moveDown();
+
     const cord = { x: doc.x, y: doc.y };
     doc
       .fontSize(10)
       .text(invoice.name, cord.x, cord.y, { align: 'left' })
+      .text(invoice.print?.print_type || 'Delivery Chalan', cord.x, cord.y, {
+        align: 'center',
+      })
       .text(invoice.territory, cord.x, cord.y, { align: 'right' });
     doc.moveDown();
     this.generateHr(doc, doc.y);
@@ -183,6 +180,26 @@ export class PrintAggregateService {
       { name: 'Total' },
       invoice.total_qty || this.getItemTotal(invoice.items),
     );
+
+    this.generateTableRow(
+      doc,
+      doc.y,
+      '',
+      {
+        name: 'Remarks',
+      },
+      '',
+    );
+    this.generateTableRow(
+      doc,
+      doc.y,
+      '',
+      {
+        name: invoice.remarks,
+      },
+      '',
+    );
+
     doc.moveDown();
     doc.moveDown();
     doc.moveDown();
