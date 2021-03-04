@@ -156,7 +156,7 @@ export class AddStockEntryPage implements OnInit {
     const selectedItem = {} as StockEntryDetails;
     selectedItem.replacedSerial = item.replacedSerial;
     selectedItem.set_warehouse = item.s_warehouse;
-    selectedItem.customer = this.warrantyObject.customer;
+    selectedItem.customer = this.warrantyObject?.customer_code;
     selectedItem.salesWarrantyDate = res?.warranty?.salesWarrantyDate;
     selectedItem.soldOn = res?.warranty?.soldOn;
     selectedItem.delivery_note = res?.delivery_note;

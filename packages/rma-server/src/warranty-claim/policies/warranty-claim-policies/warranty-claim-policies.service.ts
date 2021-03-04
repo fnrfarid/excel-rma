@@ -3,13 +3,14 @@ import {
   NotFoundException,
   BadRequestException,
   NotImplementedException,
+  HttpService,
 } from '@nestjs/common';
 import { SupplierService } from '../../../supplier/entity/supplier/supplier.service';
 import {
   BulkWarrantyClaimInterface,
   BulkWarrantyClaim,
 } from '../../entity/warranty-claim/create-bulk-warranty-claim.interface';
-import { from, throwError, of } from 'rxjs';
+import { from, throwError, of, forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
   SUPPLIER_NOT_FOUND,
@@ -17,7 +18,6 @@ import {
   INVALID_CUSTOMER,
   INVALID_SERIAL_NO,
 } from '../../../constants/messages';
-import { CustomerService } from '../../../customer/entity/customer/customer.service';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
 import { WARRANTY_STATUS } from '../../../constants/app-strings';
@@ -25,15 +25,18 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { SerialNo } from '../../../serial-no/entity/serial-no/serial-no.entity';
 import { DateTime } from 'luxon';
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
+import { FRAPPE_API_GET_CUSTOMER_ENDPOINT } from '../../../constants/routes';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
   constructor(
     private readonly supplierService: SupplierService,
-    private readonly customerService: CustomerService,
+    private readonly clientToken: ClientTokenManagerService,
     private readonly serialNoService: SerialNoService,
     private readonly warrantyService: WarrantyClaimService,
     private readonly settings: SettingsService,
+    private readonly http: HttpService,
   ) {}
 
   validateBulkWarrantyClaim(warrantyClaim: BulkWarrantyClaimInterface) {
@@ -80,12 +83,22 @@ export class WarrantyClaimPoliciesService {
   }
 
   validateWarrantyCustomer(customer_name: string) {
-    return from(this.customerService.findOne({ name: customer_name })).pipe(
-      switchMap(customer => {
-        if (!customer) {
-          return throwError(new NotFoundException(INVALID_CUSTOMER));
-        }
-        return of(true);
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        if (!settings || !settings.authServerURL)
+          return throwError(new NotImplementedException());
+        const url = `${settings.authServerURL}${FRAPPE_API_GET_CUSTOMER_ENDPOINT}/${customer_name}`;
+        return this.http.get(url, { headers }).pipe(
+          switchMap(customer => {
+            if (!customer) {
+              return throwError(new NotFoundException(INVALID_CUSTOMER));
+            }
+            return of(true);
+          }),
+        );
       }),
     );
   }

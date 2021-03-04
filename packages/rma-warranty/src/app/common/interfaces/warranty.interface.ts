@@ -110,6 +110,7 @@ export interface WarrantyClaimsDetails {
   damage_product: string;
   parent?: string;
   claim_status?: string;
+  customer_code?: string;
 }
 
 export class WarrantyBulkProducts {

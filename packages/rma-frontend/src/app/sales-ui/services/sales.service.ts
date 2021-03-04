@@ -7,6 +7,7 @@ import {
   Item,
   APIResponse,
   SerialAssign,
+  AggregatedDocument,
 } from '../../common/interfaces/sales.interface';
 import {
   AUTHORIZATION,
@@ -61,7 +62,6 @@ import {
   NON_SERIAL_ITEM,
   TERRITORY,
 } from '../../constants/app-string';
-import { DeliveryNoteItemInterface } from '../view-sales-invoice/serials/serials-datasource';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
@@ -777,15 +777,9 @@ export class SalesService {
     return this.http.get<any>(API_INFO_ENDPOINT);
   }
 
-  getAggregatedDocument(
-    res: {
-      items: DeliveryNoteItemInterface[];
-      total?: number;
-      total_qty?: number;
-    }[],
-  ) {
+  getAggregatedDocument(res: AggregatedDocument[]) {
     const itemsHashMap = {};
-    const doc = res[0];
+    const doc: any = res[0];
     doc.total = 0;
     doc.total_qty = 0;
     res.forEach(document => {
