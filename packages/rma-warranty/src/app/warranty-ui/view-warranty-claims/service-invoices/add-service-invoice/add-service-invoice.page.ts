@@ -24,6 +24,7 @@ import {
   CONTACT_ENDPOINT,
   CUSTOMER_ENDPOINT,
 } from '../../../../constants/url-strings';
+import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -50,6 +51,8 @@ export class AddServiceInvoicePage implements OnInit {
   warrantyDetails: WarrantyClaimsDetails;
   accountList: Observable<any[]>;
   addressList: Observable<any[]>;
+  permissionState = PERMISSION_STATE;
+
   get f() {
     return this.serviceInvoiceForm.controls;
   }

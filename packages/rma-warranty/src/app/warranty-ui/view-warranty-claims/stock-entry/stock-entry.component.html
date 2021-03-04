@@ -9,7 +9,7 @@
         </ion-col>
         <ion-col
           class="ion-text-right"
-          *ngIf="permissionState.warranty_claim.create"
+          *ngIf="permissionState.rma_stock_entry.create"
         >
           <ion-button
             *ngIf="
@@ -122,6 +122,7 @@
           <mat-header-cell *matHeaderCellDef>Rollback</mat-header-cell>
           <mat-cell *matCellDef="let row; let i = index">
             <ion-button
+              *ngIf="permissionState.rma_stock_entry.cancel"
               fill="clear"
               class="ion-no-padding"
               color="danger"

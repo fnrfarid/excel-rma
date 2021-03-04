@@ -20,6 +20,7 @@
         </ion-col>
         <ion-col class="ion-text-right">
           <ion-button
+            *ngIf="permissionState.warranty_claim.read"
             color="tertiary"
             [disabled]="!dataSource.length"
             (click)="downloadSerials()"
@@ -245,7 +246,13 @@
           </ion-col>
         </ion-row>
       </ion-grid>
-      <div class="example-container mat-elevation-z8">
+      <div *ngIf="!permissionState.warranty_claim.create">
+        Requires Permission to access Documents.
+      </div>
+      <div
+        class="example-container mat-elevation-z8"
+        *ngIf="permissionState.warranty_claim.read"
+      >
         <table
           mat-table
           class="full-width-table"
