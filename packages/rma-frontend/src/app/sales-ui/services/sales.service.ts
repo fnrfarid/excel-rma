@@ -14,6 +14,7 @@ import {
   BEARER_TOKEN_PREFIX,
   ACCESS_TOKEN,
   DEFAULT_SELLING_PRICE_LIST,
+  HUNDRED_NUMBERSTRING,
 } from '../../constants/storage';
 import {
   LIST_SALES_INVOICE_ENDPOINT,
@@ -628,6 +629,7 @@ export class SalesService {
     const params = new HttpParams({
       fromObject: {
         filters: `[["against_sales_invoice","=","${invoice_name}"],["is_return","=","0"]]`,
+        limit_page_length: (HUNDRED_NUMBERSTRING * 10).toString(),
       },
     });
     return this.getHeaders().pipe(
