@@ -26,6 +26,7 @@ import {
 import { LoadingController } from '@ionic/angular';
 import { mergeMap, switchMap, toArray } from 'rxjs/operators';
 import { from, of } from 'rxjs';
+import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 
 @Component({
   selector: 'app-add-stock-entry',
@@ -50,6 +51,7 @@ export class AddStockEntryPage implements OnInit {
     'quantity',
     'delete',
   ];
+  permissionState = PERMISSION_STATE;
   stockEntryType: Array<string> = Object.values(STOCK_ENTRY_ITEM_TYPE);
 
   get formControl() {

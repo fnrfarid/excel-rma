@@ -13,7 +13,10 @@
           </ion-fab-button>
           <ion-fab-list side="start">
             <ion-fab-button
-              *ngIf="warrantyClaimsDetails?.claim_status !== 'Cancelled'"
+              *ngIf="
+                permissionState.warranty_claim.update &&
+                warrantyClaimsDetails?.claim_status !== 'Cancelled'
+              "
               [routerLink]="[
                 '/warranty/warranty-claim',
                 'edit',
@@ -27,7 +30,10 @@
               <ion-icon name="create-outline"></ion-icon>
             </ion-fab-button>
             <ion-fab-button
-              *ngIf="warrantyClaimsDetails?.claim_status !== 'Cancelled'"
+              *ngIf="
+                permissionState.warranty_claim.delete &&
+                warrantyClaimsDetails?.claim_status !== 'Cancelled'
+              "
               (click)="resetEntry()"
               matTooltip="cancel"
               matTooltipPosition="above"
@@ -48,7 +54,10 @@
               <ion-icon name="print-outline"></ion-icon>
             </ion-fab-button>
             <ion-fab-button
-              *ngIf="warrantyClaimsDetails?.claim_status === 'Cancelled'"
+              *ngIf="
+                permissionState.warranty_claim.delete &&
+                warrantyClaimsDetails?.claim_status === 'Cancelled'
+              "
               (click)="removeEntry()"
               matTooltip="delete"
               matTooltipPosition="above"

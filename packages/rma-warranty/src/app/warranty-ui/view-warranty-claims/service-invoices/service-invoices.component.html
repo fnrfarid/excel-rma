@@ -9,14 +9,14 @@
         </ion-col>
         <ion-col class="ion-text-right">
           <ion-button
-            *ngIf="permissionState.warranty_claim.create"
+            *ngIf="permissionState.service_invoice.create"
             color="tertiary"
             [routerLink]="['/warranty/service-invoice', 'add', invoiceUuid]"
           >
             Add
           </ion-button>
           <ion-button
-            *ngIf="dataSource.length && permissionState.warranty_claim.create"
+            *ngIf="dataSource.length && permissionState.service_invoice.submit"
             color="tertiary"
             fill="outline"
             (click)="syncInvoice()"
@@ -29,7 +29,13 @@
   </ion-card-header>
 
   <ion-card-content class="ion-no-padding">
-    <div class="example-container mat-elevation-z8">
+    <div *ngIf="!permissionState.service_invoice.read">
+      Requires permission to access document.
+    </div>
+    <div
+      *ngIf="permissionState.service_invoice.read"
+      class="example-container mat-elevation-z8"
+    >
       <mat-table #table [dataSource]="dataSource">
         <ng-container matColumnDef="invoice_no">
           <mat-header-cell *matHeaderCellDef>Invoice No</mat-header-cell>

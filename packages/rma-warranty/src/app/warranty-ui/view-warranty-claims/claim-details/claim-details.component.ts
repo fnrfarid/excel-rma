@@ -12,6 +12,7 @@ import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { DEFAULT_COMPANY } from '../../../constants/storage';
 import { LoadingController } from '@ionic/angular';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 @Component({
   selector: 'claim-details',
   templateUrl: './claim-details.component.html',
@@ -35,6 +36,7 @@ export class ClaimDetailsComponent implements OnInit {
     'servicing_amount',
   ];
   warrantyClaimsDetails: WarrantyClaimsDetails;
+  permissionState = PERMISSION_STATE;
   dataSource: WarrantyItem[];
   invoiceUuid: string;
   viewWArrantyClaimUrl: string;
