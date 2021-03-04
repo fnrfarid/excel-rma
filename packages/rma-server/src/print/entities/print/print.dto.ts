@@ -62,6 +62,7 @@ export class DeliveryChalanDto {
   sales_person?: string;
   created_by?: string;
   modified_by?: string;
+  remarks?: string;
 }
 
 export class DeliveryChalanItemDto {
