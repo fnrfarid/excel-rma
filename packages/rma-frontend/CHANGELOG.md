@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.8.0...rma-frontend@1.8.1) (2021-03-06)
+
+
+### Bug Fixes
+
+* **Excel-rma:** Fix print for delivery note ([db2ea96](https://gitlab.com/castlecraft/excel-rma/commit/db2ea96d20f6707e3983a2b2a56f508f7f18962f))
+* **rma-frontend:** Delivery Chalan print fixed ([5b2dea4](https://gitlab.com/castlecraft/excel-rma/commit/5b2dea47605c268024a367cc829dd255137c97d7))
+* **rma-frontend:** Delivery Chalan print fixed 1 ([0411bc3](https://gitlab.com/castlecraft/excel-rma/commit/0411bc36006aa430fc0ceb7840fa5149cc0d1ede))
+* **rma-frontend:** Delivery Chalan print fixed 2 ([4701010](https://gitlab.com/castlecraft/excel-rma/commit/470101052d425d76576a42a6b733fc0b1cd2e91b))
+
+
+
+
+
 # [1.8.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.7.1...rma-frontend@1.8.0) (2021-02-27)
 
 
