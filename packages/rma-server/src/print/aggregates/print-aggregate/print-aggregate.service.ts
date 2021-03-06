@@ -75,17 +75,14 @@ export class PrintAggregateService {
     // this customer section will be dynamic from a object instead of hardcoded.
     doc.moveDown();
     doc.moveDown();
-    doc
-      .fillColor('#444444')
-      .fontSize(20)
-      .text(invoice.print?.print_type || 'Delivery Chalan', {
-        align: 'center',
-      });
-    doc.moveDown();
+
     const cord = { x: doc.x, y: doc.y };
     doc
       .fontSize(10)
       .text(invoice.name, cord.x, cord.y, { align: 'left' })
+      .text(invoice.print?.print_type || 'Delivery Chalan', cord.x, cord.y, {
+        align: 'center',
+      })
       .text(invoice.territory, cord.x, cord.y, { align: 'right' });
     doc.moveDown();
     this.generateHr(doc, doc.y);
@@ -97,21 +94,17 @@ export class PrintAggregateService {
       .text('Customer:', 50, customerInformationTop)
       .text(invoice.customer_name, 100, customerInformationTop, { width: 200 })
       .text('Address:', 50, customerInformationTop + 15)
-      .text(invoice.address, 100, customerInformationTop + 15)
-      .text('Contact:', 50, customerInformationTop + 30)
-      .text(invoice.contact, 100, customerInformationTop + 30)
+      .text(invoice.address_display, 100, customerInformationTop + 15)
       .text('Mobile No:', 50, customerInformationTop + 45)
-      .text(invoice.contact, 100, customerInformationTop + 45)
+      .text(invoice.contact_mobile, 100, customerInformationTop + 45)
 
       .text('Posting Date:', 300, customerInformationTop)
       .text(invoice.posting_date, 420, customerInformationTop)
-      .text('Due Date:', 300, customerInformationTop + 15)
-      .text(invoice.due_date, 420, customerInformationTop + 15)
       .text('Sold By', 300, customerInformationTop + 30)
-      .text(invoice.sold_by, 420, customerInformationTop + 30)
+      .text(invoice.sales_person, 420, customerInformationTop + 30)
       .text('Created By:', 300, customerInformationTop + 45)
       .text(invoice.created_by, 420, customerInformationTop + 45)
-      .text('Approved By:', 300, customerInformationTop + 60)
+      .text('Delivered By:', 300, customerInformationTop + 60)
       .text(invoice.modified_by, 420, customerInformationTop + 60);
 
     if (invoice?.print?.s_warehouse || invoice?.print?.t_warehouse) {
@@ -183,6 +176,26 @@ export class PrintAggregateService {
       { name: 'Total' },
       invoice.total_qty || this.getItemTotal(invoice.items),
     );
+
+    this.generateTableRow(
+      doc,
+      doc.y,
+      '',
+      {
+        name: 'Remarks',
+      },
+      '',
+    );
+    this.generateTableRow(
+      doc,
+      doc.y,
+      '',
+      {
+        name: invoice.remarks,
+      },
+      '',
+    );
+
     doc.moveDown();
     doc.moveDown();
     doc.moveDown();

@@ -10,6 +10,7 @@
 </ion-header>
 <ion-content class="page-background">
   <ion-fab
+    *ngIf="permissionState.service_invoice.create"
     class="ion-margin-end"
     slot="fixed"
     vertical="top"
@@ -39,7 +40,7 @@
                   [matDatepicker]="posting_date"
                   placeholder="Posting Date"
                   formControlName="posting_date"
-                  (dateChange)="selectedPostingDate($event)"
+                  (dateChange)="selectedPostingDate($event.option)"
                 />
                 <mat-datepicker-toggle
                   matSuffix
@@ -63,7 +64,8 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #customer="matAutocomplete"
-                  [displayWith]="getOption"
+                  [displayWith]="getCustOption"
+                  (optionSelected)="setCode($event.option.value)"
                 >
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async"

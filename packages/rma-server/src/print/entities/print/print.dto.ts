@@ -56,12 +56,13 @@ export class DeliveryChalanDto {
 
   sales_team?: any[];
 
-  address?: string;
-  contact?: string;
+  address_display?: string;
+  contact_mobile?: string;
   due_date?: string;
-  sold_by?: string;
+  sales_person?: string;
   created_by?: string;
   modified_by?: string;
+  remarks?: string;
 }
 
 export class DeliveryChalanItemDto {

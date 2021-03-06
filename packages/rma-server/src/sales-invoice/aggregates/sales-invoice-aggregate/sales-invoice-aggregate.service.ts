@@ -123,7 +123,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       filter = { territory: { $in: territory } };
     }
     const provider = await this.salesInvoiceService.findOne(
-      { uuid, ...filter },
+      { $or: [{ uuid }, { name: uuid }], ...filter },
       undefined,
       true,
     );

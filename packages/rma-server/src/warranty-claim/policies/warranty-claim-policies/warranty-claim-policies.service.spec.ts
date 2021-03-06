@@ -5,6 +5,8 @@ import { CustomerService } from '../../../customer/entity/customer/customer.serv
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { HttpService } from '@nestjs/common';
 
 describe('WarrantyClaimPoliciesService', () => {
   let service: WarrantyClaimPoliciesService;
@@ -31,6 +33,14 @@ describe('WarrantyClaimPoliciesService', () => {
         },
         {
           provide: WarrantyClaimService,
+          useValue: {},
+        },
+        {
+          provide: ClientTokenManagerService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
           useValue: {},
         },
       ],

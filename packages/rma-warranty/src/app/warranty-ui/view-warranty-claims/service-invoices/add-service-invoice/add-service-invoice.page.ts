@@ -24,6 +24,7 @@ import {
   CONTACT_ENDPOINT,
   CUSTOMER_ENDPOINT,
 } from '../../../../constants/url-strings';
+import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 
 @Component({
   selector: 'app-add-service-invoice',
@@ -35,6 +36,7 @@ export class AddServiceInvoicePage implements OnInit {
   serviceInvoiceForm: FormGroup;
   dataSource: ItemsDataSource;
   itemsControl: FormArray;
+  customerCode: string;
   displayedColumns: string[] = [
     'item_group',
     'item_name',
@@ -49,6 +51,8 @@ export class AddServiceInvoicePage implements OnInit {
   warrantyDetails: WarrantyClaimsDetails;
   accountList: Observable<any[]>;
   addressList: Observable<any[]>;
+  permissionState = PERMISSION_STATE;
+
   get f() {
     return this.serviceInvoiceForm.controls;
   }
@@ -212,7 +216,7 @@ export class AddServiceInvoicePage implements OnInit {
   mapInvoiceData() {
     const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
     serviceInvoiceDetails.warrantyClaimUuid = this.activatedRoute.snapshot.params.uuid;
-    serviceInvoiceDetails.customer = this.serviceInvoiceForm.controls.customer_name.value.name;
+    serviceInvoiceDetails.customer = this.customerCode;
     serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
     serviceInvoiceDetails.total_qty = 0;
     serviceInvoiceDetails.total = 0;
@@ -343,9 +347,17 @@ export class AddServiceInvoicePage implements OnInit {
     if (option) return option.name;
   }
 
+  getCustOption(option) {
+    if (option) return option.customer_name;
+  }
+
   getBranchOption(option) {
     if (option) return option;
   }
 
   getSelectedOption(option) {}
+
+  setCode(option) {
+    this.customerCode = option.name;
+  }
 }

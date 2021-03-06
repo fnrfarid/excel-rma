@@ -11,6 +11,7 @@
 
 <ion-content class="page-background">
   <ion-fab
+    *ngIf="permissionState.rma_stock_entry.create"
     class="ion-margin-end"
     slot="fixed"
     vertical="top"
@@ -111,6 +112,7 @@
         </ion-col>
         <ion-col class="ion-text-right" size="auto">
           <ion-button
+            *ngIf="permissionState.rma_stock_entry.create"
             color="tertiary"
             fill="outline"
             matTooltip=" ( ctrl + i ) "
@@ -274,9 +276,7 @@
               (click)="p.open()"
             >
               <ng-container> {{row.qty}} </ng-container>
-              <span class="add-comment" *ngIf="!row.s_warehouse">
-                Quantity
-              </span>
+              <span class="add-comment" *ngIf="!row.qty"> Quantity </span>
               <sat-popover
                 #p
                 hasBackdrop
