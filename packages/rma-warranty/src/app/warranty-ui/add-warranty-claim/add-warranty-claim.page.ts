@@ -118,7 +118,7 @@ export class AddWarrantyClaimPage implements OnInit {
       category: { disabled: true, active: true },
     };
     this.createForm();
-    this.setDefaults()
+    this.setDefaults();
 
     this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
       debounceTime(500),
@@ -153,16 +153,16 @@ export class AddWarrantyClaimPage implements OnInit {
       this.setValues();
     }
   }
-  async setDefaults(){
+  async setDefaults() {
     this.warrantyClaimForm.controls.received_on.setValue(
       await (await this.getDateTime(new Date())).date,
     );
     this.warrantyClaimForm.controls.delivery_date.setValue(
       await this.getDeliveryDate(new Date()),
     );
-    this.warrantyClaimForm.controls.claim_type.setValue(this.claimList[0])
-    this.warrantyClaimForm.controls.category.setValue(CATEGORY.SINGLE)
-    this.getFormState(this.warrantyClaimForm.controls.claim_type.value)
+    this.warrantyClaimForm.controls.claim_type.setValue(this.claimList[0]);
+    this.warrantyClaimForm.controls.category.setValue(CATEGORY.SINGLE);
+    this.getFormState(this.warrantyClaimForm.controls.claim_type.value);
   }
 
   clearAllControlValidators() {
@@ -387,9 +387,11 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   async createClaim() {
-    if(!this.warrantyClaimForm.valid){
-      this.snackbar.open("Please enter missing fields.",CLOSE,{ duration: 4500})
-      this.warrantyClaimForm.markAllAsTouched()
+    if (!this.warrantyClaimForm.valid) {
+      this.snackbar.open('Please enter missing fields.', CLOSE, {
+        duration: 4500,
+      });
+      this.warrantyClaimForm.markAllAsTouched();
       return;
     }
     const loading = await this.loadingController.create();
@@ -510,8 +512,8 @@ export class AddWarrantyClaimPage implements OnInit {
                 duration: DURATION,
               },
             );
-          this.warrantyClaimForm.controls.customer_contact.setValue("");
-          this.warrantyClaimForm.controls.customer_address.setValue("");
+            this.warrantyClaimForm.controls.customer_contact.setValue('');
+            this.warrantyClaimForm.controls.customer_address.setValue('');
           } else {
             this.snackbar.open('Address Not found', 'Close', {
               duration: DURATION,
@@ -536,10 +538,14 @@ export class AddWarrantyClaimPage implements OnInit {
           );
         }
       },
-      error:err=>{
+      error: err => {
         loading.dismiss();
-        this.snackbar.open(err?.error?.message || "Error fetching customer",CLOSE,{ duration : 4200})
-      }
+        this.snackbar.open(
+          err?.error?.message || 'Error fetching customer',
+          CLOSE,
+          { duration: 4200 },
+        );
+      },
     });
   }
   getOptionText(option) {
@@ -618,9 +624,13 @@ export class AddWarrantyClaimPage implements OnInit {
         this.customerChanged({ name: res.customer });
       },
       error: error => {
-        this.snackbar.open(error?.error?.message || "Error Fetching provided serial.", 'Close', {
-          duration: DURATION,
-        });
+        this.snackbar.open(
+          error?.error?.message || 'Error Fetching provided serial.',
+          'Close',
+          {
+            duration: DURATION,
+          },
+        );
       },
     });
   }
