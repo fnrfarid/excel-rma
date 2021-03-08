@@ -5,6 +5,7 @@ import { ServerSettingsService } from '../../../system-settings/entities/server-
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { HttpService } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
+import { CustomerAggregateService } from '../../aggregates/customer-aggregate/customer-aggregate.service';
 
 describe('Customer Controller', () => {
   let controller: CustomerController;
@@ -27,6 +28,10 @@ describe('Customer Controller', () => {
         },
         {
           provide: TokenCacheService,
+          useValue: {},
+        },
+        {
+          provide: CustomerAggregateService,
           useValue: {},
         },
         {

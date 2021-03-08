@@ -112,7 +112,10 @@ export class AddServiceInvoicePage implements OnInit {
       .valueChanges.pipe(
         debounceTime(500),
         startWith(''),
-        this.serviceInvoiceService.getRelayList(CUSTOMER_ENDPOINT),
+        this.serviceInvoiceService.getRelayList(
+          CUSTOMER_ENDPOINT,
+          'customer_name',
+        ),
       );
 
     this.customerContactList = this.serviceInvoiceForm

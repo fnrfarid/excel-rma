@@ -11,7 +11,10 @@ import { CustomerUpdatedEvent } from '../../event/customer-updated/customer-upda
 import { Customer } from '../../entity/customer/customer.entity';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { FRAPPE_API_GET_USER_INFO_ENDPOINT } from '../../../constants/routes';
+import {
+  FRAPPE_API_GET_USER_INFO_ENDPOINT,
+  FRAPPE_API_GET_CUSTOMER_ENDPOINT,
+} from '../../../constants/routes';
 
 @Injectable()
 export class CustomerAggregateService extends AggregateRoot {
@@ -92,6 +95,38 @@ export class CustomerAggregateService extends AggregateRoot {
             { headers },
           )
           .pipe(map(res => res.data.data));
+      }),
+    );
+  }
+
+  relayListCustomers(query) {
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        const url = settings.authServerURL + FRAPPE_API_GET_CUSTOMER_ENDPOINT;
+        return this.http
+          .get(url, {
+            headers,
+            params: query,
+          })
+          .pipe(map(res => res.data));
+      }),
+    );
+  }
+  relayCustomer(name) {
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        const url = `${settings.authServerURL}${FRAPPE_API_GET_CUSTOMER_ENDPOINT}/${name}`;
+        return this.http
+          .get(url, {
+            headers,
+          })
+          .pipe(map(res => res.data));
       }),
     );
   }

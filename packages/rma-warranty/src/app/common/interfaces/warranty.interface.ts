@@ -185,6 +185,7 @@ export class SerialNoDetails {
   delivery_note?: string;
   purchase_document_no?: string;
   sales_return_name?: string;
+  sales_document_no?: string;
   purchase_document_type?: string;
   company?: string;
   warranty?: Warranty;

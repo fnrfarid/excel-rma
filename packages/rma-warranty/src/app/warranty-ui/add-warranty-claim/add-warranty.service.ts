@@ -11,6 +11,8 @@ import {
   GET_LIST_PROBLEM_ENDPOINT,
   CREATE_WARRANTY_CLAIM_ENDPOINT,
   UPDATE_WARRANTY_CLAIM_ENDPOINT,
+  RELAY_CUSTOMER_LIST_ENDPOINT,
+  RELAY_CUSTOMER_ENDPOINT,
 } from '../../constants/url-strings';
 import { of, from } from 'rxjs';
 import {
@@ -54,13 +56,44 @@ export class AddWarrantyService {
     );
   }
 
+  getRelayedCustomerList() {
+    return switchMap(value => {
+      if (!value) value = '';
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["customer_name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(RELAY_CUSTOMER_LIST_ENDPOINT, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
+  }
+
+  getRelayCustomer(name) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get(`${RELAY_CUSTOMER_ENDPOINT}/${name}`, { headers });
+      }),
+      map((data: any) => data.data),
+    );
+  }
+
   getCustomerList(value?) {
     return switchMap(value => {
       if (!value) value = '';
       const params = new HttpParams({
         fromObject: {
           fields: '["*"]',
-          filters: `[["name","like","%${''}%"]]`,
+          filters: `[["customer_name","like","%${value}%"]]`,
         },
       });
       return this.getHeaders().pipe(
