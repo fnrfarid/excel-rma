@@ -21,12 +21,14 @@ import { CustomerDto } from '../../../customer/entity/customer/customer-dto';
 import { UpdateCustomerDto } from '../../entity/customer/update-customer-dto';
 import { UpdateCreditLimitDto } from '../../entity/customer/update-credit-limit.dto';
 import { UpdateCreditLimitCommand } from '../../command/update-credit-limit/update-credit-limit.command';
+import { CustomerAggregateService } from '../../aggregates/customer-aggregate/customer-aggregate.service';
 
 @Controller('customer')
 export class CustomerController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly aggregate: CustomerAggregateService,
   ) {}
 
   @Post('v1/create')
@@ -92,5 +94,17 @@ export class CustomerController {
     return await this.commandBus.execute(
       new UpdateCreditLimitCommand(updatePayload, req),
     );
+  }
+
+  @Get('v1/relay_list_customer')
+  @UseGuards(TokenGuard)
+  relayListCustomers(@Query() query) {
+    return this.aggregate.relayListCustomers(query);
+  }
+
+  @Get('v1/relay_customer/:name')
+  @UseGuards(TokenGuard)
+  relayCustomer(@Param('name') name) {
+    return this.aggregate.relayCustomer(name);
   }
 }

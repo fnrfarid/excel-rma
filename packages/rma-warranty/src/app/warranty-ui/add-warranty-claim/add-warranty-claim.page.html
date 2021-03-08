@@ -24,7 +24,6 @@
       *ngIf="route ==='add'"
       class="fab-position"
       (click)="createClaim()"
-      [disabled]="warrantyClaimForm.invalid"
     >
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
@@ -40,25 +39,11 @@
   <form [formGroup]="warrantyClaimForm">
     <ion-card>
       <ion-card-header>
-        <ion-card-title color="tertiary"> Product Details </ion-card-title>
+        <ion-card-title color="tertiary"> Warranty Details </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState?.serial_no?.active">
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  placeholder="Serial no"
-                  formControlName="serial_no"
-                  (keyup.enter)="serialChanged($event.target.value)"
-                />
-                <mat-error *ngIf="f.serial_no.hasError('required')">
-                  Serial no is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -83,18 +68,54 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width" *ngIf="route ==='add'">
+                <input
+                  matInput
+                  type="text"
+                  placeholder="Claim Category"
+                  formControlName="category"
+                  [matAutocomplete]="claimCategory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #claimCategory="matAutocomplete"
+                  [displayWith]="getOption"
+                >
+                  <mat-option
+                    *ngFor="let option of categoryList"
+                    [value]="option"
+                  >
+                    {{ option }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.category.hasError('required')">
+                  Claim Category is <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
           </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title color="tertiary"> Product Details </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="i-no-padding">
           <ion-row class="align">
-            <ion-col *ngIf="warrantyState?.invoice_no?.active">
+            <ion-col *ngIf="warrantyState?.serial_no?.active">
               <mat-form-field class="example-full-width">
                 <input
                   matInput
                   type="text"
-                  placeholder="Invoice number"
-                  formControlName="invoice_no"
+                  placeholder="Serial no"
+                  formControlName="serial_no"
+                  (keyup.enter)="serialChanged($event.target.value)"
                 />
-                <mat-error *ngIf="f.invoice_no.hasError('required')">
-                  Invoice number is <strong>required</strong>
+                <mat-error *ngIf="f.serial_no.hasError('required')">
+                  Serial no is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -212,29 +233,16 @@
                 />
               </mat-form-field>
             </ion-col>
-            <ion-col>
-              <mat-form-field class="example-full-width" *ngIf="route ==='add'">
+            <ion-col *ngIf="warrantyState?.invoice_no?.active">
+              <mat-form-field class="example-full-width">
                 <input
                   matInput
                   type="text"
-                  placeholder="Claim Category"
-                  formControlName="category"
-                  [matAutocomplete]="claimCategory"
+                  placeholder="Invoice number"
+                  formControlName="invoice_no"
                 />
-                <mat-autocomplete
-                  autoActiveFirstOption
-                  #claimCategory="matAutocomplete"
-                  [displayWith]="getOption"
-                >
-                  <mat-option
-                    *ngFor="let option of categoryList"
-                    [value]="option"
-                  >
-                    {{ option }}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="f.category.hasError('required')">
-                  Claim Category is <strong>required</strong>
+                <mat-error *ngIf="f.invoice_no.hasError('required')">
+                  Invoice number is <strong>required</strong>
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -243,7 +251,7 @@
             <ion-col class="ion-text-left">
               <ion-button
                 color="tertiary"
-                [disabled]="f.category.value !=='Bulk'"
+                *ngIf="f.category.value === 'Bulk'"
                 (click)="appendProduct()"
               >
                 Add

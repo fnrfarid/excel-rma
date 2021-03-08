@@ -3,7 +3,10 @@ import { TestBed } from '@angular/core/testing';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { HttpErrorHandler } from '../../common/interfaces/services/http-error-handler/http-error-handler.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { STORAGE_TOKEN } from '../../api/storage/storage.service';
+import {
+  StorageService,
+  STORAGE_TOKEN,
+} from '../../api/storage/storage.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 describe('WarrantyService', () => {
@@ -16,6 +19,13 @@ describe('WarrantyService', () => {
           useValue: {
             handleError<T>(...args) {},
             createHandleError(...args) {},
+          },
+        },
+        {
+          provide: StorageService,
+          useValue: {
+            getItem: (...args) => Promise.resolve('Item'),
+            getItems: (...args) => Promise.resolve({}),
           },
         },
         { provide: STORAGE_TOKEN, useValue: {} },

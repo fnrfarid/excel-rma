@@ -10,415 +10,449 @@
 </ion-header>
 
 <ion-content class="page-background">
-  <ion-card>
-    <ion-card-header style="padding-bottom: 0">
-      <ion-row class="align">
-        <ion-col>
-          <ion-card-title>
-            <ion-text color="tertiary"> Warranty Claims </ion-text>
-          </ion-card-title>
-        </ion-col>
-        <ion-col class="ion-text-right">
-          <ion-button
-            *ngIf="permissionState.warranty_claim.read"
-            color="tertiary"
-            [disabled]="!dataSource.length"
-            (click)="downloadSerials()"
-            fill="outline"
-          >
-            Download CSV
-          </ion-button>
-          <ion-button
-            *ngIf="permissionState.warranty_claim.create"
-            color="tertiary"
-            [routerLink]="['/warranty/warranty-claim', 'add']"
-          >
-            Add
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-card-header>
-    <div class="loading-shade" *ngIf="dataSource.loading$ | async">
-      <mat-progress-bar
-        *ngIf="dataSource.loading$ | async"
-        mode="indeterminate"
-      ></mat-progress-bar>
-    </div>
-    <ion-card-content class="ion-no-padding">
-      <ion-grid>
-        <ion-row>
+  <form [formGroup]="warrantyForm">
+    <ion-card>
+      <ion-card-header style="padding-bottom: 0">
+        <ion-row class="align">
           <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                placeholder="Customer"
-                [matAutocomplete]="address"
-                [(ngModel)]="customer"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #address="matAutocomplete"
-                [displayWith]="getCustomerOption"
-                (optionSelected)="setFilter()"
-              >
-                <mat-option
-                  *ngFor="let option of customerList"
-                  [value]="option"
-                >
-                  {{ option.name }}
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
+            <ion-card-title>
+              <ion-text color="tertiary"> Warranty Claims </ion-text>
+            </ion-card-title>
           </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                [(ngModel)]="claim_no"
-                placeholder="Claim No"
-                (keyup.enter)="setFilter()"
-              />
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                [(ngModel)]="customer_third_party"
-                placeholder="Third Party"
-                (keyup.enter)="setFilter()"
-              />
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                placeholder="Product"
-                [(ngModel)]="product"
-                (keyup.enter)="setFilter()"
-              />
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <mat-label>Claim Status</mat-label>
-              <mat-select
-                [(value)]="claim_status"
-                (selectionChange)="statusChange($event.value)"
-              >
-                <mat-option
-                  *ngFor="let status of claimStatusList"
-                  [value]="status"
-                >
-                  {{status}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                type="text"
-                [(ngModel)]="claim_type"
-                placeholder="Claim Type"
-                [matAutocomplete]="claimType"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #claimType="matAutocomplete"
-                [displayWith]="getOption"
-                (optionSelected)="setFilter()"
-              >
-                <mat-option *ngFor="let option of claimList" [value]="option">
-                  {{ option }}
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                type="text"
-                placeholder="Branch"
-                [matAutocomplete]="branch"
-                [(ngModel)]="territory"
-                (optionSelected)="setFilter()"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #branch="matAutocomplete"
-                [displayWith]="getOption"
-              >
-                <mat-option
-                  *ngFor="let option of territoryList"
-                  [value]="option"
-                >
-                  {{ option }}
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
-          </ion-col>
-          <ion-col>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                placeholder="Serial Number"
-                [(ngModel)]="claimed_serial"
-                (keyup.enter)="setFilter()"
-              />
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col class="ion-text-center">
-            <ion-text color="medium" class="date-filter-text">
-              Range Date
-            </ion-text>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                [matDatepicker]="fromDate"
-                placeholder="From Date"
-                readonly
-                [formControl]="fromDateFormControl"
-                (dateChange)="dateFilter()"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="fromDate"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #fromDate disabled="false"></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                [matDatepicker]="toDate"
-                placeholder="To Date"
-                readonly
-                [formControl]="toDateFormControl"
-                (dateChange)="dateFilter()"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="toDate"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #toDate disabled="false"></mat-datepicker>
-            </mat-form-field>
-          </ion-col>
-          <ion-col class="ion-text-center">
-            <ion-text color="medium" class="date-filter-text">
-              Single Date
-            </ion-text>
-            <mat-form-field class="full-width">
-              <input
-                matInput
-                [matDatepicker]="singleDate"
-                placeholder="Select Date"
-                readonly
-                [formControl]="singleDateFormControl"
-                (dateChange)="singleDateFilter()"
-              />
-              <mat-datepicker-toggle
-                matSuffix
-                [for]="singleDate"
-              ></mat-datepicker-toggle>
-              <mat-datepicker #singleDate disabled="false"></mat-datepicker>
-            </mat-form-field>
+          <ion-col class="ion-text-right">
             <ion-button
               color="tertiary"
-              (click)="clearFilters()"
+              [disabled]="!dataSource.length"
+              (click)="downloadSerials()"
               fill="outline"
             >
-              Clear
+              Download CSV
             </ion-button>
             <ion-button
+              *ngIf="permissionState.warranty_claim.create"
               color="tertiary"
-              (click)="getBulkClaims()"
-              fill="outline"
+              [routerLink]="['/warranty/warranty-claim', 'add']"
             >
-              Bulk Claims
+              Add
             </ion-button>
           </ion-col>
         </ion-row>
-      </ion-grid>
-      <div *ngIf="!permissionState.warranty_claim.create">
-        Requires Permission to access Documents.
+      </ion-card-header>
+      <div class="loading-shade" *ngIf="dataSource.loading$ | async">
+        <mat-progress-bar
+          *ngIf="dataSource.loading$ | async"
+          mode="indeterminate"
+        ></mat-progress-bar>
       </div>
-      <div
-        class="example-container mat-elevation-z8"
-        *ngIf="permissionState.warranty_claim.read"
-      >
-        <table
-          mat-table
-          class="full-width-table"
-          matSort
-          aria-label="Elements"
-          [dataSource]="dataSource"
-          (matSortChange)="setFilter($event)"
-        >
-          <ng-container matColumnDef="sr_no">
-            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let row;let i=index "> {{i+1}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+      <ion-card-content class="ion-no-padding">
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Customer"
+                  [matAutocomplete]="customer"
+                  formControlName="customer_name"
+                  (focusout)="validateInput(f.customer_name, filteredCustomerList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #customer="matAutocomplete"
+                  [displayWith]="getCustomerOption"
+                  (optionSelected)="setFilter()"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredCustomerList | async"
+                    [value]="option"
+                  >
+                    {{ option.customer_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.customer_name.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.customer.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  formControlName="claim_no"
+                  placeholder="Claim No"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  formControlName="customer_third_party"
+                  placeholder="Third Party"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Product"
+                  [matAutocomplete]="product"
+                  formControlName="product"
+                  (focusout)="validateInput(f.product, filteredProductList)"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #product="matAutocomplete"
+                  [displayWith]="getProductOption"
+                  (optionSelected)="setFilter()"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredProductList | async"
+                    [value]="option"
+                  >
+                    {{ option.item_name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.product.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.product.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <mat-label>Claim Status</mat-label>
+                <mat-select
+                  formControlName="claim_status"
+                  (selectionChange)="statusChange($event.value)"
+                >
+                  <mat-option
+                    *ngFor="let status of claimStatusList"
+                    [value]="status"
+                  >
+                    {{status}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  type="text"
+                  formControlName="claim_type"
+                  placeholder="Claim Type"
+                  [matAutocomplete]="claimType"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #claimType="matAutocomplete"
+                  [displayWith]="getOption"
+                  (optionSelected)="setFilter($event.option.value)"
+                >
+                  <mat-option *ngFor="let option of claimList" [value]="option">
+                    {{ option }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Branch"
+                  [matAutocomplete]="territory"
+                  formControlName="territory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #territory="matAutocomplete"
+                  [displayWith]="getOption"
+                  (optionSelected)="setFilter()"
+                >
+                  <mat-option
+                    *ngFor="let option of filteredTerrirtoryList | async"
+                    [value]="option"
+                  >
+                    {{ option }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Serial Number"
+                  formControlName="claimed_serial"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col class="ion-text-center">
+              <ion-text color="medium" class="date-filter-text">
+                Range Date
+              </ion-text>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  [matDatepicker]="fromDate"
+                  placeholder="From Date"
+                  readonly
+                  formControlName="fromDateFormControl"
+                  (dateChange)="dateFilter()"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="fromDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #fromDate disabled="false"></mat-datepicker>
+              </mat-form-field>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  [matDatepicker]="toDate"
+                  placeholder="To Date"
+                  readonly
+                  formControlName="toDateFormControl"
+                  (dateChange)="dateFilter()"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="toDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #toDate disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </ion-col>
+            <ion-col class="ion-text-center">
+              <ion-text color="medium" class="date-filter-text">
+                Single Date
+              </ion-text>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  [matDatepicker]="singleDate"
+                  placeholder="Select Date"
+                  readonly
+                  formControlName="singleDateFormControl"
+                  (dateChange)="singleDateFilter()"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="singleDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #singleDate disabled="false"></mat-datepicker>
+              </mat-form-field>
+              <ion-button
+                color="tertiary"
+                (click)="clearFilters()"
+                fill="outline"
+              >
+                Clear
+              </ion-button>
+              <ion-button
+                color="tertiary"
+                (click)="getBulkClaims()"
+                fill="outline"
+              >
+                Bulk Claims
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <div class="example-container mat-elevation-z8">
+          <table
+            mat-table
+            class="full-width-table"
+            matSort
+            aria-label="Elements"
+            [dataSource]="dataSource"
+            (matSortChange)="setFilter($event)"
+          >
+            <ng-container matColumnDef="sr_no">
+              <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+              <mat-cell *matCellDef="let row;let i=index "> {{i+1}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="claim_no">
-            <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
-              Claim no
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              <a (click)="warrantyRoute(row)">{{row.claim_no || 'Draft'}}</a>
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="claim_no">
+              <mat-header-cell *matHeaderCellDef mat-sort-header="claim_no">
+                Claim no
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                <a (click)="warrantyRoute(row)">{{row.claim_no || 'Draft'}}</a>
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="claim_type">
-            <mat-header-cell *matHeaderCellDef mat-sort-header="claim_type">
-              Claim Type
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.claim_type}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="claim_type">
+              <mat-header-cell *matHeaderCellDef mat-sort-header="claim_type">
+                Claim Type
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.claim_type}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="received_date">
-            <mat-header-cell *matHeaderCellDef mat-sort-header="received_date">
-              Received Date
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.received_on }} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="customer_name">
-            <mat-header-cell *matHeaderCellDef> Customer name </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.customer}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="third_party_name">
-            <mat-header-cell *matHeaderCellDef>
-              Third Party Customer Name
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.third_party_name}}
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="received_date">
+              <mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header="received_date"
+              >
+                Received Date
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.received_on }} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="customer_name">
+              <mat-header-cell *matHeaderCellDef>
+                Customer name
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.customer}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="third_party_name">
+              <mat-header-cell *matHeaderCellDef>
+                Third Party Customer Name
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{row.third_party_name}}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="item_code">
-            <mat-header-cell *matHeaderCellDef> Item </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.item_code}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="item_code">
+              <mat-header-cell *matHeaderCellDef> Item </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.item_code}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="claimed_serial">
-            <mat-header-cell *matHeaderCellDef>
-              Claimed Serial
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.serial_no}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="product_brand">
-            <mat-header-cell *matHeaderCellDef> Brand </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.product_brand}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="problem">
-            <mat-header-cell *matHeaderCellDef> Problem </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.problem}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="remarks">
-            <mat-header-cell *matHeaderCellDef> Remarks </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.remarks}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="claim_status">
-            <mat-header-cell *matHeaderCellDef> Claim Status </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.claim_status}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="verdict">
-            <mat-header-cell *matHeaderCellDef> Verdict </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.status_history?row.status_history[row.status_history.length-1].verdict:''}}
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="billed_amount">
-            <mat-header-cell *matHeaderCellDef> Billed Amount </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.billed_amount}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="receiving_branch">
-            <mat-header-cell *matHeaderCellDef>
-              Receiving Branch
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row">
-              {{row.receiving_branch}}
-            </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="claimed_serial">
+              <mat-header-cell *matHeaderCellDef>
+                Claimed Serial
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.serial_no}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="product_brand">
+              <mat-header-cell *matHeaderCellDef> Brand </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.product_brand}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="problem">
+              <mat-header-cell *matHeaderCellDef> Problem </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.problem}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="remarks">
+              <mat-header-cell *matHeaderCellDef> Remarks </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.remarks}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="claim_status">
+              <mat-header-cell *matHeaderCellDef>
+                Claim Status
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.claim_status}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="verdict">
+              <mat-header-cell *matHeaderCellDef> Verdict </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{row.status_history?row.status_history[row.status_history.length-1].verdict:''}}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="billed_amount">
+              <mat-header-cell *matHeaderCellDef>
+                Billed Amount
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.billed_amount}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="receiving_branch">
+              <mat-header-cell *matHeaderCellDef>
+                Receiving Branch
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{row.receiving_branch}}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="delivery_branch">
-            <mat-header-cell *matHeaderCellDef>
-              Delivery Branch
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.delivery_branch}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="delivery_branch">
+              <mat-header-cell *matHeaderCellDef>
+                Delivery Branch
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{row.delivery_branch}}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="received_by">
-            <mat-header-cell *matHeaderCellDef> Received By </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.received_by}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="replace_serial">
-            <mat-header-cell *matHeaderCellDef>
-              Replaced Serial
-            </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.replace_serial}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
+            <ng-container matColumnDef="received_by">
+              <mat-header-cell *matHeaderCellDef> Received By </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.received_by}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="replace_serial">
+              <mat-header-cell *matHeaderCellDef>
+                Replaced Serial
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row">
+                {{row.replace_serial}}
+              </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
 
-          <ng-container matColumnDef="delivered_by">
-            <mat-header-cell *matHeaderCellDef> Delivered by </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.delivered_by}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <ng-container matColumnDef="delivery_date">
-            <mat-header-cell *matHeaderCellDef> Delivery Date </mat-header-cell>
-            <mat-cell *matCellDef="let row"> {{row.delivery_date}} </mat-cell>
-            <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-          </ng-container>
-          <mat-header-row
-            *matHeaderRowDef="displayedColumns; sticky: true"
-          ></mat-header-row>
+            <ng-container matColumnDef="delivered_by">
+              <mat-header-cell *matHeaderCellDef>
+                Delivered by
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.delivered_by}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <ng-container matColumnDef="delivery_date">
+              <mat-header-cell *matHeaderCellDef>
+                Delivery Date
+              </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.delivery_date}} </mat-cell>
+              <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+            </ng-container>
+            <mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></mat-header-row>
 
-          <mat-row
-            *matRowDef="let row; columns: displayedColumns;"
-            [ngStyle]="{'background-color':row.claim_status==='Cancelled'?'#F8DEDE':row.set==='Bulk'?'#F4F4FB':row.set==='Part'?'#FDFAE5':'rgb(255, 255, 255)'
+            <mat-row
+              *matRowDef="let row; columns: displayedColumns;"
+              [ngStyle]="{'background-color':row.claim_status==='Cancelled'?'#F8DEDE':row.set==='Bulk'?'#F4F4FB':row.set==='Part'?'#FDFAE5':'rgb(255, 255, 255)'
 
           }"
-          ></mat-row>
-          <mat-footer-row
-            class="footer"
-            *matFooterRowDef="displayedColumns; sticky: true"
-          ></mat-footer-row>
-        </table>
-      </div>
-      <mat-card-actions>
-        <mat-paginator
-          #paginator
-          class="mat-paginator-sticky"
-          (page)="getUpdate($event)"
-          [length]="dataSource.length"
-          [pageSizeOptions]="[30, 50, 100, 500]"
-        >
-        </mat-paginator>
-      </mat-card-actions>
-    </ion-card-content>
-  </ion-card>
+            ></mat-row>
+            <mat-footer-row
+              class="footer"
+              *matFooterRowDef="displayedColumns; sticky: true"
+            ></mat-footer-row>
+          </table>
+        </div>
+        <mat-card-actions>
+          <mat-paginator
+            #paginator
+            class="mat-paginator-sticky"
+            (page)="getUpdate($event)"
+            [length]="dataSource.length"
+            [pageSizeOptions]="[30, 50, 100, 500]"
+          >
+          </mat-paginator>
+        </mat-card-actions>
+      </ion-card-content>
+    </ion-card>
+  </form>
 </ion-content>

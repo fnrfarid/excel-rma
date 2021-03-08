@@ -103,7 +103,7 @@ export class WarrantyClaimPoliciesService {
     );
   }
 
-  validateWarrantySerailNo(claimsPayload: WarrantyClaimDto) {
+  validateWarrantySerialNo(claimsPayload: WarrantyClaimDto) {
     return from(
       this.serialNoService.findOne({
         serial_no: claimsPayload.serial_no,

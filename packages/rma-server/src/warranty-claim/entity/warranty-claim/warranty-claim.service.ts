@@ -62,12 +62,12 @@ export class WarrantyClaimService {
     const $or: any[] = [
       {
         'status_history.transfer_branch': {
-          $in: territory.territory,
+          $in: clientHttpRequest.token.territory,
         },
       },
       {
         'status_history.status_from': {
-          $in: territory.territory,
+          $in: clientHttpRequest.token.territory,
         },
       },
     ];
