@@ -39,7 +39,13 @@ describe('WarrantyPage', () => {
         {
           provide: WarrantyService,
           useValue: {
+            getCustomerList: (...args) => of([{}]),
+            getItemList: (...args) => of([{}]),
             getAddressList: (...args) => of([{}]),
+            getStorage: () => ({
+              getItem: (...args) => Promise.resolve('Item'),
+              getItemAsync: (...args) => Promise.resolve('Item'),
+            }),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
