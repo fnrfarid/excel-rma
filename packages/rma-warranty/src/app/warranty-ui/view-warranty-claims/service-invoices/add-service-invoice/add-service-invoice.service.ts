@@ -173,13 +173,13 @@ export class AddServiceInvoiceService {
     );
   }
 
-  getRelayList(url: string, value?) {
+  getRelayList(url: string, key?: string) {
     return switchMap(value => {
       if (!value) value = '';
       const params = new HttpParams({
         fromObject: {
           fields: '["*"]',
-          filters: `[["name","like","%${value}%"]]`,
+          filters: `[["${key || 'name'}","like","%${value}%"]]`,
         },
       });
       return this.getHeaders().pipe(

@@ -28,8 +28,8 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { AUTH_SERVER_URL, TIME_ZONE } from '../../constants/storage';
 import { DateTime } from 'luxon';
-import { StorageService } from '../../api/storage/storage.service';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
+
 @Component({
   selector: 'app-add-warranty-claim',
   templateUrl: './add-warranty-claim.page.html',
@@ -85,12 +85,11 @@ export class AddWarrantyClaimPage implements OnInit {
   constructor(
     private location: Location,
     private readonly time: TimeService,
-    private readonly warrantyService: AddWarrantyService,
+    private readonly addWarrantyService: AddWarrantyService,
     private readonly loadingController: LoadingController,
     private readonly snackbar: MatSnackBar,
     private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly storage: StorageService,
     private readonly warrantyClaim: WarrantyService,
   ) {}
 
@@ -123,16 +122,16 @@ export class AddWarrantyClaimPage implements OnInit {
     this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      this.warrantyService.getCustomerList(),
+      this.addWarrantyService.getRelayedCustomerList(),
     );
 
     this.productList = this.warrantyClaimForm.controls.product_name.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      this.warrantyService.getItemList(),
+      this.addWarrantyService.getItemList(),
     );
 
-    this.warrantyService
+    this.addWarrantyService
       .getStorage()
       .getItem('territory')
       .then(territory => {
@@ -144,7 +143,7 @@ export class AddWarrantyClaimPage implements OnInit {
       debounceTime(500),
       startWith(''),
       switchMap(value => {
-        return this.warrantyService.getProblemList(value);
+        return this.addWarrantyService.getProblemList(value);
       }),
       map(res => res.docs),
     );
@@ -253,7 +252,7 @@ export class AddWarrantyClaimPage implements OnInit {
     const loading = await this.loadingController.create();
     await loading.present();
     const payload = this.mapUpdateClaim();
-    this.warrantyService.updateWarrantyClaim(payload).subscribe({
+    this.addWarrantyService.updateWarrantyClaim(payload).subscribe({
       next: () => {
         loading.dismiss();
         this.router.navigate(['/warranty']);
@@ -399,19 +398,21 @@ export class AddWarrantyClaimPage implements OnInit {
     const detail = await this.assignFields();
     if (this.warrantyClaimForm.controls.category.value === CATEGORY.BULK) {
       if (detail.bulk_products?.length > 1) {
-        return this.warrantyService.createBulkWarrantyClaim(detail).subscribe({
-          next: () => {
-            loading.dismiss();
-            this.router.navigate(['/warranty']);
-          },
-          error: ({ message }) => {
-            loading.dismiss();
-            if (!message) message = SOMETHING_WENT_WRONG;
-            this.snackbar.open(message, 'Close', {
-              duration: DURATION,
-            });
-          },
-        });
+        return this.addWarrantyService
+          .createBulkWarrantyClaim(detail)
+          .subscribe({
+            next: () => {
+              loading.dismiss();
+              this.router.navigate(['/warranty']);
+            },
+            error: ({ message }) => {
+              loading.dismiss();
+              if (!message) message = SOMETHING_WENT_WRONG;
+              this.snackbar.open(message, 'Close', {
+                duration: DURATION,
+              });
+            },
+          });
       }
       loading.dismiss();
       this.snackbar.open(`Please use single claim for one product`, CLOSE, {
@@ -419,17 +420,14 @@ export class AddWarrantyClaimPage implements OnInit {
       });
     }
 
-    return this.warrantyService.createWarrantyClaim(detail).subscribe({
+    return this.addWarrantyService.createWarrantyClaim(detail).subscribe({
       next: () => {
         loading.dismiss();
         this.router.navigate(['/warranty']);
       },
-      error: ({ message }) => {
+      error: error => {
         loading.dismiss();
-        if (!message) message = SOMETHING_WENT_WRONG;
-        this.snackbar.open(message, 'Close', {
-          duration: DURATION,
-        });
+        this.getMessage(error?.error?.message || 'Error in creating claim.');
       },
     });
   }
@@ -499,10 +497,16 @@ export class AddWarrantyClaimPage implements OnInit {
   async customerChanged(customer) {
     const loading = await this.loadingController.create();
     await loading.present();
-    this.warrantyService.getAddress(customer.name).subscribe({
-      next: res => {
+    return this.addWarrantyService.getRelayCustomer(customer.name).subscribe({
+      next: (res: any) => {
+        // this clearly needs rework. dont try to optimize. rewrite it.
         loading.dismiss();
         this.contact = res;
+        if (!res) {
+          this.getMessage('Failed to fetch customer.');
+          return;
+        }
+        this.warrantyClaimForm.controls.customer_name.setValue(res);
         if (!res.customer_primary_address) {
           if (!res.mobile_no) {
             this.snackbar.open(
@@ -569,24 +573,20 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   async serialChanged(name) {
-    const timeZone = await this.storage.getItem(TIME_ZONE);
-    this.warrantyService.getSerial(name).subscribe({
+    const timeZone = await this.addWarrantyService
+      .getStorage()
+      .getItem(TIME_ZONE);
+    this.addWarrantyService.getSerial(name).subscribe({
       next: (res: SerialNoDetails) => {
         this.getSerialData = res;
         if (res.claim_no) {
-          this.snackbar.open(
-            `Claim already exists serial no ${res.serial_no}`,
-            'Close',
-            {
-              duration: DURATION,
-            },
-          );
+          this.getMessage(`Claim already exists serial no ${res.serial_no}`);
           return;
         }
-        if (!res.delivery_note) {
-          this.snackbar.open('Serial not sold yet', 'Close', {
-            duration: DURATION,
-          });
+        if (!res.customer) {
+          this.getMessage(
+            'Serial not sold or serials is not linked to customer.',
+          );
           return;
         }
         if (
@@ -635,6 +635,12 @@ export class AddWarrantyClaimPage implements OnInit {
     });
   }
 
+  getMessage(message) {
+    this.snackbar.open(message, CLOSE, {
+      duration: DURATION,
+    });
+  }
+
   dateChanges(option) {
     this.getDateTime(option).then(date => {
       if (this.warrantyClaimForm.controls.received_on.value < date.date) {
@@ -650,7 +656,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   itemOptionChanged(option) {
-    this.warrantyService.getItem(option.item_code).subscribe({
+    this.addWarrantyService.getItem(option.item_code).subscribe({
       next: (res: WarrantyItem) => {
         this.itemDetail = res;
         if (!res.brand) {
@@ -668,7 +674,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   getItemBrandFromERP(item_code: string) {
-    this.warrantyService.getItemBrandFromERP(item_code).subscribe({
+    this.addWarrantyService.getItemBrandFromERP(item_code).subscribe({
       next: res => {
         if (!res.brand) {
           this.snackbar.open(ITEM_BRAND_FETCH_ERROR, 'Close', {
@@ -693,7 +699,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   openERPItem(item_code: string) {
-    this.warrantyService
+    this.addWarrantyService
       .getStorage()
       .getItem(AUTH_SERVER_URL)
       .then(auth_url => {

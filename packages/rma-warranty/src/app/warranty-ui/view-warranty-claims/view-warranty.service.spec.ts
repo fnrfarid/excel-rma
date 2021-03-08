@@ -10,7 +10,15 @@ describe('ViewWarrantyService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{ provide: STORAGE_TOKEN, useValue: {} }],
+      providers: [
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+            getItems: (...args) => Promise.resolve([]),
+          },
+        },
+      ],
     });
     service = TestBed.inject(ViewWarrantyService);
   });
