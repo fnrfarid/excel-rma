@@ -5,7 +5,7 @@ import { WarrantyClaimsDataSource } from './warranty-claims-datasource';
 import { Location } from '@angular/common';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { WarrantyClaims } from '../../common/interfaces/warranty.interface';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import {
   DateAdapter,
   MAT_DATE_LOCALE,
@@ -14,7 +14,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
-import { map, filter } from 'rxjs/operators';
+import { map, filter, startWith, switchMap } from 'rxjs/operators';
 import { PERMISSION_STATE } from '../../constants/permission-roles';
 import {
   CATEGORY,
@@ -24,6 +24,8 @@ import {
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
 import { APP_URL } from '../../constants/storage';
+import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-warranty',
@@ -67,19 +69,16 @@ export class WarrantyPage implements OnInit {
     'remarks',
   ];
   claimList;
-  customerList;
+  filteredCustomerList: Observable<any[]>;
+  filteredProductList: Observable<any[]>;
+  filteredTerrirtoryList: Observable<any[]>;
+  sortQuery: any = {};
   territoryList;
-  customer: any;
   claim_no: string;
   customer_third_party: string;
-  product: string;
   claim_status: string = 'All';
   claim_type: string;
-  territory: string;
   claimed_serial: string;
-  fromDateFormControl = new FormControl();
-  toDateFormControl = new FormControl();
-  singleDateFormControl = new FormControl();
   claimStatusList: string[] = [
     'In Progress',
     'To Deliver',
@@ -87,6 +86,12 @@ export class WarrantyPage implements OnInit {
     'Rejected',
     'All',
   ];
+  validateInput: any = ValidateInputSelected;
+  warrantyForm: FormGroup;
+
+  get f() {
+    return this.warrantyForm.controls;
+  }
 
   constructor(
     private location: Location,
@@ -97,6 +102,7 @@ export class WarrantyPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
@@ -111,7 +117,18 @@ export class WarrantyPage implements OnInit {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         map((event: any) => {
-          if (event.url === '/warranty') this.getTerritory();
+          if (event.url === '/warranty') {
+            this.dataSource.loadItems(
+              undefined,
+              undefined,
+              undefined,
+              {},
+              {
+                territory: this.territoryList,
+                set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
+              },
+            );
+          }
           return event;
         }),
       )
@@ -119,61 +136,166 @@ export class WarrantyPage implements OnInit {
         next: res => {},
         error: err => {},
       });
-    this.getCustomerList();
+
+    this.filteredCustomerList = this.warrantyForm
+      .get('customer_name')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.warrantyService.getCustomerList(value);
+        }),
+      );
+    this.filteredProductList = this.warrantyForm
+      .get('product')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.warrantyService.getItemList(value);
+        }),
+      );
+    this.filteredTerrirtoryList = this.warrantyForm
+      .get('territory')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.warrantyService
+            .getStorage()
+            .getItemAsync('territory', value);
+        }),
+      );
   }
 
-  getTerritory() {
-    this.warrantyService
-      .getStorage()
-      .getItem('territory')
-      .then(territory => {
-        this.territoryList = territory;
-        this.dataSource.loadItems(
-          undefined,
-          undefined,
-          undefined,
-          { set: { $ne: 'Part' } },
-          { territory, set: [CATEGORY.BULK, CATEGORY.SINGLE] },
-        );
-      });
+  createFormGroup() {
+    this.warrantyForm = new FormGroup({
+      customer_name: new FormControl(''),
+      claim_no: new FormControl(''),
+      customer_third_party: new FormControl(''),
+      product: new FormControl(''),
+      claim_status: new FormControl(''),
+      claim_type: new FormControl(''),
+      territory: new FormControl(''),
+      claimed_serial: new FormControl(''),
+      fromDateFormControl: new FormControl(''),
+      toDateFormControl: new FormControl(''),
+      singleDateFormControl: new FormControl(''),
+    });
   }
 
   getUpdate(event) {
-    const query: any = this.getFilterQuery();
-    const sortQuery = {};
-    if (event) {
-      for (const key of Object.keys(event)) {
-        if (key === 'active' && event.direction !== '') {
-          sortQuery[event[key]] = event.direction;
-        }
-      }
+    const query: any = {};
+    if (this.f.customer_name) query.customer = this.f.customer_name.value.name;
+    if (this.f.claim_no.value) query.claim_no = this.f.claim_no.value;
+    if (this.f.customer_third_party.value)
+      query.customer_third_party = this.f.customer_third_party.value;
+    if (this.f.product.value) query.product = this.f.product.value.item_name;
+    if (this.f.claim_status.value)
+      query.claim_status = this.f.claim_status.value;
+    if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
+    if (this.f.territory.value) query.territory = this.f.territory.value.name;
+    if (this.f.claimed_serial.value)
+      query.claimed_serial = this.f.claimed_serial.value;
+
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
     }
+
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+
+    this.paginator.pageIndex = event?.pageIndex || 0;
+    this.paginator.pageSize = event?.pageSize || 30;
+
     this.dataSource.loadItems(
-      sortQuery,
-      event?.pageIndex || 0,
-      event?.pageSize || 30,
+      this.sortQuery,
+      this.paginator.pageIndex,
+      this.paginator.pageSize,
       query,
       {
         territory: this.territoryList,
-        set: [CATEGORY.BULK, CATEGORY.SINGLE],
+        set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
       },
     );
   }
 
   setFilter(event?) {
-    const query: any = this.getFilterQuery();
+    const query: any = {};
+    if (this.f.customer_name.value)
+      query.customer = this.f.customer_name.value.customer_name;
+    if (this.f.claim_no.value) query.claim_no = this.f.claim_no.value;
+    if (this.f.customer_third_party.value)
+      query.customer_third_party = this.f.customer_third_party.value;
+    if (this.f.product.value) query.item_name = this.f.product.value.item_name;
+    if (this.f.claim_status.value)
+      query.claim_status = this.f.claim_status.value;
+    if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
+    if (this.f.territory.value) query.territory = this.f.territory.value.name;
+    if (this.f.claimed_serial.value)
+      query.claimed_serial = this.f.claimed_serial.value;
 
-    const sortQuery = {};
+    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
+      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+
+    if (this.f.singleDateFormControl.value) {
+      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
+        0,
+        0,
+        0,
+        0,
+      );
+      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
+        23,
+        59,
+        59,
+        59,
+      );
+    }
+
+    this.sortQuery = {};
     if (event) {
       for (const key of Object.keys(event)) {
         if (key === 'active' && event.direction !== '') {
-          sortQuery[event[key]] = event.direction;
+          this.sortQuery[event[key]] = event.direction;
         }
       }
     }
 
     this.dataSource.loadItems(
-      sortQuery,
+      this.sortQuery,
       this.paginator.pageIndex,
       this.paginator.pageSize,
       query,
@@ -191,50 +313,6 @@ export class WarrantyPage implements OnInit {
     });
   }
 
-  getFilterQuery() {
-    const query: any = {};
-    if (this.customer) query.customer = this.customer.name;
-    if (this.claim_no) query.claim_no = this.claim_no;
-    if (this.customer_third_party)
-      query.customer_third_party = this.customer_third_party;
-    if (this.product) query.product = this.product;
-    if (this.claim_status) query.claim_status = this.claim_status;
-    if (this.claim_type) query.claim_type = this.claim_type;
-    if (this.territory) query.territory = this.territory;
-    if (this.claimed_serial) query.claimed_serial = this.claimed_serial;
-
-    if (this.fromDateFormControl.value && this.toDateFormControl.value) {
-      query.fromDate = new Date(this.fromDateFormControl.value).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
-      query.toDate = new Date(this.toDateFormControl.value).setHours(
-        23,
-        59,
-        59,
-        59,
-      );
-    }
-
-    if (this.singleDateFormControl.value) {
-      query.fromDate = new Date(this.singleDateFormControl.value).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
-      query.toDate = new Date(this.singleDateFormControl.value).setHours(
-        23,
-        59,
-        59,
-        59,
-      );
-    }
-    return query;
-  }
-
   statusChange(status) {
     if (status === 'All') {
       this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
@@ -248,28 +326,28 @@ export class WarrantyPage implements OnInit {
   }
 
   dateFilter() {
-    this.singleDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.setFilter();
   }
 
   singleDateFilter() {
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
     this.setFilter();
   }
 
   clearFilters() {
-    this.customer = '';
-    this.claim_no = '';
-    this.customer_third_party = '';
-    this.product = '';
-    this.claim_status = 'All';
-    this.claim_type = '';
-    this.territory = '';
-    this.claimed_serial = '';
-    this.fromDateFormControl.setValue('');
-    this.toDateFormControl.setValue('');
-    this.singleDateFormControl.setValue('');
+    this.f.customer_name.setValue('');
+    this.f.claim_no.setValue('');
+    this.f.customer_third_party.setValue('');
+    this.f.product.setValue('');
+    this.f.claim_status.setValue('All');
+    this.f.claim_type.setValue('');
+    this.f.territory.setValue('');
+    this.f.claimed_serial.setValue('');
+    this.f.fromDateFormControl.setValue('');
+    this.f.toDateFormControl.setValue('');
+    this.f.singleDateFormControl.setValue('');
     this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
       territory: this.territoryList,
       set: [CATEGORY.BULK, CATEGORY.SINGLE],
@@ -280,20 +358,17 @@ export class WarrantyPage implements OnInit {
     this.location.back();
   }
 
-  getCustomerList() {
-    this.warrantyService.getAddressList().subscribe({
-      next: response => {
-        this.customerList = response;
-      },
-      error: error => {},
-    });
-  }
-
   getCustomerOption(option) {
-    if (option) return option.name;
+    return option.customer_name;
   }
 
-  getOption() {}
+  getProductOption(option) {
+    return option.item_name;
+  }
+
+  getOption(option) {
+    return option;
+  }
 
   warrantyRoute(row) {
     switch (row.set) {
