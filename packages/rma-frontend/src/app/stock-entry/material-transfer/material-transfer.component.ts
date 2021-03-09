@@ -741,8 +741,9 @@ export class MaterialTransferComponent implements OnInit {
     }
 
     if (
-      this.form.controls.stock_entry_type.value ===
-        STOCK_ENTRY_TYPE.RnD_PRODUCTS &&
+      [STOCK_ENTRY_TYPE.MATERIAL_ISSUE, STOCK_ENTRY_TYPE.RnD_PRODUCTS].includes(
+        this.form.controls.stock_entry_type.value,
+      ) &&
       (!this.form.controls.customer.valid || !this.form.controls.customer.value)
     ) {
       this.getMessage('Please select an expense account.');
@@ -763,8 +764,9 @@ export class MaterialTransferComponent implements OnInit {
     body.item_data = this.itemDataSource.data();
     body.uuid = this.uuid;
     if (
-      this.form.controls.stock_entry_type.value ===
-      STOCK_ENTRY_TYPE.RnD_PRODUCTS
+      [STOCK_ENTRY_TYPE.MATERIAL_ISSUE, STOCK_ENTRY_TYPE.RnD_PRODUCTS].includes(
+        this.form.controls.stock_entry_type.value,
+      )
     ) {
       body.customer = this.form.controls.customer.value.name;
     }

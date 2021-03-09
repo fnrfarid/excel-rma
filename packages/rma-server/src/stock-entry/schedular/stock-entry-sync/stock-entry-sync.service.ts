@@ -297,6 +297,9 @@ export class StockEntrySyncService {
         });
         break;
 
+      case STOCK_ENTRY_TYPE.MATERIAL_ISSUE:
+        break;
+
       default:
         delete payload.customer;
         break;
@@ -332,10 +335,12 @@ export class StockEntrySyncService {
           serialHistory.eventType = this.getEventType(type, payload);
           serialHistory.parent_document = parent;
           serialHistory.transaction_from = item.s_warehouse;
-          serialHistory.transaction_to =
-            payload.stock_entry_type === STOCK_ENTRY_TYPE.RnD_PRODUCTS
-              ? payload.customer
-              : item.t_warehouse;
+          serialHistory.transaction_to = [
+            STOCK_ENTRY_TYPE.RnD_PRODUCTS,
+            STOCK_ENTRY_TYPE.MATERIAL_ISSUE,
+          ].includes(payload.stock_entry_type)
+            ? payload.customer
+            : item.t_warehouse;
           return forkJoin({
             serials: this.updateMongoSerials(
               serials,
@@ -387,6 +392,7 @@ export class StockEntrySyncService {
           sales_document_type: payload.stock_entry_type,
           sales_document_no: doc_name,
           sales_invoice_name: payload.uuid,
+          customer: payload.customer,
         };
   }
 
