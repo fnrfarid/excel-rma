@@ -1,9 +1,6 @@
 import { DataSource } from '@angular/cdk/table';
 import { BehaviorSubject } from 'rxjs';
 import { StockEntryItems } from '../../../common/interfaces/warranty.interface';
-// import { SalesService } from '../services/sales.service';
-
-// export interface
 
 export class ItemsDataSource extends DataSource<StockEntryItems> {
   itemSubject = new BehaviorSubject<StockEntryItems[]>([]);

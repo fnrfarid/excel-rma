@@ -288,7 +288,14 @@
                 Claim no
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                <a (click)="warrantyRoute(row)">{{row.claim_no || 'Draft'}}</a>
+                <a *ngIf="row.set==='Bulk'" (click)="warrantyRoute(row)"
+                  >{{row.claim_no || 'Draft'}}</a
+                >
+                <a
+                  *ngIf="row.set === 'Single' || row.set ==='Part'"
+                  [routerLink]="['/warranty/view-warranty-claims', row.uuid]"
+                  >{{row.claim_no || 'Draft'}}</a
+                >
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>

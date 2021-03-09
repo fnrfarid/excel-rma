@@ -1,11 +1,18 @@
 import { Component, Input, Optional, Host } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { filter, switchMap, startWith, map } from 'rxjs/operators';
+import {
+  filter,
+  switchMap,
+  startWith,
+  map,
+  debounceTime,
+} from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
 import {
+  CLOSE,
   DURATION,
   ITEM_COLUMN,
   STOCK_ENTRY_ITEM_TYPE,
@@ -44,7 +51,7 @@ export class InlineEditComponent {
   warehouseFormControl = new FormControl();
 
   itemList: Array<Item>;
-  filteredItemList: Observable<any[]>;
+  filteredItemList: Observable<unknown[]>;
   item: any;
 
   warehouseList: Observable<any[]>;
@@ -73,27 +80,16 @@ export class InlineEditComponent {
 
   getItemList() {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
+      debounceTime(500),
       startWith(''),
-      switchMap(value => {
-        return this.addServiceInvoiceService.getItemList(value);
-      }),
+      this.addServiceInvoiceService.getItemList(undefined, undefined),
     );
   }
 
   getOptionText(option) {
     return option.item_name;
   }
-
-  ItemSelected(option) {
-    return this.addServiceInvoiceService
-      .getItemFromRMAServer(option.item_code)
-      .pipe(
-        switchMap(item => {
-          this.item = item;
-          return of({});
-        }),
-      );
-  }
+  1;
   getWarehouseOptionText(option) {
     if (option) return option.warehouse;
   }
@@ -134,7 +130,17 @@ export class InlineEditComponent {
                   : 'Non Serial Item';
                 this.popover.close(selectedItem);
               },
-              error: err => {},
+              error: err => {
+                if (err && err.error && err.error.message) {
+                  this.snackbar.open(err.error.message, CLOSE, {
+                    duration: DURATION,
+                  });
+                } else {
+                  this.snackbar.open('failed to fetch item try again', CLOSE, {
+                    duration: DURATION,
+                  });
+                }
+              },
             });
           break;
         case ITEM_COLUMN.SERIAL_NO:
@@ -177,6 +183,19 @@ export class InlineEditComponent {
                 }
 
                 this.popover.close(selectedItem);
+              },
+              error: err => {
+                if (err && err.error && err.error.message) {
+                  this.snackbar.open(err.error.message, CLOSE, {
+                    duration: DURATION,
+                  });
+                } else {
+                  this.snackbar.open(
+                    'failed to fetch serial try again',
+                    CLOSE,
+                    { duration: DURATION },
+                  );
+                }
               },
             });
           break;

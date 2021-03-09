@@ -77,13 +77,14 @@ export class AddServiceInvoiceService {
     });
   }
 
-  getItemList(value?) {
+  getItemList(value?, group?) {
     return switchMap(value => {
       if (!value) value = '';
+      if (!group) group = '';
       const params = new HttpParams({
         fromObject: {
           fields: '["*"]',
-          filters: `[["item_name","like","%${value}%"],["item_group","like","RMA SERVICE"]]`,
+          filters: `[["item_name","like","%${value}%"],["item_group","like","%${group}%"]]`,
         },
       });
       return this.getHeaders().pipe(
