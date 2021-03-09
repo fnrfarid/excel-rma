@@ -23,8 +23,7 @@ import {
 } from '../../constants/app-string';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CsvJsonService } from '../../api/csv-json/csv-json.service';
-import { APP_URL } from '../../constants/storage';
-import { ValidateInputSelected } from 'src/app/common/pipes/validators';
+import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -125,7 +124,7 @@ export class WarrantyPage implements OnInit {
               {},
               {
                 territory: this.territoryList,
-                set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
+                set: [CATEGORY.BULK, CATEGORY.SINGLE],
               },
             );
           }
@@ -371,34 +370,16 @@ export class WarrantyPage implements OnInit {
   }
 
   warrantyRoute(row) {
-    switch (row.set) {
-      case CATEGORY.BULK:
-        this.dataSource.loadItems(
-          undefined,
-          undefined,
-          undefined,
-          { parent: row.uuid },
-          {
-            territory: this.territoryList,
-            set: ['Part'],
-          },
-        );
-        break;
-      default:
-        this.warrantyService
-          .getStorage()
-          .getItem(APP_URL)
-          .then(url => {
-            this.router.navigate([]).then(result => {
-              window.open(
-                `${url}/warranty/view-warranty-claims/${row.uuid}`,
-                '_blank',
-              );
-            });
-          });
-
-        break;
-    }
+    this.dataSource.loadItems(
+      undefined,
+      undefined,
+      undefined,
+      { parent: row.uuid },
+      {
+        territory: this.territoryList,
+        set: ['Part'],
+      },
+    );
   }
 
   downloadSerials() {

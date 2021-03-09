@@ -65,7 +65,7 @@ export class InlineEditComponent {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
-      this.serviceInvoiceService.getItemList(),
+      this.serviceInvoiceService.getItemList(undefined, 'RMA SERVICE'),
     );
   }
 
