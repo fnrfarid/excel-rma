@@ -85,18 +85,6 @@ export class StatusHistoryComponent implements OnInit {
     this.statusHistoryForm.controls.delivery_status.updateValueAndValidity();
   }
 
-  createFormGroup() {
-    this.statusHistoryForm = new FormGroup({
-      posting_time: new FormControl('', [Validators.required]),
-      posting_date: new FormControl('', [Validators.required]),
-      status_from: new FormControl('', [Validators.required]),
-      transfer_branch: new FormControl(''),
-      current_status_verdict: new FormControl('', [Validators.required]),
-      description: new FormControl(''),
-      delivery_status: new FormControl(''),
-    });
-  }
-
   getTerritoryList() {
     this.territoryList = this.statusHistoryForm.controls.transfer_branch.valueChanges.pipe(
       debounceTime(500),

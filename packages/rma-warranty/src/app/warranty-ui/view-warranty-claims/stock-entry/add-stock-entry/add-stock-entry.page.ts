@@ -36,11 +36,18 @@ import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 export class AddStockEntryPage implements OnInit {
   @Input()
   warrantyObject: WarrantyClaimsDetails;
+  stockEntryForm = new FormGroup({
+    type: new FormControl('', [Validators.required]),
+    date: new FormControl('', Validators.required),
+    time: new FormControl(),
+    description: new FormControl(),
+    items: new FormArray([], this.itemValidator),
+  });
+  itemsControl = this.stockEntryForm.get('items') as FormArray;
+
   company: string;
   dataSource: ItemsDataSource;
-  stockEntryForm: FormGroup;
   type: Array<any> = [];
-  itemsControl: FormArray;
   button_active: boolean;
   serialItem: any;
   displayedColumns: string[] = [
@@ -72,7 +79,6 @@ export class AddStockEntryPage implements OnInit {
       key => STOCK_ENTRY_STATUS[key],
     );
     this.dataSource = new ItemsDataSource();
-    this.createFormGroup();
     this.setDateTime(new Date());
     this.checkActive(this.dataSource.data().length);
 
@@ -174,17 +180,6 @@ export class AddStockEntryPage implements OnInit {
       selectedItem.is_return = 1;
     }
     return selectedItem;
-  }
-
-  createFormGroup() {
-    this.stockEntryForm = new FormGroup({
-      type: new FormControl('', [Validators.required]),
-      date: new FormControl('', Validators.required),
-      time: new FormControl(),
-      description: new FormControl(''),
-      items: new FormArray([]),
-    });
-    this.itemsControl = this.stockEntryForm.controls.items as FormArray;
   }
 
   async setDateTime(date: Date) {
@@ -290,6 +285,7 @@ export class AddStockEntryPage implements OnInit {
         ? serialItem.serial_no
         : 'Non serial Item',
     });
+    this.itemsControl.push(new FormControl(itemDataSource));
     this.dataSource.update(itemDataSource);
   }
 
@@ -308,7 +304,7 @@ export class AddStockEntryPage implements OnInit {
   }
 
   updateSerial(index: number, serialObject: any) {
-    if (!serialObject.serial_no) {
+    if (!serialObject?.serial_no) {
       return;
     }
     if (this.checkDuplicateSerial()) {

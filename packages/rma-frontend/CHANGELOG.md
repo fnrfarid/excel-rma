@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.8.1...rma-frontend@1.9.0) (2021-03-09)
+
+
+### Features
+
+* **Excel-rma:** Update stock entry flow for issue and RnD ([9ded65d](https://gitlab.com/castlecraft/excel-rma/commit/9ded65d40cd96d4d7491ffb31a4848d93bd7057b))
+
+
+
+
+
 ## [1.8.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.8.0...rma-frontend@1.8.1) (2021-03-06)
 
 

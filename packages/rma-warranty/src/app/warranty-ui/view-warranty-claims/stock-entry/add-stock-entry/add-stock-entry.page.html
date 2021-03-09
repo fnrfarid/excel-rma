@@ -86,7 +86,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  required
                   placeholder="Description"
                   formControlName="description"
                 />
@@ -257,7 +256,6 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  *ngIf="formControl.type.value === 'Repair' || i"
                   style="width: 400px !important"
                   [value]="row.s_warehouse"
                   column="warehouse"
