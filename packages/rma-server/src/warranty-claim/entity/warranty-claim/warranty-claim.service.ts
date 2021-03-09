@@ -142,13 +142,12 @@ export class WarrantyClaimService {
   async generateNamingSeries() {
     const settings = await this.settings.find().toPromise();
     const date = new DateTime(settings.timeZone).year;
-    let count;
-    count = await this.asyncAggregate([
+    let count = await this.asyncAggregate([
       { $project: { year: { $year: '$createdOn' } } },
       { $match: { year: date } },
       { $count: 'total' },
     ]).toPromise();
-    count = count[0].total + 1;
+    count = (count[0]?.total || 0) + 1;
     return DEFAULT_NAMING_SERIES.warranty_claim + date + '-' + count;
   }
 }
