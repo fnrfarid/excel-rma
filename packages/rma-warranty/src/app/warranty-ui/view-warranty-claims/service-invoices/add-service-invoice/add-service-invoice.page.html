@@ -40,7 +40,7 @@
                   [matDatepicker]="posting_date"
                   placeholder="Posting Date"
                   formControlName="posting_date"
-                  (dateChange)="selectedPostingDate()"
+                  (dateChange)="selectedPostingDate($event)"
                 />
                 <mat-datepicker-toggle
                   matSuffix
