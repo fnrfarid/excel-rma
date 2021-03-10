@@ -273,7 +273,7 @@ export class AddWarrantyClaimPage implements OnInit {
         this.warrantyState = {
           serial_no: { disabled: true, active: false },
           invoice_no: { disabled: true, active: false },
-          warranty_end_date: { disabled: true, active: false },
+          warranty_end_date: { disabled: true, active: true },
           customer_contact: { disabled: false, active: true },
           customer_address: { disabled: false, active: true },
           product_name: { disabled: true, active: true },
@@ -292,7 +292,7 @@ export class AddWarrantyClaimPage implements OnInit {
         this.warrantyState = {
           serial_no: { disabled: true, active: true },
           invoice_no: { disabled: false, active: false },
-          warranty_end_date: { disabled: true, active: false },
+          warranty_end_date: { disabled: true, active: true },
           customer_contact: { disabled: true, active: true },
           customer_address: { disabled: true, active: true },
           product_name: { disabled: true, active: true },
