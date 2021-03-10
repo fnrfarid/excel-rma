@@ -40,7 +40,7 @@
                   [matDatepicker]="posting_date"
                   placeholder="Posting Date"
                   formControlName="posting_date"
-                  (dateChange)="selectedPostingDate($event.option)"
+                  (dateChange)="selectedPostingDate()"
                 />
                 <mat-datepicker-toggle
                   matSuffix
@@ -65,7 +65,7 @@
                   autoActiveFirstOption
                   #customer="matAutocomplete"
                   [displayWith]="getCustOption"
-                  (optionSelected)="setCode($event.option.value)"
+                  (optionSelected)="customerChanged($event.option.value)"
                 >
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async"
@@ -93,8 +93,8 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #address="matAutocomplete"
-                  [displayWith]="getOption"
-                  (optionSelected)="getSelectedOption($event.option.value)"
+                  [displayWith]="getNameOption"
+                  (optionSelected)="getOption($event.option.value)"
                 >
                   <mat-option
                     *ngFor="let option of addressList"
@@ -114,6 +114,7 @@
                   matInput
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
+                  
                   [matAutocomplete]="contact"
                 />
                 <mat-autocomplete
@@ -139,44 +140,6 @@
               <mat-form-field class="example-full-width">
                 <input
                   matInput
-                  placeholder="Third Party Name"
-                  formControlName="third_party_name"
-                />
-                <mat-error *ngIf="f.third_party_name.hasError('required')">
-                  Third Party Name is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  placeholder="Third Party Address"
-                  formControlName="third_party_address"
-                />
-                <mat-error *ngIf="f.third_party_address.hasError('required')">
-                  Third Party Address is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-          </ion-row>
-          <ion-row class="align">
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  placeholder="Third Party Contact"
-                  formControlName="third_party_contact"
-                />
-                <mat-error *ngIf="f.third_party_contact.hasError('required')">
-                  Third Party Contact is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
                   placeholder="Account"
                   formControlName="account"
                   [matAutocomplete]="account"
@@ -184,8 +147,8 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #account="matAutocomplete"
-                  [displayWith]="getOption"
-                  (optionSelected)="getSelectedOption($event.option.value)"
+                  [displayWith]="getNameOption"
+                  (optionSelected)="getOption($event.option.value)"
                 >
                   <mat-option
                     *ngFor="let option of accountList"
@@ -199,8 +162,6 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-          </ion-row>
-          <ion-row class="align">
             <ion-col>
               <mat-form-field class="example-full-width">
                 <input
@@ -212,7 +173,7 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #deliveryBranch="matAutocomplete"
-                  [displayWith]="getBranchOption"
+                  [displayWith]="getOption"
                 >
                   <mat-option
                     *ngFor="let option of territoryList"
@@ -226,6 +187,8 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+          </ion-row>
+          <ion-row class="align">
             <ion-col>
               <mat-checkbox formControlName="is_pos"> Paid </mat-checkbox>
             </ion-col>

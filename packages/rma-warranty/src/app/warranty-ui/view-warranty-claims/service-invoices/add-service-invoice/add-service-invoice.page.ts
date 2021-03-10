@@ -110,7 +110,6 @@ export class AddServiceInvoicePage implements OnInit {
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customer_name')
       .valueChanges.pipe(
-        debounceTime(500),
         startWith(''),
         this.serviceInvoiceService.getRelayList(
           CUSTOMER_ENDPOINT,
@@ -139,15 +138,6 @@ export class AddServiceInvoicePage implements OnInit {
           this.serviceInvoiceForm.controls.customer_address.setValue({
             name: res.customer_address,
           });
-          this.serviceInvoiceForm.controls.third_party_name.setValue(
-            res.third_party_name,
-          );
-          this.serviceInvoiceForm.controls.third_party_contact.setValue(
-            res.third_party_contact,
-          );
-          this.serviceInvoiceForm.controls.third_party_address.setValue(
-            res.third_party_address,
-          );
           this.serviceInvoiceForm.controls.branch.setValue(
             res.receiving_branch,
           );
@@ -162,9 +152,6 @@ export class AddServiceInvoicePage implements OnInit {
       customer_name: new FormControl('', [Validators.required]),
       customer_contact: new FormControl(''),
       customer_address: new FormControl(''),
-      third_party_name: new FormControl(''),
-      third_party_contact: new FormControl(''),
-      third_party_address: new FormControl(''),
       account: new FormControl('', [Validators.required]),
       posting_date: new FormControl('', [Validators.required]),
       branch: new FormControl('', [Validators.required]),
@@ -231,9 +218,6 @@ export class AddServiceInvoicePage implements OnInit {
     serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.controls.posting_date.value;
     serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value.name;
     serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value.name;
-    serviceInvoiceDetails.third_party_name = this.serviceInvoiceForm.controls.third_party_name.value;
-    serviceInvoiceDetails.third_party_address = this.serviceInvoiceForm.controls.third_party_address.value;
-    serviceInvoiceDetails.third_party_contact = this.serviceInvoiceForm.controls.third_party_contact.value;
     serviceInvoiceDetails.docstatus = 0;
     const itemList = this.dataSource.data().filter(item => {
       if (item.item_name !== '') {
@@ -346,7 +330,7 @@ export class AddServiceInvoicePage implements OnInit {
     this.dataSource.update(this.dataSource.data());
   }
 
-  getOption(option) {
+  getNameOption(option) {
     if (option) return option.name;
   }
 
@@ -354,13 +338,11 @@ export class AddServiceInvoicePage implements OnInit {
     if (option) return option.customer_name;
   }
 
-  getBranchOption(option) {
+  getOption(option) {
     if (option) return option;
   }
 
-  getSelectedOption(option) {}
-
-  setCode(option) {
+  customerChanged(option) {
     this.customerCode = option.name;
   }
 }
