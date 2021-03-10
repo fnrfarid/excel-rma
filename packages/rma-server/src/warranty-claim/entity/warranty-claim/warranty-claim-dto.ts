@@ -126,7 +126,7 @@ export class WarrantyClaimDto {
   @IsString()
   item_name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   product_brand: string;
 
@@ -134,11 +134,11 @@ export class WarrantyClaimDto {
   @IsString()
   problem: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   problem_details: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   remarks: string;
 

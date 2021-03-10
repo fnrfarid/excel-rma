@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.1...rma-warranty@1.6.2) (2021-03-10)
+
+
+### Bug Fixes
+
+* **rma-warranty:** Fixed filters on Create Service Invoice page ([9de2a79](https://gitlab.com/castlecraft/excel-rma/commit/9de2a79a6db3bc8a492d057c8185d628a22a5de1))
+* **rma-warranty:** Fixed filters on Create Service Invoice page 1 ([59819a8](https://gitlab.com/castlecraft/excel-rma/commit/59819a82c3e029c3c321492737172328a4525275))
+
+
+
+
+
 ## [1.6.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.0...rma-warranty@1.6.1) (2021-03-09)
 
 **Note:** Version bump only for package rma-warranty
