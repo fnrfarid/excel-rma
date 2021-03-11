@@ -1,3 +1,4 @@
+const DEFAULT_CUSTOMER = "{{cur_frm.doc.name}}"
 
 function execute(){
     const aggregatedData = db.serial_no.aggregate([
@@ -40,7 +41,7 @@ function updateStockEntry(data){
         },
         {
             $set : {
-                customer : stockEntry.customer
+                customer : stockEntry.customer || DEFAULT_CUSTOMER
             },
         }
     )
