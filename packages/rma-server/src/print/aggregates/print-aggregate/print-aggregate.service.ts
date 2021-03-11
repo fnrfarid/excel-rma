@@ -304,17 +304,27 @@ export class PrintAggregateService {
     let yAxis = 0;
     // let xAxis = 50
     const customerInfoObject = {
-      'Third Party Name': invoice.third_party_name,
-      'Third Party Contact': invoice.third_party_contact,
-      'Third Party Address': invoice.third_party_address,
-      'Contact Name:': invoice.customer,
-      'Contact No:': invoice.customer_contact,
-      'Remarks:': invoice.remarks,
-      'Contact Address:': invoice.customer_address,
-      'Claim No:': invoice.claim_no,
-      'Claim Date:': invoice.received_on,
-      'Delivery Date:': invoice.delivery_date,
-      'Claim Branch:': invoice.receiving_branch,
+      'Third Party Name': invoice.third_party_name
+        ? invoice.third_party_name
+        : '',
+      'Third Party Contact': invoice.third_party_contact
+        ? invoice.third_party_contact
+        : '',
+      'Third Party Address': invoice.third_party_address
+        ? invoice.third_party_address
+        : '',
+      'Customer Name:': invoice.customer ? invoice.customer : '',
+      'Customer No:': invoice.customer_contact ? invoice.customer_contact : '',
+      'Contact Address:': invoice.customer_address
+        ? invoice.customer_address
+        : '',
+      'Remarks:': invoice.remarks ? invoice.remarks : '',
+      'Claim No:': invoice.claim_no ? invoice.claim_no : '',
+      'Claim Date:': invoice.received_on ? invoice.received_on : '',
+      'Delivery Date:': invoice.delivery_date ? invoice.delivery_date : '',
+      'Claim Branch:': invoice.receiving_branch ? invoice.receiving_branch : '',
+      Problem: invoice.problem ? invoice.problem : '',
+      'Problem Details': invoice.problem ? invoice.problem : '',
     };
 
     for (const key in customerInfoObject) {
@@ -331,12 +341,22 @@ export class PrintAggregateService {
           doc.fontSize(10).text(key, 300, customerInformationTop + yAxis);
           doc
             .fontSize(10)
-            .text(customerInfoObject[key], 420, customerInformationTop + yAxis);
+            .text(
+              customerInfoObject[key],
+              420,
+              customerInformationTop + yAxis,
+              { width: 150 },
+            );
         } else {
           doc.fontSize(10).text(key, 50, customerInformationTop + yAxis);
           doc
             .fontSize(10)
-            .text(customerInfoObject[key], 150, customerInformationTop + yAxis);
+            .text(
+              customerInfoObject[key],
+              150,
+              customerInformationTop + yAxis,
+              { width: 150 },
+            );
         }
         yAxis += 15;
       }
@@ -533,9 +553,13 @@ export class PrintAggregateService {
     doc.moveDown();
     doc.moveDown();
     const cord = { x: doc.x, y: doc.y };
-    doc
-      .fontSize(13)
-      .text('Received with good condition by', 50, cord.y, { underline: true });
+    if (invoice.print.print_type === 'Service Token') {
+      doc.fontSize(13).text('For Customer', 50, cord.y, { underline: true });
+    } else {
+      doc.fontSize(13).text('Received with good condition by', 50, cord.y, {
+        underline: true,
+      });
+    }
     doc.fontSize(13).text(`For ${invoice.company} `, 250, cord.y, {
       underline: true,
       align: 'right',

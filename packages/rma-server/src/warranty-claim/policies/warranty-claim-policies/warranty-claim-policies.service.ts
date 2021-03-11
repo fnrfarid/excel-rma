@@ -158,8 +158,8 @@ export class WarrantyClaimPoliciesService {
       switchMap(claim => {
         if (claim) {
           if (
-            claim.progress_state.length &&
-            claim.completed_delivery_note.length
+            claim?.progress_state?.length &&
+            claim?.completed_delivery_note?.length
           ) {
             return throwError(
               new BadRequestException('Cancel the linked documents first'),
@@ -168,7 +168,7 @@ export class WarrantyClaimPoliciesService {
           return of(true);
         }
         if (
-          claim.status_history[claim.status_history.length - 1].verdict ===
+          claim.status_history[claim.status_history?.length - 1].verdict ===
           'Received from Customer'
         ) {
           return of(true);
