@@ -31,7 +31,7 @@ export class ServiceInvoiceDto {
   due_date: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   remarks: string;
 
   @IsString()

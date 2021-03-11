@@ -188,10 +188,10 @@ export class AddServiceInvoicePage implements OnInit {
               this.activatedRoute.snapshot.params.uuid,
             ]);
           },
-          error: ({ message }) => {
+          error: err => {
             loading.dismiss();
-            if (!message) message = UPDATE_ERROR;
-            this.snackbar.open(message, 'Close', {
+            if (!err?.error?.message) err.error.message = UPDATE_ERROR;
+            this.snackbar.open(err.error.message, 'Close', {
               duration: DURATION,
             });
           },
