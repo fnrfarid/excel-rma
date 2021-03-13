@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.10.1...rma-server@1.11.0) (2021-03-13)
+
+
+### Features
+
+* **excel-rma:** Add migration to set default customer for material issue ([48db9fd](https://gitlab.com/castlecraft/excel-rma/commit/48db9fda04ddeeaacbc2ae88834f7dff55225b96))
+
+
+
+
+
 ## [1.10.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.10.0...rma-server@1.10.1) (2021-03-10)
 
 **Note:** Version bump only for package rma-server
