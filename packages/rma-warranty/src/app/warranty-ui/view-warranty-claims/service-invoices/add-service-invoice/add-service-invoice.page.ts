@@ -344,5 +344,11 @@ export class AddServiceInvoicePage implements OnInit {
 
   customerChanged(option) {
     this.customerCode = option.name;
+    this.serviceInvoiceForm.controls.customer_address.setValue({
+      name: option?.customer_primary_address,
+    });
+    this.serviceInvoiceForm.controls.customer_contact.setValue(
+      option?.customer_primary_contact,
+    );
   }
 }
