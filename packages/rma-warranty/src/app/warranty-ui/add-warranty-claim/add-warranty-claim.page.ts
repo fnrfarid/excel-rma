@@ -721,6 +721,19 @@ export class AddWarrantyClaimPage implements OnInit {
         warranty_end_date: this.warrantyClaimForm.controls.warranty_end_date
           .value,
       });
+      [
+        'serial_no',
+        'invoice_no',
+        'warranty_end_date',
+        'product_name',
+        'product_brand',
+        'problem',
+        'problem_details',
+        'remarks',
+      ].forEach(element => {
+        this.warrantyClaimForm.get(element).setValue('');
+        this.warrantyClaimForm.get(element).markAsUntouched();
+      });
     }
   }
 
