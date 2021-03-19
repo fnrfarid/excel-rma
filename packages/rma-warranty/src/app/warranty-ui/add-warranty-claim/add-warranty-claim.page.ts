@@ -643,16 +643,33 @@ export class AddWarrantyClaimPage implements OnInit {
 
   dateChanges(option) {
     this.getDateTime(option).then(date => {
-      if (this.warrantyClaimForm.controls.received_on.value < date.date) {
-        this.warrantyClaimForm.controls.claim_type.setValue(
-          WARRANTY_TYPE.WARRANTY,
-        );
-      } else {
-        this.warrantyClaimForm.controls.claim_type.setValue(
-          WARRANTY_TYPE.NON_WARRANTY,
-        );
+      switch (this.warrantyClaimForm.controls.claim_type.value) {
+        case WARRANTY_TYPE.WARRANTY:
+          this.validateWarrantyDate(date);
+
+        case WARRANTY_TYPE.NON_WARRANTY:
+          this.validateWarrantyDate(date);
+
+        default:
+          this.warrantyClaimForm.controls.claim_type.setValue(
+            this.warrantyClaimForm.controls.claim_type.value,
+          );
+          break;
       }
     });
+  }
+
+  validateWarrantyDate(date: any) {
+    if (this.warrantyClaimForm.controls.received_on.value < date.date) {
+      this.warrantyClaimForm.controls.claim_type.setValue(
+        WARRANTY_TYPE.WARRANTY,
+      );
+      return '';
+    }
+    this.warrantyClaimForm.controls.claim_type.setValue(
+      WARRANTY_TYPE.NON_WARRANTY,
+    );
+    return '';
   }
 
   itemOptionChanged(option) {

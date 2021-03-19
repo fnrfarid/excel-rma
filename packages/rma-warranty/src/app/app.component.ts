@@ -14,6 +14,7 @@ import {
   LOGGED_IN,
   AUTH_SERVER_URL,
   ALL_TERRITORIES,
+  SALES_APP_URL,
 } from './constants/storage';
 import { AppService } from './app.service';
 import { LoginService } from './api/login/login.service';
@@ -300,6 +301,15 @@ export class AppComponent implements OnInit {
             error: error => {},
           });
         }
+      });
+  }
+
+  openSalesPortal() {
+    this.appService
+      .getStorage()
+      .getItem(SALES_APP_URL)
+      .then(salesPortalUrl => {
+        window.open(salesPortalUrl, '_blank');
       });
   }
 

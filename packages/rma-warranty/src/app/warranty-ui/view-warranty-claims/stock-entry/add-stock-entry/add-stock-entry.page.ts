@@ -14,6 +14,7 @@ import {
   STOCK_ENTRY_ITEM_TYPE,
   STOCK_ENTRY_STATUS,
   DURATION,
+  WARRANTY_TYPE,
 } from '../../../../constants/app-string';
 import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
 import { DEFAULT_COMPANY } from '../../../../constants/storage';
@@ -36,6 +37,7 @@ import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 export class AddStockEntryPage implements OnInit {
   @Input()
   warrantyObject: WarrantyClaimsDetails;
+  item: any;
   stockEntryForm = new FormGroup({
     type: new FormControl('', [Validators.required]),
     date: new FormControl('', Validators.required),
@@ -150,10 +152,11 @@ export class AddStockEntryPage implements OnInit {
             this.activatedRoute.snapshot.params.uuid,
           ]);
         },
-        error: ({ message }) => {
+        error: (err: any) => {
           loading.dismiss();
-          if (!message) message = STOCK_ENTRY_CREATE_FAILURE;
-          this.snackbar.open(message, 'Close', {
+          if (!err.error.message)
+            err.error.message = STOCK_ENTRY_CREATE_FAILURE;
+          this.snackbar.open(err.error.message, 'Close', {
             duration: DURATION,
           });
         },
@@ -210,8 +213,10 @@ export class AddStockEntryPage implements OnInit {
   setStockEntryType(type) {
     this.trimRow();
     if (
-      type === STOCK_ENTRY_STATUS.REPLACE ||
-      type === STOCK_ENTRY_STATUS.UPGRADE
+      (this.warrantyObject.claim_type !== WARRANTY_TYPE.THIRD_PARTY &&
+        type === STOCK_ENTRY_STATUS.REPLACE) ||
+      (this.warrantyObject.claim_type !== WARRANTY_TYPE.THIRD_PARTY &&
+        type === STOCK_ENTRY_STATUS.UPGRADE)
     ) {
       this.button_active = true;
       this.addServiceInvoiceService
@@ -290,6 +295,7 @@ export class AddStockEntryPage implements OnInit {
   }
 
   updateItem(index: number, updatedItem: StockEntryItems) {
+    this.item = updatedItem;
     const existingItem = this.dataSource.data()[index];
     Object.assign(existingItem, updatedItem);
     this.dataSource.data()[index] = existingItem;

@@ -14,6 +14,7 @@ import {
   STOCK_ENTRY_STATUS,
   VERDICT,
   WARRANTY_CLAIM_DOCTYPE,
+  WARRANTY_TYPE,
 } from '../../../constants/app-strings';
 import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
@@ -619,24 +620,38 @@ export class WarrantyStockEntryAggregateService {
   }
 
   resetCancelledSerialItem(stock_voucher_number: string) {
+    let stockEntryObject;
     return from(this.stockEntryService.findOne({ stock_voucher_number })).pipe(
       switchMap((stockEntry: any) => {
+        stockEntryObject = stockEntry;
         return from(
-          this.serialService.updateOne(
-            { serial_no: stockEntry.items[0]?.serial_no },
-            {
-              $set: {
-                customer: stockEntry.items[0].customer,
-                warehouse: stockEntry.items[0].warehouse,
-                'warranty.salesWarrantyDate':
-                  stockEntry.items[0].warranty.salesWarrantyDate,
-                'warranty.soldOn': stockEntry.items[0].warranty.soldOn,
-                sales_invoice_name: stockEntry.items[0].sales_invoice_name,
-                delivery_note: stockEntry.items[0].delivery_note,
-              },
-            },
-          ),
+          this.warrantyService.findOne({
+            uuid: stockEntry.warrantyClaimUuid,
+            claim_type: WARRANTY_TYPE.THIRD_PARTY,
+          }),
         );
+      }),
+      switchMap(warranty => {
+        if (!warranty) {
+          return from(
+            this.serialService.updateOne(
+              { serial_no: stockEntryObject.items[0]?.serial_no },
+              {
+                $set: {
+                  customer: stockEntryObject.items[0].customer,
+                  warehouse: stockEntryObject.items[0].warehouse,
+                  'warranty.salesWarrantyDate':
+                    stockEntryObject.items[0].warranty.salesWarrantyDate,
+                  'warranty.soldOn': stockEntryObject.items[0].warranty.soldOn,
+                  sales_invoice_name:
+                    stockEntryObject.items[0].sales_invoice_name,
+                  delivery_note: stockEntryObject.items[0].delivery_note,
+                },
+              },
+            ),
+          );
+        }
+        return of({});
       }),
     );
   }
