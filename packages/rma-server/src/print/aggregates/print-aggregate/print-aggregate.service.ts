@@ -53,7 +53,11 @@ export class PrintAggregateService {
         this.generateCustomerInformation(doc, invoice);
         this.generatePrintTable(doc, invoice);
       }
-      await this.generateFooter(doc, serverSettings);
+      await this.generateFooter(
+        doc,
+        serverSettings,
+        'https://www.excelbd.com/wp-content/uploads/2021/02/Warranty-Claim-Footer.jpg',
+      );
       doc.end();
     });
 
@@ -212,9 +216,11 @@ export class PrintAggregateService {
     });
   }
 
-  async generateFooter(doc, settings: ServerSettings) {
+  async generateFooter(doc, settings: ServerSettings, imageUrl?: string) {
     doc.moveDown();
-    const image = await this.getCDNImage(settings.footerImageURL);
+    const image = !imageUrl
+      ? await this.getCDNImage(settings.footerImageURL)
+      : await this.getCDNImage(imageUrl);
     doc.image(image, 20, doc.page.height - 50, {
       lineBreak: false,
       width: settings.footerWidth,
@@ -324,7 +330,7 @@ export class PrintAggregateService {
       'Delivery Date:': invoice.delivery_date ? invoice.delivery_date : '',
       'Claim Branch:': invoice.receiving_branch ? invoice.receiving_branch : '',
       Problem: invoice.problem ? invoice.problem : '',
-      'Problem Details': invoice.problem ? invoice.problem : '',
+      'Problem Details': invoice.problem ? invoice.problem_details : '',
     };
 
     for (const key in customerInfoObject) {
