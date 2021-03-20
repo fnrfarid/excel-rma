@@ -153,18 +153,6 @@ export class InlineEditComponent {
             });
           break;
         case ITEM_COLUMN.SERIAL_NO:
-          if (
-            this.type === WARRANTY_TYPE.THIRD_PARTY &&
-            this.stock_type === 'Returned'
-          ) {
-            this.popover.close({
-              serial_no: this.serial_no,
-              item_code: this.item.item_code,
-              item_name: this.item.item_name,
-              has_serial_no: 0,
-            });
-            return;
-          }
           this.addServiceInvoiceService
             .getSerialItemFromRMAServer(this.serial_no)
             .pipe(
@@ -173,16 +161,43 @@ export class InlineEditComponent {
                   .getItemPrice(item.item_code)
                   .pipe(
                     map(priceListArray => {
-                      if (item.warranty.salesWarrantyDate) {
-                        this.snackbar.open('Serial already sold', 'Close', {
-                          duration: DURATION,
-                        });
-                        return {};
+                      switch (this.stock_type) {
+                        case 'Returned':
+                          if (!item.warranty.salesWarrantyDate) {
+                            this.snackbar.open(
+                              'Item Not Sold.It cannot be returned',
+                              'Close',
+                              {
+                                duration: DURATION,
+                              },
+                            );
+                            return {};
+                          }
+                          return {
+                            priceListArray,
+                            item,
+                          };
+                        case 'Delivered':
+                          if (item.warranty.salesWarrantyDate) {
+                            this.snackbar.open('Serial already sold', 'Close', {
+                              duration: DURATION,
+                            });
+                            return {};
+                          }
+                          return {
+                            priceListArray,
+                            item,
+                          };
+                        default:
+                          this.snackbar.open(
+                            'Check Stock Entry Type',
+                            'Close',
+                            {
+                              duration: DURATION,
+                            },
+                          );
+                          return {};
                       }
-                      return {
-                        priceListArray,
-                        item,
-                      };
                     }),
                   );
               }),
@@ -206,16 +221,27 @@ export class InlineEditComponent {
                 this.popover.close(selectedItem);
               },
               error: err => {
-                if (err && err.error && err.error.message) {
-                  this.snackbar.open(err.error.message, CLOSE, {
-                    duration: DURATION,
+                if (
+                  this.type === WARRANTY_TYPE.THIRD_PARTY &&
+                  this.stock_type === 'Returned'
+                ) {
+                  if (err && err.error && err.error.message) {
+                    this.snackbar.open(err.error.message, CLOSE, {
+                      duration: DURATION,
+                    });
+                  } else {
+                    this.snackbar.open(
+                      'failed to fetch serial try again',
+                      CLOSE,
+                      { duration: DURATION },
+                    );
+                  }
+                  this.popover.close({
+                    serial_no: this.serial_no,
+                    item_code: this.item.item_code,
+                    item_name: this.item.item_name,
+                    has_serial_no: 0,
                   });
-                } else {
-                  this.snackbar.open(
-                    'failed to fetch serial try again',
-                    CLOSE,
-                    { duration: DURATION },
-                  );
                 }
               },
             });

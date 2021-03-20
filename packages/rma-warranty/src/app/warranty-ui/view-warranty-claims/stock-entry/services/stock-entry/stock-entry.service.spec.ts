@@ -7,7 +7,14 @@ describe('StockEntryService', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{ provide: STORAGE_TOKEN, useValue: {} }],
+      providers: [
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve(),
+          },
+        },
+      ],
     }),
   );
 

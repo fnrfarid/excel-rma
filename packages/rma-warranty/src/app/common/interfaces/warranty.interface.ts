@@ -228,7 +228,6 @@ export class StockEntryDetails {
   sales_invoice_name?: string;
   items?: StockItem[];
   set_warehouse?: string;
-  replacedSerial?: string;
   is_return?: number;
 }
 
@@ -240,7 +239,6 @@ export class StockItem {
   item_name?: string;
   qty?: number;
   serial_no?: string;
-  replacedSerial?: string;
   has_serial_no?: number;
 }
 
@@ -271,5 +269,4 @@ export class StockEntryItems {
   warehouse?: string;
   type?: string;
   stock_entry_type?: string;
-  replacedSerial?: string;
 }

@@ -80,10 +80,6 @@ export class WarrantyStockEntryDto {
   @IsString()
   set_warehouse: string;
 
-  @IsOptional()
-  @IsString()
-  replacedSerial: string;
-
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => WarrantyStockEntryItemDto)
@@ -126,10 +122,6 @@ export class WarrantyStockEntryItemDto {
   @IsOptional()
   @IsString()
   warehouse: string;
-
-  @IsOptional()
-  @IsString()
-  replacedSerial: string;
 
   @IsOptional()
   @IsString()
