@@ -70,14 +70,10 @@ export class WarrantyPage implements OnInit {
   claimList;
   filteredCustomerList: Observable<any[]>;
   filteredProductList: Observable<any[]>;
-  filteredTerrirtoryList: Observable<any[]>;
+  filteredTerritoryList: Observable<any[]>;
   sortQuery: any = {};
   territoryList;
-  claim_no: string;
-  customer_third_party: string;
   claim_status: string = 'All';
-  claim_type: string;
-  claimed_serial: string;
   claimStatusList: string[] = [
     'In Progress',
     'To Deliver',
@@ -152,7 +148,7 @@ export class WarrantyPage implements OnInit {
           return this.warrantyService.getItemList(value);
         }),
       );
-    this.filteredTerrirtoryList = this.warrantyForm
+    this.filteredTerritoryList = this.warrantyForm
       .get('territory')
       .valueChanges.pipe(
         startWith(''),
@@ -168,15 +164,15 @@ export class WarrantyPage implements OnInit {
     this.warrantyForm = new FormGroup({
       customer_name: new FormControl(''),
       claim_no: new FormControl(''),
-      customer_third_party: new FormControl(''),
+      third_party_name: new FormControl(''),
       product: new FormControl(''),
       claim_status: new FormControl(''),
       claim_type: new FormControl(''),
       territory: new FormControl(''),
-      claimed_serial: new FormControl(''),
-      fromDateFormControl: new FormControl(''),
-      toDateFormControl: new FormControl(''),
-      singleDateFormControl: new FormControl(''),
+      serial_no: new FormControl(''),
+      fromDate: new FormControl(''),
+      toDate: new FormControl(''),
+      singleDate: new FormControl(''),
     });
   }
 
@@ -184,44 +180,22 @@ export class WarrantyPage implements OnInit {
     const query: any = {};
     if (this.f.customer_name) query.customer = this.f.customer_name.value.name;
     if (this.f.claim_no.value) query.claim_no = this.f.claim_no.value;
-    if (this.f.customer_third_party.value)
-      query.customer_third_party = this.f.customer_third_party.value;
+    if (this.f.third_party_name.value)
+      query.third_party_name = this.f.third_party_name.value;
     if (this.f.product.value) query.product = this.f.product.value.item_name;
-    if (this.f.claim_status.value)
-      query.claim_status = this.f.claim_status.value;
+    if (this.claim_status) query.claim_status = this.claim_status;
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
-    if (this.f.territory.value) query.territory = this.f.territory.value.name;
-    if (this.f.claimed_serial.value)
-      query.claimed_serial = this.f.claimed_serial.value;
+    if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
+    if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
 
-    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
-      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
-      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
-        23,
-        59,
-        59,
-        59,
-      );
+    if (this.f.fromDate.value && this.f.toDate.value) {
+      query.fromDate = new Date(this.f.fromDate.value).setHours(0, 0, 0, 0);
+      query.toDate = new Date(this.f.toDate.value).setHours(23, 59, 59, 59);
     }
 
-    if (this.f.singleDateFormControl.value) {
-      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
-      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
-        23,
-        59,
-        59,
-        59,
-      );
+    if (this.f.singleDate.value) {
+      query.fromDate = new Date(this.f.singleDate.value).setHours(0, 0, 0, 0);
+      query.toDate = new Date(this.f.singleDate.value).setHours(23, 59, 59, 59);
     }
 
     this.paginator.pageIndex = event?.pageIndex || 0;
@@ -244,44 +218,22 @@ export class WarrantyPage implements OnInit {
     if (this.f.customer_name.value)
       query.customer = this.f.customer_name.value.customer_name;
     if (this.f.claim_no.value) query.claim_no = this.f.claim_no.value;
-    if (this.f.customer_third_party.value)
-      query.customer_third_party = this.f.customer_third_party.value;
+    if (this.f.third_party_name.value)
+      query.third_party_name = this.f.third_party_name.value;
+    if (this.claim_status) query.claim_status = this.claim_status;
     if (this.f.product.value) query.item_name = this.f.product.value.item_name;
-    if (this.f.claim_status.value)
-      query.claim_status = this.f.claim_status.value;
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
-    if (this.f.territory.value) query.territory = this.f.territory.value.name;
-    if (this.f.claimed_serial.value)
-      query.claimed_serial = this.f.claimed_serial.value;
+    if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
+    if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
 
-    if (this.f.fromDateFormControl.value && this.f.toDateFormControl.value) {
-      query.fromDate = new Date(this.f.fromDateFormControl.value).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
-      query.toDate = new Date(this.f.toDateFormControl.value).setHours(
-        23,
-        59,
-        59,
-        59,
-      );
+    if (this.f.fromDate.value && this.f.toDate.value) {
+      query.fromDate = new Date(this.f.fromDate.value).setHours(0, 0, 0, 0);
+      query.toDate = new Date(this.f.toDate.value).setHours(23, 59, 59, 59);
     }
 
-    if (this.f.singleDateFormControl.value) {
-      query.fromDate = new Date(this.f.singleDateFormControl.value).setHours(
-        0,
-        0,
-        0,
-        0,
-      );
-      query.toDate = new Date(this.f.singleDateFormControl.value).setHours(
-        23,
-        59,
-        59,
-        59,
-      );
+    if (this.f.singleDate.value) {
+      query.fromDate = new Date(this.f.singleDate.value).setHours(0, 0, 0, 0);
+      query.toDate = new Date(this.f.singleDate.value).setHours(23, 59, 59, 59);
     }
 
     this.sortQuery = {};
@@ -325,28 +277,28 @@ export class WarrantyPage implements OnInit {
   }
 
   dateFilter() {
-    this.f.singleDateFormControl.setValue('');
+    this.f.singleDate.setValue('');
     this.setFilter();
   }
 
   singleDateFilter() {
-    this.f.fromDateFormControl.setValue('');
-    this.f.toDateFormControl.setValue('');
+    this.f.fromDate.setValue('');
+    this.f.toDate.setValue('');
     this.setFilter();
   }
 
   clearFilters() {
     this.f.customer_name.setValue('');
     this.f.claim_no.setValue('');
-    this.f.customer_third_party.setValue('');
+    this.f.third_party_name.setValue('');
     this.f.product.setValue('');
-    this.f.claim_status.setValue('All');
+    this.claim_status = 'All';
     this.f.claim_type.setValue('');
     this.f.territory.setValue('');
-    this.f.claimed_serial.setValue('');
-    this.f.fromDateFormControl.setValue('');
-    this.f.toDateFormControl.setValue('');
-    this.f.singleDateFormControl.setValue('');
+    this.f.serial_no.setValue('');
+    this.f.fromDate.setValue('');
+    this.f.toDate.setValue('');
+    this.f.singleDate.setValue('');
     this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
       territory: this.territoryList,
       set: [CATEGORY.BULK, CATEGORY.SINGLE],

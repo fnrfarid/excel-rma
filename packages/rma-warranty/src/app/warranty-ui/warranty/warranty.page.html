@@ -71,7 +71,7 @@
                 </mat-autocomplete>
                 <mat-error *ngIf="f.customer_name.hasError('falseValse')">
                   You should select a value from dropdown only.
-                  <strong>'{{f.customer.value}}'</strong> is not allowed.
+                  <strong>'{{f.customer_name.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -89,7 +89,7 @@
               <mat-form-field class="full-width">
                 <input
                   matInput
-                  formControlName="customer_third_party"
+                  formControlName="third_party_name"
                   placeholder="Third Party"
                   (keyup.enter)="setFilter()"
                 />
@@ -177,7 +177,7 @@
                   (optionSelected)="setFilter()"
                 >
                   <mat-option
-                    *ngFor="let option of filteredTerrirtoryList | async"
+                    *ngFor="let option of filteredTerritoryList | async"
                     [value]="option"
                   >
                     {{ option }}
@@ -190,7 +190,7 @@
                 <input
                   matInput
                   placeholder="Serial Number"
-                  formControlName="claimed_serial"
+                  formControlName="serial_no"
                   (keyup.enter)="setFilter()"
                 />
               </mat-form-field>
@@ -207,7 +207,7 @@
                   [matDatepicker]="fromDate"
                   placeholder="From Date"
                   readonly
-                  formControlName="fromDateFormControl"
+                  formControlName="fromDate"
                   (dateChange)="dateFilter()"
                 />
                 <mat-datepicker-toggle
@@ -222,7 +222,7 @@
                   [matDatepicker]="toDate"
                   placeholder="To Date"
                   readonly
-                  formControlName="toDateFormControl"
+                  formControlName="toDate"
                   (dateChange)="dateFilter()"
                 />
                 <mat-datepicker-toggle
@@ -242,7 +242,7 @@
                   [matDatepicker]="singleDate"
                   placeholder="Select Date"
                   readonly
-                  formControlName="singleDateFormControl"
+                  formControlName="singleDate"
                   (dateChange)="singleDateFilter()"
                 />
                 <mat-datepicker-toggle

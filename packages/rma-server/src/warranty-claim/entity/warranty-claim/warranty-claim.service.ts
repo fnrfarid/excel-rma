@@ -46,7 +46,7 @@ export class WarrantyClaimService {
 
     if (filter_query?.fromDate && filter_query?.toDate) {
       dateQuery = {
-        created_on: {
+        createdOn: {
           $gte: new Date(filter_query.fromDate),
           $lte: new Date(filter_query.toDate),
         },
