@@ -165,7 +165,6 @@ export class AddStockEntryPage implements OnInit {
 
   mapStockData(res, item) {
     const selectedItem = {} as StockEntryDetails;
-    selectedItem.replacedSerial = item.replacedSerial;
     selectedItem.set_warehouse = item.s_warehouse;
     selectedItem.customer = this.warrantyObject?.customer_code;
     selectedItem.salesWarrantyDate = res?.warranty?.salesWarrantyDate;
@@ -295,6 +294,12 @@ export class AddStockEntryPage implements OnInit {
   }
 
   updateItem(index: number, updatedItem: StockEntryItems) {
+    if (updatedItem?.stock_entry_type) {
+      this.dataSource.data()[index] = {
+        stock_entry_type: updatedItem.stock_entry_type,
+        serial_no: 'Non serial Item',
+      };
+    }
     this.item = updatedItem;
     const existingItem = this.dataSource.data()[index];
     Object.assign(existingItem, updatedItem);
@@ -314,24 +319,6 @@ export class AddStockEntryPage implements OnInit {
       return;
     }
     if (this.checkDuplicateSerial()) {
-      if (
-        this.stockEntryForm.controls.type.value === STOCK_ENTRY_STATUS.REPLACE
-      ) {
-        if (
-          this.dataSource.data()[index].stock_entry_type ===
-          STOCK_ENTRY_ITEM_TYPE.DELIVERED
-        ) {
-          this.dataSource.data()[index].replacedSerial = this.dataSource.data()[
-            this.dataSource
-              .data()
-              .findIndex(
-                serialData =>
-                  serialData.stock_entry_type ===
-                  STOCK_ENTRY_ITEM_TYPE.RETURNED,
-              )
-          ].serial_no;
-        }
-      }
       this.updateItem(index, serialObject);
     }
   }
