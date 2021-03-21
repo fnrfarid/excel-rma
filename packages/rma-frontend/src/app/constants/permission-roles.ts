@@ -286,7 +286,7 @@ export const PermissionRoles = {
 
   item_price: {
     create: ['Item Price Manager', 'General Admin'],
-    read: ['Item Price Manager', 'General Admin'],
+    read: ['Item Price Manager', 'Item Price Viewer', 'General Admin'],
     update: ['Item Price Manager', 'General Admin'],
     delete: ['Item Price Manager', 'General Admin'],
   },
