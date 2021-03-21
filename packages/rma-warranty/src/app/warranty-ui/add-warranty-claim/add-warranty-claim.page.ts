@@ -333,7 +333,7 @@ export class AddWarrantyClaimPage implements OnInit {
     const obj = {
       Warranty: ['serial_no', 'invoice_no', 'customer_name'],
       'Non Serial Warranty': ['customer_name'],
-      'Third Party Warranty': ['third_party_name'],
+      'Third Party Warranty': ['third_party_name', 'customer_name'],
     };
     obj[type].forEach(element => {
       this.warrantyClaimForm.get(element).setValidators(Validators.required);
@@ -397,7 +397,7 @@ export class AddWarrantyClaimPage implements OnInit {
     await loading.present();
     const detail = await this.assignFields();
     if (this.warrantyClaimForm.controls.category.value === CATEGORY.BULK) {
-      if (detail.bulk_products?.length > 1) {
+      if (detail.bulk_products?.length >= 1) {
         return this.addWarrantyService
           .createBulkWarrantyClaim(detail)
           .subscribe({
@@ -737,19 +737,6 @@ export class AddWarrantyClaimPage implements OnInit {
         invoice_no: this.warrantyClaimForm.controls.invoice_no.value,
         warranty_end_date: this.warrantyClaimForm.controls.warranty_end_date
           .value,
-      });
-      [
-        'serial_no',
-        'invoice_no',
-        'warranty_end_date',
-        'product_name',
-        'product_brand',
-        'problem',
-        'problem_details',
-        'remarks',
-      ].forEach(element => {
-        this.warrantyClaimForm.get(element).setValue('');
-        this.warrantyClaimForm.get(element).markAsUntouched();
       });
     }
   }
