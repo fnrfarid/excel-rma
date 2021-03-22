@@ -33,6 +33,7 @@ export class WarrantyClaimService {
   async list(skip, take, sort, filter_query?, territory?, clientHttpRequest?) {
     let sortQuery;
     let dateQuery = {};
+    let claimQuery = {};
 
     try {
       sortQuery = JSON.parse(sort);
@@ -51,6 +52,12 @@ export class WarrantyClaimService {
           $lte: new Date(filter_query.toDate),
         },
       };
+    }
+
+    if (filter_query?.claim_type) {
+      claimQuery = {
+        claim_type: filter_query.claim_type
+      }
     }
 
     for (const key of Object.keys(sortQuery)) {
@@ -77,6 +84,7 @@ export class WarrantyClaimService {
       { set: { $in: territory.set } },
       filter_query ? this.getFilterQuery(filter_query) : {},
       dateQuery,
+      claimQuery,
     ];
 
     const where: { $and: any } = { $and };
