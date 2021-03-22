@@ -165,6 +165,15 @@ export class WarrantyStockEntryAggregateService {
       settingState: this.settingService.find(),
     }).pipe(
       switchMap(claim => {
+        if (
+          claim.warranty.status_history[
+            claim.warranty.status_history.length - 1
+          ].verdict === VERDICT.DELIVER_TO_CUSTOMER
+        ) {
+          return throwError(
+            new BadRequestException('Stock Entries Already Finalized'),
+          );
+        }
         const statusHistoryDetails = {} as any;
         statusHistoryDetails.uuid = claim.warranty.uuid;
         (statusHistoryDetails.time = new DateTime(

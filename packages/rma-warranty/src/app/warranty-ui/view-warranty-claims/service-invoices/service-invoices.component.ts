@@ -3,9 +3,6 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDataSource } from './service-invoice-datasource';
 import { WarrantyClaimsDetails } from '../../../common/interfaces/warranty.interface';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { DURATION } from '../../../constants/app-string';
-import { LoadingController } from '@ionic/angular';
 import { AUTH_SERVER_URL } from '../../../constants/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -41,8 +38,6 @@ export class ServiceInvoicesComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
-    private readonly snackbar: MatSnackBar,
-    private readonly loadingController: LoadingController,
     private readonly router: Router,
   ) {
     this.router.events
@@ -73,28 +68,6 @@ export class ServiceInvoicesComponent implements OnInit {
       event.pageIndex,
       event.pageSize,
     );
-  }
-
-  async syncInvoice() {
-    const loading = await this.loadingController.create();
-    await loading.present();
-    this.serviceInvoice.syncInvoice(this.warrantyObject?.uuid).subscribe({
-      next: () => {
-        loading.dismiss();
-        this.snackbar.open('Invoice Synced Sucessfully', 'Close', {
-          duration: DURATION,
-        });
-        this.dataSource.loadItems(this.invoiceUuid);
-      },
-      error: ({ message }) => {
-        loading.dismiss();
-        if (!message) message = 'Failed to Sync Service Invoice';
-        this.snackbar.open(message, 'Close', {
-          duration: DURATION,
-        });
-        this.dataSource.loadItems(this.invoiceUuid);
-      },
-    });
   }
 
   openERPServiceInvoice(row) {

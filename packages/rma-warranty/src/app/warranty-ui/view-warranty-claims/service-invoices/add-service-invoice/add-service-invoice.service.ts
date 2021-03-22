@@ -11,7 +11,6 @@ import {
   LIST_SERVICE_INVOICE_ENDPOINT,
   RELAY_LIST_ACCOUNT_ENDPOINT,
   RELAY_LIST_ADDRESS_ENDPOINT,
-  SYNC_SERVICE_INVOICE_ENDPOINT,
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
   RELAY_LIST_BRANCH_ENDPOINT,
   RELAY_GET_FULL_ITEM_ENDPOINT,
@@ -316,15 +315,6 @@ export class AddServiceInvoiceService {
         return this.http.get<any>(url, { headers });
       }),
       map(res => res.data),
-    );
-  }
-
-  syncInvoice(uuid: string) {
-    const url = SYNC_SERVICE_INVOICE_ENDPOINT;
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.post(url, { uuid }, { headers });
-      }),
     );
   }
 }

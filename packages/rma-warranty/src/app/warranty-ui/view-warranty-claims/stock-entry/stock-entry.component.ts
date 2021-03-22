@@ -121,25 +121,29 @@ export class StockEntryComponent implements OnInit {
     this.stockEntryService.finalizeEntry(this.warrantyClaimUuid).subscribe({
       next: res => {
         loading.dismiss();
+        this.dataSource.loadItems(undefined, undefined, undefined, {
+          warrantyClaimUuid: this.warrantyClaimUuid,
+        });
         this.snackbar.open('Stock Entries Finalized', 'Close', {
           duration: DURATION,
-        });
-        this.dataSource.loadItems('asc', 0, 10, {
-          warrantyClaimUuid: this.warrantyClaimUuid,
         });
       },
       error: err => {
         loading.dismiss();
         if (err && err.error && err.error.message) {
+          this.dataSource.loadItems(undefined, undefined, undefined, {
+            warrantyClaimUuid: this.warrantyClaimUuid,
+          });
           this.snackbar.open(err.error.message, 'Close', {
             duration: DURATION,
           });
+          return;
         }
+        this.dataSource.loadItems(undefined, undefined, undefined, {
+          warrantyClaimUuid: this.warrantyClaimUuid,
+        });
         this.snackbar.open('Failed to Finalize Stock Entry', 'Close', {
           duration: DURATION,
-        });
-        this.dataSource.loadItems('asc', 0, 10, {
-          warrantyClaimUuid: this.warrantyClaimUuid,
         });
       },
     });

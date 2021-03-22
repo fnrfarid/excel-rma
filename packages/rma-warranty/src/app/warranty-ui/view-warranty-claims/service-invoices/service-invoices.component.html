@@ -15,14 +15,6 @@
           >
             Add
           </ion-button>
-          <ion-button
-            *ngIf="dataSource.length && permissionState.service_invoice.submit"
-            color="tertiary"
-            fill="outline"
-            (click)="syncInvoice()"
-          >
-            Sync Invoices
-          </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
