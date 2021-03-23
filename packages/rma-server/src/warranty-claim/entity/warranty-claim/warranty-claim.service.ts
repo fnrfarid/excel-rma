@@ -103,6 +103,9 @@ export class WarrantyClaimService {
           delete query[key];
         } else {
           if (typeof query[key] === 'string') {
+            if (['claim_type'].includes(key)) {
+              return;
+            }
             query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
           } else {
             delete query[key];
