@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.11.0...rma-server@1.11.1) (2021-03-24)
+
+
+### Bug Fixes
+
+* **rma-server:** Claim type filters fixed on Warranty Page ([baabd4c](https://gitlab.com/castlecraft/excel-rma/commit/baabd4c42cced3f756bb470c063b2100177f64ef))
+* **rma-server:** Claim type filters fixed on Warranty Page 1 ([fcb4adb](https://gitlab.com/castlecraft/excel-rma/commit/fcb4adb0b75f8be8cc175c9c24250f5045f2ead1))
+* **rma-server:** Claim type filters fixed on Warranty Page 2 ([6aa7b12](https://gitlab.com/castlecraft/excel-rma/commit/6aa7b12a310c89fadf4beaae98880f3b7b053d07))
+* **rma-warranty:** Filters fixed on Warranty Page ([4457d93](https://gitlab.com/castlecraft/excel-rma/commit/4457d93cda56a17e8962cd7d0cda4df4cf89fe94))
+
+
+
+
+
 # [1.11.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.10.1...rma-server@1.11.0) (2021-03-13)
 
 
