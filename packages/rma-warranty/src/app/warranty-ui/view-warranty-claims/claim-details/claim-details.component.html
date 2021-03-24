@@ -77,6 +77,20 @@
       <ion-row>
         <ion-col>
           <ion-item lines="none">
+            <ion-label position="floating">Claim No</ion-label>
+            <ion-input
+              placeholder="Claim No"
+              type="text"
+              value="{{
+                warrantyClaimsDetails?.claim_no
+                  ? warrantyClaimsDetails.claim_no
+                  : ''
+              }}"
+            ></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item lines="none">
             <ion-label position="floating">Warranty End Date</ion-label>
             <ion-input
               placeholder="Warranty End Date"
@@ -89,6 +103,8 @@
             ></ion-input>
           </ion-item>
         </ion-col>
+      </ion-row>
+      <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Receive Date & Time</ion-label>
@@ -104,9 +120,6 @@
             ></ion-input>
           </ion-item>
         </ion-col>
-      </ion-row>
-
-      <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Receiving Branch</ion-label>
@@ -122,6 +135,8 @@
             ></ion-input>
           </ion-item>
         </ion-col>
+      </ion-row>
+      <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Received By</ion-label>
@@ -136,9 +151,7 @@
             ></ion-input>
           </ion-item>
         </ion-col>
-      </ion-row>
 
-      <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Deliver Date & Time</ion-label>
@@ -154,6 +167,9 @@
             ></ion-input>
           </ion-item>
         </ion-col>
+      </ion-row>
+
+      <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Delivery Branch</ion-label>
@@ -169,9 +185,6 @@
             ></ion-input>
           </ion-item>
         </ion-col>
-      </ion-row>
-
-      <ion-row>
         <ion-col>
           <ion-item lines="none">
             <ion-label position="floating">Delivered By</ion-label>

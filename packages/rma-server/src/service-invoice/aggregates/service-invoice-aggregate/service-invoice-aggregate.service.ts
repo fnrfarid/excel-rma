@@ -13,15 +13,8 @@ import { ServiceInvoiceRemovedEvent } from '../../event/service-invoice-removed/
 import { ServiceInvoiceUpdatedEvent } from '../../event/service-invoice-updated/service-invoice-updated.event';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import {
-  switchMap,
-  map,
-  catchError,
-  toArray,
-  mergeMap,
-  concatMap,
-} from 'rxjs/operators';
-import { throwError, of, from, forkJoin } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
+import { throwError, of, from } from 'rxjs';
 import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
 import {
   CONTENT_TYPE,
@@ -152,87 +145,5 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
     }
     const update = Object.assign(provider, updatePayload);
     this.apply(new ServiceInvoiceUpdatedEvent(update));
-  }
-
-  submitInvoice(payload: UpdateServiceInvoiceDto, clientHttpRequest) {
-    return this.settings.find().pipe(
-      switchMap(setting => {
-        const url = `${setting.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${payload.invoice_no}`;
-        const body = payload;
-        return this.http.put<any>(url, body, {
-          headers: this.settings.getAuthorizationHeaders(
-            clientHttpRequest.token,
-          ),
-        });
-      }),
-      map(res => res.data.data),
-      switchMap(res => {
-        return from(
-          this.serviceInvoiceService.updateOne(
-            {
-              uuid: payload.uuid,
-            },
-            { $set: { docstatus: payload.docstatus, status: payload.status } },
-          ),
-        );
-      }),
-      catchError(err => {
-        return throwError(new BadRequestException(err));
-      }),
-    );
-  }
-
-  syncInvoice(uuid, req) {
-    return forkJoin({
-      Invoice: from(
-        this.serviceInvoiceService.find({ warrantyClaimUuid: uuid.uuid }),
-      ),
-      settings: this.settings.find(),
-    }).pipe(
-      switchMap(res => {
-        return from(this.filterSubmittedInvoice(res.Invoice)).pipe(
-          concatMap(invoice => {
-            return this.http.get(
-              `${res.settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice}`,
-              {
-                headers: this.settings.getAuthorizationHeaders(req.token),
-              },
-            );
-          }),
-          map(res => res.data.data),
-          toArray(),
-        );
-      }),
-      switchMap(array => {
-        return from(array).pipe(
-          mergeMap(doc => {
-            return from(
-              this.serviceInvoiceService.updateOne(
-                { invoice_no: doc.name },
-                {
-                  $set: {
-                    docstatus: doc.docstatus,
-                  },
-                },
-              ),
-            );
-          }),
-          toArray(),
-        );
-      }),
-      catchError(err => {
-        return throwError(new BadRequestException(err));
-      }),
-    );
-  }
-
-  filterSubmittedInvoice(serviceInvoices: ServiceInvoice[]) {
-    const filteredInvoices: Array<string> = [];
-    serviceInvoices.forEach(invoice => {
-      if (!invoice.docstatus) {
-        filteredInvoices.push(invoice.invoice_no);
-      }
-    });
-    return filteredInvoices;
   }
 }

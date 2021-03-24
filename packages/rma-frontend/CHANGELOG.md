@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.9.0...rma-frontend@1.9.1) (2021-03-24)
+
+
+### Bug Fixes
+
+* Update permission-roles.ts ([2d29d7b](https://gitlab.com/castlecraft/excel-rma/commit/2d29d7bd9fd8bb7ef6f2957101d3caa08b97d2ee))
+
+
+
+
+
 # [1.9.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.8.1...rma-frontend@1.9.0) (2021-03-09)
 
 

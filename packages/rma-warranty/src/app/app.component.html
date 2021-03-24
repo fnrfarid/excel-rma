@@ -8,8 +8,8 @@
             <ion-icon name="refresh">Refresh Session</ion-icon>
           </ion-button>
           <ion-text class="ion-margin-end" slot="end" color="primary">
-            <ng-container *ngIf="counter > 0" >
-              {{counter | formatTime}}
+            <ng-container *ngIf="counter > 0">
+              {{ counter | formatTime }}
             </ng-container>
           </ion-text>
         </ion-toolbar>
@@ -84,6 +84,17 @@
             >
               <ion-icon slot="start" name="barcode"></ion-icon>
               <ion-label>Serial Search</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item
+              *ngIf="loggedIn"
+              (click)="openSalesPortal()"
+              lines="none"
+              routerLinkActive="active"
+            >
+              <ion-icon slot="start" name="desktop-outline"></ion-icon>
+              <ion-label>Sales Portal</ion-label>
             </ion-item>
           </ion-menu-toggle>
           <ion-item

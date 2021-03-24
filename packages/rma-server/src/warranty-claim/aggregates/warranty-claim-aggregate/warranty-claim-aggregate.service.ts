@@ -729,6 +729,13 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           }
           return of({});
         }),
+        switchMap(res => {
+          return from(
+            this.serialNoHistoryService.deleteOne({
+              parent_document: cancelPayload.uuid,
+            }),
+          );
+        }),
       );
   }
 }

@@ -22,7 +22,7 @@ export class WarrantyClaimService {
   }
 
   async create(warrantyclaim: WarrantyClaim) {
-    warrantyclaim.claim_no = await this.generateNamingSeries();
+    warrantyclaim.claim_no = await this.generateNamingSeries(warrantyclaim.set);
     return await this.warrantyClaimRepository.insertOne(warrantyclaim);
   }
 
@@ -46,7 +46,7 @@ export class WarrantyClaimService {
 
     if (filter_query?.fromDate && filter_query?.toDate) {
       dateQuery = {
-        created_on: {
+        createdOn: {
           $gte: new Date(filter_query.fromDate),
           $lte: new Date(filter_query.toDate),
         },
@@ -103,6 +103,9 @@ export class WarrantyClaimService {
           delete query[key];
         } else {
           if (typeof query[key] === 'string') {
+            if (['claim_type'].includes(key)) {
+              return;
+            }
             query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
           } else {
             delete query[key];
@@ -139,15 +142,28 @@ export class WarrantyClaimService {
     );
   }
 
-  async generateNamingSeries() {
+  async generateNamingSeries(type: string) {
     const settings = await this.settings.find().toPromise();
     const date = new DateTime(settings.timeZone).year;
-    let count = await this.asyncAggregate([
-      { $project: { year: { $year: '$createdOn' } } },
-      { $match: { year: date } },
-      { $count: 'total' },
-    ]).toPromise();
-    count = (count[0]?.total || 0) + 1;
-    return DEFAULT_NAMING_SERIES.warranty_claim + date + '-' + count;
+    let count;
+    switch (type) {
+      case 'Bulk':
+        count = await this.asyncAggregate([
+          { $project: { set: 1, year: { $year: '$createdOn' } } },
+          { $match: { year: date, set: type } },
+          { $count: 'total' },
+        ]).toPromise();
+        count = (count[0]?.total || 0) + 1;
+        return DEFAULT_NAMING_SERIES.bulk_warranty_claim + date + '-' + count;
+
+      default:
+        count = await this.asyncAggregate([
+          { $project: { set: 1, year: { $year: '$createdOn' } } },
+          { $match: { year: date, $or: [{ set: 'Single' }, { set: 'Part' }] } },
+          { $count: 'total' },
+        ]).toPromise();
+        count = (count[0]?.total || 0) + 1;
+        return DEFAULT_NAMING_SERIES.warranty_claim + date + '-' + count;
+    }
   }
 }

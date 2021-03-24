@@ -333,7 +333,7 @@ export class AddWarrantyClaimPage implements OnInit {
     const obj = {
       Warranty: ['serial_no', 'invoice_no', 'customer_name'],
       'Non Serial Warranty': ['customer_name'],
-      'Third Party Warranty': ['third_party_name'],
+      'Third Party Warranty': ['third_party_name', 'customer_name'],
     };
     obj[type].forEach(element => {
       this.warrantyClaimForm.get(element).setValidators(Validators.required);
@@ -397,7 +397,7 @@ export class AddWarrantyClaimPage implements OnInit {
     await loading.present();
     const detail = await this.assignFields();
     if (this.warrantyClaimForm.controls.category.value === CATEGORY.BULK) {
-      if (detail.bulk_products?.length > 1) {
+      if (detail.bulk_products?.length >= 1) {
         return this.addWarrantyService
           .createBulkWarrantyClaim(detail)
           .subscribe({
@@ -643,16 +643,33 @@ export class AddWarrantyClaimPage implements OnInit {
 
   dateChanges(option) {
     this.getDateTime(option).then(date => {
-      if (this.warrantyClaimForm.controls.received_on.value < date.date) {
-        this.warrantyClaimForm.controls.claim_type.setValue(
-          WARRANTY_TYPE.WARRANTY,
-        );
-      } else {
-        this.warrantyClaimForm.controls.claim_type.setValue(
-          WARRANTY_TYPE.NON_WARRANTY,
-        );
+      switch (this.warrantyClaimForm.controls.claim_type.value) {
+        case WARRANTY_TYPE.WARRANTY:
+          this.validateWarrantyDate(date);
+
+        case WARRANTY_TYPE.NON_WARRANTY:
+          this.validateWarrantyDate(date);
+
+        default:
+          this.warrantyClaimForm.controls.claim_type.setValue(
+            this.warrantyClaimForm.controls.claim_type.value,
+          );
+          break;
       }
     });
+  }
+
+  validateWarrantyDate(date: any) {
+    if (this.warrantyClaimForm.controls.received_on.value < date.date) {
+      this.warrantyClaimForm.controls.claim_type.setValue(
+        WARRANTY_TYPE.WARRANTY,
+      );
+      return '';
+    }
+    this.warrantyClaimForm.controls.claim_type.setValue(
+      WARRANTY_TYPE.NON_WARRANTY,
+    );
+    return '';
   }
 
   itemOptionChanged(option) {

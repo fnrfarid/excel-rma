@@ -19,7 +19,6 @@ import { UpdateServiceInvoiceCommand } from '../../command/update-service-invoic
 import { RetrieveServiceInvoiceQuery } from '../../query/get-service-invoice/retrieve-service-invoice.query';
 import { RetrieveServiceInvoiceListQuery } from '../../query/list-service-invoice/retrieve-service-invoice-list.query';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
-import { SubmitServiceInvoiceCommand } from '../../../service-invoice/command/submit-service-invoice/submit-service-invoice.command';
 
 @Controller('service_invoice')
 export class ServiceInvoiceController {
@@ -81,12 +80,5 @@ export class ServiceInvoiceController {
     return this.commandBus.execute(
       new UpdateServiceInvoiceCommand(updatePayload),
     );
-  }
-
-  @Post('v1/sync_invoice')
-  @UseGuards(TokenGuard)
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  submitServiceInvoice(@Body() uuid: string, @Req() req) {
-    return this.commandBus.execute(new SubmitServiceInvoiceCommand(uuid, req));
   }
 }

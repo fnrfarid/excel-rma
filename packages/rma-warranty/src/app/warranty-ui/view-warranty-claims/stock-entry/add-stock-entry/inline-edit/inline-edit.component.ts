@@ -16,6 +16,7 @@ import {
   DURATION,
   ITEM_COLUMN,
   STOCK_ENTRY_ITEM_TYPE,
+  WARRANTY_TYPE,
 } from '../../../../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -45,6 +46,15 @@ export class InlineEditComponent {
   @Input()
   minimumPrice: number;
 
+  @Input()
+  type: string;
+
+  @Input()
+  item: any;
+
+  @Input()
+  stock_type: string;
+
   private _value = '';
 
   itemFormControl = new FormControl();
@@ -52,7 +62,6 @@ export class InlineEditComponent {
 
   itemList: Array<Item>;
   filteredItemList: Observable<unknown[]>;
-  item: any;
 
   warehouseList: Observable<any[]>;
   /** Form model for the input. */
@@ -152,16 +161,43 @@ export class InlineEditComponent {
                   .getItemPrice(item.item_code)
                   .pipe(
                     map(priceListArray => {
-                      if (item.warranty.salesWarrantyDate) {
-                        this.snackbar.open('Serial already sold', 'Close', {
-                          duration: DURATION,
-                        });
-                        return {};
+                      switch (this.stock_type) {
+                        case 'Returned':
+                          if (!item.warranty.salesWarrantyDate) {
+                            this.snackbar.open(
+                              'Item Not Sold.It cannot be returned',
+                              'Close',
+                              {
+                                duration: DURATION,
+                              },
+                            );
+                            return {};
+                          }
+                          return {
+                            priceListArray,
+                            item,
+                          };
+                        case 'Delivered':
+                          if (item.warranty.salesWarrantyDate) {
+                            this.snackbar.open('Serial already sold', 'Close', {
+                              duration: DURATION,
+                            });
+                            return {};
+                          }
+                          return {
+                            priceListArray,
+                            item,
+                          };
+                        default:
+                          this.snackbar.open(
+                            'Check Stock Entry Type',
+                            'Close',
+                            {
+                              duration: DURATION,
+                            },
+                          );
+                          return {};
                       }
-                      return {
-                        priceListArray,
-                        item,
-                      };
                     }),
                   );
               }),
@@ -185,16 +221,27 @@ export class InlineEditComponent {
                 this.popover.close(selectedItem);
               },
               error: err => {
-                if (err && err.error && err.error.message) {
-                  this.snackbar.open(err.error.message, CLOSE, {
-                    duration: DURATION,
+                if (
+                  this.type === WARRANTY_TYPE.THIRD_PARTY &&
+                  this.stock_type === 'Returned'
+                ) {
+                  if (err && err.error && err.error.message) {
+                    this.snackbar.open(err.error.message, CLOSE, {
+                      duration: DURATION,
+                    });
+                  } else {
+                    this.snackbar.open(
+                      'failed to fetch serial try again',
+                      CLOSE,
+                      { duration: DURATION },
+                    );
+                  }
+                  this.popover.close({
+                    serial_no: this.serial_no,
+                    item_code: this.item.item_code,
+                    item_name: this.item.item_name,
+                    has_serial_no: 0,
                   });
-                } else {
-                  this.snackbar.open(
-                    'failed to fetch serial try again',
-                    CLOSE,
-                    { duration: DURATION },
-                  );
                 }
               },
             });

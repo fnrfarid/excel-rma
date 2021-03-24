@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.4](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.3...rma-warranty@1.6.4) (2021-03-24)
+
+
+### Bug Fixes
+
+* **rma-warranty:** Filters fixed on Warranty Page ([4457d93](https://gitlab.com/castlecraft/excel-rma/commit/4457d93cda56a17e8962cd7d0cda4df4cf89fe94))
+
+
+
+
+
 ## [1.6.3](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.2...rma-warranty@1.6.3) (2021-03-13)
 
 **Note:** Version bump only for package rma-warranty

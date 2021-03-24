@@ -23,7 +23,14 @@ describe('AddServiceInvoiceService', () => {
         NoopAnimationsModule,
         RouterTestingModule.withRoutes([]),
       ],
-      providers: [{ provide: STORAGE_TOKEN, useValue: {} }],
+      providers: [
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve(),
+          },
+        },
+      ],
     });
     service = TestBed.inject(AddServiceInvoiceService);
   });

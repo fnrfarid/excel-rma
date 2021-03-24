@@ -33,9 +33,7 @@ import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 })
 export class AddServiceInvoicePage implements OnInit {
   posting_date: { date: string; time: string };
-  serviceInvoiceForm: FormGroup;
   dataSource: ItemsDataSource;
-  itemsControl: FormArray;
   customerCode: string;
   displayedColumns: string[] = [
     'item_group',
@@ -52,6 +50,18 @@ export class AddServiceInvoicePage implements OnInit {
   accountList: Observable<any[]>;
   addressList: Observable<any[]>;
   permissionState = PERMISSION_STATE;
+  serviceInvoiceForm = new FormGroup({
+    customer_name: new FormControl('', [Validators.required]),
+    customer_contact: new FormControl(''),
+    customer_address: new FormControl(''),
+    account: new FormControl('', [Validators.required]),
+    posting_date: new FormControl('', [Validators.required]),
+    branch: new FormControl('', [Validators.required]),
+    items: new FormArray([], this.itemValidator),
+    total: new FormControl(0),
+    is_pos: new FormControl(''),
+  });
+  itemsControl = this.serviceInvoiceForm.get('items') as FormArray;
 
   get f() {
     return this.serviceInvoiceForm.controls;
@@ -72,7 +82,6 @@ export class AddServiceInvoicePage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.createFormGroup();
     this.getCurrentDate();
     this.dataSource = new ItemsDataSource();
     this.serviceInvoiceForm.controls.is_pos.setValue(true);
@@ -147,21 +156,6 @@ export class AddServiceInvoicePage implements OnInit {
       });
   }
 
-  createFormGroup() {
-    this.serviceInvoiceForm = new FormGroup({
-      customer_name: new FormControl('', [Validators.required]),
-      customer_contact: new FormControl(''),
-      customer_address: new FormControl(''),
-      account: new FormControl('', [Validators.required]),
-      posting_date: new FormControl('', [Validators.required]),
-      branch: new FormControl('', [Validators.required]),
-      items: new FormArray([], this.itemValidator),
-      total: new FormControl(0),
-      is_pos: new FormControl(''),
-    });
-    this.itemsControl = this.serviceInvoiceForm.get('items') as FormArray;
-  }
-
   navigateBack() {
     this.location.back();
   }
@@ -218,7 +212,7 @@ export class AddServiceInvoicePage implements OnInit {
     serviceInvoiceDetails.posting_date = this.serviceInvoiceForm.controls.posting_date.value;
     serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value.name;
     serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value.name;
-    serviceInvoiceDetails.docstatus = 0;
+    serviceInvoiceDetails.docstatus = 1;
     const itemList = this.dataSource.data().filter(item => {
       if (item.item_name !== '') {
         item.amount = item.qty * item.rate;
@@ -344,5 +338,11 @@ export class AddServiceInvoicePage implements OnInit {
 
   customerChanged(option) {
     this.customerCode = option.name;
+    this.serviceInvoiceForm.controls.customer_address.setValue({
+      name: option?.customer_primary_address,
+    });
+    this.serviceInvoiceForm.controls.customer_contact.setValue(
+      option?.customer_primary_contact,
+    );
   }
 }
