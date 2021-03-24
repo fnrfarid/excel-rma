@@ -23,7 +23,15 @@ export class WarrantyClaimService {
 
   async create(warrantyclaim: WarrantyClaim) {
     warrantyclaim.claim_no = await this.generateNamingSeries(warrantyclaim.set);
-    return await this.warrantyClaimRepository.insertOne(warrantyclaim);
+    const data = await this.warrantyClaimRepository
+      .insertOne(warrantyclaim)
+      .catch(err => {
+        return this.generateErrorNamingSeries(warrantyclaim.set).then(res => {
+          warrantyclaim.claim_no = res;
+          return this.warrantyClaimRepository.insertOne(warrantyclaim);
+        });
+      });
+    return data;
   }
 
   async findOne(param, options?) {
@@ -164,6 +172,37 @@ export class WarrantyClaimService {
         ]).toPromise();
         count = (count[0]?.total || 0) + 1;
         return DEFAULT_NAMING_SERIES.warranty_claim + date + '-' + count;
+    }
+  }
+
+  async generateErrorNamingSeries(type: string) {
+    const settings = await this.settings.find().toPromise();
+    const date = new DateTime(settings.timeZone).year;
+    let count;
+    switch (type) {
+      case 'Bulk':
+        count = await this.asyncAggregate([
+          { $project: { set: 1, claim_no: 1, year: { $year: '$createdOn' } } },
+          { $match: { year: date, set: type } },
+          { $sort: { _id: -1 } },
+          { $limit: 1 },
+        ]).toPromise();
+        count = count[0].claim_no.split('-');
+        count[2] = parseInt(count[2], 10) + 1;
+        count = count.join('-');
+        return count;
+
+      default:
+        count = await this.asyncAggregate([
+          { $project: { set: 1, claim_no: 1, year: { $year: '$createdOn' } } },
+          { $match: { year: date, $or: [{ set: 'Single' }, { set: 'Part' }] } },
+          { $sort: { _id: -1 } },
+          { $limit: 1 },
+        ]).toPromise();
+        count = count[0].claim_no.split('-');
+        count[2] = parseInt(count[2], 10) + 1;
+        count = count.join('-');
+        return count;
     }
   }
 }
