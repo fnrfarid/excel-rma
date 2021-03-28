@@ -139,13 +139,17 @@ export const PermissionRoles = {
   stock_entry: {
     read: [
       'Branch Sales Manager',
+      'Branch Stock Viewer',
       'Branch Stock User',
       'Branch Stock Supervisor',
       'Branch Stock Manager',
+      'Branch Stock Receipt Viewer',
       'Branch Stock Receipt Creator',
       'Branch Stock Receipt Approver',
+      'Branch Stock Issue Viewer',
       'Branch Stock Issue Creator',
       'Branch Stock Issue Approver',
+      'Branch Stock RnD Viewer',
       'Branch Stock RnD Creator',
       'Branch Stock RnD Approver',
       'Branch Sales Creator',
@@ -184,6 +188,7 @@ export const PermissionRoles = {
   // Material Receipt
   stock_entry_receipt: {
     read: [
+      'Branch Stock Receipt Viewer',
       'Branch Stock Receipt Creator',
       'Branch Stock Receipt Approver',
       'General Admin',
@@ -205,6 +210,7 @@ export const PermissionRoles = {
   // Material Issue
   stock_entry_issue: {
     read: [
+      'Branch Stock Issue Viewer',
       'Branch Stock Issue Creator',
       'Branch Stock Issue Approver',
       'General Admin',
@@ -226,6 +232,7 @@ export const PermissionRoles = {
   // Material RnD
   stock_entry_rnd: {
     read: [
+      'Branch Stock RnD Viewer',
       'Branch Stock RnD Creator',
       'Branch Stock RnD Approver',
       'General Admin',
