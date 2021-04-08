@@ -2,7 +2,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WarrantyClaim } from './warranty-claim.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
-import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
+import {
+  CATEGORY,
+  DEFAULT_NAMING_SERIES,
+} from '../../../constants/app-strings';
 import { PARSE_REGEX } from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { DateTime } from 'luxon';
@@ -173,7 +176,7 @@ export class WarrantyClaimService {
           {
             $match: {
               $expr: { $eq: [{ $year: '$createdOn' }, date] },
-              $or: [{ set: 'Single' }, { set: 'Part' }],
+              $or: [{ set: CATEGORY.SINGLE }, { set: CATEGORY.PART }],
             },
           },
           { $count: 'total' },
@@ -206,7 +209,7 @@ export class WarrantyClaimService {
           {
             $match: {
               $expr: { $eq: [{ $year: '$createdOn' }, date] },
-              $or: [{ set: 'Single' }, { set: 'Part' }],
+              $or: [{ set: CATEGORY.SINGLE }, { set: CATEGORY.PART }],
             },
           },
           { $sort: { createdOn: -1 } },
