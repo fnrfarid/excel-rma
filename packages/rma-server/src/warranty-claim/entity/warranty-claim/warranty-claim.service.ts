@@ -157,8 +157,12 @@ export class WarrantyClaimService {
     switch (type) {
       case 'Bulk':
         count = await this.asyncAggregate([
-          { $project: { set: 1, year: { $year: '$createdOn' } } },
-          { $match: { year: date, set: type } },
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              set: type,
+            },
+          },
           { $count: 'total' },
         ]).toPromise();
         count = (count[0]?.total || 0) + 1;
@@ -166,8 +170,12 @@ export class WarrantyClaimService {
 
       default:
         count = await this.asyncAggregate([
-          { $project: { set: 1, year: { $year: '$createdOn' } } },
-          { $match: { year: date, $or: [{ set: 'Single' }, { set: 'Part' }] } },
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              $or: [{ set: 'Single' }, { set: 'Part' }],
+            },
+          },
           { $count: 'total' },
         ]).toPromise();
         count = (count[0]?.total || 0) + 1;
@@ -182,8 +190,12 @@ export class WarrantyClaimService {
     switch (type) {
       case 'Bulk':
         count = await this.asyncAggregate([
-          { $project: { set: 1, claim_no: 1, year: { $year: '$createdOn' } } },
-          { $match: { year: date, set: type } },
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              set: type,
+            },
+          },
           { $sort: { _id: -1 } },
           { $limit: 1 },
         ]).toPromise();
@@ -194,8 +206,12 @@ export class WarrantyClaimService {
 
       default:
         count = await this.asyncAggregate([
-          { $project: { set: 1, claim_no: 1, year: { $year: '$createdOn' } } },
-          { $match: { year: date, $or: [{ set: 'Single' }, { set: 'Part' }] } },
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              $or: [{ set: 'Single' }, { set: 'Part' }],
+            },
+          },
           { $sort: { _id: -1 } },
           { $limit: 1 },
         ]).toPromise();
