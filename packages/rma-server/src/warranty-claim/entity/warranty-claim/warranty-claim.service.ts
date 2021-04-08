@@ -186,39 +186,40 @@ export class WarrantyClaimService {
   async generateErrorNamingSeries(type: string) {
     const settings = await this.settings.find().toPromise();
     const date = new DateTime(settings.timeZone).year;
-    let count;
+    let lastCreatedClaim;
     switch (type) {
       case 'Bulk':
-        count = await this.asyncAggregate([
+        lastCreatedClaim = await this.asyncAggregate([
           {
             $match: {
               $expr: { $eq: [{ $year: '$createdOn' }, date] },
               set: type,
             },
           },
-          { $sort: { _id: -1 } },
+          { $sort: { createdOn: -1 } },
           { $limit: 1 },
         ]).toPromise();
-        count = count[0].claim_no.split('-');
-        count[2] = parseInt(count[2], 10) + 1;
-        count = count.join('-');
-        return count;
+        return this.generateClaimString(lastCreatedClaim);
 
       default:
-        count = await this.asyncAggregate([
+        lastCreatedClaim = await this.asyncAggregate([
           {
             $match: {
               $expr: { $eq: [{ $year: '$createdOn' }, date] },
               $or: [{ set: 'Single' }, { set: 'Part' }],
             },
           },
-          { $sort: { _id: -1 } },
+          { $sort: { createdOn: -1 } },
           { $limit: 1 },
         ]).toPromise();
-        count = count[0].claim_no.split('-');
-        count[2] = parseInt(count[2], 10) + 1;
-        count = count.join('-');
-        return count;
+        return this.generateClaimString(lastCreatedClaim);
     }
+  }
+
+  generateClaimString(claim_no) {
+    claim_no = claim_no[0].claim_no.split('-');
+    claim_no[2] = parseInt(claim_no[2], 10) + 1;
+    claim_no = claim_no.join('-');
+    return claim_no;
   }
 }
