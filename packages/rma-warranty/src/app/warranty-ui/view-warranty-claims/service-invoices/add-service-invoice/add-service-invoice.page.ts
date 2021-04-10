@@ -23,6 +23,8 @@ import { ItemsDataSource } from '../items-datasource';
 import {
   CONTACT_ENDPOINT,
   CUSTOMER_ENDPOINT,
+  RELAY_LIST_ACCOUNT_ENDPOINT,
+  RELAY_LIST_ADDRESS_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { PERMISSION_STATE } from '../../../../constants/permission-roles';
 
@@ -96,12 +98,12 @@ export class AddServiceInvoicePage implements OnInit {
         this.territoryList = territory;
       });
 
-    this.serviceInvoiceService.getAccountList().subscribe({
-      next: response => {
-        this.accountList = response;
-      },
-      error: error => {},
-    });
+    this.accountList = this.serviceInvoiceForm
+      .get('account')
+      .valueChanges.pipe(
+        startWith(''),
+        this.serviceInvoiceService.getRelayList(RELAY_LIST_ACCOUNT_ENDPOINT),
+      );
 
     this.serviceInvoiceService.getCashAccount().subscribe({
       next: response => {
@@ -109,12 +111,12 @@ export class AddServiceInvoicePage implements OnInit {
       },
     });
 
-    this.serviceInvoiceService.getAddressList().subscribe({
-      next: response => {
-        this.addressList = response;
-      },
-      error: error => {},
-    });
+    this.addressList = this.serviceInvoiceForm
+      .get('customer_address')
+      .valueChanges.pipe(
+        startWith(''),
+        this.serviceInvoiceService.getRelayList(RELAY_LIST_ADDRESS_ENDPOINT),
+      );
 
     this.filteredCustomerList = this.serviceInvoiceForm
       .get('customer_name')
