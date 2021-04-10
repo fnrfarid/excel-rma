@@ -10,7 +10,6 @@ import {
   CREATE_WARRANTY_STOCK_ENTRY,
   LIST_SERVICE_INVOICE_ENDPOINT,
   RELAY_LIST_ACCOUNT_ENDPOINT,
-  RELAY_LIST_ADDRESS_ENDPOINT,
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
   RELAY_LIST_BRANCH_ENDPOINT,
   RELAY_GET_FULL_ITEM_ENDPOINT,
@@ -283,16 +282,6 @@ export class AddServiceInvoiceService {
     );
   }
 
-  getAccountList() {
-    const url = RELAY_LIST_ACCOUNT_ENDPOINT;
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<any>(url, { headers });
-      }),
-      map(res => res.data),
-    );
-  }
-
   getCashAccount() {
     const url = RELAY_LIST_ACCOUNT_ENDPOINT;
     const params = new HttpParams({
@@ -303,16 +292,6 @@ export class AddServiceInvoiceService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.get<any>(url, { params, headers });
-      }),
-      map(res => res.data),
-    );
-  }
-
-  getAddressList() {
-    const url = RELAY_LIST_ADDRESS_ENDPOINT;
-    return this.getHeaders().pipe(
-      switchMap(headers => {
-        return this.http.get<any>(url, { headers });
       }),
       map(res => res.data),
     );

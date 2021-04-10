@@ -97,7 +97,7 @@
                   (optionSelected)="getOption($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of addressList"
+                    *ngFor="let option of addressList | async"
                     [value]="option"
                   >
                     {{ option.name }}
@@ -114,7 +114,6 @@
                   matInput
                   placeholder="Customer Contact"
                   formControlName="customer_contact"
-                  
                   [matAutocomplete]="contact"
                 />
                 <mat-autocomplete
@@ -151,7 +150,7 @@
                   (optionSelected)="getOption($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of accountList"
+                    *ngFor="let option of accountList |async "
                     [value]="option"
                   >
                     {{ option.name }}
