@@ -1,4 +1,4 @@
-const DEFAULT_CUSTOMER = "{{cur_frm.doc.name}}"
+const DEFAULT_CUSTOMER = "{{cur_frm.doc.name}}" // change it to "Castle Craft".
 
 function execute(){
     const aggregatedData = db.serial_no.aggregate([
