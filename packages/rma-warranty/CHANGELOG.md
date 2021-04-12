@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.5](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.4...rma-warranty@1.6.5) (2021-04-12)
+
+**Note:** Version bump only for package rma-warranty
+
+
+
+
+
 ## [1.6.4](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.3...rma-warranty@1.6.4) (2021-03-24)
 
 

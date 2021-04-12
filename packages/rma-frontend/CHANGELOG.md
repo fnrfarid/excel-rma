@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.9.1...rma-frontend@1.9.2) (2021-04-12)
+
+
+### Bug Fixes
+
+* Update Stock Entry View Role Permission ([74a1f61](https://gitlab.com/castlecraft/excel-rma/commit/74a1f61a11408ced8d7e42baf7421514907768b9))
+
+
+
+
+
 ## [1.9.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.9.0...rma-frontend@1.9.1) (2021-03-24)
 
 
