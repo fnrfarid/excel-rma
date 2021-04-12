@@ -2,7 +2,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WarrantyClaim } from './warranty-claim.entity';
 import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
-import { DEFAULT_NAMING_SERIES } from '../../../constants/app-strings';
+import {
+  CATEGORY,
+  DEFAULT_NAMING_SERIES,
+} from '../../../constants/app-strings';
 import { PARSE_REGEX } from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { DateTime } from 'luxon';
@@ -23,7 +26,15 @@ export class WarrantyClaimService {
 
   async create(warrantyclaim: WarrantyClaim) {
     warrantyclaim.claim_no = await this.generateNamingSeries(warrantyclaim.set);
-    return await this.warrantyClaimRepository.insertOne(warrantyclaim);
+    const data = await this.warrantyClaimRepository
+      .insertOne(warrantyclaim)
+      .catch(err => {
+        return this.generateErrorNamingSeries(warrantyclaim.set).then(res => {
+          warrantyclaim.claim_no = res;
+          return this.warrantyClaimRepository.insertOne(warrantyclaim);
+        });
+      });
+    return data;
   }
 
   async findOne(param, options?) {
@@ -149,8 +160,12 @@ export class WarrantyClaimService {
     switch (type) {
       case 'Bulk':
         count = await this.asyncAggregate([
-          { $project: { set: 1, year: { $year: '$createdOn' } } },
-          { $match: { year: date, set: type } },
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              set: type,
+            },
+          },
           { $count: 'total' },
         ]).toPromise();
         count = (count[0]?.total || 0) + 1;
@@ -158,12 +173,56 @@ export class WarrantyClaimService {
 
       default:
         count = await this.asyncAggregate([
-          { $project: { set: 1, year: { $year: '$createdOn' } } },
-          { $match: { year: date, $or: [{ set: 'Single' }, { set: 'Part' }] } },
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              $or: [{ set: CATEGORY.SINGLE }, { set: CATEGORY.PART }],
+            },
+          },
           { $count: 'total' },
         ]).toPromise();
         count = (count[0]?.total || 0) + 1;
         return DEFAULT_NAMING_SERIES.warranty_claim + date + '-' + count;
     }
+  }
+
+  async generateErrorNamingSeries(type: string) {
+    const settings = await this.settings.find().toPromise();
+    const date = new DateTime(settings.timeZone).year;
+    let lastCreatedClaim;
+    switch (type) {
+      case 'Bulk':
+        lastCreatedClaim = await this.asyncAggregate([
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              set: type,
+            },
+          },
+          { $sort: { createdOn: -1 } },
+          { $limit: 1 },
+        ]).toPromise();
+        return this.generateClaimString(lastCreatedClaim);
+
+      default:
+        lastCreatedClaim = await this.asyncAggregate([
+          {
+            $match: {
+              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              $or: [{ set: CATEGORY.SINGLE }, { set: CATEGORY.PART }],
+            },
+          },
+          { $sort: { createdOn: -1 } },
+          { $limit: 1 },
+        ]).toPromise();
+        return this.generateClaimString(lastCreatedClaim);
+    }
+  }
+
+  generateClaimString(claim_no) {
+    claim_no = claim_no[0].claim_no.split('-');
+    claim_no[2] = parseInt(claim_no[2], 10) + 1;
+    claim_no = claim_no.join('-');
+    return claim_no;
   }
 }

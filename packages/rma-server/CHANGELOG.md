@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.11.1...rma-server@1.12.0) (2021-04-12)
+
+
+### Features
+
+* **Excel-rma:** Add migration for thirdparty warranty ([35b5315](https://gitlab.com/castlecraft/excel-rma/commit/35b53157b0c2a943588334293a230f1ea99079eb))
+
+
+
+
+
 ## [1.11.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.11.0...rma-server@1.11.1) (2021-03-24)
 
 
