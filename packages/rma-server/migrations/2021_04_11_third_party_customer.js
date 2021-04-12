@@ -1,5 +1,5 @@
 let DEFAULT_CUSTOMER = {
-    customer : "{{cur_frm.doc.name}}", // change it to "Castle Craft".
+    customer : "{{cur_frm.doc.customer_name}}", // change it to "Castle Craft".
     customer_contact: "", // set if any default contact eg. "1234567890"
     customer_address: "", // set if any default address eg. "testing-address"
 }
