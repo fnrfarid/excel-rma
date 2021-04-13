@@ -209,6 +209,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   createMaterialReciept(warrantyPayload: WarrantyClaimDto, req) {
+    if (!warrantyPayload.serial_no) {
+      return of({});
+    }
     return this.settingsService.find().pipe(
       switchMap(settings => {
         const url = `${settings.authServerURL}${STOCK_ENTRY_API_ENDPOINT}`;
@@ -221,6 +224,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       switchMap(materialReceipt => {
         const serialBody = this.serialNoBody(warrantyPayload, materialReceipt);
         return from(this.serialNoService.create(serialBody));
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
       }),
     );
   }
