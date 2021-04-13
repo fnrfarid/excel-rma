@@ -6,6 +6,7 @@ import { SerialNoAggregateService } from '../../../serial-no/aggregates/serial-n
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNoHistoryService } from '../../../serial-no/entity/serial-no-history/serial-no-history.service';
+import { HttpService } from '@nestjs/common';
 
 describe('warrantyClaimAggregateService', () => {
   let service: WarrantyClaimAggregateService;
@@ -36,6 +37,10 @@ describe('warrantyClaimAggregateService', () => {
         },
         {
           provide: SerialNoHistoryService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
           useValue: {},
         },
       ],
