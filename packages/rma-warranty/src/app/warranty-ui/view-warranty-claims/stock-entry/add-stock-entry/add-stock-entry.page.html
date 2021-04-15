@@ -154,7 +154,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  *ngIf="warrantyObject?.claim_type==='Third Party Warranty'||formControl.type.value === 'Repair' || i"
+                  *ngIf="warrantyObject?.claim_type==='Third Party Warranty'||formControl.type.value === 'Spare Parts' || i"
                   style="width: 400px !important"
                   [value]="row.stock_entry_type"
                   column="stock_entry_type"
@@ -187,7 +187,7 @@
                 (closed)="updateItem(i,$event)"
               >
                 <inline-edit
-                  *ngIf="warrantyObject?.claim_type==='Third Party Warranty'||formControl.type.value === 'Repair' || i"
+                  *ngIf="warrantyObject?.claim_type==='Third Party Warranty'||formControl.type.value === 'Spare Parts' || i"
                   style="width: 400px !important"
                   [value]="row.item_name"
                   column="item"
@@ -220,7 +220,7 @@
                 (closed)="updateSerial(i,$event)"
               >
                 <inline-edit
-                  *ngIf=" warrantyObject?.claim_type==='Third Party Warranty'||row.has_serial_no && i || formControl.type.value === 'Repair'"
+                  *ngIf=" warrantyObject?.claim_type==='Third Party Warranty'||row.has_serial_no && i || formControl.type.value === 'Spare Parts'"
                   style="width: 400px !important"
                   [value]="row.serial_no"
                   column="serial_no"
@@ -286,7 +286,7 @@
                 (closed)="updateItem(i, $event)"
               >
                 <inline-edit
-                  *ngIf="warrantyObject?.claim_type==='Third Party Warranty'||formControl.type.value === 'Repair' || i"
+                  *ngIf="warrantyObject?.claim_type==='Third Party Warranty'||formControl.type.value === 'Spare Parts' || i"
                   [value]="row.qty"
                   column="quantity"
                   [minimumPrice]="row.minimumPrice"

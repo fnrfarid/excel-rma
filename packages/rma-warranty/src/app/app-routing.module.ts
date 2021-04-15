@@ -95,6 +95,13 @@ const routes: Routes = [
         m => m.SerialInfoPageModule,
       ),
   },
+  {
+    path: 'bulk-warranty-claim/:name/:uuid',
+    loadChildren: () =>
+      import(
+        './warranty-ui/bulk-warranty-claim/bulk-warranty-claim.module'
+      ).then(m => m.BulkWarrantyClaimPageModule),
+  },
 
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },

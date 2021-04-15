@@ -119,7 +119,6 @@ export class WarrantyPage implements OnInit {
               undefined,
               {},
               {
-                territory: this.territoryList,
                 set: [CATEGORY.BULK, CATEGORY.SINGLE],
               },
             );
