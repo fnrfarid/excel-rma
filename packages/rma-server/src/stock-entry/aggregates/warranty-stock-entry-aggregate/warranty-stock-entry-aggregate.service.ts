@@ -195,7 +195,7 @@ export class WarrantyStockEntryAggregateService {
           case 'Upgrade':
             statusHistoryDetails.delivery_status = DELIVERY_STATUS.UPGRADED;
             break;
-          case 'Repair':
+          case 'Spare Parts':
             statusHistoryDetails.delivery_status = DELIVERY_STATUS.REPAIRED;
             break;
           default:

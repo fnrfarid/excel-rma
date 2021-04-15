@@ -98,7 +98,7 @@ export const ITEM_COLUMN = {
 export const STOCK_ENTRY_STATUS = {
   REPLACE: 'Replace',
   UPGRADE: 'Upgrade',
-  REPAIR: 'Repair',
+  REPAIR: 'Spare Parts',
 };
 export const STOCK_ENTRY_ITEM_TYPE = {
   RETURNED: 'Returned',
