@@ -197,6 +197,28 @@
             </ion-col>
           </ion-row>
           <ion-row>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Received By"
+                  formControlName="received_by"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Delivered By"
+                  formControlName="delivered_by"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
             <ion-col class="ion-text-center">
               <ion-text color="medium" class="date-filter-text">
                 Range Date

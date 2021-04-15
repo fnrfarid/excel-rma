@@ -169,6 +169,8 @@ export class WarrantyPage implements OnInit {
       claim_type: new FormControl(''),
       territory: new FormControl(''),
       serial_no: new FormControl(''),
+      received_by: new FormControl(''),
+      delivered_by: new FormControl(''),
       fromDate: new FormControl(''),
       toDate: new FormControl(''),
       singleDate: new FormControl(''),
@@ -186,6 +188,9 @@ export class WarrantyPage implements OnInit {
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
     if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
     if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
+    if (this.f.received_by.value) query.received_by = this.f.received_by.value;
+    if (this.f.delivered_by.value)
+      query.delivered_by = this.f.delivered_by.value;
 
     if (this.f.fromDate.value && this.f.toDate.value) {
       query.fromDate = new Date(this.f.fromDate.value).setHours(0, 0, 0, 0);
@@ -224,6 +229,9 @@ export class WarrantyPage implements OnInit {
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
     if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
     if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
+    if (this.f.received_by.value) query.received_by = this.f.received_by.value;
+    if (this.f.delivered_by.value)
+      query.delivered_by = this.f.delivered_by.value;
 
     if (this.f.fromDate.value && this.f.toDate.value) {
       query.fromDate = new Date(this.f.fromDate.value).setHours(0, 0, 0, 0);
@@ -295,6 +303,8 @@ export class WarrantyPage implements OnInit {
     this.f.claim_type.setValue('');
     this.f.territory.setValue('');
     this.f.serial_no.setValue('');
+    this.f.received_by.setValue('');
+    this.f.delivered_by.setValue('');
     this.f.fromDate.setValue('');
     this.f.toDate.setValue('');
     this.f.singleDate.setValue('');
