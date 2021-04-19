@@ -1,3 +1,5 @@
+import { BulkServiceInvoicesComponent } from './../../../../../../../../../../home/castlecraft/Projects/excel-rma/packages/rma-warranty/src/app/warranty-ui/bulk-warranty-claim/bulk-service-invoices/bulk-service-invoices.component';
+import { BulkClaimDetailsComponent } from './bulk-claim-details/bulk-claim-details.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,6 +24,10 @@ import { AppCommonModule } from '../../common/app-common.module';
     AppCommonModule,
     BulkWarrantyClaimPageRoutingModule,
   ],
-  declarations: [BulkWarrantyClaimPage],
+  declarations: [
+    BulkWarrantyClaimPage,
+    BulkClaimDetailsComponent,
+    BulkServiceInvoicesComponent,
+  ],
 })
 export class BulkWarrantyClaimPageModule {}
