@@ -1,4 +1,3 @@
-import { BulkServiceInvoicesComponent } from './../../../../../../../../../../home/castlecraft/Projects/excel-rma/packages/rma-warranty/src/app/warranty-ui/bulk-warranty-claim/bulk-service-invoices/bulk-service-invoices.component';
 import { BulkClaimDetailsComponent } from './bulk-claim-details/bulk-claim-details.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -12,6 +11,7 @@ import { BulkWarrantyClaimPage } from './bulk-warranty-claim.page';
 import { MaterialModule } from '../../material/material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppCommonModule } from '../../common/app-common.module';
+import { BulkServiceInvoicesComponent } from './bulk-service-invoices/bulk-service-invoices.component';
 
 @NgModule({
   imports: [
