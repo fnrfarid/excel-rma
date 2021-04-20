@@ -1,0 +1,20 @@
+.full-width {
+  width: 100%;
+  color: black;
+}
+
+table {
+  width: 150%;
+}
+
+.example-container {
+  box-shadow: none;
+  height: auto;
+  width: 100%;
+  overflow: auto;
+}
+
+mat-header-cell {
+  flex-wrap: nowrap;
+  min-width: 100px;
+}

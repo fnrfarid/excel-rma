@@ -1,3 +1,4 @@
+import { BulkClaimDetailsComponent } from './bulk-claim-details/bulk-claim-details.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,6 +11,7 @@ import { BulkWarrantyClaimPage } from './bulk-warranty-claim.page';
 import { MaterialModule } from '../../material/material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppCommonModule } from '../../common/app-common.module';
+import { BulkServiceInvoicesComponent } from './bulk-service-invoices/bulk-service-invoices.component';
 
 @NgModule({
   imports: [
@@ -22,6 +24,10 @@ import { AppCommonModule } from '../../common/app-common.module';
     AppCommonModule,
     BulkWarrantyClaimPageRoutingModule,
   ],
-  declarations: [BulkWarrantyClaimPage],
+  declarations: [
+    BulkWarrantyClaimPage,
+    BulkClaimDetailsComponent,
+    BulkServiceInvoicesComponent,
+  ],
 })
 export class BulkWarrantyClaimPageModule {}

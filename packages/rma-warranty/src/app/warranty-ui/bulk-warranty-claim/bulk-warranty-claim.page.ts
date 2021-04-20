@@ -1,10 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Location } from '@angular/common';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
-import { DURATION } from 'src/app/constants/app-string';
+import { ActivatedRoute } from '@angular/router';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { WarrantyClaimsDataSource } from '../warranty/warranty-claims-datasource';
 
@@ -18,63 +16,18 @@ export class BulkWarrantyClaimPage implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   dataSource: WarrantyClaimsDataSource;
   claim_no: string = this.route.snapshot.params.name;
-  displayedColumns = [
-    'sr_no',
-    'claim_no',
-    'claim_type',
-    'received_date',
-    'customer_name',
-    'third_party_name',
-    'item_code',
-    'claimed_serial',
-    'claim_status',
-    'receiving_branch',
-    'delivery_branch',
-    'received_by',
-    'delivered_by',
-    'product_brand',
-    'replace_serial',
-    'problem',
-    'verdict',
-    'delivery_date',
-    'billed_amount',
-    'remarks',
-  ];
+
   constructor(
-    private readonly router: Router,
+    private readonly location: Location,
     private route: ActivatedRoute,
     private warrantyService: WarrantyService,
-    private readonly snackBar: MatSnackBar,
   ) {}
 
+  selectedSegment: any;
+
   ngOnInit() {
+    this.selectedSegment = 0;
     this.dataSource = new WarrantyClaimsDataSource(this.warrantyService);
-    this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd),
-        map((event: any) => {
-          if (
-            (event.url === '/bulk-warranty-claim',
-            this.route.snapshot.params.name,
-            this.route.snapshot.params.uuid)
-          ) {
-            this.dataSource.loadItems(
-              undefined,
-              undefined,
-              undefined,
-              { parent: this.route.snapshot.params?.uuid },
-              {
-                set: ['Part'],
-              },
-            );
-          }
-          return event;
-        }),
-      )
-      .subscribe({
-        next: res => {},
-        error: err => {},
-      });
   }
 
   getUpdate(event) {
@@ -93,7 +46,7 @@ export class BulkWarrantyClaimPage implements OnInit {
     );
   }
 
-  comingSoon(message) {
-    this.snackBar.open(message, 'Close', { duration: DURATION });
+  navigateBack() {
+    this.location.back();
   }
 }
