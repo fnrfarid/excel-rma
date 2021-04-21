@@ -34,7 +34,6 @@ import { PERMISSION_STATE } from '../../../../constants/permission-roles';
   styleUrls: ['./add-service-invoice.page.scss'],
 })
 export class AddServiceInvoicePage implements OnInit {
-  posting_date: { date: string; time: string };
   dataSource: ItemsDataSource;
   customerCode: string;
   displayedColumns: string[] = [
@@ -163,7 +162,9 @@ export class AddServiceInvoicePage implements OnInit {
   }
 
   async selectedPostingDate($event) {
-    this.posting_date = await this.time.getDateAndTime($event.value);
+    this.serviceInvoiceForm.controls.posting_date.setValue(
+      await (await this.time.getDateAndTime($event.value)).date,
+    );
   }
 
   async createInvoice() {
@@ -203,7 +204,7 @@ export class AddServiceInvoicePage implements OnInit {
     const serviceInvoiceDetails = {} as ServiceInvoiceDetails;
     serviceInvoiceDetails.warrantyClaimUuid = this.activatedRoute.snapshot.params.uuid;
     serviceInvoiceDetails.customer = this.customerCode;
-    serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value;
+    serviceInvoiceDetails.customer_contact = this.serviceInvoiceForm.controls.customer_contact.value.name;
     serviceInvoiceDetails.total_qty = 0;
     serviceInvoiceDetails.total = 0;
     serviceInvoiceDetails.due_date = this.serviceInvoiceForm.controls.posting_date.value;
@@ -215,6 +216,7 @@ export class AddServiceInvoicePage implements OnInit {
     serviceInvoiceDetails.customer_name = this.serviceInvoiceForm.controls.customer_name.value.name;
     serviceInvoiceDetails.customer_address = this.serviceInvoiceForm.controls.customer_address.value.name;
     serviceInvoiceDetails.docstatus = 1;
+    serviceInvoiceDetails.set_posting_time = 1;
     const itemList = this.dataSource.data().filter(item => {
       if (item.item_name !== '') {
         item.amount = item.qty * item.rate;
