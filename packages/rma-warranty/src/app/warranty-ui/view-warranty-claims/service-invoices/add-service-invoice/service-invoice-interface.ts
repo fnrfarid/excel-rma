@@ -32,6 +32,7 @@ export class ServiceInvoiceDetails {
   is_pos?: number;
   pos_profile?: string;
   payments?: Payments[];
+  set_posting_time?: number;
 }
 
 export class Payments {
