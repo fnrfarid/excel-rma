@@ -22,6 +22,7 @@ export class ServiceInvoicesComponent implements OnInit {
   invoiceUuid: string;
   dataSource: ServiceInvoiceDataSource;
   permissionState = PERMISSION_STATE;
+  total: number = 0;
   displayedColumns = [
     'invoice_no',
     'status',
@@ -44,6 +45,7 @@ export class ServiceInvoicesComponent implements OnInit {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(val => {
         this.dataSource.loadItems(this.route.snapshot.params.uuid);
+        this.getTotal();
       });
   }
 
@@ -68,6 +70,14 @@ export class ServiceInvoicesComponent implements OnInit {
       event.pageIndex,
       event.pageSize,
     );
+  }
+
+  getTotal() {
+    this.dataSource.total.subscribe({
+      next: total => {
+        this.total = total;
+      },
+    });
   }
 
   openERPServiceInvoice(row) {

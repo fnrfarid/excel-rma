@@ -9,6 +9,8 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
   length: number;
   offset: number;
 
+  total = new BehaviorSubject<number>(0);
+
   itemSubject = new BehaviorSubject<ServiceInvoiceDetails[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
 
@@ -43,6 +45,17 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
-      .subscribe(items => this.itemSubject.next(items));
+      .subscribe(items => {
+        this.itemSubject.next(items);
+        this.calculateTotal(items);
+      });
+  }
+
+  calculateTotal(serviceInvoice: ServiceInvoiceDetails[]) {
+    let sum = 0;
+    serviceInvoice.forEach(item => {
+      sum += item.total;
+    });
+    this.total.next(sum);
   }
 }

@@ -68,7 +68,7 @@
               {{ row.customer_third_party }}
             </ng-container>
           </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          <mat-footer-cell *matFooterCellDef>Total</mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="invoice_amount">
@@ -78,7 +78,7 @@
               {{ row.total }}
             </ng-container>
           </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          <mat-footer-cell *matFooterCellDef>{{ total | curFormat |async}}</mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="claim_no">
