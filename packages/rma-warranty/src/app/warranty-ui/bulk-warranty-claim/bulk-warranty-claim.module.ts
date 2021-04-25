@@ -11,7 +11,7 @@ import { BulkWarrantyClaimPage } from './bulk-warranty-claim.page';
 import { MaterialModule } from '../../material/material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppCommonModule } from '../../common/app-common.module';
-import { ServiceInvoicesComponent } from '../view-warranty-claims/service-invoices/service-invoices.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -23,11 +23,8 @@ import { ServiceInvoicesComponent } from '../view-warranty-claims/service-invoic
     HttpClientModule,
     AppCommonModule,
     BulkWarrantyClaimPageRoutingModule,
+    SharedModule,
   ],
-  declarations: [
-    BulkWarrantyClaimPage,
-    BulkClaimDetailsComponent,
-    ServiceInvoicesComponent,
-  ],
+  declarations: [BulkWarrantyClaimPage, BulkClaimDetailsComponent],
 })
 export class BulkWarrantyClaimPageModule {}

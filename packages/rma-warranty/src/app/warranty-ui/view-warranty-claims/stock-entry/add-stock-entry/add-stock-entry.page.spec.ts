@@ -15,7 +15,7 @@ import { TimeService } from '../../../../api/time/time.service';
 import { of } from 'rxjs';
 import { StorageService } from '../../../../api/storage/storage.service';
 import { Location } from '@angular/common';
-import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
+import { AddServiceInvoiceService } from '../../../shared/service-invoices/add-service-invoice/add-service-invoice.service';
 
 @Pipe({ name: 'curFormat' })
 class MockPipe implements PipeTransform {

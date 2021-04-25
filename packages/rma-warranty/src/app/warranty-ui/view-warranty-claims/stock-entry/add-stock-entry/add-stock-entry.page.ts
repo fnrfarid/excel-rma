@@ -16,7 +16,7 @@ import {
   DURATION,
   WARRANTY_TYPE,
 } from '../../../../constants/app-string';
-import { AddServiceInvoiceService } from '../../service-invoices/add-service-invoice/add-service-invoice.service';
+import { AddServiceInvoiceService } from '../../../shared/service-invoices/add-service-invoice/add-service-invoice.service';
 import { DEFAULT_COMPANY } from '../../../../constants/storage';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
