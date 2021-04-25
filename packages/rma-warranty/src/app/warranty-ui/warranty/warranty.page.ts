@@ -179,7 +179,8 @@ export class WarrantyPage implements OnInit {
 
   getUpdate(event) {
     const query: any = {};
-    if (this.f.customer_name) query.customer = this.f.customer_name.value.name;
+    if (this.f.customer_name.value)
+      query.customer = this.f.customer_name.value.name;
     if (this.f.claim_no.value) query.claim_no = this.f.claim_no.value;
     if (this.f.third_party_name.value)
       query.third_party_name = this.f.third_party_name.value;
@@ -204,6 +205,10 @@ export class WarrantyPage implements OnInit {
 
     this.paginator.pageIndex = event?.pageIndex || 0;
     this.paginator.pageSize = event?.pageSize || 30;
+    this.sortQuery =
+      Object.keys(this.sortQuery).length === 0
+        ? { createdOn: 'desc' }
+        : this.sortQuery;
 
     this.dataSource.loadItems(
       this.sortQuery,
@@ -212,7 +217,7 @@ export class WarrantyPage implements OnInit {
       query,
       {
         territory: this.territoryList,
-        set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
+        set: [CATEGORY.BULK, CATEGORY.SINGLE],
       },
     );
   }
@@ -259,7 +264,7 @@ export class WarrantyPage implements OnInit {
       query,
       {
         territory: this.territoryList,
-        set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
+        set: [CATEGORY.BULK, CATEGORY.SINGLE],
       },
     );
   }
