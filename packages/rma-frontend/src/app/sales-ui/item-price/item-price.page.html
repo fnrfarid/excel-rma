@@ -33,27 +33,10 @@
                 <input
                   matInput
                   placeholder="Item Name"
-                  [matAutocomplete]="itemNameAutocomplete"
                   formControlName="itemName"
-                  (focusout)="validateInput(f.itemName, filteredItemNameList)"
-                />
-                <mat-autocomplete
-                  autoActiveFirstOption
-                  #itemNameAutocomplete="matAutocomplete"
-                  [displayWith]="getItemNameOption"
-                  (optionSelected)="setFilter($event.option.value)"
-                >
-                  <mat-option
-                    *ngFor="let option of filteredItemNameList | async"
-                    [value]="option"
-                  >
-                    {{ option.item_name }}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="f.itemName.hasError('falseValse')">
-                  You should select a value from dropdown only.
-                  <strong>'{{f.itemName.value}}'</strong> is not allowed.
-                </mat-error>
+                  autocomplete="off"
+                  (keyup.enter)="setFilter()"
+                  />
               </mat-form-field>
             </ion-col>
             <ion-col>
