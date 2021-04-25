@@ -144,7 +144,6 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
       throw new NotFoundException();
     }
     const update = Object.assign(provider, updatePayload);
-  
     this.apply(new ServiceInvoiceUpdatedEvent(update));
   }
 }
