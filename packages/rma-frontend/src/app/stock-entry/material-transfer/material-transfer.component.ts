@@ -89,6 +89,7 @@ export class MaterialTransferComponent implements OnInit {
   readonly: boolean = false;
   company: string;
   status: string;
+  title: string;
   filteredWarehouseList1: Observable<any[]>;
   filteredWarehouseList2: Observable<any[]>;
   transferWarehouse: string;
@@ -192,6 +193,7 @@ export class MaterialTransferComponent implements OnInit {
             new Date(success.posting_date),
           );
           this.stock_receipt_names = success.names || [];
+          this.title = success.names[0];
           this.status = success.status;
           this.form.controls.remarks.setValue(success.remarks);
           if (success.stock_entry_type !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
