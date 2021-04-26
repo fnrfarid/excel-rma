@@ -11,7 +11,7 @@ import { BulkWarrantyClaimPage } from './bulk-warranty-claim.page';
 import { MaterialModule } from '../../material/material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AppCommonModule } from '../../common/app-common.module';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '../shared-warranty-modules/shared.module';
 
 @NgModule({
   imports: [

@@ -13,7 +13,7 @@ import { StockEntryComponent } from './stock-entry/stock-entry.component';
 
 import { MaterialModule } from '../../material/material.module';
 import { AppCommonModule } from '../../common/app-common.module';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '../shared-warranty-modules/shared.module';
 
 @NgModule({
   imports: [
