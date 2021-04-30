@@ -35,6 +35,7 @@ import { ProblemModule } from './problem/problem.module';
 import { SyncEntitiesModule } from './sync/entities/sync-entity.module';
 import { ServiceInvoiceModule } from './service-invoice/service-invoice.module';
 import { PrintModule } from './print/print-module';
+import { TermsAndConditionsModule } from './terms-and-conditions/terms-and-conditions.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { PrintModule } from './print/print-module';
     PurchaseOrderModule,
     ProblemModule,
     ServiceInvoiceModule,
+    TermsAndConditionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

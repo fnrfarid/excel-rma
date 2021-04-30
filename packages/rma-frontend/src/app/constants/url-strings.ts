@@ -115,6 +115,16 @@ export const GET_PROBLEM_ENDPOINT = '/api/problem/v1/get';
 export const ADD_PROBLEM_ENDPOINT = '/api/problem/v1/create';
 export const UPDATE_PROBLEM_ENDPOINT = '/api/problem/v1/update';
 export const DELETE_PROBLEM_ENDPOINT = '/api/problem/v1/delete';
+export const LIST_TERMS_AND_CONDITIONS_ENDPOINT =
+  '/api/terms_and_conditions/v1/list';
+export const GET_TERMS_AND_CONDITIONS_ENDPOINT =
+  '/api/terms_and_conditions/v1/get';
+export const ADD_TERMS_AND_CONDITIONS_ENDPOINT =
+  '/api/terms_and_conditions/v1/create';
+export const UPDATE_TERMS_AND_CONDITIONS_ENDPOINT =
+  '/api/terms_and_conditions/v1/update';
+export const DELETE_TERMS_AND_CONDITIONS_ENDPOINT =
+  '/api/terms_and_conditions/v1/delete';
 export const JOB_QUEUE_LIST_ENDPOINT = '/api/job_queue/v1/list';
 export const JOB_QUEUE_RETRY_ENDPOINT = '/api/job_queue/v1/retry';
 export const JOB_QUEUE_RESYNC_ENDPOINT = '/api/job_queue/v1/resync';

@@ -30,6 +30,7 @@ import { Problem } from '../problem/entity/problem/problem-entity';
 import { AgendaJob } from '../sync/entities/agenda-job/agenda-job.entity';
 import { ServiceInvoice } from '../service-invoice/entity/service-invoice/service-invoice.entity';
 import { SerialNoHistory } from '../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { TermsAndConditions } from 'src/terms-and-conditions/entity/terms-and-conditions/terms-and-conditions.entity';
 
 export const TOKEN_CACHE_CONNECTION = 'tokencache';
 export const DEFAULT = 'default';
@@ -65,6 +66,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       AgendaJob,
       ServiceInvoice,
       SerialNoHistory,
+      TermsAndConditions
     ],
     useNewUrlParser: true,
     w: 'majority',

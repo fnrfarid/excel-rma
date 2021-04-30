@@ -109,6 +109,13 @@ const routes: Routes = [
       ),
   },
   {
+    path: 'settings/terms-and-conditions',
+    loadChildren: () =>
+      import(
+        './terms-and-conditions-ui/terms-and-conditions/terms-and-conditions.module'
+      ).then(m => m.TermsAndConditionsPageModule),
+  },
+  {
     path: 'jobs',
     loadChildren: () =>
       import('./job-ui/jobs/jobs.module').then(m => m.JobsPageModule),
