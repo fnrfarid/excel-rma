@@ -66,7 +66,7 @@ export function connectTypeORM(config: ConfigService): MongoConnectionOptions {
       AgendaJob,
       ServiceInvoice,
       SerialNoHistory,
-      TermsAndConditions
+      TermsAndConditions,
     ],
     useNewUrlParser: true,
     w: 'majority',
