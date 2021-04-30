@@ -17,7 +17,7 @@ import {
   UpdateTermsAndConditionsDto,
 } from '../../entity/terms-and-conditions/terms-and-conditions.dto';
 
-@Controller('terms-and-conditions')
+@Controller('terms_and_conditions')
 export class TermsAndConditionsController {
   constructor(
     private readonly termsAndConditionsAggregateService: TermsAndConditionsAggregateService,
