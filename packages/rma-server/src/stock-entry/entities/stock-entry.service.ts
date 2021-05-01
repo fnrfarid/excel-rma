@@ -57,7 +57,8 @@ export class StockEntryService {
     }
 
     if (filter_query.names) {
-      query.names = filter_query.names;
+      // query.names = filter_query.names;
+      query.names = {$regex: PARSE_REGEX(filter_query.names), $options: 'i'}
       delete filter_query.names;
     }
 

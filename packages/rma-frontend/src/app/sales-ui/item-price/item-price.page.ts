@@ -199,7 +199,7 @@ export class ItemPricePage implements OnInit {
   setFilter(item?) {
     const query: any = {};
     if (this.f.itemName.value) {
-      query.item_name = this.f.itemName.value;
+      query.item_name = this.f.itemName.value.item_name;
     }
     if (this.f.itemGroup.value) {
       query.item_group = this.f.itemGroup.value.item_group_name;
