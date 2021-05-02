@@ -104,12 +104,12 @@ const routes: Routes = [
   },
   {
     path: 'service-invoice',
-    loadChildren: () => 
-      import(
-        './service-invoices/service-invoices.module'
-        ).then( m => m.ServiceInvoicesPageModule),
+    loadChildren: () =>
+      import('./service-invoices/service-invoices.module').then(
+        m => m.ServiceInvoicesPageModule,
+      ),
   },
-  
+
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];

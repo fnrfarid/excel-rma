@@ -9,6 +9,8 @@ import { MaterialModule } from 'src/app/material/material.module';
 
 import { ServiceInvoicesPage } from './service-invoices.page';
 import { AppCommonModule } from '../common/app-common.module';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -17,8 +19,10 @@ import { AppCommonModule } from '../common/app-common.module';
     IonicModule,
     ServiceInvoicesPageRoutingModule,
     MaterialModule,
+    HttpClientModule,
     AppCommonModule,
+    RouterModule,
   ],
-  declarations: [ServiceInvoicesPage]
+  declarations: [ServiceInvoicesPage],
 })
 export class ServiceInvoicesPageModule {}

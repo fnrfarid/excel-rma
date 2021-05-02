@@ -32,17 +32,19 @@ export class ServiceInvoicesPage implements OnInit {
     'submitted_by',
     'submit',
   ];
-  
-  constructor(private readonly route: ActivatedRoute,
+
+  constructor(
+    private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
-    private readonly router: Router,) { 
-      this.router.events
+    private readonly router: Router,
+  ) {
+    this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(val => {
         this.dataSource.loadItems(this.route.snapshot.params.uuid);
         this.getTotal();
       });
-    }
+  }
 
   ngOnInit() {
     this.invoiceUuid = this.route.snapshot.params.uuid;
