@@ -304,6 +304,15 @@
                 <ion-icon slot="start" name="warning-outline"></ion-icon>
                 <ion-label>Problems</ion-label>
               </ion-item>
+              <ion-item
+              *ngIf="loggedIn"
+              routerLink="/settings/terms-and-conditions"
+              lines="none"
+              routerLinkActive="active"
+            >
+              <ion-icon slot="start" name="document-outline"></ion-icon>
+              <ion-label>Terms and Conditions</ion-label>
+            </ion-item>
             </ion-list>
           </ion-menu-toggle>
           <ion-item
