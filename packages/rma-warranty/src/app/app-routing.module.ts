@@ -102,7 +102,14 @@ const routes: Routes = [
         './warranty-ui/bulk-warranty-claim/bulk-warranty-claim.module'
       ).then(m => m.BulkWarrantyClaimPageModule),
   },
-
+  {
+    path: 'service-invoice',
+    loadChildren: () => 
+      import(
+        './service-invoices/service-invoices.module'
+        ).then( m => m.ServiceInvoicesPageModule),
+  },
+  
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'home' },
 ];

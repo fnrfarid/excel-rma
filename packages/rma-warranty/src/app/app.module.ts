@@ -25,6 +25,7 @@ import { ExcelSalesUserGuard } from './common/guards/excel-sales-user.guard';
 import { PermissionManager } from './api/permission/permission.service';
 import { SerialUiModule } from './serial-ui/serial-ui.module';
 import { ApiModule } from './api/api.module';
+import { ServiceInvoicesPageModule } from './service-invoices/service-invoices.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,6 +40,7 @@ import { ApiModule } from './api/api.module';
     BrowserAnimationsModule,
     AppCommonModule,
     WarrantyUiModule,
+    ServiceInvoicesPageModule,
     SerialUiModule,
     ApiModule,
   ],
