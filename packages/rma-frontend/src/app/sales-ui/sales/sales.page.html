@@ -277,7 +277,7 @@
                 Customer Name
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                {{ row.customer_name }}
+                {{ row.customer_name || row.customer }}
               </mat-cell>
               <mat-footer-cell *matFooterCellDef>Total</mat-footer-cell>
             </ng-container>
