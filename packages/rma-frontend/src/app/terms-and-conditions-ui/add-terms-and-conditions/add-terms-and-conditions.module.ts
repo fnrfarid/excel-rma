@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { AddTermsAndConditionsPageRoutingModule } from './add-terms-and-conditions-routing.module';
 
 import { AddTermsAndConditionsPage } from './add-terms-and-conditions.page';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../material/material.module';
 
 @NgModule({
   imports: [

@@ -2,21 +2,21 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { from } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
-import { StorageService } from 'src/app/api/storage/storage.service';
-import { APIResponse } from 'src/app/common/interfaces/sales.interface';
-import { TermsAndConditions } from 'src/app/common/interfaces/terms-and-conditions.interface';
+import { StorageService } from '../../../api/storage/storage.service';
+import { APIResponse } from '../../../common/interfaces/sales.interface';
+import { TermsAndConditions } from '../../../common/interfaces/terms-and-conditions.interface';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
-} from 'src/app/constants/storage';
+} from '../../../constants/storage';
 import {
   LIST_TERMS_AND_CONDITIONS_ENDPOINT,
   GET_TERMS_AND_CONDITIONS_ENDPOINT,
   ADD_TERMS_AND_CONDITIONS_ENDPOINT,
   UPDATE_TERMS_AND_CONDITIONS_ENDPOINT,
   DELETE_TERMS_AND_CONDITIONS_ENDPOINT,
-} from 'src/app/constants/url-strings';
+} from '../../../constants/url-strings';
 
 @Injectable({
   providedIn: 'root',

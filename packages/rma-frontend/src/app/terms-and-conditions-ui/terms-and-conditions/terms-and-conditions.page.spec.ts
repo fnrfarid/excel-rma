@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IonicModule, PopoverController } from '@ionic/angular';
 import { of } from 'rxjs';
-import { MaterialModule } from 'src/app/material/material.module';
+import { MaterialModule } from '../../material/material.module';
 import { TermsAndConditionsService } from '../services/TermsAndConditions/terms-and-conditions.service';
 
 import { TermsAndConditionsPage } from './terms-and-conditions.page';

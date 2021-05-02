@@ -1,6 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { StorageService } from 'src/app/api/storage/storage.service';
+import { StorageService } from '../../../api/storage/storage.service';
 
 import { TermsAndConditionsService } from './terms-and-conditions.service';
 
