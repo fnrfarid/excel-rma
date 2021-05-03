@@ -78,6 +78,17 @@
           <ion-menu-toggle auto-hide="false">
             <ion-item
               *ngIf="loggedIn"
+              routerLink="/service-invoice"
+              lines="none"
+              routerLinkActive="active"
+            >
+              <ion-icon slot="start" name="receipt"></ion-icon>
+              <ion-label>Service Invoice</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item
+              *ngIf="loggedIn"
               routerLink="/serial-search"
               lines="none"
               routerLinkActive="active"
