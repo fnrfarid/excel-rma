@@ -94,6 +94,10 @@ export class AddWarrantyClaimPage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    if (this.activatedRoute.snapshot.params.name === 'edit') {
+      this.clearAllControlValidators();
+      this.setValues();
+    }
     this.route = this.activatedRoute.snapshot.params.name;
     this.categoryList = ['Bulk', 'Single'];
     this.claimList = [
@@ -147,10 +151,6 @@ export class AddWarrantyClaimPage implements OnInit {
       }),
       map(res => res.docs),
     );
-    if (this.activatedRoute.snapshot.params.name === 'edit') {
-      this.clearAllControlValidators();
-      this.setValues();
-    }
   }
   async setDefaults() {
     this.warrantyClaimForm.controls.received_on.setValue(
@@ -176,6 +176,11 @@ export class AddWarrantyClaimPage implements OnInit {
       .getWarrantyClaim(this.activatedRoute.snapshot.params.uuid)
       .subscribe({
         next: (res: WarrantyClaimsDetails) => {
+          if (res.set === CATEGORY.BULK) {
+            this.warrantyClaimForm.get('category').setValue(res.category);
+            this.warrantyObject = res;
+            return this.warrantyObject;
+          }
           this.warrantyObject = res;
           Object.keys(this.warrantyClaimForm.controls).forEach(element => {
             switch (element) {
@@ -252,6 +257,10 @@ export class AddWarrantyClaimPage implements OnInit {
     const loading = await this.loadingController.create();
     await loading.present();
     const payload = this.mapUpdateClaim();
+    if (this.warrantyObject.category === CATEGORY.BULK) {
+      payload.bulk_products = this.bulkProducts;
+      payload.category = this.warrantyObject.category;
+    }
     this.addWarrantyService.updateWarrantyClaim(payload).subscribe({
       next: () => {
         loading.dismiss();

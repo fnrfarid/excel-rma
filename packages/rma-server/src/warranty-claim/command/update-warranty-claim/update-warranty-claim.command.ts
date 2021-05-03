@@ -1,6 +1,9 @@
 import { ICommand } from '@nestjs/cqrs';
-import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
+import { WarrantyClaimDto } from 'src/warranty-claim/entity/warranty-claim/warranty-claim-dto';
 
 export class UpdateWarrantyClaimCommand implements ICommand {
-  constructor(public readonly updatePayload: UpdateWarrantyClaimDto) {}
+  constructor(
+    public readonly updatePayload: WarrantyClaimDto,
+    public readonly req: any,
+  ) {}
 }

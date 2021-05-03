@@ -63,7 +63,7 @@ export class WarrantyService {
     pageNumber = 0,
     pageSize = 30,
     query,
-    territory,
+    territory?,
   ) {
     if (!sortOrder) sortOrder = { createdOn: 'desc' };
     if (!query) query = {};

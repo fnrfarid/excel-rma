@@ -22,7 +22,6 @@ import { ResetWarrantyClaimCommand } from '../../command/reset-warranty-claim/re
 import { UpdateWarrantyClaimCommand } from '../../command/update-warranty-claim/update-warranty-claim.command';
 import { RetrieveWarrantyClaimQuery } from '../../query/get-warranty-claim/retrieve-warranty-claim.query';
 import { RetrieveWarrantyClaimListQuery } from '../../query/list-warranty-claim/retrieve-warranty-claim-list.query';
-import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { APPLICATION_JSON_CONTENT_TYPE } from '../../../constants/app-strings';
 import { FILE_NOT_FOUND, INVALID_FILE } from '../../../constants/app-strings';
@@ -32,6 +31,7 @@ import { StatusHistoryDto } from '../../entity/warranty-claim/status-history-dto
 import { AddStatusHistoryCommand } from '../../command/add-status-history/add-status-history.command';
 import { RemoveStatusHistoryCommand } from '../../command/remove-status-history/remove-status-history.command';
 import { BulkWarrantyClaimDto } from '../../entity/warranty-claim/bulk-warranty-claim-dto';
+import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
@@ -113,9 +113,9 @@ export class WarrantyClaimController {
   @Post('v1/update')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  updateClient(@Body() updatePayload: UpdateWarrantyClaimDto) {
+  updateClient(@Body() updatePayload: UpdateWarrantyClaimDto, @Req() req) {
     return this.commandBus.execute(
-      new UpdateWarrantyClaimCommand(updatePayload),
+      new UpdateWarrantyClaimCommand(updatePayload, req),
     );
   }
 
