@@ -19,6 +19,7 @@ export class BulkClaimDetailsComponent implements OnInit {
   dataSource: WarrantyClaimsDataSource;
   claim_no: string = this.route.snapshot.params.name;
   selectedSegment: any;
+  uuid: string = this.route.snapshot.params.uuid;
   displayedColumns = [
     'sr_no',
     'claim_no',

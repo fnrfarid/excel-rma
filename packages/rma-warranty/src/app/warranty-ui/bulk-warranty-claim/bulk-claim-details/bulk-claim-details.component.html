@@ -11,7 +11,7 @@
           color="tertiary"
           [disabled]="!dataSource.length"
           fill="outline"
-          (click)="comingSoon('Edit Feature is coming Soon...')"
+          [routerLink]="['/warranty/warranty-claim', 'edit', uuid]"
         >
           Edit
         </ion-button>
@@ -36,7 +36,7 @@
         [dataSource]="dataSource"
       >
         <ng-container matColumnDef="sr_no">
-          <mat-header-cell *matHeaderCellDef>No. </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef> </mat-header-cell>
           <mat-cell *matCellDef="let row; let i = index">
             {{ paginator.pageIndex * paginator.pageSize + 1 + i }}
           </mat-cell>
