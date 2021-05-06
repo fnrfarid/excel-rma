@@ -82,9 +82,6 @@ export class ItemService {
         if (['bundle_items', 'is_stock_item'].includes(key)) {
           return;
         }
-        if (['item_name'].includes(key)) {
-          return;
-        }
         if (key === 'status' && query[key] === 'All') {
           delete query[key];
         } else {
