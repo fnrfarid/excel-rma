@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 import { AUTH_SERVER_URL } from '../constants/storage';
 import { AddServiceInvoiceService } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 import { ServiceInvoicesDataSource } from './service-invoices-datasource';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-service-invoice',
@@ -34,6 +35,7 @@ export class ServiceInvoicesPage implements OnInit {
   ];
 
   constructor(
+    private location: Location,
     private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
     private readonly router: Router,
@@ -50,6 +52,9 @@ export class ServiceInvoicesPage implements OnInit {
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoicesDataSource(this.serviceInvoice);
     this.dataSource.loadItems(this.invoiceUuid);
+  }
+  navigateBack() {
+    this.location.back();
   }
   getUpdate(event) {
     const sortQuery = {};
