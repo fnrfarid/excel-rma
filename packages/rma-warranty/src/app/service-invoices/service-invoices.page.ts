@@ -7,6 +7,11 @@ import { AUTH_SERVER_URL } from '../constants/storage';
 import { AddServiceInvoiceService } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 import { ServiceInvoicesDataSource } from './service-invoices-datasource';
 import { Location } from '@angular/common';
+import { CsvJsonService } from '../api/csv-json/csv-json.service';
+import {
+  SERVICE_INVOICE_CSV_FILE,
+  SERVICE_INVOICE_DOWNLOAD_HEADERS,
+} from '../constants/app-string';
 
 @Component({
   selector: 'app-service-invoice',
@@ -39,6 +44,7 @@ export class ServiceInvoicesPage implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
     private readonly router: Router,
+    private csvService: CsvJsonService,
   ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -91,5 +97,13 @@ export class ServiceInvoicesPage implements OnInit {
           '_blank',
         );
       });
+  }
+
+  downloadServiceInvoices() {
+    this.csvService.downloadAsCSV(
+      this.dataSource.data,
+      SERVICE_INVOICE_DOWNLOAD_HEADERS,
+      `${SERVICE_INVOICE_CSV_FILE}`,
+    );
   }
 }
