@@ -117,3 +117,10 @@ export enum CATEGORY {
   BULK = 'Bulk',
   SINGLE = 'Single',
 }
+
+export const SERVICE_INVOICE_DOWNLOAD_HEADERS = [
+  'customer_name',
+  'date',
+  'total',
+];
+export const SERVICE_INVOICE_CSV_FILE = 'service-invoice-list.csv';

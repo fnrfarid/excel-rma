@@ -13,6 +13,16 @@
   <form>
 <ion-card>
   <ion-card-content class="ion-no-padding">
+    <ion-col >
+      <ion-button
+        color="tertiary"
+        [disabled]="!dataSource.length"
+        (click)="downloadServiceInvoices()"
+        fill="outline"
+      >
+        Download CSV
+      </ion-button>
+    </ion-col>
     <div
       class="example-container mat-elevation-z8"
     >
