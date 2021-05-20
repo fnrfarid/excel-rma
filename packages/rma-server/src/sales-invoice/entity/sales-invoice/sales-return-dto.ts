@@ -17,7 +17,7 @@ export class CreateSalesReturnDto {
   @IsNotEmpty()
   company: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   contact_email: string;
 
   @IsNotEmpty()
