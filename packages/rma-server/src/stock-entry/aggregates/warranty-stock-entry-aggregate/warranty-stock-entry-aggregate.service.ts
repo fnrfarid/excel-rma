@@ -467,10 +467,12 @@ export class WarrantyStockEntryAggregateService {
           DEFAULT_NAMING_SERIES.warranty_delivery_return;
         erpPayload.is_return = 1;
         item.qty = -item.qty;
+        item.rate = 0;
       }
       if (item.stock_entry_type === 'Delivered')
         erpPayload.naming_series = DEFAULT_NAMING_SERIES.warranty_delivery_note;
       item.qty = item.qty;
+      item.rate = 0;
     });
     return erpPayload;
   }
