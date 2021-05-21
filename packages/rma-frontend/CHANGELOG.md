@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.9.2...rma-frontend@1.10.0) (2021-05-21)
+
+
+### Bug Fixes
+
+* **rma-frontend:** fixed customer name  on sales page ([75b7955](https://gitlab.com/castlecraft/excel-rma/commit/75b7955da3e8aed98803b27bd8af2421d1064120))
+* **rma-server:** fixed customer name issue on sales page ([b82c2e7](https://gitlab.com/castlecraft/excel-rma/commit/b82c2e747ffedddac7132d2a913a15e1ed9eeffe))
+
+
+### Features
+
+* **rma-frontend:** added permissions for delivered status on sales invoice page ([f5409b3](https://gitlab.com/castlecraft/excel-rma/commit/f5409b345dc6b8cc158879b690cfbd14bf5fc7d3))
+* **rma-frontend:** added permissions for delivered status on sales invoice page--1 ([ae5f080](https://gitlab.com/castlecraft/excel-rma/commit/ae5f080fc8f64fb72a35e7659eb7525a26524272))
+* **rma-frontend:** Added permissions on Item Price Page ([78dbb6d](https://gitlab.com/castlecraft/excel-rma/commit/78dbb6d906bd7a31aa966999e6d19f649413f8cb))
+* **rma-frontend:** Added Serial number on serials page ([f6220fc](https://gitlab.com/castlecraft/excel-rma/commit/f6220fcd55f19f84d629f4c497569659520002f7))
+* **rma-frontend:** Added zero quantity filter on Stock Availability page ([3dd5da0](https://gitlab.com/castlecraft/excel-rma/commit/3dd5da0b1a4dc73bc77eeea07e4d4e96e66a3c5f))
+* **rma-frontend:** removed autocomplete from Item search on item price page. ([f0c691f](https://gitlab.com/castlecraft/excel-rma/commit/f0c691f38eb0a06443ff93f2db7ffc25f7297b14))
+* **rma-frontend:** removed autocomplete statement. ([77b70d2](https://gitlab.com/castlecraft/excel-rma/commit/77b70d2d648d4ba793c27686a84df48e6e5570b7))
+* **rma-frontend and ram-server:**  item search in item price make it exact search & Stock entry number search should fetch by matching values. ([3a8fa25](https://gitlab.com/castlecraft/excel-rma/commit/3a8fa2504590fee3a2461d74ebad60222092be57))
+* **rma:frontend:** Added Terms and Conditions Page ([9e1251a](https://gitlab.com/castlecraft/excel-rma/commit/9e1251a1cec42acfcb03805a67ad809d93a3ec20))
+* **rma:frontend:** Added Terms and Conditions Page 2 ([6fff070](https://gitlab.com/castlecraft/excel-rma/commit/6fff070df5b3e0add1d4d8448e514f0a685f5877))
+* **rma:frontend:** Added Terms and Conditions Page 4 ([eaf1239](https://gitlab.com/castlecraft/excel-rma/commit/eaf1239ad2317e0eb520fc9317b90edc556f2efc))
+* **rma:frontend:** fixed imports ([4892996](https://gitlab.com/castlecraft/excel-rma/commit/48929967f08d81fa8648523ed8c31f235366f2f1))
+
+
+
+
+
 ## [1.9.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.9.1...rma-frontend@1.9.2) (2021-04-12)
 
 

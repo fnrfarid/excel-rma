@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.12.0...rma-server@1.13.0) (2021-05-21)
+
+
+### Bug Fixes
+
+* **rma-server:** Fixed autocomplete issues on item name ([5aa8268](https://gitlab.com/castlecraft/excel-rma/commit/5aa82683ad6dad51974b23e86ca8ce419d8f0666))
+* **rma-server:** fixed customer name issue on sales page ([b82c2e7](https://gitlab.com/castlecraft/excel-rma/commit/b82c2e747ffedddac7132d2a913a15e1ed9eeffe))
+* **rma-server:** Fixed email error while creating sales return ([b395638](https://gitlab.com/castlecraft/excel-rma/commit/b3956389e13bca97b85c3ac2f546ed975b51080e))
+
+
+### Features
+
+* **rma-frontend and ram-server:**  item search in item price make it exact search & Stock entry number search should fetch by matching values. ([3a8fa25](https://gitlab.com/castlecraft/excel-rma/commit/3a8fa2504590fee3a2461d74ebad60222092be57))
+* **rma-server:** pipeline test fail fixed. ([f50d8b1](https://gitlab.com/castlecraft/excel-rma/commit/f50d8b16b3b599a154dbc24522b96a9479787a43))
+* **rma:frontend:** Added Terms and Conditions Page ([9e1251a](https://gitlab.com/castlecraft/excel-rma/commit/9e1251a1cec42acfcb03805a67ad809d93a3ec20))
+* **rma:frontend:** Added Terms and Conditions Page 1 ([6f32c3a](https://gitlab.com/castlecraft/excel-rma/commit/6f32c3ae3bb379600e8e011bae414d39837de498))
+* **rma:frontend:** Added Terms and Conditions Page 2 ([6fff070](https://gitlab.com/castlecraft/excel-rma/commit/6fff070df5b3e0add1d4d8448e514f0a685f5877))
+* **rma:frontend:** Added Terms and Conditions Page 3 ([9859bea](https://gitlab.com/castlecraft/excel-rma/commit/9859bea7dd499f17ffecf511b00abf1ef5aa15e2))
+
+
+
+
+
 # [1.12.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.11.1...rma-server@1.12.0) (2021-04-12)
 
 

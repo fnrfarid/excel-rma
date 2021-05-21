@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.5...rma-warranty@1.7.0) (2021-05-21)
+
+
+### Bug Fixes
+
+* **rma-frontend:** fixed table design on warranty page ([b6cbe85](https://gitlab.com/castlecraft/excel-rma/commit/b6cbe855be0411bce4d1276af706ba3e7fa9b426))
+* **rma:warranty:** Warranty table pagination fix ([c2a2da3](https://gitlab.com/castlecraft/excel-rma/commit/c2a2da35b567433545f9ecbbed037cf61fa0aa5a))
+
+
+### Features
+
+* **rma-warranty:** Added Service Invoice page...1 ([41ecb44](https://gitlab.com/castlecraft/excel-rma/commit/41ecb441bcd7c2f7ee7c4003b5f5556770d61536))
+* **rma-warranty:** Added title on service invoice page ([0f3f1e5](https://gitlab.com/castlecraft/excel-rma/commit/0f3f1e5b49b6628ed6e216d0cdbda19abcd19156))
+* **rma-warranty:** Added title on service invoice page...1 ([61acf5b](https://gitlab.com/castlecraft/excel-rma/commit/61acf5b96d9c1f228a2c458403fb79b1a63ddf19))
+* **rma-warranty:** download CSV button added in service invoice page. ([9f957a2](https://gitlab.com/castlecraft/excel-rma/commit/9f957a287afb9494c4749970ece9a71a0d8f893b))
+* **rma:warranty:** Changed Shared module name ([cb1130d](https://gitlab.com/castlecraft/excel-rma/commit/cb1130ddfce5482922ee4c9603dfb2a2f9f57a69))
+* **rma:warranty:** Service invoice added to shared ([08c5c29](https://gitlab.com/castlecraft/excel-rma/commit/08c5c293cab144d425912bd3e7e7e41d8b1207dd))
+* **rma:warranty:** Service invoice for bulk claims added ([98e3d7f](https://gitlab.com/castlecraft/excel-rma/commit/98e3d7ff8c80f381280f6114d60e4f6cf0a46df9))
+
+
+
+
+
 ## [1.6.5](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.4...rma-warranty@1.6.5) (2021-04-12)
 
 **Note:** Version bump only for package rma-warranty
