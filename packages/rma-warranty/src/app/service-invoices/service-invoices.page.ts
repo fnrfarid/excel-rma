@@ -11,6 +11,7 @@ import { CsvJsonService } from '../api/csv-json/csv-json.service';
 import {
   SERVICE_INVOICE_CSV_FILE,
   SERVICE_INVOICE_DOWNLOAD_HEADERS,
+  SERVICE_INVOICE_STATUS,
 } from '../constants/app-string';
 import { TimeService } from '../api/time/time.service';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -33,8 +34,8 @@ export class ServiceInvoicesPage implements OnInit {
   validateInput: any = ValidateInputSelected;
   filteredCustomerList: Observable<any[]>;
   filteredTerritoryList: Observable<any[]>;
-  statusList: string[] = ['Paid', 'Un Paid', 'All'];
-  status: string = 'All';
+  statusList = Object.values(SERVICE_INVOICE_STATUS);
+  status = SERVICE_INVOICE_STATUS.ALL;
   displayedColumns = [
     'invoice_no',
     'status',
@@ -177,7 +178,7 @@ export class ServiceInvoicesPage implements OnInit {
     this.f.fromDate.setValue('');
     this.f.toDate.setValue('');
     this.dataSource.loadItems();
-    this.status = 'All';
+    this.status = SERVICE_INVOICE_STATUS.ALL;
   }
 
   navigateBack() {
