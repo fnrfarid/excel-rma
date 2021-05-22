@@ -10,7 +10,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { Item } from '../../../../../common/interfaces/sales.interface';
 import { Observable, of } from 'rxjs';
-import { AddServiceInvoiceService } from '../../../service-invoices/add-service-invoice/add-service-invoice.service';
+import { AddServiceInvoiceService } from '../../../../shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 import {
   CLOSE,
   DURATION,

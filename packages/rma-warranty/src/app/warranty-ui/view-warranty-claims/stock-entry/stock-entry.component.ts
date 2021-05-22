@@ -9,7 +9,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
-import { AddServiceInvoiceService } from '../service-invoices/add-service-invoice/add-service-invoice.service';
+import { AddServiceInvoiceService } from '../../shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 import { filter } from 'rxjs/operators';
 
 @Component({

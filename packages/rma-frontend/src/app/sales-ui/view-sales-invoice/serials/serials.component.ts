@@ -99,6 +99,7 @@ export class SerialsComponent implements OnInit {
   toRangeUpdate = new Subject<string>();
   validateInput: any = ValidateInputSelected;
   itemDisplayedColumns = [
+    'sr_no',
     'item_name',
     'qty',
     'assigned',
@@ -109,6 +110,7 @@ export class SerialsComponent implements OnInit {
   ];
   itemDataSource: ItemDataSource;
   serialDisplayedColumns = [
+    'sr_no',
     'item_name',
     'qty',
     'warranty_date',

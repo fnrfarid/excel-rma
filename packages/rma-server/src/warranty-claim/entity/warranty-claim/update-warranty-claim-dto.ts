@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsNotEmpty } from 'class-validator';
 import { StatusHistory, WarrantyBulkProducts } from './warranty-claim.entity';
+
 export class UpdateWarrantyClaimDto {
   @IsNotEmpty()
   @IsString()
@@ -185,4 +186,13 @@ export class UpdateWarrantyClaimDto {
 
   @IsOptional()
   parent: string;
+
+  @IsOptional()
+  service_vouchers: string[];
+
+  @IsOptional()
+  service_items: string[];
+
+  @IsOptional()
+  customer_code: string;
 }

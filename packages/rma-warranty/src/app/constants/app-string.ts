@@ -98,7 +98,7 @@ export const ITEM_COLUMN = {
 export const STOCK_ENTRY_STATUS = {
   REPLACE: 'Replace',
   UPGRADE: 'Upgrade',
-  REPAIR: 'Repair',
+  REPAIR: 'Spare Parts',
 };
 export const STOCK_ENTRY_ITEM_TYPE = {
   RETURNED: 'Returned',
@@ -117,3 +117,10 @@ export enum CATEGORY {
   BULK = 'Bulk',
   SINGLE = 'Single',
 }
+
+export const SERVICE_INVOICE_DOWNLOAD_HEADERS = [
+  'customer_name',
+  'date',
+  'total',
+];
+export const SERVICE_INVOICE_CSV_FILE = 'service-invoice-list.csv';

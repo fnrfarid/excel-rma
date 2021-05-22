@@ -1,13 +1,15 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
-import { ServiceInvoiceDetails } from './add-service-invoice/service-invoice-interface';
+import { ServiceInvoiceDetails } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/service-invoice-interface';
+import { AddServiceInvoiceService } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 
-export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> {
+export class ServiceInvoicesDataSource extends DataSource<ServiceInvoiceDetails> {
   data: ServiceInvoiceDetails[];
   length: number;
   offset: number;
+
+  total = new BehaviorSubject<number>(0);
 
   itemSubject = new BehaviorSubject<ServiceInvoiceDetails[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
@@ -43,6 +45,17 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
-      .subscribe(items => this.itemSubject.next(items));
+      .subscribe(items => {
+        this.itemSubject.next(items);
+        this.calculateTotal(items);
+      });
+  }
+
+  calculateTotal(serviceInvoice: ServiceInvoiceDetails[]) {
+    let sum = 0;
+    serviceInvoice.forEach(item => {
+      sum += item.total;
+    });
+    this.total.next(sum);
   }
 }

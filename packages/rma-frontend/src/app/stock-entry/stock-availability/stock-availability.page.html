@@ -144,6 +144,11 @@
                   <strong>'{{f.excel_item_brand.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
+                <mat-checkbox 
+                  (change)=setFilter();
+                  formControlName="actual_qty">
+                    Show All
+                </mat-checkbox>
               <ion-button
               color="tertiary"
               (click)="clearFilters()"

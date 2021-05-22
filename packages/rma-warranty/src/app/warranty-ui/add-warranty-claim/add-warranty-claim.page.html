@@ -247,8 +247,17 @@
               </mat-form-field>
             </ion-col>
           </ion-row>
-          <ion-row class="align" *ngIf="route ==='add'">
-            <ion-col class="ion-text-left">
+          <ion-row class="align">
+            <ion-col class="ion-text-left" *ngIf="route ==='edit'">
+              <ion-button
+                color="tertiary"
+                *ngIf="warrantyObject?.category === 'Bulk'"
+                (click)="appendProduct()"
+              >
+                Add
+              </ion-button>
+            </ion-col>
+            <ion-col class="ion-text-left" *ngIf="route ==='add'">
               <ion-button
                 color="tertiary"
                 *ngIf="f.category.value === 'Bulk'"

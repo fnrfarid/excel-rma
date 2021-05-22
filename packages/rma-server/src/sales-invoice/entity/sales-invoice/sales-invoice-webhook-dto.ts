@@ -28,6 +28,10 @@ export class SalesInvoiceWebhookDto {
 
   @IsNotEmpty()
   @IsString()
+  customer_name: string;
+
+  @IsNotEmpty()
+  @IsString()
   company: string;
 
   @IsNotEmpty()

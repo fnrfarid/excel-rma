@@ -53,6 +53,10 @@ export class StockAvailabilityPage implements OnInit {
     this.route.params.subscribe(() => {
       this.paginator.firstPage();
     });
+    if (!this.f.actual_qty.value) {
+      this.filters.push(['actual_qty', '!=', `0`]);
+      this.countFilter.actual_qty = ['!=', `0`];
+    }
     this.dataSource = new StockAvailabilityDataSource(this.salesService);
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
 
@@ -114,6 +118,7 @@ export class StockAvailabilityPage implements OnInit {
       warehouse: new FormControl(),
       excel_item_group: new FormControl(),
       excel_item_brand: new FormControl(),
+      actual_qty: new FormControl(),
     });
   }
 
@@ -190,6 +195,12 @@ export class StockAvailabilityPage implements OnInit {
         `%${this.f.excel_item_brand.value.brand}%`,
       ];
     }
+
+    if (!this.f.actual_qty.value) {
+      this.filters.push(['actual_qty', '!=', `0`]);
+      this.countFilter.actual_qty = ['!=', `0`];
+    }
+
     this.dataSource.loadItems(0, 30, this.filters, this.countFilter);
   }
 

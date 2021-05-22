@@ -71,7 +71,7 @@ const routes: Routes = [
     path: 'warranty/service-invoice/:name/:uuid',
     loadChildren: () =>
       import(
-        './warranty-ui/view-warranty-claims/service-invoices/add-service-invoice/add-service-invoice.module'
+        './warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.module'
       ).then(m => m.AddServiceInvoicePageModule),
   },
   {
@@ -93,6 +93,20 @@ const routes: Routes = [
     loadChildren: () =>
       import('./serial-ui/serial-info/serial-info.module').then(
         m => m.SerialInfoPageModule,
+      ),
+  },
+  {
+    path: 'bulk-warranty-claim/:name/:uuid',
+    loadChildren: () =>
+      import(
+        './warranty-ui/bulk-warranty-claim/bulk-warranty-claim.module'
+      ).then(m => m.BulkWarrantyClaimPageModule),
+  },
+  {
+    path: 'service-invoice',
+    loadChildren: () =>
+      import('./service-invoices/service-invoices.module').then(
+        m => m.ServiceInvoicesPageModule,
       ),
   },
 

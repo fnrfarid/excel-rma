@@ -197,6 +197,28 @@
             </ion-col>
           </ion-row>
           <ion-row>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Received By"
+                  formControlName="received_by"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Delivered By"
+                  formControlName="delivered_by"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+          <ion-row>
             <ion-col class="ion-text-center">
               <ion-text color="medium" class="date-filter-text">
                 Range Date
@@ -278,7 +300,7 @@
             (matSortChange)="setFilter($event)"
           >
             <ng-container matColumnDef="sr_no">
-              <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+              <mat-header-cell *matHeaderCellDef>No. </mat-header-cell>
               <mat-cell *matCellDef="let row;let i=index "> {{i+1}} </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>
@@ -288,7 +310,9 @@
                 Claim no
               </mat-header-cell>
               <mat-cell *matCellDef="let row">
-                <a *ngIf="row.set==='Bulk'" (click)="warrantyRoute(row)"
+                <a
+                  *ngIf="row.set==='Bulk'"
+                  [routerLink]="['/bulk-warranty-claim', row.claim_no,row.uuid]"
                   >{{row.claim_no || 'Draft'}}</a
                 >
                 <a

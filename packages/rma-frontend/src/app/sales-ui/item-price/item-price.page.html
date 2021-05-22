@@ -13,9 +13,7 @@
   <ion-card>
     <ion-card-header>
       <ion-card-title>
-        <ion-text color="tertiary">
-          Items
-        </ion-text>
+        <ion-text color="tertiary"> Items </ion-text>
       </ion-card-title>
     </ion-card-header>
     <div class="loading-shade" *ngIf="dataSource.loading$ | async">
@@ -146,25 +144,17 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header="name">
               Item
             </th>
-            <td mat-cell *matCellDef="let row">
-              {{row.name}}
-            </td>
+            <td mat-cell *matCellDef="let row">{{row.name}}</td>
           </ng-container>
 
           <!-- Item Name -->
           <ng-container matColumnDef="item_name">
-            <th mat-header-cell *matHeaderCellDef>
-              Item Name
-            </th>
-            <td mat-cell *matCellDef="let row">
-              {{row.item_name}}
-            </td>
+            <th mat-header-cell *matHeaderCellDef>Item Name</th>
+            <td mat-cell *matCellDef="let row">{{row.item_name}}</td>
           </ng-container>
 
           <ng-container matColumnDef="has_serial">
-            <th mat-header-cell *matHeaderCellDef>
-              Serialized
-            </th>
+            <th mat-header-cell *matHeaderCellDef>Serialized</th>
             <td mat-cell *matCellDef="let row">
               <section>
                 <mat-checkbox
@@ -191,7 +181,7 @@
               (keyup.enter)="d.open()"
               (click)="d.open()"
             >
-              <ion-text>
+              <ion-text *ngIf="permissionState?.item_price?.read">
                 {{row.salesWarrantyMonths}}
               </ion-text>
               <sat-popover
@@ -203,6 +193,7 @@
               >
                 <edit-days
                   column="sales"
+                  *ngIf="permissionState?.item_price?.update"
                   [value]="row.salesWarrantyMonths"
                 ></edit-days>
               </sat-popover>
@@ -224,9 +215,7 @@
               (keyup.enter)="d.open()"
               (click)="d.open()"
             >
-              <ion-text>
-                {{row.purchaseWarrantyMonths}}
-              </ion-text>
+              <ion-text> {{row.purchaseWarrantyMonths}} </ion-text>
               <sat-popover
                 #d
                 hasBackdrop
@@ -255,7 +244,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ion-text>
+              <ion-text *ngIf="permissionState?.item_price?.read">
                 {{row.minimumPrice || 0 | curFormat | async}}
               </ion-text>
               <sat-popover
@@ -266,6 +255,7 @@
                 (closed)="updateMinPrice(row, $event)"
               >
                 <edit-price
+                  *ngIf="permissionState?.item_price?.update"
                   [value]="row.minimumPrice"
                   column="price"
                 ></edit-price>
@@ -286,7 +276,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ion-text>
+              <ion-text *ngIf="permissionState?.item_price?.read">
                 {{row.mrp || 0 | curFormat | async}}
               </ion-text>
               <sat-popover
@@ -296,7 +286,11 @@
                 yAlign="start"
                 (closed)="updateMRP(row, $event)"
               >
-                <edit-price [value]="row.mrp" column="mrp"></edit-price>
+                <edit-price
+                  [value]="row.mrp"
+                  column="mrp"
+                  *ngIf="permissionState?.item_price?.update"
+                ></edit-price>
               </sat-popover>
             </td>
           </ng-container>

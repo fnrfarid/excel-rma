@@ -26,6 +26,7 @@ import { JobUIModule } from './job-ui/job-ui.module';
 import { PermissionManager } from './api/permission/permission.service';
 import { ApiModule } from './api/api.module';
 import { CommonComponentModule } from './common/components/common-component.module';
+import { TermsAndConditionsUiModule } from './terms-and-conditions-ui/terms-and-conditions-ui.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -45,6 +46,7 @@ import { CommonComponentModule } from './common/components/common-component.modu
     BrowserAnimationsModule,
     AppCommonModule,
     ProblemUiModule,
+    TermsAndConditionsUiModule,
   ],
   providers: [
     AppService,

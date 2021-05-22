@@ -122,6 +122,10 @@ export class ServiceInvoiceDto {
   is_pos: number;
 
   @IsOptional()
+  @IsNumber()
+  set_posting_time: number;
+
+  @IsOptional()
   @IsString()
   pos_profile: string;
 

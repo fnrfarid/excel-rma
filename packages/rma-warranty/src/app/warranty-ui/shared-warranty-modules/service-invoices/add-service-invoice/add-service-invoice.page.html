@@ -119,7 +119,7 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #contact="matAutocomplete"
-                  [displayWith]="getOption"
+                  [displayWith]="getNameOption"
                 >
                   <mat-option
                     *ngFor="let option of customerContactList | async"

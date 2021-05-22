@@ -1,31 +1,29 @@
-<ion-card>
-  <ion-card-header>
-    <ion-grid>
-      <ion-row>
-        <ion-col class="ion-text-left">
-          <ion-card-title>
-            <ion-text color="tertiary"> Service Invoice </ion-text>
-          </ion-card-title>
-        </ion-col>
-        <ion-col class="ion-text-right">
-          <ion-button
-            *ngIf="permissionState.service_invoice.create"
-            color="tertiary"
-            [routerLink]="['/warranty/service-invoice', 'add', invoiceUuid]"
-          >
-            Add
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-card-header>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="navigateBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Service Invoice</ion-title>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content class="page-background">
+  <form>
+<ion-card>
   <ion-card-content class="ion-no-padding">
-    <div *ngIf="!permissionState.service_invoice.read">
-      Requires permission to access document.
-    </div>
+    <ion-col >
+      <ion-button
+        color="tertiary"
+        [disabled]="!dataSource.length"
+        (click)="downloadServiceInvoices()"
+        fill="outline"
+      >
+        Download CSV
+      </ion-button>
+    </ion-col>
     <div
-      *ngIf="permissionState.service_invoice.read"
       class="example-container mat-elevation-z8"
     >
       <mat-table #table [dataSource]="dataSource">
@@ -39,7 +37,7 @@
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
 
-        <ng-container matColumnDef="status">
+         <ng-container matColumnDef="status">
           <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
           <mat-cell *matCellDef="let row">
             <ng-container>
@@ -68,7 +66,7 @@
               {{ row.customer_third_party }}
             </ng-container>
           </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          <mat-footer-cell *matFooterCellDef>Total</mat-footer-cell>
         </ng-container>
 
         <ng-container matColumnDef="invoice_amount">
@@ -78,8 +76,11 @@
               {{ row.total }}
             </ng-container>
           </mat-cell>
-          <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+          <mat-footer-cell *matFooterCellDef>
+            {{ total | curFormat |async}}
+          </mat-footer-cell>
         </ng-container>
+        
 
         <ng-container matColumnDef="claim_no">
           <mat-header-cell *matHeaderCellDef>Claim No</mat-header-cell>
@@ -139,7 +140,7 @@
         <mat-footer-row
           class="footer"
           *matFooterRowDef="displayedColumns; sticky: true"
-        ></mat-footer-row>
+        ></mat-footer-row> 
       </mat-table>
     </div>
     <mat-card-actions>
@@ -154,3 +155,5 @@
     </mat-card-actions>
   </ion-card-content>
 </ion-card>
+</form>
+</ion-content>
