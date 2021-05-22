@@ -31,10 +31,15 @@ export class ServiceInvoicesDataSource extends DataSource<ServiceInvoiceDetails>
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder?, pageIndex = 0, pageSize = 30) {
+  loadItems(filter: any = {}, sortOrder?, pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
+    try {
+      filter = JSON.stringify(filter);
+    } catch {
+      filter = JSON.stringify({});
+    }
     this.serviceInvoice
-      .getServiceInvoiceList(filter, sortOrder, pageIndex, pageSize)
+      .getServiceInvoiceList(filter as string, sortOrder, pageIndex, pageSize)
       .pipe(
         map((serviceInvoice: ServiceInvoiceDetails[]) => {
           this.data = serviceInvoice;

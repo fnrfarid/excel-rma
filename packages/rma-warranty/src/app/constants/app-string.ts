@@ -25,6 +25,7 @@ export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
   PAID: 'Paid',
   UNPAID: 'Unpaid',
+  ALL: 'All',
 };
 export const SERIAL_DOWNLOAD_HEADERS = [
   'serial_no',

@@ -40,6 +40,10 @@ describe('ServiceInvoicesPage', () => {
           provide: AddServiceInvoiceService,
           useValue: {
             getServiceInvoiceList: (...args) => of([{}]),
+            getCustomerList: (...args) => of([{}]),
+            getStorage: () => ({
+              getItemAsync: (...args) => Promise.resolve('Item'),
+            }),
           },
         },
         {

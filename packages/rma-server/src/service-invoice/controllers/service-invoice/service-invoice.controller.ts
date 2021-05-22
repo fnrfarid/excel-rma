@@ -62,6 +62,9 @@ export class ServiceInvoiceController {
     if (sort !== 'ASC') {
       sort = 'DESC';
     }
+    try {
+      search = decodeURIComponent(search);
+    } catch {}
     return this.queryBus.execute(
       new RetrieveServiceInvoiceListQuery(
         offset,
