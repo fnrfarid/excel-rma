@@ -19,12 +19,14 @@ import { UpdateServiceInvoiceCommand } from '../../command/update-service-invoic
 import { RetrieveServiceInvoiceQuery } from '../../query/get-service-invoice/retrieve-service-invoice.query';
 import { RetrieveServiceInvoiceListQuery } from '../../query/list-service-invoice/retrieve-service-invoice-list.query';
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
+import { ServiceInvoiceAggregateService } from '../../../service-invoice/aggregates/service-invoice-aggregate/service-invoice-aggregate.service';
 
 @Controller('service_invoice')
 export class ServiceInvoiceController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly serviceInvoiceAggregate: ServiceInvoiceAggregateService,
   ) {}
 
   @Post('v1/create')
@@ -83,5 +85,14 @@ export class ServiceInvoiceController {
     return this.commandBus.execute(
       new UpdateServiceInvoiceCommand(updatePayload),
     );
+  }
+
+  @Post('v1/update_docstatus/:no')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async updateDocStatus(@Param('no') invoice_no: string) {
+    return await this.serviceInvoiceAggregate
+      .updateDocStatus(invoice_no)
+      .toPromise();
   }
 }

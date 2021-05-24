@@ -6,6 +6,7 @@ import { TokenCacheService } from '../../../auth/entities/token-cache/token-cach
 import { HttpService } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+import { ServiceInvoiceAggregateService } from '../../../service-invoice/aggregates/service-invoice-aggregate/service-invoice-aggregate.service';
 
 describe('ServiceInvoice Controller', () => {
   let controller: ServiceInvoiceController;
@@ -36,6 +37,10 @@ describe('ServiceInvoice Controller', () => {
         },
         {
           provide: SettingsService,
+          useValue: {},
+        },
+        {
+          provide: ServiceInvoiceAggregateService,
           useValue: {},
         },
       ],

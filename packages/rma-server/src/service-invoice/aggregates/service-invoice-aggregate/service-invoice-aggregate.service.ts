@@ -3,6 +3,7 @@ import {
   NotFoundException,
   HttpService,
   BadRequestException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +15,7 @@ import { ServiceInvoiceUpdatedEvent } from '../../event/service-invoice-updated/
 import { UpdateServiceInvoiceDto } from '../../entity/service-invoice/update-service-invoice-dto';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { switchMap, map, catchError } from 'rxjs/operators';
-import { throwError, of, from } from 'rxjs';
+import { throwError, of, from, forkJoin } from 'rxjs';
 import { FRAPPE_API_SALES_INVOICE_ENDPOINT } from '../../../constants/routes';
 import {
   CONTENT_TYPE,
@@ -25,10 +26,12 @@ import {
   DEFAULT_NAMING_SERIES,
 } from '../../../constants/app-strings';
 import { WarrantyClaimService } from '../../../warranty-claim/entity/warranty-claim/warranty-claim.service';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 
 @Injectable()
 export class ServiceInvoiceAggregateService extends AggregateRoot {
   constructor(
+    private readonly clientToken: ClientTokenManagerService,
     private readonly serviceInvoiceService: ServiceInvoiceService,
     private readonly settings: SettingsService,
     private readonly http: HttpService,
@@ -145,5 +148,35 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
     }
     const update = Object.assign(provider, updatePayload);
     this.apply(new ServiceInvoiceUpdatedEvent(update));
+  }
+
+  updateDocStatus(invoice_no: string) {
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        if (!settings || !settings.authServerURL)
+          return throwError(new NotImplementedException());
+        const url = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice_no}`;
+        return this.http.get(url, { headers }).pipe(
+          map(res => res.data.data),
+          switchMap(service_invoice => {
+            this.serviceInvoiceService
+              .updateOne(
+                { invoice_no },
+                {
+                  $set: {
+                    docstatus: service_invoice.docstatus,
+                  },
+                },
+              )
+              .then(success => {})
+              .catch(error => {});
+            return of({ docstatus: service_invoice.docstatus });
+          }),
+        );
+      }),
+    );
   }
 }

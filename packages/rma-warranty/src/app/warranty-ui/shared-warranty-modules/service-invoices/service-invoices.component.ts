@@ -23,6 +23,7 @@ export class ServiceInvoicesComponent implements OnInit {
   dataSource: ServiceInvoiceDataSource;
   permissionState = PERMISSION_STATE;
   total: number = 0;
+  disableRefresh: boolean = false;
   displayedColumns = [
     'invoice_no',
     'status',
@@ -53,6 +54,17 @@ export class ServiceInvoicesComponent implements OnInit {
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoiceDataSource(this.serviceInvoice);
     this.dataSource.loadItems(this.invoiceUuid);
+    this.dataSource.disableRefresh.subscribe({
+      next: res => {
+        this.disableRefresh = res;
+      },
+    });
+  }
+
+  syncDocStatus() {
+    this.dataSource.syncDocStatus().subscribe({
+      next: res => {},
+    });
   }
 
   getUpdate(event) {
