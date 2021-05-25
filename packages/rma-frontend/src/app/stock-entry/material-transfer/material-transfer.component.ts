@@ -193,7 +193,7 @@ export class MaterialTransferComponent implements OnInit {
             new Date(success.posting_date),
           );
           this.stock_receipt_names = success.names || [];
-          this.title = success.names[0];
+          this.title = success.names? success.names[0]: "";
           this.status = success.status;
           this.form.controls.remarks.setValue(success.remarks);
           if (success.stock_entry_type !== STOCK_ENTRY_TYPE.MATERIAL_TRANSFER) {
