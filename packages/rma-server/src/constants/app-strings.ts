@@ -261,6 +261,12 @@ export enum CATEGORY {
   PART = 'Part',
 }
 
+export const PROGRESS_STATUS = {
+  REPLACE: 'Replace',
+  UPGRADE: 'Upgrade',
+  SPARE_PARTS: 'Spare Parts',
+};
+
 export const DELIVERY_STATUS = {
   REPAIRED: 'Repaired',
   REPLACED: 'Replaced',
