@@ -465,17 +465,16 @@ export class WarrantyStockEntryAggregateService {
     erpPayload.items.forEach(item => {
       item.excel_serials = item.serial_no[0];
       item.serial_no = undefined;
+      item.price_list_rate = 0;
       if (item.stock_entry_type === STOCK_ENTRY_STATUS.returned) {
         erpPayload.return_against = payload.delivery_note;
         erpPayload.naming_series =
           DEFAULT_NAMING_SERIES.warranty_delivery_return;
         erpPayload.is_return = 1;
         item.qty = -item.qty;
-        item.rate = 0;
       }
       if (item.stock_entry_type === STOCK_ENTRY_STATUS.delivered) {
         erpPayload.naming_series = DEFAULT_NAMING_SERIES.warranty_delivery_note;
-        item.rate = 0;
       }
     });
     return erpPayload;
