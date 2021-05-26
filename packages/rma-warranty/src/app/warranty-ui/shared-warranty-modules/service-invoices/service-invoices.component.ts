@@ -41,7 +41,7 @@ export class ServiceInvoicesComponent implements OnInit {
     Submitted: '#4d2500',
     'Not Submitted': 'red',
     Canceled: 'red',
-  }
+  };
   constructor(
     private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
