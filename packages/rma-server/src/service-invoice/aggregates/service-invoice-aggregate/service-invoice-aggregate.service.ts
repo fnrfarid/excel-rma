@@ -156,8 +156,9 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
       settings: this.settings.find(),
     }).pipe(
       switchMap(({ headers, settings }) => {
-        if (!settings || !settings.authServerURL)
+        if (!settings || !settings.authServerURL) {
           return throwError(new NotImplementedException());
+        }
         const url = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice_no}`;
         return this.http.get(url, { headers }).pipe(
           map(res => res.data.data),

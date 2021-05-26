@@ -37,6 +37,11 @@ export class ServiceInvoicesComponent implements OnInit {
     'submitted_by',
     'submit',
   ];
+  statusColor = {
+    Submitted: '#4d2500',
+    'Not Submitted': 'red',
+    Canceled: 'red',
+  }
   constructor(
     private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
@@ -90,6 +95,10 @@ export class ServiceInvoicesComponent implements OnInit {
         this.total = total;
       },
     });
+  }
+
+  getStatusColor(status: string) {
+    return { color: this.statusColor[status] };
   }
 
   openERPServiceInvoice(row) {

@@ -87,12 +87,11 @@ export class ServiceInvoiceController {
     );
   }
 
-  @Post('v1/update_docstatus/:no')
+  @Post('v1/update_docstatus/:invoice_no')
   @UseGuards(TokenGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  async updateDocStatus(@Param('no') invoice_no: string) {
-    return await this.serviceInvoiceAggregate
+    updateDocStatus(@Param('invoice_no') invoice_no: string) {
+    return this.serviceInvoiceAggregate
       .updateDocStatus(invoice_no)
-      .toPromise();
   }
 }
