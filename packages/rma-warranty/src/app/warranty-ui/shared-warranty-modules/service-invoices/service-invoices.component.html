@@ -134,15 +134,12 @@
           <mat-cell *matCellDef="let row; let i = index">
             <ion-text
               [ngStyle]="{
-                color: [0, 2].includes(row.docstatus) ? 'red' : '#4d2500'
+                color: row.docstatus === 1 ? '#4d2500' : 'red'
               }"
             >
               {{
-                [0].includes(row.docstatus)
-                  ? 'Not Submitted'
-                  : [1].includes(row.docstatus)
-                  ? 'Submitted'
-                  : 'Canceled'
+                row.docstatus === 0 ? 'Not Submitted' : 
+                row.docstatus === 1 ? 'Submitted' : 'Canceled'
               }}
             </ion-text>
           </mat-cell>
