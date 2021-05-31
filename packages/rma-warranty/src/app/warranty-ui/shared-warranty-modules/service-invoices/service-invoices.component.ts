@@ -53,7 +53,7 @@ export class ServiceInvoicesComponent implements OnInit {
   ngOnInit() {
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoiceDataSource(this.serviceInvoice);
-    this.dataSource.loadItems(this.invoiceUuid);
+    this.dataSource.loadItems({ warrantyClaimUuid: this.invoiceUuid });
     this.dataSource.disableRefresh.subscribe({
       next: res => {
         this.disableRefresh = res;
@@ -77,7 +77,7 @@ export class ServiceInvoicesComponent implements OnInit {
       }
     }
     this.dataSource.loadItems(
-      this.invoiceUuid,
+      { warrantyClaimUuid: this.invoiceUuid },
       sortQuery,
       event.pageIndex,
       event.pageSize,
