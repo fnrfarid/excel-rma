@@ -7,7 +7,14 @@
         </ion-card-title>
       </ion-col>
       <ion-col class="ion-text-right">
-        <ion-fab color="danger" horizontal="end">
+        <ion-fab
+          color="danger"
+          horizontal="end"
+          *ngIf="
+            permissionState.warranty_claim.delete &&
+            warrantyClaimsDetails?.claim_status !== 'Cancelled'
+          "
+        >
           <ion-fab-button color="primary">
             <ion-icon name="chevron-back-circle-outline"></ion-icon>
           </ion-fab-button>
@@ -52,19 +59,6 @@
               color="primary"
             >
               <ion-icon name="print-outline"></ion-icon>
-            </ion-fab-button>
-            <ion-fab-button
-              *ngIf="
-                permissionState.warranty_claim.delete &&
-                warrantyClaimsDetails?.claim_status === 'Cancelled'
-              "
-              (click)="removeEntry()"
-              matTooltip="delete"
-              matTooltipPosition="above"
-              matTooltipClass="tooltip"
-              color="danger"
-            >
-              <ion-icon name="trash-outline"></ion-icon>
             </ion-fab-button>
           </ion-fab-list>
         </ion-fab>
