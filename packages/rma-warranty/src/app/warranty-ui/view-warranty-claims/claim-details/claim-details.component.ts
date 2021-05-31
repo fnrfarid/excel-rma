@@ -167,29 +167,4 @@ export class ClaimDetailsComponent implements OnInit {
         },
       });
   }
-
-  async removeEntry() {
-    const loading = await this.loadingController.create({
-      message: `Deleting Claim Please Wait...!`,
-    });
-    await loading.present();
-    this.warrantyService
-      .removeClaim(this.warrantyClaimsDetails?.uuid)
-      .subscribe({
-        next: success => {
-          loading.dismiss();
-          this.router.navigate(['warranty']);
-        },
-        error: err => {
-          loading.dismiss();
-          this.snackBar.open(
-            err.error.message ? err.error.message : `Failed to delete claim`,
-            CLOSE,
-            {
-              duration: 4500,
-            },
-          );
-        },
-      });
-  }
 }
