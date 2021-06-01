@@ -466,6 +466,7 @@ export class WarrantyStockEntryAggregateService {
       item.excel_serials = item.serial_no[0];
       item.serial_no = undefined;
       item.price_list_rate = 0;
+      item.rate = 0;
       if (item.stock_entry_type === STOCK_ENTRY_STATUS.returned) {
         erpPayload.return_against = payload.delivery_note;
         erpPayload.naming_series =
