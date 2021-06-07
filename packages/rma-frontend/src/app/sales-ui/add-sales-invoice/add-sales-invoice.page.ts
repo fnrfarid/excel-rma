@@ -48,6 +48,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { ValidateInputSelected } from '../../common/pipes/validators';
+import { SettingsService } from 'src/app/settings/settings.service';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -95,6 +96,7 @@ export class AddSalesInvoicePage implements OnInit {
     private location: Location,
     private readonly router: Router,
     private readonly time: TimeService,
+    private readonly service: SettingsService,
   ) {}
 
   ngOnInit() {
@@ -208,6 +210,14 @@ export class AddSalesInvoicePage implements OnInit {
         },
         error: error => {},
       });
+
+    this.service.getSettings().subscribe({
+      next: res => {
+        this.salesInvoiceForm
+          .get('postingDate')
+          [res.backdatedInvoices ? 'enable' : 'disable']();
+      },
+    });
   }
 
   createFormGroup() {

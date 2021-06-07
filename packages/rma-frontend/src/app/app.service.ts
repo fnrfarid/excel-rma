@@ -27,6 +27,7 @@ import {
   POS_PROFILE,
   ACCESS_TOKEN,
   BRAND,
+  BACKDATE_PERMISSION,
 } from './constants/storage';
 import { StorageService } from './api/storage/storage.service';
 import {
@@ -110,6 +111,7 @@ export class AppService {
         time_zone: string;
         transferWarehouse: string;
         brand: BrandSettings;
+        backdate_permission: boolean;
       }) => {
         if (success?.brand?.faviconURL) {
           this.settings.setFavicon(success.brand.faviconURL);
@@ -119,6 +121,12 @@ export class AppService {
           .then(() => this.storage.setItem(COUNTRY, success.country))
           .then(() => this.storage.setItem(TIME_ZONE, success.time_zone))
           .then(() => this.storage.setItem(BRAND, success.brand))
+          .then(() =>
+            this.storage.setItem(
+              BACKDATE_PERMISSION,
+              success.backdate_permission,
+            ),
+          )
           .then(() =>
             this.storage.setItem(TRANSFER_WAREHOUSE, success.transferWarehouse),
           );

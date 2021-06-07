@@ -133,6 +133,7 @@ export class SettingsService {
     headerWidth: string,
     footerImageURL: string,
     footerWidth: string,
+    backdatedInvoices: boolean,
     brand: { [key: string]: any },
   ) {
     return this.getHeaders().pipe(
@@ -160,6 +161,7 @@ export class SettingsService {
             headerWidth,
             footerImageURL,
             footerWidth,
+            backdatedInvoices,
             brand,
           },
           { headers },

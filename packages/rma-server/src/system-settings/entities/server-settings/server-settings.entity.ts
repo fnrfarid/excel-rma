@@ -106,6 +106,9 @@ export class ServerSettings extends BaseEntity {
   @Column()
   brand: BrandSettings;
 
+  @Column()
+  backdatedInvoices: boolean;
+
   constructor() {
     super();
     if (!this.uuid) this.uuid = uuidv4();

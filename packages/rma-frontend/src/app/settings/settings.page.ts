@@ -49,6 +49,7 @@ export class SettingsPage implements OnInit {
     footerImageURL: new FormControl(),
     footerWidth: new FormControl(),
     faviconURL: new FormControl(),
+    backdatedInvoices: new FormControl(),
   });
   validateInput: any = ValidateInputSelected;
 
@@ -167,6 +168,9 @@ export class SettingsPage implements OnInit {
           .get('footerImageURL')
           .setValue(res.footerImageURL);
         this.companySettingsForm.get('footerWidth').setValue(res.footerWidth);
+        this.companySettingsForm
+          .get('backdatedInvoices')
+          .setValue(res.backdatedInvoices);
         if (res.brand?.faviconURL) {
           this.companySettingsForm
             .get('faviconURL')
@@ -217,6 +221,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('headerWidth').value,
         this.companySettingsForm.get('footerImageURL').value,
         this.companySettingsForm.get('footerWidth').value,
+        this.companySettingsForm.get('backdatedInvoices').value,
         {
           faviconURL: this.companySettingsForm.get('faviconURL').value,
         },
