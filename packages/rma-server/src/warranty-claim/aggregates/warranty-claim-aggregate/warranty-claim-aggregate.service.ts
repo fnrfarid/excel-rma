@@ -3,7 +3,6 @@ import {
   NotFoundException,
   BadRequestException,
   NotImplementedException,
-  HttpService,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
@@ -45,7 +44,6 @@ import {
   SerialNoHistoryInterface,
   EventType,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
-import { STOCK_ENTRY_API_ENDPOINT } from '../../../constants/routes';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -55,7 +53,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
     private readonly serialNoHistoryService: SerialNoHistoryService,
-    private readonly httpService: HttpService,
   ) {
     super();
   }
@@ -187,7 +184,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   createThirdPartyClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
-    return this.createMaterialReciept(claimsPayload, clientHttpRequest).pipe(
+    return this.addSerialRecord(claimsPayload, clientHttpRequest).pipe(
       switchMap(res => {
         return this.assignFields(claimsPayload, clientHttpRequest);
       }),
@@ -208,21 +205,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     );
   }
 
-  createMaterialReciept(warrantyPayload: WarrantyClaimDto, req) {
+  addSerialRecord(warrantyPayload: WarrantyClaimDto, req) {
     if (!warrantyPayload.serial_no) {
       return of({});
     }
-    return this.settingsService.find().pipe(
-      switchMap(settings => {
-        const url = `${settings.authServerURL}${STOCK_ENTRY_API_ENDPOINT}`;
-        const body = this.MaterialReceiptBody(warrantyPayload, req);
-        return this.httpService.post(url, body, {
-          headers: this.settingsService.getAuthorizationHeaders(req.token),
-        });
-      }),
-      map(res => res.data.data),
-      switchMap(materialReceipt => {
-        const serialBody = this.serialNoBody(warrantyPayload, materialReceipt);
+    return this.serialNoBody(warrantyPayload).pipe(
+      switchMap(serialBody => {
         return from(this.serialNoService.create(serialBody));
       }),
       catchError(err => {
@@ -245,20 +233,16 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return body;
   }
 
-  serialNoBody(payload: WarrantyClaimDto, res: any) {
+  serialNoBody(payload: WarrantyClaimDto) {
     const serialBody = {} as any;
     serialBody.serial_no = payload.serial_no;
     serialBody.item_code = payload.item_code;
-    serialBody.purchase_date = res.posting_date;
-    serialBody.purchase_time = res.posting_time;
-    serialBody.purchase_rate = res.items[0].amount;
-    serialBody.supplier = res.supplier;
-    serialBody.company = res.company;
+    serialBody.purchase_date = payload.createdOn;
+    serialBody.purchase_time = payload.posting_time;
     serialBody.item_name = payload.item_name;
-    serialBody.purchase_document_no = res.name;
-    serialBody.purchase_document_type = res.stock_entry_type;
-    serialBody.customer = res.customer;
-    return serialBody;
+    serialBody.customer = payload.customer_code;
+    serialBody.customer_name = payload.customer;
+    return of(serialBody);
   }
 
   async retrieveWarrantyClaim(uuid: string, req) {
@@ -594,7 +578,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           const statusHistory = {} as StatusHistoryDto;
           Object.assign(
             statusHistory,
-            res.status_history[res.status_history.length - 1],
+            res.status_history[res.status_history.length - 2],
           );
           statusHistory.doc_name = res.claim_no;
           if (statusHistory.verdict === VERDICT.RECEIVED_FROM_CUSTOMER) {
