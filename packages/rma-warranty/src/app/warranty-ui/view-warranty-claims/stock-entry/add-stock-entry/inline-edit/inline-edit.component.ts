@@ -35,7 +35,7 @@ export class InlineEditComponent {
     this.itemFormControl.setValue({ item_name: x });
     this.quantity = x;
     this.serial_no = x;
-    this.warehouseFormControl.setValue({ name: x });
+    this.warehouseFormControl.setValue({ warehouse: x });
     this._value = x;
     this.stock_entry_type.setValue(x);
   }
