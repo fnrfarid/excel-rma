@@ -85,6 +85,12 @@ export class AppService {
         ),
       )
       .then(() => this.storage.setItem(POS_PROFILE, response.posProfile))
+      .then(() =>
+        this.storage.setItem(
+          BACKDATE_PERMISSION,
+          response.backdate_permission,
+        ),
+      )
       .then(saved => {});
   }
 

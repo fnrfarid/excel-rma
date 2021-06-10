@@ -16,6 +16,7 @@ import { MatSort } from '@angular/material/sort';
 import { TerritoryDataSource } from './territory-datasource';
 import { MapTerritoryComponent } from './map-territory/map-territory.component';
 import { ValidateInputSelected } from '../common/pipes/validators';
+import { PermissionManager } from '../api/permission/permission.service';
 
 @Component({
   selector: 'app-settings',
@@ -113,6 +114,7 @@ export class SettingsPage implements OnInit {
     private readonly service: SettingsService,
     private readonly toastController: ToastController,
     private readonly popoverController: PopoverController,
+    private readonly permissionManager: PermissionManager,
   ) {}
 
   ngOnInit() {
@@ -229,6 +231,9 @@ export class SettingsPage implements OnInit {
       .subscribe({
         next: success => {
           this.service.setFavicon(this.f.faviconURL.value);
+          this.permissionManager.setGlobalPermissions(
+            this.f.backdatedInvoices.value,
+          );
           this.toastController
             .create({
               message: UPDATE_SUCCESSFUL,

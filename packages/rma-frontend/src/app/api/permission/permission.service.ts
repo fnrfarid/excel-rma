@@ -14,7 +14,9 @@ import { Injectable } from '@angular/core';
 import {
   PermissionRoles,
   PERMISSION_STATE,
+  settingPermissions,
 } from '../../constants/permission-roles';
+import { BACKDATE_PERMISSION } from '../../constants/storage';
 
 export const PermissionState = {
   create: 'create',
@@ -94,6 +96,11 @@ export class PermissionManager {
         ).toPromise();
       });
     });
+  }
+
+  setGlobalPermissions(backdate_permission: boolean) {
+    this.storageService.setItem(BACKDATE_PERMISSION, backdate_permission),
+      (settingPermissions.backdated_permissions = backdate_permission);
   }
 }
 
