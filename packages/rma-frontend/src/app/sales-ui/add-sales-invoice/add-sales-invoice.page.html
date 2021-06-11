@@ -118,7 +118,6 @@
                   placeholder="Posting Date"
                   readonly
                   formControlName="postingDate"
-                  [disabled]="!permissionState.backdated_permissions"
                   (dateChange)="selectedPostingDate($event)"
                 />
                 <mat-datepicker-toggle

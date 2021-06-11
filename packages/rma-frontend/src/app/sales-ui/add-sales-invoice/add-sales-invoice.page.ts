@@ -26,6 +26,7 @@ import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
+  BACKDATE_PERMISSION,
 } from '../../constants/storage';
 import {
   DRAFT,
@@ -48,7 +49,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { ValidateInputSelected } from '../../common/pipes/validators';
-import { settingPermissions } from '../../constants/permission-roles';
+import { PermissionManager } from 'src/app/api/permission/permission.service';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -83,7 +84,6 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoiceForm: FormGroup;
   itemsControl: FormArray;
   validateInput: any = ValidateInputSelected;
-  permissionState: any = settingPermissions;
 
   get f() {
     return this.salesInvoiceForm.controls;
@@ -97,6 +97,7 @@ export class AddSalesInvoicePage implements OnInit {
     private location: Location,
     private readonly router: Router,
     private readonly time: TimeService,
+    private permissionManager: PermissionManager,
   ) {}
 
   ngOnInit() {
@@ -206,6 +207,22 @@ export class AddSalesInvoicePage implements OnInit {
                   error: error => {},
                 });
               }
+            })
+            .then(() => {
+              this.permissionManager.changes.subscribe({
+                next: event => {
+                  if (
+                    event.key === BACKDATE_PERMISSION &&
+                    event.value === true
+                  ) {
+                    this.salesInvoiceForm.get('postingDate').enable();
+                  } else {
+                    this.salesInvoiceForm.get('postingDate').disable();
+                  }
+                },
+                error: error => {},
+              });
+              this.permissionManager.updateGlobalPermissions();
             });
         },
         error: error => {},
