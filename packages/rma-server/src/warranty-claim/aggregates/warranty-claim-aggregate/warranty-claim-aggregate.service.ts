@@ -209,7 +209,13 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     if (!warrantyPayload.serial_no) {
       return of({});
     }
-    return this.serialNoBody(warrantyPayload, req).pipe(
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        if (!settings) {
+          return throwError(new NotImplementedException());
+        }
+        return this.serialNoBody(warrantyPayload, req, settings);
+      }),
       switchMap(serialBody => {
         return from(this.serialNoService.create(serialBody));
       }),
@@ -219,8 +225,11 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     );
   }
 
-  serialNoBody(payload: WarrantyClaimDto, req) {
+  serialNoBody(payload: WarrantyClaimDto, req, settings) {
     const serialBody = {} as any;
+    serialBody.date = DateTime.fromJSDate(new Date()).setZone(
+      settings.timeZone,
+    );
     serialBody.warranty = {};
     serialBody.serial_no = payload.serial_no;
     serialBody.item_code = payload.item_code;
@@ -229,10 +238,10 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     serialBody.item_name = payload.item_name;
     serialBody.customer = payload.customer_code;
     serialBody.customer_name = payload.customer;
-    serialBody.warranty.purchasedOn = new Date();
-    serialBody.warranty.purchaseWarrantyDate = new Date();
-    serialBody.warranty.salesWarrantyDate = new Date();
-    serialBody.warranty.soldOn = new Date();
+    serialBody.warranty.purchasedOn = serialBody.date;
+    serialBody.warranty.purchaseWarrantyDate = serialBody.date;
+    serialBody.warranty.salesWarrantyDate = serialBody.date;
+    serialBody.warranty.soldOn = serialBody.date;
     serialBody.warehouse = req.token.warehouses[0];
     return of(serialBody);
   }
