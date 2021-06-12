@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.10.0...rma-frontend@1.11.0) (2021-06-12)
+
+
+### Bug Fixes
+
+* **rma-frontend:** fixed material transfer title ([0c9f93d](https://gitlab.com/castlecraft/excel-rma/commit/0c9f93df9ddafcf87d0c297057410473b63c3130))
+* **rma-frontend:** fixed material transfer title 1 ([e550bbb](https://gitlab.com/castlecraft/excel-rma/commit/e550bbb60f7e3e6169e79bb2f43175fc8f98e0ba))
+* **rma-frontend:** serial assigned date fix on Serials tab ([9cfd52e](https://gitlab.com/castlecraft/excel-rma/commit/9cfd52ec66700de1015fbe75aff6127ec2ab599c))
+
+
+### Features
+
+* **rma-frontend:** Update role permissions for item price ([83ab63d](https://gitlab.com/castlecraft/excel-rma/commit/83ab63dde0b7a335213d5797ada12b9b4b0187e4))
+* **rma-warranty:** Added filters on service invoice page ([f37fd12](https://gitlab.com/castlecraft/excel-rma/commit/f37fd1214f5987b51a9c82f9972cecf13b14a674))
+
+
+
+
+
 # [1.10.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.9.2...rma-frontend@1.10.0) (2021-05-21)
 
 
