@@ -190,4 +190,5 @@ export class ServerSettingsDto {
     type: 'object',
   })
   brand: BrandSettingsDTO;
+  backdatedInvoices: boolean;
 }

@@ -20,13 +20,22 @@
         <ion-segment-button value="0">
           <ion-label>Details</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="1">
+        <ion-segment-button
+          *ngIf="warrantyDetail?.claim_status !== 'Cancelled'"
+          value="1"
+        >
           <ion-label>Service Invoice</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="2">
+        <ion-segment-button
+          *ngIf="warrantyDetail?.claim_status !== 'Cancelled'"
+          value="2"
+        >
           <ion-label>Status</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="3">
+        <ion-segment-button
+          *ngIf="warrantyDetail?.claim_status !== 'Cancelled'"
+          value="3"
+        >
           <ion-label>Stock</ion-label>
         </ion-segment-button>
       </ion-segment>

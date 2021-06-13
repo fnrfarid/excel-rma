@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.7.0...rma-warranty@1.8.0) (2021-06-12)
+
+
+### Bug Fixes
+
+* **rma-warranty:** fixed service invoice for warranty claim ([0cf635d](https://gitlab.com/castlecraft/excel-rma/commit/0cf635d4f65be76de235e2bc01cb453542014400))
+
+
+### Features
+
+* **rma-frontend:** Update role permissions for item price ([83ab63d](https://gitlab.com/castlecraft/excel-rma/commit/83ab63dde0b7a335213d5797ada12b9b4b0187e4))
+* **rma-warranty:** Added filters on service invoice page ([f37fd12](https://gitlab.com/castlecraft/excel-rma/commit/f37fd1214f5987b51a9c82f9972cecf13b14a674))
+* **rma-warranty:** Added filters on service invoice page...1 ([2cf2900](https://gitlab.com/castlecraft/excel-rma/commit/2cf2900e45b0418254b3829c159856ca16722227))
+* **rma-warranty:** Added Sync data button on warranty service invoice page ([2ad7cf6](https://gitlab.com/castlecraft/excel-rma/commit/2ad7cf6871abea4a1eec4c6e4de23c3af2fc1810))
+* **rma-warranty:** Added Sync data button on warranty service invoice page...1 ([f649770](https://gitlab.com/castlecraft/excel-rma/commit/f6497701ec8287475e39970b78856b48393e9e12))
+* **rma-warranty:** Added Sync data button on warranty service invoice page...2 ([0a75024](https://gitlab.com/castlecraft/excel-rma/commit/0a7502473c6d489476c814d8e70ea6d5e7c3b667))
+* **rma-warranty:** Added Sync data button on warranty service invoice page...3 ([5deb5bb](https://gitlab.com/castlecraft/excel-rma/commit/5deb5bb2a4d64c90e110d791e0833e0982020791))
+* **rma-warranty:** Added Sync data button on warranty service invoice page...4 ([7dbd844](https://gitlab.com/castlecraft/excel-rma/commit/7dbd844b29b591200aebb64ee4c70f516c0e9b73))
+
+
+
+
+
 # [1.7.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-warranty@1.6.5...rma-warranty@1.7.0) (2021-05-21)
 
 

@@ -1,6 +1,13 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-import { map, catchError, finalize } from 'rxjs/operators';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import {
+  map,
+  catchError,
+  finalize,
+  concatMap,
+  switchMap,
+  toArray,
+} from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDetails } from './add-service-invoice/service-invoice-interface';
 
@@ -13,7 +20,7 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
 
   itemSubject = new BehaviorSubject<ServiceInvoiceDetails[]>([]);
   loadingSubject = new BehaviorSubject<boolean>(false);
-
+  disableRefresh = new BehaviorSubject<boolean>(false);
   loading$ = this.loadingSubject.asObservable();
 
   constructor(private serviceInvoice: AddServiceInvoiceService) {
@@ -31,8 +38,13 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
     this.loadingSubject.complete();
   }
 
-  loadItems(filter = '', sortOrder?, pageIndex = 0, pageSize = 30) {
+  loadItems(filter: any = {}, sortOrder?, pageIndex = 0, pageSize = 30) {
     this.loadingSubject.next(true);
+    try {
+      filter = JSON.stringify(filter);
+    } catch {
+      filter = JSON.stringify({});
+    }
     this.serviceInvoice
       .getServiceInvoiceList(filter, sortOrder, pageIndex, pageSize)
       .pipe(
@@ -44,11 +56,45 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
         }),
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
+        switchMap(items => {
+          return from(items).pipe(
+            concatMap(item => {
+              return this.serviceInvoice.updateDocStatus(item.invoice_no).pipe(
+                switchMap((res: { docstatus: number }) => {
+                  item.docstatus = res.docstatus;
+                  return of(item);
+                }),
+              );
+            }),
+            toArray(),
+          );
+        }),
       )
       .subscribe(items => {
         this.itemSubject.next(items);
         this.calculateTotal(items);
       });
+  }
+
+  syncDocStatus() {
+    this.disableRefresh.next(true);
+    return from(this.itemSubject.value).pipe(
+      concatMap(item => {
+        return this.serviceInvoice.updateDocStatus(item.invoice_no).pipe(
+          switchMap((res: { docstatus: number }) => {
+            item.docstatus = res.docstatus;
+            return of(item);
+          }),
+        );
+      }),
+      toArray(),
+      switchMap(items => {
+        this.disableRefresh.next(false);
+        this.itemSubject.next(items);
+        this.calculateTotal(items);
+        return of({});
+      }),
+    );
   }
 
   calculateTotal(serviceInvoice: ServiceInvoiceDetails[]) {

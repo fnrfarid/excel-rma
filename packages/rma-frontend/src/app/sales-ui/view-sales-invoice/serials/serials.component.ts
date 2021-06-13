@@ -250,7 +250,7 @@ export class SerialsComponent implements OnInit {
           this.filteredItemList = this.getFilteredItems(sales_invoice);
           this.itemDataSource.loadItems(this.filteredItemList);
           this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
-          this.date.setValue(new Date(this.salesInvoiceDetails.posting_date));
+          this.date.setValue(new Date());
           this.getItemsWarranty();
           this.state.itemData = this.itemDataSource.data();
           this.state.warehouse = this.warehouseFormControl.value;

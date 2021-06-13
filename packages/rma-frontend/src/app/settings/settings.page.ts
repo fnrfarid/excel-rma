@@ -16,6 +16,7 @@ import { MatSort } from '@angular/material/sort';
 import { TerritoryDataSource } from './territory-datasource';
 import { MapTerritoryComponent } from './map-territory/map-territory.component';
 import { ValidateInputSelected } from '../common/pipes/validators';
+import { PermissionManager } from '../api/permission/permission.service';
 
 @Component({
   selector: 'app-settings',
@@ -49,6 +50,7 @@ export class SettingsPage implements OnInit {
     footerImageURL: new FormControl(),
     footerWidth: new FormControl(),
     faviconURL: new FormControl(),
+    backdatedInvoices: new FormControl(),
   });
   validateInput: any = ValidateInputSelected;
 
@@ -112,6 +114,7 @@ export class SettingsPage implements OnInit {
     private readonly service: SettingsService,
     private readonly toastController: ToastController,
     private readonly popoverController: PopoverController,
+    private readonly permissionManager: PermissionManager,
   ) {}
 
   ngOnInit() {
@@ -167,6 +170,9 @@ export class SettingsPage implements OnInit {
           .get('footerImageURL')
           .setValue(res.footerImageURL);
         this.companySettingsForm.get('footerWidth').setValue(res.footerWidth);
+        this.companySettingsForm
+          .get('backdatedInvoices')
+          .setValue(res.backdatedInvoices);
         if (res.brand?.faviconURL) {
           this.companySettingsForm
             .get('faviconURL')
@@ -217,6 +223,7 @@ export class SettingsPage implements OnInit {
         this.companySettingsForm.get('headerWidth').value,
         this.companySettingsForm.get('footerImageURL').value,
         this.companySettingsForm.get('footerWidth').value,
+        this.companySettingsForm.get('backdatedInvoices').value,
         {
           faviconURL: this.companySettingsForm.get('faviconURL').value,
         },
@@ -224,6 +231,9 @@ export class SettingsPage implements OnInit {
       .subscribe({
         next: success => {
           this.service.setFavicon(this.f.faviconURL.value);
+          this.permissionManager.setGlobalPermissions(
+            this.f.backdatedInvoices.value,
+          );
           this.toastController
             .create({
               message: UPDATE_SUCCESSFUL,

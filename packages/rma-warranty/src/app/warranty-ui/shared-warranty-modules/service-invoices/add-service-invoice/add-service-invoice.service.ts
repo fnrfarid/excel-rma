@@ -13,6 +13,8 @@ import {
   RETURN_DELIVERY_NOTE_STOCK_ENTRY_ENDPOINT,
   RELAY_LIST_BRANCH_ENDPOINT,
   RELAY_GET_FULL_ITEM_ENDPOINT,
+  LIST_CUSTOMER_ENDPOINT,
+  UPDATE_DOCSTATUS_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { APIResponse } from '../../../../common/interfaces/sales.interface';
@@ -58,6 +60,34 @@ export class AddServiceInvoiceService {
           headers,
         });
       }),
+    );
+  }
+
+  getStorage() {
+    return this.storage;
+  }
+
+  getCustomerList(
+    filter = '',
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 30,
+  ) {
+    const url = LIST_CUSTOMER_ENDPOINT;
+    const params = new HttpParams()
+      .set('limit', pageSize.toString())
+      .set('offset', (pageNumber * pageSize).toString())
+      .set('search', encodeURIComponent(filter))
+      .set('sort', sortOrder);
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
+      }),
+      map(res => res.docs),
     );
   }
 
@@ -256,7 +286,7 @@ export class AddServiceInvoiceService {
   }
 
   getServiceInvoiceList(
-    filter = '',
+    filter: string,
     sortOrder = 'asc',
     pageNumber = 0,
     pageSize = 30,
@@ -265,7 +295,7 @@ export class AddServiceInvoiceService {
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
+      .set('search', encodeURIComponent(filter))
       .set('sort', sortOrder);
 
     return this.getHeaders().pipe(
@@ -294,6 +324,15 @@ export class AddServiceInvoiceService {
         return this.http.get<any>(url, { params, headers });
       }),
       map(res => res.data),
+    );
+  }
+
+  updateDocStatus(invoice_no: string) {
+    const url = `${UPDATE_DOCSTATUS_ENDPOINT}${invoice_no}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
+      }),
     );
   }
 }

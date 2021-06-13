@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { PARSE_REGEX } from '../../../constants/app-strings';
 
 @Injectable()
 export class ServiceInvoiceService {
@@ -12,6 +13,28 @@ export class ServiceInvoiceService {
     private readonly serviceInvoiceRepository: MongoRepository<ServiceInvoice>,
   ) {}
 
+  getFilterQuery(query) {
+    const keys = Object.keys(query);
+    keys.forEach(key => {
+      if (query[key]) {
+        if (['fromDate', 'toDate'].includes(key)) {
+          delete query[key];
+        }
+        if (key === 'status' && query[key] === 'All') {
+          delete query[key];
+        } else {
+          if (typeof query[key] === 'string') {
+            query[key] = { $regex: PARSE_REGEX(query[key]), $options: 'i' };
+          } else {
+            delete query[key];
+          }
+        }
+      } else {
+        delete query[key];
+      }
+    });
+    return query;
+  }
   async find(query?) {
     return await this.serviceInvoiceRepository.find(query);
   }
@@ -27,17 +50,22 @@ export class ServiceInvoiceService {
   }
 
   async list(skip, take, search, sort) {
-    const nameExp = new RegExp(search, 'i');
-    const columns = this.serviceInvoiceRepository.manager.connection
-      .getMetadata(ServiceInvoice)
-      .ownColumns.map(column => column.propertyName);
+    let dateQuery = {};
+    try {
+      search = JSON.parse(search);
+    } catch {
+      search = {};
+    }
+    if (search?.fromDate && search?.toDate) {
+      dateQuery = {
+        creation: {
+          $gte: search.fromDate,
+          $lte: search.toDate,
+        },
+      };
+    }
 
-    const $or = columns.map(field => {
-      const filter = {};
-      filter[field] = nameExp;
-      return filter;
-    });
-    const $and: any[] = [{ $or }];
+    const $and: any[] = [search ? this.getFilterQuery(search) : {}, dateQuery];
 
     const where: { $and: any } = { $and };
 

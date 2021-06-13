@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.13.0...rma-server@1.14.0) (2021-06-12)
+
+
+### Bug Fixes
+
+* **rma-server:** Fixed create warranty stock entry ([27ad155](https://gitlab.com/castlecraft/excel-rma/commit/27ad15546532378a056f8f7b28ffcde4b014d7e1))
+* **rma-server:** Replaced hardcoded strings ([5b368fd](https://gitlab.com/castlecraft/excel-rma/commit/5b368fdf1925be3da9a46a2836650387061c16cb))
+
+
+### Features
+
+* **rma-warranty:** Added filters on service invoice page ([f37fd12](https://gitlab.com/castlecraft/excel-rma/commit/f37fd1214f5987b51a9c82f9972cecf13b14a674))
+* **rma-warranty:** Added Sync data button on warranty service invoice page ([2ad7cf6](https://gitlab.com/castlecraft/excel-rma/commit/2ad7cf6871abea4a1eec4c6e4de23c3af2fc1810))
+* **rma-warranty:** Added Sync data button on warranty service invoice page...1 ([f649770](https://gitlab.com/castlecraft/excel-rma/commit/f6497701ec8287475e39970b78856b48393e9e12))
+* **rma-warranty:** Added Sync data button on warranty service invoice page...2 ([0a75024](https://gitlab.com/castlecraft/excel-rma/commit/0a7502473c6d489476c814d8e70ea6d5e7c3b667))
+
+
+
+
+
 # [1.13.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.12.0...rma-server@1.13.0) (2021-05-21)
 
 

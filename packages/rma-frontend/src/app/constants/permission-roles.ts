@@ -293,7 +293,12 @@ export const PermissionRoles = {
 
   item_price: {
     create: ['Item Price Manager', 'General Admin'],
-    read: ['Item Price Manager', 'Item Price Viewer', 'General Admin'],
+    read: [
+      'Item Price Manager',
+      'Item Price Viewer',
+      'Branch Sales Creator',
+      'General Admin',
+    ],
     update: ['Item Price Manager', 'General Admin'],
     delete: ['Item Price Manager', 'General Admin'],
   },
@@ -594,4 +599,8 @@ export const PERMISSION_STATE: PermissionStateInterface = {
     submit: false,
     delete: false,
   },
+};
+
+export const settingPermissions = {
+  backdated_permissions: false,
 };
