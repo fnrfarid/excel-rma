@@ -8,10 +8,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {
-  StorageService,
-  STORAGE_TOKEN,
-} from '../../api/storage/storage.service';
+import { STORAGE_TOKEN } from '../../api/storage/storage.service';
 import { SalesService } from '../services/sales.service';
 import { ItemPriceService } from '../services/item-price.service';
 
@@ -66,12 +63,6 @@ describe('AddSalesInvoicePage', () => {
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),
             }),
-          },
-        },
-        {
-          provide: StorageService,
-          useValue: {
-            getItem: (...args) => Promise.resolve('ITEM'),
           },
         },
         { provide: STORAGE_TOKEN, useValue: {} },

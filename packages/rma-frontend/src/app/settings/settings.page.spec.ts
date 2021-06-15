@@ -11,7 +11,6 @@ import { switchMap } from 'rxjs/operators';
 import { SettingsPage } from './settings.page';
 import { SettingsService } from './settings.service';
 import { MaterialModule } from '../material/material.module';
-import { StorageService } from '../api/storage/storage.service';
 
 describe('SettingsPage', () => {
   let component: SettingsPage;
@@ -41,12 +40,6 @@ describe('SettingsPage', () => {
             relayAccountsOperation: (...args) => switchMap(res => empty()),
             relayWarehousesOperation: (...args) => switchMap(res => empty()),
             relayPosProfiles: (...args) => switchMap(res => empty()),
-          },
-        },
-        {
-          provide: StorageService,
-          useValue: {
-            getItem: (...args) => Promise.resolve(),
           },
         },
         { provide: ToastController, useValue: {} },

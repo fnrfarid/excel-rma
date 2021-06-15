@@ -502,7 +502,6 @@ export class SettingsService extends AggregateRoot {
                             time_zone: systemSettings.time_zone,
                             transferWarehouse: settings.transferWarehouse,
                             brand: settings.brand,
-                            backdate_permission: settings.backdatedInvoices,
                           });
                         },
                       ),

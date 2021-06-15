@@ -65,4 +65,3 @@ export const DELIVERED_SERIALS_DISPLAYED_COLUMNS = {
 };
 export const BASIC_RATE = 'basic_rate';
 export const BRAND = 'brand';
-export const BACKDATE_PERMISSION = 'backdate_permission';

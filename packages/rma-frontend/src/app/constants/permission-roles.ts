@@ -600,7 +600,3 @@ export const PERMISSION_STATE: PermissionStateInterface = {
     delete: false,
   },
 };
-
-export const settingPermissions = {
-  backdated_permissions: false,
-};

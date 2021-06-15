@@ -1,6 +1,6 @@
 import { SYSTEM_MANAGER, USER_ROLE } from '../../constants/app-string';
 import { StorageService } from '../storage/storage.service';
-import { from, of, Subject, throwError } from 'rxjs';
+import { from, of, throwError } from 'rxjs';
 import {
   switchMap,
   catchError,
@@ -14,9 +14,7 @@ import { Injectable } from '@angular/core';
 import {
   PermissionRoles,
   PERMISSION_STATE,
-  settingPermissions,
 } from '../../constants/permission-roles';
-import { BACKDATE_PERMISSION } from '../../constants/storage';
 
 export const PermissionState = {
   create: 'create',
@@ -29,9 +27,6 @@ export const PermissionState = {
   providedIn: 'root',
 })
 export class PermissionManager {
-  private onSubject = new Subject<{ key: string; value: any }>();
-  public changes = this.onSubject.asObservable();
-
   constructor(private readonly storageService: StorageService) {}
 
   // module = something like "sales_invoice" , state = something like "create"
@@ -98,18 +93,6 @@ export class PermissionManager {
           context,
         ).toPromise();
       });
-    });
-  }
-
-  setGlobalPermissions(backdate_permission: boolean) {
-    this.storageService.setItem(BACKDATE_PERMISSION, backdate_permission),
-      (settingPermissions.backdated_permissions = backdate_permission);
-  }
-
-  updateGlobalPermissions() {
-    this.onSubject.next({
-      key: BACKDATE_PERMISSION,
-      value: settingPermissions.backdated_permissions,
     });
   }
 }
