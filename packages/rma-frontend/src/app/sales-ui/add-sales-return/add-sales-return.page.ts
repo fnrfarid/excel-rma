@@ -511,16 +511,17 @@ export class AddSalesReturnPage implements OnInit {
 
       let valid = true;
       response.forEach(element => {
-        if (!valid) return;
+        if (!valid || !element.credit_note_qty) {
+          return;
+        }
 
         if (
           element.credit_note_qty >= 0 ||
           element.credit_note_qty < 0 - element.qty
         ) {
           this.getMessage(
-            `Credit Note Item quantity for ${
-              element.item_name
-            }, should be between -1 and ${0 - element.qty}`,
+            `Credit Note Item quantity for ${element.item_name}, 
+            should be between -1 and ${0 - element.qty}`,
           );
           valid = false;
           return;
@@ -593,6 +594,7 @@ export class AddSalesReturnPage implements OnInit {
     salesReturn.credit_note_items = credit_note_items?.length
       ? credit_note_items
       : undefined;
+
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
         this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 4500 });
