@@ -4,6 +4,7 @@ import {
   IsNumber,
   ValidateNested,
   Max,
+  IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -73,17 +74,24 @@ export class CreateSalesReturnDto {
 
 export class SalesReturnItemDto {
   @IsNotEmpty()
+  @IsString()
   item_code: string;
+
+  @IsOptional()
+  @IsString()
   item_name?: string;
 
   @IsNotEmpty()
   @Max(-1)
+  @IsNumber()
   qty: number;
 
   @IsNotEmpty()
+  @IsNumber()
   rate: number;
 
   @IsNotEmpty()
+  @IsNumber()
   amount: number;
 
   @IsNotEmpty()
@@ -91,6 +99,7 @@ export class SalesReturnItemDto {
   has_serial_no: number;
 
   @IsOptional()
+  @IsString()
   against_sales_invoice: string;
 
   @IsOptional()
