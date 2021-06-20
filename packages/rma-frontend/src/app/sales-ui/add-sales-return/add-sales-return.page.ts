@@ -330,7 +330,7 @@ export class AddSalesReturnPage implements OnInit {
         next: success => {
           this.itemDataSource.loadItems(success);
         },
-        error: err => { },
+        error: err => {},
       });
   }
 
@@ -365,15 +365,15 @@ export class AddSalesReturnPage implements OnInit {
         next: (success: { notFoundSerials: string[] }) => {
           success.notFoundSerials && success.notFoundSerials.length
             ? this.snackBar.open(
-              `Invalid Serials ${success.notFoundSerials
-                .splice(0, 50)
-                .join(', ')}...`,
-              CLOSE,
-              { duration: 4500 },
-            )
+                `Invalid Serials ${success.notFoundSerials
+                  .splice(0, 50)
+                  .join(', ')}...`,
+                CLOSE,
+                { duration: 4500 },
+              )
             : this.assignRangeSerial(row, this.rangePickerState.serials);
         },
-        error: err => { },
+        error: err => {},
       });
   }
 
@@ -429,9 +429,9 @@ export class AddSalesReturnPage implements OnInit {
     const dialogRef =
       row.remaining >= ASSIGN_SERIAL_DIALOG_QTY
         ? this.dialog.open(AssignSerialsDialog, {
-          width: '250px',
-          data: { serials: row.remaining || 0 },
-        })
+            width: '250px',
+            data: { serials: row.remaining || 0 },
+          })
         : null;
 
     const serials =
@@ -595,8 +595,6 @@ export class AddSalesReturnPage implements OnInit {
       ? credit_note_items
       : undefined;
 
-    console.log(salesReturn);
-
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
         this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 4500 });
@@ -609,9 +607,10 @@ export class AddSalesReturnPage implements OnInit {
         loading.dismiss();
         if (err.status === 400) {
           this.snackBar.open(
-            `Invalid ${err.error.invalidSerials
-              ? err.error.invalidSerials
-              : err.error && err.error.message
+            `Invalid ${
+              err.error.invalidSerials
+                ? err.error.invalidSerials
+                : err.error && err.error.message
                 ? err.error.message
                 : err
             }`,
@@ -636,62 +635,62 @@ export class AddSalesReturnPage implements OnInit {
       // validate file headers
       this.csvService.validateHeaders(headers)
         ? // if valid convert to json.
-        this.csvService
-          .csvToJSON(csvData)
-          .pipe(
-            switchMap(json => {
-              // club json data to item_name as unique { blue cotton candy : { serials : [1,2,3..]}, ...  }
-              const data = this.csvService.mapJson(json);
-              // name of all items [ "blue cotton candy" ...]
-              const item_names = [];
-              // obj map for item and number of serial present like - { blue cotton candy : 50  }
-              const itemObj: any = {};
+          this.csvService
+            .csvToJSON(csvData)
+            .pipe(
+              switchMap(json => {
+                // club json data to item_name as unique { blue cotton candy : { serials : [1,2,3..]}, ...  }
+                const data = this.csvService.mapJson(json);
+                // name of all items [ "blue cotton candy" ...]
+                const item_names = [];
+                // obj map for item and number of serial present like - { blue cotton candy : 50  }
+                const itemObj: any = {};
 
-              // get all item_name and validate from current remaining items and then the API
-              for (const key in data) {
-                if (key) {
-                  item_names.push(key);
-                  itemObj[key] = {
-                    serial: data[key].serial_no.length,
-                    serial_no: data[key].serial_no.map(serial => {
-                      return serial.toUpperCase();
-                    }),
-                  };
+                // get all item_name and validate from current remaining items and then the API
+                for (const key in data) {
+                  if (key) {
+                    item_names.push(key);
+                    itemObj[key] = {
+                      serial: data[key].serial_no.length,
+                      serial_no: data[key].serial_no.map(serial => {
+                        return serial.toUpperCase();
+                      }),
+                    };
+                  }
                 }
-              }
 
-              // validate Json serials with remaining products to be assigned.
-              return this.validateJson(itemObj)
-                ? // if valid ping backend to validate found serials
-                this.csvService
-                  .validateReturnSerials(
-                    item_names,
-                    itemObj,
-                    this.deliveryNoteNames,
-                    this.warehouseFormControl.value,
-                  )
-                  .pipe(
-                    switchMap((response: boolean) => {
-                      this.csvFileInput.nativeElement.value = '';
-                      if (response) {
-                        return of(itemObj);
-                      }
-                      return of(false);
-                    }),
-                  )
-                : of(false);
-            }),
-          )
-          .subscribe({
-            next: (response: CsvJsonObj | boolean) => {
-              response ? this.addSerialsFromCsvJson(response) : null;
-              // reset file input, restart the flow.
-              this.csvFileInput.nativeElement.value = '';
-            },
-            error: err => {
-              this.csvFileInput.nativeElement.value = '';
-            },
-          })
+                // validate Json serials with remaining products to be assigned.
+                return this.validateJson(itemObj)
+                  ? // if valid ping backend to validate found serials
+                    this.csvService
+                      .validateReturnSerials(
+                        item_names,
+                        itemObj,
+                        this.deliveryNoteNames,
+                        this.warehouseFormControl.value,
+                      )
+                      .pipe(
+                        switchMap((response: boolean) => {
+                          this.csvFileInput.nativeElement.value = '';
+                          if (response) {
+                            return of(itemObj);
+                          }
+                          return of(false);
+                        }),
+                      )
+                  : of(false);
+              }),
+            )
+            .subscribe({
+              next: (response: CsvJsonObj | boolean) => {
+                response ? this.addSerialsFromCsvJson(response) : null;
+                // reset file input, restart the flow.
+                this.csvFileInput.nativeElement.value = '';
+              },
+              error: err => {
+                this.csvFileInput.nativeElement.value = '';
+              },
+            })
         : (this.csvFileInput.nativeElement.value = '');
     };
   }
