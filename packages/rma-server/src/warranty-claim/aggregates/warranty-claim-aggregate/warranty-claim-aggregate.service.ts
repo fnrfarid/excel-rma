@@ -349,16 +349,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       switchMap(warrantyBulkClaim => {
         existingWarrantyClaim = warrantyBulkClaim;
         const bulk_products = [
-          warrantyBulkClaim.bulk_products,
+          ...warrantyBulkClaim.bulk_products,
           ...claimsPayload.bulk_products,
         ];
         return from(
           this.warrantyClaimService.updateOne(
             { uuid: claimsPayload.uuid },
             {
-              $set: {
-                bulk_products,
-              },
+              $set: { bulk_products },
             },
           ),
         );
