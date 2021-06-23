@@ -3,23 +3,24 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   ACCESS_TOKEN,
   AUTHORIZATION,
+  AUTH_SERVER_URL,
   BEARER_TOKEN_PREFIX,
 } from '../../constants/storage';
 import { from } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
 import {
-  PRINT_DELIVERY_INVOICE_ENDPOINT,
+  PRINT_WARRANTY_INVOICE_ENDPOINT,
   LIST_WARRANTY_INVOICE_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   RESET_WARRANTY_CLAIM_ENDPOINT,
   REMOVE_WARRANTY_CLAIM_ENDPOINT,
   LIST_CUSTOMER_ENDPOINT,
   LIST_ITEMS_ENDPOINT,
+  RELAY_LIST_PRINT_FORMAT_ENDPOINT,
+  PRINT_SALES_INVOICE_PDF_METHOD,
 } from '../../constants/url-strings';
 import { APIResponse, Item } from '../../common/interfaces/sales.interface';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { CLOSE } from '../../constants/app-string';
 import { of } from 'rxjs';
 @Injectable({
   providedIn: 'root',
@@ -30,7 +31,6 @@ export class WarrantyService {
   constructor(
     private http: HttpClient,
     private readonly storage: StorageService,
-    private readonly snackbar: MatSnackBar,
   ) {
     this.itemList = [];
   }
@@ -175,37 +175,47 @@ export class WarrantyService {
     );
   }
 
+  getPrintFormats(name: string = '') {
+    return switchMap(value => {
+      if (!value) value = '';
+      const url = RELAY_LIST_PRINT_FORMAT_ENDPOINT;
+      const params = new HttpParams({
+        fromObject: {
+          fields: `["name"]`,
+          filters: `[["doc_type", "=", "Warranty Print"],["name","like","%${value}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(url, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
+  }
+
   getStorage() {
     return this.storage;
   }
 
-  printDocument(doc, invoice_name) {
+  printDocument(doc) {
     const blob = new Blob([JSON.stringify(doc)], {
       type: 'application/json',
     });
     const uploadData = new FormData();
     uploadData.append('file', blob, 'purchase_receipts');
-    return this.http
-      .post(PRINT_DELIVERY_INVOICE_ENDPOINT, uploadData, {
-        responseType: 'arraybuffer',
-      })
-      .subscribe({
-        next: success => {
-          const file = new Blob([success], { type: 'application/pdf' });
-          const fileURL = URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = fileURL;
-          a.target = '_blank';
-          a.download = invoice_name + '.pdf';
-          document.body.appendChild(a);
-          a.click();
-        },
-        error: err => {
-          this.snackbar.open(err?.message || err?.error?.message, CLOSE, {
-            duration: 4500,
-          });
-        },
-      });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(PRINT_WARRANTY_INVOICE_ENDPOINT, uploadData, {
+          headers,
+          responseType: 'arraybuffer',
+        });
+      }),
+    );
   }
 
   resetClaim(uuid: string, serial_no?: string) {
@@ -230,5 +240,20 @@ export class WarrantyService {
         );
       }),
     );
+  }
+
+  openPdf(format, uuid) {
+    this.getStorage()
+      .getItem(AUTH_SERVER_URL)
+      .then(auth_url => {
+        window.open(
+          `${auth_url}${PRINT_SALES_INVOICE_PDF_METHOD}?doctype=Warranty%20Print&name=` +
+            `${uuid}` +
+            `&format=${format.name}` +
+            `&no_letterhead=0` +
+            `&_lang=en`,
+          '_blank',
+        );
+      });
   }
 }

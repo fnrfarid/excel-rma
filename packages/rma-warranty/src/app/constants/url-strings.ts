@@ -141,6 +141,8 @@ export const GET_WARRANTY_STOCK_ENTRY =
   '/api/stock_entry/v1/get_warranty_stock';
 export const RELAY_LIST_ACCOUNT_ENDPOINT =
   '/api/command/user/api/resource/Account';
+export const RELAY_LIST_PRINT_FORMAT_ENDPOINT =
+  '/api/command/user/api/resource/Print%20Format';
 export const RELAY_LIST_ADDRESS_ENDPOINT =
   '/api/command/user/api/resource/Address';
 export const GET_TERRITORY_BY_WAREHOUSE_ENDPOINT =
@@ -154,6 +156,7 @@ export const SERIAL_LIST_API = '/api/serial_no/v1/list';
 export const RELAY_DOCTYPE_ENDPOINT_PREFIX = '/api/command/user/api/resource/';
 export const GET_LIST_PROBLEM_ENDPOINT = '/api/problem/v1/list';
 export const PRINT_DELIVERY_INVOICE_ENDPOINT = 'api/print/v1/delivery_invoice';
+export const PRINT_WARRANTY_INVOICE_ENDPOINT = 'api/print/v1/service_invoice';
 export const FINALIZE_WARRANTY_STOCK_ENTRY =
   '/api/stock_entry/v1/finalize_warranty_stock';
 export const UPDATE_DOCSTATUS_ENDPOINT =

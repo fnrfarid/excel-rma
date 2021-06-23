@@ -5,6 +5,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { WarrantyBulkProducts } from '../../../warranty-claim/entity/warranty-claim/warranty-claim.entity';
 
 export class Print {
   @IsString()
@@ -97,4 +98,61 @@ export class DeliveryChalanItemDto {
 
   @IsNumber()
   amount: number;
+}
+
+export interface WarrantyPrintDetails {
+  name: string;
+  third_party_name: string;
+  third_party_contact: string;
+  third_party_address: string;
+  customer: string;
+  customer_contact: string;
+  customer_address: string;
+  remarks: string;
+  claim_no: string;
+  received_on: string;
+  delivery_date: string;
+  receiving_branch: string;
+  problem_details: string;
+  delivered_by: string;
+  received_by: string;
+  items: string;
+  s_warehouse: string;
+  t_warehouse: string;
+  tc_details: string;
+  select_print_heading: string;
+  warranty_invoices: string;
+  footer: string;
+  problem: string;
+  uuid?: string;
+  replace_serial: string;
+  replace_product: string;
+  replace_warehouse: string;
+  claim_status?: string;
+  status_history?: string;
+  progress_state?: string;
+  completed_delivery_note?: string;
+  damage?: string;
+  set?: string;
+  service_vouchers?: string;
+  damaged_serial?: string;
+  damage_warehouse?: string;
+  damage_product?: string;
+  category?: string;
+  service_items?: string;
+  delivery_status?: string;
+  bulk_products?: WarrantyBulkProducts[];
+  print_type?: string;
+}
+
+export class WarrantyVouchers {
+  voucher_number: string;
+  amount: number;
+  paid: number;
+  unpaid: number;
+}
+export class WarrantyPrintItems {
+  item_name: string;
+  serial_no: string;
+  warranty_end_date: Date;
 }
