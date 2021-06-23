@@ -182,7 +182,9 @@ export class WarrantyService {
       const params = new HttpParams({
         fromObject: {
           fields: `["name"]`,
-          filters: `[["doc_type", "=", "Warranty Print"],["name","like","%${value}%"]]`,
+          filters: value
+            ? `[["doc_type", "=", "Warranty Print"],["name","like","%${value}%"]]`
+            : `[["doc_type", "=", "Warranty Print"],["name","like","%''%"]]`,
         },
       });
       return this.getHeaders().pipe(
