@@ -249,7 +249,7 @@ export class WarrantyService {
       .getItem(AUTH_SERVER_URL)
       .then(auth_url => {
         window.open(
-          `${auth_url}${PRINT_SALES_INVOICE_PDF_METHOD}?doctype=Warranty%20Print&name=` +
+          `${auth_url}${PRINT_SALES_INVOICE_PDF_METHOD}?doctype=Excel%20Warranty%20Print&name=` +
             `${uuid}` +
             `&format=${format.name}` +
             `&no_letterhead=0` +
