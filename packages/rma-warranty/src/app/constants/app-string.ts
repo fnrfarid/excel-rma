@@ -21,6 +21,7 @@ export const MATERIAL_RECEIPT = 'Material Receipt';
 export const PURCHASE_USER = 'Purchase User';
 export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
 export const EXCEL_SALES_USER = 'Excel Sales User';
+export const EXCEL_WARRANTY_PRINT = 'Excel Warranty Print';
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
   PAID: 'Paid',

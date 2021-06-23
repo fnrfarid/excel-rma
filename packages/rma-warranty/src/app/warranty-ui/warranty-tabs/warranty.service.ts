@@ -22,6 +22,7 @@ import {
 } from '../../constants/url-strings';
 import { APIResponse, Item } from '../../common/interfaces/sales.interface';
 import { of } from 'rxjs';
+import { EXCEL_WARRANTY_PRINT } from 'src/app/constants/app-string';
 @Injectable({
   providedIn: 'root',
 })
@@ -183,8 +184,8 @@ export class WarrantyService {
         fromObject: {
           fields: `["name"]`,
           filters: value
-            ? `[["doc_type", "=", "Warranty Print"],["name","like","%${value}%"]]`
-            : `[["doc_type", "=", "Warranty Print"],["name","like","%''%"]]`,
+            ? `[["doc_type", "=", "${EXCEL_WARRANTY_PRINT}"],["name","like","%${value}%"]]`
+            : `[["doc_type", "=", "${EXCEL_WARRANTY_PRINT}"],["name","like","%''%"]]`,
         },
       });
       return this.getHeaders().pipe(
@@ -249,8 +250,8 @@ export class WarrantyService {
       .getItem(AUTH_SERVER_URL)
       .then(auth_url => {
         window.open(
-          `${auth_url}${PRINT_SALES_INVOICE_PDF_METHOD}?doctype=Excel%20Warranty%20Print&name=` +
-            `${uuid}` +
+          `${auth_url}${PRINT_SALES_INVOICE_PDF_METHOD}?doctype=${EXCEL_WARRANTY_PRINT}` +
+            `&name=${uuid}` +
             `&format=${format.name}` +
             `&no_letterhead=0` +
             `&_lang=en`,
