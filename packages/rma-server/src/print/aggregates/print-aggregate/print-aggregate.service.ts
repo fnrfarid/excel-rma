@@ -11,18 +11,11 @@ import { ServerSettings } from '../../../system-settings/entities/server-setting
 import {
   DeliveryChalanDto,
   WarrantyPrintDetails,
-  WarrantyPrintItems,
-  WarrantyVouchers,
 } from '../../../print/entities/print/print.dto';
 import { Response } from 'express';
-import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
-import {
-  APPLICATION_JSON_CONTENT_TYPE,
-  CATEGORY,
-} from '../../../constants/app-strings';
-import { ServiceInvoiceService } from '../../../service-invoice/entity/service-invoice/service-invoice.service';
-import { from, of, throwError } from 'rxjs';
-import { catchError, concatMap, map, switchMap, toArray } from 'rxjs/operators';
+import { APPLICATION_JSON_CONTENT_TYPE } from '../../../constants/app-strings';
+import { throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { POST_WARRANTY_PRINT_ENDPOINT } from '../../../constants/routes';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
@@ -30,7 +23,6 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 export class PrintAggregateService {
   constructor(
     private readonly settings: ServerSettingsService,
-    private invoiceService: ServiceInvoiceService,
     private http: HttpService,
     private settingService: SettingsService,
   ) {}
@@ -304,63 +296,8 @@ export class PrintAggregateService {
     return year + '/' + month + '/' + day;
   }
 
-  createFrappePrint(req, invoice: WarrantyClaimDto) {
-    return this.generateWarrantyPrintBody(req, invoice);
-  }
-
-  generateWarrantyPrintBody(req, invoice: WarrantyClaimDto) {
-    const erpBody = {} as WarrantyPrintDetails;
-    invoice.service_vouchers = invoice.service_vouchers
-      ? invoice.service_vouchers
-      : [];
-    Object.assign(erpBody, invoice);
-    erpBody.name = invoice.uuid;
-    erpBody.delivery_status = invoice.claim_status;
-    erpBody.print_type = invoice.print.print_type;
-    erpBody.items = JSON.stringify(this.mapWarrantyItems(invoice));
-    return from(
-      this.invoiceService.find({
-        invoice_no: { $in: invoice.service_vouchers },
-      }),
-    ).pipe(
-      switchMap(res => {
-        return from(res).pipe(
-          concatMap(singleVoucher => {
-            return of({
-              voucher_number: singleVoucher.invoice_no,
-              description: singleVoucher.items[0].item_name,
-              amount: singleVoucher.total,
-              paid: singleVoucher.total,
-              unpaid: singleVoucher.total - singleVoucher.total,
-            });
-          }),
-          toArray(),
-        );
-      }),
-      switchMap((warrantyInvoices: WarrantyVouchers[]) => {
-        Object.values([
-          'progress_state',
-          'completed_delivery_note',
-          'set',
-          'damaged_serial',
-          'damage_warehouse',
-          'damage_product',
-          'category',
-          'service_items',
-          'service_vouchers',
-          'bulk_products',
-          'status_history',
-          'print',
-        ]).forEach(key => {
-          delete erpBody[key];
-        });
-        erpBody.warranty_invoices = JSON.stringify([...warrantyInvoices]);
-        return of(erpBody);
-      }),
-      switchMap((body: WarrantyPrintDetails) => {
-        return this.createWarrantyPrintDocument(req, body);
-      }),
-    );
+  createFrappePrint(req, invoice: WarrantyPrintDetails) {
+    return this.createWarrantyPrintDocument(req, invoice);
   }
 
   createWarrantyPrintDocument(req, warrantyPrintBody: WarrantyPrintDetails) {
@@ -405,20 +342,5 @@ export class PrintAggregateService {
       }),
       map(res => res.data),
     );
-  }
-
-  mapWarrantyItems(invoice: WarrantyClaimDto) {
-    const array: WarrantyPrintItems[] = [];
-    if (invoice.set === CATEGORY.BULK) {
-      return [...invoice.bulk_products];
-    }
-    return [
-      ...array,
-      {
-        item_name: invoice.item_name,
-        serial_no: invoice.serial_no,
-        warranty_end_date: invoice.warranty_end_date,
-      },
-    ];
   }
 }

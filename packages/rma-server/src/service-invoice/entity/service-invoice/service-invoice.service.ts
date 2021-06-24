@@ -35,6 +35,7 @@ export class ServiceInvoiceService {
     });
     return query;
   }
+
   async find(query?) {
     return await this.serviceInvoiceRepository.find(query);
   }
@@ -51,6 +52,7 @@ export class ServiceInvoiceService {
 
   async list(skip, take, search, sort) {
     let dateQuery = {};
+    let service_vouchers = {};
     try {
       search = JSON.parse(search);
     } catch {
@@ -65,7 +67,15 @@ export class ServiceInvoiceService {
       };
     }
 
-    const $and: any[] = [search ? this.getFilterQuery(search) : {}, dateQuery];
+    if (search.service_vouchers) {
+      service_vouchers = search.service_vouchers;
+    }
+
+    const $and: any[] = [
+      search ? this.getFilterQuery(search) : {},
+      dateQuery,
+      service_vouchers,
+    ];
 
     const where: { $and: any } = { $and };
 

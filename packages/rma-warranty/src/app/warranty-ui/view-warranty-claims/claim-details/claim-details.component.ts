@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CLOSE, CLAIM_STATUS } from '../../../constants/app-string';
+import { CLOSE } from '../../../constants/app-string';
 import {
   WarrantyItem,
   WarrantyClaimsDetails,
@@ -88,19 +88,11 @@ export class ClaimDetailsComponent implements OnInit {
   }
 
   printDeliveryNote(docType?: string, format?: string) {
-    let print_type: string = '';
+    const print_type: string = '';
     return this.warrantyService.getWarrantyClaim(this.invoiceUuid).pipe(
       switchMap((data: any) => {
         data.company = this.company;
-        switch (data.claim_status) {
-          case CLAIM_STATUS.DELIVERED:
-            print_type = `Delivery Token`;
-            break;
 
-          default:
-            print_type = `Service Token`;
-            break;
-        }
         const aggregatedWarrantyReciept = data;
         const warehouses: {
           [ket: string]: string;
@@ -122,8 +114,7 @@ export class ClaimDetailsComponent implements OnInit {
       message: `Generating Print...!`,
     });
     await loading.present();
-    const doc = `Warranty Claim`;
-    this.printDeliveryNote(doc, format).subscribe({
+    this.warrantyService.generateWarrantyPrintBody(this.invoiceUuid).subscribe({
       next: success => {
         this.warrantyService.openPdf(format, this.invoiceUuid);
         loading.dismiss();

@@ -126,3 +126,5 @@ export const SERVICE_INVOICE_DOWNLOAD_HEADERS = [
   'total',
 ];
 export const SERVICE_INVOICE_CSV_FILE = 'service-invoice-list.csv';
+export const DELIVERY_TOKEN = 'Delivery Token';
+export const SERVICE_TOKEN = 'Service Token';

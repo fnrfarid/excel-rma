@@ -144,8 +144,7 @@ export class BulkClaimDetailsComponent implements OnInit {
       message: `Generating Print...!`,
     });
     await loading.present();
-    const doc = `Warranty Claim`;
-    this.printDeliveryNote(doc, format).subscribe({
+    this.warrantyService.generateWarrantyPrintBody(this.uuid).subscribe({
       next: success => {
         this.warrantyService.openPdf(format, this.uuid);
         loading.dismiss();

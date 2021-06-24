@@ -144,15 +144,3 @@ export interface WarrantyPrintDetails {
   bulk_products?: WarrantyBulkProducts[];
   print_type?: string;
 }
-
-export class WarrantyVouchers {
-  voucher_number: string;
-  amount: number;
-  paid: number;
-  unpaid: number;
-}
-export class WarrantyPrintItems {
-  item_name: string;
-  serial_no: string;
-  warranty_end_date: Date;
-}
