@@ -14,11 +14,15 @@ describe('AppService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AppService, {
-        provide: STORAGE_TOKEN, useValue: {
-          getItem: (...args) => Promise.resolve('ITEM')
-        }
-      }],
+      providers: [
+        AppService,
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
+        },
+      ],
     });
 
     injector = getTestBed();
