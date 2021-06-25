@@ -1,31 +1,14 @@
-import {
-  BadRequestException,
-  HttpService,
-  Injectable,
-  NotImplementedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as pdfkit from 'pdfkit';
 import * as fetch from 'node-fetch';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
-import {
-  DeliveryChalanDto,
-  WarrantyPrintDetails,
-} from '../../../print/entities/print/print.dto';
+import { DeliveryChalanDto } from '../../../print/entities/print/print.dto';
 import { Response } from 'express';
-import { APPLICATION_JSON_CONTENT_TYPE } from '../../../constants/app-strings';
-import { throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { POST_WARRANTY_PRINT_ENDPOINT } from '../../../constants/routes';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 
 @Injectable()
 export class PrintAggregateService {
-  constructor(
-    private readonly settings: ServerSettingsService,
-    private http: HttpService,
-    private settingService: SettingsService,
-  ) {}
+  constructor(private readonly settings: ServerSettingsService) {}
 
   async getDeliveryChalan(invoice: DeliveryChalanDto, res: Response, req) {
     let buffer;
@@ -294,53 +277,5 @@ export class PrintAggregateService {
     const year = date.getFullYear();
 
     return year + '/' + month + '/' + day;
-  }
-
-  createFrappePrint(req, invoice: WarrantyPrintDetails) {
-    return this.createWarrantyPrintDocument(req, invoice);
-  }
-
-  createWarrantyPrintDocument(req, warrantyPrintBody: WarrantyPrintDetails) {
-    let url: string = '';
-    return this.settingService.find().pipe(
-      switchMap(setting => {
-        if (!setting.authServerURL) {
-          return throwError(new NotImplementedException());
-        }
-        url = `${setting.authServerURL}${POST_WARRANTY_PRINT_ENDPOINT}`;
-        return this.http.get(`${url}/${warrantyPrintBody.uuid}`, {
-          headers: {
-            authorization: req.headers.authorization,
-            Accept: APPLICATION_JSON_CONTENT_TYPE,
-          },
-        });
-      }),
-      map(res => res.data),
-      switchMap(() => {
-        return this.http.put(
-          `${url}/${warrantyPrintBody.uuid}`,
-          warrantyPrintBody,
-          {
-            headers: {
-              authorization: req.headers.authorization,
-              Accept: APPLICATION_JSON_CONTENT_TYPE,
-            },
-          },
-        );
-      }),
-      map(res => res.data),
-      catchError(err => {
-        if (err.response.status === 404) {
-          return this.http.post(url, warrantyPrintBody, {
-            headers: {
-              authorization: req.headers.authorization,
-              Accept: APPLICATION_JSON_CONTENT_TYPE,
-            },
-          });
-        }
-        return throwError(new BadRequestException(err.response.statusText));
-      }),
-      map(res => res.data),
-    );
   }
 }

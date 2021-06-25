@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   NotImplementedException,
+  HttpService,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +24,7 @@ import {
   CLAIM_STATUS,
   WARRANTY_CLAIM_DOCTYPE,
   CATEGORY,
+  APPLICATION_JSON_CONTENT_TYPE,
 } from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
@@ -44,6 +46,8 @@ import {
   SerialNoHistoryInterface,
   EventType,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { POST_WARRANTY_PRINT_ENDPOINT } from '../../../constants/routes';
+import { WarrantyPrintDetails } from '../../../print/entities/print/print.dto';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -53,6 +57,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
     private readonly serialNoHistoryService: SerialNoHistoryService,
+    private readonly http: HttpService,
   ) {
     super();
   }
@@ -824,5 +829,49 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           );
         }),
       );
+  }
+
+  syncWarrantyClaimDocument(req, warrantyPrintBody: WarrantyPrintDetails) {
+    let url: string = '';
+    return this.settingsService.find().pipe(
+      switchMap(setting => {
+        if (!setting.authServerURL) {
+          return throwError(new NotImplementedException());
+        }
+        url = `${setting.authServerURL}${POST_WARRANTY_PRINT_ENDPOINT}`;
+        return this.http.get(`${url}/${warrantyPrintBody.uuid}`, {
+          headers: {
+            authorization: req.headers.authorization,
+            Accept: APPLICATION_JSON_CONTENT_TYPE,
+          },
+        });
+      }),
+      map(res => res.data),
+      switchMap(() => {
+        return this.http.put(
+          `${url}/${warrantyPrintBody.uuid}`,
+          warrantyPrintBody,
+          {
+            headers: {
+              authorization: req.headers.authorization,
+              Accept: APPLICATION_JSON_CONTENT_TYPE,
+            },
+          },
+        );
+      }),
+      map(res => res.data),
+      catchError(err => {
+        if (err.response.status === 404) {
+          return this.http.post(url, warrantyPrintBody, {
+            headers: {
+              authorization: req.headers.authorization,
+              Accept: APPLICATION_JSON_CONTENT_TYPE,
+            },
+          });
+        }
+        return throwError(new BadRequestException(err.response.statusText));
+      }),
+      map(res => res.data),
+    );
   }
 }

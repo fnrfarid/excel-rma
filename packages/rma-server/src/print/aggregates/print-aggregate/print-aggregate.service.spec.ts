@@ -1,6 +1,4 @@
-import { HttpService } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
 import { PrintAggregateService } from './print-aggregate.service';
 
@@ -13,14 +11,6 @@ describe('PrintAggregateService', () => {
         PrintAggregateService,
         {
           provide: ServerSettingsService,
-          useValue: {},
-        },
-        {
-          provide: SettingsService,
-          useValue: {},
-        },
-        {
-          provide: HttpService,
           useValue: {},
         },
       ],

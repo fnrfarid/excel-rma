@@ -5,6 +5,7 @@ import { ServerSettingsService } from '../../../system-settings/entities/server-
 import { TokenCacheService } from '../../../auth/entities/token-cache/token-cache.service';
 import { HttpService } from '@nestjs/common';
 import { TokenGuard } from '../../../auth/guards/token.guard';
+import { WarrantyClaimAggregateService } from '../../aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
 
 describe('WarrantyClaim Controller', () => {
   let controller: WarrantyClaimController;
@@ -33,6 +34,10 @@ describe('WarrantyClaim Controller', () => {
           provide: HttpService,
           useValue: {},
         },
+        {
+          provide: WarrantyClaimAggregateService,
+          useValue: {}
+        }
       ],
     })
       .overrideGuard(TokenGuard)

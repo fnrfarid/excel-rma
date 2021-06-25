@@ -10,7 +10,7 @@ import { from } from 'rxjs';
 import { catchError, concatMap, map, switchMap, toArray } from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
 import {
-  PRINT_WARRANTY_INVOICE_ENDPOINT,
+  SYNC_WARRANTY_INVOICE_ENDPOINT,
   LIST_WARRANTY_INVOICE_ENDPOINT,
   WARRANTY_CLAIM_GET_ONE_ENDPOINT,
   RESET_WARRANTY_CLAIM_ENDPOINT,
@@ -227,7 +227,7 @@ export class WarrantyService {
     uploadData.append('file', blob, 'purchase_receipts');
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.post(PRINT_WARRANTY_INVOICE_ENDPOINT, uploadData, {
+        return this.http.post(SYNC_WARRANTY_INVOICE_ENDPOINT, uploadData, {
           headers,
           responseType: 'arraybuffer',
         });
