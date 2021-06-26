@@ -91,3 +91,5 @@ export const LANDED_COST_VOUCHER_ENDPOINT =
   '/api/resource/Landed%20Cost%20Voucher';
 export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
   '/api/method/erpnext.stock.utils.get_stock_balance';
+export const POST_WARRANTY_PRINT_ENDPOINT =
+  '/api/resource/Excel%20Warranty%20Print';

@@ -3,10 +3,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { WarrantyService } from '../../warranty-tabs/warranty.service';
 import { WarrantyClaimsDataSource } from '../../warranty/warranty-claims-datasource';
-import { DURATION } from 'src/app/constants/app-string';
+import { CLAIM_STATUS, CLOSE } from '../../../constants/app-string';
+import { LoadingController } from '@ionic/angular';
+import { MatDialog } from '@angular/material/dialog';
+import { PrintSettingDialog } from '../../shared-warranty-modules/print-setting-dialog/print-setting-dialog';
 
 @Component({
   selector: 'bulk-claim-details',
@@ -47,6 +50,8 @@ export class BulkClaimDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
     private warrantyService: WarrantyService,
+    private readonly loadingController: LoadingController,
+    private readonly dialog: MatDialog,
   ) {}
 
   ngOnInit() {
@@ -105,7 +110,62 @@ export class BulkClaimDetailsComponent implements OnInit {
     );
   }
 
-  comingSoon(message) {
-    this.snackBar.open(message, 'Close', { duration: DURATION });
+  printDeliveryNote(docType?: string, format?: string) {
+    let print_type: string = '';
+    return this.warrantyService.getWarrantyClaim(this.uuid).pipe(
+      switchMap((data: any) => {
+        switch (data.claim_status) {
+          case CLAIM_STATUS.DELIVERED:
+            print_type = `Delivery Token`;
+            break;
+
+          default:
+            print_type = `Service Token`;
+            break;
+        }
+        const aggregatedWarrantyReciept = data;
+        const warehouses: {
+          [ket: string]: string;
+        } = {};
+        return this.warrantyService.printDocument({
+          ...aggregatedWarrantyReciept,
+          name: data.claim_no,
+          print: {
+            print_type,
+            ...warehouses,
+          },
+        });
+      }),
+    );
+  }
+
+  async getPrint(format) {
+    const loading = await this.loadingController.create({
+      message: `Generating Print...!`,
+    });
+    await loading.present();
+    this.warrantyService.generateWarrantyPrintBody(this.uuid).subscribe({
+      next: success => {
+        this.warrantyService.openPdf(format, this.uuid);
+        loading.dismiss();
+      },
+      error: err => {
+        loading.dismiss();
+        this.snackBar.open(`Failed To Print`, CLOSE, { duration: 4500 });
+      },
+    });
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(PrintSettingDialog, {
+      width: '300px',
+      data: {},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getPrint(result);
+      }
+    });
   }
 }

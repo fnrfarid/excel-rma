@@ -32,12 +32,15 @@ import { AddStatusHistoryCommand } from '../../command/add-status-history/add-st
 import { RemoveStatusHistoryCommand } from '../../command/remove-status-history/remove-status-history.command';
 import { BulkWarrantyClaimDto } from '../../entity/warranty-claim/bulk-warranty-claim-dto';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
+import { WarrantyPrintDetails } from '../../../print/entities/print/print.dto';
+import { WarrantyClaimAggregateService } from '../../aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
 
 @Controller('warranty_claim')
 export class WarrantyClaimController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly aggregate: WarrantyClaimAggregateService,
   ) {}
 
   @Post('v1/create')
@@ -147,5 +150,13 @@ export class WarrantyClaimController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   removeStatusHistory(@Body() uuid: string) {
     return this.commandBus.execute(new RemoveStatusHistoryCommand(uuid));
+  }
+
+  @Post('v1/sync_warranty_document')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @UseInterceptors(FileInterceptor('file'))
+  syncWarrantyClaimDocument(@Req() req, @UploadedFile('file') file) {
+    const body: WarrantyPrintDetails = JSON.parse(file.buffer);
+    return this.aggregate.syncWarrantyClaimDocument(req, body);
   }
 }

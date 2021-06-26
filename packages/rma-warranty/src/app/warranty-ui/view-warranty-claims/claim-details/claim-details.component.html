@@ -51,11 +51,11 @@
             </ion-fab-button>
             <ion-fab-button
               *ngIf="warrantyClaimsDetails?.claim_status !== 'Cancelled'"
-              (click)="getPrint()"
+              (click)="openDialog()"
               matTooltip="print"
               matTooltipPosition="above"
               matTooltipClass="tooltip"
-              (ctrlM)="getPrint()"
+              (ctrlM)="openDialog()"
               color="primary"
             >
               <ion-icon name="print-outline"></ion-icon>

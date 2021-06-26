@@ -40,7 +40,12 @@ describe('AppComponent', () => {
             },
           },
         },
-        { provide: STORAGE_TOKEN, useValue: {} },
+        {
+          provide: STORAGE_TOKEN,
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
+        },
       ],
       imports: [RouterTestingModule.withRoutes([]), HttpClientTestingModule],
     }).compileComponents();

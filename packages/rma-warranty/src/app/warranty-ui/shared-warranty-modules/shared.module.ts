@@ -7,9 +7,10 @@ import { IonicModule } from '@ionic/angular';
 import { AppCommonModule } from 'src/app/common/app-common.module';
 import { MaterialModule } from 'src/app/material/material.module';
 import { RouterModule } from '@angular/router';
+import { PrintSettingDialog } from './print-setting-dialog/print-setting-dialog';
 
 @NgModule({
-  declarations: [ServiceInvoicesComponent],
+  declarations: [ServiceInvoicesComponent, PrintSettingDialog],
   imports: [
     CommonModule,
     FormsModule,
@@ -20,6 +21,6 @@ import { RouterModule } from '@angular/router';
     AppCommonModule,
     RouterModule,
   ],
-  exports: [ServiceInvoicesComponent],
+  exports: [ServiceInvoicesComponent, PrintSettingDialog],
 })
 export class SharedModule {}

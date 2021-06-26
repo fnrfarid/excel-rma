@@ -251,7 +251,7 @@
             <ion-col class="ion-text-left" *ngIf="route ==='edit'">
               <ion-button
                 color="tertiary"
-                *ngIf="warrantyObject?.category === 'Bulk'"
+                *ngIf="warrantyObject?.set === 'Bulk'"
                 (click)="appendProduct()"
               >
                 Add
