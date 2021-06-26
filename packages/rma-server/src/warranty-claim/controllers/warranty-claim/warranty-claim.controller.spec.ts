@@ -36,8 +36,8 @@ describe('WarrantyClaim Controller', () => {
         },
         {
           provide: WarrantyClaimAggregateService,
-          useValue: {}
-        }
+          useValue: {},
+        },
       ],
     })
       .overrideGuard(TokenGuard)
