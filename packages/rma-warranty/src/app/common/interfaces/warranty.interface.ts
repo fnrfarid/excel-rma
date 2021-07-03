@@ -224,6 +224,7 @@ export class StockEntryDetails {
   type?: string;
   description?: string;
   customer?: string;
+  stock_voucher_number?: string;
   salesWarrantyDate?: string;
   soldOn?: string;
   delivery_note?: string;
@@ -242,6 +243,8 @@ export class StockItem {
   qty?: number;
   serial_no?: string;
   has_serial_no?: number;
+  excel_serials?: string;
+  warranty?: any;
 }
 
 export class StockEntryItems {
@@ -316,6 +319,18 @@ export interface WarrantyPrintDetails {
   delivery_status?: string;
   bulk_products?: WarrantyBulkProducts[];
   print_type?: string;
+  delivery_notes?: string;
+  posting_time?: Date;
+  warranty_end_date?: string;
+}
+
+export class PrintDeliveryNotes {
+  item_name?: string;
+  serial_no?: string;
+  voucher_number?: string;
+  warranty_end_date?: string;
+  set_warehouse?: string;
+  description?: string;
 }
 
 export class WarrantyVouchers {

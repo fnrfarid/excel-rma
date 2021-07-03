@@ -166,6 +166,9 @@ export class WarrantyClaim extends BaseEntity {
 
   @Column()
   service_items: string[];
+
+  @Column()
+  posting_time: Date;
 }
 
 export class WarrantyBulkProducts {

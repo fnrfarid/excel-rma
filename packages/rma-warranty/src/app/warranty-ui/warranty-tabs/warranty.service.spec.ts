@@ -8,6 +8,8 @@ import {
   STORAGE_TOKEN,
 } from '../../api/storage/storage.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { StockEntryService } from '../view-warranty-claims/stock-entry/services/stock-entry/stock-entry.service';
+import { of } from 'rxjs';
 
 describe('WarrantyService', () => {
   beforeEach(() =>
@@ -26,6 +28,12 @@ describe('WarrantyService', () => {
           useValue: {
             getItem: (...args) => Promise.resolve('Item'),
             getItems: (...args) => Promise.resolve({}),
+          },
+        },
+        {
+          provide: StockEntryService,
+          useValue: {
+            getWarrantyClaimsList: (...args) => of([{}]),
           },
         },
         { provide: STORAGE_TOKEN, useValue: {} },

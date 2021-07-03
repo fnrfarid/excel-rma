@@ -162,3 +162,5 @@ export const FINALIZE_WARRANTY_STOCK_ENTRY =
   '/api/stock_entry/v1/finalize_warranty_stock';
 export const UPDATE_DOCSTATUS_ENDPOINT =
   'api/service_invoice/v1/update_docstatus/';
+export const LOAD_FRAPPE_DOCUMENT_METHOD_ENDPOINT =
+  '/api/command/user/api/method/frappe.desk.form.load.getdoc';
