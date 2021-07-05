@@ -143,4 +143,5 @@ export interface WarrantyPrintDetails {
   delivery_status?: string;
   bulk_products?: WarrantyBulkProducts[];
   print_type?: string;
+  posting_time?: string;
 }

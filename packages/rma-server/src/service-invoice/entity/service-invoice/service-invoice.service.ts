@@ -69,6 +69,10 @@ export class ServiceInvoiceService {
 
     if (search.service_vouchers) {
       service_vouchers = search.service_vouchers;
+      service_vouchers = {
+        ...search.service_vouchers,
+        docstatus: search.service_vouchers.docstatus,
+      };
     }
 
     const $and: any[] = [
