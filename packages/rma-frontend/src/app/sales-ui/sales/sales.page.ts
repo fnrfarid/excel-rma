@@ -344,8 +344,6 @@ export class SalesPage implements OnInit {
       );
     }
     this.sortQuery = {};
-      console.log(query);
-      
     if (event) {
       for (const key of Object.keys(event)) {
         if (key === 'active' && event.direction !== '') {
