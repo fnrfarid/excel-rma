@@ -50,13 +50,6 @@ export class SerialSearchDataSource extends DataSource<SerialSearchFields> {
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe(items => {
-        this.serialSearchService
-          .getCustomerName(this.data[0].customer)
-          .subscribe({
-            next: res => {
-              this.data[0].customer_name = res.customer_name;
-            },
-          });
         this.itemSubject.next(items);
       });
   }
