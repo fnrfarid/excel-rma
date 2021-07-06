@@ -13,6 +13,7 @@ import {
   RELAY_DOCTYPE_ENDPOINT_PREFIX,
   GET_DIRECT_SERIAL_ENDPOINT,
   API_INFO_ENDPOINT,
+  CUSTOMER_ENDPOINT,
   GET_SERIAL_HISTORY_ENDPOINT,
   LIST_ITEMS_ENDPOINT,
 } from '../../constants/url-strings';
@@ -58,6 +59,19 @@ export class SerialSearchService {
           params,
           headers,
         });
+      }),
+    );
+  }
+
+  getCustomerName(customerCode: string) {
+    const getcustomernameURL = `${CUSTOMER_ENDPOINT}/${customerCode}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(getcustomernameURL, { headers });
+      }),
+      map(res => res.data),
+      switchMap(res => {
+        return of(res);
       }),
     );
   }
