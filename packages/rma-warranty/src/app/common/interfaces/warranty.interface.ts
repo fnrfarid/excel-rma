@@ -114,6 +114,7 @@ export interface WarrantyClaimsDetails {
   claim_no?: string;
   service_vouchers?: string[];
   print?: any;
+  progress_state: StockEntryDetails[];
 }
 
 export class WarrantyBulkProducts {
@@ -322,6 +323,7 @@ export interface WarrantyPrintDetails {
   delivery_notes?: string;
   posting_time?: Date;
   warranty_end_date?: string;
+  bulk_invoices?: string;
 }
 
 export class PrintDeliveryNotes {
