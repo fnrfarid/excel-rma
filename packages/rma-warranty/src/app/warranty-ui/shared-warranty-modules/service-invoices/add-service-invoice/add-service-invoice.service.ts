@@ -306,7 +306,7 @@ export class AddServiceInvoiceService {
         });
       }),
       map(res => res.docs),
-      switchMap(res => {
+      switchMap((res: ServiceInvoiceDetails[]) => {
         return of(res);
       }),
     );

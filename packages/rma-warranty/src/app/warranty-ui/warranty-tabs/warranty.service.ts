@@ -7,7 +7,14 @@ import {
   BEARER_TOKEN_PREFIX,
 } from '../../constants/storage';
 import { forkJoin, from } from 'rxjs';
-import { catchError, concatMap, map, switchMap, toArray } from 'rxjs/operators';
+import {
+  catchError,
+  concatMap,
+  filter,
+  map,
+  switchMap,
+  toArray,
+} from 'rxjs/operators';
 import { StorageService } from '../../api/storage/storage.service';
 import {
   SYNC_WARRANTY_INVOICE_ENDPOINT,
@@ -33,11 +40,10 @@ import {
   StockEntryDetails,
   WarrantyClaimsDetails,
   WarrantyPrintDetails,
-  WarrantyVouchers,
 } from '../../common/interfaces/warranty.interface';
 import { AddServiceInvoiceService } from '../shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 import { LOAD_FRAPPE_DOCUMENT_METHOD_ENDPOINT } from '../../constants/url-strings';
-import { StockEntryService } from '../view-warranty-claims/stock-entry/services/stock-entry/stock-entry.service';
+import { ServiceInvoiceDetails } from '../shared-warranty-modules/service-invoices/add-service-invoice/service-invoice-interface';
 @Injectable({
   providedIn: 'root',
 })
@@ -48,7 +54,6 @@ export class WarrantyService {
     private http: HttpClient,
     private readonly storage: StorageService,
     private readonly serviceInvoiceService: AddServiceInvoiceService,
-    private readonly stockEntryService: StockEntryService,
   ) {
     this.itemList = [];
   }
@@ -281,13 +286,13 @@ export class WarrantyService {
       });
   }
 
-  mapWarrantyItems(invoice: WarrantyClaimsDetails) {
-    if (invoice.set === CATEGORY.BULK) {
+  mapWarrantyItems(warrantyDetail: WarrantyClaimsDetails) {
+    if (warrantyDetail.set === CATEGORY.BULK) {
       return this.getWarrantyClaimsList(
         undefined,
         undefined,
         undefined,
-        { parent: invoice.uuid },
+        { parent: warrantyDetail.uuid },
         {
           set: ['Part'],
         },
@@ -301,12 +306,16 @@ export class WarrantyService {
             toArray(),
           );
         }),
-        switchMap(finalBody => {
-          return of(finalBody);
+        switchMap(bulkClaimItems => {
+          return of(bulkClaimItems);
         }),
       );
     }
-    return this.mapClaim(invoice);
+    return this.mapClaim(warrantyDetail).pipe(
+      switchMap(singleClaimItem => {
+        return of([singleClaimItem]);
+      }),
+    );
   }
 
   addressAndContact(doctype: string, customer: string) {
@@ -346,75 +355,138 @@ export class WarrantyService {
     );
   }
 
-  mapDeliveryNotes(warrantyClaimUuid?: string) {
-    return from(
-      this.stockEntryService.getStockEntryList(
-        undefined,
-        undefined,
-        undefined,
-        {
-          stock_entry_type: 'Delivered',
-          warrantyClaimUuid,
-        },
-      ),
-    ).pipe(
-      switchMap((res: any) => {
-        return from(res.docs).pipe(
-          concatMap((singleRes: StockEntryDetails) => {
-            return of({
-              stock_voucher_number: singleRes.stock_voucher_number,
-              serial_no:
-                singleRes.items[0] && singleRes.items[0].excel_serials
-                  ? singleRes.items[0].excel_serials
-                  : '',
-              item_name:
-                singleRes.items[0] && singleRes.items[0].item_name
-                  ? singleRes.items[0].item_name
-                  : '',
-              warranty_end_date:
-                singleRes.items[0] && singleRes.items[0].warranty
-                  ? singleRes.items[0].warranty.salesWarrantyDate
-                  : '',
-              warehouse: singleRes.set_warehouse,
-              description: singleRes.description,
-            });
-          }),
-        );
+  mapDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
+    return from(warrantyDetail.progress_state).pipe(
+      concatMap((singleStockEntry: StockEntryDetails) => {
+        return of({
+          stock_voucher_number: singleStockEntry.stock_voucher_number,
+          serial_no: singleStockEntry.items.find(item => item).excel_serials,
+          item_name: singleStockEntry.items.find(item => item).item_name,
+          warranty_end_date: warrantyDetail.warranty_end_date
+            ? warrantyDetail.warranty_end_date.toString().split('T')[0]
+            : '',
+          warehouse: singleStockEntry.set_warehouse,
+          description: singleStockEntry.description,
+        });
       }),
       toArray(),
-      switchMap(finalBody => {
-        return of(finalBody);
+      switchMap(deliveryNotesPayload => {
+        return of({ [warrantyDetail.uuid]: deliveryNotesPayload });
       }),
     );
   }
 
-  mapClaim(invoice: WarrantyClaimsDetails) {
+  mapBulkServiceInvoice(warrantyDetail: WarrantyClaimsDetails) {
+    if (warrantyDetail.set === CATEGORY.BULK) {
+      return this.getWarrantyClaimsList(
+        undefined,
+        undefined,
+        undefined,
+        { parent: warrantyDetail.uuid },
+        {
+          set: ['Part'],
+        },
+      ).pipe(
+        map(res => res.docs),
+        switchMap(res => {
+          return from(res).pipe(
+            concatMap(partClaim => {
+              return this.getInvoiceList(partClaim);
+            }),
+            toArray(),
+          );
+        }),
+        switchMap((subClaimServiceInvoices: ServiceInvoiceDetails[][]) => {
+          return of({
+            subClaimServiceInvoices,
+          });
+        }),
+      );
+    }
+    return of({ subClaimServiceInvoices: {} });
+  }
+
+  getInvoiceList(warrantyDetail: WarrantyClaimsDetails) {
+    return this.serviceInvoiceService
+      .getServiceInvoiceList(
+        JSON.stringify({
+          service_vouchers: {
+            docstatus: 1,
+            invoice_no: { $in: warrantyDetail.service_vouchers },
+          },
+        }),
+      )
+      .pipe(
+        switchMap((res: ServiceInvoiceDetails[]) => {
+          return of(res);
+        }),
+      );
+  }
+
+  mapBulkDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
+    if (warrantyDetail.set === CATEGORY.BULK) {
+      return this.getWarrantyClaimsList(
+        undefined,
+        undefined,
+        undefined,
+        { parent: warrantyDetail.uuid },
+        {
+          set: ['Part'],
+        },
+      ).pipe(
+        map(res => res.docs),
+        switchMap(res => {
+          return from(res).pipe(
+            concatMap(partClaim => {
+              return this.mapDeliveryNotes(partClaim);
+            }),
+            toArray(),
+          );
+        }),
+        switchMap(bulkDeliveryNotes => {
+          return of(bulkDeliveryNotes);
+        }),
+      );
+    }
+    return this.mapDeliveryNotes(warrantyDetail).pipe(
+      switchMap(singleClaimItem => {
+        return of(singleClaimItem);
+      }),
+    );
+  }
+
+  mapClaim(warrantyDetail: WarrantyClaimsDetails) {
     return of({
-      item_name: invoice.item_name,
-      serial_no: invoice.serial_no,
-      warranty_end_date: invoice.warranty_end_date
-        ? invoice.warranty_end_date.toString().split('T')[0]
+      uuid: warrantyDetail.uuid,
+      item_name: warrantyDetail.item_name,
+      serial_no: warrantyDetail.serial_no,
+      warranty_end_date: warrantyDetail.warranty_end_date
+        ? warrantyDetail.warranty_end_date.toString().split('T')[0]
         : '',
-      invoice_no: invoice.invoice_no,
-      problem: invoice.problem,
-      problem_details: invoice.problem_details,
-      remarks: invoice.remarks,
-      delivery_status:
-        invoice.status_history[invoice.status_history.length - 1].verdict,
+      invoice_no: warrantyDetail.invoice_no,
+      problem: warrantyDetail.problem,
+      problem_details: warrantyDetail.problem_details,
+      remarks: warrantyDetail.remarks,
+      status_history:
+        warrantyDetail.status_history[warrantyDetail.status_history.length - 1],
+      claim_status:
+        warrantyDetail.status_history[warrantyDetail.status_history.length - 1]
+          .verdict,
       description:
-        invoice.status_history[invoice.status_history.length - 1].description,
+        warrantyDetail.status_history[warrantyDetail.status_history.length - 1]
+          .description,
     });
   }
 
   generateWarrantyPrintBody(uuid: string) {
     const erpBody = {} as WarrantyPrintDetails;
     return this.getWarrantyClaim(uuid).pipe(
-      switchMap((invoice: WarrantyClaimsDetails) => {
-        invoice.service_vouchers = invoice.service_vouchers
-          ? invoice.service_vouchers
+      switchMap((warrantyDetail: WarrantyClaimsDetails) => {
+        warrantyDetail.service_vouchers = warrantyDetail.service_vouchers
+          ? warrantyDetail.service_vouchers
           : [];
-        Object.assign(erpBody, invoice);
-        switch (invoice.claim_status) {
+        Object.assign(erpBody, warrantyDetail);
+        switch (warrantyDetail.claim_status) {
           case CLAIM_STATUS.DELIVERED:
             erpBody.print_type = DELIVERY_TOKEN;
             break;
@@ -423,45 +495,56 @@ export class WarrantyService {
             erpBody.print_type = SERVICE_TOKEN;
             break;
         }
-        erpBody.name = invoice.uuid;
-        erpBody.posting_time = invoice.posting_time;
-        erpBody.delivery_status = invoice.claim_status;
+        erpBody.name = warrantyDetail.uuid;
+        erpBody.posting_time = warrantyDetail.posting_time;
+        erpBody.delivery_status = warrantyDetail.claim_status;
         return forkJoin({
-          finalBody: this.mapWarrantyItems(invoice),
-          payload: this.serviceInvoiceService.getServiceInvoiceList(
+          mappedWarrantyItemsPayload: this.mapWarrantyItems(warrantyDetail),
+          bulkserviceInvoiceListPayload: this.mapBulkServiceInvoice(
+            warrantyDetail,
+          )
+            ? this.mapBulkServiceInvoice(warrantyDetail)
+            : of({ subClaimServiceInvoices: {} }),
+          customerInformationPayload: this.addressAndContact(
+            'Customer',
+            warrantyDetail.customer_code,
+          ),
+          mappedDeliveryNotesPayload: this.mapBulkDeliveryNotes(warrantyDetail),
+          serviceInvoice: this.serviceInvoiceService.getServiceInvoiceList(
             JSON.stringify({
               service_vouchers: {
                 docstatus: 1,
-                invoice_no: { $in: invoice.service_vouchers },
+                invoice_no: { $in: warrantyDetail.service_vouchers },
               },
             }),
           ),
-          addressContact: this.addressAndContact(
-            'Customer',
-            invoice.customer_code,
-          ),
-          delivery_notes: this.mapDeliveryNotes(invoice.uuid),
         });
       }),
-      switchMap(res => {
-        erpBody.customer_address = res.addressContact.customer_address;
-        erpBody.customer_contact = res.addressContact.customer_contact;
-        erpBody.delivery_notes = JSON.stringify(res.delivery_notes);
-        erpBody.items = JSON.stringify([res.finalBody]);
-        return from(res.payload).pipe(
-          concatMap(singleVoucher => {
-            return of({
-              voucher_number: singleVoucher.invoice_no,
-              description: singleVoucher.items[0].item_name,
-              amount: singleVoucher.total,
-              paid: singleVoucher.total,
-              unpaid: singleVoucher.total - singleVoucher.total,
-            });
+      switchMap(mappedWarrantyDetails => {
+        erpBody.customer_address =
+          mappedWarrantyDetails.customerInformationPayload.customer_address;
+        erpBody.customer_contact =
+          mappedWarrantyDetails.customerInformationPayload.customer_contact;
+        erpBody.delivery_notes = JSON.stringify(
+          mappedWarrantyDetails.mappedDeliveryNotesPayload,
+        );
+        erpBody.items = JSON.stringify([
+          ...mappedWarrantyDetails.mappedWarrantyItemsPayload,
+        ]);
+        return this.singleInvoiceMap(mappedWarrantyDetails.serviceInvoice).pipe(
+          switchMap(warrantyInvoices => {
+            if (!erpBody.bulk_products) {
+              erpBody.warranty_invoices = JSON.stringify(warrantyInvoices);
+              return of([]);
+            }
+            return this.bulkInvoiceMap(
+              mappedWarrantyDetails.bulkserviceInvoiceListPayload
+                .subClaimServiceInvoices,
+            );
           }),
-          toArray(),
         );
       }),
-      switchMap((warrantyInvoices: WarrantyVouchers[]) => {
+      switchMap(bulkInvoices => {
         [
           'progress_state',
           'completed_delivery_note',
@@ -480,14 +563,47 @@ export class WarrantyService {
         erpBody.status_history = JSON.stringify([
           erpBody.status_history[erpBody.status_history.length - 1],
         ]);
-        erpBody.warranty_invoices = JSON.stringify([...warrantyInvoices]);
+        erpBody.bulk_invoices = JSON.stringify([...bulkInvoices]);
         return of(erpBody);
       }),
+
       switchMap((body: WarrantyPrintDetails) => {
         return this.printDocument(body);
       }),
       catchError(err => {
         return of(err);
+      }),
+    );
+  }
+
+  bulkInvoiceMap(serviceInvoice) {
+    return from(serviceInvoice).pipe(
+      filter((v: ServiceInvoiceDetails[]) => v.length !== 0),
+      concatMap((singlebulkVoucher: ServiceInvoiceDetails[]) => {
+        return this.singleInvoiceMap(singlebulkVoucher);
+      }),
+      toArray(),
+    );
+  }
+
+  singleInvoiceMap(serviceInvoice) {
+    return from(serviceInvoice).pipe(
+      concatMap((singleVoucher: ServiceInvoiceDetails) => {
+        return of({
+          voucher_number: singleVoucher.invoice_no,
+          description: singleVoucher.items[0].item_name,
+          amount: singleVoucher.total,
+          paid: singleVoucher.total,
+          unpaid: singleVoucher.total - singleVoucher.total,
+        });
+      }),
+      toArray(),
+      switchMap((res: any) => {
+        return of({
+          [serviceInvoice.find(res => {
+            return res.warrantyClaimUuid;
+          }).warrantyClaimUuid]: res,
+        });
       }),
     );
   }
