@@ -356,24 +356,27 @@ export class WarrantyService {
   }
 
   mapDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
-    return from(warrantyDetail.progress_state).pipe(
-      concatMap((singleStockEntry: StockEntryDetails) => {
-        return of({
-          stock_voucher_number: singleStockEntry.stock_voucher_number,
-          serial_no: singleStockEntry.items.find(item => item).excel_serials,
-          item_name: singleStockEntry.items.find(item => item).item_name,
-          warranty_end_date: warrantyDetail.warranty_end_date
-            ? warrantyDetail.warranty_end_date.toString().split('T')[0]
-            : '',
-          warehouse: singleStockEntry.set_warehouse,
-          description: singleStockEntry.description,
-        });
-      }),
-      toArray(),
-      switchMap(deliveryNotesPayload => {
-        return of({ [warrantyDetail.uuid]: deliveryNotesPayload });
-      }),
-    );
+    if (warrantyDetail.progress_state) {
+      return from(warrantyDetail.progress_state).pipe(
+        concatMap((singleStockEntry: StockEntryDetails) => {
+          return of({
+            stock_voucher_number: singleStockEntry.stock_voucher_number,
+            serial_no: singleStockEntry.items.find(item => item).excel_serials,
+            item_name: singleStockEntry.items.find(item => item).item_name,
+            warranty_end_date: warrantyDetail.warranty_end_date
+              ? warrantyDetail.warranty_end_date.toString().split('T')[0]
+              : '',
+            warehouse: singleStockEntry.set_warehouse,
+            description: singleStockEntry.description,
+          });
+        }),
+        toArray(),
+        switchMap(deliveryNotesPayload => {
+          return of({ [warrantyDetail.uuid]: deliveryNotesPayload });
+        }),
+      );
+    }
+    return of({});
   }
 
   mapBulkServiceInvoice(warrantyDetail: WarrantyClaimsDetails) {
@@ -390,7 +393,11 @@ export class WarrantyService {
         map(res => res.docs),
         switchMap(res => {
           return from(res).pipe(
+            filter(v => v.service_vouchers !== undefined),
             concatMap(partClaim => {
+              if (!partClaim) {
+                return of([]);
+              }
               return this.getInvoiceList(partClaim);
             }),
             toArray(),
@@ -407,20 +414,18 @@ export class WarrantyService {
   }
 
   getInvoiceList(warrantyDetail: WarrantyClaimsDetails) {
-    return this.serviceInvoiceService
-      .getServiceInvoiceList(
-        JSON.stringify({
-          service_vouchers: {
-            docstatus: 1,
-            invoice_no: { $in: warrantyDetail.service_vouchers },
+    return this.serviceInvoiceService.getServiceInvoiceList(
+      JSON.stringify({
+        service_vouchers: {
+          docstatus: 1,
+          invoice_no: {
+            $in: warrantyDetail.service_vouchers
+              ? warrantyDetail.service_vouchers
+              : [],
           },
-        }),
-      )
-      .pipe(
-        switchMap((res: ServiceInvoiceDetails[]) => {
-          return of(res);
-        }),
-      );
+        },
+      }),
+    );
   }
 
   mapBulkDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
@@ -437,6 +442,7 @@ export class WarrantyService {
         map(res => res.docs),
         switchMap(res => {
           return from(res).pipe(
+            filter(v => v.progress_state !== undefined),
             concatMap(partClaim => {
               return this.mapDeliveryNotes(partClaim);
             }),
@@ -514,7 +520,11 @@ export class WarrantyService {
             JSON.stringify({
               service_vouchers: {
                 docstatus: 1,
-                invoice_no: { $in: warrantyDetail.service_vouchers },
+                invoice_no: {
+                  $in: warrantyDetail.service_vouchers
+                    ? warrantyDetail.service_vouchers
+                    : [],
+                },
               },
             }),
           ),
@@ -587,24 +597,28 @@ export class WarrantyService {
   }
 
   singleInvoiceMap(serviceInvoice) {
-    return from(serviceInvoice).pipe(
-      concatMap((singleVoucher: ServiceInvoiceDetails) => {
-        return of({
-          voucher_number: singleVoucher.invoice_no,
-          description: singleVoucher.items[0].item_name,
-          amount: singleVoucher.total,
-          paid: singleVoucher.total,
-          unpaid: singleVoucher.total - singleVoucher.total,
-        });
-      }),
-      toArray(),
-      switchMap((res: any) => {
-        return of({
-          [serviceInvoice.find(res => {
-            return res.warrantyClaimUuid;
-          }).warrantyClaimUuid]: res,
-        });
-      }),
-    );
+    if (serviceInvoice.length) {
+      return from(serviceInvoice).pipe(
+        concatMap((singleVoucher: ServiceInvoiceDetails) => {
+          return of({
+            voucher_number: singleVoucher.invoice_no,
+            description: singleVoucher.items[0].item_name,
+            amount: singleVoucher.total,
+            paid: singleVoucher.total,
+            unpaid: singleVoucher.total - singleVoucher.total,
+          });
+        }),
+        toArray(),
+        filter(v => v.length !== 0),
+        switchMap((res: any) => {
+          return of({
+            [serviceInvoice.find(res => {
+              return res.warrantyClaimUuid;
+            }).warrantyClaimUuid]: res,
+          });
+        }),
+      );
+    }
+    return of({});
   }
 }
