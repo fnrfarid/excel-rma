@@ -35,6 +35,7 @@ import {
   DELIVERY_TOKEN,
   EXCEL_WARRANTY_PRINT,
   SERVICE_TOKEN,
+  STOCK_ENTRY_ITEM_TYPE,
 } from '../../constants/app-string';
 import {
   StockEntryDetails,
@@ -358,6 +359,7 @@ export class WarrantyService {
   mapDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.progress_state) {
       return from(warrantyDetail.progress_state).pipe(
+        filter(v => v.stock_entry_type !== STOCK_ENTRY_ITEM_TYPE.RETURNED),
         concatMap((singleStockEntry: StockEntryDetails) => {
           return of({
             stock_voucher_number: singleStockEntry.stock_voucher_number,
@@ -372,7 +374,10 @@ export class WarrantyService {
         }),
         toArray(),
         switchMap(deliveryNotesPayload => {
-          return of({ [warrantyDetail.uuid]: deliveryNotesPayload });
+          if (deliveryNotesPayload.length) {
+            return of({ [warrantyDetail.uuid]: deliveryNotesPayload });
+          }
+          return of({});
         }),
       );
     }
@@ -395,9 +400,6 @@ export class WarrantyService {
           return from(res).pipe(
             filter(v => v.service_vouchers !== undefined),
             concatMap(partClaim => {
-              if (!partClaim) {
-                return of([]);
-              }
               return this.getInvoiceList(partClaim);
             }),
             toArray(),
@@ -456,7 +458,7 @@ export class WarrantyService {
     }
     return this.mapDeliveryNotes(warrantyDetail).pipe(
       switchMap(singleClaimItem => {
-        return of(singleClaimItem);
+        return of([singleClaimItem]);
       }),
     );
   }
@@ -544,9 +546,10 @@ export class WarrantyService {
         return this.singleInvoiceMap(mappedWarrantyDetails.serviceInvoice).pipe(
           switchMap(warrantyInvoices => {
             if (!erpBody.bulk_products) {
-              erpBody.warranty_invoices = JSON.stringify(warrantyInvoices);
+              erpBody.warranty_invoices = JSON.stringify([warrantyInvoices]);
               return of([]);
             }
+            erpBody.warranty_invoices = JSON.stringify([warrantyInvoices]);
             return this.bulkInvoiceMap(
               mappedWarrantyDetails.bulkserviceInvoiceListPayload
                 .subClaimServiceInvoices,
