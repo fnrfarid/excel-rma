@@ -736,6 +736,20 @@ export class AddWarrantyClaimPage implements OnInit {
   appendProduct() {
     if (this.validateProduct()) {
       this.bulkProducts = this.bulkProducts.concat({
+        customer_contact: this.warrantyClaimForm.controls.customer_contact
+          .value,
+        customer_address: this.warrantyClaimForm.controls.customer_address
+          .value,
+        third_party_name: this.warrantyClaimForm.controls.third_party_name
+          .value,
+        third_party_contact: this.warrantyClaimForm.controls.third_party_contact
+          .value,
+        third_party_address: this.warrantyClaimForm.controls.third_party_address
+          .value,
+        customer: this.warrantyClaimForm.controls.customer_name.value
+          .customer_name,
+        warranty_claim_date: this.warrantyClaimForm.controls.received_on.value,
+        customer_code: this.contact.name,
         claim_type: this.warrantyClaimForm.controls.claim_type.value,
         product_brand: this.warrantyClaimForm.controls.product_brand.value,
         problem: this.warrantyClaimForm.controls.problem.value.problem_name,

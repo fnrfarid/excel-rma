@@ -128,6 +128,17 @@ export class WarrantyBulkProducts {
   problem_details?: string;
   remarks?: string;
   item_code?: string;
+  customer_contact?: string;
+  customer_address?: string;
+  customer_name?: string;
+  third_party_name?: string;
+  third_party_contact?: string;
+  third_party_address?: string;
+  received_by?: string;
+  delivered_by?: string;
+  customer?: string;
+  customer_code?: string;
+  warranty_claim_date?: string;
 }
 
 export class WarrantyState {
