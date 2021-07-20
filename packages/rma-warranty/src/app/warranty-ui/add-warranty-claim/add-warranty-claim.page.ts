@@ -230,7 +230,11 @@ export class AddWarrantyClaimPage implements OnInit {
           )
             updatePayload.customer = this.warrantyClaimForm.get(
               element,
-            ).value.name;
+            ).value.customer_name;
+          updatePayload.customer_code = this.warrantyClaimForm.get(
+            element,
+          ).value.name;
+
           break;
         case 'problem':
           if (
@@ -260,6 +264,7 @@ export class AddWarrantyClaimPage implements OnInit {
     if (this.warrantyObject.category === CATEGORY.BULK) {
       payload.bulk_products = this.bulkProducts;
       payload.category = this.warrantyObject.category;
+      payload.set = this.warrantyObject.set;
     }
     this.addWarrantyService.updateWarrantyClaim(payload).subscribe({
       next: () => {
@@ -736,6 +741,9 @@ export class AddWarrantyClaimPage implements OnInit {
   appendProduct() {
     if (this.validateProduct()) {
       this.bulkProducts = this.bulkProducts.concat({
+        received_on: this.warrantyClaimForm.controls.received_on.value,
+        delivery_date: this.warrantyClaimForm.controls.delivery_date.value,
+        remarks: this.warrantyClaimForm.controls.remarks.value,
         customer_contact: this.warrantyClaimForm.controls.customer_contact
           .value,
         customer_address: this.warrantyClaimForm.controls.customer_address

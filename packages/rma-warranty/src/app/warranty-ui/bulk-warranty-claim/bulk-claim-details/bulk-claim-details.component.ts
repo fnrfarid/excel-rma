@@ -10,11 +10,28 @@ import { CLAIM_STATUS, CLOSE } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { PrintSettingDialog } from '../../shared-warranty-modules/print-setting-dialog/print-setting-dialog';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
 
 @Component({
   selector: 'bulk-claim-details',
   templateUrl: './bulk-claim-details.component.html',
   styleUrls: ['./bulk-claim-details.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ margin: '0', height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'),
+      ),
+    ]),
+  ],
 })
 export class BulkClaimDetailsComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -23,6 +40,7 @@ export class BulkClaimDetailsComponent implements OnInit {
   claim_no: string = this.route.snapshot.params.name;
   selectedSegment: any;
   uuid: string = this.route.snapshot.params.uuid;
+  expandedElement: WarrantyClaimsDataSource | null;
   displayedColumns = [
     'sr_no',
     'claim_no',

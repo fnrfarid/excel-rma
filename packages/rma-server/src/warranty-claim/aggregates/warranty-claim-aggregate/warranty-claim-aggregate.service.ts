@@ -290,7 +290,11 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     if (!provider) {
       throw new NotFoundException();
     }
+    if (updatePayload.claim_type === WARRANTY_TYPE.NON_SERAIL) {
+      updatePayload.serial_no = '';
+    }
     const update = Object.assign(provider, updatePayload);
+
     update.modifiedOn = new Date();
     this.apply(new WarrantyClaimUpdatedEvent(update));
   }
@@ -790,6 +794,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
     );
   }
+
   cancelWarrantyClaim(cancelPayload: { uuid: string; serial_no: string }) {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
