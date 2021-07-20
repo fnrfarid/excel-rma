@@ -466,6 +466,7 @@ export class WarrantyService {
   mapClaim(warrantyDetail: WarrantyClaimsDetails) {
     return of({
       uuid: warrantyDetail.uuid,
+      claim_no: warrantyDetail.claim_no,
       item_name: warrantyDetail.item_name,
       serial_no: warrantyDetail.serial_no,
       warranty_end_date: warrantyDetail.warranty_end_date
@@ -603,13 +604,17 @@ export class WarrantyService {
     if (serviceInvoice.length) {
       return from(serviceInvoice).pipe(
         concatMap((singleVoucher: ServiceInvoiceDetails) => {
-          return of({
-            voucher_number: singleVoucher.invoice_no,
-            description: singleVoucher.items[0].item_name,
-            amount: singleVoucher.total,
-            paid: singleVoucher.total,
-            unpaid: singleVoucher.total - singleVoucher.total,
-          });
+          return from(singleVoucher.items).pipe(
+            concatMap(item => {
+              return of({
+                voucher_number: singleVoucher.invoice_no,
+                description: item.item_name,
+                amount: singleVoucher.total,
+                paid: singleVoucher.total,
+                unpaid: singleVoucher.total - singleVoucher.total,
+              });
+            }),
+          );
         }),
         toArray(),
         filter(v => v.length !== 0),

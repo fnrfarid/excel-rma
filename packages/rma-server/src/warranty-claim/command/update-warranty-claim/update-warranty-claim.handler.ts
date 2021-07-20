@@ -13,7 +13,7 @@ export class UpdateWarrantyClaimCommandHandler
   async execute(command: UpdateWarrantyClaimCommand) {
     const { updatePayload, req } = command;
     const aggregate = this.publisher.mergeObjectContext(this.manager);
-    switch (updatePayload.category) {
+    switch (updatePayload.set) {
       case 'Bulk':
         await this.manager.appendBulkClaim(updatePayload, req).toPromise();
         break;

@@ -139,6 +139,9 @@ export class WarrantyBulkProducts {
   customer?: string;
   customer_code?: string;
   warranty_claim_date?: string;
+  received_on?: Date;
+  delivery_date?: Date;
+  receiving_branch?: string;
 }
 
 export class WarrantyState {
