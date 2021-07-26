@@ -102,19 +102,24 @@ export class SalesInvoiceService {
   }
 
   aggregateList($skip = 0, $limit = 10, $match, $sort, $group) {
-    return this.asyncAggregate([
-      { $match },
-      {
-        $unwind: {
-          path: '$delivery_note_items',
-          preserveNullAndEmptyArrays: true,
+    return this.asyncAggregate(
+      [
+        { $match },
+        {
+          $unwind: {
+            path: '$delivery_note_items',
+            preserveNullAndEmptyArrays: true,
+          },
         },
+        { $group },
+        { $sort },
+        { $skip },
+        { $limit },
+      ],
+      {
+        allowDiskUse: true,
       },
-      { $group },
-      { $sort },
-      { $skip },
-      { $limit },
-    ]);
+    );
   }
 
   async deleteOne(query, param?) {
@@ -155,8 +160,8 @@ export class SalesInvoiceService {
     return query;
   }
 
-  asyncAggregate(query) {
-    return of(this.salesInvoiceRepository.aggregate(query)).pipe(
+  asyncAggregate(query, options?) {
+    return of(this.salesInvoiceRepository.aggregate(query, options)).pipe(
       switchMap((aggregateData: any) => {
         return aggregateData.toArray();
       }),
