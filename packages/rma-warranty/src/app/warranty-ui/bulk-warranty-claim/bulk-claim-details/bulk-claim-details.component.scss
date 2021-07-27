@@ -32,7 +32,11 @@ mat-header-cell {
 
 
 ion-card.example-element-detail{
-  width: fit-content;
+  width: max-content;
+}
+
+ion-row.rowDetail{
+  width: max-content;
 }
 
 .cards{
