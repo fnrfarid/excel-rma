@@ -40,7 +40,7 @@ export class BulkClaimDetailsComponent implements OnInit {
   claim_no: string = this.route.snapshot.params.name;
   selectedSegment: any;
   uuid: string = this.route.snapshot.params.uuid;
-  expandedElement: WarrantyClaimsDataSource | null;
+  expandedElement: any;
   displayedColumns = [
     'sr_no',
     'claim_no',
@@ -84,6 +84,7 @@ export class BulkClaimDetailsComponent implements OnInit {
         set: ['Part'],
       },
     );
+    this.expandedElement = this.dataSource.data;
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),

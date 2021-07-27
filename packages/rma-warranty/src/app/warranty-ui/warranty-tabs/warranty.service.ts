@@ -212,7 +212,7 @@ export class WarrantyService {
           fields: `["name"]`,
           filters: value
             ? `[["doc_type", "=", "${EXCEL_WARRANTY_PRINT}"],["name","like","%${value}%"]]`
-            : `[["doc_type", "=", "${EXCEL_WARRANTY_PRINT}"],["name","like","%''%"]]`,
+            : `[["doc_type", "=", "${EXCEL_WARRANTY_PRINT}"]]`,
         },
       });
       return this.getHeaders().pipe(
