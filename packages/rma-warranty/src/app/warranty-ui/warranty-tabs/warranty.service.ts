@@ -405,11 +405,21 @@ export class WarrantyService {
             toArray(),
           );
         }),
-        switchMap((subClaimServiceInvoices: ServiceInvoiceDetails[][]) => {
-          return of({
-            subClaimServiceInvoices,
-          });
-        }),
+        switchMap(
+          (
+            subClaimServiceInvoices: {
+              docs: ServiceInvoiceDetails[];
+              offset: number;
+              length;
+            }[],
+          ) => {
+            return of({
+              subClaimServiceInvoices: subClaimServiceInvoices.map(
+                subclaim => subclaim.docs,
+              ),
+            });
+          },
+        ),
       );
     }
     return of({ subClaimServiceInvoices: {} });
@@ -466,6 +476,7 @@ export class WarrantyService {
   mapClaim(warrantyDetail: WarrantyClaimsDetails) {
     return of({
       uuid: warrantyDetail.uuid,
+      claim_type: warrantyDetail.claim_type,
       claim_no: warrantyDetail.claim_no,
       item_name: warrantyDetail.item_name,
       serial_no: warrantyDetail.serial_no,

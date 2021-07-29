@@ -253,6 +253,7 @@
                 color="tertiary"
                 *ngIf="warrantyObject?.set === 'Bulk'"
                 (click)="appendProduct()"
+                [disabled]="warrantyClaimForm.invalid"
               >
                 Add
               </ion-button>
@@ -262,6 +263,7 @@
                 color="tertiary"
                 *ngIf="f.category.value === 'Bulk'"
                 (click)="appendProduct()"
+                [disabled]="warrantyClaimForm.invalid"
               >
                 Add
               </ion-button>

@@ -11,6 +11,11 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { AddServiceInvoiceService } from './add-service-invoice/add-service-invoice.service';
 import { ServiceInvoiceDetails } from './add-service-invoice/service-invoice-interface';
 
+export interface ListResponse {
+  docs: ServiceInvoiceDetails[];
+  length: number;
+  offset: number;
+}
 export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> {
   data: ServiceInvoiceDetails[];
   length: number;
@@ -48,16 +53,16 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
     this.serviceInvoice
       .getServiceInvoiceList(filter, sortOrder, pageIndex, pageSize)
       .pipe(
-        map((serviceInvoice: ServiceInvoiceDetails[]) => {
-          this.data = serviceInvoice;
-          this.offset = (pageIndex + 1) * pageSize;
-          this.length = serviceInvoice.length;
-          return serviceInvoice;
+        map((serviceInvoice: ListResponse) => {
+          this.data = serviceInvoice?.docs;
+          this.offset = serviceInvoice?.offset;
+          this.length = serviceInvoice?.length;
+          return serviceInvoice?.docs;
         }),
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
         switchMap(items => {
-          return from(items).pipe(
+          return from(items ? items : []).pipe(
             concatMap(item => {
               return this.serviceInvoice.updateDocStatus(item.invoice_no).pipe(
                 switchMap((res: { docstatus: number }) => {
@@ -72,7 +77,7 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
       )
       .subscribe(items => {
         this.itemSubject.next(items);
-        this.calculateTotal(items);
+        this.calculateTotal(items ? items : []);
       });
   }
 
@@ -91,7 +96,7 @@ export class ServiceInvoiceDataSource extends DataSource<ServiceInvoiceDetails> 
       switchMap(items => {
         this.disableRefresh.next(false);
         this.itemSubject.next(items);
-        this.calculateTotal(items);
+        this.calculateTotal(items ? items : []);
         return of({});
       }),
     );

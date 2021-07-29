@@ -142,6 +142,7 @@ export class WarrantyBulkProducts {
   received_on?: Date;
   delivery_date?: Date;
   receiving_branch?: string;
+  delivery_branch?: string;
 }
 
 export class WarrantyState {
