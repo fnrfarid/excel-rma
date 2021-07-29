@@ -264,7 +264,7 @@ export class WarrantyPage implements OnInit {
       query,
       {
         territory: this.territoryList,
-        set: [CATEGORY.BULK, CATEGORY.SINGLE],
+        set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
       },
     );
   }

@@ -522,7 +522,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             { uuid: statusHistoryPayload.uuid },
             {
               $set: {
-                delivery_date: statusHistoryPayload.date,
+                delivery_date: statusHistoryPayload.posting_date,
                 delivery_branch: statusHistoryPayload.delivery_branch,
                 delivered_by: clientHttpRequest.token.fullName,
               },

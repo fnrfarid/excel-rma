@@ -4,6 +4,11 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ServiceInvoiceDetails } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/service-invoice-interface';
 import { AddServiceInvoiceService } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 
+export interface ListResponse {
+  docs: ServiceInvoiceDetails[];
+  length: number;
+  offset: number;
+}
 export class ServiceInvoicesDataSource extends DataSource<ServiceInvoiceDetails> {
   data: ServiceInvoiceDetails[];
   length: number;
@@ -41,11 +46,11 @@ export class ServiceInvoicesDataSource extends DataSource<ServiceInvoiceDetails>
     this.serviceInvoice
       .getServiceInvoiceList(filter as string, sortOrder, pageIndex, pageSize)
       .pipe(
-        map((serviceInvoice: ServiceInvoiceDetails[]) => {
-          this.data = serviceInvoice;
-          this.offset = (pageIndex + 1) * pageSize;
-          this.length = serviceInvoice.length;
-          return serviceInvoice;
+        map((serviceInvoice: ListResponse) => {
+          this.data = serviceInvoice?.docs;
+          this.offset = serviceInvoice?.offset;
+          this.length = serviceInvoice?.length;
+          return serviceInvoice?.docs;
         }),
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
@@ -58,7 +63,7 @@ export class ServiceInvoicesDataSource extends DataSource<ServiceInvoiceDetails>
 
   calculateTotal(serviceInvoice: ServiceInvoiceDetails[]) {
     let sum = 0;
-    serviceInvoice.forEach(item => {
+    (serviceInvoice ? serviceInvoice : []).forEach(item => {
       sum += item.total;
     });
     this.total.next(sum);

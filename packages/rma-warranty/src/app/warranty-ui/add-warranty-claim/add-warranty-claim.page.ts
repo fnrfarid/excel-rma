@@ -482,27 +482,12 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.customer_name;
     warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
     warrantyClaimDetails.customer_code = this.contact.name;
+    warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
+    warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
+    warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
     warrantyClaimDetails.posting_time = await (
       await this.getDateTime(new Date())
     ).time;
-    switch (warrantyClaimDetails.claim_type) {
-      case 'Warranty':
-        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
-        warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
-        warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
-        break;
-      case 'Non Warranty':
-        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
-        warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
-        warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
-        break;
-      case 'Third Party Warranty':
-        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
-        break;
-
-      default:
-        break;
-    }
     return warrantyClaimDetails;
   }
 
@@ -768,6 +753,7 @@ export class AddWarrantyClaimPage implements OnInit {
         invoice_no: this.warrantyClaimForm.controls.invoice_no.value,
         warranty_end_date: this.warrantyClaimForm.controls.warranty_end_date
           .value,
+        delivery_branch: this.warrantyClaimForm.controls.delivery_branch.value,
       });
     }
   }
