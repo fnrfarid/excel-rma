@@ -52,6 +52,7 @@ import {
   PRINT_DELIVERY_INVOICE_ENDPOINT,
   STOCK_AVAILABILITY_ENDPOINT,
   UPDATE_DELIVERY_STATUS_ENDPOINT,
+  UPDATE_SALES_INVOICE_ITEM_MRP,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -166,6 +167,15 @@ export class SalesService {
     );
   }
 
+  updateSubmittedInvoice(invoice_name: string) {
+    const url = `${UPDATE_DELIVERY_STATUS_ENDPOINT}/${invoice_name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
   validateReturnSerials(item: {
     item_code: string;
     serials: string[];
@@ -243,6 +253,15 @@ export class SalesService {
 
   updateOutstandingAmount(invoice_name: string) {
     const url = `${UPDATE_OUTSTANDING_AMOUNT_ENDPOINT}${invoice_name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
+  updateSalesInvoiceItem(invoice_name: string) {
+    const url = `${UPDATE_SALES_INVOICE_ITEM_MRP}/${invoice_name}`;
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, {}, { headers });

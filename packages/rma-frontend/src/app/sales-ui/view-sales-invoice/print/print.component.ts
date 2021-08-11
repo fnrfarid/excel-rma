@@ -22,6 +22,7 @@ import { SalesService } from '../../services/sales.service';
 export class PrintComponent implements OnInit {
   invoice_name: string = '';
   printSalesInvoiceURL: string = '';
+  printMRPSalesInvoiceURL: string = '';
   deliveryNoteNames: string[] = [];
   printDeliveryNoteURL: string = '';
 
@@ -35,6 +36,7 @@ export class PrintComponent implements OnInit {
   ngOnInit() {
     this.invoice_name = this.navParams.data.invoice_name;
     this.getPrintSalesInvoiceURL();
+    this.getPrintMRPSalesInvoiceURL();
     this.getPrintDeliveryNoteURL();
   }
 
@@ -49,6 +51,26 @@ export class PrintComponent implements OnInit {
     }&${no_letterhead}`;
   }
 
+  async getPrintMRPSalesInvoiceURL() {
+    const authURL = await this.storage.getItem(AUTH_SERVER_URL);
+    const url = `${authURL}${PRINT_SALES_INVOICE_PDF_METHOD}`;
+    const doctype = 'Sales Invoice';
+    const name = `name=${this.invoice_name}`;
+    const no_letterhead = 'no_letterhead=0';
+    this.printMRPSalesInvoiceURL = `${url}?doctype=${doctype}&${name}&format=${
+      PRINT_FORMAT_PREFIX + 'MRP Sales Print'
+    }&${no_letterhead}`;
+  }
+
+  modifyMRPPrint() {
+    this.popoverController.dismiss();
+    this.salesService.updateSalesInvoiceItem(this.invoice_name).subscribe({
+      next: success => {
+        window.open(this.printMRPSalesInvoiceURL, '_blank');
+      },
+      error: error => {},
+    });
+  }
   getPrintDeliveryNoteURL() {
     this.salesService.getDeliveryNoteNames(this.invoice_name).subscribe({
       next: async res => {
