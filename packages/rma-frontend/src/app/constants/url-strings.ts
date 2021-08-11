@@ -17,6 +17,8 @@ export const CREATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/create';
 export const UPDATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/update';
 export const UPDATE_DELIVERY_STATUS_ENDPOINT =
   'api/sales_invoice/v1/update_delivery_status';
+export const UPDATE_SALES_INVOICE_ITEM_MRP =
+  'api/sales_invoice/v1/update_mrp_rate';
 export const SUBMIT_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/submit';
 export const CANCEL_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/cancel';
 export const CREATE_SALES_RETURN_ENDPOINT =
