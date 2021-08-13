@@ -555,7 +555,9 @@ export class WarrantyService {
         erpBody.items = JSON.stringify([
           ...mappedWarrantyDetails.mappedWarrantyItemsPayload,
         ]);
-        return this.singleInvoiceMap(mappedWarrantyDetails.serviceInvoice).pipe(
+        return this.singleInvoiceMap(
+          mappedWarrantyDetails.serviceInvoice.docs,
+        ).pipe(
           switchMap(warrantyInvoices => {
             if (!erpBody.bulk_products) {
               erpBody.warranty_invoices = JSON.stringify([warrantyInvoices]);
