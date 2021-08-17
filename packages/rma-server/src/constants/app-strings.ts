@@ -488,3 +488,15 @@ export const STOCK_OPERATION = {
   delete: 'delete',
   accept: 'accept',
 };
+export const CURRENT_STATUS_VERDICT = {
+  RECEIVED_FROM_CUSTOMER: 'Received from Customer',
+  RECEIVED_FROM_BRANCH: 'Received from Branch',
+  WORK_IN_PROGRESS: 'Work in Progress',
+  SENT_TO_ENG_DEPT: 'Sent to Eng. Dept',
+  SENT_TO_REPAIR_DEPT: 'Sent to Repair Dept',
+  TRANSFERRED: 'Transferred',
+  SOLVED: 'Solved - Repairing done',
+  TO_REPLACE: 'Unsolved - To Replace',
+  UNSOLVED: 'Unsolved - Return to Owner',
+  DELIVER_TO_CUSTOMER: 'Deliver to Customer',
+};

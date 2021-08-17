@@ -227,14 +227,14 @@ export class AddWarrantyClaimPage implements OnInit {
           if (
             this.warrantyObject.customer !==
             this.warrantyClaimForm.get(element).value.name
-          )
+          ) {
             updatePayload.customer = this.warrantyClaimForm.get(
               element,
             ).value.customer_name;
-          updatePayload.customer_code = this.warrantyClaimForm.get(
-            element,
-          ).value.name;
-
+            updatePayload.customer_code = this.warrantyClaimForm.get(
+              element,
+            ).value.name;
+          }
           break;
         case 'problem':
           if (

@@ -34,6 +34,7 @@ import {
   CLAIM_STATUS,
   DELIVERY_TOKEN,
   EXCEL_WARRANTY_PRINT,
+  SERVICE_INVOICE_STATUS,
   SERVICE_TOKEN,
   STOCK_ENTRY_ITEM_TYPE,
 } from '../../constants/app-string';
@@ -299,9 +300,13 @@ export class WarrantyService {
         },
       ).pipe(
         map(res => res.docs),
-        switchMap(res => {
+        switchMap((res: WarrantyClaimsDetails[]) => {
           return from(res).pipe(
-            concatMap(partClaim => {
+            filter(
+              (res: WarrantyClaimsDetails) =>
+                res.claim_status !== CLAIM_STATUS.CANCELLED,
+            ),
+            concatMap((partClaim: WarrantyClaimsDetails) => {
               return this.mapClaim(partClaim);
             }),
             toArray(),
@@ -398,7 +403,11 @@ export class WarrantyService {
         map(res => res.docs),
         switchMap(res => {
           return from(res).pipe(
-            filter(v => v.service_vouchers !== undefined),
+            filter(
+              v =>
+                v.service_vouchers !== undefined &&
+                v.claim_status !== CLAIM_STATUS.CANCELLED,
+            ),
             concatMap(partClaim => {
               return this.getInvoiceList(partClaim);
             }),
@@ -454,7 +463,11 @@ export class WarrantyService {
         map(res => res.docs),
         switchMap(res => {
           return from(res).pipe(
-            filter(v => v.progress_state !== undefined),
+            filter(
+              v =>
+                v.progress_state !== undefined &&
+                v.claim_status !== CLAIM_STATUS.CANCELLED,
+            ),
             concatMap(partClaim => {
               return this.mapDeliveryNotes(partClaim);
             }),
@@ -528,7 +541,9 @@ export class WarrantyService {
           customerInformationPayload: this.addressAndContact(
             'Customer',
             warrantyDetail.customer_code,
-          ),
+          )
+            ? this.addressAndContact('Customer', warrantyDetail.customer_code)
+            : of({ customer_contact: '', customer_address: '' }),
           mappedDeliveryNotesPayload: this.mapBulkDeliveryNotes(warrantyDetail),
           serviceInvoice: this.serviceInvoiceService.getServiceInvoiceList(
             JSON.stringify({
@@ -622,9 +637,15 @@ export class WarrantyService {
               return of({
                 voucher_number: singleVoucher.invoice_no,
                 description: item.item_name,
-                amount: singleVoucher.total,
-                paid: singleVoucher.total,
-                unpaid: singleVoucher.total - singleVoucher.total,
+                amount: item.amount,
+                paid:
+                  singleVoucher.status === SERVICE_INVOICE_STATUS.PAID
+                    ? item.amount
+                    : 0,
+                unpaid:
+                  singleVoucher.status === SERVICE_INVOICE_STATUS.UNPAID
+                    ? item.amount
+                    : 0,
               });
             }),
           );

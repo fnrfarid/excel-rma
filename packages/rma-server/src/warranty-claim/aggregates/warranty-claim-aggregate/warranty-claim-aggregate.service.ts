@@ -624,7 +624,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
               ),
             ),
             statusPayload: of(
-              res.status_history[res.status_history.length - 1],
+              res.status_history[res.status_history.length - 2],
             ),
           });
         }

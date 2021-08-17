@@ -8,7 +8,6 @@ import { WarrantyService } from '../../warranty-tabs/warranty.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ERROR_FETCHING_WARRANTY_CLAIM } from '../../../constants/messages';
-import { switchMap } from 'rxjs/operators';
 import { DEFAULT_COMPANY } from '../../../constants/storage';
 import { LoadingController } from '@ionic/angular';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
@@ -85,28 +84,6 @@ export class ClaimDetailsComponent implements OnInit {
         );
       },
     });
-  }
-
-  printDeliveryNote(docType?: string, format?: string) {
-    const print_type: string = '';
-    return this.warrantyService.getWarrantyClaim(this.invoiceUuid).pipe(
-      switchMap((data: any) => {
-        data.company = this.company;
-
-        const aggregatedWarrantyReciept = data;
-        const warehouses: {
-          [ket: string]: string;
-        } = {};
-        return this.warrantyService.printDocument({
-          ...aggregatedWarrantyReciept,
-          name: data.claim_no,
-          print: {
-            print_type,
-            ...warehouses,
-          },
-        });
-      }),
-    );
   }
 
   async getPrint(format) {

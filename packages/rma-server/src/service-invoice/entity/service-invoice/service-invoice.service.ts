@@ -53,6 +53,19 @@ export class ServiceInvoiceService {
   async list(skip, take, search, sort) {
     let dateQuery = {};
     let service_vouchers = {};
+    let sortQuery;
+    try {
+      sortQuery = JSON.parse(sort);
+    } catch {
+      sortQuery = { creation: 'desc' };
+    }
+
+    for (const key of Object.keys(sortQuery)) {
+      sortQuery[key] = sortQuery[key].toUpperCase();
+      if (!sortQuery[key]) {
+        delete sortQuery[key];
+      }
+    }
     try {
       search = JSON.parse(search);
     } catch {
@@ -87,6 +100,7 @@ export class ServiceInvoiceService {
       skip,
       take,
       where,
+      order: sortQuery,
     });
 
     return {
