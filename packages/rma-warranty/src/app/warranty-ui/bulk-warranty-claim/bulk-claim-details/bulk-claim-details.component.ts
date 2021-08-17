@@ -3,10 +3,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { WarrantyService } from '../../warranty-tabs/warranty.service';
 import { WarrantyClaimsDataSource } from '../../warranty/warranty-claims-datasource';
-import { CLAIM_STATUS, CLOSE } from '../../../constants/app-string';
+import { CLOSE } from '../../../constants/app-string';
 import { LoadingController } from '@ionic/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { PrintSettingDialog } from '../../shared-warranty-modules/print-setting-dialog/print-setting-dialog';
@@ -126,35 +126,6 @@ export class BulkClaimDetailsComponent implements OnInit {
       {
         set: ['Part'],
       },
-    );
-  }
-
-  printDeliveryNote(docType?: string, format?: string) {
-    let print_type: string = '';
-    return this.warrantyService.getWarrantyClaim(this.uuid).pipe(
-      switchMap((data: any) => {
-        switch (data.claim_status) {
-          case CLAIM_STATUS.DELIVERED:
-            print_type = `Delivery Token`;
-            break;
-
-          default:
-            print_type = `Service Token`;
-            break;
-        }
-        const aggregatedWarrantyReciept = data;
-        const warehouses: {
-          [ket: string]: string;
-        } = {};
-        return this.warrantyService.printDocument({
-          ...aggregatedWarrantyReciept,
-          name: data.claim_no,
-          print: {
-            print_type,
-            ...warehouses,
-          },
-        });
-      }),
     );
   }
 

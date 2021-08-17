@@ -8,6 +8,7 @@ import {
 import { StockEntryService } from '../../entities/stock-entry.service';
 import { from, throwError, of, forkJoin } from 'rxjs';
 import {
+  CURRENT_STATUS_VERDICT,
   DEFAULT_NAMING_SERIES,
   DELIVERY_STATUS,
   STOCK_ENTRY,
@@ -33,10 +34,7 @@ import {
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { StockEntryPoliciesService } from '../../../stock-entry/policies/stock-entry-policies/stock-entry-policies.service';
 import { WarrantyClaimAggregateService } from '../../../warranty-claim/aggregates/warranty-claim-aggregate/warranty-claim-aggregate.service';
-import {
-  INVOICE_DELIVERY_STATUS,
-  PROGRESS_STATUS,
-} from '../../../constants/app-strings';
+import { PROGRESS_STATUS } from '../../../constants/app-strings';
 
 @Injectable()
 export class WarrantyStockEntryAggregateService {
@@ -625,7 +623,7 @@ export class WarrantyStockEntryAggregateService {
         uuid,
         status_history: {
           $elemMatch: {
-            verdict: INVOICE_DELIVERY_STATUS.DELIVERED_TO_CUSTOMER,
+            verdict: CURRENT_STATUS_VERDICT.DELIVER_TO_CUSTOMER,
           },
         },
       }),

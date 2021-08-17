@@ -361,3 +361,11 @@ export class WarrantyPrintItems {
   serial_no: string;
   warranty_end_date: Date;
 }
+
+export interface serviceInvoicePrintData {
+  voucher_number: string;
+  description: string;
+  amount: number;
+  paid: number;
+  unpaid: number;
+}
