@@ -1,6 +1,13 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, catchError, finalize } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import {
+  map,
+  catchError,
+  finalize,
+  switchMap,
+  concatMap,
+  toArray,
+} from 'rxjs/operators';
 import { SerialSearchFields } from './search-fields.interface';
 import { SerialSearchService } from './serial-search.service';
 
@@ -49,14 +56,24 @@ export class SerialSearchDataSource extends DataSource<SerialSearchFields> {
         catchError(error => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
+      .pipe(
+        switchMap(res => {
+          return from(res).pipe(
+            concatMap(eachCustomer => {
+              return this.serialSearchService
+                .getCustomerName(eachCustomer.customer)
+                .pipe(
+                  switchMap(customerDetail => {
+                    eachCustomer.customer_name = customerDetail.customer_name;
+                    return of(eachCustomer);
+                  }),
+                );
+            }),
+            toArray(),
+          );
+        }),
+      )
       .subscribe(items => {
-        this.serialSearchService
-          .getCustomerName(this.data[0].customer)
-          .subscribe({
-            next: res => {
-              this.data[0].customer_name = res.customer_name;
-            },
-          });
         this.itemSubject.next(items);
       });
   }

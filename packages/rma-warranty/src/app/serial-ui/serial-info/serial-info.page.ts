@@ -22,7 +22,6 @@ export class SerialInfoPage implements OnInit {
   viewPRUrl: string;
   viewDNUrl: string;
   viewCustomerUrl: string;
-  customerCode: string;
   viewSupplierUrl: string;
   displayedColumns: string[] = [
     'eventType',
@@ -43,6 +42,7 @@ export class SerialInfoPage implements OnInit {
     purchase_document_no: new FormControl(),
     delivery_note: new FormControl(),
     customer: new FormControl(),
+    customer_code: new FormControl(),
     supplier: new FormControl(),
   });
 
@@ -71,7 +71,7 @@ export class SerialInfoPage implements OnInit {
         this.snackBar.open(SERIAL_FETCH_ERROR, CLOSE, { duration: DURATION });
       },
       next: res => {
-        this.customerCode = res.customer;
+        this.serialInfoForm.controls.customer_code.setValue(res.customer);
         this.serialInfoForm.controls.serial_no.setValue(res.serial_no);
         this.serialInfoForm.controls.item_code.setValue(res.item_code);
         this.serialInfoForm.controls.item_name.setValue(res.item_name);
@@ -110,8 +110,9 @@ export class SerialInfoPage implements OnInit {
           this.viewDNUrl = this.serialInfoForm.controls.delivery_note.value
             ? `${authServerUrl}/desk#Form/Delivery%20Note/${this.serialInfoForm.controls.delivery_note.value}`
             : null;
-          this.viewCustomerUrl = this.customerCode
-            ? `${authServerUrl}/desk#Form/Customer/${this.customerCode}`
+          this.viewCustomerUrl = this.serialInfoForm.controls.customer_code
+            .value
+            ? `${authServerUrl}/desk#Form/Customer/${this.serialInfoForm.controls.customer_code.value}`
             : null;
           this.viewSupplierUrl = this.serialInfoForm.controls.supplier.value
             ? `${authServerUrl}/desk#Form/Supplier/${this.serialInfoForm.controls.supplier.value}`
@@ -123,7 +124,9 @@ export class SerialInfoPage implements OnInit {
 
   loadSerialFromParamMap() {
     const paramMap = this.activatedRoute.snapshot.paramMap;
-    this.customerCode = paramMap.get('customer');
+    this.serialInfoForm.controls.customer_code.setValue(
+      paramMap.get('customer'),
+    );
     this.serialInfoForm.controls.serial_no.setValue(paramMap.get('serial_no'));
     this.serialInfoForm.controls.item_code.setValue(paramMap.get('item_code'));
     this.serialInfoForm.controls.item_name.setValue(paramMap.get('item_name'));
