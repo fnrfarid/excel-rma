@@ -17,6 +17,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CsvJsonService } from '../../../api/csv-json/csv-json.service';
 import { TimeService } from '../../../api/time/time.service';
 import { ViewSalesInvoicePage } from '../view-sales-invoice.page';
+import { switchMap } from 'rxjs/operators';
 
 describe('SerialsComponent', () => {
   let component: SerialsComponent;
@@ -44,6 +45,7 @@ describe('SerialsComponent', () => {
             getSalesInvoice: (...args) =>
               of({ items: [], delivered_items_map: {} }),
             getWarehouseList: (...args) => of([{}]),
+            getCostCenterList: (...args) => switchMap(res => of(res)),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),
             }),

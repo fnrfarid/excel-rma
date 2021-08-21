@@ -48,6 +48,8 @@ export const RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT =
   '/api/command/user/api/method/frappe.contacts.doctype.address.address.get_default_address';
 export const RELAY_GET_FULL_ADDRESS_ENDPOINT =
   '/api/command/user/api/resource/Address/';
+export const RELAY_COST_CENTER_ENDPOINT =
+  '/api/command/user/api/resource/Cost%20Center';
 export const RELAY_LIST_TERRITORIES_ENDPOINT =
   '/api/command/user/api/resource/Territory';
 export const RELAY_LIST_SALES_RETURN_ENDPOINT =

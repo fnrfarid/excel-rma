@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { NavParams, PopoverController } from '@ionic/angular';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  LoadingController,
+  NavParams,
+  PopoverController,
+} from '@ionic/angular';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
   AggregatedDocument,
   SalesInvoice,
 } from 'src/app/common/interfaces/sales.interface';
+import { CLOSE } from '../../../constants/app-string';
 import { StorageService } from '../../../api/storage/storage.service';
 import {
   AUTH_SERVER_URL,
@@ -31,6 +37,8 @@ export class PrintComponent implements OnInit {
     private readonly storage: StorageService,
     private readonly salesService: SalesService,
     private popoverController: PopoverController,
+    private loadingController: LoadingController,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -62,13 +70,21 @@ export class PrintComponent implements OnInit {
     }&${no_letterhead}`;
   }
 
-  modifyMRPPrint() {
+  async modifyMRPPrint() {
     this.popoverController.dismiss();
+    const loading = await this.loadingController.create({
+      message: `Generating Print...!`,
+    });
+    await loading.present();
     this.salesService.updateSalesInvoiceItem(this.invoice_name).subscribe({
       next: success => {
+        loading.dismiss();
         window.open(this.printMRPSalesInvoiceURL, '_blank');
       },
-      error: error => {},
+      error: error => {
+        loading.dismiss();
+        this.snackBar.open(`Failed To Print`, CLOSE, { duration: 4500 });
+      },
     });
   }
   getPrintDeliveryNoteURL() {

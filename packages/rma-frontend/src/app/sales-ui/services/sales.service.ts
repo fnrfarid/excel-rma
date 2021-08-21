@@ -53,6 +53,7 @@ import {
   STOCK_AVAILABILITY_ENDPOINT,
   UPDATE_DELIVERY_STATUS_ENDPOINT,
   UPDATE_SALES_INVOICE_ITEM_MRP,
+  RELAY_COST_CENTER_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -786,6 +787,29 @@ export class SalesService {
       }),
       map(res => res.data),
     );
+  }
+
+  getCostCenterList(company: string) {
+    return switchMap(value => {
+      if (!value) value = '';
+      const url = RELAY_COST_CENTER_ENDPOINT;
+      const params = new HttpParams({
+        fromObject: {
+          fields: '["*"]',
+          filters: `[["name","like","%${value}%"],["company","like","%${company}%"]]`,
+        },
+      });
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http
+            .get<{ data: unknown[] }>(url, {
+              headers,
+              params,
+            })
+            .pipe(map(res => res.data));
+        }),
+      );
+    });
   }
 
   getStore() {
