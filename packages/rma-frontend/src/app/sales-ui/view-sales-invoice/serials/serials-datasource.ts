@@ -78,4 +78,5 @@ export interface DeliveryNoteItemInterface {
   amount?: number;
   serial_no?: string[];
   excel_serials?: string;
+  cost_center?:string
 }

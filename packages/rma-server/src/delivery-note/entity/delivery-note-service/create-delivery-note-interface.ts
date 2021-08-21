@@ -34,4 +34,5 @@ export interface CreateDeliveryNoteItemInterface {
   warranty_date?: string;
   against_sales_invoice?: string;
   serial_no?: any;
+  cost_center?: string;
 }

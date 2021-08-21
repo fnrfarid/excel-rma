@@ -76,8 +76,9 @@ export class SerialsComponent implements OnInit {
   permissionState = PERMISSION_STATE;
 
   warehouseFormControl = new FormControl('', [Validators.required]);
-
+  costCenterFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
+  filteredCostCenterList:Observable<any[]>
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
   submit: boolean = false;
@@ -85,6 +86,7 @@ export class SerialsComponent implements OnInit {
     component: DELIVERY_NOTE,
     warehouse: '',
     itemData: [],
+    costCenter:''
   };
   rangePickerState = {
     prefix: '',
@@ -171,6 +173,7 @@ export class SerialsComponent implements OnInit {
         return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
       }),
     );
+   
   }
 
   getFilteredItems(salesInvoice: SalesInvoiceDetails) {
@@ -254,6 +257,10 @@ export class SerialsComponent implements OnInit {
           this.getItemsWarranty();
           this.state.itemData = this.itemDataSource.data();
           this.state.warehouse = this.warehouseFormControl.value;
+          this.filteredCostCenterList = this.costCenterFormControl.valueChanges.pipe(
+            startWith(''),
+            this.salesService.getCostCenterList(sales_invoice.company)
+          );
         },
         error: err => {
           this.snackBar.open(
@@ -478,6 +485,12 @@ export class SerialsComponent implements OnInit {
       });
       return false;
     }
+    if (!this.costCenterFormControl.value) {
+      this.snackBar.open('Please select a Cost Center.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
     for (const item of data) {
       index++;
       if (
@@ -525,6 +538,7 @@ export class SerialsComponent implements OnInit {
       item_hash[item.item_code].rate = item.rate || 0;
       item_hash[item.item_code].qty = 0;
       item_hash[item.item_code].amount = 0;
+      item_hash[item.item_code].cost_center=this.costCenterFormControl.value
     });
 
     this.serialDataSource.data().forEach(serial => {
@@ -657,6 +671,10 @@ export class SerialsComponent implements OnInit {
 
   warehouseOptionChanged(warehouse) {
     this.state.warehouse = warehouse;
+  }
+
+  costCenterOptionChanged(costCenter) {
+    this.state.costCenter = costCenter.name;
   }
 }
 

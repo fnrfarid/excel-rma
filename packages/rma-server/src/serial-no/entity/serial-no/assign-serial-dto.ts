@@ -85,4 +85,8 @@ export class DeliveryNoteItemDto {
   @IsNotEmpty()
   @IsArray()
   serial_no: any;
+
+  @IsNotEmpty()
+  @IsString()
+  cost_center: string;
 }
