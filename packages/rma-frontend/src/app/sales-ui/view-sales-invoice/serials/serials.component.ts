@@ -78,7 +78,7 @@ export class SerialsComponent implements OnInit {
   warehouseFormControl = new FormControl('', [Validators.required]);
   costCenterFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
-  filteredCostCenterList:Observable<any[]>
+  filteredCostCenterList: Observable<any[]>;
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
   submit: boolean = false;
@@ -86,7 +86,7 @@ export class SerialsComponent implements OnInit {
     component: DELIVERY_NOTE,
     warehouse: '',
     itemData: [],
-    costCenter:''
+    costCenter: '',
   };
   rangePickerState = {
     prefix: '',
@@ -173,7 +173,6 @@ export class SerialsComponent implements OnInit {
         return this.salesService.getStore().getItemAsync(WAREHOUSES, value);
       }),
     );
-   
   }
 
   getFilteredItems(salesInvoice: SalesInvoiceDetails) {
@@ -259,7 +258,7 @@ export class SerialsComponent implements OnInit {
           this.state.warehouse = this.warehouseFormControl.value;
           this.filteredCostCenterList = this.costCenterFormControl.valueChanges.pipe(
             startWith(''),
-            this.salesService.getCostCenterList(sales_invoice.company)
+            this.salesService.getCostCenterList(sales_invoice.company),
           );
         },
         error: err => {
@@ -538,7 +537,7 @@ export class SerialsComponent implements OnInit {
       item_hash[item.item_code].rate = item.rate || 0;
       item_hash[item.item_code].qty = 0;
       item_hash[item.item_code].amount = 0;
-      item_hash[item.item_code].cost_center=this.costCenterFormControl.value
+      item_hash[item.item_code].cost_center = this.costCenterFormControl.value;
     });
 
     this.serialDataSource.data().forEach(serial => {

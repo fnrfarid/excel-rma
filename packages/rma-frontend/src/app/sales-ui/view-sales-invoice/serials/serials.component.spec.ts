@@ -44,6 +44,7 @@ describe('SerialsComponent', () => {
             getSalesInvoice: (...args) =>
               of({ items: [], delivered_items_map: {} }),
             getWarehouseList: (...args) => of([{}]),
+            getCostCenterList: (...args) => of([{}]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('ITEM'),
             }),

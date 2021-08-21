@@ -789,7 +789,7 @@ export class SalesService {
     );
   }
 
-  getCostCenterList(company:string) {
+  getCostCenterList(company: string) {
     return switchMap(value => {
       if (!value) value = '';
       const url = RELAY_COST_CENTER_ENDPOINT;

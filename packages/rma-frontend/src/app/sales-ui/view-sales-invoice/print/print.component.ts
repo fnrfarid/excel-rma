@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { LoadingController, NavParams, PopoverController } from '@ionic/angular';
+import {
+  LoadingController,
+  NavParams,
+  PopoverController,
+} from '@ionic/angular';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
@@ -33,8 +37,8 @@ export class PrintComponent implements OnInit {
     private readonly storage: StorageService,
     private readonly salesService: SalesService,
     private popoverController: PopoverController,
-    private loadingController:LoadingController,
-    private snackBar:MatSnackBar
+    private loadingController: LoadingController,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
@@ -74,11 +78,11 @@ export class PrintComponent implements OnInit {
     await loading.present();
     this.salesService.updateSalesInvoiceItem(this.invoice_name).subscribe({
       next: success => {
-        loading.dismiss()
+        loading.dismiss();
         window.open(this.printMRPSalesInvoiceURL, '_blank');
       },
       error: error => {
-        loading.dismiss()
+        loading.dismiss();
         this.snackBar.open(`Failed To Print`, CLOSE, { duration: 4500 });
       },
     });
