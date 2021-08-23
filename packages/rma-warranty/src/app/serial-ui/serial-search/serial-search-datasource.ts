@@ -43,6 +43,7 @@ export class SerialSearchDataSource extends DataSource<SerialSearchFields> {
     if (!sortOrder) {
       sortOrder = { serial_no: 'asc' };
     }
+    this.itemSubject.next([]);
     this.loadingSubject.next(true);
     this.serialSearchService
       .getSerialsList(sortOrder, pageIndex, pageSize, query)
@@ -59,15 +60,27 @@ export class SerialSearchDataSource extends DataSource<SerialSearchFields> {
       .pipe(
         switchMap(res => {
           return from(res).pipe(
-            concatMap(eachCustomer => {
-              return this.serialSearchService
-                .getCustomerName(eachCustomer.customer)
-                .pipe(
-                  switchMap(customerDetail => {
-                    eachCustomer.customer_name = customerDetail.customer_name;
-                    return of(eachCustomer);
-                  }),
-                );
+            concatMap(serialInfo => {
+              if (serialInfo.customer) {
+                return this.serialSearchService
+                  .getCustomerName(serialInfo.customer)
+                  .pipe(
+                    switchMap(customerDetail => {
+                      serialInfo.customer_name = customerDetail.customer_name;
+                      return of(serialInfo);
+                    }),
+                    switchMap(serialData => {
+                      this.itemSubject.next([
+                        ...this.itemSubject.value,
+                        serialData,
+                      ]);
+                      return of(serialData);
+                    }),
+                  );
+              }
+              serialInfo.customer_name = '';
+              this.itemSubject.next([...this.itemSubject.value, serialInfo]);
+              return of(serialInfo);
             }),
             toArray(),
           );

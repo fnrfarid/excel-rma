@@ -38,25 +38,6 @@
                 </ion-col>
             </ion-row>
             <ion-row>
-                <ion-col size-md="6">
-                    <mat-form-field class="example-full-width transform">
-                        <input type="text" placeholder="Select Cost Center" matInput [formControl]="costCenterFormControl" (focusout)="
-                validateInput(costCenterFormControl, filteredCostCenterList)
-              " [matAutocomplete]="costCenter" />
-                        <mat-autocomplete autoActiveFirstOption #costCenter="matAutocomplete" [displayWith]="getOptionText" (optionSelected)="costCenterOptionChanged($event.option.value)">
-                            <mat-option *ngFor="let option of filteredCostCenterList | async" [value]="option.name">
-                                {{ option.name }}
-                            </mat-option>
-                        </mat-autocomplete>
-                        <mat-error *ngIf="costCenterFormControl.hasError('falseValse')">
-                            You should select a value from dropdown only.
-                            <strong>'{{ costCenterFormControl.value }}'</strong> is not allowed.
-                        </mat-error>
-                        <mat-error *ngIf="costCenterFormControl.hasError('required')">
-                            cost center is <strong>required</strong>
-                        </mat-error>
-                    </mat-form-field>    
-                </ion-col>
             </ion-row>
         </ion-grid>
     </ion-card-content>

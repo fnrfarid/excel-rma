@@ -74,11 +74,9 @@ export class SerialsComponent implements OnInit {
   date = new FormControl(new Date());
   claimsReceivedDate: string;
   permissionState = PERMISSION_STATE;
-
   warehouseFormControl = new FormControl('', [Validators.required]);
   costCenterFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
-  filteredCostCenterList: Observable<any[]>;
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
   submit: boolean = false;
@@ -256,10 +254,18 @@ export class SerialsComponent implements OnInit {
           this.getItemsWarranty();
           this.state.itemData = this.itemDataSource.data();
           this.state.warehouse = this.warehouseFormControl.value;
-          this.filteredCostCenterList = this.costCenterFormControl.valueChanges.pipe(
-            startWith(''),
-            this.salesService.getCostCenterList(sales_invoice.company),
-          );
+          this.salesService.relaySalesInvoice(sales_invoice.name).subscribe({
+            next: success => {
+              this.costCenterFormControl.setValue(success);
+            },
+            error: () => {
+              this.snackBar.open(
+                `Cost Center Not found refresh page or Check Sales Invoice`,
+                CLOSE,
+                { duration: 4500 },
+              );
+            },
+          });
         },
         error: err => {
           this.snackBar.open(
