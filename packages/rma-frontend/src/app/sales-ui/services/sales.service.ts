@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { of, from, forkJoin, Observable } from 'rxjs';
+import { of, from, forkJoin, Observable, throwError } from 'rxjs';
 import { switchMap, catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   SalesInvoice,
@@ -53,7 +53,7 @@ import {
   STOCK_AVAILABILITY_ENDPOINT,
   UPDATE_DELIVERY_STATUS_ENDPOINT,
   UPDATE_SALES_INVOICE_ITEM_MRP,
-  RELAY_COST_CENTER_ENDPOINT,
+  RELAY_LIST_SALES_RETURN_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -789,27 +789,37 @@ export class SalesService {
     );
   }
 
-  getCostCenterList(company: string) {
-    return switchMap(value => {
-      if (!value) value = '';
-      const url = RELAY_COST_CENTER_ENDPOINT;
-      const params = new HttpParams({
-        fromObject: {
-          fields: '["*"]',
-          filters: `[["name","like","%${value}%"],["company","like","%${company}%"]]`,
-        },
-      });
-      return this.getHeaders().pipe(
-        switchMap(headers => {
-          return this.http
-            .get<{ data: unknown[] }>(url, {
-              headers,
-              params,
-            })
-            .pipe(map(res => res.data));
-        }),
-      );
+  relaySalesInvoice(sales_invoice_name: string) {
+    const url = `${RELAY_LIST_SALES_RETURN_ENDPOINT}`;
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["cost_center"]',
+        filters: `[["name","like","%${sales_invoice_name}%"]]`,
+      },
     });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<{ data: unknown[] }>(url, {
+          headers,
+          params,
+        });
+      }),
+      map(res => res.data),
+      switchMap((salesInvoice: { cost_center: string }[]) => {
+        if (
+          !salesInvoice.find(
+            (Invoice: { cost_center: string }) => Invoice.cost_center,
+          )
+        ) {
+          return throwError(`Cost Center Not Found`);
+        }
+        return of(
+          salesInvoice.find(
+            (Invoice: { cost_center: string }) => Invoice.cost_center,
+          ),
+        );
+      }),
+    );
   }
 
   getStore() {
