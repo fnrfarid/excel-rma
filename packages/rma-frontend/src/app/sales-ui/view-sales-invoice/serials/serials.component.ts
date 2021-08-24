@@ -256,7 +256,7 @@ export class SerialsComponent implements OnInit {
           this.state.warehouse = this.warehouseFormControl.value;
           this.salesService.relaySalesInvoice(sales_invoice.name).subscribe({
             next: success => {
-              this.costCenterFormControl.setValue(success);
+              this.costCenterFormControl.setValue(success.cost_center);
             },
             error: () => {
               this.snackBar.open(
