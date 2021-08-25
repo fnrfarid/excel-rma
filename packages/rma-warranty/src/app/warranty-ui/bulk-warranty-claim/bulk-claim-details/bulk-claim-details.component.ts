@@ -17,6 +17,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import { PERMISSION_STATE } from '../../../constants/permission-roles';
 
 @Component({
   selector: 'bulk-claim-details',
@@ -39,6 +40,7 @@ export class BulkClaimDetailsComponent implements OnInit {
   dataSource: WarrantyClaimsDataSource;
   claim_no: string = this.route.snapshot.params.name;
   selectedSegment: any;
+  permissionState = PERMISSION_STATE;
   uuid: string = this.route.snapshot.params.uuid;
   expandedElement: any;
   displayedColumns = [

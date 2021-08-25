@@ -333,7 +333,7 @@ export class WarrantyStockEntryAggregateService {
 
   updateSerials(deliveryNote, serial_no, settings) {
     if (deliveryNote.isSync) {
-      return of();
+      return of(true);
     }
     if (
       deliveryNote.items[0].excel_serials &&
@@ -442,8 +442,9 @@ export class WarrantyStockEntryAggregateService {
             {
               $set: {
                 customer: state.progress_state[0].customer,
-                'warranty.salesWarrantyDate':
-                  state.progress_state[0].salesWarrantyDate,
+                'warranty.salesWarrantyDate': state.warranty_end_date
+                  ? state.warranty_end_date
+                  : '',
                 'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
                 sales_invoice_name: state.progress_state[0].sales_invoice_name,
                 delivery_note: payload.delivery_note,

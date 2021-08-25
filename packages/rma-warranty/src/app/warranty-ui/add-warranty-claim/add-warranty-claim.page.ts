@@ -29,6 +29,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AUTH_SERVER_URL, TIME_ZONE } from '../../constants/storage';
 import { DateTime } from 'luxon';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
+import { ValidateInputSelected } from '../../common/pipes/validators';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-add-warranty-claim',
@@ -36,6 +38,7 @@ import { WarrantyService } from '../warranty-tabs/warranty.service';
   styleUrls: ['./add-warranty-claim.page.scss'],
 })
 export class AddWarrantyClaimPage implements OnInit {
+  validateInput: any = ValidateInputSelected;
   warrantyObject: WarrantyClaimsDetails;
   contact = {} as any;
   filteredCustomerList: any;
@@ -45,7 +48,7 @@ export class AddWarrantyClaimPage implements OnInit {
   warrantyState: WarrantyState;
   bulkProducts: WarrantyBulkProducts[] = [];
   productList: any;
-  territoryList: any;
+  territoryList: Observable<any[]>;
   itemDetail: any;
   problemList: any;
   route: string;
@@ -139,8 +142,7 @@ export class AddWarrantyClaimPage implements OnInit {
       .getStorage()
       .getItem('territory')
       .then(territory => {
-        this.territoryList = territory;
-        this.warrantyClaimForm.controls.receiving_branch.setValue(territory[0]);
+        this.territoryList = of(territory);
       });
 
     this.problemList = this.warrantyClaimForm.controls.problem.valueChanges.pipe(
@@ -162,6 +164,15 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyClaimForm.controls.claim_type.setValue(this.claimList[0]);
     this.warrantyClaimForm.controls.category.setValue(CATEGORY.SINGLE);
     this.getFormState(this.warrantyClaimForm.controls.claim_type.value);
+    this.territoryList.subscribe({
+      next: territory => {
+        this.warrantyClaimForm.controls.receiving_branch.setValue(
+          territory.find(branch => {
+            return branch;
+          }),
+        );
+      },
+    });
   }
 
   clearAllControlValidators() {
