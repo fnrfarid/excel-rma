@@ -486,6 +486,7 @@
                   placeholder="Recieving Branch"
                   formControlName="receiving_branch"
                   [matAutocomplete]="recievingBranch"
+                  (focusout)="validateInput(f.receiving_branch, territoryList)"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
@@ -494,14 +495,18 @@
                   (optionSelected)="branchOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of territoryList | async"
                     [value]="option"
                   >
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.receiving_branch.hasError('required')">
-                  Recieving Branch is <strong>required</strong>
+                  Warehouse is <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="f.receiving_branch.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.receiving_branch.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>

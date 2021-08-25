@@ -191,7 +191,7 @@ export enum WARRANTY_STATUS {
   VALID = 'Valid',
   EXPIRED = 'Expired',
 }
-
+export const CALIM_CANCEL_DOCUMENT = 'Claim Cannot be Cancelled';
 export const PURCHASE_RECEIPT_SERIALS_BATCH_SIZE = 20000;
 // changing PURCHASE_RECEIPT_INSERT_MANY_BATCH_COUNT would require change's in data import,
 // make sure to handle them before changing this.

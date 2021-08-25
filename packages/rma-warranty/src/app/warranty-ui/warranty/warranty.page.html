@@ -217,6 +217,16 @@
                 />
               </mat-form-field>
             </ion-col>
+            <ion-col>
+              <mat-form-field class="full-width">
+                <input
+                  matInput
+                  placeholder="Replaced Serial Number"
+                  formControlName="replace_serial"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
           </ion-row>
           <ion-row>
             <ion-col class="ion-text-center">

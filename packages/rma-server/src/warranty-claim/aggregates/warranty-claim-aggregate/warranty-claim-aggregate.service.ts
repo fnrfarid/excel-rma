@@ -786,6 +786,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           {
             serial_no: serialArray[0],
             document_type: WARRANTY_CLAIM_DOCTYPE,
+            document_no: statusHistoryPayload.doc_name,
           },
           {
             $set: serialHistory,
@@ -799,6 +800,11 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
       .pipe(
+        switchMap(res => {
+          return this.warrantyClaimsPoliciesService.validateServiceInvoice(
+            cancelPayload.uuid,
+          );
+        }),
         switchMap(res => {
           return from(
             this.warrantyClaimService.updateOne(

@@ -7,6 +7,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
 import { HttpService } from '@nestjs/common';
+import { ServiceInvoiceService } from '../../../service-invoice/entity/service-invoice/service-invoice.service';
 
 describe('WarrantyClaimPoliciesService', () => {
   let service: WarrantyClaimPoliciesService;
@@ -41,6 +42,10 @@ describe('WarrantyClaimPoliciesService', () => {
         },
         {
           provide: HttpService,
+          useValue: {},
+        },
+        {
+          provide: ServiceInvoiceService,
           useValue: {},
         },
       ],

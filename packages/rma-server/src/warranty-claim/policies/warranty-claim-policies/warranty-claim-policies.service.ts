@@ -20,18 +20,23 @@ import {
 } from '../../../constants/messages';
 import { SerialNoService } from '../../../serial-no/entity/serial-no/serial-no.service';
 import { WarrantyClaimDto } from '../../../warranty-claim/entity/warranty-claim/warranty-claim-dto';
-import { WARRANTY_STATUS } from '../../../constants/app-strings';
+import {
+  CALIM_CANCEL_DOCUMENT,
+  WARRANTY_STATUS,
+} from '../../../constants/app-strings';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
 import { SerialNo } from '../../../serial-no/entity/serial-no/serial-no.entity';
 import { DateTime } from 'luxon';
 import { WarrantyClaimService } from '../../entity/warranty-claim/warranty-claim.service';
 import { FRAPPE_API_GET_CUSTOMER_ENDPOINT } from '../../../constants/routes';
 import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { ServiceInvoiceService } from '../../../service-invoice/entity/service-invoice/service-invoice.service';
 
 @Injectable()
 export class WarrantyClaimPoliciesService {
   constructor(
     private readonly supplierService: SupplierService,
+    private readonly invoiceService: ServiceInvoiceService,
     private readonly clientToken: ClientTokenManagerService,
     private readonly serialNoService: SerialNoService,
     private readonly warrantyService: WarrantyClaimService,
@@ -147,12 +152,7 @@ export class WarrantyClaimPoliciesService {
     return from(
       this.warrantyService.findOne(
         { uuid },
-        {
-          $or: [
-            { service_vouchers: { $exists: true } },
-            { progress_state: { $exists: true } },
-          ],
-        },
+        { progress_state: { $exists: true } },
       ),
     ).pipe(
       switchMap(claim => {
@@ -162,7 +162,9 @@ export class WarrantyClaimPoliciesService {
             claim?.completed_delivery_note?.length
           ) {
             return throwError(
-              new BadRequestException('Cancel the linked documents first'),
+              new BadRequestException(
+                `${CALIM_CANCEL_DOCUMENT} Cancel Stock Entries`,
+              ),
             );
           }
           return of(true);
@@ -174,8 +176,27 @@ export class WarrantyClaimPoliciesService {
           return of(true);
         }
         return throwError(
-          new BadRequestException('Claim Cannot be Canclled,revert the state'),
+          new BadRequestException(
+            `${CALIM_CANCEL_DOCUMENT} Revert The Status History`,
+          ),
         );
+      }),
+    );
+  }
+
+  validateServiceInvoice(warrantyClaimUuid: string) {
+    return from(
+      this.invoiceService.findOne({ warrantyClaimUuid, docstatus: 1 }),
+    ).pipe(
+      switchMap(serviceInvoice => {
+        if (serviceInvoice) {
+          return throwError(
+            new BadRequestException(
+              `${CALIM_CANCEL_DOCUMENT} Cancel Service Invoices`,
+            ),
+          );
+        }
+        return of(true);
       }),
     );
   }

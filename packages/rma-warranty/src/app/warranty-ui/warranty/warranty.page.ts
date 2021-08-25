@@ -169,6 +169,7 @@ export class WarrantyPage implements OnInit {
       claim_type: new FormControl(''),
       territory: new FormControl(''),
       serial_no: new FormControl(''),
+      replace_serial: new FormControl(''),
       received_by: new FormControl(''),
       delivered_by: new FormControl(''),
       fromDate: new FormControl(''),
@@ -234,6 +235,9 @@ export class WarrantyPage implements OnInit {
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
     if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
     if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
+    if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
+    if (this.f.replace_serial.value)
+      query.replace_serial = this.f.replace_serial.value;
     if (this.f.received_by.value) query.received_by = this.f.received_by.value;
     if (this.f.delivered_by.value)
       query.delivered_by = this.f.delivered_by.value;
