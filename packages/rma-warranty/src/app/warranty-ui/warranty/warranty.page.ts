@@ -190,6 +190,8 @@ export class WarrantyPage implements OnInit {
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
     if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
     if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
+    if (this.f.replace_serial.value)
+      query.replace_serial = this.f.replace_serial.value;
     if (this.f.received_by.value) query.received_by = this.f.received_by.value;
     if (this.f.delivered_by.value)
       query.delivered_by = this.f.delivered_by.value;
@@ -235,7 +237,6 @@ export class WarrantyPage implements OnInit {
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
     if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
     if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
-    if (this.f.serial_no.value) query.serial_no = this.f.serial_no.value;
     if (this.f.replace_serial.value)
       query.replace_serial = this.f.replace_serial.value;
     if (this.f.received_by.value) query.received_by = this.f.received_by.value;
@@ -261,16 +262,10 @@ export class WarrantyPage implements OnInit {
       }
     }
 
-    this.dataSource.loadItems(
-      this.sortQuery,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-      query,
-      {
-        territory: this.territoryList,
-        set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
-      },
-    );
+    this.dataSource.loadItems(this.sortQuery, undefined, undefined, query, {
+      territory: this.territoryList,
+      set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
+    });
   }
 
   getBulkClaims() {
@@ -308,7 +303,7 @@ export class WarrantyPage implements OnInit {
     this.f.claim_no.setValue('');
     this.f.third_party_name.setValue('');
     this.f.product.setValue('');
-    this.claim_status = 'All';
+    this.f.claim_status.setValue('');
     this.f.claim_type.setValue('');
     this.f.territory.setValue('');
     this.f.serial_no.setValue('');
@@ -317,6 +312,9 @@ export class WarrantyPage implements OnInit {
     this.f.fromDate.setValue('');
     this.f.toDate.setValue('');
     this.f.singleDate.setValue('');
+    this.f.replace_serial.setValue('');
+    this.paginator.pageSize = 30;
+    this.paginator.firstPage();
     this.dataSource.loadItems(undefined, undefined, undefined, undefined, {
       territory: this.territoryList,
       set: [CATEGORY.BULK, CATEGORY.SINGLE],
