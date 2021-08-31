@@ -517,6 +517,7 @@
                   type="text"
                   placeholder="Delivery Branch"
                   formControlName="delivery_branch"
+                  (focusout)="validateInput(f.delivery_branch, territoryList)"
                   [matAutocomplete]="deliveryBranch"
                 />
                 <mat-autocomplete
@@ -526,12 +527,16 @@
                   (optionSelected)="branchOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of territoryList | async"
                     [value]="option"
                   >
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="f.delivery_branch.hasError('falseValse')">
+                You should select a value from dropdown only. 
+                <strong>'{{f.delivery_branch.value}}'</strong> is not allowed.
+              </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>

@@ -505,7 +505,7 @@ export class WarrantyStockEntryAggregateService {
     return from(this.stockEntryService.findOne(warrantyClaimUuid));
   }
 
-  removeStockEntry(stockEntry, req) {
+  removeStockEntry(stockEntry: WarrantyStockEntryDto, req) {
     let set: any;
     return this.stockEntryPoliciesService
       .validateCancelWarrantyStockEntry(stockEntry.warrantyClaimUuid, [
@@ -530,39 +530,49 @@ export class WarrantyStockEntryAggregateService {
           if (!response) {
             return throwError(new NotFoundException());
           }
-          const url = `${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
-          response.docstatus = 2;
-          response.items.forEach(item => {
-            item.docstatus = 2;
-          });
-          return this.http.put(url, response, {
-            headers: this.settingService.getAuthorizationHeaders(req.token),
-          });
+          if (response.docstatus !== 2) {
+            const url = `${set.authServerURL}${POST_DELIVERY_NOTE_ENDPOINT}/${stockEntry.stock_voucher_number}`;
+            response.docstatus = 2;
+            response.items.forEach(item => {
+              item.docstatus = 2;
+            });
+            return this.http.put(url, response, {
+              headers: this.settingService.getAuthorizationHeaders(req.token),
+            });
+          }
+          return of({ data: {} });
         }),
         map(res => res.data.data),
         switchMap(serialItem => {
-          if (stockEntry.stock_entry_type === STOCK_ENTRY_STATUS.delivered) {
-            return from(
-              this.serialService.updateOne(
-                { serial_no: stockEntry.items[0]?.serial_no },
-                {
-                  $unset: {
-                    customer: '',
-                    'warranty.salesWarrantyDate': '',
-                    'warranty.soldOn': '',
-                    delivery_note: '',
-                    sales_invoice_name: '',
+          if (
+            stockEntry.items.find(item => {
+              return item.serial_no;
+            })
+          ) {
+            if (stockEntry.stock_entry_type === STOCK_ENTRY_STATUS.delivered) {
+              return from(
+                this.serialService.updateOne(
+                  { serial_no: stockEntry.items[0]?.serial_no },
+                  {
+                    $unset: {
+                      customer: '',
+                      'warranty.salesWarrantyDate': '',
+                      'warranty.soldOn': '',
+                      delivery_note: '',
+                      sales_invoice_name: '',
+                    },
                   },
-                },
-              ),
-            );
+                ),
+              );
+            }
+            if (stockEntry.stock_entry_type === STOCK_ENTRY_STATUS.returned) {
+              return this.resetCancelledSerialItem(
+                stockEntry.stock_voucher_number,
+              );
+            }
+            return of(true);
           }
-          if (stockEntry.stock_entry_type === STOCK_ENTRY_STATUS.returned) {
-            return this.resetCancelledSerialItem(
-              stockEntry.stock_voucher_number,
-            );
-          }
-          return of();
+          return of(true);
         }),
         switchMap(() => {
           if (stockEntry.stock_entry_type === STOCK_ENTRY_STATUS.delivered) {
@@ -584,7 +594,7 @@ export class WarrantyStockEntryAggregateService {
         switchMap(() => {
           return from(
             this.stockEntryService.deleteOne({
-              stock_voucher_number: stockEntry.stock_voucher_number,
+              uuid: stockEntry.uuid,
             }),
           );
         }),
@@ -609,11 +619,18 @@ export class WarrantyStockEntryAggregateService {
           );
         }),
         switchMap(() => {
-          return from(
-            this.serialNoHistoryService.deleteOne({
-              document_no: stockEntry.stock_voucher_number,
-            }),
-          );
+          if (
+            stockEntry.items.find(item => {
+              return item.serial_no;
+            })
+          ) {
+            return from(
+              this.serialNoHistoryService.deleteOne({
+                document_no: stockEntry.stock_voucher_number,
+              }),
+            );
+          }
+          return of(true);
         }),
       );
   }
@@ -670,7 +687,20 @@ export class WarrantyStockEntryAggregateService {
             ),
           );
         }
-        return of({});
+        return from(
+          this.serialService.updateOne(
+            { serial_no: stockEntryObject.items[0]?.serial_no },
+            {
+              $set: {
+                'warranty.salesWarrantyDate': warranty.received_on,
+                'warranty.soldOn': warranty.received_on,
+              },
+              $unset: {
+                delivery_note: '',
+              },
+            },
+          ),
+        );
       }),
     );
   }
