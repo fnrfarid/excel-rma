@@ -63,6 +63,7 @@ describe('AddSalesReturnPage', () => {
         {
           provide: SalesService,
           useValue: {
+            relaySalesInvoice: (...args) => of({}),
             getSalesInvoice: (...args) =>
               of({
                 items: [],

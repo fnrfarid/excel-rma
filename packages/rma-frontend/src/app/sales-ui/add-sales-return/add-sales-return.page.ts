@@ -77,6 +77,7 @@ export class AddSalesReturnPage implements OnInit {
   warehouseFormControl = new FormControl();
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
+  costCenterFormControl = new FormControl();
   remarks = new FormControl();
   getOptionText = '';
   validateInput: any = ValidateInputSelected;
@@ -309,6 +310,18 @@ export class AddSalesReturnPage implements OnInit {
           this.itemDataSource.loadItems(this.filteredItemList);
           this.getItemsWarranty();
           this.deliveryNoteNames = res.delivery_note_names;
+          this.salesService.relaySalesInvoice(res.name).subscribe({
+            next: success => {
+              this.costCenterFormControl.setValue(success.cost_center);
+            },
+            error: () => {
+              this.snackBar.open(
+                `Cost Center Not found refresh page or Check Sales Invoice`,
+                CLOSE,
+                { duration: 4500 },
+              );
+            },
+          });
         },
       });
   }
@@ -576,6 +589,7 @@ export class AddSalesReturnPage implements OnInit {
           serialItem.qty -= item.qty || 0;
           serialItem.amount += item.qty * item.rate || 0;
           serialItem.has_serial_no = item.has_serial_no;
+          serialItem.cost_center = this.costCenterFormControl.value;
           serialItem.serial_no.push(...item.serial_no);
         }
       }
@@ -699,6 +713,12 @@ export class AddSalesReturnPage implements OnInit {
     const data = this.serialDataSource.data();
     let isValid = true;
     let index = 0;
+    if (!this.costCenterFormControl.value) {
+      this.snackBar.open('Please select a Cost Center.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
     for (const item of data) {
       index++;
 
@@ -837,4 +857,5 @@ export interface SerialReturnItem {
   against_sales_invoice: string;
   has_serial_no: number;
   serial_no: any;
+  cost_center: string;
 }
