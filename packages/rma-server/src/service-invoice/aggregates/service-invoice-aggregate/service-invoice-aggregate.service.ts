@@ -82,7 +82,7 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
           {
             $project: {
               invoice_no: 1,
-              total: 1,
+              total: '$items.amount',
               item_name: '$items.item_name',
             },
           },

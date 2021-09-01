@@ -15,7 +15,7 @@ export class ServiceInvoice extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   invoice_no: string;
 
   @Column()

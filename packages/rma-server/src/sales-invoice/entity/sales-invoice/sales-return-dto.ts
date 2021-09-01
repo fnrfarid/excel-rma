@@ -104,4 +104,8 @@ export class SalesReturnItemDto {
 
   @IsOptional()
   serial_no: any;
+
+  @IsNotEmpty()
+  @IsString()
+  cost_center: string;
 }
