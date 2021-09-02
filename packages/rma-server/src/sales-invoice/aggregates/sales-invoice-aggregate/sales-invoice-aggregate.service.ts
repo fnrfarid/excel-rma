@@ -682,6 +682,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
           qty: item.qty,
           rate: item.rate,
           amount: item.amount,
+          cost_center: item.cost_center,
         };
       }),
     };

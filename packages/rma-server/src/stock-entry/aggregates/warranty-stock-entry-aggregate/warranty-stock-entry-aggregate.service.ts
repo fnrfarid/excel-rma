@@ -546,6 +546,9 @@ export class WarrantyStockEntryAggregateService {
         switchMap(serialItem => {
           if (
             stockEntry.items.find(item => {
+              if (item.serial_no === 'Non serial Item') {
+                return undefined;
+              }
               return item.serial_no;
             })
           ) {
@@ -621,6 +624,9 @@ export class WarrantyStockEntryAggregateService {
         switchMap(() => {
           if (
             stockEntry.items.find(item => {
+              if (item.serial_no === 'Non serial Item') {
+                return undefined;
+              }
               return item.serial_no;
             })
           ) {
