@@ -698,6 +698,7 @@ export interface SerialItem {
   amount: number;
   serial_no: string[];
   against_sales_invoice?: string;
+  cost_center?: string;
 }
 
 export interface Item {
