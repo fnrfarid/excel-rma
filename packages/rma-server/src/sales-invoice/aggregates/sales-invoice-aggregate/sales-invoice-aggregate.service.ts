@@ -676,6 +676,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       return_against: salesInvoice.name,
       posting_time: assignPayload.posting_time,
       remarks: assignPayload.remarks,
+      cost_center: assignPayload.items.find(item => item).cost_center,
       items: assignPayload.items.map(item => {
         return {
           item_code: item.item_code,
