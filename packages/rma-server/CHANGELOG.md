@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.14.0...rma-server@1.15.0) (2021-09-07)
+
+
+### Bug Fixes
+
+* **Excel-rma:** Fix partial sales return creation for credit note items ([25cc9af](https://gitlab.com/castlecraft/excel-rma/commit/25cc9af907d43ca6c7e087361733947f9df880b0))
+
+
+### Features
+
+* **rma-frontend:** added backdated invoice control ([773ab7a](https://gitlab.com/castlecraft/excel-rma/commit/773ab7af230ed16bfc62054e60700de04a26fec6))
+
+
+
+
+
 # [1.14.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.13.0...rma-server@1.14.0) (2021-06-12)
 
 
