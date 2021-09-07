@@ -291,6 +291,8 @@ export const DOC_NAMES = {
   DELIVERY_NOTE: 'Delivery Note',
 };
 
+export const NON_SERIAL_ITEM = 'NON SERIAL ITEM';
+
 export const DOC_RESET_INFO = {
   [DOC_NAMES.PURCHASE_ORDER]: {
     'Purchase Invoice': {

@@ -11,6 +11,7 @@ import {
   CURRENT_STATUS_VERDICT,
   DEFAULT_NAMING_SERIES,
   DELIVERY_STATUS,
+  NON_SERIAL_ITEM,
   STOCK_ENTRY,
   STOCK_ENTRY_STATUS,
   VERDICT,
@@ -546,7 +547,7 @@ export class WarrantyStockEntryAggregateService {
         switchMap(serialItem => {
           if (
             stockEntry.items.find(item => {
-              if (item.serial_no === 'Non serial Item') {
+              if (item.serial_no.toUpperCase() === NON_SERIAL_ITEM) {
                 return undefined;
               }
               return item.serial_no;
@@ -624,7 +625,7 @@ export class WarrantyStockEntryAggregateService {
         switchMap(() => {
           if (
             stockEntry.items.find(item => {
-              if (item.serial_no === 'Non serial Item') {
+              if (item.serial_no.toUpperCase() === NON_SERIAL_ITEM) {
                 return undefined;
               }
               return item.serial_no;

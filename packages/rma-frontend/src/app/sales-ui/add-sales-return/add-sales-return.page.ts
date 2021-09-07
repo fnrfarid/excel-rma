@@ -542,6 +542,7 @@ export class AddSalesReturnPage implements OnInit {
         const data: any = {};
         Object.assign(data, element);
         data.qty = data.credit_note_qty;
+        data.cost_center = this.costCenterFormControl.value;
         delete data.credit_note_qty;
         credit_note_items.push(data);
       });

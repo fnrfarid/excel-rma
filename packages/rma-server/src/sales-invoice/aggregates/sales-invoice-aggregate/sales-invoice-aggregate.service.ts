@@ -721,6 +721,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         serial_no: eachItemData.serial_no,
         against_sales_invoice: eachItemData.against_sales_invoice,
         amount: eachItemData.amount,
+        cost_center: eachItemData.cost_center,
       });
     });
     return itemData;
