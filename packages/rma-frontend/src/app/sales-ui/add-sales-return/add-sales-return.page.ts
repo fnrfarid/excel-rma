@@ -77,6 +77,7 @@ export class AddSalesReturnPage implements OnInit {
   warehouseFormControl = new FormControl();
   postingDateFormControl = new FormControl();
   dueDateFormControl = new FormControl();
+  costCenterFormControl = new FormControl();
   remarks = new FormControl();
   getOptionText = '';
   validateInput: any = ValidateInputSelected;
@@ -309,6 +310,18 @@ export class AddSalesReturnPage implements OnInit {
           this.itemDataSource.loadItems(this.filteredItemList);
           this.getItemsWarranty();
           this.deliveryNoteNames = res.delivery_note_names;
+          this.salesService.relaySalesInvoice(res.name).subscribe({
+            next: success => {
+              this.costCenterFormControl.setValue(success.cost_center);
+            },
+            error: () => {
+              this.snackBar.open(
+                `Cost Center Not found refresh page or Check Sales Invoice`,
+                CLOSE,
+                { duration: 4500 },
+              );
+            },
+          });
         },
       });
   }
@@ -511,16 +524,17 @@ export class AddSalesReturnPage implements OnInit {
 
       let valid = true;
       response.forEach(element => {
-        if (!valid) return;
+        if (!valid || !element.credit_note_qty) {
+          return;
+        }
 
         if (
           element.credit_note_qty >= 0 ||
           element.credit_note_qty < 0 - element.qty
         ) {
           this.getMessage(
-            `Credit Note Item quantity for ${
-              element.item_name
-            }, should be between -1 and ${0 - element.qty}`,
+            `Credit Note Item quantity for ${element.item_name}, 
+            should be between -1 and ${0 - element.qty}`,
           );
           valid = false;
           return;
@@ -528,6 +542,7 @@ export class AddSalesReturnPage implements OnInit {
         const data: any = {};
         Object.assign(data, element);
         data.qty = data.credit_note_qty;
+        data.cost_center = this.costCenterFormControl.value;
         delete data.credit_note_qty;
         credit_note_items.push(data);
       });
@@ -575,6 +590,7 @@ export class AddSalesReturnPage implements OnInit {
           serialItem.qty -= item.qty || 0;
           serialItem.amount += item.qty * item.rate || 0;
           serialItem.has_serial_no = item.has_serial_no;
+          serialItem.cost_center = this.costCenterFormControl.value;
           serialItem.serial_no.push(...item.serial_no);
         }
       }
@@ -593,6 +609,7 @@ export class AddSalesReturnPage implements OnInit {
     salesReturn.credit_note_items = credit_note_items?.length
       ? credit_note_items
       : undefined;
+
     this.salesService.createSalesReturn(salesReturn).subscribe({
       next: success => {
         this.snackBar.open(`Sales Return created.`, CLOSE, { duration: 4500 });
@@ -697,6 +714,12 @@ export class AddSalesReturnPage implements OnInit {
     const data = this.serialDataSource.data();
     let isValid = true;
     let index = 0;
+    if (!this.costCenterFormControl.value) {
+      this.snackBar.open('Please select a Cost Center.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
     for (const item of data) {
       index++;
 
@@ -835,4 +858,5 @@ export interface SerialReturnItem {
   against_sales_invoice: string;
   has_serial_no: number;
   serial_no: any;
+  cost_center: string;
 }

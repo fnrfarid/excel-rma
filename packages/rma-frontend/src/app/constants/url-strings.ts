@@ -17,6 +17,8 @@ export const CREATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/create';
 export const UPDATE_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/update';
 export const UPDATE_DELIVERY_STATUS_ENDPOINT =
   'api/sales_invoice/v1/update_delivery_status';
+export const UPDATE_SALES_INVOICE_ITEM_MRP =
+  'api/sales_invoice/v1/update_mrp_rate';
 export const SUBMIT_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/submit';
 export const CANCEL_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/cancel';
 export const CREATE_SALES_RETURN_ENDPOINT =
@@ -46,6 +48,8 @@ export const RELAY_GET_ADDRESS_NAME_METHOD_ENDPOINT =
   '/api/command/user/api/method/frappe.contacts.doctype.address.address.get_default_address';
 export const RELAY_GET_FULL_ADDRESS_ENDPOINT =
   '/api/command/user/api/resource/Address/';
+export const RELAY_COST_CENTER_ENDPOINT =
+  '/api/command/user/api/resource/Cost%20Center';
 export const RELAY_LIST_TERRITORIES_ENDPOINT =
   '/api/command/user/api/resource/Territory';
 export const RELAY_LIST_SALES_RETURN_ENDPOINT =

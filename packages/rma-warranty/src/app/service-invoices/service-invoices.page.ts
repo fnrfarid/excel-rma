@@ -12,6 +12,7 @@ import {
   SERVICE_INVOICE_CSV_FILE,
   SERVICE_INVOICE_DOWNLOAD_HEADERS,
   SERVICE_INVOICE_STATUS,
+  SORT_ORDER,
 } from '../constants/app-string';
 import { TimeService } from '../api/time/time.service';
 import { FormControl, FormGroup } from '@angular/forms';
@@ -65,7 +66,10 @@ export class ServiceInvoicesPage implements OnInit {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(val => {
-        this.dataSource.loadItems(this.route.snapshot.params.uuid);
+        this.dataSource.loadItems(
+          this.route.snapshot.params.uuid,
+          SORT_ORDER.DESCENDING,
+        );
         this.getTotal();
       });
   }
@@ -87,7 +91,7 @@ export class ServiceInvoicesPage implements OnInit {
   ngOnInit() {
     this.invoiceUuid = this.route.snapshot.params.uuid;
     this.dataSource = new ServiceInvoicesDataSource(this.serviceInvoice);
-    this.dataSource.loadItems(this.invoiceUuid);
+    this.dataSource.loadItems(this.invoiceUuid, SORT_ORDER.DESCENDING);
     this.createFormGroup();
 
     this.filteredCustomerList = this.serviceForm
@@ -140,7 +144,7 @@ export class ServiceInvoicesPage implements OnInit {
     }
     this.dataSource.loadItems(
       query,
-      sortQuery,
+      SORT_ORDER.DESCENDING,
       this.paginator.pageIndex,
       this.paginator.pageSize,
     );
@@ -156,7 +160,7 @@ export class ServiceInvoicesPage implements OnInit {
 
   statusChange(status) {
     if (status === 'All') {
-      this.dataSource.loadItems();
+      this.dataSource.loadItems({}, SORT_ORDER.DESCENDING);
     } else {
       this.status = status;
       this.setFilter();
@@ -177,7 +181,7 @@ export class ServiceInvoicesPage implements OnInit {
     this.f.submitted_by.setValue('');
     this.f.fromDate.setValue('');
     this.f.toDate.setValue('');
-    this.dataSource.loadItems();
+    this.dataSource.loadItems(undefined, SORT_ORDER.DESCENDING);
     this.status = SERVICE_INVOICE_STATUS.ALL;
   }
 
@@ -213,7 +217,7 @@ export class ServiceInvoicesPage implements OnInit {
     }
     this.dataSource.loadItems(
       query,
-      sortQuery,
+      SORT_ORDER.DESCENDING,
       event.pageIndex,
       event.pageSize,
     );

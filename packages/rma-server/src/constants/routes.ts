@@ -18,6 +18,8 @@ export const ITEM_ON_TRASH_ENDPOINT = '/api/item/webhook/v1/delete';
 export const FRAPPE_API_SERIAL_NO_ENDPOINT = '/api/resource/Serial%20No';
 export const FRAPPE_API_SALES_INVOICE_ENDPOINT =
   '/api/resource/Sales%20Invoice';
+export const FRAPPE_API_SALES_INVOICE_ITEM_ENDPOINT =
+  '/api/resource/Sales%20Invoice%20Item';
 export const OAUTH_BEARER_TOKEN_ENDPOINT =
   '/api/resource/OAuth%20Bearer%20Token';
 export const GET_TIME_ZONE_ENDPOINT = '/api/method/frappe.client.get_time_zone';
@@ -91,3 +93,5 @@ export const LANDED_COST_VOUCHER_ENDPOINT =
   '/api/resource/Landed%20Cost%20Voucher';
 export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
   '/api/method/erpnext.stock.utils.get_stock_balance';
+export const POST_WARRANTY_PRINT_ENDPOINT =
+  '/api/resource/Excel%20Warranty%20Print';

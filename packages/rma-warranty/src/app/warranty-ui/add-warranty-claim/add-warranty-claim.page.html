@@ -251,8 +251,9 @@
             <ion-col class="ion-text-left" *ngIf="route ==='edit'">
               <ion-button
                 color="tertiary"
-                *ngIf="warrantyObject?.category === 'Bulk'"
+                *ngIf="warrantyObject?.set === 'Bulk'"
                 (click)="appendProduct()"
+                [disabled]="warrantyClaimForm.invalid"
               >
                 Add
               </ion-button>
@@ -262,6 +263,7 @@
                 color="tertiary"
                 *ngIf="f.category.value === 'Bulk'"
                 (click)="appendProduct()"
+                [disabled]="warrantyClaimForm.invalid"
               >
                 Add
               </ion-button>
@@ -428,7 +430,7 @@
         </ion-grid>
       </ion-card-content>
     </ion-card>
-    <ion-card *ngIf="route ==='add'">
+    <ion-card>
       <ion-card-header>
         <ion-card-title color="tertiary"> Company Details </ion-card-title>
       </ion-card-header>
@@ -484,6 +486,7 @@
                   placeholder="Recieving Branch"
                   formControlName="receiving_branch"
                   [matAutocomplete]="recievingBranch"
+                  (focusout)="validateInput(f.receiving_branch, territoryList)"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
@@ -492,14 +495,18 @@
                   (optionSelected)="branchOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of territoryList | async"
                     [value]="option"
                   >
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.receiving_branch.hasError('required')">
-                  Recieving Branch is <strong>required</strong>
+                  Warehouse is <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="f.receiving_branch.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.receiving_branch.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -510,6 +517,7 @@
                   type="text"
                   placeholder="Delivery Branch"
                   formControlName="delivery_branch"
+                  (focusout)="validateInput(f.delivery_branch, territoryList)"
                   [matAutocomplete]="deliveryBranch"
                 />
                 <mat-autocomplete
@@ -519,12 +527,16 @@
                   (optionSelected)="branchOptionChanged($event.option.value)"
                 >
                   <mat-option
-                    *ngFor="let option of territoryList"
+                    *ngFor="let option of territoryList | async"
                     [value]="option"
                   >
                     {{ option }}
                   </mat-option>
                 </mat-autocomplete>
+                <mat-error *ngIf="f.delivery_branch.hasError('falseValse')">
+                You should select a value from dropdown only. 
+                <strong>'{{f.delivery_branch.value}}'</strong> is not allowed.
+              </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>

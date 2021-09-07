@@ -30,6 +30,10 @@ export class WarrantyStockEntryDto {
 
   @IsOptional()
   @IsString()
+  stock_voucher_number: string;
+
+  @IsOptional()
+  @IsString()
   company: string;
 
   @IsOptional()

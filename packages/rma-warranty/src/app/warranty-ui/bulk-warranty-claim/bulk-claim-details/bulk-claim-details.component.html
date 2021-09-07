@@ -8,6 +8,7 @@
       </ion-col>
       <ion-col class="ion-text-right">
         <ion-button
+        *ngIf="permissionState.warranty_claim.update"
           color="tertiary"
           [disabled]="!dataSource.length"
           fill="outline"
@@ -16,9 +17,10 @@
           Edit
         </ion-button>
         <ion-button
+        *ngIf="permissionState.warranty_claim.read"
           color="tertiary"
           [disabled]="!dataSource.length"
-          (click)="comingSoon('Print Feature is coming Soon...')"
+          (click)="openDialog()"
         >
           Print
         </ion-button>
@@ -190,6 +192,7 @@
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
+
         <mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"
         ></mat-header-row>
@@ -206,12 +209,441 @@
                 ? '#FDFAE5'
                 : 'rgb(255, 255, 255)'
           }"
+          class="example-element-row"
+          [class.example-expanded-row]="expandedElement === row"
+          (click)="expandedElement = expandedElement === row ? null : row"
         ></mat-row>
         <mat-footer-row
           class="footer"
           *matFooterRowDef="displayedColumns; sticky: true"
         ></mat-footer-row>
       </table>
+      <ion-row class="rowDetail">
+        <ion-col>
+          <ion-card class="example-element-detail">
+            <ion-card-header>
+              <ion-row>
+                <ion-col class="ion-text-left">
+                  <ion-card-title>
+                    <ion-text color="tertiary"> Warranty Details </ion-text>
+                  </ion-card-title>
+                </ion-col>
+              </ion-row>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Claim No</ion-label>
+                      <ion-input
+                        placeholder="Claim No"
+                        type="text"
+                        value="{{
+                          expandedElement?.claim_no
+                            ? expandedElement.claim_no
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Warranty End Date</ion-label
+                      >
+                      <ion-input
+                        placeholder="Warranty End Date"
+                        type="text"
+                        value="{{
+                          expandedElement?.warranty_end_date
+                            ? expandedElement.warranty_end_date
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Receive Date & Time</ion-label
+                      >
+                      <ion-input
+                        placeholder="Receive Date & Time"
+                        readonly="true"
+                        type="text"
+                        value="{{
+                          expandedElement?.received_on
+                            ? expandedElement.received_on
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Receiving Branch</ion-label
+                      >
+                      <ion-input
+                        placeholder="Delivery Branch"
+                        readonly="true"
+                        type="text"
+                        value="{{
+                          expandedElement?.receiving_branch
+                            ? expandedElement.receiving_branch
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Received By</ion-label>
+                      <ion-input
+                        placeholder="Received By"
+                        type="text"
+                        value="{{
+                          expandedElement?.received_by
+                            ? expandedElement.received_by
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Deliver Date & Time</ion-label
+                      >
+                      <ion-input
+                        placeholder="Receive Date & Time"
+                        readonly="true"
+                        type="text"
+                        value="{{
+                          expandedElement?.delivery_date
+                            ? expandedElement.delivery_date
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Delivery Branch</ion-label>
+                      <ion-input
+                        placeholder="Delivery Branch"
+                        readonly="true"
+                        type="text"
+                        value="{{
+                          expandedElement?.delivery_branch
+                            ? expandedElement.delivery_branch
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Delivered By</ion-label>
+                      <ion-input
+                        placeholder="Delivered By"
+                        type="text"
+                        value="{{
+                          expandedElement?.delivered_by
+                            ? expandedElement.delivered_by
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col>
+          <ion-card
+            [@detailExpand]="
+              expandedElement == expandedElement ? 'expanded' : 'collapsed'
+            "
+            class="example-element-detail"
+          >
+            <ion-card-header>
+              <ion-row>
+                <ion-col class="ion-text-left">
+                  <ion-card-title>
+                    <ion-text color="tertiary"> Product Details </ion-text>
+                  </ion-card-title>
+                </ion-col>
+              </ion-row>
+            </ion-card-header>
+
+            <ion-card-content>
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Serial Number</ion-label>
+                      <ion-input
+                        placeholder="Serial Number"
+                        readonly="true"
+                        type="text"
+                        value="{{
+                          expandedElement?.serial_no
+                            ? expandedElement.serial_no
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Claim Type</ion-label>
+                      <ion-input
+                        placeholder="Claim Type"
+                        readonly="true"
+                        type="text"
+                        value="{{
+                          expandedElement?.claim_type
+                            ? expandedElement.claim_type
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">INV No</ion-label>
+                      <ion-input
+                        placeholder="INV No"
+                        type="text"
+                        value="{{
+                          expandedElement?.invoice_no
+                            ? expandedElement.invoice_no
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Product Name</ion-label>
+                      <ion-input
+                        placeholder="Product Name"
+                        type="text"
+                        value="{{
+                          expandedElement?.item_name
+                            ? expandedElement.item_name
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Product Brand</ion-label>
+                      <ion-input
+                        placeholder="Product Brand"
+                        type="text"
+                        value="{{
+                          expandedElement?.product_brand
+                            ? expandedElement.product_brand
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Problem</ion-label>
+                      <ion-input
+                        placeholder="Problem"
+                        type="text"
+                        value="{{
+                          expandedElement?.problem
+                            ? expandedElement.problem
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Problem Details</ion-label>
+                      <ion-input
+                        placeholder="Problem Details"
+                        type="text"
+                        value="{{
+                          expandedElement?.problem_details
+                            ? expandedElement.problem_details
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Additional Receive/Remarks</ion-label
+                      >
+                      <ion-input
+                        placeholder="Additional Receive/Remarks"
+                        type="text"
+                        value="{{
+                          expandedElement?.remarks
+                            ? expandedElement.remarks
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col>
+          <ion-card
+            [@detailExpand]="
+              expandedElement == expandedElement ? 'expanded' : 'collapsed'
+            "
+            class="example-element-detail"
+          >
+            <ion-card-header>
+              <ion-row>
+                <ion-col class="ion-text-left">
+                  <ion-card-title>
+                    <ion-text color="tertiary"> Customer Details </ion-text>
+                  </ion-card-title>
+                </ion-col>
+              </ion-row>
+            </ion-card-header>
+
+            <ion-card-content>
+              <ion-grid class="ion-no-padding">
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Customer Name</ion-label>
+                      <ion-input
+                        placeholder="Customer Name"
+                        type="text"
+                        value="{{
+                          expandedElement?.customer
+                            ? expandedElement.customer
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating">Third Pary Name</ion-label>
+                      <ion-input
+                        placeholder="Third Pary Name"
+                        type="text"
+                        value="{{
+                          expandedElement?.third_party_name
+                            ? expandedElement.third_party_name
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Customer Contact</ion-label
+                      >
+                      <ion-input
+                        placeholder="Customer Contact"
+                        type="Number"
+                        value="{{
+                          expandedElement?.customer_contact
+                            ? expandedElement.customer_contact
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Third Party Contact</ion-label
+                      >
+                      <ion-input
+                        placeholder="Third Party Contact"
+                        type="Number"
+                        value="{{
+                          expandedElement?.third_party_contact
+                            ? expandedElement.third_party_contact
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+
+                <ion-row>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Customer Contact and Address</ion-label
+                      >
+                      <ion-input
+                        placeholder="Customer Contact and Address"
+                        type="text"
+                        value="{{
+                          expandedElement?.customer_address
+                            ? expandedElement.customer_address
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col>
+                    <ion-item lines="none">
+                      <ion-label position="floating"
+                        >Third Party Address
+                      </ion-label>
+                      <ion-input
+                        placeholder="Third Party Address"
+                        type="text"
+                        value="{{
+                          expandedElement?.third_party_address
+                            ? expandedElement.third_party_address
+                            : ''
+                        }}"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
     </div>
     <mat-card-actions>
       <mat-paginator

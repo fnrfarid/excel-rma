@@ -7,7 +7,10 @@ import {
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
-import { SalesInvoiceDto } from '../../entity/sales-invoice/sales-invoice-dto';
+import {
+  MRPRateUpdateInterface,
+  SalesInvoiceDto,
+} from '../../entity/sales-invoice/sales-invoice-dto';
 import { SalesInvoice } from '../../entity/sales-invoice/sales-invoice.entity';
 import { SalesInvoiceAddedEvent } from '../../event/sales-invoice-added/sales-invoice-added.event';
 import { SalesInvoiceService } from '../../entity/sales-invoice/sales-invoice.service';
@@ -17,7 +20,7 @@ import { SalesInvoiceUpdateDto } from '../../entity/sales-invoice/sales-invoice-
 import { SALES_INVOICE_CANNOT_BE_UPDATED } from '../../../constants/messages';
 import { SalesInvoiceSubmittedEvent } from '../../event/sales-invoice-submitted/sales-invoice-submitted.event';
 import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
-import { switchMap, map, catchError, toArray } from 'rxjs/operators';
+import { switchMap, map, catchError, toArray, concatMap } from 'rxjs/operators';
 import { throwError, of, from, forkJoin } from 'rxjs';
 import {
   AUTHORIZATION,
@@ -40,6 +43,7 @@ import {
   FRAPPE_API_SALES_INVOICE_ENDPOINT,
   POST_DELIVERY_NOTE_ENDPOINT,
   LIST_CREDIT_NOTE_ENDPOINT,
+  FRAPPE_API_SALES_INVOICE_ITEM_ENDPOINT,
 } from '../../../constants/routes';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
@@ -62,6 +66,7 @@ import {
 import { ItemService } from '../../../item/entity/item/item.service';
 import { ItemAggregateService } from '../../../item/aggregates/item-aggregate/item-aggregate.service';
 import { getParsedPostingDate } from '../../../constants/agenda-job';
+import { Item } from '../../../item/entity/item/item.entity';
 @Injectable()
 export class SalesInvoiceAggregateService extends AggregateRoot {
   constructor(
@@ -671,12 +676,14 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       return_against: salesInvoice.name,
       posting_time: assignPayload.posting_time,
       remarks: assignPayload.remarks,
+      cost_center: assignPayload.items.find(item => item).cost_center,
       items: assignPayload.items.map(item => {
         return {
           item_code: item.item_code,
           qty: item.qty,
           rate: item.rate,
           amount: item.amount,
+          cost_center: item.cost_center,
         };
       }),
     };
@@ -715,6 +722,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         serial_no: eachItemData.serial_no,
         against_sales_invoice: eachItemData.against_sales_invoice,
         amount: eachItemData.amount,
+        cost_center: eachItemData.cost_center,
       });
     });
     return itemData;
@@ -775,5 +783,83 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         next: success => {},
         error: err => {},
       });
+  }
+
+  getErpSalesInvoice(invoice_name: string, req) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        const url = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice_name}`;
+        return this.http.get(url, {
+          headers: this.settingsService.getAuthorizationHeaders(req.token),
+        });
+      }),
+      map(res => res.data.data),
+    );
+  }
+
+  updateErpSalesInvoice(url, body, req) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        return this.http.put(`${settings.authServerURL}${url}`, body, {
+          headers: this.settingsService.getAuthorizationHeaders(req.token),
+        });
+      }),
+      map(res => res.data.data),
+    );
+  }
+
+  createERPSalesInvoiceItemBody(payload: MRPRateUpdateInterface) {
+    return from(
+      this.itemService.findOne({ item_code: payload.item_code }),
+    ).pipe(
+      switchMap((item: Item) => {
+        payload.mrp_sales_rate = item.mrp;
+        payload.mrp_sales_amount = payload.qty * item.mrp;
+        return of(payload);
+      }),
+    );
+  }
+
+  updateSalesInvoiceItemMRPRate(invoice_name: string, req) {
+    let mrp_sales_grand_total = 0;
+    return this.getErpSalesInvoice(invoice_name, req).pipe(
+      switchMap((salesInvoice: SalesInvoiceDto) => {
+        return from(salesInvoice.items ? salesInvoice.items : []).pipe(
+          concatMap(item => {
+            return this.createERPSalesInvoiceItemBody(item);
+          }),
+          toArray(),
+        );
+      }),
+      switchMap(items => {
+        (items ? items : []).forEach(item => {
+          mrp_sales_grand_total += item.mrp_sales_amount;
+        });
+        return this.updateERPSalesInvoiceItems(items, req);
+      }),
+      switchMap(() => {
+        return this.updateErpSalesInvoice(
+          `${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice_name}`,
+          { mrp_sales_grand_total },
+          req,
+        );
+      }),
+    );
+  }
+
+  updateERPSalesInvoiceItems(items: MRPRateUpdateInterface[], req) {
+    return from(items).pipe(
+      concatMap((item: MRPRateUpdateInterface) => {
+        return this.updateErpSalesInvoice(
+          `${FRAPPE_API_SALES_INVOICE_ITEM_ENDPOINT}/${item.name}`,
+          {
+            mrp_sales_rate: item.mrp_sales_rate,
+            mrp_sales_amount: item.mrp_sales_amount,
+          },
+          req,
+        );
+      }),
+      toArray(),
+    );
   }
 }

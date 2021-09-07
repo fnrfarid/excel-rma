@@ -29,6 +29,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AUTH_SERVER_URL, TIME_ZONE } from '../../constants/storage';
 import { DateTime } from 'luxon';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
+import { ValidateInputSelected } from '../../common/pipes/validators';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-add-warranty-claim',
@@ -36,6 +38,7 @@ import { WarrantyService } from '../warranty-tabs/warranty.service';
   styleUrls: ['./add-warranty-claim.page.scss'],
 })
 export class AddWarrantyClaimPage implements OnInit {
+  validateInput: any = ValidateInputSelected;
   warrantyObject: WarrantyClaimsDetails;
   contact = {} as any;
   filteredCustomerList: any;
@@ -45,7 +48,7 @@ export class AddWarrantyClaimPage implements OnInit {
   warrantyState: WarrantyState;
   bulkProducts: WarrantyBulkProducts[] = [];
   productList: any;
-  territoryList: any;
+  territoryList: Observable<any[]>;
   itemDetail: any;
   problemList: any;
   route: string;
@@ -139,8 +142,7 @@ export class AddWarrantyClaimPage implements OnInit {
       .getStorage()
       .getItem('territory')
       .then(territory => {
-        this.territoryList = territory;
-        this.warrantyClaimForm.controls.receiving_branch.setValue(territory[0]);
+        this.territoryList = of(territory);
       });
 
     this.problemList = this.warrantyClaimForm.controls.problem.valueChanges.pipe(
@@ -162,6 +164,15 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyClaimForm.controls.claim_type.setValue(this.claimList[0]);
     this.warrantyClaimForm.controls.category.setValue(CATEGORY.SINGLE);
     this.getFormState(this.warrantyClaimForm.controls.claim_type.value);
+    this.territoryList.subscribe({
+      next: territory => {
+        this.warrantyClaimForm.controls.receiving_branch.setValue(
+          territory.find(branch => {
+            return branch;
+          }),
+        );
+      },
+    });
   }
 
   clearAllControlValidators() {
@@ -227,10 +238,14 @@ export class AddWarrantyClaimPage implements OnInit {
           if (
             this.warrantyObject.customer !==
             this.warrantyClaimForm.get(element).value.name
-          )
+          ) {
             updatePayload.customer = this.warrantyClaimForm.get(
               element,
+            ).value.customer_name;
+            updatePayload.customer_code = this.warrantyClaimForm.get(
+              element,
             ).value.name;
+          }
           break;
         case 'problem':
           if (
@@ -260,6 +275,7 @@ export class AddWarrantyClaimPage implements OnInit {
     if (this.warrantyObject.category === CATEGORY.BULK) {
       payload.bulk_products = this.bulkProducts;
       payload.category = this.warrantyObject.category;
+      payload.set = this.warrantyObject.set;
     }
     this.addWarrantyService.updateWarrantyClaim(payload).subscribe({
       next: () => {
@@ -477,27 +493,12 @@ export class AddWarrantyClaimPage implements OnInit {
     warrantyClaimDetails.customer = this.warrantyClaimForm.controls.customer_name.value.customer_name;
     warrantyClaimDetails.warranty_claim_date = this.warrantyClaimForm.controls.received_on.value;
     warrantyClaimDetails.customer_code = this.contact.name;
+    warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
+    warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
+    warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
     warrantyClaimDetails.posting_time = await (
       await this.getDateTime(new Date())
     ).time;
-    switch (warrantyClaimDetails.claim_type) {
-      case 'Warranty':
-        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
-        warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
-        warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
-        break;
-      case 'Non Warranty':
-        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
-        warrantyClaimDetails.invoice_no = this.warrantyClaimForm.controls.invoice_no.value;
-        warrantyClaimDetails.warranty_end_date = this.warrantyClaimForm.controls.warranty_end_date.value;
-        break;
-      case 'Third Party Warranty':
-        warrantyClaimDetails.serial_no = this.warrantyClaimForm.controls.serial_no.value;
-        break;
-
-      default:
-        break;
-    }
     return warrantyClaimDetails;
   }
 
@@ -736,6 +737,23 @@ export class AddWarrantyClaimPage implements OnInit {
   appendProduct() {
     if (this.validateProduct()) {
       this.bulkProducts = this.bulkProducts.concat({
+        received_on: this.warrantyClaimForm.controls.received_on.value,
+        delivery_date: this.warrantyClaimForm.controls.delivery_date.value,
+        remarks: this.warrantyClaimForm.controls.remarks.value,
+        customer_contact: this.warrantyClaimForm.controls.customer_contact
+          .value,
+        customer_address: this.warrantyClaimForm.controls.customer_address
+          .value,
+        third_party_name: this.warrantyClaimForm.controls.third_party_name
+          .value,
+        third_party_contact: this.warrantyClaimForm.controls.third_party_contact
+          .value,
+        third_party_address: this.warrantyClaimForm.controls.third_party_address
+          .value,
+        customer: this.warrantyClaimForm.controls.customer_name.value
+          .customer_name,
+        warranty_claim_date: this.warrantyClaimForm.controls.received_on.value,
+        customer_code: this.contact.name,
         claim_type: this.warrantyClaimForm.controls.claim_type.value,
         product_brand: this.warrantyClaimForm.controls.product_brand.value,
         problem: this.warrantyClaimForm.controls.problem.value.problem_name,
@@ -746,6 +764,7 @@ export class AddWarrantyClaimPage implements OnInit {
         invoice_no: this.warrantyClaimForm.controls.invoice_no.value,
         warranty_end_date: this.warrantyClaimForm.controls.warranty_end_date
           .value,
+        delivery_branch: this.warrantyClaimForm.controls.delivery_branch.value,
       });
     }
   }

@@ -279,12 +279,16 @@
             <ng-container matColumnDef="submit">
               <mat-header-cell *matHeaderCellDef>Submit</mat-header-cell>
               <mat-cell *matCellDef="let row; let i = index">
-                <ion-text *ngIf="!row.docstatus" color="danger">
-                  Not Submitted
-                </ion-text>
-                <ion-text *ngIf="row.docstatus" color="success"
-                  >Submitted</ion-text
-                >
+                <ion-text
+                [ngStyle]="{
+                  color: row.docstatus === 1 ? '#4d2500' : 'red'
+                }"
+              >
+                {{
+                  row.docstatus === 0 ? 'Not Submitted' : 
+                  row.docstatus === 1 ? 'Submitted' : 'Canceled'
+                }}
+              </ion-text>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
             </ng-container>

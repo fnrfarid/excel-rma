@@ -112,6 +112,9 @@ export interface WarrantyClaimsDetails {
   claim_status?: string;
   customer_code?: string;
   claim_no?: string;
+  service_vouchers?: string[];
+  print?: any;
+  progress_state: StockEntryDetails[];
 }
 
 export class WarrantyBulkProducts {
@@ -125,6 +128,21 @@ export class WarrantyBulkProducts {
   problem_details?: string;
   remarks?: string;
   item_code?: string;
+  customer_contact?: string;
+  customer_address?: string;
+  customer_name?: string;
+  third_party_name?: string;
+  third_party_contact?: string;
+  third_party_address?: string;
+  received_by?: string;
+  delivered_by?: string;
+  customer?: string;
+  customer_code?: string;
+  warranty_claim_date?: string;
+  received_on?: Date;
+  delivery_date?: Date;
+  receiving_branch?: string;
+  delivery_branch?: string;
 }
 
 export class WarrantyState {
@@ -222,6 +240,7 @@ export class StockEntryDetails {
   type?: string;
   description?: string;
   customer?: string;
+  stock_voucher_number?: string;
   salesWarrantyDate?: string;
   soldOn?: string;
   delivery_note?: string;
@@ -240,6 +259,8 @@ export class StockItem {
   qty?: number;
   serial_no?: string;
   has_serial_no?: number;
+  excel_serials?: string;
+  warranty?: any;
 }
 
 export class StockEntryItems {
@@ -269,4 +290,82 @@ export class StockEntryItems {
   warehouse?: string;
   type?: string;
   stock_entry_type?: string;
+}
+
+export interface WarrantyPrintDetails {
+  name: string;
+  third_party_name: string;
+  third_party_contact: string;
+  third_party_address: string;
+  customer: string;
+  customer_contact: string;
+  customer_address: string;
+  remarks: string;
+  claim_no: string;
+  received_on: string;
+  delivery_date: string;
+  receiving_branch: string;
+  problem_details: string;
+  delivered_by: string;
+  received_by: string;
+  items: string;
+  s_warehouse: string;
+  t_warehouse: string;
+  tc_details: string;
+  select_print_heading: string;
+  warranty_invoices: string;
+  footer: string;
+  problem: string;
+  uuid?: string;
+  replace_serial: string;
+  replace_product: string;
+  replace_warehouse: string;
+  claim_status?: string;
+  status_history?: string;
+  progress_state?: string;
+  completed_delivery_note?: string;
+  damage?: string;
+  set?: string;
+  service_vouchers?: string;
+  damaged_serial?: string;
+  damage_warehouse?: string;
+  damage_product?: string;
+  category?: string;
+  service_items?: string;
+  delivery_status?: string;
+  bulk_products?: WarrantyBulkProducts[];
+  print_type?: string;
+  delivery_notes?: string;
+  posting_time?: Date;
+  warranty_end_date?: string;
+  bulk_invoices?: string;
+}
+
+export class PrintDeliveryNotes {
+  item_name?: string;
+  serial_no?: string;
+  voucher_number?: string;
+  warranty_end_date?: string;
+  set_warehouse?: string;
+  description?: string;
+}
+
+export class WarrantyVouchers {
+  voucher_number: string;
+  amount: number;
+  paid: number;
+  unpaid: number;
+}
+export class WarrantyPrintItems {
+  item_name: string;
+  serial_no: string;
+  warranty_end_date: Date;
+}
+
+export interface serviceInvoicePrintData {
+  voucher_number: string;
+  description: string;
+  amount: number;
+  paid: number;
+  unpaid: number;
 }

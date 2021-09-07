@@ -1,11 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NavParams, PopoverController } from '@ionic/angular';
+import {
+  LoadingController,
+  NavParams,
+  PopoverController,
+} from '@ionic/angular';
 
 import { PrintComponent } from './print.component';
 import { SalesService } from '../../services/sales.service';
 import { of } from 'rxjs';
 import { StorageService } from '../../../api/storage/storage.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 describe('PrintComponent', () => {
   let component: PrintComponent;
@@ -25,6 +30,14 @@ describe('PrintComponent', () => {
               getItems: (...args) => Promise.resolve({}),
             }),
           },
+        },
+        {
+          provide: LoadingController,
+          useValue: {},
+        },
+        {
+          provide: MatSnackBar,
+          useValue: {},
         },
         {
           provide: NavParams,

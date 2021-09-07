@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   NotImplementedException,
+  HttpService,
 } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +24,7 @@ import {
   CLAIM_STATUS,
   WARRANTY_CLAIM_DOCTYPE,
   CATEGORY,
+  APPLICATION_JSON_CONTENT_TYPE,
 } from '../../../constants/app-strings';
 import {
   BulkWarrantyClaimInterface,
@@ -44,6 +46,8 @@ import {
   SerialNoHistoryInterface,
   EventType,
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
+import { POST_WARRANTY_PRINT_ENDPOINT } from '../../../constants/routes';
+import { WarrantyPrintDetails } from '../../../print/entities/print/print.dto';
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -53,6 +57,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     private readonly serialNoService: SerialNoService,
     private readonly settingsService: SettingsService,
     private readonly serialNoHistoryService: SerialNoHistoryService,
+    private readonly http: HttpService,
   ) {
     super();
   }
@@ -285,7 +290,11 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     if (!provider) {
       throw new NotFoundException();
     }
+    if (updatePayload.claim_type === WARRANTY_TYPE.NON_SERAIL) {
+      updatePayload.serial_no = '';
+    }
     const update = Object.assign(provider, updatePayload);
+
     update.modifiedOn = new Date();
     this.apply(new WarrantyClaimUpdatedEvent(update));
   }
@@ -349,16 +358,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       switchMap(warrantyBulkClaim => {
         existingWarrantyClaim = warrantyBulkClaim;
         const bulk_products = [
-          warrantyBulkClaim.bulk_products,
+          ...warrantyBulkClaim.bulk_products,
           ...claimsPayload.bulk_products,
         ];
         return from(
           this.warrantyClaimService.updateOne(
             { uuid: claimsPayload.uuid },
             {
-              $set: {
-                bulk_products,
-              },
+              $set: { bulk_products },
             },
           ),
         );
@@ -515,7 +522,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             { uuid: statusHistoryPayload.uuid },
             {
               $set: {
-                delivery_date: statusHistoryPayload.date,
+                delivery_date: statusHistoryPayload.posting_date,
                 delivery_branch: statusHistoryPayload.delivery_branch,
                 delivered_by: clientHttpRequest.token.fullName,
               },
@@ -617,7 +624,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
               ),
             ),
             statusPayload: of(
-              res.status_history[res.status_history.length - 1],
+              res.status_history[res.status_history.length - 2],
             ),
           });
         }
@@ -779,6 +786,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           {
             serial_no: serialArray[0],
             document_type: WARRANTY_CLAIM_DOCTYPE,
+            document_no: statusHistoryPayload.doc_name,
           },
           {
             $set: serialHistory,
@@ -787,10 +795,16 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
     );
   }
+
   cancelWarrantyClaim(cancelPayload: { uuid: string; serial_no: string }) {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
       .pipe(
+        switchMap(res => {
+          return this.warrantyClaimsPoliciesService.validateServiceInvoice(
+            cancelPayload.uuid,
+          );
+        }),
         switchMap(res => {
           return from(
             this.warrantyClaimService.updateOne(
@@ -826,5 +840,49 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           );
         }),
       );
+  }
+
+  syncWarrantyClaimDocument(req, warrantyPrintBody: WarrantyPrintDetails) {
+    let url: string = '';
+    return this.settingsService.find().pipe(
+      switchMap(setting => {
+        if (!setting.authServerURL) {
+          return throwError(new NotImplementedException());
+        }
+        url = `${setting.authServerURL}${POST_WARRANTY_PRINT_ENDPOINT}`;
+        return this.http.get(`${url}/${warrantyPrintBody.uuid}`, {
+          headers: {
+            authorization: req.headers.authorization,
+            Accept: APPLICATION_JSON_CONTENT_TYPE,
+          },
+        });
+      }),
+      map(res => res.data),
+      switchMap(() => {
+        return this.http.put(
+          `${url}/${warrantyPrintBody.uuid}`,
+          warrantyPrintBody,
+          {
+            headers: {
+              authorization: req.headers.authorization,
+              Accept: APPLICATION_JSON_CONTENT_TYPE,
+            },
+          },
+        );
+      }),
+      map(res => res.data),
+      catchError(err => {
+        if (err.response.status === 404) {
+          return this.http.post(url, warrantyPrintBody, {
+            headers: {
+              authorization: req.headers.authorization,
+              Accept: APPLICATION_JSON_CONTENT_TYPE,
+            },
+          });
+        }
+        return throwError(new BadRequestException(err.response.statusText));
+      }),
+      map(res => res.data),
+    );
   }
 }

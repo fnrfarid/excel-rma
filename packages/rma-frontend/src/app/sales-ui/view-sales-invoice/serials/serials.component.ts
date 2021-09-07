@@ -74,9 +74,8 @@ export class SerialsComponent implements OnInit {
   date = new FormControl(new Date());
   claimsReceivedDate: string;
   permissionState = PERMISSION_STATE;
-
   warehouseFormControl = new FormControl('', [Validators.required]);
-
+  costCenterFormControl = new FormControl('', [Validators.required]);
   filteredWarehouseList: Observable<any[]>;
   getOptionText = '';
   salesInvoiceDetails: SalesInvoiceDetails;
@@ -85,6 +84,7 @@ export class SerialsComponent implements OnInit {
     component: DELIVERY_NOTE,
     warehouse: '',
     itemData: [],
+    costCenter: '',
   };
   rangePickerState = {
     prefix: '',
@@ -254,6 +254,18 @@ export class SerialsComponent implements OnInit {
           this.getItemsWarranty();
           this.state.itemData = this.itemDataSource.data();
           this.state.warehouse = this.warehouseFormControl.value;
+          this.salesService.relaySalesInvoice(sales_invoice.name).subscribe({
+            next: success => {
+              this.costCenterFormControl.setValue(success.cost_center);
+            },
+            error: () => {
+              this.snackBar.open(
+                `Cost Center Not found refresh page or Check Sales Invoice`,
+                CLOSE,
+                { duration: 4500 },
+              );
+            },
+          });
         },
         error: err => {
           this.snackBar.open(
@@ -478,6 +490,12 @@ export class SerialsComponent implements OnInit {
       });
       return false;
     }
+    if (!this.costCenterFormControl.value) {
+      this.snackBar.open('Please select a Cost Center.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
     for (const item of data) {
       index++;
       if (
@@ -525,6 +543,7 @@ export class SerialsComponent implements OnInit {
       item_hash[item.item_code].rate = item.rate || 0;
       item_hash[item.item_code].qty = 0;
       item_hash[item.item_code].amount = 0;
+      item_hash[item.item_code].cost_center = this.costCenterFormControl.value;
     });
 
     this.serialDataSource.data().forEach(serial => {
@@ -658,6 +677,10 @@ export class SerialsComponent implements OnInit {
   warehouseOptionChanged(warehouse) {
     this.state.warehouse = warehouse;
   }
+
+  costCenterOptionChanged(costCenter) {
+    this.state.costCenter = costCenter.name;
+  }
 }
 
 export interface CsvJsonObj {
@@ -675,6 +698,7 @@ export interface SerialItem {
   amount: number;
   serial_no: string[];
   against_sales_invoice?: string;
+  cost_center?: string;
 }
 
 export interface Item {

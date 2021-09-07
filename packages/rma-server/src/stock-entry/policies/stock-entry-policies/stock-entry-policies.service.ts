@@ -18,6 +18,7 @@ import {
   AGENDA_JOB_STATUS,
   STOCK_ENTRY_PERMISSIONS,
   SYSTEM_MANAGER,
+  NON_SERIAL_ITEM,
 } from '../../../constants/app-strings';
 import { StockEntry } from '../../entities/stock-entry.entity';
 import { SerialNoHistoryPoliciesService } from '../../../serial-no/policies/serial-no-history-policies/serial-no-history-policies.service';
@@ -479,25 +480,31 @@ export class StockEntryPoliciesService {
     parent_document: string,
     serial_no: string[],
   ) {
-    return this.serialNoHistoryPolicyService
-      .validateLatestEventWithParent(parent_document, serial_no)
-      .pipe(
-        switchMap(response => {
-          let message = `Found ${response.length} Events, please cancel Following events for serials
+    if (
+      serial_no.filter(serial => serial.toUpperCase() !== NON_SERIAL_ITEM)
+        .length
+    ) {
+      return this.serialNoHistoryPolicyService
+        .validateLatestEventWithParent(parent_document, serial_no)
+        .pipe(
+          switchMap(response => {
+            let message = `Found ${response.length} Events, please cancel Following events for serials
       `;
-          response.forEach(value =>
-            value
-              ? (message += `${value._id} : ${value.serials
-                  .splice(0, 50)
-                  .join(', ')}`)
-              : null,
-          );
-          if (response && response.length) {
-            return throwError(message);
-          }
-          return of(true);
-        }),
-      );
+            response.forEach(value =>
+              value
+                ? (message += `${value._id} : ${value.serials
+                    .splice(0, 50)
+                    .join(', ')}`)
+                : null,
+            );
+            if (response && response.length) {
+              return throwError(message);
+            }
+            return of(true);
+          }),
+        );
+    }
+    return of(true);
   }
 
   validateWarrantyStockEntry(payload: StockEntryDto, clientHttpRequest) {

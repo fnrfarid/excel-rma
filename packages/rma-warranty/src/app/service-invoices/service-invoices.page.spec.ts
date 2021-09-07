@@ -7,7 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { IonicModule } from '@ionic/angular';
 import { of } from 'rxjs';
 import { CsvJsonService } from '../api/csv-json/csv-json.service';
-import { StorageService, STORAGE_TOKEN } from '../api/storage/storage.service';
+import { STORAGE_TOKEN } from '../api/storage/storage.service';
 import { MaterialModule } from '../material/material.module';
 import { AddServiceInvoiceService } from '../warranty-ui/shared-warranty-modules/service-invoices/add-service-invoice/add-service-invoice.service';
 import { ServiceInvoicesPage } from './service-invoices.page';
@@ -48,11 +48,9 @@ describe('ServiceInvoicesPage', () => {
         },
         {
           provide: STORAGE_TOKEN,
-          useValue: {},
-        },
-        {
-          provide: StorageService,
-          useValue: {},
+          useValue: {
+            getItem: (...args) => Promise.resolve('ITEM'),
+          },
         },
         {
           provide: CsvJsonService,

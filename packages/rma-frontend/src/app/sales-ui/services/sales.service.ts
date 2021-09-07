@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { of, from, forkJoin, Observable } from 'rxjs';
+import { of, from, forkJoin, Observable, throwError } from 'rxjs';
 import { switchMap, catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   SalesInvoice,
@@ -52,6 +52,8 @@ import {
   PRINT_DELIVERY_INVOICE_ENDPOINT,
   STOCK_AVAILABILITY_ENDPOINT,
   UPDATE_DELIVERY_STATUS_ENDPOINT,
+  UPDATE_SALES_INVOICE_ITEM_MRP,
+  RELAY_LIST_SALES_RETURN_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -166,6 +168,15 @@ export class SalesService {
     );
   }
 
+  updateSubmittedInvoice(invoice_name: string) {
+    const url = `${UPDATE_DELIVERY_STATUS_ENDPOINT}/${invoice_name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
   validateReturnSerials(item: {
     item_code: string;
     serials: string[];
@@ -243,6 +254,15 @@ export class SalesService {
 
   updateOutstandingAmount(invoice_name: string) {
     const url = `${UPDATE_OUTSTANDING_AMOUNT_ENDPOINT}${invoice_name}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, {}, { headers });
+      }),
+    );
+  }
+
+  updateSalesInvoiceItem(invoice_name: string) {
+    const url = `${UPDATE_SALES_INVOICE_ITEM_MRP}/${invoice_name}`;
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http.post(url, {}, { headers });
@@ -766,6 +786,39 @@ export class SalesService {
         return this.http.get<any>(url, { headers });
       }),
       map(res => res.data),
+    );
+  }
+
+  relaySalesInvoice(sales_invoice_name: string) {
+    const url = `${RELAY_LIST_SALES_RETURN_ENDPOINT}`;
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["cost_center"]',
+        filters: `[["name","like","%${sales_invoice_name}%"]]`,
+      },
+    });
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<{ data: unknown[] }>(url, {
+          headers,
+          params,
+        });
+      }),
+      map(res => res.data),
+      switchMap((salesInvoice: { cost_center: string }[]) => {
+        if (
+          !salesInvoice.find(
+            (Invoice: { cost_center: string }) => Invoice.cost_center,
+          )
+        ) {
+          return throwError(`Cost Center Not Found`);
+        }
+        return of(
+          salesInvoice.find(
+            (Invoice: { cost_center: string }) => Invoice.cost_center,
+          ),
+        );
+      }),
     );
   }
 

@@ -209,3 +209,11 @@ export class ItemDto {
   @IsNumber()
   amount: number;
 }
+
+export class MRPRateUpdateInterface {
+  name: string;
+  item_code: string;
+  qty: number;
+  mrp_sales_rate?: number;
+  mrp_sales_amount?: number;
+}

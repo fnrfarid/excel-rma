@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { NavParams, PopoverController } from '@ionic/angular';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  LoadingController,
+  NavParams,
+  PopoverController,
+} from '@ionic/angular';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
   AggregatedDocument,
   SalesInvoice,
 } from 'src/app/common/interfaces/sales.interface';
+import { CLOSE } from '../../../constants/app-string';
 import { StorageService } from '../../../api/storage/storage.service';
 import {
   AUTH_SERVER_URL,
@@ -22,6 +28,7 @@ import { SalesService } from '../../services/sales.service';
 export class PrintComponent implements OnInit {
   invoice_name: string = '';
   printSalesInvoiceURL: string = '';
+  printMRPSalesInvoiceURL: string = '';
   deliveryNoteNames: string[] = [];
   printDeliveryNoteURL: string = '';
 
@@ -30,11 +37,14 @@ export class PrintComponent implements OnInit {
     private readonly storage: StorageService,
     private readonly salesService: SalesService,
     private popoverController: PopoverController,
+    private loadingController: LoadingController,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit() {
     this.invoice_name = this.navParams.data.invoice_name;
     this.getPrintSalesInvoiceURL();
+    this.getPrintMRPSalesInvoiceURL();
     this.getPrintDeliveryNoteURL();
   }
 
@@ -49,6 +59,34 @@ export class PrintComponent implements OnInit {
     }&${no_letterhead}`;
   }
 
+  async getPrintMRPSalesInvoiceURL() {
+    const authURL = await this.storage.getItem(AUTH_SERVER_URL);
+    const url = `${authURL}${PRINT_SALES_INVOICE_PDF_METHOD}`;
+    const doctype = 'Sales Invoice';
+    const name = `name=${this.invoice_name}`;
+    const no_letterhead = 'no_letterhead=0';
+    this.printMRPSalesInvoiceURL = `${url}?doctype=${doctype}&${name}&format=${
+      PRINT_FORMAT_PREFIX + 'MRP Sales Print'
+    }&${no_letterhead}`;
+  }
+
+  async modifyMRPPrint() {
+    this.popoverController.dismiss();
+    const loading = await this.loadingController.create({
+      message: `Generating Print...!`,
+    });
+    await loading.present();
+    this.salesService.updateSalesInvoiceItem(this.invoice_name).subscribe({
+      next: success => {
+        loading.dismiss();
+        window.open(this.printMRPSalesInvoiceURL, '_blank');
+      },
+      error: error => {
+        loading.dismiss();
+        this.snackBar.open(`Failed To Print`, CLOSE, { duration: 4500 });
+      },
+    });
+  }
   getPrintDeliveryNoteURL() {
     this.salesService.getDeliveryNoteNames(this.invoice_name).subscribe({
       next: async res => {

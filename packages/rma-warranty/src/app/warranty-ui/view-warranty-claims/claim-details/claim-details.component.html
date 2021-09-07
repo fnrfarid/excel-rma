@@ -11,7 +11,7 @@
           color="danger"
           horizontal="end"
           *ngIf="
-            permissionState.warranty_claim.delete &&
+            permissionState.warranty_claim.read &&
             warrantyClaimsDetails?.claim_status !== 'Cancelled'
           "
         >
@@ -50,12 +50,13 @@
               <ion-icon name="close-circle-outline"></ion-icon>
             </ion-fab-button>
             <ion-fab-button
-              *ngIf="warrantyClaimsDetails?.claim_status !== 'Cancelled'"
-              (click)="getPrint()"
+              *ngIf="permissionState.warranty_claim.read &&
+              warrantyClaimsDetails?.claim_status !== 'Cancelled'"
+              (click)="openDialog()"
               matTooltip="print"
               matTooltipPosition="above"
               matTooltipClass="tooltip"
-              (ctrlM)="getPrint()"
+              (ctrlM)="openDialog()"
               color="primary"
             >
               <ion-icon name="print-outline"></ion-icon>

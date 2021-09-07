@@ -120,4 +120,17 @@ export class SalesInvoiceController {
   async updateDeliveryStatus(@Body() payload) {
     return await this.salesInvoiceAggregate.updateDeliveryStatus(payload);
   }
+
+  @Post('v1/update_mrp_rate/:name')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  updateSalesInvoiceItemMRPRate(
+    @Param('name') invoice_name: string,
+    @Req() req,
+  ) {
+    return this.salesInvoiceAggregate.updateSalesInvoiceItemMRPRate(
+      invoice_name,
+      req,
+    );
+  }
 }

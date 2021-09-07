@@ -305,10 +305,6 @@ export class AddServiceInvoiceService {
           headers,
         });
       }),
-      map(res => res.docs),
-      switchMap(res => {
-        return of(res);
-      }),
     );
   }
 

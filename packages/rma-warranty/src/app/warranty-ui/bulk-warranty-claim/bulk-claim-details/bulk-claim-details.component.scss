@@ -28,3 +28,22 @@ mat-header-cell {
   flex: 0 0 3% !important;
   min-width: 10px !important;
 }
+
+
+
+ion-card.example-element-detail{
+  width: max-content;
+}
+
+ion-row.rowDetail{
+  width: max-content;
+}
+
+.cards{
+  float: left;
+}
+
+tr.example-detail-row {
+  height: 0;
+}
+

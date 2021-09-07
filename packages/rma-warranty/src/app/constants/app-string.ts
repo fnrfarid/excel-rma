@@ -21,6 +21,7 @@ export const MATERIAL_RECEIPT = 'Material Receipt';
 export const PURCHASE_USER = 'Purchase User';
 export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
 export const EXCEL_SALES_USER = 'Excel Sales User';
+export const EXCEL_WARRANTY_PRINT = 'Excel Warranty Print';
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
   PAID: 'Paid',
@@ -112,6 +113,7 @@ export enum CLAIM_STATUS {
   DELIVERED = 'Delivered',
   UNSOLVED = 'Unsolved',
   REJECTED = 'Rejected',
+  CANCELLED = 'Cancelled',
 }
 
 export enum CATEGORY {
@@ -124,4 +126,10 @@ export const SERVICE_INVOICE_DOWNLOAD_HEADERS = [
   'date',
   'total',
 ];
+export enum SORT_ORDER {
+  ASCENDING = 'ASC',
+  DESCENDING = 'DESC',
+}
 export const SERVICE_INVOICE_CSV_FILE = 'service-invoice-list.csv';
+export const DELIVERY_TOKEN = 'Delivery Token';
+export const SERVICE_TOKEN = 'Service Token';

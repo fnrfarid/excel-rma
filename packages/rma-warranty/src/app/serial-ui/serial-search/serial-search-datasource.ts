@@ -1,6 +1,13 @@
 import { DataSource, CollectionViewer } from '@angular/cdk/collections';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, catchError, finalize } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import {
+  map,
+  catchError,
+  finalize,
+  switchMap,
+  concatMap,
+  toArray,
+} from 'rxjs/operators';
 import { SerialSearchFields } from './search-fields.interface';
 import { SerialSearchService } from './serial-search.service';
 
@@ -36,6 +43,7 @@ export class SerialSearchDataSource extends DataSource<SerialSearchFields> {
     if (!sortOrder) {
       sortOrder = { serial_no: 'asc' };
     }
+    this.itemSubject.next([]);
     this.loadingSubject.next(true);
     this.serialSearchService
       .getSerialsList(sortOrder, pageIndex, pageSize, query)
@@ -48,6 +56,35 @@ export class SerialSearchDataSource extends DataSource<SerialSearchFields> {
         }),
         catchError(error => of([])),
         finalize(() => this.loadingSubject.next(false)),
+      )
+      .pipe(
+        switchMap(res => {
+          return from(res).pipe(
+            concatMap(serialInfo => {
+              if (serialInfo.customer) {
+                return this.serialSearchService
+                  .getCustomerName(serialInfo.customer)
+                  .pipe(
+                    switchMap(customerDetail => {
+                      serialInfo.customer_name = customerDetail.customer_name;
+                      return of(serialInfo);
+                    }),
+                    switchMap(serialData => {
+                      this.itemSubject.next([
+                        ...this.itemSubject.value,
+                        serialData,
+                      ]);
+                      return of(serialData);
+                    }),
+                  );
+              }
+              serialInfo.customer_name = '';
+              this.itemSubject.next([...this.itemSubject.value, serialInfo]);
+              return of(serialInfo);
+            }),
+            toArray(),
+          );
+        }),
       )
       .subscribe(items => {
         this.itemSubject.next(items);

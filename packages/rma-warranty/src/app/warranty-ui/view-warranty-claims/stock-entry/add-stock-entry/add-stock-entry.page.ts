@@ -202,7 +202,15 @@ export class AddStockEntryPage implements OnInit {
     } else {
       const itemList = items
         .getRawValue()
-        .filter(item => item.item_name !== '');
+        .filter(
+          item =>
+            item.s_warehouse !== undefined &&
+            item.item_name !== undefined &&
+            item.item_code !== undefined &&
+            item.qty !== null &&
+            item.serial_no !== undefined &&
+            item.qty !== undefined,
+        );
       if (itemList.length !== items.length) {
         return { items: true };
       } else return null;
@@ -305,6 +313,7 @@ export class AddStockEntryPage implements OnInit {
     Object.assign(existingItem, updatedItem);
     this.dataSource.data()[index] = existingItem;
     this.dataSource.update(this.dataSource.data());
+    this.itemsControl.controls[index].setValue(existingItem);
   }
 
   deleteRow(i: number) {

@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.11.0...rma-frontend@1.12.0) (2021-09-07)
+
+
+### Bug Fixes
+
+* Add sales return page for credit note ([0752c5c](https://gitlab.com/castlecraft/excel-rma/commit/0752c5cd9cc2e3259d2bac83d13b361dcb582052))
+* **rma-frontend:** removed date permissions from add sales invoice page ([df527ae](https://gitlab.com/castlecraft/excel-rma/commit/df527aec084112489c6e3053a7a944874fad94c4))
+
+
+### Features
+
+* **rma-frontend:** added backdated invoice control ([773ab7a](https://gitlab.com/castlecraft/excel-rma/commit/773ab7af230ed16bfc62054e60700de04a26fec6))
+* **rma-frontend:** added backdated invoice control 1 ([64c6386](https://gitlab.com/castlecraft/excel-rma/commit/64c6386fd1264d050096b697f35afa61aca2d62b))
+* **rma-frontend:** added backdated invoice control 2 ([14cc2bd](https://gitlab.com/castlecraft/excel-rma/commit/14cc2bdc8008e50e4b8e630543f11c432b8e4973))
+* **rma-frontend:** added backdated invoice control 3 ([f064290](https://gitlab.com/castlecraft/excel-rma/commit/f0642908eb6cda79db7dc7bcc33a4f8f0df67100))
+* **rma-frontend:** added backdated invoice control 4 ([8b05f4c](https://gitlab.com/castlecraft/excel-rma/commit/8b05f4c4be8da7aafaa5b577fa298c3917ab407b))
+
+
+
+
+
 # [1.11.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.10.0...rma-frontend@1.11.0) (2021-06-12)
 
 
