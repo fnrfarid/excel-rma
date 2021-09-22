@@ -790,34 +790,26 @@ export class SalesService {
   }
 
   relaySalesInvoice(sales_invoice_name: string) {
-    const url = `${RELAY_LIST_SALES_RETURN_ENDPOINT}`;
-    const params = new HttpParams({
-      fromObject: {
-        fields: '["cost_center"]',
-        filters: `[["name","like","%${sales_invoice_name}%"]]`,
-      },
-    });
+    const url = `${RELAY_LIST_SALES_RETURN_ENDPOINT}/${sales_invoice_name}`;
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get<{ data: unknown[] }>(url, {
+        return this.http.get<{ data: { items: unknown[] } }>(url, {
           headers,
-          params,
         });
       }),
-      map(res => res.data),
-      switchMap((salesInvoice: { cost_center: string }[]) => {
+      map(res => res.data.items),
+      switchMap((Items: { cost_center: string }[]) => {
         if (
-          !salesInvoice.find(
-            (Invoice: { cost_center: string }) => Invoice.cost_center,
-          )
+          !Items.find((Invoice: { cost_center: string }) => Invoice.cost_center)
         ) {
           return throwError(`Cost Center Not Found`);
         }
         return of(
-          salesInvoice.find(
-            (Invoice: { cost_center: string }) => Invoice.cost_center,
-          ),
+          Items.find((Invoice: { cost_center: string }) => Invoice.cost_center),
         );
+      }),
+      catchError(err => {
+        throw new Error('Something Went Wrong');
       }),
     );
   }
