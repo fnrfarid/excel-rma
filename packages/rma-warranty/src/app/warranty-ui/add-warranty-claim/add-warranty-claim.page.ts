@@ -63,7 +63,7 @@ export class AddWarrantyClaimPage implements OnInit {
     'product_brand',
     'problem',
     'item_code',
-    'remove'
+    'remove',
   ];
   warrantyClaimForm = new FormGroup({
     warranty_end_date: new FormControl(''),
@@ -100,7 +100,6 @@ export class AddWarrantyClaimPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-   
     this.route = this.activatedRoute.snapshot.params.name;
     this.categoryList = ['Bulk', 'Single'];
     this.claimList = [
@@ -213,8 +212,8 @@ export class AddWarrantyClaimPage implements OnInit {
                   .get(element)
                   .setValue({ problem_name: res.problem });
                 break;
-              default:                
-              this.warrantyClaimForm.get(element).setValue(res[element]);
+              default:
+                this.warrantyClaimForm.get(element).setValue(res[element]);
                 break;
             }
           });
@@ -313,7 +312,7 @@ export class AddWarrantyClaimPage implements OnInit {
           category: { disabled: true, active: true },
         };
         this.isDisabled();
-        this.warrantyClaimForm.controls.serial_no.setValue('')
+        this.warrantyClaimForm.controls.serial_no.setValue('');
         this.clearAllValidators('Non Serial Warranty');
         break;
 
@@ -504,7 +503,6 @@ export class AddWarrantyClaimPage implements OnInit {
     ).time;
     return warrantyClaimDetails;
   }
-
 
   async customerChanged(customer) {
     const loading = await this.loadingController.create();
@@ -774,8 +772,9 @@ export class AddWarrantyClaimPage implements OnInit {
   validateProduct() {
     let check: boolean;
     if (this.bulkProducts.length) {
-      for (const product of this.bulkProducts) {        
-        if (product.claim_type !== 'Non Serial Warranty' &&
+      for (const product of this.bulkProducts) {
+        if (
+          product.claim_type !== 'Non Serial Warranty' &&
           product.serial_no === this.warrantyClaimForm.controls.serial_no.value
         ) {
           this.snackbar.open('Serial Already Exists', CLOSE, {
@@ -792,9 +791,9 @@ export class AddWarrantyClaimPage implements OnInit {
     return check;
   }
 
-  removeRow(row,i){
-    this.bulkProducts.splice(i,1)
-    this.table.renderRows()    
+  removeRow(row, i) {
+    this.bulkProducts.splice(i, 1);
+    this.table.renderRows();
   }
 
   getUpdate(event) {}
