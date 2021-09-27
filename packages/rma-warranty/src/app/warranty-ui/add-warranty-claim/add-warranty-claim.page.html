@@ -151,6 +151,7 @@
                   placeholder="Product Name"
                   formControlName="product_name"
                   [matAutocomplete]="product_name"
+                  (focusout)="validateInput(f.product_name, productList)"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
@@ -165,8 +166,9 @@
                     {{ option.item_name }}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.product_name.hasError('required')">
-                  Product is <strong>required</strong>
+                <mat-error *ngIf="f.product_name.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.product_name.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
