@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TimeService } from '../../api/time/time.service';
@@ -31,6 +31,7 @@ import { DateTime } from 'luxon';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable, of } from 'rxjs';
+import { MatTable } from '@angular/material/table';
 
 @Component({
   selector: 'app-add-warranty-claim',
@@ -38,10 +39,11 @@ import { Observable, of } from 'rxjs';
   styleUrls: ['./add-warranty-claim.page.scss'],
 })
 export class AddWarrantyClaimPage implements OnInit {
+  @ViewChild(MatTable) table: MatTable<WarrantyBulkProducts>;
   validateInput: any = ValidateInputSelected;
   warrantyObject: WarrantyClaimsDetails;
   contact = {} as any;
-  filteredCustomerList: any;
+  filteredCustomerList: Observable<any[]>;
   claimList: any;
   categoryList: any;
   getSerialData: SerialNoDetails;
@@ -61,6 +63,7 @@ export class AddWarrantyClaimPage implements OnInit {
     'product_brand',
     'problem',
     'item_code',
+    'remove',
   ];
   warrantyClaimForm = new FormGroup({
     warranty_end_date: new FormControl(''),
@@ -97,10 +100,6 @@ export class AddWarrantyClaimPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    if (this.activatedRoute.snapshot.params.name === 'edit') {
-      this.clearAllControlValidators();
-      this.setValues();
-    }
     this.route = this.activatedRoute.snapshot.params.name;
     this.categoryList = ['Bulk', 'Single'];
     this.claimList = [
@@ -123,7 +122,6 @@ export class AddWarrantyClaimPage implements OnInit {
       third_party_address: { disabled: true, active: true },
       category: { disabled: true, active: true },
     };
-    this.createForm();
     this.setDefaults();
 
     this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
@@ -153,6 +151,10 @@ export class AddWarrantyClaimPage implements OnInit {
       }),
       map(res => res.docs),
     );
+    if (this.activatedRoute.snapshot.params.name === 'edit') {
+      this.clearAllControlValidators();
+      this.setValues();
+    }
   }
   async setDefaults() {
     this.warrantyClaimForm.controls.received_on.setValue(
@@ -310,6 +312,7 @@ export class AddWarrantyClaimPage implements OnInit {
           category: { disabled: true, active: true },
         };
         this.isDisabled();
+        this.warrantyClaimForm.controls.serial_no.setValue('');
         this.clearAllValidators('Non Serial Warranty');
         break;
 
@@ -349,7 +352,6 @@ export class AddWarrantyClaimPage implements OnInit {
         };
         this.isDisabled();
         this.clearAllValidators('Warranty');
-
         break;
     }
   }
@@ -501,8 +503,6 @@ export class AddWarrantyClaimPage implements OnInit {
     ).time;
     return warrantyClaimDetails;
   }
-
-  createForm() {}
 
   async customerChanged(customer) {
     const loading = await this.loadingController.create();
@@ -774,6 +774,7 @@ export class AddWarrantyClaimPage implements OnInit {
     if (this.bulkProducts.length) {
       for (const product of this.bulkProducts) {
         if (
+          product.claim_type !== 'Non Serial Warranty' &&
           product.serial_no === this.warrantyClaimForm.controls.serial_no.value
         ) {
           this.snackbar.open('Serial Already Exists', CLOSE, {
@@ -788,6 +789,11 @@ export class AddWarrantyClaimPage implements OnInit {
       check = true;
     }
     return check;
+  }
+
+  removeRow(row, i) {
+    this.bulkProducts.splice(i, 1);
+    this.table.renderRows();
   }
 
   getUpdate(event) {}
