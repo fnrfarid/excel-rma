@@ -251,7 +251,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return of(serialBody);
   }
 
-  async retrieveWarrantyClaim(uuid: string, req) {
+  async retrieveWarrantyClaim(uuid: string, req?) {
     const provider = await this.warrantyClaimService.findOne({ uuid });
     if (!provider) throw new NotFoundException();
     return provider;
@@ -800,12 +800,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
       .pipe(
-        switchMap(res => {
+        switchMap(() => {
           return this.warrantyClaimsPoliciesService.validateServiceInvoice(
             cancelPayload.uuid,
           );
         }),
-        switchMap(res => {
+        switchMap(() => {
           return from(
             this.warrantyClaimService.updateOne(
               { uuid: cancelPayload.uuid },
@@ -817,7 +817,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             ),
           );
         }),
-        switchMap(res => {
+        switchMap(() => {
           if (cancelPayload.serial_no) {
             return from(
               this.serialNoService.updateOne(
@@ -832,12 +832,25 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           }
           return of({});
         }),
-        switchMap(res => {
+        switchMap(() => {
           return from(
             this.serialNoHistoryService.deleteOne({
               parent_document: cancelPayload.uuid,
             }),
           );
+        }),
+        switchMap(() => {
+          return from(this.retrieveWarrantyClaim(cancelPayload.uuid));
+        }),
+        switchMap(claim => {
+          if (claim.claim_type === WARRANTY_TYPE.THIRD_PARTY) {
+            return from(
+              this.serialNoService.deleteOne({
+                serial_no: cancelPayload.serial_no,
+              }),
+            );
+          }
+          return of({});
         }),
       );
   }
