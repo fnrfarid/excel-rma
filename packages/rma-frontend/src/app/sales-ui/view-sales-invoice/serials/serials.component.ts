@@ -10,7 +10,13 @@ import { SalesService } from '../../services/sales.service';
 import { FormControl, Validators } from '@angular/forms';
 
 import { Observable, Subject, of, from } from 'rxjs';
-import { startWith, switchMap, mergeMap, toArray } from 'rxjs/operators';
+import {
+  startWith,
+  switchMap,
+  mergeMap,
+  toArray,
+  concatMap,
+} from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   MatDialogRef,
@@ -566,40 +572,50 @@ export class SerialsComponent implements OnInit {
       ].against_sales_invoice = this.salesInvoiceDetails.name;
     });
 
-    Object.keys(item_hash).forEach(key => {
-      if (item_hash[key].qty) {
-        assignSerial.items.push(item_hash[key]);
-      }
-    });
+    from(Object.keys(item_hash))
+      .pipe(
+        concatMap(key => {
+          if (item_hash[key].qty) {
+            assignSerial.items = [];
+            assignSerial.items.push(item_hash[key]);
+            return this.assignItemSerial(assignSerial);
+          }
+          return of({});
+        }),
+        toArray(),
+      )
+      .subscribe({
+        next: success => {
+          this.submit = false;
+          loading.dismiss();
+          this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
+            duration: 2500,
+          });
+          this.viewSalesInvoicePage.selectedSegment = 0;
+        },
+        error: err => {
+          loading.dismiss();
+          this.submit = false;
+          if (err.status === 406) {
+            const errMessage = err.error.message.split('\\n');
+            this.snackBar.open(
+              errMessage[errMessage.length - 2].split(':')[1],
+              CLOSE,
+              {
+                duration: 2500,
+              },
+            );
+            return;
+          }
+          this.snackBar.open(err.error.message, CLOSE, {
+            duration: 2500,
+          });
+        },
+      });
+  }
 
-    this.salesService.assignSerials(assignSerial).subscribe({
-      next: success => {
-        this.submit = false;
-        loading.dismiss();
-        this.snackBar.open(SERIAL_ASSIGNED, CLOSE, {
-          duration: 2500,
-        });
-        this.viewSalesInvoicePage.selectedSegment = 0;
-      },
-      error: err => {
-        loading.dismiss();
-        this.submit = false;
-        if (err.status === 406) {
-          const errMessage = err.error.message.split('\\n');
-          this.snackBar.open(
-            errMessage[errMessage.length - 2].split(':')[1],
-            CLOSE,
-            {
-              duration: 2500,
-            },
-          );
-          return;
-        }
-        this.snackBar.open(err.error.message, CLOSE, {
-          duration: 2500,
-        });
-      },
-    });
+  assignItemSerial(assignSerial) {
+    return this.salesService.assignSerials(assignSerial);
   }
 
   mergeDuplicateItems() {
