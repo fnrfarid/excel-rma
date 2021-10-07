@@ -353,7 +353,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           return of(true);
         }
         return throwError(
-          new BadRequestException('Some Sub Claim Could Be Created try again'),
+          new BadRequestException('Error in Creating Subclaim'),
         );
       }),
       catchError(err => {
@@ -364,7 +364,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         ).pipe(
           switchMap(err => {
             return throwError(
-              new BadRequestException('Not Elgigble to create claim'),
+              new BadRequestException(
+                'Error While Creating Bulk Claim fill details correctly.',
+              ),
             );
           }),
         );
