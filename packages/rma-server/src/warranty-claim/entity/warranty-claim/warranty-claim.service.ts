@@ -133,6 +133,10 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.deleteOne(query, options);
   }
 
+  async deleteAll(query, options?) {
+    return await this.warrantyClaimRepository.deleteMany(query, options);
+  }
+
   async updateOne(query, options?) {
     return await this.warrantyClaimRepository.updateOne(query, options);
   }
