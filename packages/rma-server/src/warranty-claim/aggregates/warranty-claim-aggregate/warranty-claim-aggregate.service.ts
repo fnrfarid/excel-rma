@@ -276,7 +276,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     serialBody.customer_name = payload.customer;
     serialBody.warranty.purchasedOn = serialBody.date;
     serialBody.warranty.purchaseWarrantyDate = serialBody.date;
-    serialBody.warranty.salesWarrantyDate = serialBody.date;
+    serialBody.warranty.salesWarrantyDate = payload.warranty_end_date;
     serialBody.warranty.soldOn = serialBody.date;
     serialBody.warehouse = req.token.warehouses[0];
     return of(serialBody);
