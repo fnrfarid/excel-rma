@@ -106,18 +106,22 @@
         <ion-grid class="i-no-padding">
           <ion-row class="align">
             <ion-col *ngIf="warrantyState?.serial_no?.active">
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  placeholder="Serial no"
-                  formControlName="serial_no"
-                  (keyup.enter)="serialChanged($event.target.value)"
-                />
-                <mat-error *ngIf="f.serial_no.hasError('required')">
-                  Serial no is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
+                <mat-form-field class="example-full-width" style="width: 92%;">
+                  <input
+                    matInput
+                    type="text"
+                    placeholder="Serial no"
+                    formControlName="serial_no"
+                    (keyup.enter)="serialChanged($event.target.value)"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <mat-error *ngIf="f.serial_no.hasError('required')">
+                    Serial no is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="serialChanged(f.serial_no.value)" mat-icon-button color="tertiary" aria-label="Example icon button with a menu icon">
+                  <mat-icon>search</mat-icon>
+                </button>        
             </ion-col>
             <ion-col *ngIf="warrantyState?.warranty_end_date?.active">
               <mat-form-field class="example-full-width">
@@ -250,25 +254,22 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col class="ion-text-left" *ngIf="route ==='edit'">
+            <ion-col class="ion-text-left" *ngIf="f.category.value ==='Bulk'">
               <ion-button
                 color="tertiary"
-                *ngIf="warrantyObject?.set === 'Bulk'"
                 (click)="appendProduct()"
                 [disabled]="warrantyClaimForm.invalid"
               >
                 Add
               </ion-button>
-            </ion-col>
-            <ion-col class="ion-text-left" *ngIf="route ==='add'">
               <ion-button
-                color="tertiary"
-                *ngIf="f.category.value === 'Bulk'"
-                (click)="appendProduct()"
-                [disabled]="warrantyClaimForm.invalid"
-              >
-                Add
-              </ion-button>
+              color="tertiary"
+              (click)="clearProductFields()"
+              fill="outline"
+              [disabled]="warrantyClaimForm.invalid"
+            >
+              Clear
+            </ion-button>
             </ion-col>
             <ion-col> </ion-col>
           </ion-row>

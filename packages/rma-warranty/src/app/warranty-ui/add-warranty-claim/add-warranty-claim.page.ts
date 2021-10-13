@@ -32,6 +32,7 @@ import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable, of } from 'rxjs';
 import { MatTable } from '@angular/material/table';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-add-warranty-claim',
@@ -40,6 +41,8 @@ import { MatTable } from '@angular/material/table';
 })
 export class AddWarrantyClaimPage implements OnInit {
   @ViewChild(MatTable) table: MatTable<WarrantyBulkProducts>;
+  @ViewChild(MatAutocompleteTrigger) _auto: MatAutocompleteTrigger;
+  activeOption;
   validateInput: any = ValidateInputSelected;
   warrantyObject: WarrantyClaimsDetails;
   contact = {} as any;
@@ -156,6 +159,7 @@ export class AddWarrantyClaimPage implements OnInit {
       this.setValues();
     }
   }
+
   async setDefaults() {
     this.warrantyClaimForm.controls.received_on.setValue(
       await (await this.getDateTime(new Date())).date,
@@ -163,7 +167,11 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyClaimForm.controls.delivery_date.setValue(
       await this.getDeliveryDate(new Date()),
     );
-    this.warrantyClaimForm.controls.claim_type.setValue(this.claimList[0]);
+    this.warrantyClaimForm.controls.claim_type.setValue(
+      this.warrantyClaimForm.controls.claim_type.value
+        ? this.warrantyClaimForm.controls.claim_type.value
+        : this.claimList.find(x => x),
+    );
     this.warrantyClaimForm.controls.category.setValue(CATEGORY.SINGLE);
     this.getFormState(this.warrantyClaimForm.controls.claim_type.value);
     this.territoryList.subscribe({
@@ -198,22 +206,22 @@ export class AddWarrantyClaimPage implements OnInit {
           Object.keys(this.warrantyClaimForm.controls).forEach(element => {
             switch (element) {
               case 'product_name':
-                this.warrantyClaimForm
-                  .get(element)
-                  .setValue({ item_name: res.item_name });
+                this.warrantyClaimForm.controls[element].setValue({
+                  item_name: res.item_name,
+                });
                 break;
               case 'customer_name':
-                this.warrantyClaimForm
-                  .get(element)
-                  .setValue({ name: res.customer });
+                this.warrantyClaimForm.controls[element].setValue({
+                  customer_name: res.customer,
+                });
                 break;
               case 'problem':
-                this.warrantyClaimForm
-                  .get(element)
-                  .setValue({ problem_name: res.problem });
+                this.warrantyClaimForm.controls[element].setValue({
+                  problem_name: res.problem,
+                });
                 break;
               default:
-                this.warrantyClaimForm.get(element).setValue(res[element]);
+                this.warrantyClaimForm.controls[element].setValue(res[element]);
                 break;
             }
           });
@@ -566,8 +574,13 @@ export class AddWarrantyClaimPage implements OnInit {
     if (option) return option.customer_name;
   }
 
-  getOption(option) {
-    if (option) return option;
+  getOption(option, name?) {
+    if (option) {
+      if (name) {
+        return name;
+      }
+      return option;
+    }
   }
 
   getItemOption(option) {
@@ -796,6 +809,20 @@ export class AddWarrantyClaimPage implements OnInit {
     this.table.renderRows();
   }
 
+  clearProductFields() {
+    [
+      'serial_no',
+      'warranty_end_date',
+      'product_name',
+      'product_brand',
+      'problem',
+      'problem_details',
+      'remarks',
+      'invoice_no',
+    ].forEach(control => {
+      this.warrantyClaimForm.controls[control].reset();
+    });
+  }
   getUpdate(event) {}
 
   branchOptionChanged(option) {}
