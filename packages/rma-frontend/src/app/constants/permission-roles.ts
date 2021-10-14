@@ -375,7 +375,7 @@ export const PermissionRoles = {
     create: [
       'RMA Stock Creator',
       'RMA Stock Manager',
-      'RMA Branch Manager',            
+      'RMA Branch Manager',
       'RMA Invoice Manager',
       'RMA Purchase Claim Manager',
       'General Admin',
