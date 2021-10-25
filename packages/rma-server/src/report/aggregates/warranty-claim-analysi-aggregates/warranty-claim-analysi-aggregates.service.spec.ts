@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WarrantyClaimAnalysisService } from '../../../report/entity/warranty-claim-analysis/warranty-claim-analysis.service';
+import { WarrantyClaimService } from '../../../warranty-claim/entity/warranty-claim/warranty-claim.service';
+
 import { WarrantyClaimAnalysiAggregatesService } from './warranty-claim-analysi-aggregates.service';
 
 describe('WarrantyClaimAnalysiAggregatesService', () => {
@@ -10,7 +11,7 @@ describe('WarrantyClaimAnalysiAggregatesService', () => {
       providers: [
         WarrantyClaimAnalysiAggregatesService,
         {
-          provide: WarrantyClaimAnalysisService,
+          provide: WarrantyClaimService,
           useValue: {},
         },
       ],
