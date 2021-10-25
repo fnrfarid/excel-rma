@@ -36,6 +36,7 @@ import { SyncEntitiesModule } from './sync/entities/sync-entity.module';
 import { ServiceInvoiceModule } from './service-invoice/service-invoice.module';
 import { PrintModule } from './print/print-module';
 import { TermsAndConditionsModule } from './terms-and-conditions/terms-and-conditions.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { TermsAndConditionsModule } from './terms-and-conditions/terms-and-condi
     ProblemModule,
     ServiceInvoiceModule,
     TermsAndConditionsModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
