@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   fix-mongodb-permissions:
@@ -25,9 +25,33 @@ services:
       - CACHE_DB_PASSWORD=admin
     volumes:
       - mongo-vol:/bitnami
-      - ../docker/backing-services/files/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 27017:27017
     depends_on:
       - fix-mongodb-permissions
+
+  mongo-configuration:
+    image: bitnami/mongodb:latest
+    command:
+      - bash
+      - -c
+      - >
+        sleep 10;
+        mongo rma-server \
+          --host localhost \
+          --port 27017 \
+          -u root \
+          -p admin \
+          --authenticationDatabase admin \
+          --eval "db.createUser({user: 'rma-server', pwd: 'admin', roles:[{role:'dbOwner', db: 'rma-server'}]});";
+
+        mongo cache-db \
+          --host localhost \
+          --port 27017 \
+          -u root \
+          -p admin \
+          --authenticationDatabase admin \
+          --eval "db.createUser({user: 'cache-db', pwd: 'admin', roles:[{role:'dbOwner', db: 'cache-db'}]});";
 
   development:
     build: .
@@ -36,7 +60,7 @@ services:
       - ..:/workspace
     working_dir: /workspace
     ports:
-      - '8800:8800'
+      - "8800:8800"
 
 volumes:
   mongo-vol:
