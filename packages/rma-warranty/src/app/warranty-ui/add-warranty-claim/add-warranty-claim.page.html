@@ -106,18 +106,22 @@
         <ion-grid class="i-no-padding">
           <ion-row class="align">
             <ion-col *ngIf="warrantyState?.serial_no?.active">
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  type="text"
-                  placeholder="Serial no"
-                  formControlName="serial_no"
-                  (keyup.enter)="serialChanged($event.target.value)"
-                />
-                <mat-error *ngIf="f.serial_no.hasError('required')">
-                  Serial no is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
+                <mat-form-field class="example-full-width" style="width: 92%;">
+                  <input
+                    matInput
+                    type="text"
+                    placeholder="Serial no"
+                    formControlName="serial_no"
+                    (keyup.enter)="serialChanged($event.target.value)"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <mat-error *ngIf="f.serial_no.hasError('required')">
+                    Serial no is <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <button (click)="serialChanged(f.serial_no.value)" mat-icon-button color="tertiary" aria-label="Example icon button with a menu icon">
+                  <mat-icon>search</mat-icon>
+                </button>        
             </ion-col>
             <ion-col *ngIf="warrantyState?.warranty_end_date?.active">
               <mat-form-field class="example-full-width">
@@ -151,6 +155,7 @@
                   placeholder="Product Name"
                   formControlName="product_name"
                   [matAutocomplete]="product_name"
+                  (focusout)="validateInput(f.product_name, productList)"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
@@ -165,8 +170,9 @@
                     {{ option.item_name }}
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.product_name.hasError('required')">
-                  Product is <strong>required</strong>
+                <mat-error *ngIf="f.product_name.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.product_name.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -248,25 +254,22 @@
             </ion-col>
           </ion-row>
           <ion-row class="align">
-            <ion-col class="ion-text-left" *ngIf="route ==='edit'">
+            <ion-col class="ion-text-left" *ngIf="f.category.value ==='Bulk'">
               <ion-button
                 color="tertiary"
-                *ngIf="warrantyObject?.set === 'Bulk'"
                 (click)="appendProduct()"
                 [disabled]="warrantyClaimForm.invalid"
               >
                 Add
               </ion-button>
-            </ion-col>
-            <ion-col class="ion-text-left" *ngIf="route ==='add'">
               <ion-button
-                color="tertiary"
-                *ngIf="f.category.value === 'Bulk'"
-                (click)="appendProduct()"
-                [disabled]="warrantyClaimForm.invalid"
-              >
-                Add
-              </ion-button>
+              color="tertiary"
+              (click)="clearProductFields()"
+              fill="outline"
+              [disabled]="warrantyClaimForm.invalid"
+            >
+              Clear
+            </ion-button>
             </ion-col>
             <ion-col> </ion-col>
           </ion-row>
@@ -293,9 +296,19 @@
               *ngFor="let column of displayedColumns"
             >
               <mat-header-cell *matHeaderCellDef>{{column}}</mat-header-cell>
-              <mat-cell *matCellDef="let row">
-                <ng-container *ngIf="row[column]">
+              <mat-cell *matCellDef="let row;let i=index">
+                <ng-container *ngIf="row[column] && column!='remove'">
                   {{ row[column] }}
+                </ng-container>
+                <ng-container *ngIf=" column==='remove'">
+                  <ion-button
+                    fill="clear"
+                    class="ion-no-padding"
+                    color="danger"
+                    (click)="removeRow(row,i)"
+                  >
+                    <ion-icon slot="icon-only" name="trash"></ion-icon>
+                  </ion-button>
                 </ng-container>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
@@ -328,7 +341,7 @@
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="i-no-padding">
-          <ion-row class="align">
+          <ion-row class="align">     
             <ion-col *ngIf="warrantyState?.customer_name?.active">
               <mat-form-field class="example-full-width">
                 <input
@@ -336,6 +349,7 @@
                   placeholder="Select Customer"
                   matInput
                   formControlName="customer_name"
+                  (focusout)="validateInput(f.customer_name, filteredCustomerList)"
                   [matAutocomplete]="auto"
                 />
                 <mat-autocomplete
@@ -352,8 +366,9 @@
                     <small class="text-muted"> {{ option.name}} </small>
                   </mat-option>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.customer_name.hasError('required')">
-                  Customer is <strong>required</strong>
+                <mat-error *ngIf="f.customer_name.hasError('falseValse')">
+                  You should select a value from dropdown only. 
+                  <strong>'{{f.customer_name.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>

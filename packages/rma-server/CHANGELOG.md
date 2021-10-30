@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.15.1](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.15.0...rma-server@1.15.1) (2021-10-30)
+
+
+### Bug Fixes
+
+* **rma-server:** fixed delivery_status and territory filters ([9860420](https://gitlab.com/castlecraft/excel-rma/commit/98604203ed3df67d7c7c15976c33ebb600aca1a8))
+
+
+
+
+
 # [1.15.0](https://gitlab.com/castlecraft/excel-rma/compare/rma-server@1.14.0...rma-server@1.15.0) (2021-09-07)
 
 

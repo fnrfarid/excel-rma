@@ -335,7 +335,7 @@ export const PermissionRoles = {
     create: ['RMA Claim Creator', 'RMA Claim Manager', 'General Admin'],
     update: ['RMA Claim Creator', 'RMA Claim Manager', 'General Admin'],
     submit: ['RMA Claim Creator', 'RMA Claim Manager', 'General Admin'],
-    delete: ['RMA Invoice Manager', 'General Admin'],
+    delete: ['RMA Branch Manager', 'General Admin'],
   },
 
   claim_verdict: {
@@ -373,14 +373,16 @@ export const PermissionRoles = {
 
   rma_stock_entry: {
     create: [
+      'RMA Stock Creator',
       'RMA Stock Manager',
+      'RMA Branch Manager',
       'RMA Invoice Manager',
       'RMA Purchase Claim Manager',
       'General Admin',
     ],
     cancel: [
       'RMA Stock Manager',
-      'RMA Invoice Manager',
+      'RMA Branch Manager',
       'RMA Purchase Claim Manager',
       'General Admin',
     ],
