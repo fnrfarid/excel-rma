@@ -18,11 +18,7 @@
     </mat-form-field>
 
     <mat-form-field *ngIf="column === 'serial_no'">
-        <input type="text"
-        placeholder="Enter a Serial No"
-        matInput name="serial_no" 
-        [(ngModel)]="serial_no" 
-        oninput="this.value = this.value.toUpperCase()" />
+        <input type="text" placeholder="Enter a Serial No" matInput name="serial_no" [(ngModel)]="serial_no" />
     </mat-form-field>
 
     <mat-form-field *ngIf="column === 'warehouse'">
