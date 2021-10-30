@@ -64,20 +64,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
 
   createClaim(warrantyClaimPayload: WarrantyClaimDto, clientHttpRequest) {
     if (warrantyClaimPayload.category === CATEGORY.BULK) {
-      return this.createBulkClaim(warrantyClaimPayload, clientHttpRequest).pipe(
-        catchError(err => {
-          return throwError(new BadRequestException(err));
-        }),
-      );
+      return this.createBulkClaim(warrantyClaimPayload, clientHttpRequest);
     } else {
-      return this.addWarrantyClaim(
-        warrantyClaimPayload,
-        clientHttpRequest,
-      ).pipe(
-        catchError(err => {
-          return throwError(new BadRequestException(err));
-        }),
-      );
+      return this.addWarrantyClaim(warrantyClaimPayload, clientHttpRequest);
     }
   }
 
@@ -106,31 +95,20 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.createWarrantyNonWarrantyClaim(
           warrantyClaimPayload,
           clientHttpRequest,
-        ).pipe(
-          catchError(err => {
-            return throwError(new BadRequestException(err));
-          }),
         );
 
       case WARRANTY_TYPE.NON_SERAIL:
         return this.createNonSerialClaim(
           warrantyClaimPayload,
           clientHttpRequest,
-        ).pipe(
-          catchError(err => {
-            return throwError(new BadRequestException(err));
-          }),
         );
 
       case WARRANTY_TYPE.THIRD_PARTY:
         return this.createThirdPartyClaim(
           warrantyClaimPayload,
           clientHttpRequest,
-        ).pipe(
-          catchError(err => {
-            return throwError(new BadRequestException(err));
-          }),
         );
+
       default:
         return throwError(new NotImplementedException(CLAIM_TYPE_INVLAID));
     }
@@ -183,9 +161,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         switchMap(nxt => {
           return of(true);
         }),
-        catchError(err => {
-          return throwError(new BadRequestException(err));
-        }),
       );
   }
 
@@ -210,9 +185,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         switchMap(nxt => {
           return of(true);
         }),
-        catchError(err => {
-          return throwError(new BadRequestException(err));
-        }),
       );
   }
 
@@ -234,9 +206,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
       switchMap(nxt => {
         return of(true);
-      }),
-      catchError(err => {
-        return throwError(new BadRequestException(err));
       }),
     );
   }
@@ -276,13 +245,13 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     serialBody.customer_name = payload.customer;
     serialBody.warranty.purchasedOn = serialBody.date;
     serialBody.warranty.purchaseWarrantyDate = serialBody.date;
-    serialBody.warranty.salesWarrantyDate = payload.warranty_end_date;
+    serialBody.warranty.salesWarrantyDate = serialBody.date;
     serialBody.warranty.soldOn = serialBody.date;
     serialBody.warehouse = req.token.warehouses[0];
     return of(serialBody);
   }
 
-  async retrieveWarrantyClaim(uuid: string, req?) {
+  async retrieveWarrantyClaim(uuid: string, req) {
     const provider = await this.warrantyClaimService.findOne({ uuid });
     if (!provider) throw new NotFoundException();
     return provider;
@@ -331,45 +300,20 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   createBulkClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
-    let uuid;
     return this.AssignBulkStatusHistory(claimsPayload, clientHttpRequest).pipe(
       switchMap(warrantyBulkClaim => {
         return from(this.warrantyClaimService.create(warrantyBulkClaim));
       }),
       map(res => res.ops[0]),
       switchMap((bulkClaim: WarrantyClaimDto) => {
-        uuid = bulkClaim.uuid;
         return this.createBulkSingularClaims(
           bulkClaim,
           bulkClaim,
           clientHttpRequest,
         );
       }),
-      switchMap(() => {
-        return from(this.warrantyClaimService.find({ parent: uuid }));
-      }),
-      switchMap(bulkCliams => {
-        if (bulkCliams.length === claimsPayload.bulk_products.length) {
-          return of(true);
-        }
-        return throwError(
-          new BadRequestException('Error in Creating Subclaim'),
-        );
-      }),
-      catchError(err => {
-        return from(
-          this.warrantyClaimService.deleteAll({
-            $or: [{ parent: uuid }, { uuid }],
-          }),
-        ).pipe(
-          switchMap(err => {
-            return throwError(
-              new BadRequestException(
-                'Error While Creating Bulk Claim fill details correctly.',
-              ),
-            );
-          }),
-        );
+      switchMap(nxt => {
+        return of(true);
       }),
     );
   }
@@ -403,9 +347,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.addWarrantyClaim(singularClaimPayload, clientHttpRequest);
       }),
       toArray(),
-      catchError(err => {
-        return throwError(new BadRequestException(err));
-      }),
     );
   }
 
@@ -462,7 +403,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.warrantyClaimsPoliciesService
           .validateBulkWarrantyClaim(data)
           .pipe(
-            switchMap(() => {
+            switchMap(validData => {
               this.createBulkSerials(data.claims, clientHttpRequest);
               const mappedWarranty = this.mapWarrantyClaims(data.claims);
               this.apply(new BulkWarrantyClaimsCreatedEvent(mappedWarranty));
@@ -859,12 +800,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
       .pipe(
-        switchMap(() => {
+        switchMap(res => {
           return this.warrantyClaimsPoliciesService.validateServiceInvoice(
             cancelPayload.uuid,
           );
         }),
-        switchMap(() => {
+        switchMap(res => {
           return from(
             this.warrantyClaimService.updateOne(
               { uuid: cancelPayload.uuid },
@@ -876,7 +817,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             ),
           );
         }),
-        switchMap(() => {
+        switchMap(res => {
           if (cancelPayload.serial_no) {
             return from(
               this.serialNoService.updateOne(
@@ -891,25 +832,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           }
           return of({});
         }),
-        switchMap(() => {
+        switchMap(res => {
           return from(
             this.serialNoHistoryService.deleteOne({
               parent_document: cancelPayload.uuid,
             }),
           );
-        }),
-        switchMap(() => {
-          return from(this.retrieveWarrantyClaim(cancelPayload.uuid));
-        }),
-        switchMap(claim => {
-          if (claim.claim_type === WARRANTY_TYPE.THIRD_PARTY) {
-            return from(
-              this.serialNoService.deleteOne({
-                serial_no: cancelPayload.serial_no,
-              }),
-            );
-          }
-          return of({});
         }),
       );
   }
