@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.12.2](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.12.1...rma-frontend@1.12.2) (2021-10-30)
+## [1.12.3](https://gitlab.com/castlecraft/excel-rma/compare/rma-frontend@1.12.2...rma-frontend@1.12.3) (2021-10-30)
 
 **Note:** Version bump only for package rma-frontend
 
