@@ -13,6 +13,7 @@ import { LoadingController } from '@ionic/angular';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { PrintSettingDialog } from '../../shared-warranty-modules/print-setting-dialog/print-setting-dialog';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog/confirm-dialog.component';
 @Component({
   selector: 'claim-details',
   templateUrl: './claim-details.component.html',
@@ -130,6 +131,17 @@ export class ClaimDetailsComponent implements OnInit {
           );
         },
       });
+  }
+
+  openConfirmDialog(): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.data) {
+        this.resetEntry();
+      }
+    });
   }
 
   openDialog(): void {
