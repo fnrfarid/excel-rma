@@ -288,18 +288,34 @@ export class WarrantyService {
       });
   }
 
+  getAllBulkClaims(warrantyDetail: WarrantyClaimsDetails) {
+    return this.getWarrantyClaimsList(
+      undefined,
+      undefined,
+      undefined,
+      { parent: warrantyDetail.uuid },
+      {
+        set: ['Part'],
+      },
+    ).pipe(
+      switchMap(res => {
+        return this.getWarrantyClaimsList(
+          undefined,
+          undefined,
+          res.length,
+          { parent: warrantyDetail.uuid },
+          {
+            set: ['Part'],
+          },
+        );
+      }),
+      map(res => res.docs),
+    );
+  }
+
   mapWarrantyItems(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.set === CATEGORY.BULK) {
-      return this.getWarrantyClaimsList(
-        undefined,
-        undefined,
-        undefined,
-        { parent: warrantyDetail.uuid },
-        {
-          set: ['Part'],
-        },
-      ).pipe(
-        map(res => res.docs),
+      return this.getAllBulkClaims(warrantyDetail).pipe(
         switchMap((res: WarrantyClaimsDetails[]) => {
           return from(res).pipe(
             filter(
@@ -391,16 +407,7 @@ export class WarrantyService {
 
   mapBulkServiceInvoice(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.set === CATEGORY.BULK) {
-      return this.getWarrantyClaimsList(
-        undefined,
-        undefined,
-        undefined,
-        { parent: warrantyDetail.uuid },
-        {
-          set: ['Part'],
-        },
-      ).pipe(
-        map(res => res.docs),
+      return this.getAllBulkClaims(warrantyDetail).pipe(
         switchMap(res => {
           return from(res).pipe(
             filter(
@@ -451,16 +458,7 @@ export class WarrantyService {
 
   mapBulkDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.set === CATEGORY.BULK) {
-      return this.getWarrantyClaimsList(
-        undefined,
-        undefined,
-        undefined,
-        { parent: warrantyDetail.uuid },
-        {
-          set: ['Part'],
-        },
-      ).pipe(
-        map(res => res.docs),
+      return this.getAllBulkClaims(warrantyDetail).pipe(
         switchMap(res => {
           return from(res).pipe(
             filter(
