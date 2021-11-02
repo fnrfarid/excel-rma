@@ -610,6 +610,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   async serialChanged(name) {
+    this.warrantyClaimForm.controls.claim_type.enable();
     const timeZone = await this.addWarrantyService
       .getStorage()
       .getItem(TIME_ZONE);
@@ -835,4 +836,15 @@ export class AddWarrantyClaimPage implements OnInit {
   getUpdate(event) {}
 
   branchOptionChanged(option) {}
+
+  clearProductDetails() {
+    this.f.serial_no.setValue('');
+    this.f.warranty_end_date.setValue('');
+    this.f.product_name.setValue('');
+    this.f.product_brand.setValue('');
+    this.f.problem.setValue('');
+    this.f.problem_details.setValue('');
+    this.f.remarks.setValue('');
+    this.f.invoice_no.setValue('');
+  }
 }
