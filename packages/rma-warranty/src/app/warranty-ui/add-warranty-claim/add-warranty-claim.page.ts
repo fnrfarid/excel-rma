@@ -3,7 +3,13 @@ import { Location } from '@angular/common';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TimeService } from '../../api/time/time.service';
 import { AddWarrantyService } from './add-warranty.service';
-import { startWith, switchMap, map, debounceTime } from 'rxjs/operators';
+import {
+  startWith,
+  switchMap,
+  map,
+  debounceTime,
+  catchError,
+} from 'rxjs/operators';
 import { LoadingController } from '@ionic/angular';
 import {
   WarrantyState,
@@ -582,6 +588,27 @@ export class AddWarrantyClaimPage implements OnInit {
     if (option) return option.problem_name;
   }
 
+  checkSerial(serialNo) {
+    return this.addWarrantyService.getSerial(serialNo).pipe(
+      switchMap((res: SerialNoDetails) => {
+        if (res.claim_no) {
+          this.getMessage(`Claim already exists serial no ${res.serial_no}`);
+          return of(false);
+        }
+        if (!res.customer) {
+          this.getMessage(
+            'Serial not sold or serials is not linked to customer.',
+          );
+          return of(false);
+        }
+        return of(true);
+      }),
+      catchError(err => {
+        return of(err);
+      }),
+    );
+  }
+
   async serialChanged(name) {
     const timeZone = await this.addWarrantyService
       .getStorage()
@@ -736,35 +763,50 @@ export class AddWarrantyClaimPage implements OnInit {
 
   appendProduct() {
     if (this.validateProduct()) {
-      this.bulkProducts = this.bulkProducts.concat({
-        received_on: this.warrantyClaimForm.controls.received_on.value,
-        delivery_date: this.warrantyClaimForm.controls.delivery_date.value,
-        remarks: this.warrantyClaimForm.controls.remarks.value,
-        customer_contact: this.warrantyClaimForm.controls.customer_contact
-          .value,
-        customer_address: this.warrantyClaimForm.controls.customer_address
-          .value,
-        third_party_name: this.warrantyClaimForm.controls.third_party_name
-          .value,
-        third_party_contact: this.warrantyClaimForm.controls.third_party_contact
-          .value,
-        third_party_address: this.warrantyClaimForm.controls.third_party_address
-          .value,
-        customer: this.warrantyClaimForm.controls.customer_name.value
-          .customer_name,
-        warranty_claim_date: this.warrantyClaimForm.controls.received_on.value,
-        customer_code: this.contact.name,
-        claim_type: this.warrantyClaimForm.controls.claim_type.value,
-        product_brand: this.warrantyClaimForm.controls.product_brand.value,
-        problem: this.warrantyClaimForm.controls.problem.value.problem_name,
-        problem_details: this.warrantyClaimForm.controls.problem_details.value,
-        item_name: this.warrantyClaimForm.controls.product_name.value.item_name,
-        item_code: this.itemDetail.item_code,
-        serial_no: this.warrantyClaimForm.controls.serial_no.value,
-        invoice_no: this.warrantyClaimForm.controls.invoice_no.value,
-        warranty_end_date: this.warrantyClaimForm.controls.warranty_end_date
-          .value,
-        delivery_branch: this.warrantyClaimForm.controls.delivery_branch.value,
+      this.checkSerial(
+        this.warrantyClaimForm.controls.serial_no.value,
+      ).subscribe({
+        next: res => {
+          if (res) {
+            this.bulkProducts = this.bulkProducts.concat({
+              received_on: this.warrantyClaimForm.controls.received_on.value,
+              delivery_date: this.warrantyClaimForm.controls.delivery_date
+                .value,
+              remarks: this.warrantyClaimForm.controls.remarks.value,
+              customer_contact: this.warrantyClaimForm.controls.customer_contact
+                .value,
+              customer_address: this.warrantyClaimForm.controls.customer_address
+                .value,
+              third_party_name: this.warrantyClaimForm.controls.third_party_name
+                .value,
+              third_party_contact: this.warrantyClaimForm.controls
+                .third_party_contact.value,
+              third_party_address: this.warrantyClaimForm.controls
+                .third_party_address.value,
+              customer: this.warrantyClaimForm.controls.customer_name.value
+                .customer_name,
+              warranty_claim_date: this.warrantyClaimForm.controls.received_on
+                .value,
+              customer_code: this.contact.name,
+              claim_type: this.warrantyClaimForm.controls.claim_type.value,
+              product_brand: this.warrantyClaimForm.controls.product_brand
+                .value,
+              problem: this.warrantyClaimForm.controls.problem.value
+                .problem_name,
+              problem_details: this.warrantyClaimForm.controls.problem_details
+                .value,
+              item_name: this.warrantyClaimForm.controls.product_name.value
+                .item_name,
+              item_code: this.itemDetail.item_code,
+              serial_no: this.warrantyClaimForm.controls.serial_no.value,
+              invoice_no: this.warrantyClaimForm.controls.invoice_no.value,
+              warranty_end_date: this.warrantyClaimForm.controls
+                .warranty_end_date.value,
+              delivery_branch: this.warrantyClaimForm.controls.delivery_branch
+                .value,
+            });
+          }
+        },
       });
     }
   }
