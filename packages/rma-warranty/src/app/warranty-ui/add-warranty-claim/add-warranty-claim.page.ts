@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { TimeService } from '../../api/time/time.service';
@@ -37,6 +37,7 @@ import { DateTime } from 'luxon';
 import { WarrantyService } from '../warranty-tabs/warranty.service';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { Observable, of } from 'rxjs';
+import { MatTable } from '@angular/material/table';
 
 @Component({
   selector: 'app-add-warranty-claim',
@@ -44,6 +45,7 @@ import { Observable, of } from 'rxjs';
   styleUrls: ['./add-warranty-claim.page.scss'],
 })
 export class AddWarrantyClaimPage implements OnInit {
+  @ViewChild(MatTable) table: MatTable<any>;
   validateInput: any = ValidateInputSelected;
   warrantyObject: WarrantyClaimsDetails;
   contact = {} as any;
@@ -67,6 +69,7 @@ export class AddWarrantyClaimPage implements OnInit {
     'product_brand',
     'problem',
     'item_code',
+    'remove',
   ];
   warrantyClaimForm = new FormGroup({
     warranty_end_date: new FormControl(''),
@@ -167,7 +170,9 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyClaimForm.controls.delivery_date.setValue(
       await this.getDeliveryDate(new Date()),
     );
-    this.warrantyClaimForm.controls.claim_type.setValue(this.claimList[0]);
+    this.warrantyClaimForm.controls.claim_type.setValue(
+      this.f.claim_type.value ? this.f.claim_type.value : this.claimList[0],
+    );
     this.warrantyClaimForm.controls.category.setValue(CATEGORY.SINGLE);
     this.getFormState(this.warrantyClaimForm.controls.claim_type.value);
     this.territoryList.subscribe({
@@ -209,7 +214,7 @@ export class AddWarrantyClaimPage implements OnInit {
               case 'customer_name':
                 this.warrantyClaimForm
                   .get(element)
-                  .setValue({ name: res.customer });
+                  .setValue({ customer_name: res.customer });
                 break;
               case 'problem':
                 this.warrantyClaimForm
@@ -817,7 +822,9 @@ export class AddWarrantyClaimPage implements OnInit {
     if (this.bulkProducts.length) {
       for (const product of this.bulkProducts) {
         if (
-          product.serial_no === this.warrantyClaimForm.controls.serial_no.value
+          product.serial_no ===
+            this.warrantyClaimForm.controls.serial_no.value &&
+          product.claim_type !== 'Non Serial Warranty'
         ) {
           this.snackbar.open('Serial Already Exists', CLOSE, {
             duration: DURATION,
@@ -846,5 +853,10 @@ export class AddWarrantyClaimPage implements OnInit {
     this.f.problem_details.setValue('');
     this.f.remarks.setValue('');
     this.f.invoice_no.setValue('');
+  }
+
+  removeSubclaim(index: number) {
+    this.bulkProducts.splice(index, 1);
+    this.table.renderRows();
   }
 }

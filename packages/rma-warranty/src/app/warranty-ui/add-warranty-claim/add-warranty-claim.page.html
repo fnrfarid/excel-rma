@@ -120,8 +120,8 @@
                 </mat-error>
                 <button
                   matSuffix
-                  mat-button
-                  color="primary"
+                  mat-flat-button
+                  color="tertiary"
                   (click)="serialChanged($event.target.value)"
                 >
                   Search
@@ -309,9 +309,16 @@
               *ngFor="let column of displayedColumns"
             >
               <mat-header-cell *matHeaderCellDef>{{column}}</mat-header-cell>
-              <mat-cell *matCellDef="let row">
+              <mat-cell *matCellDef="let row;let i=index">
                 <ng-container *ngIf="row[column]">
                   {{ row[column] }}
+                </ng-container>
+                <ng-container *ngIf="column==='remove'">
+                  <button mat-mini-fab color="warn" 
+                  (click)="removeSubclaim(i)"
+                  aria-label="">
+                    <mat-icon>delete_forever</mat-icon>
+                  </button>
                 </ng-container>
               </mat-cell>
               <mat-footer-cell *matFooterCellDef></mat-footer-cell>
