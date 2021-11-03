@@ -112,11 +112,20 @@
                   type="text"
                   placeholder="Serial no"
                   formControlName="serial_no"
+                  (change)="f.claim_type.disable()"
                   (keyup.enter)="serialChanged($event.target.value)"
                 />
                 <mat-error *ngIf="f.serial_no.hasError('required')">
                   Serial no is <strong>required</strong>
                 </mat-error>
+                <button
+                  matSuffix
+                  mat-button
+                  color="primary"
+                  (click)="serialChanged($event.target.value)"
+                >
+                  Search
+                </button>
               </mat-form-field>
             </ion-col>
             <ion-col *ngIf="warrantyState?.warranty_end_date?.active">
@@ -266,6 +275,13 @@
                 [disabled]="warrantyClaimForm.invalid"
               >
                 Add
+              </ion-button>
+              <ion-button
+                color="tertiary"
+                *ngIf="f.category.value === 'Bulk'"
+                (click)="clearProductDetails()"
+              >
+                Clear
               </ion-button>
             </ion-col>
             <ion-col> </ion-col>
@@ -505,8 +521,9 @@
                   Warehouse is <strong>required</strong>
                 </mat-error>
                 <mat-error *ngIf="f.receiving_branch.hasError('falseValse')">
-                  You should select a value from dropdown only. 
-                  <strong>'{{f.receiving_branch.value}}'</strong> is not allowed.
+                  You should select a value from dropdown only.
+                  <strong>'{{f.receiving_branch.value}}'</strong> is not
+                  allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
@@ -534,9 +551,9 @@
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.delivery_branch.hasError('falseValse')">
-                You should select a value from dropdown only. 
-                <strong>'{{f.delivery_branch.value}}'</strong> is not allowed.
-              </mat-error>
+                  You should select a value from dropdown only.
+                  <strong>'{{f.delivery_branch.value}}'</strong> is not allowed.
+                </mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
