@@ -572,7 +572,7 @@ export class WarrantyService {
           mappedWarrantyDetails.serviceInvoice.docs,
         ).pipe(
           switchMap(warrantyInvoices => {
-            if (!erpBody.bulk_products) {
+            if (erpBody.set !== 'Bulk') {
               erpBody.warranty_invoices = JSON.stringify([warrantyInvoices]);
               return of([]);
             }
