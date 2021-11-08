@@ -634,6 +634,7 @@ export class WarrantyStockEntryAggregateService {
             return from(
               this.serialNoHistoryService.deleteOne({
                 document_no: stockEntry.stock_voucher_number,
+                parent_document: stockEntry.warrantyClaimUuid,
               }),
             );
           }

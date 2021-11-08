@@ -340,6 +340,7 @@ export class AddWarrantyClaimPage implements OnInit {
           category: { disabled: true, active: true },
         };
         this.isDisabled();
+        this.warrantyClaimForm.controls.invoice_no.reset();
         this.clearAllValidators('Third Party Warranty');
         break;
 
@@ -845,14 +846,14 @@ export class AddWarrantyClaimPage implements OnInit {
   branchOptionChanged(option) {}
 
   clearProductDetails() {
-    this.f.serial_no.setValue('');
-    this.f.warranty_end_date.setValue('');
-    this.f.product_name.setValue('');
-    this.f.product_brand.setValue('');
-    this.f.problem.setValue('');
-    this.f.problem_details.setValue('');
-    this.f.remarks.setValue('');
-    this.f.invoice_no.setValue('');
+    this.warrantyClaimForm.controls.serial_no.reset();
+    this.warrantyClaimForm.controls.warranty_end_date.reset();
+    this.warrantyClaimForm.controls.product_name.reset();
+    this.warrantyClaimForm.controls.product_brand.reset();
+    this.warrantyClaimForm.controls.problem.reset();
+    this.warrantyClaimForm.controls.problem_details.reset();
+    this.warrantyClaimForm.controls.remarks.reset();
+    this.warrantyClaimForm.controls.invoice_no.reset();
   }
 
   removeSubclaim(index: number) {
