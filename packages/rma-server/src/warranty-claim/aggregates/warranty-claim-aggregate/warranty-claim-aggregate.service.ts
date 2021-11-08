@@ -796,7 +796,11 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     );
   }
 
-  cancelWarrantyClaim(cancelPayload: { uuid: string; serial_no: string }) {
+  cancelWarrantyClaim(cancelPayload: {
+    uuid: string;
+    serial_no: string;
+    type?: string;
+  }) {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
       .pipe(
@@ -817,8 +821,21 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             ),
           );
         }),
-        switchMap(res => {
+        switchMap(() => {
+          return from(
+            this.warrantyClaimService.findOne({ uuid: cancelPayload.uuid }),
+          );
+        }),
+        switchMap(claim => {
           if (cancelPayload.serial_no) {
+            if (claim.claim_type === WARRANTY_TYPE.THIRD_PARTY) {
+              cancelPayload.type = claim.claim_type;
+              return from(
+                this.serialNoService.deleteOne({
+                  serial_no: cancelPayload.serial_no,
+                }),
+              );
+            }
             return from(
               this.serialNoService.updateOne(
                 { serial_no: cancelPayload.serial_no },
@@ -833,6 +850,13 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           return of({});
         }),
         switchMap(res => {
+          if (cancelPayload.type === WARRANTY_TYPE.THIRD_PARTY) {
+            return from(
+              this.serialNoHistoryService.deleteMany({
+                serial_no: cancelPayload.serial_no,
+              }),
+            );
+          }
           return from(
             this.serialNoHistoryService.deleteOne({
               parent_document: cancelPayload.uuid,
