@@ -178,7 +178,7 @@ export class WarrantyPage implements OnInit {
     });
   }
 
-  getUpdate(event) {
+  getUpdate(event?) {
     const query: any = {};
     if (this.f.customer_name.value)
       query.customer = this.f.customer_name.value.name;
@@ -266,6 +266,8 @@ export class WarrantyPage implements OnInit {
       territory: this.territoryList,
       set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
     });
+
+    this.getUpdate();
   }
 
   getBulkClaims() {

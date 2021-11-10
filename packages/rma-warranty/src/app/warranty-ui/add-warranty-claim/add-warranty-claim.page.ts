@@ -134,7 +134,10 @@ export class AddWarrantyClaimPage implements OnInit {
     };
     this.createForm();
     this.setDefaults();
+    this.setAutoComplete();
+  }
 
+  setAutoComplete() {
     this.filteredCustomerList = this.warrantyClaimForm.controls.customer_name.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
@@ -147,13 +150,6 @@ export class AddWarrantyClaimPage implements OnInit {
       this.addWarrantyService.getItemList(),
     );
 
-    this.addWarrantyService
-      .getStorage()
-      .getItem('territory')
-      .then(territory => {
-        this.territoryList = of(territory);
-      });
-
     this.problemList = this.warrantyClaimForm.controls.problem.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
@@ -162,6 +158,13 @@ export class AddWarrantyClaimPage implements OnInit {
       }),
       map(res => res.docs),
     );
+
+    this.addWarrantyService
+      .getStorage()
+      .getItem('territory')
+      .then(territory => {
+        this.territoryList = of(territory);
+      });
   }
   async setDefaults() {
     this.warrantyClaimForm.controls.received_on.setValue(
@@ -717,6 +720,13 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   itemOptionChanged(option) {
+    if (!option.has_serial_no) {
+      this.f.serial_no.setValue('');
+      this.f.serial_no.disable();
+    } else {
+      this.f.serial_no.enable();
+    }
+
     this.addWarrantyService.getItem(option.item_code).subscribe({
       next: (res: WarrantyItem) => {
         this.itemDetail = res;
@@ -846,6 +856,8 @@ export class AddWarrantyClaimPage implements OnInit {
   branchOptionChanged(option) {}
 
   clearProductDetails() {
+    this.warrantyClaimForm.controls.serial_no.enable();
+    this.warrantyClaimForm.controls.claim_type.enable();
     this.warrantyClaimForm.controls.serial_no.reset();
     this.warrantyClaimForm.controls.warranty_end_date.reset();
     this.warrantyClaimForm.controls.product_name.reset();
@@ -854,6 +866,7 @@ export class AddWarrantyClaimPage implements OnInit {
     this.warrantyClaimForm.controls.problem_details.reset();
     this.warrantyClaimForm.controls.remarks.reset();
     this.warrantyClaimForm.controls.invoice_no.reset();
+    this.setAutoComplete();
   }
 
   removeSubclaim(index: number) {
