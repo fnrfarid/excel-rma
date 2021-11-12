@@ -89,24 +89,40 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.createWarrantyNonWarrantyClaim(
           warrantyClaimPayload,
           clientHttpRequest,
+        ).pipe(
+          catchError(err => {
+            return throwError(new BadRequestException(err));
+          }),
         );
 
       case WARRANTY_TYPE.NON_WARRANTY:
         return this.createWarrantyNonWarrantyClaim(
           warrantyClaimPayload,
           clientHttpRequest,
+        ).pipe(
+          catchError(err => {
+            return throwError(new BadRequestException(err));
+          }),
         );
 
       case WARRANTY_TYPE.NON_SERAIL:
         return this.createNonSerialClaim(
           warrantyClaimPayload,
           clientHttpRequest,
+        ).pipe(
+          catchError(err => {
+            return throwError(new BadRequestException(err));
+          }),
         );
 
       case WARRANTY_TYPE.THIRD_PARTY:
         return this.createThirdPartyClaim(
           warrantyClaimPayload,
           clientHttpRequest,
+        ).pipe(
+          catchError(err => {
+            return throwError(new BadRequestException(err));
+          }),
         );
 
       default:
@@ -161,6 +177,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         switchMap(nxt => {
           return of(true);
         }),
+        catchError(err => {
+          return throwError(new BadRequestException(err));
+        }),
       );
   }
 
@@ -185,6 +204,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         switchMap(nxt => {
           return of(true);
         }),
+        catchError(err => {
+          return throwError(new BadRequestException(err));
+        }),
       );
   }
 
@@ -206,6 +228,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
       switchMap(nxt => {
         return of(true);
+      }),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
       }),
     );
   }
@@ -300,12 +325,14 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
   }
 
   createBulkClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
+    let bulk: WarrantyClaimDto;
     return this.AssignBulkStatusHistory(claimsPayload, clientHttpRequest).pipe(
       switchMap(warrantyBulkClaim => {
         return from(this.warrantyClaimService.create(warrantyBulkClaim));
       }),
       map(res => res.ops[0]),
       switchMap((bulkClaim: WarrantyClaimDto) => {
+        bulk = bulkClaim;
         return this.createBulkSingularClaims(
           bulkClaim,
           bulkClaim,
@@ -314,6 +341,22 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
       switchMap(nxt => {
         return of(true);
+      }),
+      catchError(err => {
+        return from(
+          this.warrantyClaimService.count({ parent: bulk.uuid }),
+        ).pipe(
+          switchMap(subClaimCount => {
+            if (subClaimCount) {
+              return of(true);
+            }
+            return from(
+              this.warrantyClaimService.deleteMany({
+                $or: [{ parent: bulk.uuid }, { uuid: bulk.uuid }],
+              }),
+            );
+          }),
+        );
       }),
     );
   }
@@ -347,6 +390,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return this.addWarrantyClaim(singularClaimPayload, clientHttpRequest);
       }),
       toArray(),
+      catchError(err => {
+        return throwError(new BadRequestException(err));
+      }),
     );
   }
 
