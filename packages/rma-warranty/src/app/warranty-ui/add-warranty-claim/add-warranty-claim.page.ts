@@ -112,12 +112,7 @@ export class AddWarrantyClaimPage implements OnInit {
     }
     this.route = this.activatedRoute.snapshot.params.name;
     this.categoryList = ['Bulk', 'Single'];
-    this.claimList = [
-      'Warranty',
-      'Non Warranty',
-      'Non Serial Warranty',
-      'Third Party Warranty',
-    ];
+    this.claimList = ['Warranty', 'Non Warranty', 'Non Serial Warranty'];
     this.warrantyState = {
       serial_no: { disabled: false, active: true },
       invoice_no: { disabled: false, active: true },
@@ -619,6 +614,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   async serialChanged(name) {
+    this.claimList.push('Third Party Warranty');
     this.warrantyClaimForm.controls.claim_type.enable();
     const timeZone = await this.addWarrantyService
       .getStorage()
@@ -720,19 +716,20 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   itemOptionChanged(option) {
-    if (!option.has_serial_no) {
-      this.f.serial_no.setValue('');
-      this.f.serial_no.disable();
-    } else {
-      this.f.serial_no.enable();
-    }
-
     this.addWarrantyService.getItem(option.item_code).subscribe({
       next: (res: WarrantyItem) => {
         this.itemDetail = res;
         if (!res.brand) {
           this.getItemBrandFromERP(res.item_code);
         }
+
+        if (res.has_serial_no) {
+          this.f.serial_no.enable();
+        } else {
+          this.f.serial_no.setValue('');
+          this.f.serial_no.disable();
+        }
+
         this.warrantyClaimForm.controls.product_brand.setValue(res.brand);
       },
       error: ({ message }) => {
