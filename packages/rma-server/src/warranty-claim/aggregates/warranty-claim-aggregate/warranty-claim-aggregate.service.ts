@@ -662,6 +662,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
               this.serialNoHistoryService.updateOne(
                 {
                   serial_no: res.serial_no,
+                  parent_document: res.uuid,
                   document_type: WARRANTY_CLAIM_DOCTYPE,
                 },
                 {
