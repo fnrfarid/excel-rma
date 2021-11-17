@@ -348,7 +348,13 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         ).pipe(
           switchMap(subClaimCount => {
             if (subClaimCount) {
-              return of(true);
+              return throwError(
+                new BadRequestException(
+                  `Claim ${
+                    subClaimCount + 1
+                  } Is Invalid. Remove First ${subClaimCount} Claims and Retry the remaining`,
+                ),
+              );
             }
             return from(
               this.warrantyClaimService.deleteMany({
