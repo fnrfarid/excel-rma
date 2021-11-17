@@ -614,7 +614,12 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   async serialChanged(name) {
-    this.claimList.push('Third Party Warranty');
+    this.claimList = [
+      'Warranty',
+      'Non Warranty',
+      'Non Serial Warranty',
+      'Third Party Warranty',
+    ];
     this.warrantyClaimForm.controls.claim_type.enable();
     const timeZone = await this.addWarrantyService
       .getStorage()

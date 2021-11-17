@@ -124,6 +124,12 @@ export class MaterialTransferComponent implements OnInit {
     remarks: new FormControl(''),
     posting_date: new FormControl(''),
   });
+
+  accountingDimension = {
+    project: new FormControl(''),
+  };
+  filteredProjectList: Observable<any[]>;
+
   materialTransferDisplayedColumns = MATERIAL_TRANSFER_DISPLAYED_COLUMNS;
   itemDataSource: StockItemsDataSource = new StockItemsDataSource();
   itemDisplayedColumns = [
@@ -295,6 +301,18 @@ export class MaterialTransferComponent implements OnInit {
         return of([]);
       }),
     );
+
+    this.filteredProjectList = this.accountingDimension.project.valueChanges.pipe(
+      startWith(''),
+      switchMap(value => {
+        const filter = `[["name", "like", "%${value}%"]]`;
+        return this.stockEntryService.getFilteredAccountingDimensions(
+          'Project',
+          filter,
+        );
+      }),
+    );
+
     this.accounts = this.form.controls.accounts.valueChanges.pipe(
       debounceTime(500),
       startWith(''),
@@ -762,6 +780,7 @@ export class MaterialTransferComponent implements OnInit {
     );
     body.posting_time = date.time;
     body.stock_entry_type = this.form.controls.stock_entry_type.value;
+    body.project = this.accountingDimension.project.value;
     body.items = this.materialTransferDataSource.data();
     body.item_data = this.itemDataSource.data();
     body.uuid = this.uuid;
