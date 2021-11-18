@@ -440,11 +440,10 @@ export class AddWarrantyClaimPage implements OnInit {
               loading.dismiss();
               this.router.navigate(['/warranty']);
             },
-            error: ({ message }) => {
+            error: err => {
               loading.dismiss();
-              if (!message) message = SOMETHING_WENT_WRONG;
-              this.snackbar.open(message, 'Close', {
-                duration: DURATION,
+              this.snackbar.open(err?.error?.message, 'Close', {
+                duration: 3000,
               });
             },
           });
@@ -781,7 +780,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   appendProduct() {
-    if (this.validateProduct()) {
+    if (true) {
       this.checkSerial(
         this.warrantyClaimForm.controls.serial_no.value,
       ).subscribe({
