@@ -158,7 +158,7 @@ export class StockEntryService {
     );
   }
 
-  getFilteredAccountingDimensions(doctype, filter?) {
+  getFilteredAccountingDimensions(url, filter) {
     const params = new HttpParams({
       fromObject: {
         filters: filter,
@@ -169,8 +169,7 @@ export class StockEntryService {
       switchMap(headers => {
         return this.http
           .get<any>(
-            `api/command/user/api/resource/${doctype}`,
-
+            url,
             { params, headers },
           )
           .pipe(map(res => res.data));

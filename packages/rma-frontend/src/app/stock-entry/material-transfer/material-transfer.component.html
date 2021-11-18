@@ -18,94 +18,96 @@
 </ion-header>
 
 <ion-content class="page-background">
-  <ion-card>
-    <ion-card-header>
-      <ion-row class="align">
-        <ion-col>
-          <ion-card-title>
-            <ion-text color="tertiary">
-              {{ title }}
-            </ion-text>
-          </ion-card-title>
-        </ion-col>
-      </ion-row>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-grid class="ion-no-padding">
-        <ion-row>
-          <ion-col *ngIf="readonly">
-            <ion-button
-              [disabled]="!stock_receipt_names[0]"
-              (click)="openStockEntries()"
-              fill="clear"
-              shape="round"
-            >
-              Open All Entries
-            </ion-button>
-          </ion-col>
-          <ion-col class="ion-text-right">
-            <ion-button
-              *ngIf="status === 'Draft'"
-              color="danger"
-              fill="clear"
-              (click)="deleteStockEntry()"
-            >
-              <ion-icon name="trash"></ion-icon>
-            </ion-button>
-            <ion-button *ngIf="!readonly" color="light" (click)="saveDraft()">
-              Save
-            </ion-button>
-            <ion-button
-              *ngIf="!readonly"
-              [disabled]="!uuid || submit"
-              color="medium"
-              (click)="createMaterialTransfer()"
-            >
-              Submit
-            </ion-button>
-            <ion-button
-              *ngIf="
-                readonly &&
-                status === 'In Transit' &&
-                permissionState?.stock_entry?.accept
-              "
-              [disabled]="submit"
-              color="tertiary"
-              (click)="acceptTransfer()"
-            >
-              Accept
-            </ion-button>
-            <ion-button
-              *ngIf="readonly && status === 'In Transit'"
-              [disabled]="submit"
-              color="light"
-              (click)="rejectTransfer()"
-            >
-              Return
-            </ion-button>
-            <ion-text
-              *ngIf="readonly && status !== 'In Transit' && status !== 'Draft'"
-              [ngStyle]="{
-                color: ['Returned', 'Reseted'].includes(status)
-                  ? 'red'
-                  : 'green'
-              }"
-            >
-              <h1>Stock Transfer {{ status }}</h1>
-            </ion-text>
-            <ion-button
-              *ngIf="
-                readonly &&
-                ['In Transit', 'Delivered', 'Returned'].includes(status)
-              "
-              color="danger"
-              (click)="resetStockEntry()"
-            >
-              Cancel
-            </ion-button>
+  <form [formGroup]="form">
+    <ion-card>
+      <ion-card-header>
+        <ion-row class="align">
+          <ion-col>
+            <ion-card-title>
+              <ion-text color="tertiary">
+                {{ title }}
+              </ion-text>
+            </ion-card-title>
           </ion-col>
         </ion-row>
-        <form [formGroup]="form">
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col *ngIf="readonly">
+              <ion-button
+                [disabled]="!stock_receipt_names[0]"
+                (click)="openStockEntries()"
+                fill="clear"
+                shape="round"
+              >
+                Open All Entries
+              </ion-button>
+            </ion-col>
+            <ion-col class="ion-text-right">
+              <ion-button
+                *ngIf="status === 'Draft'"
+                color="danger"
+                fill="clear"
+                (click)="deleteStockEntry()"
+              >
+                <ion-icon name="trash"></ion-icon>
+              </ion-button>
+              <ion-button *ngIf="!readonly" color="light" (click)="saveDraft()">
+                Save
+              </ion-button>
+              <ion-button
+                *ngIf="!readonly"
+                [disabled]="!uuid || submit"
+                color="medium"
+                (click)="createMaterialTransfer()"
+              >
+                Submit
+              </ion-button>
+              <ion-button
+                *ngIf="
+                  readonly &&
+                  status === 'In Transit' &&
+                  permissionState?.stock_entry?.accept
+                "
+                [disabled]="submit"
+                color="tertiary"
+                (click)="acceptTransfer()"
+              >
+                Accept
+              </ion-button>
+              <ion-button
+                *ngIf="readonly && status === 'In Transit'"
+                [disabled]="submit"
+                color="light"
+                (click)="rejectTransfer()"
+              >
+                Return
+              </ion-button>
+              <ion-text
+                *ngIf="
+                  readonly && status !== 'In Transit' && status !== 'Draft'
+                "
+                [ngStyle]="{
+                  color: ['Returned', 'Reseted'].includes(status)
+                    ? 'red'
+                    : 'green'
+                }"
+              >
+                <h1>Stock Transfer {{ status }}</h1>
+              </ion-text>
+              <ion-button
+                *ngIf="
+                  readonly &&
+                  ['In Transit', 'Delivered', 'Returned'].includes(status)
+                "
+                color="danger"
+                (click)="resetStockEntry()"
+              >
+                Cancel
+              </ion-button>
+            </ion-col>
+          </ion-row>
           <ion-row>
             <ion-col>
               <mat-form-field class="example-full-width">
@@ -248,10 +250,54 @@
               </mat-form-field>
             </ion-col>
           </ion-row>
-        </form>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+    <ion-card *ngIf="!readonly">
+      <ion-card-header>
+        <ion-row class="align">
+          <ion-col>
+            <ion-card-title>
+              <ion-text color="tertiary"> Accounting Dimensions </ion-text>
+            </ion-card-title>
+          </ion-col>
+        </ion-row>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="ion-no-padding">
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  type="text"
+                  placeholder="Project"
+                  matInput
+                  formControlName="project"
+                  (focusout)="validateInput(f.project, filteredProjectList)"
+                  [matAutocomplete]="project"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #project="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let project of filteredProjectList | async"
+                    [value]="project.name"
+                  >
+                    {{ project.name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.project.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{ f.project.value }}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </form>
   <app-assign-serial
     *ngIf="!readonly"
     [state]="state"
@@ -349,58 +395,6 @@
     </ion-card-content>
   </ion-card>
 
-  <ion-card *ngIf="!readonly">
-    <ion-card-header>
-      <ion-row class="align">
-        <ion-col>
-          <ion-card-title>
-            <ion-text color="tertiary"> Accounting Dimensions </ion-text>
-          </ion-card-title>
-        </ion-col>
-      </ion-row>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-grid class="ion-no-padding">
-        <ion-row>
-          <ion-col>
-            <mat-form-field class="example-full-width">
-              <input
-                type="text"
-                placeholder="Project"
-                matInput
-                [formControl]="accountingDimension.project"
-                (focusout)="
-                  validateInput(
-                    accountingDimension.project,
-                    filteredProjectList
-                  )
-                "
-                [matAutocomplete]="project"
-              />
-              <mat-autocomplete
-                autoActiveFirstOption
-                #project="matAutocomplete"
-              >
-                <mat-option
-                  *ngFor="let project of filteredProjectList | async"
-                  [value]="project.name"
-                >
-                  {{ project.name }}
-                </mat-option>
-              </mat-autocomplete>
-              <mat-error
-                *ngIf="accountingDimension.project.hasError('falseValse')"
-              >
-                You should select a value from dropdown only.
-                <strong>'{{ accountingDimension.project.value }}'</strong> is
-                not allowed.
-              </mat-error>
-            </mat-form-field>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
   <ion-card *ngIf="!readonly">
     <div class="loading-shade" *ngIf="itemDataSource?.loading$ | async">
       <mat-progress-bar
