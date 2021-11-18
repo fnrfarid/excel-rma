@@ -141,6 +141,10 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.updateOne(query, options);
   }
 
+  async updateMany(query, options?) {
+    return await this.warrantyClaimRepository.updateMany(query, options);
+  }
+
   async insertMany(query, options?) {
     return await this.warrantyClaimRepository.insertMany(query, options);
   }

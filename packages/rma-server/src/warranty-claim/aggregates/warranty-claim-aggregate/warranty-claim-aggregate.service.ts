@@ -430,7 +430,28 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         );
       }),
       switchMap(nxt => {
-        return of(true);
+        return from(
+          this.warrantyClaimService.updateMany(
+            { parent: claimsPayload.uuid, claim_status: 'Draft' },
+            { $set: { claim_status: CLAIM_STATUS.IN_PROGRESS } },
+          ),
+        );
+      }),
+      catchError(err => {
+        return from(
+          this.warrantyClaimService.deleteMany({
+            parent: claimsPayload.uuid,
+            claim_status: 'Draft',
+          }),
+        ).pipe(
+          switchMap(() => {
+            return throwError(
+              new BadRequestException(
+                `One of the Claims is Invalid.To ensure, Check Parent Claim List.`,
+              ),
+            );
+          }),
+        );
       }),
     );
   }
