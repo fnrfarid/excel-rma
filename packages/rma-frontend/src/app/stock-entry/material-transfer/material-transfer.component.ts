@@ -124,7 +124,7 @@ export class MaterialTransferComponent implements OnInit {
     customer: new FormControl(''),
     remarks: new FormControl(''),
     posting_date: new FormControl(''),
-    project: new FormControl('', [Validators.required]),
+    project: new FormControl(''),
   });
 
   filteredProjectList: Observable<any[]>;

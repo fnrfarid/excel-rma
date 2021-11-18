@@ -168,10 +168,7 @@ export class StockEntryService {
     return this.getHeaders().pipe(
       switchMap(headers => {
         return this.http
-          .get<any>(
-            url,
-            { params, headers },
-          )
+          .get<any>(url, { params, headers })
           .pipe(map(res => res.data));
       }),
     );
