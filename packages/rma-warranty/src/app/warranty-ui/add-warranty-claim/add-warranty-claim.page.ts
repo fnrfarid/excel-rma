@@ -779,7 +779,7 @@ export class AddWarrantyClaimPage implements OnInit {
   }
 
   appendProduct() {
-    if (true) {
+    if (this.validateProduct()) {
       this.checkSerial(
         this.warrantyClaimForm.controls.serial_no.value,
       ).subscribe({
