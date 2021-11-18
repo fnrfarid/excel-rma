@@ -26,7 +26,6 @@ import {
   WARRANTY_TYPE,
 } from './../../constants/app-string';
 import {
-  SOMETHING_WENT_WRONG,
   ITEM_BRAND_FETCH_ERROR,
   USER_SAVE_ITEM_SUGGESTION,
   ITEM_NOT_FOUND,
@@ -285,16 +284,16 @@ export class AddWarrantyClaimPage implements OnInit {
       payload.bulk_products = this.bulkProducts;
       payload.category = this.warrantyObject.category;
       payload.set = this.warrantyObject.set;
+      payload.claim_status = 'Draft';
     }
     this.addWarrantyService.updateWarrantyClaim(payload).subscribe({
       next: () => {
         loading.dismiss();
         this.router.navigate(['/warranty']);
       },
-      error: ({ message }) => {
+      error: err => {
         loading.dismiss();
-        if (!message) message = SOMETHING_WENT_WRONG;
-        this.snackbar.open(message, 'Close', {
+        this.snackbar.open(err?.error.message, 'Close', {
           duration: DURATION,
         });
       },
