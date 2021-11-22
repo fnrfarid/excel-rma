@@ -343,23 +343,31 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         return of(true);
       }),
       catchError(err => {
-        return from(
-          this.warrantyClaimService.count({ parent: bulk.uuid }),
-        ).pipe(
+        let count;
+        return from(this.warrantyClaimService.find({ parent: bulk.uuid })).pipe(
           switchMap(subClaimCount => {
-            if (subClaimCount) {
-              return throwError(
-                new BadRequestException(
-                  `Claim ${
-                    subClaimCount + 1
-                  } Is Invalid. Remove First ${subClaimCount} Claims and Retry the remaining`,
-                ),
-              );
-            }
+            count = subClaimCount.length;
+            return from(subClaimCount).pipe(
+              concatMap(Claim => {
+                return this.cancelWarrantyClaim({
+                  uuid: Claim.uuid,
+                  serial_no: Claim.serial_no,
+                  type: Claim.claim_type,
+                });
+              }),
+              toArray(),
+            );
+          }),
+          switchMap(() => {
             return from(
               this.warrantyClaimService.deleteMany({
                 $or: [{ parent: bulk.uuid }, { uuid: bulk.uuid }],
               }),
+            );
+          }),
+          switchMap(() => {
+            return throwError(
+              new BadRequestException(`Claim No ${count + 1} Is Invalid.`),
             );
           }),
         );
@@ -424,7 +432,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
       switchMap(() => {
         return this.createBulkSingularClaims(
-          existingWarrantyClaim,
+          { subclaim_state: 'Draft', ...existingWarrantyClaim },
           claimsPayload,
           clientHttpRequest,
         );
@@ -432,22 +440,44 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       switchMap(nxt => {
         return from(
           this.warrantyClaimService.updateMany(
-            { parent: claimsPayload.uuid, claim_status: 'Draft' },
-            { $set: { claim_status: CLAIM_STATUS.IN_PROGRESS } },
+            { parent: claimsPayload.uuid, subclaim_state: 'Draft' },
+            { $unset: { subclaim_state: undefined } },
           ),
         );
       }),
       catchError(err => {
+        let count;
         return from(
-          this.warrantyClaimService.deleteMany({
+          this.warrantyClaimService.find({
             parent: claimsPayload.uuid,
-            claim_status: 'Draft',
+            subclaim_state: 'Draft',
           }),
         ).pipe(
+          switchMap(subClaimCount => {
+            count = subClaimCount.length;
+            return from(subClaimCount).pipe(
+              concatMap(Claim => {
+                return this.cancelWarrantyClaim({
+                  uuid: Claim.uuid,
+                  serial_no: Claim.serial_no,
+                  type: Claim.claim_type,
+                });
+              }),
+              toArray(),
+            );
+          }),
+          switchMap(() => {
+            return from(
+              this.warrantyClaimService.deleteMany({
+                parent: claimsPayload.uuid,
+                subclaim_state: 'Draft',
+              }),
+            );
+          }),
           switchMap(() => {
             return throwError(
               new BadRequestException(
-                `One of the Claims is Invalid.To ensure, Check Parent Claim List.`,
+                `Claim No ${count + 1} is Invalid.Please Add Valid Claim`,
               ),
             );
           }),
