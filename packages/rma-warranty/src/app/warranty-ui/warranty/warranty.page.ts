@@ -181,11 +181,11 @@ export class WarrantyPage implements OnInit {
   getUpdate(event?) {
     const query: any = {};
     if (this.f.customer_name.value)
-      query.customer = this.f.customer_name.value.name;
+      query.customer = this.f.customer_name.value.customer_name;
     if (this.f.claim_no.value) query.claim_no = this.f.claim_no.value;
     if (this.f.third_party_name.value)
       query.third_party_name = this.f.third_party_name.value;
-    if (this.f.product.value) query.product = this.f.product.value.item_name;
+    if (this.f.product.value) query.item_name = this.f.product.value.item_name;
     if (this.claim_status) query.claim_status = this.claim_status;
     if (this.f.claim_type.value) query.claim_type = this.f.claim_type.value;
     if (this.f.territory.value) query.receiving_branch = this.f.territory.value;
