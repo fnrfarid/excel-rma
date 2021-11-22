@@ -284,7 +284,7 @@ export class AddWarrantyClaimPage implements OnInit {
       payload.bulk_products = this.bulkProducts;
       payload.category = this.warrantyObject.category;
       payload.set = this.warrantyObject.set;
-      payload.claim_status = 'Draft';
+      payload.subclaim_state = 'Draft';
     }
     this.addWarrantyService.updateWarrantyClaim(payload).subscribe({
       next: () => {
