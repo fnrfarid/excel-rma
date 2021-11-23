@@ -133,18 +133,21 @@
           <mat-header-cell *matHeaderCellDef>Submit</mat-header-cell>
           <mat-cell *matCellDef="let row; let i = index">
             <ion-text
+            *ngIf="row.docstatus !=0"
               [ngStyle]="{
                 color: row.docstatus === 1 ? '#4d2500' : 'red'
               }"
             >
               {{
-                row.docstatus === 0 ? 'Not Submitted' : 
+                row.docstatus === 0 ? 'Draft' : 
                 row.docstatus === 1 ? 'Submitted' : 'Canceled'
               }}
             </ion-text>
+            <button mat-raised-button color="primary" *ngIf="row.docstatus ===0" (click)="submitInvoice(row.invoice_no)">Submit</button>
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         </ng-container>
+        
 
         <mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"

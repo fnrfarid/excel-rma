@@ -150,6 +150,27 @@ export class ServiceInvoiceAggregateService extends AggregateRoot {
     this.apply(new ServiceInvoiceUpdatedEvent(update));
   }
 
+  submitErpInvoice(invoice_no: string, clientHttpRequest) {
+    return this.settings.find().pipe(
+      switchMap(settings => {
+        const URL = `${settings.authServerURL}${FRAPPE_API_SALES_INVOICE_ENDPOINT}/${invoice_no}`;
+        const body = { docstatus: 1 };
+        return this.http.put(URL, JSON.stringify(body), {
+          headers: {
+            [AUTHORIZATION]:
+              BEARER_HEADER_VALUE_PREFIX + clientHttpRequest.token.accessToken,
+            [CONTENT_TYPE]: APPLICATION_JSON_CONTENT_TYPE,
+            [ACCEPT]: APPLICATION_JSON_CONTENT_TYPE,
+          },
+        });
+      }),
+      map(data => data.data.data),
+      switchMap(() => {
+        return this.updateDocStatus(invoice_no);
+      }),
+    );
+  }
+
   updateDocStatus(invoice_no: string) {
     return forkJoin({
       headers: this.clientToken.getServiceAccountApiHeaders(),

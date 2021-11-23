@@ -93,4 +93,11 @@ export class ServiceInvoiceController {
   updateDocStatus(@Param('invoice_no') invoice_no: string) {
     return this.serviceInvoiceAggregate.updateDocStatus(invoice_no);
   }
+
+  @Post('v1/submit/:invoice_no')
+  @UseGuards(TokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  submitInvoice(@Param('invoice_no') invoice_no: string, @Req() req) {
+    return this.serviceInvoiceAggregate.submitErpInvoice(invoice_no, req);
+  }
 }

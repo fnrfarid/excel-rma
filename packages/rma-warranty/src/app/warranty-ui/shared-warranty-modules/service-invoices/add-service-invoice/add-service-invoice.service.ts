@@ -15,6 +15,7 @@ import {
   RELAY_GET_FULL_ITEM_ENDPOINT,
   LIST_CUSTOMER_ENDPOINT,
   UPDATE_DOCSTATUS_ENDPOINT,
+  SUBMIT_SERVICE_INVOICE_ENDPOINT,
 } from '../../../../constants/url-strings';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { APIResponse } from '../../../../common/interfaces/sales.interface';
@@ -251,6 +252,21 @@ export class AddServiceInvoiceService {
         return this.http.post<ServiceInvoiceDetails>(
           url,
           serviceInvoiceDetails,
+          {
+            headers,
+          },
+        );
+      }),
+    );
+  }
+
+  submitServiceInvoice(invoice_no: string) {
+    const url = `${SUBMIT_SERVICE_INVOICE_ENDPOINT}/${invoice_no}`;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post<ServiceInvoiceDetails>(
+          url,
+          {},
           {
             headers,
           },
