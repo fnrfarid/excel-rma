@@ -280,7 +280,7 @@ export class AddWarrantyClaimPage implements OnInit {
     const loading = await this.loadingController.create();
     await loading.present();
     const payload = this.mapUpdateClaim();
-    if (this.warrantyObject.category === CATEGORY.BULK) {
+    if (this.warrantyObject.set === CATEGORY.BULK) {
       payload.bulk_products = this.bulkProducts;
       payload.category = this.warrantyObject.category;
       payload.set = this.warrantyObject.set;
