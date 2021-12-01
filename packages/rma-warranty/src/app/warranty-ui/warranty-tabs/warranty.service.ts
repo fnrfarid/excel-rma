@@ -288,24 +288,24 @@ export class WarrantyService {
       });
   }
 
-  getAllBulkClaims(warrantyDetail: WarrantyClaimsDetails) {
+  getAllSubClaims(warrantyDetail: WarrantyClaimsDetails) {
     return this.getWarrantyClaimsList(
-      undefined,
+      { createdOn: 'asc' },
       undefined,
       undefined,
       { parent: warrantyDetail.uuid },
       {
-        set: ['Part'],
+        set: [CATEGORY.PART],
       },
     ).pipe(
       switchMap(res => {
         return this.getWarrantyClaimsList(
-          undefined,
+          { createdOn: 'asc' },
           undefined,
           res.length,
           { parent: warrantyDetail.uuid },
           {
-            set: ['Part'],
+            set: [CATEGORY.PART],
           },
         );
       }),
@@ -315,7 +315,7 @@ export class WarrantyService {
 
   mapWarrantyItems(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.set === CATEGORY.BULK) {
-      return this.getAllBulkClaims(warrantyDetail).pipe(
+      return this.getAllSubClaims(warrantyDetail).pipe(
         switchMap((res: WarrantyClaimsDetails[]) => {
           return from(res).pipe(
             filter(
@@ -407,7 +407,7 @@ export class WarrantyService {
 
   mapBulkServiceInvoice(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.set === CATEGORY.BULK) {
-      return this.getAllBulkClaims(warrantyDetail).pipe(
+      return this.getAllSubClaims(warrantyDetail).pipe(
         switchMap(res => {
           return from(res).pipe(
             filter(
@@ -458,7 +458,7 @@ export class WarrantyService {
 
   mapBulkDeliveryNotes(warrantyDetail: WarrantyClaimsDetails) {
     if (warrantyDetail.set === CATEGORY.BULK) {
-      return this.getAllBulkClaims(warrantyDetail).pipe(
+      return this.getAllSubClaims(warrantyDetail).pipe(
         switchMap(res => {
           return from(res).pipe(
             filter(
@@ -491,6 +491,7 @@ export class WarrantyService {
       claim_no: warrantyDetail.claim_no,
       item_name: warrantyDetail.item_name,
       serial_no: warrantyDetail.serial_no,
+      third_party_name: warrantyDetail.third_party_name,
       warranty_end_date: warrantyDetail.warranty_end_date
         ? warrantyDetail.warranty_end_date.toString().split('T')[0]
         : '',
@@ -568,6 +569,11 @@ export class WarrantyService {
         erpBody.items = JSON.stringify([
           ...mappedWarrantyDetails.mappedWarrantyItemsPayload,
         ]);
+        erpBody.third_party_name = mappedWarrantyDetails.mappedWarrantyItemsPayload.find(
+          res => {
+            return res;
+          },
+        ).third_party_name;
         return this.singleInvoiceMap(
           mappedWarrantyDetails.serviceInvoice.docs,
         ).pipe(
