@@ -125,7 +125,6 @@ export enum CLAIM_STATUS {
 export enum CATEGORY {
   BULK = 'Bulk',
   SINGLE = 'Single',
-  PART = 'Part',
 }
 
 export const SERVICE_INVOICE_DOWNLOAD_HEADERS = [

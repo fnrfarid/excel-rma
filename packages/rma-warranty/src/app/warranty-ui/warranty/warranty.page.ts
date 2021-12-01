@@ -264,7 +264,7 @@ export class WarrantyPage implements OnInit {
 
     this.dataSource.loadItems(this.sortQuery, undefined, undefined, query, {
       territory: this.territoryList,
-      set: [CATEGORY.BULK, CATEGORY.SINGLE, CATEGORY.PART],
+      set: [CATEGORY.BULK, CATEGORY.SINGLE, 'Part'],
     });
 
     this.getUpdate();
@@ -347,7 +347,7 @@ export class WarrantyPage implements OnInit {
       { parent: row.uuid },
       {
         territory: this.territoryList,
-        set: [CATEGORY.PART],
+        set: ['Part'],
       },
     );
   }
