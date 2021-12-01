@@ -8,8 +8,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { PERMISSION_STATE } from '../../../constants/permission-roles';
 import { filter } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { DURATION } from '../../../constants/app-string';
 
 @Component({
   selector: 'service-invoices',
@@ -43,12 +41,13 @@ export class ServiceInvoicesComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly serviceInvoice: AddServiceInvoiceService,
     private readonly router: Router,
-    private readonly snackbar: MatSnackBar,
   ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(val => {
-        this.dataSource.loadItems(this.route.snapshot.params.uuid);
+        this.dataSource.loadItems({
+          warrantyClaimUuid: this.route.snapshot.params.uuid,
+        });
         this.getTotal();
       });
   }
@@ -85,26 +84,6 @@ export class ServiceInvoicesComponent implements OnInit {
       event.pageIndex,
       event.pageSize,
     );
-  }
-
-  submitInvoice(inovoice_no: string) {
-    this.serviceInvoice.submitServiceInvoice(inovoice_no).subscribe({
-      next: nxt => {
-        this.dataSource.loadItems({ warrantyClaimUuid: this.invoiceUuid });
-        this.snackbar.open(`Service Invoice Submitted Succefully`, 'Close', {
-          duration: DURATION,
-        });
-      },
-      error: err => {
-        this.snackbar.open(
-          err.error.message
-            ? err.error.message
-            : `Failed to Submit Invoice Check on Erp to ensure its submitted`,
-          'Close',
-          { duration: DURATION },
-        );
-      },
-    });
   }
 
   getTotal() {
