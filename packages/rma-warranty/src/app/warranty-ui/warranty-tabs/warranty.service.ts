@@ -574,6 +574,11 @@ export class WarrantyService {
             return res;
           },
         ).third_party_name;
+        erpBody.remarks = mappedWarrantyDetails.mappedWarrantyItemsPayload.find(
+          res => {
+            return res;
+          },
+        ).remarks;
         return this.singleInvoiceMap(
           mappedWarrantyDetails.serviceInvoice.docs,
         ).pipe(
