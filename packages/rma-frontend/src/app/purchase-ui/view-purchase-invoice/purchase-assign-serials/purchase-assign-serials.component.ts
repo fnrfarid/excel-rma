@@ -480,7 +480,16 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       });
       return false;
     }
+    let serial_no_array = [];
     for (const item of data) {
+      serial_no_array = [...serial_no_array, ...item.serial_no];
+      if (this.checkIfDuplicateExists(serial_no_array)) {
+        isValid = false;
+        this.snackBar.open('Found Duplicate Serial.', CLOSE, {
+          duration: 3000,
+        });
+        break;
+      }
       index++;
       if (
         !item.serial_no ||
@@ -495,6 +504,10 @@ export class PurchaseAssignSerialsComponent implements OnInit {
       }
     }
     return isValid;
+  }
+
+  checkIfDuplicateExists(arr) {
+    return new Set(arr).size !== arr.length;
   }
 
   async getWarrantyDate(purchaseWarrantyMonths: number) {

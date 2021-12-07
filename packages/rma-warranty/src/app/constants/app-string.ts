@@ -22,6 +22,12 @@ export const PURCHASE_USER = 'Purchase User';
 export const EXCEL_SALES_MANAGER = 'Excel Sales Manager';
 export const EXCEL_SALES_USER = 'Excel Sales User';
 export const EXCEL_WARRANTY_PRINT = 'Excel Warranty Print';
+export const SUBMIT_STATUS = {
+  SUBMITTED: 'Submitted',
+  NOT_SUBMITTED: 'Not Submitted',
+  CANCELED: 'Canceled',
+  NOT_AVAILABLE: 'Status not available',
+};
 export const SERVICE_INVOICE_STATUS = {
   SUBMITTED: 'Submitted',
   PAID: 'Paid',
@@ -119,6 +125,7 @@ export enum CLAIM_STATUS {
 export enum CATEGORY {
   BULK = 'Bulk',
   SINGLE = 'Single',
+  PART = 'Part',
 }
 
 export const SERVICE_INVOICE_DOWNLOAD_HEADERS = [
