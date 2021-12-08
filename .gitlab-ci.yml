@@ -13,14 +13,14 @@ test_rma_frontend:
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
-      - packages/rma-pos/node_modules/
+      - packages/rma-frontend/node_modules/
   only:
     changes:
-      - packages/rma-pos/**/*
+      - packages/rma-frontend/**/*
     refs:
       - merge_requests
   before_script:
-    - cd packages/rma-pos
+    - cd packages/rma-frontend
     - npm install
   script:
     # set env variable for test
@@ -36,20 +36,20 @@ test_rma_frontend:
   tags:
     - docker
 
-test_rma_mobile:
+test_rma_pos:
   image: registry.gitlab.com/castlecraft/docker-craft/node-16-headless-chrome:latest
   stage: tests
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
-      - packages/rma-mobile/node_modules/
+      - packages/rma-pos/node_modules/
   only:
     changes:
-      - packages/rma-mobile/**/*
+      - packages/rma-pos/**/*
     refs:
       - merge_requests
   before_script:
-    - cd packages/rma-mobile
+    - cd packages/rma-pos
     - npm install
   script:
     # Check Code Quality
@@ -144,13 +144,13 @@ pack_rma_frontend_staging:
     refs:
       - develop
     changes:
-      - packages/rma-pos/**/*
+      - packages/rma-frontend/**/*
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
-    - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-pos packages/rma-pos
-    - docker tag rma-pos $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-pos:latest
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-pos:latest
+    - docker build --cache-from $CI_REGISTRY_IMAGE:latest -t rma-frontend packages/rma-frontend
+    - docker tag rma-frontend $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:latest
 
 pack_rma_warranty_staging:
   image: docker
@@ -174,7 +174,7 @@ deploy_staging_frontend:
     refs:
       - develop
     changes:
-      - packages/rma-pos/**/*
+      - packages/rma-frontend/**/*
   before_script:
     - apk add curl bash
   script:
@@ -229,14 +229,14 @@ pack_rma_frontend_prod:
     refs:
       - master
     changes:
-      - packages/rma-pos/**/*
+      - packages/rma-frontend/**/*
   before_script:
     - apk add git
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   script:
-    - export VERSION=$(git tag --list "rma-pos@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
-    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-pos:$VERSION packages/rma-pos
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-pos:$VERSION
+    - export VERSION=$(git tag --list "rma-frontend@*" --sort=-version:refname | sed -n 1p | sed -e 's#.*@\(\)#\1#')
+    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION packages/rma-frontend
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/excel-rma/rma-frontend:$VERSION
 
 pack_rma_warranty_prod:
   image: docker

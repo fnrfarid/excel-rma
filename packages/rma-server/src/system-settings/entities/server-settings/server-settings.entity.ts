@@ -15,7 +15,7 @@ export class ServerSettings extends BaseEntity {
 
   @Column()
   warrantyAppURL: string;
-  
+
   @Column()
   posAppURL: string;
 
