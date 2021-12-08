@@ -36,20 +36,20 @@ test_rma_frontend:
   tags:
     - docker
 
-test_rma_mobile:
+test_rma_pos:
   image: registry.gitlab.com/castlecraft/docker-craft/node-16-headless-chrome:latest
   stage: tests
   cache:
     key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
     paths:
-      - packages/rma-mobile/node_modules/
+      - packages/rma-pos/node_modules/
   only:
     changes:
-      - packages/rma-mobile/**/*
+      - packages/rma-pos/**/*
     refs:
       - merge_requests
   before_script:
-    - cd packages/rma-mobile
+    - cd packages/rma-pos
     - npm install
   script:
     # Check Code Quality
