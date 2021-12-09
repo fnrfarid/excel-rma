@@ -119,8 +119,32 @@ export class WarrantyClaimService {
       };
     }
 
+    let deliveryQuery = {};
+    if (filter_query?.delivery_status) {
+      deliveryQuery = {
+        status_history: {
+          $elemMatch: { delivery_status: filter_query?.delivery_status },
+        },
+      };
+    }
+
+    const $or: any[] = [
+      {
+        'status_history.transfer_branch': {
+          $in: [filter_query?.territory],
+        },
+      },
+      {
+        'status_history.status_from': {
+          $in: [filter_query?.territory],
+        },
+      },
+    ];
+
     const $and: any[] = [
+      filter_query.territory ? { $or } : {},
       filter_query ? this.getReportFilterQuery(filter_query) : {},
+      deliveryQuery,
       dateQuery,
     ];
 
@@ -140,7 +164,12 @@ export class WarrantyClaimService {
     const keys = Object.keys(query);
     keys.forEach(key => {
       if (query[key]) {
-        if (key === 'fromDate' || key === 'toDate') {
+        if (
+          key === 'fromDate' ||
+          key === 'toDate' ||
+          key === 'delivery_status' ||
+          key === 'territory'
+        ) {
           delete query[key];
         }
       } else {
