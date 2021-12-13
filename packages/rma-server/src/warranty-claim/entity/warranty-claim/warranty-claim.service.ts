@@ -218,6 +218,12 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.updateMany(query, options);
   }
 
+  async findAndModify(query, params) {
+    return await this.warrantyClaimRepository.findOneAndUpdate(query, params, {
+      sort: { 'timeStamp.created_no': 1 },
+    });
+  }
+
   async insertMany(query, options?) {
     return await this.warrantyClaimRepository.insertMany(query, options);
   }
