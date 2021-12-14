@@ -132,7 +132,7 @@ export class SalesInvoice extends BaseEntity {
   payment_schedule: [];
 
   @Column()
-  payments: [];
+  payments: Payments[];
 
   @Column()
   sales_team: [];
@@ -178,6 +178,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   transactionLock: number;
+
+  @Column()
+  is_pos: boolean;
 }
 
 export class Tax {
@@ -201,4 +204,10 @@ export class Item {
   qty: number;
   rate: number;
   amount: number;
+}
+
+export class Payments {
+  mode_of_payment?: string;
+  default?: boolean;
+  amount?: number;
 }

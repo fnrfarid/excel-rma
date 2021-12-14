@@ -39,9 +39,7 @@
     <ion-card>
       <ion-card-header>
         <ion-card-title>
-          <ion-text color="tertiary">
-            Details
-          </ion-text>
+          <ion-text color="tertiary"> Details </ion-text>
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
@@ -95,13 +93,11 @@
                     [value]="option"
                   >
                     {{ option.customer_name }}
-                    <small class="text-muted">
-                      {{ option.name}}
-                    </small>
+                    <small class="text-muted"> {{ option.name}} </small>
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.customer.hasError('falseValse')">
-                  You should select a value from dropdown only. 
+                  You should select a value from dropdown only.
                   <strong>'{{f.customer.value}}'</strong> is not allowed.
                 </mat-error>
                 <mat-error *ngIf="f.customer.hasError('required')">
@@ -159,7 +155,7 @@
                   Warehouse is <strong>required</strong>
                 </mat-error>
                 <mat-error *ngIf="f.warehouse.hasError('falseValse')">
-                  You should select a value from dropdown only. 
+                  You should select a value from dropdown only.
                   <strong>'{{f.warehouse.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
@@ -249,7 +245,7 @@
                   </mat-option>
                 </mat-autocomplete>
                 <mat-error *ngIf="f.territory.hasError('falseValse')">
-                  You should select a value from dropdown only. 
+                  You should select a value from dropdown only.
                   <strong>'{{f.territory.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
@@ -258,19 +254,16 @@
         </ion-grid>
       </ion-card-content>
     </ion-card>
-  </form>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-row class="align">
-        <ion-col>
-          <ion-card-title>
-            <ion-text color="tertiary">
-              Payment Method
-            </ion-text>
-          </ion-card-title>
-        </ion-col>
-        <!-- <ion-col class="ion-text-right" size="auto">
+    <ion-card>
+      <ion-card-header>
+        <ion-row class="align">
+          <ion-col>
+            <ion-card-title>
+              <ion-text color="tertiary"> Payment Method </ion-text>
+            </ion-card-title>
+          </ion-col>
+          <!-- <ion-col class="ion-text-right" size="auto">
           <ion-button
             color="tertiary"
             fill="outline"
@@ -283,15 +276,47 @@
             Add
           </ion-button>
         </ion-col> -->
-      </ion-row>
-    </ion-card-header>
-    <ion-card-content class="ion-no-padding">
-      <ion-card-title>
+        </ion-row>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="ion-no-padding">
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Mode of Payment"
+                  matInput
+                  formControlName="modeOfPayment"
+                  (focusout)="validateInput(f.modeOfPayment, filteredModeOfPaymentList)"
+                  [matAutocomplete]="payment"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #payment="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let payment of filteredModeOfPaymentList | async"
+                    [value]="payment.name"
+                  >
+                    {{ payment.name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.modeOfPayment.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.modeOfPayment.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col></ion-row
+          ></ion-grid
+        >
+        <!-- <ion-card-title>
         <ion-text color="danger">
           Coming Soon...  ;)
         </ion-text>
-      </ion-card-title>
-      <!-- <ion-item lines="none">
+      </ion-card-title> -->
+        <!-- <ion-item lines="none">
         <mat-table #table [dataSource]="dataSource" style="width: 100%;">
           <ng-container matColumnDef="item">
             <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
@@ -422,17 +447,16 @@
           ></mat-footer-row>
         </mat-table>
       </ion-item> -->
-    </ion-card-content>
-  </ion-card>
+      </ion-card-content>
+    </ion-card>
+  </form>
 
   <ion-card>
     <ion-card-header>
       <ion-row class="align">
         <ion-col>
           <ion-card-title>
-            <ion-text color="tertiary">
-              Items
-            </ion-text>
+            <ion-text color="tertiary"> Items </ion-text>
           </ion-card-title>
         </ion-col>
         <ion-col class="ion-text-right" size="auto">
@@ -452,7 +476,7 @@
     </ion-card-header>
     <ion-card-content class="ion-no-padding">
       <ion-item lines="none">
-        <mat-table #table [dataSource]="dataSource" style="width: 100%;">
+        <mat-table #table [dataSource]="dataSource" style="width: 100%">
           <ng-container matColumnDef="item">
             <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
             <mat-cell
@@ -476,7 +500,7 @@
                 (closed)="updateItem(row,i,$event)"
               >
                 <inline-edit
-                  style="width: 400px !important;"
+                  style="width: 400px !important"
                   [value]="row.item_name"
                   column="item"
                   [minimumPrice]="row.minimumPrice"
@@ -487,8 +511,11 @@
           </ng-container>
           <ng-container matColumnDef="stock">
             <mat-header-cell *matHeaderCellDef>Available Stock</mat-header-cell>
-            <mat-cell *matCellDef="let row" [ngStyle]="{'color': row.stock > 0 ? 'green' : 'red'}">
-              {{ row.stock  }}
+            <mat-cell
+              *matCellDef="let row"
+              [ngStyle]="{'color': row.stock > 0 ? 'green' : 'red'}"
+            >
+              {{ row.stock }}
             </mat-cell>
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
           </ng-container>
@@ -501,9 +528,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container>
-                {{row.qty}}
-              </ng-container>
+              <ng-container> {{row.qty}} </ng-container>
 
               <sat-popover
                 #p
@@ -530,9 +555,7 @@
               (keyup.enter)="p.open()"
               (click)="p.open()"
             >
-              <ng-container>
-                {{row.rate}}
-              </ng-container>
+              <ng-container> {{row.rate}} </ng-container>
               <sat-popover
                 #p
                 hasBackdrop
@@ -588,9 +611,7 @@
   <ion-card>
     <ion-card-header>
       <ion-card-title>
-        <ion-text color="tertiary">
-          Address
-        </ion-text>
+        <ion-text color="tertiary"> Address </ion-text>
       </ion-card-title>
     </ion-card-header>
     <ion-card-content

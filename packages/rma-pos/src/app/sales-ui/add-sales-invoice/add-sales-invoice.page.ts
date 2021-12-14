@@ -20,7 +20,10 @@ import { Location } from '@angular/common';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
-import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
+import {
+  Payments,
+  SalesInvoiceDetails,
+} from '../view-sales-invoice/details/details.component';
 import {
   DEFAULT_COMPANY,
   ACCESS_TOKEN,
@@ -82,6 +85,7 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoiceForm: FormGroup;
   itemsControl: FormArray;
   validateInput: any = ValidateInputSelected;
+  filteredModeOfPaymentList: Observable<any[]>;
 
   get f() {
     return this.salesInvoiceForm.controls;
@@ -181,6 +185,17 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
+    this.filteredModeOfPaymentList = this.salesInvoiceForm
+      .get('modeOfPayment')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getModeOfPayment([
+            ['name', 'like', `%${value}%`],
+          ]);
+        }),
+      );
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe({
@@ -224,6 +239,7 @@ export class AddSalesInvoicePage implements OnInit {
         remarks: new FormControl(''),
         items: new FormArray([], this.itemValidator),
         total: new FormControl(0),
+        modeOfPayment: new FormControl('', [Validators.required]),
       },
       {
         validators: [this.dueDateValidator, this.creditLimitValidator],
@@ -441,6 +457,16 @@ export class AddSalesInvoicePage implements OnInit {
       salesInvoiceDetails.delivery_warehouse = this.salesInvoiceForm.get(
         'warehouse',
       ).value;
+
+      salesInvoiceDetails.is_pos = true;
+      const paymentDetails: Payments[] = [];
+      paymentDetails.push({
+        mode_of_payment: this.salesInvoiceForm.get('modeOfPayment').value,
+        default: true,
+        amount: this.f.total.value,
+      });
+      salesInvoiceDetails.payments = paymentDetails;
+
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;
