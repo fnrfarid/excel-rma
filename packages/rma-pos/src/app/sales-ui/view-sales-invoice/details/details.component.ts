@@ -296,8 +296,15 @@ export class SalesInvoiceDetails {
   remarks?: string;
   sales_team?: any[];
   delivery_status: string;
+  payments?: Payments[];
+  is_pos?: boolean;
 }
 
+export class Payments {
+  mode_of_payment?: string;
+  default?: boolean;
+  amount?: number;
+}
 export class SalesInvoiceItem {
   item_code: string;
   item_name: string;

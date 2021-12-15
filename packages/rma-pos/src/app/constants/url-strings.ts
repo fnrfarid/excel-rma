@@ -40,6 +40,8 @@ export const RELAY_GET_ITEM_BRAND_ENDPOINT =
   '/api/command/user/api/resource/Brand';
 export const RELAY_GET_DELIVERY_NOTE_ENDPOINT =
   '/api/command/user/api/resource/Delivery Note';
+export const RELAY_GET_MODE_OF_PAYMENT_ENDPOINT =
+  '/api/command/user/api/resource/Mode of Payment';
 export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
   '/api/command/user/api/method/erpnext.stock.utils.get_stock_balance';
 export const RELAY_GET_DATE_WISE_STOCK_BALANCE_ENDPOINT =

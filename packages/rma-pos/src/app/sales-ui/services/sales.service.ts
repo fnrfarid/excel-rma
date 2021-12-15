@@ -54,6 +54,7 @@ import {
   UPDATE_DELIVERY_STATUS_ENDPOINT,
   UPDATE_SALES_INVOICE_ITEM_MRP,
   RELAY_LIST_SALES_RETURN_ENDPOINT,
+  RELAY_GET_MODE_OF_PAYMENT_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -469,6 +470,18 @@ export class SalesService {
         return this.http.post<any>(url, body, { headers });
       }),
       map(data => data.message),
+    );
+  }
+
+  getModeOfPayment(filters = []): Observable<any> {
+    const url = RELAY_GET_MODE_OF_PAYMENT_ENDPOINT;
+    const params = new HttpParams().set('filters', JSON.stringify(filters));
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http
+          .get<any>(url, { params, headers })
+          .pipe(map(res => res.data));
+      }),
     );
   }
 
