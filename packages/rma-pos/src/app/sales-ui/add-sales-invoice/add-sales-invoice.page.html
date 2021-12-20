@@ -286,6 +286,35 @@
                 <input
                   required
                   type="text"
+                  placeholder="POS Profile"
+                  matInput
+                  formControlName="posProfile"
+                  (focusout)="validateInput(f.posProfile, filteredPosProfileList)"
+                  [matAutocomplete]="profile"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #profile="matAutocomplete"
+                  [displayWith]="displayPosProfileName"
+                >
+                  <mat-option
+                    *ngFor="let profile of filteredPosProfileList | async"
+                    [value]="profile"
+                  >
+                    {{ profile.name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.posProfile.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.posProfile.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
                   placeholder="Mode of Payment"
                   matInput
                   formControlName="modeOfPayment"
@@ -308,8 +337,8 @@
                   <strong>'{{f.modeOfPayment.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
-            </ion-col></ion-row
-          ></ion-grid
+            </ion-col>
+          </ion-row></ion-grid
         >
         <!-- <ion-card-title>
         <ion-text color="danger">

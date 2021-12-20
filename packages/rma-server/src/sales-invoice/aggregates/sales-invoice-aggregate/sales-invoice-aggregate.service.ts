@@ -386,6 +386,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
       payments: salesInvoice.payments,
       sales_team: salesInvoice.sales_team,
       remarks: salesInvoice.remarks,
+      is_pos: salesInvoice.is_pos,
     };
   }
 

@@ -141,6 +141,10 @@ export class SalesInvoiceDto {
 
   @IsOptional()
   is_pos: boolean;
+
+  @IsOptional()
+  @IsString()
+  pos_profile: string;
 }
 
 export class TaxDto {
@@ -227,6 +231,10 @@ export class PaymentsDto {
   @IsOptional()
   @IsBoolean()
   default?: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  account: string;
 }
 
 export class MRPRateUpdateInterface {

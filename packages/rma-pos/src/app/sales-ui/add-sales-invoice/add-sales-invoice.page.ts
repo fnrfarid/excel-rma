@@ -86,6 +86,7 @@ export class AddSalesInvoicePage implements OnInit {
   itemsControl: FormArray;
   validateInput: any = ValidateInputSelected;
   filteredModeOfPaymentList: Observable<any[]>;
+  filteredPosProfileList: Observable<any[]>;
 
   get f() {
     return this.salesInvoiceForm.controls;
@@ -196,6 +197,17 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
+    this.filteredPosProfileList = this.salesInvoiceForm
+      .get('posProfile')
+      .valueChanges.pipe(
+        startWith(''),
+        switchMap(value => {
+          return this.salesService.getPosProfile([
+            ['name', 'like', `%${value}%`],
+          ]);
+        }),
+      );
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe({
@@ -240,6 +252,7 @@ export class AddSalesInvoicePage implements OnInit {
         items: new FormArray([], this.itemValidator),
         total: new FormControl(0),
         modeOfPayment: new FormControl('', [Validators.required]),
+        posProfile: new FormControl('', [Validators.required]),
       },
       {
         validators: [this.dueDateValidator, this.creditLimitValidator],
@@ -464,9 +477,13 @@ export class AddSalesInvoicePage implements OnInit {
         mode_of_payment: this.salesInvoiceForm.get('modeOfPayment').value,
         default: true,
         amount: this.f.total.value,
+        account: this.salesInvoiceForm.get('posProfile').value
+          .account_for_change_amount,
       });
       salesInvoiceDetails.payments = paymentDetails;
-
+      salesInvoiceDetails.pos_profile = this.salesInvoiceForm.get(
+        'posProfile',
+      ).value.name;
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;
@@ -749,5 +766,9 @@ export class AddSalesInvoicePage implements OnInit {
           this.snackbar.open(frappeError, CLOSE, { duration: SHORT_DURATION });
         },
       });
+  }
+
+  displayPosProfileName(option) {
+    return option.name;
   }
 }
