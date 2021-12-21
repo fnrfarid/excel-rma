@@ -181,6 +181,9 @@ export class SalesInvoice extends BaseEntity {
 
   @Column()
   is_pos: boolean;
+
+  @Column()
+  pos_profile: string;
 }
 
 export class Tax {
@@ -210,4 +213,5 @@ export class Payments {
   mode_of_payment?: string;
   default?: boolean;
   amount?: number;
+  account?: string;
 }

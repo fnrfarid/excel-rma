@@ -52,6 +52,7 @@ describe('AddSalesInvoicePage', () => {
             getCustomerList: (...args) => of([]),
             getWarehouseList: (...args) => of([]),
             getModeOfPayment: (...args) => of([]),
+            getPosProfile: (...args) => of([]),
             getStore: () => ({
               getItem: (...args) => Promise.resolve('Item'),
               getItems: (...args) => Promise.resolve({}),

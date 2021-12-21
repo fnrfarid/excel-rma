@@ -298,12 +298,14 @@ export class SalesInvoiceDetails {
   delivery_status: string;
   payments?: Payments[];
   is_pos?: boolean;
+  pos_profile?: string;
 }
 
 export class Payments {
   mode_of_payment?: string;
   default?: boolean;
   amount?: number;
+  account?: string;
 }
 export class SalesInvoiceItem {
   item_code: string;
