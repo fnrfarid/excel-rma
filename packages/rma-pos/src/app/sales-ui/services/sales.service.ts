@@ -56,6 +56,7 @@ import {
   RELAY_LIST_SALES_RETURN_ENDPOINT,
   RELAY_GET_MODE_OF_PAYMENT_ENDPOINT,
   RELAY_GET_POS_PROFILE_ENDPOINT,
+  ERPNEXT_POS_PROFILE_ENDPOINT,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -495,6 +496,18 @@ export class SalesService {
       switchMap(headers => {
         return this.http
           .get<any>(url, { params, headers })
+          .pipe(map(res => res.data));
+      }),
+    );
+  }
+
+  getPosProfileById(uuid: string) {
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http
+          .get<{ data: unknown[] }>(ERPNEXT_POS_PROFILE_ENDPOINT + '/' + uuid, {
+            headers,
+          })
           .pipe(map(res => res.data));
       }),
     );

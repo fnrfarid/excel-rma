@@ -112,7 +112,7 @@ export class AddSalesInvoicePage implements OnInit {
     if (this.calledFrom === 'edit') {
       this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
       this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
-        next: (res: SalesInvoiceDetails) => {
+        next: async (res: SalesInvoiceDetails) => {
           this.salesInvoiceForm.get('company').setValue(res.company);
           this.salesInvoiceForm.get('territory').setValue(res.territory);
           this.salesInvoiceForm.get('customer').setValue({
@@ -124,6 +124,20 @@ export class AddSalesInvoicePage implements OnInit {
             .get('postingDate')
             .setValue(new Date(res.posting_date));
           this.salesInvoiceForm.get('dueDate').setValue(new Date(res.due_date));
+
+          this.salesInvoiceForm.get('modeOfPayment').setValue(
+            res.payments.find(x => {
+              return x;
+            }).mode_of_payment,
+          );
+          this.salesInvoiceForm
+            .get('posProfile')
+            .setValue(
+              await this.salesService
+                .getPosProfileById(res.pos_profile)
+                .toPromise(),
+            );
+
           this.dataSource.loadItems(res.items);
           res.items.forEach(item => {
             this.itemsControl.push(new FormControl(item));
@@ -577,6 +591,20 @@ export class AddSalesInvoicePage implements OnInit {
       ).value;
       salesInvoiceDetails.status = DRAFT;
       salesInvoiceDetails.remarks = this.salesInvoiceForm.get('remarks').value;
+
+      salesInvoiceDetails.is_pos = true;
+      const paymentDetails: Payments[] = [];
+      paymentDetails.push({
+        mode_of_payment: this.salesInvoiceForm.get('modeOfPayment').value,
+        default: true,
+        amount: this.f.total.value,
+        account: this.salesInvoiceForm.get('posProfile').value
+          .account_for_change_amount,
+      });
+      salesInvoiceDetails.payments = paymentDetails;
+      salesInvoiceDetails.pos_profile = this.salesInvoiceForm.get(
+        'posProfile',
+      ).value.name;
 
       const itemList = this.dataSource.data().filter(item => {
         if (item.item_name !== '') {
