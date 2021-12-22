@@ -25,16 +25,22 @@ export class WarrantyClaimService {
   }
 
   async create(warrantyclaim: WarrantyClaim) {
-    warrantyclaim.claim_no = await this.generateNamingSeries(warrantyclaim.set);
-    const data = await this.warrantyClaimRepository
-      .insertOne(warrantyclaim)
-      .catch(err => {
-        return this.generateErrorNamingSeries(warrantyclaim.set).then(res => {
-          warrantyclaim.claim_no = res;
-          return this.warrantyClaimRepository.insertOne(warrantyclaim);
+    if (!['Bulk', 'Part'].includes(warrantyclaim.set)) {
+      warrantyclaim.claim_no = await this.generateNamingSeries(
+        warrantyclaim.set,
+      );
+      const data = await this.warrantyClaimRepository
+        .insertOne(warrantyclaim)
+        .catch(err => {
+          return this.generateErrorNamingSeries(warrantyclaim.set).then(res => {
+            warrantyclaim.claim_no = res;
+            return this.warrantyClaimRepository.insertOne(warrantyclaim);
+          });
         });
-      });
-    return data;
+      return data;
+    }
+    warrantyclaim.claim_no = warrantyclaim.uuid;
+    return this.warrantyClaimRepository.insertOne(warrantyclaim);
   }
 
   async findOne(param, options?) {
@@ -218,12 +224,6 @@ export class WarrantyClaimService {
     return await this.warrantyClaimRepository.updateMany(query, options);
   }
 
-  async findAndModify(query, params) {
-    return await this.warrantyClaimRepository.findOneAndUpdate(query, params, {
-      sort: { 'timeStamp.created_no': 1 },
-    });
-  }
-
   async insertMany(query, options?) {
     return await this.warrantyClaimRepository.insertMany(query, options);
   }
@@ -262,7 +262,12 @@ export class WarrantyClaimService {
         count = await this.asyncAggregate([
           {
             $match: {
-              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              $expr: {
+                $and: [
+                  { $eq: [{ $year: '$createdOn' }, date] },
+                  { $ne: ['$claim_no', '$uuid'] },
+                ],
+              },
               $or: [{ set: CATEGORY.SINGLE }, { set: CATEGORY.PART }],
             },
           },
@@ -295,7 +300,12 @@ export class WarrantyClaimService {
         lastCreatedClaim = await this.asyncAggregate([
           {
             $match: {
-              $expr: { $eq: [{ $year: '$createdOn' }, date] },
+              $expr: {
+                $and: [
+                  { $eq: [{ $year: '$createdOn' }, date] },
+                  { $ne: ['$claim_no', '$uuid'] },
+                ],
+              },
               $or: [{ set: CATEGORY.SINGLE }, { set: CATEGORY.PART }],
             },
           },
