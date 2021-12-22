@@ -16,14 +16,7 @@ import { WarrantyClaimRemovedEvent } from '../../event/warranty-claim-removed/wa
 import { WarrantyClaimUpdatedEvent } from '../../event/warranty-claim-updated/warranty-claim-updated.event';
 import { UpdateWarrantyClaimDto } from '../../entity/warranty-claim/update-warranty-claim-dto';
 import { from, throwError, of, forkJoin } from 'rxjs';
-import {
-  switchMap,
-  map,
-  concatMap,
-  toArray,
-  catchError,
-  finalize,
-} from 'rxjs/operators';
+import { switchMap, map, concatMap, toArray, catchError } from 'rxjs/operators';
 
 import {
   INVALID_FILE,
@@ -55,10 +48,7 @@ import {
 } from '../../../serial-no/entity/serial-no-history/serial-no-history.entity';
 import { POST_WARRANTY_PRINT_ENDPOINT } from '../../../constants/routes';
 import { WarrantyPrintDetails } from '../../../print/entities/print/print.dto';
-import {
-  lockDocumentTransaction,
-  unlockDocumentTransaction,
-} from '../../../constants/transaction-helper';
+
 @Injectable()
 export class WarrantyClaimAggregateService extends AggregateRoot {
   constructor(
@@ -345,65 +335,92 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       }),
       map(res => res.ops[0]),
       switchMap((bulkClaim: WarrantyClaimDto) => {
-        return lockDocumentTransaction(this.warrantyClaimService, {
-          uuid: bulk.uuid,
-        }).pipe(
-          switchMap(obj => {
-            return of(obj).pipe(
-              switchMap(() => {
-                bulk = bulkClaim;
-                return this.createBulkSingularClaims(
-                  bulkClaim,
-                  bulkClaim,
-                  clientHttpRequest,
-                );
+        bulk = bulkClaim;
+        return this.createBulkSingularClaims(
+          bulkClaim,
+          bulkClaim,
+          clientHttpRequest,
+        );
+      }),
+      switchMap(nxt => {
+        return from(
+          this.warrantyClaimService.find({
+            $or: [{ uuid: bulk.uuid }, { parent: bulk.uuid }],
+          }),
+        );
+      }),
+      switchMap((bulkClaims: WarrantyClaim[]) => {
+        return this.AssignNamingSeries(bulkClaims);
+      }),
+      switchMap(() => {
+        return of(true);
+      }),
+      catchError(err => {
+        let count;
+        return from(this.warrantyClaimService.find({ parent: bulk.uuid })).pipe(
+          switchMap(subClaimCount => {
+            count = subClaimCount.length;
+            return from(subClaimCount).pipe(
+              concatMap(Claim => {
+                return this.cancelWarrantyClaim({
+                  uuid: Claim.uuid,
+                  serial_no: Claim.serial_no,
+                  type: Claim.claim_type,
+                });
               }),
-              switchMap(nxt => {
-                return of(true);
+              toArray(),
+            );
+          }),
+          switchMap(() => {
+            return from(
+              this.warrantyClaimService.deleteMany({
+                $or: [{ parent: bulk.uuid }, { uuid: bulk.uuid }],
               }),
-              catchError(err => {
-                let count;
-                return from(
-                  this.warrantyClaimService.find({ parent: bulk.uuid }),
-                ).pipe(
-                  switchMap(subClaimCount => {
-                    count = subClaimCount.length;
-                    return from(subClaimCount).pipe(
-                      concatMap(Claim => {
-                        return this.cancelWarrantyClaim({
-                          uuid: Claim.uuid,
-                          serial_no: Claim.serial_no,
-                          type: Claim.claim_type,
-                        });
-                      }),
-                      toArray(),
-                    );
-                  }),
-                  switchMap(() => {
-                    return from(
-                      this.warrantyClaimService.deleteMany({
-                        $or: [{ parent: bulk.uuid }, { uuid: bulk.uuid }],
-                      }),
-                    );
-                  }),
-                  switchMap(() => {
-                    return throwError(
-                      new BadRequestException(
-                        `Claim No ${count + 1} Is Invalid.`,
-                      ),
-                    );
-                  }),
-                );
-              }),
-              finalize(() =>
-                unlockDocumentTransaction(this.warrantyClaimService, {
-                  uuid: bulkClaim.uuid,
-                }),
-              ),
+            );
+          }),
+          switchMap(() => {
+            return throwError(
+              new BadRequestException(`Claim No ${count + 1} Is Invalid.`),
             );
           }),
         );
       }),
+    );
+  }
+
+  AssignNamingSeries(bulkUuid: WarrantyClaim[]) {
+    return from(bulkUuid).pipe(
+      concatMap(draftClaim => {
+        return from(
+          this.warrantyClaimService.generateNamingSeries(draftClaim.set),
+        ).pipe(
+          switchMap((name: string) => {
+            return from(
+              this.warrantyClaimService.updateOne(
+                { uuid: draftClaim.uuid },
+                { $set: { claim_no: name } },
+              ),
+            );
+          }),
+          catchError(err => {
+            return from(
+              this.warrantyClaimService.generateErrorNamingSeries(
+                draftClaim.set,
+              ),
+            ).pipe(
+              switchMap((name: string) => {
+                return from(
+                  this.warrantyClaimService.updateOne(
+                    { uuid: draftClaim.uuid },
+                    { $set: { claim_no: name } },
+                  ),
+                );
+              }),
+            );
+          }),
+        );
+      }),
+      toArray(),
     );
   }
 
@@ -476,6 +493,17 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             { $unset: { subclaim_state: undefined } },
           ),
         );
+      }),
+      switchMap(() => {
+        return from(
+          this.warrantyClaimService.find({
+            parent: existingWarrantyClaim.uuid,
+            $expr: { $eq: ['$claim_no', '$uuid'] },
+          }),
+        );
+      }),
+      switchMap(draftSubClaim => {
+        return this.AssignNamingSeries(draftSubClaim);
       }),
       catchError(err => {
         let count;
