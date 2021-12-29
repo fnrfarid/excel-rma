@@ -197,6 +197,16 @@
           </ion-item>
         </ion-col>
       </ion-row>
+
+      <ion-row>
+        <ion-col>
+          <ion-button
+            color="primary"
+            [routerLink]="['/bulk-warranty-claim', claim_no, parent_uuid]"
+            >{{claim_no}}</ion-button
+          >
+        </ion-col>
+      </ion-row>
     </ion-grid>
   </ion-card-content>
 </ion-card>

@@ -56,9 +56,10 @@
               >{{ row.claim_no || 'Draft' }}</a
             >
             <a
-              *ngIf="row.set === 'Single' || row.set === 'Part'"
-              [routerLink]="['/warranty/view-warranty-claims', row.uuid]"
-              >{{ row.claim_no || 'Draft' }}</a
+            *ngIf="row.set === 'Single' || row.set === 'Part'"
+            [routerLink]="['/warranty/view-warranty-claims', row.uuid]"
+            [queryParams]="{'claim_no': claim_no, 'parent_uuid': uuid}"
+            >{{ row.claim_no || 'Draft' }}</a
             >
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>

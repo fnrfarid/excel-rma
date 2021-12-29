@@ -42,6 +42,8 @@ export class ClaimDetailsComponent implements OnInit {
   invoiceUuid: string;
   viewWArrantyClaimUrl: string;
   company: string;
+  claim_no: string;
+  parent_uuid: string;
   constructor(
     private readonly warrantyService: WarrantyService,
     private readonly snackBar: MatSnackBar,
@@ -52,6 +54,13 @@ export class ClaimDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.route.queryParams.subscribe({
+      next: params => {
+        this.claim_no = params?.claim_no;
+        this.parent_uuid = params?.parent_uuid;
+      },
+    });
+
     this.warrantyService
       .getStorage()
       .getItem(DEFAULT_COMPANY)
