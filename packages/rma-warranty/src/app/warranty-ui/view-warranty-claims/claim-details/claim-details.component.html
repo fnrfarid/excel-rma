@@ -201,9 +201,14 @@
       <ion-row>
         <ion-col>
           <ion-button
+            *ngIf="warrantyClaimsDetails.parent"
             color="primary"
-            [routerLink]="['/bulk-warranty-claim', claim_no, parent_uuid]"
-            >{{claim_no}}</ion-button
+            [routerLink]="[
+              '/bulk-warranty-claim',
+              warrantyClaimsDetails?.claim_no,
+              warrantyClaimsDetails?.parent
+            ]"
+            >{{ warrantyClaimsDetails?.claim_no }}</ion-button
           >
         </ion-col>
       </ion-row>

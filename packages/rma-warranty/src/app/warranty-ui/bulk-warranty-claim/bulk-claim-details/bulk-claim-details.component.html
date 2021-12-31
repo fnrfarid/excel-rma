@@ -8,7 +8,7 @@
       </ion-col>
       <ion-col class="ion-text-right">
         <ion-button
-        *ngIf="permissionState.warranty_claim.update && checkSubclaimStatus()"
+          *ngIf="permissionState.warranty_claim.update && checkSubclaimStatus()"
           color="tertiary"
           [disabled]="!dataSource.length"
           fill="outline"
@@ -17,7 +17,7 @@
           Edit
         </ion-button>
         <ion-button
-        *ngIf="permissionState.warranty_claim.read"
+          *ngIf="permissionState.warranty_claim.read"
           color="tertiary"
           [disabled]="!dataSource.length"
           (click)="openDialog()"
@@ -56,10 +56,9 @@
               >{{ row.claim_no || 'Draft' }}</a
             >
             <a
-            *ngIf="row.set === 'Single' || row.set === 'Part'"
-            [routerLink]="['/warranty/view-warranty-claims', row.uuid]"
-            [queryParams]="{'claim_no': claim_no, 'parent_uuid': uuid}"
-            >{{ row.claim_no || 'Draft' }}</a
+              *ngIf="row.set === 'Single' || row.set === 'Part'"
+              [routerLink]="['/warranty/view-warranty-claims', row.uuid]"
+              >{{ row.claim_no || 'Draft' }}</a
             >
           </mat-cell>
           <mat-footer-cell *matFooterCellDef></mat-footer-cell>
