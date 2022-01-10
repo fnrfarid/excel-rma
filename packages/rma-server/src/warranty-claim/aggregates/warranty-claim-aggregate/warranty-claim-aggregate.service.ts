@@ -968,12 +968,12 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     return this.warrantyClaimsPoliciesService
       .validateCancelClaim(cancelPayload.uuid)
       .pipe(
-        switchMap(res => {
+        switchMap(() => {
           return this.warrantyClaimsPoliciesService.validateServiceInvoice(
             cancelPayload.uuid,
           );
         }),
-        switchMap(res => {
+        switchMap(() => {
           return from(
             this.warrantyClaimService.updateOne(
               { uuid: cancelPayload.uuid },
@@ -986,14 +986,34 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           );
         }),
         switchMap(() => {
+          if (cancelPayload.type === WARRANTY_TYPE.THIRD_PARTY) {
+            return from(
+              this.serialNoHistoryService.deleteMany({
+                serial_no: cancelPayload.serial_no,
+                parent_document: cancelPayload.uuid,
+              }),
+            );
+          }
           return from(
-            this.warrantyClaimService.findOne({ uuid: cancelPayload.uuid }),
+            this.serialNoHistoryService.deleteOne({
+              parent_document: cancelPayload.uuid,
+            }),
           );
         }),
+        switchMap(() => {
+          return forkJoin({
+            claim: this.warrantyClaimService.findOne({
+              uuid: cancelPayload.uuid,
+            }),
+            serialHistory: this.serialNoHistoryService.findOne({
+              serial_no: cancelPayload.serial_no,
+            }),
+          });
+        }),
         switchMap(claim => {
-          if (cancelPayload.serial_no) {
-            if (claim.claim_type === WARRANTY_TYPE.THIRD_PARTY) {
-              cancelPayload.type = claim.claim_type;
+          if (cancelPayload.serial_no && !claim.serialHistory) {
+            if (claim.claim.claim_type === WARRANTY_TYPE.THIRD_PARTY) {
+              cancelPayload.type = claim.claim.claim_type;
               return from(
                 this.serialNoService.deleteOne({
                   serial_no: cancelPayload.serial_no,
@@ -1012,20 +1032,6 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             );
           }
           return of({});
-        }),
-        switchMap(res => {
-          if (cancelPayload.type === WARRANTY_TYPE.THIRD_PARTY) {
-            return from(
-              this.serialNoHistoryService.deleteMany({
-                serial_no: cancelPayload.serial_no,
-              }),
-            );
-          }
-          return from(
-            this.serialNoHistoryService.deleteOne({
-              parent_document: cancelPayload.uuid,
-            }),
-          );
         }),
       );
   }
