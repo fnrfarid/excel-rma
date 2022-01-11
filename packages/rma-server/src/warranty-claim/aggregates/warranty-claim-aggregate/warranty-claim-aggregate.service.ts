@@ -271,7 +271,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     serialBody.customer_name = payload.customer;
     serialBody.warranty.purchasedOn = serialBody.date;
     serialBody.warranty.purchaseWarrantyDate = serialBody.date;
-    serialBody.warranty.salesWarrantyDate = serialBody.date;
+    serialBody.warranty.salesWarrantyDate = payload.warranty_end_date
+      ? payload.warranty_end_date
+      : serialBody.date;
     serialBody.warranty.soldOn = serialBody.date;
     serialBody.warehouse = req.token.warehouses[0];
     return of(serialBody);
@@ -395,12 +397,24 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           this.warrantyClaimService.generateNamingSeries(draftClaim.set),
         ).pipe(
           switchMap((name: string) => {
-            return from(
-              this.warrantyClaimService.updateOne(
-                { uuid: draftClaim.uuid },
-                { $set: { claim_no: name } },
+            return forkJoin({
+              warrantyService: from(
+                this.warrantyClaimService.updateOne(
+                  { uuid: draftClaim.uuid },
+                  { $set: { claim_no: name } },
+                ),
               ),
-            );
+              serialHistoryEvent: from(
+                this.serialNoHistoryService.updateMany(
+                  { parent_document: draftClaim.uuid },
+                  {
+                    $set: {
+                      document_no: name,
+                    },
+                  },
+                ),
+              ),
+            });
           }),
           catchError(err => {
             return from(
@@ -409,12 +423,24 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
               ),
             ).pipe(
               switchMap((name: string) => {
-                return from(
-                  this.warrantyClaimService.updateOne(
-                    { uuid: draftClaim.uuid },
-                    { $set: { claim_no: name } },
+                return forkJoin({
+                  warrantyService: from(
+                    this.warrantyClaimService.updateOne(
+                      { uuid: draftClaim.uuid },
+                      { $set: { claim_no: name } },
+                    ),
                   ),
-                );
+                  serialHistoryEvent: from(
+                    this.serialNoHistoryService.updateMany(
+                      { parent_document: draftClaim.uuid },
+                      {
+                        $set: {
+                          document_no: name,
+                        },
+                      },
+                    ),
+                  ),
+                });
               }),
             );
           }),
@@ -934,7 +960,9 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
         serialHistory.document_no = statusHistoryPayload.doc_name;
         serialHistory.document_type = WARRANTY_CLAIM_DOCTYPE;
         serialHistory.eventDate = new DateTime(settings.timeZone);
-        serialHistory.eventType = eventType;
+        serialHistory.eventType = eventType
+          ? eventType
+          : statusHistoryPayload.verdict;
         serialHistory.parent_document = statusHistoryPayload.uuid;
         serialHistory.transaction_from = statusHistoryPayload.status_from;
         serialHistory.transaction_to = !statusHistoryPayload.transfer_branch
