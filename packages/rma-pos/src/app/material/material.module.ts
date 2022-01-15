@@ -25,10 +25,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule } from '@angular/material/dialog';
 import { SatPopoverModule } from '@ncstate/sat-popover';
 import { MatChipsModule } from '@angular/material/chips';
+import { CdkStepperModule } from '@angular/cdk/stepper';
+import { MatStepperModule } from '@angular/material/stepper';
 
 @NgModule({
   declarations: [],
   imports: [
+    CdkStepperModule,
+    MatStepperModule,
     CommonModule,
     MatButtonModule,
     MatTableModule,
@@ -58,6 +62,8 @@ import { MatChipsModule } from '@angular/material/chips';
     MatTooltipModule,
   ],
   exports: [
+    CdkStepperModule,
+    MatStepperModule,
     MatTooltipModule,
     MatTableModule,
     SatPopoverModule,
