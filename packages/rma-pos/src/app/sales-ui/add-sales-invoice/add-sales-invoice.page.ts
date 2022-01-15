@@ -54,7 +54,7 @@ import { ValidateInputSelected } from '../../common/pipes/validators';
 
 @Component({
   selector: 'app-add-sales-invoice',
-  templateUrl: './add-sales-invoice.page.html',
+  templateUrl: './add-pos-invoice.html',
   styleUrls: ['./add-sales-invoice.page.scss'],
   providers: [
     {
@@ -82,14 +82,22 @@ export class AddSalesInvoicePage implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
-  salesInvoiceForm: FormGroup;
+  salesInvoiceItemsForm: FormGroup;
+  salesCustomerDetialsForm: FormGroup;
+  paymentForm: FormGroup;
   itemsControl: FormArray;
   validateInput: any = ValidateInputSelected;
   filteredModeOfPaymentList: Observable<any[]>;
   filteredPosProfileList: Observable<any[]>;
 
   get f() {
-    return this.salesInvoiceForm.controls;
+    return this.salesCustomerDetialsForm.controls;
+  }
+  get salesInvoiceItemsFormControls() {
+    return this.salesInvoiceItemsForm.controls;
+  }
+  get paymentFormControls() {
+    return this.paymentForm.controls;
   }
 
   constructor(
@@ -107,30 +115,34 @@ export class AddSalesInvoicePage implements OnInit {
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
-    this.salesInvoiceForm.get('postingDate').setValue(new Date());
+    this.salesCustomerDetialsForm.get('postingDate').setValue(new Date());
     this.calledFrom = this.route.snapshot.params.calledFrom;
     if (this.calledFrom === 'edit') {
       this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
       this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
         next: async (res: SalesInvoiceDetails) => {
-          this.salesInvoiceForm.get('company').setValue(res.company);
-          this.salesInvoiceForm.get('territory').setValue(res.territory);
-          this.salesInvoiceForm.get('customer').setValue({
+          this.salesCustomerDetialsForm.get('company').setValue(res.company);
+          this.salesCustomerDetialsForm
+            .get('territory')
+            .setValue(res.territory);
+          this.salesCustomerDetialsForm.get('customer').setValue({
             name: res.customer,
             owner: res.contact_email,
             customer_name: res.customer_name,
           });
-          this.salesInvoiceForm
+          this.salesCustomerDetialsForm
             .get('postingDate')
             .setValue(new Date(res.posting_date));
-          this.salesInvoiceForm.get('dueDate').setValue(new Date(res.due_date));
+          this.salesCustomerDetialsForm
+            .get('dueDate')
+            .setValue(new Date(res.due_date));
 
-          this.salesInvoiceForm.get('modeOfPayment').setValue(
+          this.paymentForm.get('modeOfPayment').setValue(
             res.payments.find(x => {
               return x;
             }).mode_of_payment,
           );
-          this.salesInvoiceForm
+          this.paymentForm
             .get('posProfile')
             .setValue(
               await this.salesService
@@ -143,9 +155,11 @@ export class AddSalesInvoicePage implements OnInit {
             this.itemsControl.push(new FormControl(item));
           });
           this.calculateTotal(res.items);
-          this.salesInvoiceForm.get('campaign').setValue(res.isCampaign);
-          this.salesInvoiceForm.get('remarks').setValue(res.remarks);
-          this.salesInvoiceForm
+          this.salesCustomerDetialsForm
+            .get('campaign')
+            .setValue(res.isCampaign);
+          this.salesCustomerDetialsForm.get('remarks').setValue(res.remarks);
+          this.salesCustomerDetialsForm
             .get('warehouse')
             .setValue(res.delivery_warehouse);
           this.updateStockBalance(res.delivery_warehouse);
@@ -153,7 +167,7 @@ export class AddSalesInvoicePage implements OnInit {
         },
       });
     }
-    this.filteredCustomerList = this.salesInvoiceForm
+    this.filteredCustomerList = this.salesCustomerDetialsForm
       .get('customer')
       .valueChanges.pipe(
         startWith(''),
@@ -162,7 +176,7 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
-    this.filteredWarehouseList = this.salesInvoiceForm
+    this.filteredWarehouseList = this.salesCustomerDetialsForm
       .get('warehouse')
       .valueChanges.pipe(
         startWith(''),
@@ -173,7 +187,9 @@ export class AddSalesInvoicePage implements OnInit {
           if (data && data.length) {
             this.initial.warehouse
               ? null
-              : (this.salesInvoiceForm.get('warehouse').setValue(data[0]),
+              : (this.salesCustomerDetialsForm
+                  .get('warehouse')
+                  .setValue(data[0]),
                 this.initial.warehouse++);
             return of(data);
           }
@@ -181,7 +197,7 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
-    this.territoryList = this.salesInvoiceForm
+    this.territoryList = this.salesCustomerDetialsForm
       .get('territory')
       .valueChanges.pipe(
         startWith(''),
@@ -192,7 +208,9 @@ export class AddSalesInvoicePage implements OnInit {
           if (data && data.length) {
             this.initial.territory
               ? null
-              : (this.salesInvoiceForm.get('territory').setValue(data[0]),
+              : (this.salesCustomerDetialsForm
+                  .get('territory')
+                  .setValue(data[0]),
                 this.initial.territory++);
             return of(data);
           }
@@ -200,7 +218,7 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
-    this.filteredModeOfPaymentList = this.salesInvoiceForm
+    this.filteredModeOfPaymentList = this.paymentForm
       .get('modeOfPayment')
       .valueChanges.pipe(
         startWith(''),
@@ -211,7 +229,7 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
-    this.filteredPosProfileList = this.salesInvoiceForm
+    this.filteredPosProfileList = this.paymentForm
       .get('posProfile')
       .valueChanges.pipe(
         startWith(''),
@@ -231,14 +249,14 @@ export class AddSalesInvoicePage implements OnInit {
             .getItems([DEFAULT_COMPANY])
             .then(items => {
               if (items[DEFAULT_COMPANY]) {
-                this.salesInvoiceForm
+                this.salesCustomerDetialsForm
                   .get('company')
                   .setValue(items[DEFAULT_COMPANY]);
                 this.getRemainingBalance();
               } else {
                 this.getApiInfo().subscribe({
                   next: res => {
-                    this.salesInvoiceForm
+                    this.salesCustomerDetialsForm
                       .get('company')
                       .setValue(res.defaultCompany);
                   },
@@ -252,27 +270,31 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   createFormGroup() {
-    this.salesInvoiceForm = new FormGroup(
+    this.salesInvoiceItemsForm = new FormGroup({
+      items: new FormArray([], this.itemValidator),
+      total: new FormControl(0),
+    });
+    this.salesCustomerDetialsForm = new FormGroup(
       {
-        warehouse: new FormControl('', [Validators.required]),
-        company: new FormControl('', [Validators.required]),
-        customer: new FormControl('', [Validators.required]),
-        postingDate: new FormControl('', [Validators.required]),
-        dueDate: new FormControl('', [Validators.required]),
-        territory: new FormControl('', [Validators.required]),
+        warehouse: new FormControl('', Validators.required),
+        company: new FormControl('', Validators.required),
+        customer: new FormControl('', Validators.required),
+        postingDate: new FormControl('', Validators.required),
+        dueDate: new FormControl('', Validators.required),
+        territory: new FormControl('', Validators.required),
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
-        items: new FormArray([], this.itemValidator),
-        total: new FormControl(0),
-        modeOfPayment: new FormControl('', [Validators.required]),
-        posProfile: new FormControl('', [Validators.required]),
       },
-      {
-        validators: [this.dueDateValidator, this.creditLimitValidator],
-      },
+      // {
+      //   validators: [this.dueDateValidator, this.creditLimitValidator],
+      // },
     );
-    this.itemsControl = this.salesInvoiceForm.get('items') as FormArray;
+    this.paymentForm = new FormGroup({
+      modeOfPayment: new FormControl('', Validators.required),
+      posProfile: new FormControl('', Validators.required),
+    });
+    this.itemsControl = this.salesInvoiceItemsForm.get('items') as FormArray;
   }
 
   dueDateValidator(abstractControl: AbstractControl) {
@@ -319,7 +341,7 @@ export class AddSalesInvoicePage implements OnInit {
     item.rate = 0;
     item.item_code = '';
     item.minimumPrice = 0;
-    item.stock = this.salesInvoiceForm.get('warehouse').value
+    item.stock = this.salesCustomerDetialsForm.get('warehouse').value
       ? 'Select an Item'
       : '';
     data.push(item);
@@ -362,7 +384,7 @@ export class AddSalesInvoicePage implements OnInit {
     }
     return this.itemPriceService.getStockBalance(
       item.item_code,
-      this.salesInvoiceForm.get('warehouse').value,
+      this.salesCustomerDetialsForm.get('warehouse').value,
     );
   }
 
@@ -372,7 +394,7 @@ export class AddSalesInvoicePage implements OnInit {
     }
     const copy = this.dataSource.data().slice();
     Object.assign(row, item);
-    if (this.salesInvoiceForm.get('warehouse').value) {
+    if (this.salesCustomerDetialsForm.get('warehouse').value) {
       this.getWarehouseStock(item).subscribe({
         next: res => {
           row.qty = 1;
@@ -429,7 +451,7 @@ export class AddSalesInvoicePage implements OnInit {
       let date;
       postingDate ? (date = new Date(postingDate)) : (date = new Date());
       date.setDate(date.getDate() + customer.credit_days);
-      this.salesInvoiceForm.get('dueDate').setValue(date);
+      this.salesCustomerDetialsForm.get('dueDate').setValue(date);
     }
     this.salesService.getAddress(customer.name).subscribe({
       next: res => {
@@ -449,53 +471,57 @@ export class AddSalesInvoicePage implements OnInit {
     );
     if (isValid) {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
-      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.name;
-      salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
+      salesInvoiceDetails.isCampaign = this.salesCustomerDetialsForm.get(
         'campaign',
       ).value;
-      salesInvoiceDetails.company = this.salesInvoiceForm.get('company').value;
+      salesInvoiceDetails.company = this.salesCustomerDetialsForm.get(
+        'company',
+      ).value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
-        this.salesInvoiceForm.get('postingDate').value,
+        this.salesCustomerDetialsForm.get('postingDate').value,
       );
       salesInvoiceDetails.posting_time = this.getFrappeTime();
       salesInvoiceDetails.set_posting_time = 1;
       salesInvoiceDetails.due_date = this.getParsedDate(
-        this.salesInvoiceForm.get('dueDate').value,
+        this.salesCustomerDetialsForm.get('dueDate').value,
       );
-      salesInvoiceDetails.territory = this.salesInvoiceForm.get(
+      salesInvoiceDetails.territory = this.salesCustomerDetialsForm.get(
         'territory',
       ).value;
       salesInvoiceDetails.update_stock = 0;
       salesInvoiceDetails.total_qty = 0;
       salesInvoiceDetails.total = 0;
-      salesInvoiceDetails.contact_email = this.salesInvoiceForm.get(
+      salesInvoiceDetails.contact_email = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.owner;
-      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.name;
-      salesInvoiceDetails.customer_name = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer_name = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.customer_name;
       salesInvoiceDetails.status = DRAFT;
-      salesInvoiceDetails.remarks = this.salesInvoiceForm.get('remarks').value;
-      salesInvoiceDetails.delivery_warehouse = this.salesInvoiceForm.get(
+      salesInvoiceDetails.remarks = this.salesCustomerDetialsForm.get(
+        'remarks',
+      ).value;
+      salesInvoiceDetails.delivery_warehouse = this.salesCustomerDetialsForm.get(
         'warehouse',
       ).value;
 
       salesInvoiceDetails.is_pos = true;
       const paymentDetails: Payments[] = [];
       paymentDetails.push({
-        mode_of_payment: this.salesInvoiceForm.get('modeOfPayment').value,
+        mode_of_payment: this.paymentForm.get('modeOfPayment').value,
         default: true,
-        amount: this.f.total.value,
-        account: this.salesInvoiceForm.get('posProfile').value
+        amount: this.salesInvoiceItemsForm.controls.total.value,
+        account: this.paymentForm.get('posProfile').value
           .account_for_change_amount,
       });
       salesInvoiceDetails.payments = paymentDetails;
-      salesInvoiceDetails.pos_profile = this.salesInvoiceForm.get(
+      salesInvoiceDetails.pos_profile = this.paymentForm.get(
         'posProfile',
       ).value.name;
       const itemList = this.dataSource.data().filter(item => {
@@ -510,8 +536,8 @@ export class AddSalesInvoicePage implements OnInit {
         }
       });
       salesInvoiceDetails.items = itemList;
-      if (this.salesInvoiceForm.get('customer').value.sales_team) {
-        salesInvoiceDetails.sales_team = this.salesInvoiceForm.get(
+      if (this.salesCustomerDetialsForm.get('customer').value.sales_team) {
+        salesInvoiceDetails.sales_team = this.salesCustomerDetialsForm.get(
           'customer',
         ).value.sales_team;
 
@@ -559,50 +585,54 @@ export class AddSalesInvoicePage implements OnInit {
     );
     if (isValid) {
       const salesInvoiceDetails = {} as SalesInvoiceDetails;
-      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.name;
-      salesInvoiceDetails.isCampaign = this.salesInvoiceForm.get(
+      salesInvoiceDetails.isCampaign = this.salesCustomerDetialsForm.get(
         'campaign',
       ).value;
-      salesInvoiceDetails.territory = this.salesInvoiceForm.get(
+      salesInvoiceDetails.territory = this.salesCustomerDetialsForm.get(
         'territory',
       ).value;
-      salesInvoiceDetails.company = this.salesInvoiceForm.get('company').value;
+      salesInvoiceDetails.company = this.salesCustomerDetialsForm.get(
+        'company',
+      ).value;
       salesInvoiceDetails.posting_date = this.getParsedDate(
-        this.salesInvoiceForm.get('postingDate').value,
+        this.salesCustomerDetialsForm.get('postingDate').value,
       );
       salesInvoiceDetails.posting_time = this.getFrappeTime();
       salesInvoiceDetails.set_posting_time = 1;
       salesInvoiceDetails.due_date = this.getParsedDate(
-        this.salesInvoiceForm.get('dueDate').value,
+        this.salesCustomerDetialsForm.get('dueDate').value,
       );
       salesInvoiceDetails.update_stock = 0;
       salesInvoiceDetails.total_qty = 0;
       salesInvoiceDetails.total = 0;
-      salesInvoiceDetails.customer = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.name;
-      salesInvoiceDetails.customer_name = this.salesInvoiceForm.get(
+      salesInvoiceDetails.customer_name = this.salesCustomerDetialsForm.get(
         'customer',
       ).value.customer_name;
-      salesInvoiceDetails.delivery_warehouse = this.salesInvoiceForm.get(
+      salesInvoiceDetails.delivery_warehouse = this.salesCustomerDetialsForm.get(
         'warehouse',
       ).value;
       salesInvoiceDetails.status = DRAFT;
-      salesInvoiceDetails.remarks = this.salesInvoiceForm.get('remarks').value;
+      salesInvoiceDetails.remarks = this.salesCustomerDetialsForm.get(
+        'remarks',
+      ).value;
 
       salesInvoiceDetails.is_pos = true;
       const paymentDetails: Payments[] = [];
       paymentDetails.push({
-        mode_of_payment: this.salesInvoiceForm.get('modeOfPayment').value,
+        mode_of_payment: this.paymentForm.get('modeOfPayment').value,
         default: true,
-        amount: this.f.total.value,
-        account: this.salesInvoiceForm.get('posProfile').value
+        amount: this.salesInvoiceItemsForm.controls.total.value,
+        account: this.paymentForm.get('posProfile').value
           .account_for_change_amount,
       });
       salesInvoiceDetails.payments = paymentDetails;
-      salesInvoiceDetails.pos_profile = this.salesInvoiceForm.get(
+      salesInvoiceDetails.pos_profile = this.paymentForm.get(
         'posProfile',
       ).value.name;
 
@@ -620,8 +650,8 @@ export class AddSalesInvoicePage implements OnInit {
 
       salesInvoiceDetails.items = itemList;
       salesInvoiceDetails.uuid = this.invoiceUuid;
-      if (this.salesInvoiceForm.get('customer').value.sales_team) {
-        salesInvoiceDetails.sales_team = this.salesInvoiceForm.get(
+      if (this.salesCustomerDetialsForm.get('customer').value.sales_team) {
+        salesInvoiceDetails.sales_team = this.salesCustomerDetialsForm.get(
           'customer',
         ).value.sales_team;
 
@@ -667,7 +697,7 @@ export class AddSalesInvoicePage implements OnInit {
     itemList.forEach(item => {
       sum += item.qty * item.rate;
     });
-    this.salesInvoiceForm.get('total').setValue(sum);
+    this.salesInvoiceItemsForm.get('total').setValue(sum);
   }
 
   selectedPostingDate($event) {
@@ -730,7 +760,7 @@ export class AddSalesInvoicePage implements OnInit {
   getCustomer(name: string) {
     this.salesService.getCustomer(name).subscribe({
       next: res => {
-        this.salesInvoiceForm.get('customer').setValue(res);
+        this.salesCustomerDetialsForm.get('customer').setValue(res);
         this.customerChanged(res);
       },
     });
@@ -756,8 +786,8 @@ export class AddSalesInvoicePage implements OnInit {
             debtorAccount,
             time,
             'Customer',
-            this.salesInvoiceForm.get('customer').value.name,
-            this.salesInvoiceForm.get('company').value,
+            this.salesCustomerDetialsForm.get('customer').value.name,
+            this.salesCustomerDetialsForm.get('company').value,
             headers,
           );
         }),
@@ -769,18 +799,20 @@ export class AddSalesInvoicePage implements OnInit {
           const creditLimits: {
             company: string;
             credit_limit: number;
-          }[] = this.salesInvoiceForm.get('customer').value.credit_limits;
+          }[] = this.salesCustomerDetialsForm.get('customer').value
+            .credit_limits;
 
           const limits = creditLimits.filter(
             limit =>
-              limit.company === this.salesInvoiceForm.get('company').value,
+              limit.company ===
+              this.salesCustomerDetialsForm.get('company').value,
           );
 
           if (limits.length) {
             creditLimit = Number(limits[0].credit_limit) - Number(message);
           }
 
-          this.salesInvoiceForm.get('balance').setValue(creditLimit);
+          this.salesCustomerDetialsForm.get('balance').setValue(creditLimit);
         },
         error: error => {
           let frappeError = error.message || UPDATE_ERROR;
