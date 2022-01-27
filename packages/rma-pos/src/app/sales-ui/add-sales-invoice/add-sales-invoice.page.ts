@@ -7,7 +7,7 @@ import {
   FormArray,
   AbstractControl,
 } from '@angular/forms';
-import { Observable, throwError, of, from, forkJoin } from 'rxjs';
+import { Observable, throwError, of, from, forkJoin, Subject } from 'rxjs';
 import {
   startWith,
   switchMap,
@@ -18,7 +18,11 @@ import {
   concatMap,
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
-import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
+import {
+  SalesInvoice,
+  Item,
+  SerialAssign,
+} from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
 import {
@@ -30,6 +34,7 @@ import {
   ACCESS_TOKEN,
   AUTHORIZATION,
   BEARER_TOKEN_PREFIX,
+  DELIVERED_SERIALS_DISPLAYED_COLUMNS,
 } from '../../constants/storage';
 import {
   DRAFT,
@@ -39,10 +44,16 @@ import {
   SHORT_DURATION,
   TERRITORY,
   WAREHOUSES,
+  DELIVERY_NOTE,
+  DELIVERED_SERIALS_BY,
 } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ItemPriceService } from '../services/item-price.service';
-import { INSUFFICIENT_STOCK_BALANCE } from '../../constants/messages';
+import {
+  ERROR_FETCHING_SALES_INVOICE,
+  INSUFFICIENT_STOCK_BALANCE,
+  SERIAL_ASSIGNED,
+} from '../../constants/messages';
 import { TimeService } from '../../api/time/time.service';
 import {
   DateAdapter,
@@ -53,6 +64,14 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { ValidateInputSelected } from '../../common/pipes/validators';
 import { SerialSearchFields } from '../../common/interfaces/search-fields.interface';
+import { PERMISSION_STATE } from 'src/app/constants/permission-roles';
+import {
+  DeliveryNoteItemInterface,
+  ItemDataSource,
+  SerialDataSource,
+} from '../view-sales-invoice/serials/serials-datasource';
+import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -82,7 +101,15 @@ export class AddSalesInvoicePage implements OnInit {
   postingDate: string;
   dueDate: string;
   address = {} as any;
-  displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
+  displayedColumns = [
+    'item',
+    'stock',
+    'quantity',
+    'serial_no',
+    'rate',
+    'total',
+    'delete',
+  ];
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
@@ -101,9 +128,56 @@ export class AddSalesInvoicePage implements OnInit {
   validateInput: any = ValidateInputSelected;
   filteredModeOfPaymentList: Observable<any[]>;
   filteredPosProfileList: Observable<any[]>;
+  itemMap: any = {};
+
   gridItems: Item[] = [];
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
+  serialDataSource: SerialDataSource;
+  itemDataSource: ItemDataSource;
+  // =====NEED TO CLEAN UP CODE=========
+  deliveredSerialsSearch: string = '';
+  disableDeliveredSerialsCard: boolean = false;
+  remaining: number = 0;
+  index: number = 0;
+  size: number = 10;
+
+  deliveredSerialsState: DeliveredSerialsState = {
+    deliveredSerialsDisplayedColumns:
+      DELIVERED_SERIALS_DISPLAYED_COLUMNS[
+        DELIVERED_SERIALS_BY.sales_invoice_name
+      ],
+    type: DELIVERED_SERIALS_BY.sales_invoice_name,
+  };
+
+  state = {
+    component: DELIVERY_NOTE,
+    warehouse: '',
+    itemData: [],
+    costCenter: '',
+  };
+
+  xlsxData: any;
+  value: string;
+  date = new FormControl(new Date());
+  claimsReceivedDate: string;
+  permissionState = PERMISSION_STATE;
+  warehouseFormControl = new FormControl('', [Validators.required]);
+  costCenterFormControl = new FormControl('', [Validators.required]);
+  salesInvoiceDetails: SalesInvoiceDetails;
+  submit: boolean = false;
+  rangePickerState = {
+    prefix: '',
+    fromRange: '',
+    toRange: '',
+    serials: [],
+  };
+
+  DEFAULT_SERIAL_RANGE = { start: 0, end: 0, prefix: '', serialPadding: 0 };
+  filteredItemList = [];
+  fromRangeUpdate = new Subject<string>();
+  toRangeUpdate = new Subject<string>();
+  // =====NEED TO CLEAN UP CODE=========
 
   get f() {
     return this.salesCustomerDetialsForm.controls;
@@ -123,9 +197,11 @@ export class AddSalesInvoicePage implements OnInit {
     private location: Location,
     private readonly router: Router,
     private readonly time: TimeService,
+    private readonly loadingController: LoadingController,
   ) {}
 
   ngOnInit() {
+    this.createFormGroup();
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
@@ -134,7 +210,6 @@ export class AddSalesInvoicePage implements OnInit {
       },
     });
 
-    this.createFormGroup();
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
@@ -220,6 +295,11 @@ export class AddSalesInvoicePage implements OnInit {
         }),
       );
 
+    this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
+
+    this.serialDataSource = new SerialDataSource();
+    this.itemDataSource = new ItemDataSource();
+
     this.territoryList = this.salesCustomerDetialsForm
       .get('territory')
       .valueChanges.pipe(
@@ -295,12 +375,12 @@ export class AddSalesInvoicePage implements OnInit {
   createFormGroup() {
     this.salesCustomerDetialsForm = new FormGroup(
       {
-        warehouse: new FormControl('', Validators.required),
-        company: new FormControl('', Validators.required),
-        customer: new FormControl('', Validators.required),
-        postingDate: new FormControl('', Validators.required),
-        dueDate: new FormControl('', Validators.required),
-        territory: new FormControl('', Validators.required),
+        warehouse: new FormControl('', [Validators.required]),
+        company: new FormControl('', [Validators.required]),
+        customer: new FormControl('', [Validators.required]),
+        postingDate: new FormControl('', [Validators.required]),
+        dueDate: new FormControl('', [Validators.required]),
+        territory: new FormControl('', [Validators.required]),
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
@@ -310,8 +390,8 @@ export class AddSalesInvoicePage implements OnInit {
       // },
     );
     this.paymentForm = new FormGroup({
-      modeOfPayment: new FormControl('', Validators.required),
-      posProfile: new FormControl('', Validators.required),
+      modeOfPayment: new FormControl('', [Validators.required]),
+      posProfile: new FormControl('', [Validators.required]),
     });
   }
 
@@ -406,6 +486,29 @@ export class AddSalesInvoicePage implements OnInit {
     );
   }
 
+  updateSerial(row: Item, serial_no: any) {
+    this.snackbar.open(`Added ${row.item_name}`, 'Close', {
+      duration: DURATION,
+    });
+    if (serial_no == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    row.serial_no = [serial_no];
+    this.dataSource.update(copy);
+  }
+
+  checkDuplicateSerial() {
+    const state = { existingSerials: [], setSerials: new Set() };
+    this.dataSource.data().forEach(item => {
+      state.existingSerials.push(item.serial_no);
+      state.setSerials.add(item.serial_no);
+    });
+    return state.existingSerials.length === Array.from(state.setSerials).length
+      ? true
+      : false;
+  }
+
   updateItem(row: Item, index: number, item: Item) {
     if (item == null) {
       return;
@@ -449,10 +552,27 @@ export class AddSalesInvoicePage implements OnInit {
           const item = this.dataSource.data();
           if (item.find(x => x.uuid === res.item.uuid)) {
             const index = item.findIndex(x => x.uuid === res.item.uuid);
+            const serial: any = newItem.serial_no;
             item[index].qty = item[index].qty + 1;
+            if (item[index].serial_no.find(serials => serials === serial)) {
+              item[index].qty = item[index].qty - 1;
+              this.snackbar.open(`serial ${serial} already exists`, 'Close', {
+                duration: DURATION,
+                horizontalPosition: 'left',
+                verticalPosition: 'top',
+              });
+              return;
+            }
+            item[index].serial_no.push(serial);
             this.calculateTotal(this.dataSource.data().slice());
             this.dataSource.update(item);
+            this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
+              duration: DURATION,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+            });
           } else {
+            const serial: any = newItem.serial_no;
             newItem.uuid = res.item.uuid;
             newItem.minimumPrice = res.item.minimumPrice;
             newItem.has_serial_no = res.item.has_serial_no;
@@ -461,10 +581,15 @@ export class AddSalesInvoicePage implements OnInit {
             newItem.stock = this.salesCustomerDetialsForm.get('warehouse').value
               ? res.stock.message
               : 'Please Select a Warehouse';
-            item.push(newItem);
+            item.push({ ...newItem, serial_no: [serial] });
             this.calculateTotal(item.slice());
             this.dataSource.update(item);
             this.itemsControl.push(new FormControl(newItem));
+            this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
+              duration: DURATION,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+            });
           }
         },
       });
@@ -699,6 +824,7 @@ export class AddSalesInvoicePage implements OnInit {
         'posProfile',
       ).value.name;
       const itemList = this.dataSource.data().filter(item => {
+        item.owner = salesInvoiceDetails.contact_email;
         if (item.item_name !== '') {
           item.amount = item.qty * item.rate;
           salesInvoiceDetails.total_qty += item.qty;
@@ -726,10 +852,18 @@ export class AddSalesInvoicePage implements OnInit {
           switchMap(info => {
             return this.salesService.createSalesInvoice(salesInvoiceDetails);
           }),
+          switchMap((success: any) => {
+            salesInvoiceDetails.uuid = success.uuid;
+            return this.salesService.submitSalesInvoice(success.uuid);
+          }),
         )
         .subscribe({
           next: success => {
-            this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
+            this.getSalesInvoice(salesInvoiceDetails.uuid);
+            this.snackbar.open(`Sales Invoice Created Successfully`, 'Close', {
+              duration: 3000,
+            });
+            this.router.navigate(['sales']);
           },
           error: err => {
             // bad way of doing error's do not follow this. message should always be thrown ideally as err.error.message in exception.
@@ -752,6 +886,278 @@ export class AddSalesInvoicePage implements OnInit {
       });
     }
   }
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //                    NEED TO CLEAN UP CODE
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  getItemsWarranty() {
+    const data = this.itemDataSource?.data() ? this.itemDataSource.data() : [];
+    from(data)
+      .pipe(
+        mergeMap(item => {
+          return this.salesService.getItemFromRMAServer(item.item_code).pipe(
+            switchMap(warrantyItem => {
+              item.salesWarrantyMonths = warrantyItem.salesWarrantyMonths;
+              return of(item);
+            }),
+          );
+        }),
+        toArray(),
+      )
+      .subscribe({
+        next: success => {
+          success.forEach(item => {
+            this.itemMap[item.item_code].salesWarrantyMonths =
+              item.salesWarrantyMonths;
+          });
+          this.itemDataSource?.loadItems(success);
+        },
+        error: err => {},
+      });
+  }
+
+  async completeAutoDn() {
+    const data = this.serialDataSource.data();
+    const itemsData: any = this.dataSource.data();
+    data.push(...itemsData);
+    this.getItemsWarranty();
+    this.serialDataSource.update(data);
+    await this.submitDeliveryNote();
+  }
+
+  getFilteredItems(salesInvoice: SalesInvoiceDetails) {
+    const filteredItemList = [];
+    let remaining = 0;
+    salesInvoice?.items?.forEach(item => {
+      this.itemMap[item.item_code] = item;
+      item.assigned = 0;
+      item.remaining = item.qty;
+      if (salesInvoice.delivered_items_map[btoa(item.item_code)]) {
+        item.assigned =
+          salesInvoice.delivered_items_map[btoa(item.item_code)] || 0;
+        item.remaining =
+          item.qty - salesInvoice.delivered_items_map[btoa(item.item_code)];
+      }
+      remaining += item.remaining;
+      filteredItemList.push(item);
+    });
+    this.remaining = remaining;
+    return filteredItemList;
+  }
+
+  getSalesInvoice(uuid?: string) {
+    return this.salesService
+      .getSalesInvoice(uuid)
+      .pipe(
+        switchMap((sales_invoice: SalesInvoiceDetails) => {
+          this.deliveredSerialsState.uuid = sales_invoice.name;
+          if (sales_invoice.has_bundle_item) {
+            const item_codes = {};
+            sales_invoice.items.forEach(item => {
+              item_codes[item.item_code] = item.qty;
+            });
+            return this.salesService.getBundleItem(item_codes).pipe(
+              switchMap((data: any[]) => {
+                sales_invoice.items = data;
+                return of(sales_invoice);
+              }),
+            );
+          }
+          return of(sales_invoice);
+        }),
+      )
+      .subscribe({
+        next: (sales_invoice: SalesInvoiceDetails) => {
+          this.salesInvoiceDetails = sales_invoice as SalesInvoiceDetails;
+          this.disableDeliveredSerialsCard =
+            Object.keys(
+              this.salesInvoiceDetails.delivered_items_map
+                ? this.salesInvoiceDetails.delivered_items_map
+                : {},
+            ).length === 0
+              ? true
+              : false;
+          this.filteredItemList = this.getFilteredItems(sales_invoice);
+          this.itemDataSource?.loadItems(this.filteredItemList);
+          this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
+          this.date.setValue(new Date());
+          this.getItemsWarranty();
+          this.state.itemData = this.itemDataSource?.data();
+          this.state.warehouse = this.warehouseFormControl.value;
+          this.salesService.relaySalesInvoice(sales_invoice.name).subscribe({
+            next: async success => {
+              this.costCenterFormControl.setValue(success.cost_center);
+              await this.completeAutoDn();
+            },
+            error: () => {
+              this.snackbar.open(
+                `Cost Center Not found refresh page or Check Sales Invoice`,
+                CLOSE,
+                { duration: 4500 },
+              );
+            },
+          });
+        },
+        error: err => {
+          this.snackbar.open(
+            err.error.message
+              ? err.error.message
+              : `${ERROR_FETCHING_SALES_INVOICE}${err.error.error}`,
+            CLOSE,
+            { duration: 4500 },
+          );
+        },
+      });
+  }
+
+  validateState() {
+    const data = this.serialDataSource.data();
+    let isValid = true;
+    let index = 0;
+    if (!this.warehouseFormControl.value) {
+      this.snackbar.open('Please select a warehouse.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
+    if (!this.costCenterFormControl.value) {
+      this.snackbar.open('Please select a Cost Center.', CLOSE, {
+        duration: 3000,
+      });
+      return false;
+    }
+    for (const item of data) {
+      index++;
+      if (
+        !item.serial_no ||
+        !item.serial_no.length ||
+        item.serial_no[0] === ''
+      ) {
+        isValid = false;
+        this.getMessage(
+          `Serial No empty for ${item.item_name} at position ${index}, please add a Serial No`,
+        );
+        break;
+      }
+    }
+    return isValid;
+  }
+
+  getMessage(notFoundMessage, expected?, found?) {
+    return this.snackbar.open(
+      expected && found
+        ? `${notFoundMessage}, expected ${expected} found ${found}`
+        : `${notFoundMessage}`,
+      CLOSE,
+      { duration: 4500 },
+    );
+  }
+
+  async submitDeliveryNote() {
+    if (!this.validateState()) return;
+    this.submit = true;
+    this.mergeDuplicateItems();
+    const loading = await this.loadingController.create({
+      message: 'Creating Delivery Note..',
+    });
+    await loading.present();
+    const assignSerial = {} as SerialAssign;
+    assignSerial.company = this.salesInvoiceDetails.company;
+    assignSerial.customer = this.salesInvoiceDetails.customer;
+    assignSerial.posting_date = this.getParsedDate(this.date.value);
+    assignSerial.posting_time = this.getFrappeTime();
+    assignSerial.sales_invoice_name = this.salesInvoiceDetails.name;
+    assignSerial.set_warehouse = this.warehouseFormControl.value;
+    assignSerial.total = 0;
+    assignSerial.total_qty = 0;
+    assignSerial.items = [];
+
+    const item_hash: { [key: string]: DeliveryNoteItemInterface } = {};
+
+    this.salesInvoiceDetails.items.forEach(item => {
+      if (!item_hash[item.item_code]) {
+        item_hash[item.item_code] = { serial_no: [] };
+      }
+      item_hash[item.item_code].item_code = item.item_code;
+      item_hash[item.item_code].item_name = item.item_name;
+      item_hash[item.item_code].rate = item.rate || 0;
+      item_hash[item.item_code].qty = 0;
+      item_hash[item.item_code].amount = 0;
+      item_hash[item.item_code].cost_center = this.costCenterFormControl.value;
+    });
+
+    this.serialDataSource.data().forEach(serial => {
+      const existing_qty = item_hash[serial.item_code].qty;
+      const existing_rate = item_hash[serial.item_code].rate;
+      const existing_serials = item_hash[serial.item_code].serial_no;
+
+      assignSerial.total_qty += serial.qty;
+      assignSerial.total += serial.qty * existing_rate;
+
+      Object.assign(item_hash[serial.item_code], serial);
+
+      item_hash[serial.item_code].qty += existing_qty;
+      item_hash[serial.item_code].rate = existing_rate;
+      item_hash[serial.item_code].amount =
+        item_hash[serial.item_code].qty * item_hash[serial.item_code].rate;
+      item_hash[serial.item_code].serial_no.push(...existing_serials);
+      item_hash[
+        serial.item_code
+      ].against_sales_invoice = this.salesInvoiceDetails.name;
+    });
+
+    Object.keys(item_hash).forEach(key => {
+      if (item_hash[key].qty) {
+        assignSerial.items.push(item_hash[key]);
+      }
+    });
+
+    this.salesService.assignSerials(assignSerial).subscribe({
+      next: success => {
+        this.submit = false;
+        loading.dismiss();
+        this.snackbar.open(SERIAL_ASSIGNED, CLOSE, {
+          duration: 2500,
+        });
+      },
+      error: err => {
+        loading.dismiss();
+        this.submit = false;
+        if (err.status === 406) {
+          const errMessage = err.error.message.split('\\n');
+          this.snackbar.open(
+            errMessage[errMessage.length - 2].split(':')[1],
+            CLOSE,
+            {
+              duration: 2500,
+            },
+          );
+          return;
+        }
+        this.snackbar.open(err.error.message, CLOSE, {
+          duration: 2500,
+        });
+      },
+    });
+  }
+
+  mergeDuplicateItems() {
+    const map = {};
+    this.serialDataSource.data().forEach(item => {
+      if (map[item.item_code]) {
+        map[item.item_code].qty += item.qty;
+        map[item.item_code].serial_no.push(...item.serial_no);
+      } else {
+        map[item.item_code] = item;
+      }
+    });
+    this.serialDataSource.update(Object.values(map));
+  }
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //                    NEED TO CLEAN UP CODE
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   updateSalesInvoice() {
     const isValid = this.salesService.validateItemList(
