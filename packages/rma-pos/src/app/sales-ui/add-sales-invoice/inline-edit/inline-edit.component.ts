@@ -60,7 +60,9 @@ export class InlineEditComponent {
     this.filteredItemList = this.itemFormControl.valueChanges.pipe(
       startWith(''),
       switchMap(value => {
-        return this.salesService.getItemList(value);
+        return this.salesService
+          .getItemList(value)
+          .pipe(map(items => items.docs));
       }),
     );
   }

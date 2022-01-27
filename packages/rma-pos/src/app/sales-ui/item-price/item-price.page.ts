@@ -86,7 +86,9 @@ export class ItemPricePage implements OnInit {
         startWith(''),
         debounceTime(1000),
         switchMap(value => {
-          return this.salesService.getItemList(value);
+          return this.salesService
+            .getItemList(value)
+            .pipe(map(res => res.docs));
         }),
       );
 

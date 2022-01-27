@@ -15,6 +15,7 @@ import {
   map,
   mergeMap,
   toArray,
+  concatMap,
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import { SalesInvoice, Item } from '../../common/interfaces/sales.interface';
@@ -51,6 +52,7 @@ import {
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MY_FORMATS } from '../../constants/date-format';
 import { ValidateInputSelected } from '../../common/pipes/validators';
+import { SerialSearchFields } from '../../common/interfaces/search-fields.interface';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -66,6 +68,8 @@ import { ValidateInputSelected } from '../../common/pipes/validators';
   ],
 })
 export class AddSalesInvoicePage implements OnInit {
+  isLoadMoreVisible: boolean = true;
+  isSkeletonTextVisible: boolean = true;
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
@@ -82,15 +86,26 @@ export class AddSalesInvoicePage implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
-  salesInvoiceItemsForm: FormGroup;
+  salesInvoiceItemsForm = new FormGroup({
+    items: new FormArray([], this.itemValidator),
+    total: new FormControl(0),
+    filterKey: new FormControl('Item Code'),
+    filterValue: new FormControl(),
+  });
+  itemsControl: FormArray = this.salesInvoiceItemsForm.get(
+    'items',
+  ) as FormArray;
+
   salesCustomerDetialsForm: FormGroup;
   paymentForm: FormGroup;
-  itemsControl: FormArray;
   validateInput: any = ValidateInputSelected;
   filteredModeOfPaymentList: Observable<any[]>;
   filteredPosProfileList: Observable<any[]>;
   itemMap: any = {};
 
+  gridItems: Item[] = [];
+  filterOptions: any[] = ['Item Code', 'Serial No'];
+  isDataLoading = false;
 
   get f() {
     return this.salesCustomerDetialsForm.controls;
@@ -113,6 +128,14 @@ export class AddSalesInvoicePage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.getItemList().subscribe({
+      next: res => {
+        this.gridItems = [...res.items];
+        this.showLoadMore(res.totalLength);
+        this.isSkeletonTextVisible = false;
+      },
+    });
+
     this.createFormGroup();
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
@@ -272,10 +295,6 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   createFormGroup() {
-    this.salesInvoiceItemsForm = new FormGroup({
-      items: new FormArray([], this.itemValidator),
-      total: new FormControl(0),
-    });
     this.salesCustomerDetialsForm = new FormGroup(
       {
         warehouse: new FormControl('', Validators.required),
@@ -296,7 +315,6 @@ export class AddSalesInvoicePage implements OnInit {
       modeOfPayment: new FormControl('', Validators.required),
       posProfile: new FormControl('', Validators.required),
     });
-    this.itemsControl = this.salesInvoiceItemsForm.get('items') as FormArray;
   }
 
   dueDateValidator(abstractControl: AbstractControl) {
@@ -435,6 +453,162 @@ export class AddSalesInvoicePage implements OnInit {
       this.dataSource.update(copy);
     }
     this.itemsControl.controls[index].setValue(item);
+  }
+
+  addFromItemsGrid(newItem: Item) {
+    this.salesService
+      .getItemFromRMAServer(newItem.item_code)
+      .pipe(
+        switchMap(item => {
+          return this.getWarehouseStock(item).pipe(
+            map(stock => {
+              return { item, stock };
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        next: res => {
+          const item = this.dataSource.data();
+          if (item.find(x => x.uuid === res.item.uuid)) {
+            const index = item.findIndex(x => x.uuid === res.item.uuid);
+            item[index].qty = item[index].qty + 1;
+            this.calculateTotal(this.dataSource.data().slice());
+            this.dataSource.update(item);
+          } else {
+            newItem.uuid = res.item.uuid;
+            newItem.minimumPrice = res.item.minimumPrice;
+            newItem.has_serial_no = res.item.has_serial_no;
+            newItem.qty = 1;
+            newItem.rate = newItem.rate ? newItem.rate : 0;
+            newItem.stock = this.salesCustomerDetialsForm.get('warehouse').value
+              ? res.stock.message
+              : 'Please Select a Warehouse';
+            item.push(newItem);
+            this.calculateTotal(item.slice());
+            this.dataSource.update(item);
+            this.itemsControl.push(new FormControl(newItem));
+          }
+        },
+      });
+  }
+
+  loadMoreData() {
+    this.isDataLoading = true;
+    if (this.salesInvoiceItemsForm.controls.filterKey.value === 'Item Code') {
+      this.getItemList(this.gridItems ? this.gridItems.length / 30 : 0, {
+        item_code: this.salesInvoiceItemsForm.controls.filterValue.value,
+      }).subscribe({
+        next: res => {
+          this.isDataLoading = false;
+          this.gridItems = [...this.gridItems, ...res.items];
+          this.showLoadMore(res?.totalLength);
+        },
+      });
+    } else if (
+      this.salesInvoiceItemsForm.controls.filterKey.value === 'Serial No'
+    ) {
+      this.getItemsWithSerial(
+        this.gridItems ? this.gridItems.length / 30 : 0,
+      ).subscribe({
+        next: res => {
+          this.isDataLoading = false;
+          this.gridItems = [...this.gridItems, ...res.items];
+          this.showLoadMore(res.totalLength);
+        },
+      });
+    }
+  }
+
+  showLoadMore(totalLength?: number) {
+    if (this.gridItems.length === totalLength) {
+      this.isLoadMoreVisible = false;
+    } else {
+      this.isLoadMoreVisible = true;
+    }
+  }
+
+  setFilter() {
+    this.isSkeletonTextVisible = true;
+    this.gridItems = [];
+    if (this.salesInvoiceItemsForm.controls.filterKey.value === 'Serial No') {
+      this.getItemsWithSerial().subscribe({
+        next: res => {
+          this.isSkeletonTextVisible = false;
+          this.gridItems = [...res.items];
+          this.showLoadMore(res.totalLength);
+        },
+      });
+    } else if (
+      this.salesInvoiceItemsForm.controls.filterKey.value === 'Item Code'
+    ) {
+      this.getItemList(0, {
+        item_code: this.salesInvoiceItemsForm.controls.filterValue.value,
+      }).subscribe({
+        next: res => {
+          this.isSkeletonTextVisible = false;
+          this.gridItems = [...res.items];
+          this.showLoadMore(res.totalLength);
+        },
+      });
+    }
+  }
+
+  getItemList(pageIndex = 0, filters?: { [key: string]: any }) {
+    return this.salesService
+      .getItemList(undefined, undefined, pageIndex, undefined, filters)
+      .pipe(
+        switchMap(itemList => {
+          return from(itemList.docs ? itemList.docs : []).pipe(
+            concatMap((item: Item) => {
+              return this.salesService.getItemPrice(item.item_code).pipe(
+                switchMap(res => {
+                  res.find(x => (item.rate = x.price_list_rate));
+                  return of(item);
+                }),
+              );
+            }),
+            toArray(),
+            switchMap(item => {
+              return of({ items: item, totalLength: itemList.length });
+            }),
+          );
+        }),
+      );
+  }
+
+  getItemsWithSerial(pageIndex = 0) {
+    return this.salesService
+      .getSerialList(this.getFilterQuery(), undefined, pageIndex)
+      .pipe(
+        switchMap(res => {
+          return from(res.docs ? res.docs : []).pipe(
+            concatMap(serialInfo => {
+              return this.salesService.getItemPrice(serialInfo.item_code).pipe(
+                switchMap(res => {
+                  res.find(x => (serialInfo.rate = x.price_list_rate));
+                  return of(serialInfo);
+                }),
+              );
+            }),
+            toArray(),
+            switchMap(item => {
+              return of({ items: item, totalLength: res.length });
+            }),
+          );
+        }),
+      );
+  }
+
+  getFilterQuery() {
+    const query: SerialSearchFields = {};
+    query.serial_no = {
+      $regex: this.salesInvoiceItemsForm.controls.filterValue.value
+        ? this.salesInvoiceItemsForm.controls.filterValue.value
+        : '',
+      $options: 'i',
+    };
+    return query;
   }
 
   updateQuantity(row: Item, quantity: number) {

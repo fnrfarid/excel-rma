@@ -68,6 +68,7 @@ import {
   TERRITORY,
 } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SerialSearchFields } from '../../common/interfaces/search-fields.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -331,19 +332,10 @@ export class SalesService {
       .set('sort', sortOrder);
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http
-          .get<APIResponse>(url, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.docs);
-            }),
-            catchError(err => {
-              return of(this.itemList);
-            }),
-          );
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
       }),
     );
   }
@@ -614,26 +606,25 @@ export class SalesService {
     );
   }
 
-  getSerialList(filter = '', sortOrder = 'asc', pageNumber = 0, pageSize = 30) {
+  getSerialList(
+    query: SerialSearchFields,
+    sortOrder = 'asc',
+    pageNumber = 0,
+    pageSize = 30,
+  ) {
     const url = LIST_SERIAL_ENDPOINT;
     const params = new HttpParams()
       .set('limit', pageSize.toString())
       .set('offset', (pageNumber * pageSize).toString())
-      .set('search', filter)
+      .set('query', encodeURIComponent(JSON.stringify(query)))
       .set('sort', sortOrder);
 
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http
-          .get<APIResponse>(url, {
-            params,
-            headers,
-          })
-          .pipe(
-            switchMap(response => {
-              return of(response.docs);
-            }),
-          );
+        return this.http.get<APIResponse>(url, {
+          params,
+          headers,
+        });
       }),
     );
   }
