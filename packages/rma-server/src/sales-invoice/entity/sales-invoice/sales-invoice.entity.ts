@@ -207,6 +207,7 @@ export class Item {
   qty: number;
   rate: number;
   amount: number;
+  serial_no?: string;
 }
 
 export class Payments {

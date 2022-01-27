@@ -39,12 +39,12 @@ export class InlineEditComponent {
   /** Form model for the input. */
   comment = '';
   quantity: number = null;
-  serial_no: string = ''
+  serial_no: string = '';
 
   constructor(
     @Optional() @Host() public popover: SatPopover,
     private salesService: SalesService,
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (this.popover) {
@@ -108,12 +108,9 @@ export class InlineEditComponent {
               this.popover.close(selectedItem);
             },
           });
-      }
-      else if (this.column === "serial_no") {
-        this.popover.close(this.serial_no)
-      }
-
-      else if (this.column === 'quantity') this.popover.close(this.quantity);
+      } else if (this.column === 'serial_no') {
+        this.popover.close(this.serial_no);
+      } else if (this.column === 'quantity') this.popover.close(this.quantity);
       else {
         if (this.rateFormControl.value < this.minimumPrice) {
           this.rateFormControl.setErrors({ min: false });

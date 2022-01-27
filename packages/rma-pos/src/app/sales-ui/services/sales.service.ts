@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { of, from, forkJoin, Observable, throwError, BehaviorSubject } from 'rxjs';
+import { of, from, forkJoin, Observable, throwError } from 'rxjs';
 import { switchMap, catchError, map, mergeMap, toArray } from 'rxjs/operators';
 import {
   SalesInvoice,
@@ -74,9 +74,6 @@ import { SerialSearchFields } from '../../common/interfaces/search-fields.interf
   providedIn: 'root',
 })
 export class SalesService {
-
-  isVisibleSource: BehaviorSubject<any[]> = new BehaviorSubject([]);
-  isNotVisibleSource: BehaviorSubject<any[]> = new BehaviorSubject([]);
   salesInvoiceList: Array<SalesInvoice>;
   itemList: Array<Item>;
 

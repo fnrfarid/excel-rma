@@ -37,282 +37,8 @@
   </ion-fab>
   <mat-horizontal-stepper linear #stepper>
     <!-- #docregion editable -->
-    <mat-step [stepControl]="salesInvoiceItemsForm" [editable]="isEditable">
-      <ng-template matStepLabel>Select Items</ng-template>
-      <form [formGroup]="salesInvoiceItemsForm">
-        <ion-grid>
-          <ion-row>
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <mat-label>Filter from</mat-label>
-                <mat-select formControlName="filterKey">
-                  <mat-option
-                    *ngFor="let option of filterOptions"
-                    [value]="option"
-                    >{{option}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-full-width">
-                <input
-                  matInput
-                  placeholder="Value"
-                  formControlName="filterValue"
-                  (keyup.enter)="setFilter()"
-                />
-              </mat-form-field>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
 
-        <div
-          class="grid-container ion-padding custom-skeleton"
-          *ngIf="isSkeletonTextVisible"
-        >
-          <ion-grid>
-            <ion-row>
-              <ion-col>
-                <ion-card class="grid-card">
-                  <ion-card-header>
-                    <ion-card-subtitle>
-                      <ion-skeleton-text
-                        animated
-                        style="width: 70%"
-                      ></ion-skeleton-text>
-                    </ion-card-subtitle>
-                  </ion-card-header>
-                  <ion-card-content>
-                    <ion-skeleton-text
-                      animated
-                      style="width: 70%"
-                    ></ion-skeleton-text>
-                  </ion-card-content>
-                </ion-card>
-              </ion-col>
-              <ion-col> </ion-col>
-              <ion-col> </ion-col>
-              <ion-col> </ion-col>
-            </ion-row>
-          </ion-grid>
-        </div>
-
-        <div class="grid-container" *ngIf="!isSkeletonTextVisible">
-          <ion-grid>
-            <ion-row>
-              <ion-col size="3" *ngFor="let item of gridItems">
-                <ion-card
-                  class="grid-card"
-                  (click)="addFromItemsGrid(item)"
-                  matTooltip="{{item.serial_no}}"
-                  matTooltipPosition="above"
-                >
-                  <ion-card-header>
-                    <ion-card-subtitle> {{item.item_name}} </ion-card-subtitle>
-                  </ion-card-header>
-                  <ion-card-content>
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="primary"
-                      *ngIf="item.rate"
-                      >{{item.rate}}
-                    </ion-button>
-                  </ion-card-content>
-                </ion-card>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <ion-progress-bar
-                  type="indeterminate"
-                  color="primary"
-                  *ngIf="isDataLoading"
-                ></ion-progress-bar>
-
-                <center>
-                  <ion-button
-                    fill="outline"
-                    *ngIf="isLoadMoreVisible"
-                    color="primary"
-                    (click)="loadMoreData()"
-                  >
-                    Load More</ion-button
-                  >
-                </center>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </div>
-
-        <ion-card>
-          <ion-card-header>
-            <ion-row class="align">
-              <ion-col>
-                <ion-card-title>
-                  <ion-text color="tertiary"> Items </ion-text>
-                </ion-card-title>
-              </ion-col>
-              <ion-col class="ion-text-right" size="auto">
-                <ion-button
-                  color="tertiary"
-                  fill="outline"
-                  matTooltip=" ( ctrl + i ) "
-                  matTooltipPosition="above"
-                  matTooltipClass="tooltip"
-                  (ctrlI)="addItem()"
-                  (click)="addItem()"
-                >
-                  Add
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-card-header>
-          <ion-card-content class="ion-no-padding">
-            <ion-item lines="none">
-              <mat-table #table [dataSource]="dataSource" style="width: 100%">
-                <ng-container matColumnDef="item">
-                  <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
-                  <mat-cell
-                    *matCellDef="let row;let i = index"
-                    [satPopoverAnchor]="p"
-                    tabindex="0"
-                    (keyup.enter)="p.open()"
-                    (click)="p.open()"
-                  >
-                    <ng-container *ngIf="row.item_name">
-                      {{row.item_name}}
-                    </ng-container>
-                    <span class="add-comment" *ngIf="!row.item_name">
-                      Add an item
-                    </span>
-                    <sat-popover
-                      #p
-                      hasBackdrop
-                      xAlign="start"
-                      yAlign="start"
-                      (closed)="updateItem(row,i,$event)"
-                    >
-                      <inline-edit
-                        style="width: 400px !important"
-                        [value]="row.item_name"
-                        column="item"
-                        [minimumPrice]="row.minimumPrice"
-                      ></inline-edit>
-                    </sat-popover>
-                  </mat-cell>
-                  <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-                </ng-container>
-                <ng-container matColumnDef="stock">
-                  <mat-header-cell *matHeaderCellDef
-                    >Available Stock</mat-header-cell
-                  >
-                  <mat-cell
-                    *matCellDef="let row"
-                    [ngStyle]="{'color': row.stock > 0 ? 'green' : 'red'}"
-                  >
-                    {{ row.stock }}
-                  </mat-cell>
-                  <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-                </ng-container>
-                <ng-container matColumnDef="quantity">
-                  <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
-                  <mat-cell
-                    *matCellDef="let row"
-                    [satPopoverAnchor]="p"
-                    tabindex="0"
-                    (keyup.enter)="p.open()"
-                    (click)="p.open()"
-                  >
-                    <ng-container> {{row.qty}} </ng-container>
-
-                    <sat-popover
-                      #p
-                      hasBackdrop
-                      xAlign="start"
-                      yAlign="start"
-                      (closed)="updateQuantity(row, $event)"
-                    >
-                      <inline-edit
-                        [value]="row.qty"
-                        column="quantity"
-                        [minimumPrice]="row.minimumPrice"
-                      ></inline-edit>
-                    </sat-popover>
-                  </mat-cell>
-                  <mat-footer-cell *matFooterCellDef> </mat-footer-cell>
-                </ng-container>
-                <ng-container matColumnDef="rate">
-                  <mat-header-cell *matHeaderCellDef>Rate</mat-header-cell>
-                  <mat-cell
-                    *matCellDef="let row"
-                    [satPopoverAnchor]="p"
-                    tabindex="0"
-                    (keyup.enter)="p.open()"
-                    (click)="p.open()"
-                  >
-                    <ng-container> {{row.rate}} </ng-container>
-                    <sat-popover
-                      #p
-                      hasBackdrop
-                      xAlign="start"
-                      yAlign="start"
-                      (closed)="updateRate(row, $event)"
-                    >
-                      <inline-edit
-                        [value]="row.rate"
-                        column="rate"
-                        [minimumPrice]="row.minimumPrice"
-                      ></inline-edit>
-                    </sat-popover>
-                  </mat-cell>
-                  <mat-footer-cell *matFooterCellDef>Total </mat-footer-cell>
-                </ng-container>
-                <ng-container matColumnDef="total">
-                  <mat-header-cell *matHeaderCellDef>Total</mat-header-cell>
-                  <mat-cell *matCellDef="let row"
-                    >{{row.rate * row.qty | curFormat | async}}</mat-cell
-                  >
-                  <mat-footer-cell *matFooterCellDef
-                    >{{salesInvoiceItemsFormControls.total.value | curFormat |
-                    async }}</mat-footer-cell
-                  >
-                </ng-container>
-                <ng-container matColumnDef="delete">
-                  <mat-header-cell *matHeaderCellDef></mat-header-cell>
-                  <mat-cell *matCellDef="let row ; let i = index">
-                    <ion-button
-                      (click)="deleteRow(i)"
-                      fill="clear"
-                      class="ion-no-padding"
-                      color="danger"
-                    >
-                      <ion-icon slot="icon-only" name="trash"></ion-icon>
-                    </ion-button>
-                  </mat-cell>
-                  <mat-footer-cell *matFooterCellDef></mat-footer-cell>
-                </ng-container>
-                <mat-header-row
-                  *matHeaderRowDef="displayedColumns; sticky: true"
-                ></mat-header-row>
-                <mat-row
-                  *matRowDef="let row; columns: displayedColumns;"
-                ></mat-row>
-                <mat-footer-row
-                  class="footer"
-                  *matFooterRowDef="displayedColumns; sticky: true"
-                ></mat-footer-row>
-              </mat-table>
-            </ion-item>
-          </ion-card-content>
-        </ion-card>
-        <div>
-          <button mat-flat-button color="primary" matStepperNext>Next</button>
-        </div>
-      </form>
-    </mat-step>
-    <mat-step [stepControl]="salesCustomerDetialsForm" [editable]="isEditable">
+    <mat-step [stepControl]="salesCustomerDetialsForm">
       <!-- #enddocregion editable -->
       <ng-template matStepLabel>Fill Out Customer Details</ng-template>
 
@@ -538,6 +264,39 @@
             </ion-grid>
           </ion-card-content>
         </ion-card>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>
+              <ion-text color="tertiary"> Address </ion-text>
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content
+            *ngIf="address.name && salesCustomerDetialsForm.get('customer').value"
+          >
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col>
+                  <ion-text class="example-full-width">
+                    {{address.name}}
+                    <br />
+                    {{address.address_line1}}
+                    <br />
+                    {{address.address_line2 ? address.address_line2 : ''}}
+                    <br />
+                    {{address.city}}-{{address.pincode}}
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+          <ion-card-content
+            *ngIf="!address.name && salesCustomerDetialsForm.get('customer').value "
+          >
+            <ion-text class="example-full-width">
+              No address assigned to customer
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
 
         <div>
           <button mat-flat-button color="primary" matStepperPrevious>
@@ -547,9 +306,118 @@
         </div>
       </form>
     </mat-step>
-    <mat-step [stepControl]="salesInvoiceItemsForm" [editable]="isEditable">
+    <mat-step [stepControl]="salesInvoiceItemsForm">
       <ng-template matStepLabel>Select Items</ng-template>
       <form [formGroup]="salesInvoiceItemsForm">
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <mat-label>Filter from</mat-label>
+                <mat-select formControlName="filterKey">
+                  <mat-option
+                    *ngFor="let option of filterOptions"
+                    [value]="option"
+                    >{{option}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-full-width">
+                <input
+                  matInput
+                  placeholder="Value"
+                  formControlName="filterValue"
+                  (keyup.enter)="setFilter()"
+                />
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <div
+          class="grid-container ion-padding custom-skeleton"
+          *ngIf="isSkeletonTextVisible"
+        >
+          <ion-grid>
+            <ion-row>
+              <ion-col size="3" *ngFor="let items of [0,1,2,3]">
+                <ion-card class="grid-card">
+                  <ion-card-header>
+                    <ion-card-subtitle>
+                      <ion-skeleton-text
+                        animated
+                        style="width: 70%"
+                      ></ion-skeleton-text>
+                    </ion-card-subtitle>
+                  </ion-card-header>
+                  <ion-card-content>
+                    <ion-skeleton-text
+                      animated
+                      style="width: 70%"
+                    ></ion-skeleton-text>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+              <ion-col> </ion-col>
+              <ion-col> </ion-col>
+              <ion-col> </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+
+        <div class="grid-container" *ngIf="!isSkeletonTextVisible">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="3" *ngFor="let item of gridItems">
+                <ion-card
+                  class="grid-card"
+                  (click)="addFromItemsGrid(item)"
+                  matTooltip="{{item.serial_no}}"
+                  matTooltipPosition="above"
+                >
+                  <ion-card-header>
+                    <ion-card-subtitle> {{item.item_name}} </ion-card-subtitle>
+                    <ion-card-subtitle color="primary"
+                      >{{item.serial_no?item.serial_no:''}}</ion-card-subtitle
+                    >
+                  </ion-card-header>
+                  <ion-card-content>
+                    <ion-button
+                      fill="clear"
+                      size="small"
+                      color="primary"
+                      *ngIf="item.rate"
+                      >{{item.rate}}
+                    </ion-button>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-progress-bar
+                  type="indeterminate"
+                  color="primary"
+                  *ngIf="isDataLoading"
+                ></ion-progress-bar>
+
+                <center>
+                  <ion-button
+                    fill="outline"
+                    *ngIf="isLoadMoreVisible"
+                    color="primary"
+                    (click)="loadMoreData()"
+                  >
+                    Load More</ion-button
+                  >
+                </center>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+
         <ion-card>
           <ion-card-header>
             <ion-row class="align">
@@ -651,10 +519,10 @@
                   <mat-header-cell *matHeaderCellDef>Serial No</mat-header-cell>
                   <mat-cell
                     *matCellDef="let row;let i = index"
-                    [satPopoverAnchor]="p"
+                    [satPopoverAnchor]="popover"
                     tabindex="0"
-                    (keyup.enter)="p.open()"
-                    (click)="p.open()"
+                    (keyup.enter)="popover.open()"
+                    (click)="popover.open()"
                   >
                     <ng-container *ngIf="row.serial_no">
                       {{row.serial_no}}
@@ -663,7 +531,7 @@
                       Add Serial No
                     </span>
                     <sat-popover
-                      #p
+                      #popover
                       hasBackdrop
                       xAlign="start"
                       yAlign="start"
@@ -748,8 +616,7 @@
         </div>
       </form>
     </mat-step>
-
-    <mat-step [stepControl]="paymentForm" [editable]="isEditable">
+    <mat-step [stepControl]="paymentForm">
       <ng-template matStepLabel>Select Payment Method</ng-template>
       <form [formGroup]="paymentForm">
         <ion-card>
@@ -852,38 +719,4 @@
       </form>
     </mat-step>
   </mat-horizontal-stepper>
-
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-text color="tertiary"> Address </ion-text>
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content
-      *ngIf="address.name && salesCustomerDetialsForm.get('customer').value"
-    >
-      <ion-grid class="ion-no-padding">
-        <ion-row>
-          <ion-col>
-            <ion-text class="example-full-width">
-              {{address.name}}
-              <br />
-              {{address.address_line1}}
-              <br />
-              {{address.address_line2 ? address.address_line2 : ''}}
-              <br />
-              {{address.city}}-{{address.pincode}}
-            </ion-text>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-    <ion-card-content
-      *ngIf="!address.name && salesCustomerDetialsForm.get('customer').value "
-    >
-      <ion-text class="example-full-width">
-        No address assigned to customer
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
 </ion-content>
