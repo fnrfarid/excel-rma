@@ -892,7 +892,8 @@ export class AddSalesInvoicePage implements OnInit {
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   getItemsWarranty() {
-    from(this.itemDataSource.data())
+    const data = this.itemDataSource?.data() ? this.itemDataSource.data() : [];
+    from(data)
       .pipe(
         mergeMap(item => {
           return this.salesService.getItemFromRMAServer(item.item_code).pipe(
@@ -910,7 +911,7 @@ export class AddSalesInvoicePage implements OnInit {
             this.itemMap[item.item_code].salesWarrantyMonths =
               item.salesWarrantyMonths;
           });
-          this.itemDataSource.loadItems(success);
+          this.itemDataSource?.loadItems(success);
         },
         error: err => {},
       });
@@ -982,7 +983,7 @@ export class AddSalesInvoicePage implements OnInit {
           this.warehouseFormControl.setValue(sales_invoice.delivery_warehouse);
           this.date.setValue(new Date());
           this.getItemsWarranty();
-          this.state.itemData = this.itemDataSource.data();
+          this.state.itemData = this.itemDataSource?.data();
           this.state.warehouse = this.warehouseFormControl.value;
           this.salesService.relaySalesInvoice(sales_invoice.name).subscribe({
             next: async success => {
