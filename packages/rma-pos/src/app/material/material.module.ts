@@ -27,6 +27,7 @@ import { SatPopoverModule } from '@ncstate/sat-popover';
 import { MatChipsModule } from '@angular/material/chips';
 import { CdkStepperModule } from '@angular/cdk/stepper';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatGridListModule } from '@angular/material/grid-list';
 
 @NgModule({
   declarations: [],
@@ -60,6 +61,7 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatNativeDateModule,
     MatDialogModule,
     MatTooltipModule,
+    MatGridListModule,
   ],
   exports: [
     CdkStepperModule,
@@ -90,6 +92,7 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatOptionModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatGridListModule,
   ],
 })
 export class MaterialModule {}

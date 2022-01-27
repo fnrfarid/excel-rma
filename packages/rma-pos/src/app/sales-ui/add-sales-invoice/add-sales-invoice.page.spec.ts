@@ -46,6 +46,7 @@ describe('AddSalesInvoicePage', () => {
         {
           provide: SalesService,
           useValue: {
+            getItemList: (...args) => of([{}]),
             createSalesInvoice: (...args) => of({}),
             getSalesInvoice: (...args) => of({}),
             getCustomer: (...args) => of({}),

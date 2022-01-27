@@ -44,3 +44,12 @@ mat-cell {
   display: flex;
   justify-content: center;
 }
+
+.grid-container {
+  max-height: 20em;
+  overflow-y: auto;
+}
+
+.grid-card {
+  height: 95%;
+}
