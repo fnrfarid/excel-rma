@@ -78,7 +78,7 @@ export class AddSalesInvoicePage implements OnInit {
   postingDate: string;
   dueDate: string;
   address = {} as any;
-  displayedColumns = ['item', 'stock', 'quantity', 'rate', 'total', 'delete'];
+  displayedColumns = ['item', 'stock', 'quantity', 'serial_no', 'rate', 'total', 'delete'];
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
@@ -89,6 +89,8 @@ export class AddSalesInvoicePage implements OnInit {
   validateInput: any = ValidateInputSelected;
   filteredModeOfPaymentList: Observable<any[]>;
   filteredPosProfileList: Observable<any[]>;
+  itemMap: any = {};
+
 
   get f() {
     return this.salesCustomerDetialsForm.controls;
@@ -108,7 +110,7 @@ export class AddSalesInvoicePage implements OnInit {
     private location: Location,
     private readonly router: Router,
     private readonly time: TimeService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.createFormGroup();
@@ -188,8 +190,8 @@ export class AddSalesInvoicePage implements OnInit {
             this.initial.warehouse
               ? null
               : (this.salesCustomerDetialsForm
-                  .get('warehouse')
-                  .setValue(data[0]),
+                .get('warehouse')
+                .setValue(data[0]),
                 this.initial.warehouse++);
             return of(data);
           }
@@ -209,8 +211,8 @@ export class AddSalesInvoicePage implements OnInit {
             this.initial.territory
               ? null
               : (this.salesCustomerDetialsForm
-                  .get('territory')
-                  .setValue(data[0]),
+                .get('territory')
+                .setValue(data[0]),
                 this.initial.territory++);
             return of(data);
           }
@@ -260,12 +262,12 @@ export class AddSalesInvoicePage implements OnInit {
                       .get('company')
                       .setValue(res.defaultCompany);
                   },
-                  error: error => {},
+                  error: error => { },
                 });
               }
             });
         },
-        error: error => {},
+        error: error => { },
       });
   }
 
@@ -386,6 +388,27 @@ export class AddSalesInvoicePage implements OnInit {
       item.item_code,
       this.salesCustomerDetialsForm.get('warehouse').value,
     );
+  }
+
+  updateSerial(row: Item, serial_no: any) {
+    console.log(serial_no);
+    if (serial_no == null) {
+      return;
+    }
+    const copy = this.dataSource.data().slice();
+    row.serial_no = [serial_no];
+    this.dataSource.update(copy);
+  }
+
+  checkDuplicateSerial() {
+    const state = { existingSerials: [], setSerials: new Set() };
+    this.dataSource.data().forEach(item => {
+      state.existingSerials.push(item.serial_no);
+      state.setSerials.add(item.serial_no);
+    });
+    return state.existingSerials.length === Array.from(state.setSerials).length
+      ? true
+      : false;
   }
 
   updateItem(row: Item, index: number, item: Item) {
@@ -555,6 +578,7 @@ export class AddSalesInvoicePage implements OnInit {
         )
         .subscribe({
           next: success => {
+            this.salesService.isVisibleSource.next(this.dataSource.data());
             this.router.navigate(['sales', 'view-sales-invoice', success.uuid]);
           },
           error: err => {
@@ -577,6 +601,33 @@ export class AddSalesInvoicePage implements OnInit {
         duration: DURATION,
       });
     }
+  }
+
+
+
+  getItemsWarranty() {
+    from(this.dataSource.data())
+      .pipe(
+        mergeMap(item => {
+          return this.salesService.getItemFromRMAServer(item.item_code).pipe(
+            switchMap(warrantyItem => {
+              item.salesWarrantyMonths = warrantyItem.salesWarrantyMonths;
+              return of(item);
+            }),
+          );
+        }),
+        toArray(),
+      )
+      .subscribe({
+        next: success => {
+          success.forEach(item => {
+            this.itemMap[item.item_code].salesWarrantyMonths =
+              item.salesWarrantyMonths;
+          });
+          this.dataSource.loadItems(success);
+        },
+        error: err => { },
+      });
   }
 
   updateSalesInvoice() {
@@ -800,7 +851,7 @@ export class AddSalesInvoicePage implements OnInit {
             company: string;
             credit_limit: number;
           }[] = this.salesCustomerDetialsForm.get('customer').value
-            .credit_limits;
+              .credit_limits;
 
           const limits = creditLimits.filter(
             limit =>
@@ -821,7 +872,7 @@ export class AddSalesInvoicePage implements OnInit {
             frappeError = JSON.parse(error.error._server_messages);
             frappeError = JSON.parse(frappeError);
             frappeError = (frappeError as { message?: string }).message;
-          } catch {}
+          } catch { }
 
           this.snackbar.open(frappeError, CLOSE, { duration: SHORT_DURATION });
         },
