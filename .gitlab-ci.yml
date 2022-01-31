@@ -195,6 +195,19 @@ deploy_staging_frontend:
   script:
     - curl -Ss -X POST $FRONTEND_UPDATE_KEY
 
+deploy_staging_pos:
+  image: alpine:latest
+  stage: deploy
+  only:
+    refs:
+      - develop
+    changes:
+      - packages/rma-pos/**/*
+  before_script:
+    - apk add curl bash
+  script:
+    - curl -Ss -X POST $POS_UPDATE_KEY
+    
 deploy_staging_server:
   image: alpine:latest
   stage: deploy
