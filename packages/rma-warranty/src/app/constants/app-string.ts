@@ -73,7 +73,6 @@ export const WARRANTY_TYPE = {
 };
 
 export const CURRENT_STATUS_VERDICT = {
-  RECEIVED_FROM_CUSTOMER: 'Received from Customer',
   RECEIVED_FROM_BRANCH: 'Received from Branch',
   WORK_IN_PROGRESS: 'Work in Progress',
   SENT_TO_ENG_DEPT: 'Sent to Eng. Dept',
