@@ -177,6 +177,7 @@ export class AddSalesInvoicePage implements OnInit {
   filteredItemList = [];
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
+
   // =====NEED TO CLEAN UP CODE=========
 
   get f() {
@@ -1050,7 +1051,9 @@ export class AddSalesInvoicePage implements OnInit {
         ? `${notFoundMessage}, expected ${expected} found ${found}`
         : `${notFoundMessage}`,
       CLOSE,
-      { duration: 4500 },
+      {
+        duration: 4500,
+      },
     );
   }
 
