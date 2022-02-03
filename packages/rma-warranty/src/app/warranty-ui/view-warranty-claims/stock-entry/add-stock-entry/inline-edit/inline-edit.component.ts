@@ -75,7 +75,7 @@ export class InlineEditComponent {
     @Optional() @Host() public popover: SatPopover,
     private addServiceInvoiceService: AddServiceInvoiceService,
     private snackbar: MatSnackBar,
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (this.popover) {

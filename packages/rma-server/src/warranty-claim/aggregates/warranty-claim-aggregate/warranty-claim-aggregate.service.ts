@@ -273,7 +273,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     serialBody.warranty.purchaseWarrantyDate = serialBody.date;
     serialBody.warranty.salesWarrantyDate = payload.warranty_end_date
       ? payload.warranty_end_date
-      : undefined
+      : undefined;
     serialBody.warranty.soldOn = serialBody.date;
     serialBody.warehouse = req.token.warehouses[0];
     return of(serialBody);
@@ -327,7 +327,7 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
     this.apply(new WarrantyClaimUpdatedEvent(update));
   }
 
-  acquireLock(bulk: WarrantyClaimDto) { }
+  acquireLock(bulk: WarrantyClaimDto) {}
 
   createBulkClaim(claimsPayload: WarrantyClaimDto, clientHttpRequest) {
     let bulk: WarrantyClaimDto;
@@ -637,8 +637,8 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
           }),
         )
         .subscribe({
-          next: success => { },
-          error: err => { },
+          next: success => {},
+          error: err => {},
         });
     });
   }
@@ -675,10 +675,10 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
       statusHistoryPayload,
       clientHttpRequest,
     );
-    let settings
+    let settings;
     return this.settingsService.find().pipe(
       switchMap(setting => {
-        settings = setting
+        settings = setting;
         return from(
           this.warrantyClaimService.updateOne(
             { uuid: statusHistoryPayload.uuid },
@@ -687,7 +687,8 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
                 status_history: statusHistoryDetails,
               },
             },
-          ))
+          ),
+        );
       }),
       switchMap(history => {
         return this.setClaimStatus(statusHistoryPayload);
@@ -746,8 +747,10 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             this.serialNoService.updateOne(
               { serial_no: warrantyState.serial_no },
               {
-                $set: { 'warranty.soldOn': new DateTime(settings.timeZone).toJSDate() },
-                $unset: { claim_no: undefined }
+                $set: {
+                  'warranty.soldOn': new DateTime(settings.timeZone).toJSDate(),
+                },
+                $unset: { claim_no: undefined },
               },
             ),
           );

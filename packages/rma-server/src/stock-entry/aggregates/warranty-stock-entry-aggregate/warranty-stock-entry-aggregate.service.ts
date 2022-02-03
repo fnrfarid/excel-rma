@@ -48,7 +48,7 @@ export class WarrantyStockEntryAggregateService {
     private serialNoHistoryService: SerialNoHistoryService,
     private readonly stockEntryPoliciesService: StockEntryPoliciesService,
     private readonly warrantyAggregateService: WarrantyClaimAggregateService,
-  ) { }
+  ) {}
 
   createDeliveryNote(deliveryNotes: WarrantyStockEntryDto[], req) {
     const warrantyPayload: any = {};
