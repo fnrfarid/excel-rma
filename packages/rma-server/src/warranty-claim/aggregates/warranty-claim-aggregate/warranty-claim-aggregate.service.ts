@@ -823,6 +823,16 @@ export class WarrantyClaimAggregateService extends AggregateRoot {
             statusPayload: of(
               res.status_history[res.status_history.length - 2],
             ),
+            serialInfo: of(
+              this.serialNoService.updateOne(
+                { serial_no: res.serial_no },
+                {
+                  $set: {
+                    claim_no: res.claim_no,
+                  },
+                },
+              ),
+            ),
           });
         }
         return throwError(
