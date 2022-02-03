@@ -48,7 +48,7 @@ export class WarrantyStockEntryAggregateService {
     private serialNoHistoryService: SerialNoHistoryService,
     private readonly stockEntryPoliciesService: StockEntryPoliciesService,
     private readonly warrantyAggregateService: WarrantyClaimAggregateService,
-  ) {}
+  ) { }
 
   createDeliveryNote(deliveryNotes: WarrantyStockEntryDto[], req) {
     const warrantyPayload: any = {};
@@ -353,10 +353,7 @@ export class WarrantyStockEntryAggregateService {
             warehouse: deliveryNote.set_warehouse,
           },
           $unset: {
-            customer: '',
-            'warranty.salesWarrantyDate': '',
-            'warranty.soldOn': '',
-            sales_invoice_name: '',
+            sales_invoice_name: undefined,
           },
         },
       ),

@@ -102,7 +102,7 @@ export class AddWarrantyClaimPage implements OnInit {
     private readonly router: Router,
     private readonly activatedRoute: ActivatedRoute,
     private readonly warrantyClaim: WarrantyService,
-  ) {}
+  ) { }
 
   async ngOnInit() {
     if (this.activatedRoute.snapshot.params.name === 'edit') {
@@ -510,7 +510,7 @@ export class AddWarrantyClaimPage implements OnInit {
     return warrantyClaimDetails;
   }
 
-  createForm() {}
+  createForm() { }
 
   async customerChanged(customer) {
     const loading = await this.loadingController.create();
@@ -635,21 +635,28 @@ export class AddWarrantyClaimPage implements OnInit {
           );
           return;
         }
-        if (
-          DateTime.fromISO(this.warrantyClaimForm.controls.received_on.value)
-            .setZone(timeZone)
-            .toFormat('yyyy-MM-dd') <
-          DateTime.fromISO(this.getSerialData.warranty.salesWarrantyDate)
-            .setZone(timeZone)
-            .toFormat('yyyy-MM-dd')
-        ) {
-          this.warrantyClaimForm.controls.claim_type.setValue(
-            WARRANTY_TYPE.WARRANTY,
-          );
-        } else {
+        if (!this.getSerialData.warranty.salesWarrantyDate) {
           this.warrantyClaimForm.controls.claim_type.setValue(
             WARRANTY_TYPE.NON_WARRANTY,
-          );
+          )
+        }
+        else {
+          if (
+            DateTime.fromISO(this.warrantyClaimForm.controls.received_on.value)
+              .setZone(timeZone)
+              .toFormat('yyyy-MM-dd') <
+            DateTime.fromISO(this.getSerialData.warranty.salesWarrantyDate)
+              .setZone(timeZone)
+              .toFormat('yyyy-MM-dd')
+          ) {
+            this.warrantyClaimForm.controls.claim_type.setValue(
+              WARRANTY_TYPE.WARRANTY,
+            );
+          } else {
+            this.warrantyClaimForm.controls.claim_type.setValue(
+              WARRANTY_TYPE.NON_WARRANTY,
+            );
+          }
         }
         this.warrantyClaimForm.controls.warranty_end_date.setValue(
           res.warranty.salesWarrantyDate,
@@ -658,7 +665,8 @@ export class AddWarrantyClaimPage implements OnInit {
           res.sales_invoice_name,
         );
         this.warrantyClaimForm.controls.warranty_end_date.setValue(
-          new Date(res.warranty.salesWarrantyDate),
+          res.warranty.salesWarrantyDate ?
+            new Date(res.warranty.salesWarrantyDate) : '',
         );
         this.warrantyClaimForm.controls.product_name.setValue({
           item_name: res.item_name,
@@ -834,7 +842,7 @@ export class AddWarrantyClaimPage implements OnInit {
       for (const product of this.bulkProducts) {
         if (
           product.serial_no ===
-            this.warrantyClaimForm.controls.serial_no.value &&
+          this.warrantyClaimForm.controls.serial_no.value &&
           product.claim_type !== 'Non Serial Warranty'
         ) {
           this.snackbar.open('Serial Already Exists', CLOSE, {
@@ -851,9 +859,9 @@ export class AddWarrantyClaimPage implements OnInit {
     return check;
   }
 
-  getUpdate(event) {}
+  getUpdate(event) { }
 
-  branchOptionChanged(option) {}
+  branchOptionChanged(option) { }
 
   clearProductDetails() {
     this.warrantyClaimForm.controls.serial_no.enable();
