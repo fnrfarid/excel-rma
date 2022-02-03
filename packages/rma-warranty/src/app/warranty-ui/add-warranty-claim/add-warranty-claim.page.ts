@@ -635,21 +635,27 @@ export class AddWarrantyClaimPage implements OnInit {
           );
           return;
         }
-        if (
-          DateTime.fromISO(this.warrantyClaimForm.controls.received_on.value)
-            .setZone(timeZone)
-            .toFormat('yyyy-MM-dd') <
-          DateTime.fromISO(this.getSerialData.warranty.salesWarrantyDate)
-            .setZone(timeZone)
-            .toFormat('yyyy-MM-dd')
-        ) {
-          this.warrantyClaimForm.controls.claim_type.setValue(
-            WARRANTY_TYPE.WARRANTY,
-          );
-        } else {
+        if (!this.getSerialData.warranty.salesWarrantyDate) {
           this.warrantyClaimForm.controls.claim_type.setValue(
             WARRANTY_TYPE.NON_WARRANTY,
           );
+        } else {
+          if (
+            DateTime.fromISO(this.warrantyClaimForm.controls.received_on.value)
+              .setZone(timeZone)
+              .toFormat('yyyy-MM-dd') <
+            DateTime.fromISO(this.getSerialData.warranty.salesWarrantyDate)
+              .setZone(timeZone)
+              .toFormat('yyyy-MM-dd')
+          ) {
+            this.warrantyClaimForm.controls.claim_type.setValue(
+              WARRANTY_TYPE.WARRANTY,
+            );
+          } else {
+            this.warrantyClaimForm.controls.claim_type.setValue(
+              WARRANTY_TYPE.NON_WARRANTY,
+            );
+          }
         }
         this.warrantyClaimForm.controls.warranty_end_date.setValue(
           res.warranty.salesWarrantyDate,
@@ -658,7 +664,9 @@ export class AddWarrantyClaimPage implements OnInit {
           res.sales_invoice_name,
         );
         this.warrantyClaimForm.controls.warranty_end_date.setValue(
-          new Date(res.warranty.salesWarrantyDate),
+          res.warranty.salesWarrantyDate
+            ? new Date(res.warranty.salesWarrantyDate)
+            : '',
         );
         this.warrantyClaimForm.controls.product_name.setValue({
           item_name: res.item_name,

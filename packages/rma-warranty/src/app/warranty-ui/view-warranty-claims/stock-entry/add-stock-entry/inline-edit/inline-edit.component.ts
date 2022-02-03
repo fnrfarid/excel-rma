@@ -163,7 +163,7 @@ export class InlineEditComponent {
                     map(priceListArray => {
                       switch (this.stock_type) {
                         case 'Returned':
-                          if (!item.warranty.salesWarrantyDate) {
+                          if (!item.warranty.soldOn) {
                             this.snackbar.open(
                               'Item Not Sold.It cannot be returned',
                               'Close',
@@ -178,7 +178,7 @@ export class InlineEditComponent {
                             item,
                           };
                         case 'Delivered':
-                          if (item.warranty.salesWarrantyDate) {
+                          if (item.warranty.soldOn) {
                             this.snackbar.open('Serial already sold', 'Close', {
                               duration: DURATION,
                             });
