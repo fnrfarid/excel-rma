@@ -44,6 +44,8 @@ import {
   POST_DELIVERY_NOTE_ENDPOINT,
   LIST_CREDIT_NOTE_ENDPOINT,
   FRAPPE_API_SALES_INVOICE_ITEM_ENDPOINT,
+  TAX_CALCULATE,
+  TAX_LIST
 } from '../../../constants/routes';
 import { SalesInvoicePoliciesService } from '../../../sales-invoice/policies/sales-invoice-policies/sales-invoice-policies.service';
 import { CreateSalesReturnDto } from '../../entity/sales-invoice/sales-return-dto';
@@ -83,7 +85,7 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
   ) {
     super();
   }
-
+ 
   addSalesInvoice(salesInvoicePayload: SalesInvoiceDto, clientHttpRequest) {
     return this.settingsService.find().pipe(
       switchMap(settings => {
@@ -860,6 +862,53 @@ export class SalesInvoiceAggregateService extends AggregateRoot {
         );
       }),
       toArray(),
+    );
+  }
+
+
+  getErpTax(req) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        const url = `${settings.authServerURL}${TAX_CALCULATE}`;
+        return this.http.get(url, {
+          headers: this.settingsService.getAuthorizationHeaders(req.token),
+        });
+      }),
+      map(res => res.data),
+    );
+   
+  } 
+
+  getTaxList(req) {
+    return this.settingsService.find().pipe(
+      switchMap(settings => {
+        const url = `${settings.authServerURL}${TAX_LIST}`;
+        return this.http.get(url, {
+          headers: this.settingsService.getAuthorizationHeaders(req.token),
+        }
+        );
+      }),  
+      map(res =>res.data),
+        
+    );
+  }
+
+  getErpDetails(details){
+    console.log(details)
+    
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settingsService.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        
+        const url = settings.authServerURL + TAX_LIST+ "/"+ details;
+        return this.http
+          .get(url, {
+            headers
+          })
+          .pipe(map(res => res.data));
+      }),
     );
   }
 }

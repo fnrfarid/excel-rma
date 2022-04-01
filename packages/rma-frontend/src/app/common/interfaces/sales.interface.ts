@@ -44,6 +44,16 @@ export class Item {
   target_warehouse?: string;
 }
 
+
+
+export class Taxdetail{
+  charge_type:string;
+  account_head:string;
+  rate:number;
+  amount:number;
+  total:number;
+}
+
 export class ItemDefaults {
   name: string;
   owner: string;

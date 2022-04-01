@@ -95,3 +95,8 @@ export const RELAY_GET_STOCK_BALANCE_ENDPOINT =
   '/api/method/erpnext.stock.utils.get_stock_balance';
 export const POST_WARRANTY_PRINT_ENDPOINT =
   '/api/resource/Excel%20Warranty%20Print';
+export const TAX_CALCULATE= 
+  '/api/resource/Sales%20Taxes%20and%20Charges%20Template/Tax%20on%20net%20total'
+
+export const TAX_LIST =
+'/api/resource/Sales%20Taxes%20and%20Charges%20Template'

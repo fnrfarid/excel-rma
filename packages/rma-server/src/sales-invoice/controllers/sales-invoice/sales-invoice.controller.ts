@@ -133,4 +133,26 @@ export class SalesInvoiceController {
       req,
     );
   }
+
+
+
+
+  @Get('v1/taxdetails')
+  @UseGuards(TokenGuard)
+  async calculateTaxDetails(@Param('name') name : any,@Req() req){
+
+   
+    return await this.salesInvoiceAggregate.getErpDetails(req.query.name)
+
+  }
+
+
+  @Get('v1/taxlist')
+  @UseGuards(TokenGuard)
+  async ListTax(@Req() req){
+    console.log('hi')
+   return await this.salesInvoiceAggregate.getTaxList(req)
+  }
+
+
 }

@@ -1,6 +1,5 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { map } from 'rxjs/operators';
 import { settingsAlreadyExists } from '../../../constants/exceptions';
 import { ServerSettings } from '../../../system-settings/entities/server-settings/server-settings.entity';
 import { SettingsService } from '../../aggregates/settings/settings.service';
@@ -11,7 +10,6 @@ import {
   REVOKE_ENDPOINT,
   SCOPE,
 } from '../../../constants/app-strings';
-import { GET_TIME_ZONE_ENDPOINT } from '../../../constants/routes';
 
 @Injectable()
 export class SetupService {
@@ -36,11 +34,11 @@ export class SetupService {
     // settings.backendCallbackURLs = [settings.appURL];
 
     settings.webhookApiKey = randomBytes(64).toString('hex');
-    const timeZone = await this.http
-      .get(settings.authServerURL + GET_TIME_ZONE_ENDPOINT)
-      .pipe(map(resTZ => resTZ.data.message.time_zone))
-      .toPromise();
-    settings.timeZone = timeZone;
+    // const timeZone = await this.http
+    //   .get(settings.authServerURL + GET_TIME_ZONE_ENDPOINT)
+    //   .pipe(map(resTZ => resTZ.data.message.time_zone))
+    //   .toPromise();
+    settings.timeZone = "Asia/Karachi";
 
     return await settings.save();
   }

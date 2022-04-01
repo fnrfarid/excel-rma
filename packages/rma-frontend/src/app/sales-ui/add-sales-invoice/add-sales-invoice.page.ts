@@ -79,12 +79,21 @@ export class AddSalesInvoicePage implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
+  taxdatalist:any=[];
   salesInvoiceForm: FormGroup;
+  taxcalulcateForm: FormGroup;
   itemsControl: FormArray;
+  taxControl:FormArray;
   validateInput: any = ValidateInputSelected;
-
+  tax_data:any =[];
+  tax_list:any=[];
+  flag:any;
+  
   get f() {
     return this.salesInvoiceForm.controls;
+  }
+  get g(){
+    return this.taxcalulcateForm.controls;
   }
 
   constructor(
@@ -99,11 +108,38 @@ export class AddSalesInvoicePage implements OnInit {
 
   ngOnInit() {
     this.createFormGroup();
+    this.createTaxForm();
+    // this.taxcalulcateForm.valueChanges.subscribe((data)=>{
+    //   debugger
+    //   if(data.amount>0){
+    //     // let newtax=data.rate;
+    //     // let amountax=0;
+    //     // let totaltax=0;
+    //     // debugger
+    //     // amountax=(newtax*data.amount)/100;
+    //     // totaltax=amountax+data.amount;
+    //     // this.taxcalulcateForm.get('amount').setValue(amountax);
+    //     // this.taxcalulcateForm.get('total').setValue(totaltax);
+
+    //   }
+    // })
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
     this.salesInvoiceForm.get('postingDate').setValue(new Date());
+ 
     this.calledFrom = this.route.snapshot.params.calledFrom;
+    
+  
+    this.salesService.getTaxList().subscribe((data:any) =>{
+      for(let i=0;i<data.length;i++)
+      {
+        this.tax_list.push(data[i])
+      }
+  }
+  )
+
+
     if (this.calledFrom === 'edit') {
       this.invoiceUuid = this.route.snapshot.params.invoiceUuid;
       this.salesService.getSalesInvoice(this.invoiceUuid).subscribe({
@@ -139,9 +175,15 @@ export class AddSalesInvoicePage implements OnInit {
       .valueChanges.pipe(
         startWith(''),
         switchMap(value => {
+          
           return this.salesService.getCustomerList(value);
         }),
       );
+
+
+
+   
+     
 
     this.filteredWarehouseList = this.salesInvoiceForm
       .get('warehouse')
@@ -224,6 +266,7 @@ export class AddSalesInvoicePage implements OnInit {
         remarks: new FormControl(''),
         items: new FormArray([], this.itemValidator),
         total: new FormControl(0),
+        tax:new FormControl('')
       },
       {
         validators: [this.dueDateValidator, this.creditLimitValidator],
@@ -231,6 +274,20 @@ export class AddSalesInvoicePage implements OnInit {
     );
     this.itemsControl = this.salesInvoiceForm.get('items') as FormArray;
   }
+  createTaxForm(){
+    this.taxcalulcateForm =new FormGroup(
+      {
+        taxtype:new FormControl(''),
+        accountHead:new FormControl(''),
+        rate: new FormControl(0),
+        amount: new FormControl(0),
+        total: new FormControl(0),
+      }
+    );
+    this.taxControl= this.taxcalulcateForm.get('items') as FormArray
+  
+  }
+
 
   dueDateValidator(abstractControl: AbstractControl) {
     const dueDate = new Date(abstractControl.get('dueDate').value);
@@ -267,8 +324,9 @@ export class AddSalesInvoicePage implements OnInit {
       } else return null;
     }
   }
-
+ 
   addItem() {
+   
     const data = this.dataSource.data();
     const item = {} as Item;
     item.item_name = '';
@@ -276,13 +334,17 @@ export class AddSalesInvoicePage implements OnInit {
     item.rate = 0;
     item.item_code = '';
     item.minimumPrice = 0;
+    
     item.stock = this.salesInvoiceForm.get('warehouse').value
       ? 'Select an Item'
       : '';
+  
     data.push(item);
     this.itemsControl.push(new FormControl(item));
     this.dataSource.update(data);
   }
+
+
 
   updateStockBalance(warehouse) {
     const data = this.dataSource.data();
@@ -307,6 +369,7 @@ export class AddSalesInvoicePage implements OnInit {
       });
     }
   }
+
 
   getWarehouseStock(item: {
     item_code: string;
@@ -379,6 +442,25 @@ export class AddSalesInvoicePage implements OnInit {
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
+  }
+
+  taxchange(tax){
+    console.log(tax)
+    
+    this.salesService.getTaxDetails(tax).forEach((data) =>{
+      if(data['data'].taxes[0].charge_type =="On Net Total"){
+        this.flag=false;
+      }
+      else{
+        this.flag=true;
+      }
+      this.taxcalulcateForm.get('taxtype').setValue(data['data'].taxes[0].charge_type);
+      this.taxcalulcateForm.get('accountHead').setValue(data['data'].taxes[0].description);
+      this.taxcalulcateForm.get('rate').setValue(data['data'].taxes[0].rate);  
+    })
+    
+    
+    
   }
 
   customerChanged(customer, postingDate?) {
@@ -593,10 +675,32 @@ export class AddSalesInvoicePage implements OnInit {
 
   calculateTotal(itemList: Item[]) {
     let sum = 0;
+    let taxrate:any =this.taxcalulcateForm.get('rate').value
+    let taxamount=0;
+    let totalamount=0;
+
     itemList.forEach(item => {
       sum += item.qty * item.rate;
     });
+  
+    taxamount=(Number(taxrate)*Number(sum))/100;
+    totalamount=taxamount+sum
+
     this.salesInvoiceForm.get('total').setValue(sum);
+    this.taxcalulcateForm.get('amount').setValue(taxamount)
+    this.taxcalulcateForm.get('total').setValue(totalamount)
+
+  }
+  ratechange($event){
+   let newamount= this.salesInvoiceForm.get('total').value;
+   let totalam= this.taxcalulcateForm.get('total').value;
+   let newtax=$event.target.value;
+   let calamount=0;
+   let totalamount=0;
+   calamount=(newamount*newtax)/100;
+   totalamount=calamount+totalam;
+   this.taxcalulcateForm.get('amount').setValue(calamount);
+   this.taxcalulcateForm.get('total').setValue(totalamount);
   }
 
   selectedPostingDate($event) {
@@ -612,7 +716,6 @@ export class AddSalesInvoicePage implements OnInit {
     const date = new Date();
     return [date.getHours(), date.getMinutes(), date.getSeconds()].join(':');
   }
-
   getParsedDate(value) {
     const date = new Date(value);
     return [

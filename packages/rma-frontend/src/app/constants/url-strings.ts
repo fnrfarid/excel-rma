@@ -8,6 +8,7 @@ export const LIST_WAREHOUSE_ENDPOINT =
   'api/delivery_note/v1/relay_list_warehouses';
 export const GET_USER_PROFILE_ROLES = '/api/settings/v1/profile';
 export const LIST_CUSTOMER_ENDPOINT = 'api/customer/v1/list';
+
 export const GET_CUSTOMER_ENDPOINT = 'api/customer/v1/get';
 export const LIST_SALES_INVOICE_ENDPOINT = 'api/sales_invoice/v1/list';
 export const UPDATE_OUTSTANDING_AMOUNT_ENDPOINT =
@@ -171,3 +172,5 @@ export const SYNC_FRAPPE_ITEMS_ENDPOINT = '/api/item/v1/sync_items';
 export const DELETE_EMPTY_JOBS_ENDPOINT = '/api/job_queue/v1/delete_empty_jobs';
 export const GET_STOCK_ENTRY_DELIVERED_SERIALS =
   '/api/stock_entry/v1/get_delivered_serials';
+export const TAX_NEW ='/api/sales_invoice/v1/taxdetails'
+export const LIST_TAX ='/api/sales_invoice/v1/taxlist'

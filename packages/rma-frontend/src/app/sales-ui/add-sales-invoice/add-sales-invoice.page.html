@@ -35,6 +35,8 @@
       <ion-icon name="create"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+
   <form [formGroup]="salesInvoiceForm">
     <ion-card>
       <ion-card-header>
@@ -254,11 +256,40 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+
+            <ion-col size-md="6">
+              <mat-form-field class="example-full-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Tax"
+                  matInput
+                  formControlName="tax"
+                  [matAutocomplete]="tax"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #tax="matAutocomplete"
+                  (optionSelected)="taxchange($event.option.value)"
+                > 
+                  <mat-option
+                    *ngFor="let opt of tax_list "
+                    [value]="opt.name"
+                  >
+                    {{ opt.name}}
+                  </mat-option>
+                
+                </mat-autocomplete>
+               
+              </mat-form-field>
+            </ion-col>
+
           </ion-row>
         </ion-grid>
       </ion-card-content>
     </ion-card>
   </form>
+
 
   <ion-card>
     <ion-card-header>
@@ -419,6 +450,141 @@
       </ion-item>
     </ion-card-content>
   </ion-card>
+
+  <form [formGroup]="taxcalulcateForm">
+  <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-text color="tertiary">
+           Sales Tax and Charges
+          </ion-text>
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid class="ion-no-padding">
+          <ion-row class="align">
+            <ion-col>
+              <mat-form-field class="example-half-width">
+                <input
+                  matInput
+                  placeholder="Type Tax"
+                  readonly
+                  formControlName="taxtype"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-half-width">
+                <input
+                  matInput
+                  placeholder="Account Head"
+                  readonly
+                  formControlName="accountHead"
+                />
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-half-width">
+                <input
+                  matInput
+                  placeholder="Rate"
+                  type="number"
+                  formControlName="rate"
+                  (change)="ratechange($event)"
+                  [readonly]="flag"
+                />
+               
+              </mat-form-field>
+            </ion-col>
+
+            <ion-col>
+              <mat-form-field class="example-half-width">
+                <input
+                  matInput
+                  placeholder="Amount"
+                  readonly
+                  type="number"
+                  formControlName="amount"
+                 
+                />
+               
+              </mat-form-field>
+            </ion-col>
+            <ion-col>
+              <mat-form-field class="example-half-width">
+                <input
+                  matInput
+                  placeholder="Total"
+                  type="number"
+                  formControlName="total"
+                  [value]="aaa"
+                />
+               
+              </mat-form-field>
+            </ion-col>
+
+
+
+
+
+
+
+
+          </ion-row>
+          
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <ion-card>
     <ion-card-header>

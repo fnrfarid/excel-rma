@@ -54,6 +54,8 @@ import {
   UPDATE_DELIVERY_STATUS_ENDPOINT,
   UPDATE_SALES_INVOICE_ITEM_MRP,
   RELAY_LIST_SALES_RETURN_ENDPOINT,
+  TAX_NEW,
+  LIST_TAX,
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -782,7 +784,7 @@ export class SalesService {
   customerList() {
     const url = CUSTOMER_ENDPOINT;
     return this.getHeaders().pipe(
-      switchMap(headers => {
+      switchMap(headers => { 
         return this.http.get<any>(url, { headers });
       }),
       map(res => res.data),
@@ -881,5 +883,28 @@ export class SalesService {
           });
         },
       });
+  }
+ getTaxDetails(tax) {
+
+    const params = new HttpParams().set(
+      'name',
+    tax,
+    );
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(TAX_NEW, { headers,params });
+      }),
+    );
+  }
+
+
+  getTaxList(){
+    const url=LIST_TAX;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
   }
 }
