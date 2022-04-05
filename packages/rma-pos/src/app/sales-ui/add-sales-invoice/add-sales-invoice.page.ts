@@ -7,6 +7,8 @@ import {
   FormArray,
   AbstractControl,
 } from '@angular/forms';
+import { MatTableDataSource } from '@angular/material/table';
+
 import { Observable, throwError, of, from, forkJoin, Subject } from 'rxjs';
 import {
   startWith,
@@ -24,6 +26,7 @@ import {
   SerialAssign,
 } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
+import { DraftsDataSource } from './drafts-datasource';
 import { SalesService } from '../services/sales.service';
 import {
   Payments,
@@ -72,6 +75,7 @@ import {
 } from '../view-sales-invoice/serials/serials-datasource';
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
+import { draftList } from '../../common/interfaces/sales.interface';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -93,6 +97,16 @@ export class AddSalesInvoicePage implements OnInit {
   invoiceUuid: string;
   calledFrom: string;
   dataSource: ItemsDataSource;
+  dataSource1: draftList[]= [{
+    customerName: "hamza",
+    amount : 1000
+  },
+  {
+    customerName : "ali haider",
+    amount: 2000
+  }
+];
+dataSource2 = new MatTableDataSource(this.dataSource1)
   series: string;
   initial: { [key: string]: number } = {
     warehouse: 0,
@@ -110,6 +124,11 @@ export class AddSalesInvoicePage implements OnInit {
     'total',
     'delete',
   ];
+  displayedColumnsItems = [
+    'customerName',
+    'amount'
+  ]
+
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
@@ -397,6 +416,12 @@ export class AddSalesInvoicePage implements OnInit {
     this.paymentForm = new FormGroup({
       modeOfPayment: new FormControl('', [Validators.required]),
       posProfile: new FormControl('', [Validators.required]),
+      vat: new FormControl(''),
+      discount : new FormControl(''),
+      grandTotal : new FormControl(''),
+      receivedAmount : new FormControl(''),
+      change : new FormControl(''),
+      due : new FormControl('')
     });
   }
 

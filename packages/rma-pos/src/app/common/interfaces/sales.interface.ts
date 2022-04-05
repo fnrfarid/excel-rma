@@ -85,3 +85,8 @@ export interface AggregatedDocument {
   sales_person?: string;
   created_by?: string;
 }
+
+export interface draftList {
+  customerName ?: String,
+  amount ?: number
+}
