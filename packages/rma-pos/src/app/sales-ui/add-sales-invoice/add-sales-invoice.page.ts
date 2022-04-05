@@ -224,11 +224,15 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     this.createFormGroup();
     this.getItemList().subscribe({
       next: res => {
+        console.log(res);
         this.gridItems = [...res.items];
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
       },
     });
+  
+  
+    
 
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
