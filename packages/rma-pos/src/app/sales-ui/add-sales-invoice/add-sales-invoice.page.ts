@@ -231,7 +231,6 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     });
 
     this.dataSource = new ItemsDataSource();
-    this.dataSource1 = new DraftsDataSource()
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
     this.salesCustomerDetialsForm.get('postingDate').setValue(new Date());
