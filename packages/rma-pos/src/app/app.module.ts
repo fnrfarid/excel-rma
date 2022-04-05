@@ -23,6 +23,8 @@ import { CsvJsonService } from './api/csv-json/csv-json.service';
 import { JobUIModule } from './job-ui/job-ui.module';
 import { PermissionManager } from './api/permission/permission.service';
 import { ApiModule } from './api/api.module';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule} from '@angular/material/button';
 import { CommonComponentModule } from './common/components/common-component.module';
 
 @NgModule({
@@ -38,6 +40,8 @@ import { CommonComponentModule } from './common/components/common-component.modu
     AppRoutingModule,
     HttpClientModule,
     SalesUiModule,
+    MatDialogModule,
+    MatButtonModule,
     ApiModule,
     BrowserAnimationsModule,
     AppCommonModule,
