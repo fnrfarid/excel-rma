@@ -89,10 +89,11 @@ export class ItemController {
     try {
       search = decodeURIComponent(search);
     } catch {}
-    return await this.queryBus.execute(
+      return await this.queryBus.execute(
       new RetrieveItemListQuery(offset, limit, sort, search, clientHttpRequest),
     );
   }
+
 
   @Roles(SYSTEM_MANAGER)
   @Post('v1/set_minimum_item_price/:uuid')
