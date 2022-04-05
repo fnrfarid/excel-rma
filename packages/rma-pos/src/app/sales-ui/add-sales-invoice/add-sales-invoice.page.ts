@@ -26,7 +26,6 @@ import {
   SerialAssign,
 } from '../../common/interfaces/sales.interface';
 import { ItemsDataSource } from './items-datasource';
-import { DraftsDataSource } from './drafts-datasource';
 import { SalesService } from '../services/sales.service';
 import {
   Payments,
