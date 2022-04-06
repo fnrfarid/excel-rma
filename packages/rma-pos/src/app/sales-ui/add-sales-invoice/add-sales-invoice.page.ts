@@ -1,3 +1,4 @@
+import { PaymentDialogueComponent } from './payment-dialogue/payment-dialogue.component';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
@@ -7,6 +8,7 @@ import {
   FormArray,
   AbstractControl,
 } from '@angular/forms';
+import {MatDialog} from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Observable, throwError, of, from, forkJoin, Subject } from 'rxjs';
@@ -217,6 +219,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     private readonly router: Router,
     private readonly time: TimeService,
     private readonly loadingController: LoadingController,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -1444,4 +1447,13 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   displayPosProfileName(option) {
     return option.name;
   }
+
+  makeDraft() {
+    console.log("Making Draft....")
+  };
+  submitPayment() {
+    this.dialog.open(PaymentDialogueComponent, {height: '500px',
+    width: '600px',})
+  };
+
 }

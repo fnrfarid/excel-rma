@@ -8,6 +8,8 @@ import { MaterialModule } from '../../material/material.module';
 import { InlineEditComponent } from './inline-edit/inline-edit.component';
 import { KeyDownDetectorDirective } from './on-key-down-directive';
 import { AppCommonModule } from '../../common/app-common.module';
+import { MatButtonModule} from '@angular/material/button';
+
 
 const routes: Routes = [
   {
@@ -25,6 +27,7 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MaterialModule,
     ReactiveFormsModule,
+    MatButtonModule
   ],
   declarations: [
     AddSalesInvoicePage,
