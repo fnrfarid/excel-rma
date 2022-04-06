@@ -94,6 +94,11 @@ export class ItemController {
     );
   }
 
+  @Get('v1/image_list')
+  @UseGuards(TokenGuard)
+  async ListImage(@Req() req){
+    return this.aggregate.getImageDetails(req.query.name)
+  }
 
   @Roles(SYSTEM_MANAGER)
   @Post('v1/set_minimum_item_price/:uuid')

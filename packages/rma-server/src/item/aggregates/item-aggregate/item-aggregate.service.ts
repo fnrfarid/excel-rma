@@ -27,15 +27,19 @@ import {
   BEARER_HEADER_VALUE_PREFIX,
   ITEM_SYNC_BUFFER_COUNT,
 } from '../../../constants/app-strings';
-import { ServerSettingsService } from '../../../system-settings/entities/server-settings/server-settings.service';
-import { FRAPPE_API_GET_ITEM_ENDPOINT } from '../../../constants/routes';
+import { FRAPPE_API_GET_ITEM_ENDPOINT,IMAGE_LIST } from '../../../constants/routes';
+import { ClientTokenManagerService } from '../../../auth/aggregates/client-token-manager/client-token-manager.service';
+import { SettingsService } from '../../../system-settings/aggregates/settings/settings.service';
+
 
 @Injectable()
 export class ItemAggregateService extends AggregateRoot {
   constructor(
     private readonly itemService: ItemService,
     private readonly http: HttpService,
-    private readonly settingService: ServerSettingsService,
+    private readonly settingService: SettingsService,
+    private readonly clientToken: ClientTokenManagerService,
+    private readonly settingsService: SettingsService,
   ) {
     super();
   }
@@ -202,5 +206,21 @@ export class ItemAggregateService extends AggregateRoot {
 
   getJsonData(file) {
     return of(JSON.parse(file.buffer));
+  }
+
+  getImageDetails(details){
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settingsService.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        const url = settings.authServerURL + IMAGE_LIST+ "/"+ details;
+        return this.http
+          .get(url, {
+            headers
+          })
+          .pipe(map(res => res.data));
+      }),
+    );
   }
 }

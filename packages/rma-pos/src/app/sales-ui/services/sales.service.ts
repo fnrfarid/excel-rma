@@ -57,6 +57,7 @@ import {
   RELAY_GET_MODE_OF_PAYMENT_ENDPOINT,
   RELAY_GET_POS_PROFILE_ENDPOINT,
   ERPNEXT_POS_PROFILE_ENDPOINT,
+  IMAGE_ITEMS_ENDPOINT
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -76,6 +77,7 @@ import { SerialSearchFields } from '../../common/interfaces/search-fields.interf
 export class SalesService {
   salesInvoiceList: Array<SalesInvoice>;
   itemList: Array<Item>;
+  image_name:any=[];
 
   constructor(
     private http: HttpClient,
@@ -336,7 +338,17 @@ export class SalesService {
       }),
     );
   }
-
+  getImageList(name){
+      const params = new HttpParams().set(
+        'name',
+      name,
+      );
+      return this.getHeaders().pipe(
+        switchMap(headers => {
+          return this.http.get<APIResponse>(IMAGE_ITEMS_ENDPOINT, { headers,params });
+        }),
+      ); 
+  }
   getItemGroupList(value: string, pageIndex = 0, pageSize = 30) {
     const url = RELAY_GET_ITEM_GROUP_ENDPOINT;
 
