@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-payment-dialogue',
   templateUrl: './payment-dialogue.component.html',
@@ -7,9 +7,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PaymentDialogueComponent implements OnInit {
 
-  constructor() { }
+  constructor(private dialog: MatDialogRef<PaymentDialogueComponent> ) {
 
+   }
+  
   ngOnInit() {}
 
-  
+  closeDialog() {
+    this.dialog.close()
+  };
+  submitPayment() {
+    console.log("payment submitted !!")
+  };
 }

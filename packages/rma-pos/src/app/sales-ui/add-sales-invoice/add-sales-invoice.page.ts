@@ -226,7 +226,6 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     this.createFormGroup();
     this.getItemList().subscribe({
       next: res => {
-        console.log(res);
         this.gridItems = [...res.items];
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
@@ -1450,7 +1449,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     console.log("Making Draft....")
   };
   submitPayment() {
-    this.dialog.open(PaymentDialogueComponent, {height: '500px',
+    this.dialog.open(PaymentDialogueComponent, {height: '540px',
     width: '600px',})
   };
 
