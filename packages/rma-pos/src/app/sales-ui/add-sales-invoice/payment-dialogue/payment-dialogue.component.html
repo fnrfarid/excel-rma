@@ -1,6 +1,112 @@
-<header mat-dialog-title class="header-style">
-    <h4 class="header-text">Total Amount</h4>
-    <button mat-button class="header-btn">close</button>
-    <button mat-button class="primary header-btn">Submit</button>
+<header mat-dialog-title>
+    <h4 class="header-text">
+      Total Amount 
+      <ion-button size="small" (click)="closeDialog()" class="header-btn" color="danger">
+        close
+      </ion-button>
+      <ion-button size="small" (click)="submitPayment()"  class="header-btn">
+        Submit
+      </ion-button>
+    </h4>
 </header>
-<mat-divider></mat-divider>
+<ion-item-divider></ion-item-divider>
+<ion-grid>
+  <ion-row>
+    <ion-col size="6">
+      <mat-form-field appearance="fill">
+        <label>
+          Credit Limit
+        </label><br>
+        <input type="number" id="creditLimit" name="CreditLimit" value="0.00">
+        <br><br>
+        <label>
+          Cash
+        </label><br>
+        <input type="number" id="cash" name="cash" value="0.00">
+        <br><br>
+        <label>
+          Credit Card
+        </label>
+        <br>
+        <input type="text" id="creditCard" name="creditCard" value="0.00">
+      </mat-form-field>
+    </ion-col>
+    <ion-col size="5">
+      <br>
+      <div>
+        <ion-row class="numpad">
+          <ion-col class="numpad-key" size="4">
+            <div>1</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>2</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>3</div>
+          </ion-col>
+        </ion-row>
+        <ion-row class="numpad">
+          <ion-col class="numpad-key" size="4">
+            <div>4</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>5</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>6</div>
+          </ion-col>
+        </ion-row>
+        <ion-row class="numpad">
+          <ion-col class="numpad-key" size="4">
+            <div>7</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>8</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>9</div>
+          </ion-col>
+        </ion-row>
+        <ion-row class="numpad">
+          <ion-col class="numpad-key" size="4">
+            <div>Del</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>0</div>
+          </ion-col>
+          <ion-col class="numpad-key" size="4">
+            <div>.</div>
+          </ion-col>
+        </ion-row>
+      </div>
+    </ion-col>
+  </ion-row>
+  <ion-item-divider></ion-item-divider>
+  <br>
+  <ion-row>
+    <ion-col size="6">
+      <label>Write off Amount</label>
+      <br>
+      <input type="number" id="writeOffAmount" name="writeOffAmount" value="0.00">
+    </ion-col>
+    <ion-col size="4">
+      <label>Change Amount</label>
+      <br>
+      <input type="number" id="changeAmount" name="changeAmount" value="0.00">
+    </ion-col>
+  </ion-row>
+  <ion-item-divider></ion-item-divider>
+  <br>
+  <ion-row>
+    <ion-col size="6">
+      <label>Paid Amount</label>
+      <br>
+      <input type="number" id="paidAmount" name="paidAmount" value="0.00">
+    </ion-col>
+    <ion-col size="4">
+      <label>Outstanding Amount</label>
+      <br>
+      <input type="number" id="outstandingAmount" name="outstandingAmount" value="0.00">
+    </ion-col>
+  </ion-row>
+</ion-grid>

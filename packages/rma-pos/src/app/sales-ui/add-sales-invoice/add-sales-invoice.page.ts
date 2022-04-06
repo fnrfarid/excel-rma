@@ -1455,7 +1455,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     console.log("Making Draft....")
   };
   submitPayment() {
-    this.dialog.open(PaymentDialogueComponent, {height: '500px',
+    this.dialog.open(PaymentDialogueComponent, {height: '540px',
     width: '600px',})
   };
   onCreateCustomer(){
