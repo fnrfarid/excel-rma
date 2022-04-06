@@ -1,0 +1,204 @@
+  <form [formGroup] = "salesCustomerDialogForm">
+    <div mat-dialog-content>
+      <h5>New Customer </h5>
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Series"
+          formControlName="series"
+        />
+        <mat-error *ngIf="f.series.hasError('required')">
+          Series is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Full Name"
+          formControlName="fullName"
+        />
+        <mat-error *ngIf="f.fullName.hasError('required')">
+          Full Name is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Type"
+          formControlName="type"
+        />
+        <mat-error *ngIf="f.type.hasError('required')">
+          Type is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Customer Group"
+          formControlName="customerGroup"
+        />
+        <mat-error *ngIf="f.customerGroup.hasError('required')">
+          customer Group is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+    <mat-form-field class="example-full-width">
+      <input
+        required
+        type="text"
+        placeholder="Select territory"
+        matInput
+        formControlName="territory"
+        (focusout)="validateInput(f.territory, territoryList)"
+        [matAutocomplete]="territory"
+      />
+      <mat-autocomplete
+        autoActiveFirstOption
+        #territory="matAutocomplete"
+
+      >
+        <mat-option
+          *ngFor="let territory of territoryList | async"
+          [value]="territory"
+        >
+          {{ territory }}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="f.territory.hasError('falseValse')">
+        You should select a value from dropdown only.
+        <strong>'{{f.territory.value}}'</strong> is not allowed.
+      </mat-error>
+    </mat-form-field>
+    <br /><br />
+
+    <mat-form-field class="example-full-width">
+      <input
+        matInput
+        required
+        placeholder="Excel Fixed Credit Limit"
+        formControlName="excelFixedCreditLimit"
+      />
+      <mat-error *ngIf="f.excelFixedCreditLimit.hasError('required')">
+        excelFixedCreditLimit is <strong>required</strong>
+      </mat-error>
+    </mat-form-field><br />
+
+    <h5>primary Contact Details</h5>
+    <mat-form-field class="example-full-width">
+      <input
+        matInput
+        required
+        placeholder="Email Id"
+        formControlName="emailId"
+      />
+      <mat-error *ngIf="f.emailId.hasError('required')">
+        Email id is <strong>required</strong>
+      </mat-error>
+    </mat-form-field><br />
+    <mat-form-field class="example-full-width">
+      <input
+        matInput
+        required
+        placeholder="Mobile No"
+        formControlName="mobileNo"
+      />
+      <mat-error *ngIf="f.mobileNo.hasError('required')">
+        Mobile No is <strong>required</strong>
+      </mat-error>
+    </mat-form-field><br />
+    <h5>Primary Address Details </h5>
+    <ion-grid>
+      <ion-row>
+      <ion-col>
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            required
+            placeholder="Address Line 1"
+            formControlName="addressLine1"
+          />
+          <mat-error *ngIf="f.addressLine1.hasError('required')">
+            Address Line 1 is <strong>required</strong>
+          </mat-error>
+        </mat-form-field><br />
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            required
+            placeholder="Address Line 2"
+            formControlName="addressLine2"
+          />
+          <mat-error *ngIf="f.addressLine2.hasError('required')">
+            Address Line 2 is <strong>required</strong>
+          </mat-error>
+        </mat-form-field><br />
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            required
+            placeholder="ZIP Code"
+            formControlName="zipCode"
+          />
+          <mat-error *ngIf="f.zipCode.hasError('required')">
+            Zipe Code is <strong>required</strong>
+          </mat-error>
+        </mat-form-field><br />
+      </ion-col>
+      <ion-col>
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            required
+            placeholder="City"
+            formControlName="city"
+          />
+          <mat-error *ngIf="f.city.hasError('required')">
+            City is <strong>required</strong>
+          </mat-error>
+        </mat-form-field><br />
+
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            required
+            placeholder="State"
+            formControlName="state"
+          />
+          <mat-error *ngIf="f.state.hasError('required')">
+            State is <strong>required</strong>
+          </mat-error>
+        </mat-form-field><br />
+
+        <mat-form-field class="example-full-width">
+          <input
+            matInput
+            required
+            placeholder="Country"
+            formControlName="country"
+          />
+          <mat-error *ngIf="f.country.hasError('required')">
+            country is <strong>required</strong>
+          </mat-error>
+        </mat-form-field><br />
+      </ion-col>
+      </ion-row>
+    </ion-grid>
+  
+  
+  
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="onNoClick()">No Thanks</button>
+    <button mat-button [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
+  </div>
+
+  </form>
+

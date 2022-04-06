@@ -77,6 +77,7 @@ import {
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
+import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -197,6 +198,8 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   filteredItemList = [];
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
+  animal: string;
+  name: string;
 
   // =====NEED TO CLEAN UP CODE=========
 
@@ -780,7 +783,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   customerChanged(customer, postingDate?) {
-    if (customer.credit_days) {
+    if (customer.hasOwnProperty("credit_days")) {
       let date;
       postingDate ? (date = new Date(postingDate)) : (date = new Date());
       date.setDate(date.getDate() + customer.credit_days);
@@ -1455,5 +1458,16 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     this.dialog.open(PaymentDialogueComponent, {height: '500px',
     width: '600px',})
   };
+  onCreateCustomer(){
+    const dialogRef = this.dialog.open(CustomerCreateDialogComponent, {
+      width: '500px',
+      data: {name: this.name,age: this.animal,territoryList:this.territoryList},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.animal = result;
+    });
+  }
 
 }

@@ -89,14 +89,23 @@
                   [displayWith]="getOptionText"
                   (optionSelected)="customerChanged($event.option.value)"
                 >
-           
+                 <div *ngIf = "!f.customer.hasError('falseValse'); else errorBlock">
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async "
                     [value]="option"
-                  >
+                    >
                     {{ option.customer_name }}
                     <small class="text-muted"> {{option.customer_name}} </small>
-                  </mat-option>
+                    </mat-option>
+                 </div>
+                 <ng-template #errorBlock>
+                  <mat-option>
+                    <button class="button" type="submit" (click)="onCreateCustomer()">Create Customer</button>
+
+                  </mat-option> 
+
+                 </ng-template>
+
              
                
                 </mat-autocomplete>

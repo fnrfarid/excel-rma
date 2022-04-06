@@ -44,8 +44,8 @@ import { CommonComponentModule } from './common/components/common-component.modu
     MatButtonModule,
     ApiModule,
     BrowserAnimationsModule,
-    AppCommonModule,
-  ],
+    AppCommonModule
+    ],
   providers: [
     AppService,
     StatusBar,
