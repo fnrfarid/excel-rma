@@ -31,6 +31,7 @@ import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
 import {
   Payments,
+  PosDraftDetails,
   SalesInvoiceDetails,
 } from '../view-sales-invoice/details/details.component';
 import {
@@ -40,6 +41,7 @@ import {
   BEARER_TOKEN_PREFIX,
   DELIVERED_SERIALS_DISPLAYED_COLUMNS,
 } from '../../constants/storage';
+import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
 import {
   DRAFT,
   CLOSE,
@@ -77,7 +79,6 @@ import {
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
-import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -98,17 +99,10 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
+  dataSource3 = [];
   dataSource: ItemsDataSource;
-  dataSource1: draftList[]= [{
-    customerName: "hamza",
-    amount : 1000
-  },
-  {
-    customerName : "ali haider",
-    amount: 2000
-  }
-];
-dataSource2 = new MatTableDataSource(this.dataSource1)
+  dataSource1: draftList[] = [];
+  dataSource2 = new MatTableDataSource(this.dataSource1);
   series: string;
   initial: { [key: string]: number } = {
     warehouse: 0,
@@ -186,6 +180,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   warehouseFormControl = new FormControl('', [Validators.required]);
   costCenterFormControl = new FormControl('', [Validators.required]);
   salesInvoiceDetails: SalesInvoiceDetails;
+  posdraftdetails: PosDraftDetails;
   submit: boolean = false;
   rangePickerState = {
     prefix: '',
@@ -226,16 +221,11 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   ) {}
 
   ngOnInit() {
+    
     this.createFormGroup();
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
-        for(let i =0 ;i<this.gridItems.length;i++){
-          this.salesService.getImageList(this.gridItems[i].name).subscribe((data)=>{
-          this.gridItems[i]['website_image']=data['data'].website_image
-         })
-        }
-        console.log(this.gridItems)
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
       },
@@ -470,6 +460,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
 
   addItem() {
     const data = this.dataSource.data();
+    // console.log("for Data\n",data)
     const item = {} as Item;
     item.item_name = '';
     item.qty = 0;
@@ -1451,12 +1442,69 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     return option.name;
   }
 
+  clearFields() {
+   this.salesCustomerDetialsForm.get('customer').setValue(null);
+   this.salesCustomerDetialsForm.get('remarks',).setValue(null);
+   this.salesCustomerDetialsForm.get('warehouse',).setValue(null);
+   this.salesCustomerDetialsForm.get('dueDate').setValue(null);
+   this.salesCustomerDetialsForm.get('territory',).setValue(null);
+   this.salesCustomerDetialsForm.get('campaign',).setValue(0);
+   this.salesCustomerDetialsForm.get('balance',).setValue(null)
+   this.dataSource.data().splice(0,this.dataSource.data().length);
+   this.itemsControl.removeAt(this.dataSource.data().length);
+   this.calculateTotal(this.dataSource.data().slice());
+   this.dataSource.update(this.dataSource.data());
+  }
+
   makeDraft() {
-    console.log("Making Draft....")
+    const posDraftDetails = {} as PosDraftDetails;
+    var customer_name: string = null;
+    var total_amount: number = 0;
+    posDraftDetails.items = [];
+    let draft: draftList;
+    
+    posDraftDetails.customer = this.salesCustomerDetialsForm.get('customer',).value.name;
+    posDraftDetails.company = this.salesCustomerDetialsForm.get('company',).value;
+    posDraftDetails.posting_date = this.getParsedDate(
+      this.salesCustomerDetialsForm.get('postingDate').value,);
+    posDraftDetails.due_date = this.getParsedDate(
+      this.salesCustomerDetialsForm.get('dueDate').value,);
+    posDraftDetails.territory = this.salesCustomerDetialsForm.get('territory',).value;
+    posDraftDetails.warehouse = this.salesCustomerDetialsForm.get('warehouse',).value;
+    posDraftDetails.remarks = this.salesCustomerDetialsForm.get('remarks',).value;
+    posDraftDetails.remaining_balance = this.salesCustomerDetialsForm.get('balance',).value;
+    posDraftDetails.isCampaign = this.salesCustomerDetialsForm.get('campaign',).value;
+    posDraftDetails.total = this.salesInvoiceItemsForm.controls.total.value;
+
+    total_amount = posDraftDetails.total;
+    customer_name =  posDraftDetails.customer;
+
+    // if (customer_name != null) {
+      for (let i = 0; i < this.dataSource.data().length; i++) {
+        if (this.dataSource.data()[i].item_code != '') {
+          posDraftDetails.items.push(this.dataSource.data()[i]);
+        }
+      };
+
+      draft  = {
+        customerName: customer_name,
+        amount: total_amount
+      };
+
+      this.dataSource1.push(draft)
+      this.dataSource2 = new MatTableDataSource(this.dataSource1)
+
+      this.clearFields()
+    // }
+    // else{
+    //   this.snackbar.open("Please Select or Create a Valid User", CLOSE, {
+    //     duration: 3000,
+    //   });  
+    // }
+    
   };
   submitPayment() {
-    this.dialog.open(PaymentDialogueComponent, {height: '540px',
-    width: '600px',})
+    this.dialog.open(PaymentDialogueComponent, {height: '540px', width: '600px',});
   };
   onCreateCustomer(){
     const dialogRef = this.dialog.open(CustomerCreateDialogComponent, {

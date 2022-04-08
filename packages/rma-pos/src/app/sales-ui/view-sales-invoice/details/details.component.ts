@@ -257,6 +257,22 @@ export class DetailsComponent implements OnInit {
     return { color: this.statusColor[status] };
   }
 }
+//Interface for making-draft
+export class PosDraftDetails {
+  naming_series: string;
+  company: string;
+  customer: string;
+  posting_date: string;
+  warehouse: string;
+  due_date: string;
+  remaining_balance?: number;
+  remarks?: string;
+  territory: string;
+  isCampaign?: boolean;
+  items?: Item[];
+  total?: number;
+  // Payments?: [];
+};
 
 export class SalesInvoiceDetails {
   uuid?: string;
