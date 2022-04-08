@@ -1,32 +1,20 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DialogData } from '../../../common/interfaces/sales.interface';
-import { Observable, throwError, of, from, forkJoin, Subject } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
+  map,
   startWith,
   switchMap,
-  filter,
-  map,
-  mergeMap,
-  toArray,
-  concatMap,
 } from 'rxjs/operators';
 
 import {
   FormControl,
-  FormGroup,
+  FormGroup
 } from '@angular/forms';
 import { SalesService } from '../../services/sales.service';
 import {
-  DRAFT,
-  CLOSE,
-  DURATION,
-  UPDATE_ERROR,
-  SHORT_DURATION,
-  TERRITORY,
-  WAREHOUSES,
-  DELIVERY_NOTE,
-  DELIVERED_SERIALS_BY,
+  TERRITORY
 } from '../../../constants/app-string';
 
 import { ValidateInputSelected } from '../../../common/pipes/validators';
@@ -43,8 +31,12 @@ export class CustomerCreateDialogComponent implements OnInit {
   initial: { [key: string]: number } = {
     warehouse: 0,
     territory: 0,
+    customerGroup:0
   };
   validateInput: any = ValidateInputSelected;
+
+  customerGroupList: any;
+  copyCustomerGroupList: any;
 
 
 
@@ -65,6 +57,13 @@ export class CustomerCreateDialogComponent implements OnInit {
 
   ngOnInit() {
     this.createFormGroup();
+    this.salesService.customerGroupList().subscribe((data) =>{
+      this.customerGroupList = data
+      
+    });
+
+    // fetches the territory list and populates inside the customer modal
+
     this.territoryList = this.salesCustomerDialogForm
     .get('territory')
     .valueChanges.pipe(
@@ -85,7 +84,24 @@ export class CustomerCreateDialogComponent implements OnInit {
         return of([]);
       }),
     );
+    //fetches the customer group list data
+
+    this.salesService.customerGroupList().subscribe((data) =>{
+      this.customerGroupList = data
+    });
+
+    //search function that searches from a duplicate list and renders the results
+
+    this.salesCustomerDialogForm.get('customerGroup').valueChanges.subscribe(newValue=>{
+      this.salesService.customerGroupList().subscribe((data) =>{
+        this.copyCustomerGroupList = data
+        this.customerGroupList = this.filterValues(newValue);
+
+      });
+    })
+
   }
+  //customer creation form 
 
   createFormGroup(){
     this.salesCustomerDialogForm = new FormGroup({
@@ -94,16 +110,21 @@ export class CustomerCreateDialogComponent implements OnInit {
       type : new FormControl(''),
       customerGroup: new FormControl(''),
       territory: new FormControl(''),
-      excelFixedCreditLimit : new FormControl(''),
       emailId : new FormControl(''),
       mobileNo : new FormControl(''),
-      addressLine1 : new FormControl(''),
-      addressLine2: new FormControl(''),
-      zipCode : new FormControl(''),
-      city : new FormControl(''),
-      state: new FormControl(''),
-      country: new FormControl('')
+      address : new FormControl(''),
+      city : new FormControl('')
     })
+  }
+
+  //filters the value from the customer group and retrurns the value
+  
+  filterValues(name){
+    if(this.copyCustomerGroupList){
+      return this.copyCustomerGroupList.filter(value=>
+        value.name.toLowerCase().indexOf(name.toLowerCase()) !== -1);
+    }
+
   }
 
 }

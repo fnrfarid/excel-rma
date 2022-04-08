@@ -98,3 +98,5 @@ export const POST_WARRANTY_PRINT_ENDPOINT =
 
   export const IMAGE_LIST =
   '/api/resource/Item'
+  export const FRAPPE_API_GET_CUSTOMER_GROUP_ENDPOINT = 
+  '/api/resource/Customer%20Group'
