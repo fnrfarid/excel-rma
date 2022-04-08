@@ -101,3 +101,7 @@
 .cancel {
   color: var(--ion-color-danger) !important;
 }
+
+#cdk-overlay-1 .mat-option-text {
+  line-height: 1.5;
+}

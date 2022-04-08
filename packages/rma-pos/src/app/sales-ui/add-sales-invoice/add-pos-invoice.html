@@ -258,6 +258,34 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+            <ion-col >
+              <mat-form-field class="example-half-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select mobileNo"
+                  matInput
+                  formControlName="mobileNo"
+                  (focusout)="validateInput(f.mobileNo, territoryList)"
+                  [matAutocomplete]="mobileNo"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #mobileNo="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let customerDetail of filteredCustomerDetailList"
+                    [value]="customerDetail.mobileNo"
+                  >
+                    {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.mobileNo.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.mobileNo.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
             <ion-col>
               <mat-form-field class="mat-input-wrapper" appearance="none">
                 <mat-checkbox matInput formControlName="campaign">

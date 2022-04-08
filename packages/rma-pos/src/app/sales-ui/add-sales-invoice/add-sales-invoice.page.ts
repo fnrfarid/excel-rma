@@ -20,6 +20,7 @@ import {
   mergeMap,
   toArray,
   concatMap,
+  flatMap,
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import {
@@ -134,6 +135,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
+  filteredCustomerDetailList: any= [];
   salesInvoiceItemsForm = new FormGroup({
     items: new FormArray([], this.itemValidator),
     total: new FormControl(0),
@@ -305,6 +307,20 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
         }),
       );
 
+    this.filteredCustomerList.subscribe((data)=>{
+      data.forEach((element)=>{
+        this.salesService.relayCustomer(element.name).subscribe((data)=>{
+          if(this.filteredCustomerDetailList){
+            this.filteredCustomerDetailList.push({
+              customerName: data.customer_name,
+              mobileNo: data.mobile_no ? data.mobile_no : '-'
+            })
+          }    
+        })
+      })
+    })
+
+
     this.filteredWarehouseList = this.salesCustomerDetialsForm
       .get('warehouse')
       .valueChanges.pipe(
@@ -415,6 +431,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
+        mobileNo: new FormControl('')
       },
       // {
       //   validators: [this.dueDateValidator, this.creditLimitValidator],

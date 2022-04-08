@@ -3,7 +3,6 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DialogData } from '../../../common/interfaces/sales.interface';
 import { Observable, of } from 'rxjs';
 import {
-  map,
   startWith,
   switchMap,
 } from 'rxjs/operators';
@@ -118,7 +117,7 @@ export class CustomerCreateDialogComponent implements OnInit {
   }
 
   //filters the value from the customer group and retrurns the value
-  
+
   filterValues(name){
     if(this.copyCustomerGroupList){
       return this.copyCustomerGroupList.filter(value=>
