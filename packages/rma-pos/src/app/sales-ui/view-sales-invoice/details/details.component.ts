@@ -259,7 +259,7 @@ export class DetailsComponent implements OnInit {
 }
 //Interface for making-draft
 export class PosDraftDetails {
-  naming_series: string;
+  uuid: string;
   company: string;
   customer: string;
   posting_date: string;
