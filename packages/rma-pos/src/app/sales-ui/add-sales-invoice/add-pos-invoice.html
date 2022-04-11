@@ -10,8 +10,9 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="page-background">
-  <ion-fab
+<!-- <ion-content class="page-background"> -->
+  <ion-content>
+      <ion-fab
     class="ion-margin-end"
     slot="fixed"
     vertical="top"
@@ -22,7 +23,7 @@
       *ngIf="calledFrom === 'add'"
       class="fab-position"
       [disabled]="salesCustomerDetialsForm.invalid"
-      (click)="submitDraft()"
+      (click)="submitDraft($event)"
     >
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
@@ -36,7 +37,7 @@
     </ion-fab-button>
   </ion-fab>
 
-  <form [formGroup]="salesCustomerDetialsForm">
+  <form [formGroup]="salesCustomerDetialsForm"  class="label-form">
     <ion-card>
       <ion-card-header>
         <ion-card-title>
@@ -46,32 +47,6 @@
       <ion-card-content>
         <ion-grid class="ion-no-padding">
           <ion-row class="align">
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
-                  matInput
-                  placeholder="Naming Series"
-                  readonly
-                  value="SINV-####"
-                />
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
-                  matInput
-                  required
-                  placeholder="Company"
-                  readonly
-                  formControlName="company"
-                />
-                <mat-error *ngIf="f.company.hasError('required')">
-                  Company is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-         
-
             <ion-col>
               <mat-form-field class="example-half-width">
                 <input
@@ -118,65 +93,62 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-
-
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
-                  required
-                  matInput
-                  [matDatepicker]="postingDate"
-                  placeholder="Posting Date"
-                  readonly
-                  formControlName="postingDate"
-                  (dateChange)="selectedPostingDate($event)"
-                />
-                <mat-datepicker-toggle
-                  matSuffix
-                  [for]="postingDate"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #postingDate disabled="false"></mat-datepicker>
-                <mat-error *ngIf="f.postingDate.hasError('required')">
-                  Posting Date is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-        
-            <ion-col>
+            <ion-col >
               <mat-form-field class="example-half-width">
                 <input
                   required
                   type="text"
-                  placeholder="Select Warehouse"
+                  placeholder="Select mobileNo"
                   matInput
-                  formControlName="warehouse"
-                  (focusout)="validateInput(f.warehouse, filteredWarehouseList)"
-                  [matAutocomplete]="warehouse"
+                  formControlName="mobileNo"
+                  (focusout)="validateInput(f.mobileNo, territoryList)"
+                  [matAutocomplete]="mobileNo"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
-                  #warehouse="matAutocomplete"
-                  (optionSelected)="updateStockBalance($event.option.value)"
+                  #mobileNo="matAutocomplete"
+                  (optionSelected)="mobileNoChanged($event)"
                 >
+                <div *ngIf = "!f.mobileNo.hasError('falseValse'); else errorBlock1">
                   <mat-option
-                    *ngFor="let warehouse of filteredWarehouseList | async"
-                    [value]="warehouse"
+                    *ngFor="let customerDetail of filteredCustomerDetailList"
+                    [value]="customerDetail.mobileNo"
                   >
-                    {{ warehouse }}
+                  {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}} <br> {{customerDetail.name}}
                   </mat-option>
+
+                </div>
+                <ng-template #errorBlock1>
+                  <mat-option>
+                    <button class="button" type="submit" (click)="onCreateCustomer()">Create Customer</button>
+
+                  </mat-option> 
+
+                 </ng-template>
                 </mat-autocomplete>
-                <mat-error *ngIf="f.warehouse.hasError('required')">
-                  Warehouse is <strong>required</strong>
-                </mat-error>
-                <mat-error *ngIf="f.warehouse.hasError('falseValse')">
+                <mat-error *ngIf="f.mobileNo.hasError('falseValse')">
                   You should select a value from dropdown only.
-                  <strong>'{{f.warehouse.value}}'</strong> is not allowed.
+                  <strong>'{{f.mobileNo.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
 
-
-
+            <ion-col>
+              <mat-form-field class="example-half-width">
+                <input
+                  matInput
+                  placeholder="Remaining Balance"
+                  readonly
+                  formControlName="balance"
+                  [value]="salesCustomerDetialsForm.get('balance').value | curFormat | async"
+                />
+                <mat-error
+                  *ngIf="f.balance.errors && f.balance.hasError('min')"
+                >
+                  Credit limit exceeded
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
             <ion-col >
               <mat-form-field class="example-half-width">
                 <input
@@ -205,31 +177,7 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-         
-       
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
-                  matInput
-                  placeholder="Remaining Balance"
-                  readonly
-                  formControlName="balance"
-                  [value]="salesCustomerDetialsForm.get('balance').value | curFormat | async"
-                />
-                <mat-error
-                  *ngIf="f.balance.errors && f.balance.hasError('min')"
-                >
-                  Credit limit exceeded
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-         
-            <ion-col size-md="6">
-              <mat-form-field class="example-half-width">
-                <mat-label>Remarks</mat-label>
-                <textarea matInput formControlName="remarks"></textarea>
-              </mat-form-field>
-            </ion-col>
+          
             <ion-col >
               <mat-form-field class="example-half-width">
                 <input
@@ -258,30 +206,29 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col >
+            <ion-col>
               <mat-form-field class="example-half-width">
                 <input
                   required
                   type="text"
-                  placeholder="Select mobileNo"
+                  placeholder="Select Warehouse"
                   matInput
-                  formControlName="mobileNo"
-                  (focusout)="validateInput(f.mobileNo, territoryList)"
-                  [matAutocomplete]="mobileNo"
+                  formControlName="warehouse"
+                  (focusout)="validateInput(f.warehouse, filteredWarehouseList)"
+                  [matAutocomplete]="warehouse"
                 />
                 <mat-autocomplete
                   autoActiveFirstOption
-                  #mobileNo="matAutocomplete"
-                  (optionSelected)="mobileNoChanged($event)"
-
+                  #warehouse="matAutocomplete"
+                  (optionSelected)="updateStockBalance($event.option.value)"
                 >
                 <div *ngIf = "!f.mobileNo.hasError('falseValse'); else errorBlock1">
 
                   <mat-option
-                  *ngFor="let customerDetail of filteredCustomerDetailList"
-                  [value]="customerDetail.mobileNo"
+                    *ngFor="let warehouse of filteredWarehouseList | async"
+                    [value]="warehouse"
                   >
-                    {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}} <br> {{customerDetail.name}}
+                    {{ warehouse }}
                   </mat-option>
                 </div>
 
@@ -294,20 +241,23 @@
                  </ng-template>
 
                 </mat-autocomplete>
-                <mat-error *ngIf="f.mobileNo.hasError('falseValse')">
+                <mat-error *ngIf="f.warehouse.hasError('required')">
+                  Warehouse is <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="f.warehouse.hasError('falseValse')">
                   You should select a value from dropdown only.
-                  <strong>'{{f.mobileNo.value}}'</strong> is not allowed.
+                  <strong>'{{f.warehouse.value}}'</strong> is not allowed.
                 </mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col>
-              <mat-form-field class="mat-input-wrapper" appearance="none">
-                <mat-checkbox matInput formControlName="campaign">
-                  Campaign Invoice
-                </mat-checkbox>
-                <input matInput disabled />
-              </mat-form-field>
-            </ion-col>
+          </ion-row>
+        <ion-row class="search_bar">
+          <ion-col size-md="8" >
+            <mat-form-field class="example-half-width remarks-label">
+              <mat-label>Remarks</mat-label>
+              <textarea matInput formControlName="remarks" placeholder="Cash Collected on place"></textarea>
+            </mat-form-field>
+          </ion-col>
           </ion-row>
         </ion-grid>
       </ion-card-content>
@@ -353,7 +303,18 @@
         <form [formGroup]="salesInvoiceItemsForm">
           <ion-grid>
             <ion-row>
-              <ion-col>
+              <ion-col size="12">
+                <mat-form-field class="search-table example-full-width">
+                  <mat-icon matPrefix>search</mat-icon>
+                  <input
+                    matInput
+                    placeholder="Scan/Search Item Here"
+                    formControlName="filterValue"
+                    (keyup.enter)="setFilter()"
+                  />
+                </mat-form-field>
+              </ion-col>
+              <ion-col  size="12">
                 <mat-form-field class="example-full-width">
                   <mat-label>Filter from</mat-label>
                   <mat-select formControlName="filterKey">
@@ -363,16 +324,7 @@
                   </mat-select>
                 </mat-form-field>
               </ion-col>
-              <ion-col>
-                <mat-form-field class="example-full-width">
-                  <input
-                    matInput
-                    placeholder="Value"
-                    formControlName="filterValue"
-                    (keyup.enter)="setFilter()"
-                  />
-                </mat-form-field>
-              </ion-col>
+            
             </ion-row>
           </ion-grid>
       
@@ -407,7 +359,7 @@
             </ion-grid>
           </div>
       
-          <div class="grid-container" *ngIf="!isSkeletonTextVisible">
+          <div class="grid-container horizontal-boxes" *ngIf="!isSkeletonTextVisible">
             <ion-grid>
               <ion-row>
                 <ion-col size="3" *ngFor="let item of gridItems">
@@ -417,20 +369,17 @@
                     matTooltip="{{item.serial_no}}"
                     matTooltipPosition="above"
                   >
-                    <ion-card-header>
-                      <ion-card-subtitle> {{item.item_name}} </ion-card-subtitle>
-                      <ion-card-subtitle color="primary"
-                        >{{item.serial_no?item.serial_no:''}}</ion-card-subtitle
-                      >
-                    </ion-card-header>
+                  <ion-card-header>
+                    <ion-row>
+                      <ion-col class="ion-text-left pieces-num" size="6">
+                        {{item.safety_stock}} {{item.stock_uom}}
+                      </ion-col>
+                    </ion-row>
+                  </ion-card-header>
                     <ion-card-content>
+
                       <ion-row color="primary">
-                        <ion-col size="6">
-                          {{item.rate}}
-                        </ion-col>
-                        <ion-col class="ion-text-right" size="6">
-                          {{item.safety_stock}} {{item.stock_uom}}
-                        </ion-col>
+                        
                         <ion-img class="item-image" src='http://0.0.0.0:8000{{item.website_image}}'></ion-img>
                       </ion-row>
                       <ion-button
@@ -440,10 +389,17 @@
                         *ngIf="item.rate">
                       </ion-button>
                     </ion-card-content>
+                    <ion-card-footer>
+                      <ion-card-subtitle> {{item.item_name}} </ion-card-subtitle>
+                      <ion-card-subtitle color="primary"
+                        >{{item.serial_no?item.serial_no:''}}</ion-card-subtitle
+                      >
+                      <ion-col class="box-price">
+                        ${{item.rate}}
+                      </ion-col>
+                    </ion-card-footer>
                   </ion-card>
                 </ion-col>
-              </ion-row>
-              <ion-row>
                 <ion-col>
                   <ion-progress-bar
                     type="indeterminate"
@@ -463,11 +419,31 @@
                   </center>
                 </ion-col>
               </ion-row>
+              <!-- <ion-row>
+                <ion-col>
+                  <ion-progress-bar
+                    type="indeterminate"
+                    color="primary"
+                    *ngIf="isDataLoading"
+                  ></ion-progress-bar>
+      
+                  <center>
+                    <ion-button
+                      fill="outline"
+                      *ngIf="isLoadMoreVisible"
+                      color="primary"
+                      (click)="loadMoreData()"
+                    >
+                      Load More</ion-button
+                    >
+                  </center>
+                </ion-col>
+              </ion-row> -->
             </ion-grid>
           </div>
       
-          <ion-card>
-            <ion-card-header>
+          <ion-card class="table-card">
+            <!-- <ion-card-header>
               <ion-row class="align">
                 <ion-col>
                   <ion-card-title>
@@ -488,10 +464,10 @@
                   </ion-button>
                 </ion-col>
               </ion-row>
-            </ion-card-header>
+            </ion-card-header> -->
             <ion-card-content class="ion-no-padding">
               <ion-item lines="none">
-                <mat-table #table [dataSource]="dataSource" style="width: 100%">
+                <mat-table #table class="striped" [dataSource]="dataSource" style="width: 100%">
                   <ng-container matColumnDef="item">
                     <mat-header-cell *matHeaderCellDef>Item</mat-header-cell>
                     <mat-cell
@@ -660,8 +636,8 @@
         </form>
       </ion-col >
 
-      <ion-col size="3">
-        <ion-card>
+      <ion-col size="3" class="draft_box">
+        <!-- <ion-card>
           <ion-card-header>
             <ion-row class="align">
               <ion-col>
@@ -675,7 +651,7 @@
             <mat-table  [dataSource]="dataSource2">
               <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumnsItems" >
                 <th mat-header-cell class="draft-table" *matHeaderCellDef>{{column}}</th>
-                <td mat-cell class="draft-table" *matCellDef="let row"> <a href="#">{{row[column]}}</a>  </td>
+                <td mat-cell class="draft-table" *matCellDef="let row"> <a href="sales/add-sales-invoice/add" (click)="onList($event)"   >{{row[column]}}</a>  </td>
               </ng-container>        
               
               <mat-header-row *matHeaderRowDef="displayedColumnsItems; sticky: true"></mat-header-row>
@@ -687,7 +663,7 @@
 
         </ion-card-content>
 
-        </ion-card>
+        </ion-card> -->
 
         <form [formGroup]="paymentForm">
           <ion-card>
@@ -962,16 +938,17 @@
             </ion-card-content>
           </ion-card>
           </form>
-      </ion-col>
-      <ion-col size="9">
-          <div>
-            <div style='float: right;'>
-              <button mat-stroked-button (click)="makeDraft()" color="primary">Make Draft</button>
-              &nbsp;&nbsp;
-              <button mat-stroked-button (click)="submitPayment()" color="primary">Pay and Submit</button>
+          <!-- <ion-col size="9"> -->
+            <div>
+              <div style='float: left;'>
+                <button class="draft-payment" mat-stroked-button (click)="makeDraft()" color="primary">Make Draft</button>
+                &nbsp;&nbsp;
+                <button class="submit-payment" mat-stroked-button (click)="submitPayment()" color="primary">Pay and Submit</button>
+              </div>
             </div>
-          </div>
+        <!-- </ion-col> -->
       </ion-col>
+   
     </ion-row>
   </ion-grid>
 

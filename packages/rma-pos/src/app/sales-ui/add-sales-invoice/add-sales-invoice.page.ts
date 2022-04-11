@@ -1,4 +1,5 @@
 import { PaymentDialogueComponent } from './payment-dialogue/payment-dialogue.component';
+import {DraftListComponent} from './draft-list/draft-list.component'
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
@@ -1495,6 +1496,9 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
 
   makeDraft() {
     console.log("Making Draft....")
+    this.dialog.open(DraftListComponent, {height: '540px',
+    width: '600px',})
+
   };
   submitPayment() {
     this.dialog.open(PaymentDialogueComponent, {height: '540px',
