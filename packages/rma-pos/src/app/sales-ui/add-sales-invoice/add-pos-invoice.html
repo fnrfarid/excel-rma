@@ -272,13 +272,27 @@
                 <mat-autocomplete
                   autoActiveFirstOption
                   #mobileNo="matAutocomplete"
+                  (optionSelected)="mobileNoChanged($event)"
+
                 >
+                <div *ngIf = "!f.mobileNo.hasError('falseValse'); else errorBlock1">
+
                   <mat-option
-                    *ngFor="let customerDetail of filteredCustomerDetailList"
-                    [value]="customerDetail.mobileNo"
+                  *ngFor="let customerDetail of filteredCustomerDetailList"
+                  [value]="customerDetail.mobileNo"
                   >
-                    {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}}
+                    {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}} <br> {{customerDetail.name}}
                   </mat-option>
+                </div>
+
+                <ng-template #errorBlock1>
+                  <mat-option>
+                    <button class="button" type="submit" (click)="onCreateCustomer()">Create Customer</button>
+
+                  </mat-option> 
+
+                 </ng-template>
+
                 </mat-autocomplete>
                 <mat-error *ngIf="f.mobileNo.hasError('falseValse')">
                   You should select a value from dropdown only.
