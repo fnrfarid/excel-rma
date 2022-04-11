@@ -90,3 +90,9 @@ export interface draftList {
   customerName ?: String,
   amount ?: number
 }
+
+export interface DialogData {
+  name ? : String,
+  age ?: String,
+  territoryList ?: any
+}

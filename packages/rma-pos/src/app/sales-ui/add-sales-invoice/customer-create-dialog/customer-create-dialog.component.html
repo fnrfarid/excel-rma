@@ -1,0 +1,168 @@
+  <form [formGroup] = "salesCustomerDialogForm">
+    <div mat-dialog-content>
+      <h5>New Customer </h5>
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Series"
+          formControlName="series"
+        />
+        <mat-error *ngIf="f.series.hasError('required')">
+          Series is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Full Name"
+          formControlName="fullName"
+        />
+        <mat-error *ngIf="f.fullName.hasError('required')">
+          Full Name is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+      <mat-form-field class="example-full-width">
+        <input
+          matInput
+          required
+          placeholder="Type"
+          formControlName="type"
+        />
+        <mat-error *ngIf="f.type.hasError('required')">
+          Type is <strong>required</strong>
+        </mat-error>
+      </mat-form-field><br />
+
+      <mat-form-field class="example-full-width">
+        <input
+          required
+          type="text"
+          placeholder="Select Customer Group"
+          matInput
+          formControlName="customerGroup"
+          (focusout)="validateInput(f.customerGroup, customerGroupList)"
+          [matAutocomplete]="customerGroup"
+        />
+        <mat-autocomplete
+          autoActiveFirstOption
+          #customerGroup="matAutocomplete"
+  
+        >
+          <mat-option
+            *ngFor="let customerGroup of customerGroupList"
+            [value]="customerGroup.name"
+          >
+            {{ customerGroup.name }}
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="f.customerGroup.hasError('falseValse')">
+          You should select a value from dropdown only.
+          <strong>'{{f.customerGroup.value}}'</strong> is not allowed.
+        </mat-error>
+      </mat-form-field>
+      <br /><br />
+
+
+    <mat-form-field class="example-full-width">
+      <input
+        required
+        type="text"
+        placeholder="Select territory"
+        matInput
+        formControlName="territory"
+        (focusout)="validateInput(f.territory, territoryList)"
+        [matAutocomplete]="territory"
+      />
+      <mat-autocomplete
+        autoActiveFirstOption
+        #territory="matAutocomplete"
+
+      >
+        <mat-option
+          *ngFor="let territory of territoryList | async"
+          [value]="territory"
+        >
+          {{ territory }}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="f.territory.hasError('falseValse')">
+        You should select a value from dropdown only.
+        <strong>'{{f.territory.value}}'</strong> is not allowed.
+      </mat-error>
+    </mat-form-field>
+    <br /><br />
+
+    <h5>primary Contact Details</h5>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              required
+              placeholder="Mobile No"
+              formControlName="mobileNo"
+            />
+            <mat-error *ngIf="f.mobileNo.hasError('required')">
+              Mobile No is <strong>required</strong>
+            </mat-error>
+          </mat-form-field><br />
+
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              required
+              placeholder="Address"
+              formControlName="address"
+            />
+            <mat-error *ngIf="f.address.hasError('required')">
+              Address is <strong>required</strong>
+            </mat-error>
+          </mat-form-field><br />
+
+        </ion-col>
+        <ion-col>
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              required
+              placeholder="Email Id"
+              formControlName="emailId"
+            />
+            <mat-error *ngIf="f.emailId.hasError('required')">
+              Email id is <strong>required</strong>
+            </mat-error>
+          </mat-form-field><br />
+
+          <mat-form-field class="example-full-width">
+            <input
+              matInput
+              required
+              placeholder="City"
+              formControlName="city"
+            />
+            <mat-error *ngIf="f.city.hasError('required')">
+              City is <strong>required</strong>
+            </mat-error>
+          </mat-form-field><br />
+
+
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  
+  
+  
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="onNoClick()">No Thanks</button>
+    <button mat-button [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
+  </div>
+
+  </form>
+

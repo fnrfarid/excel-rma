@@ -1,4 +1,5 @@
 import { PaymentDialogueComponent } from './payment-dialogue/payment-dialogue.component';
+import {DraftListComponent} from './draft-list/draft-list.component'
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
@@ -20,6 +21,7 @@ import {
   mergeMap,
   toArray,
   concatMap,
+  flatMap,
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import {
@@ -77,6 +79,7 @@ import {
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
+import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -133,6 +136,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
+  filteredCustomerDetailList: any= [];
   salesInvoiceItemsForm = new FormGroup({
     items: new FormArray([], this.itemValidator),
     total: new FormControl(0),
@@ -197,6 +201,8 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   filteredItemList = [];
   fromRangeUpdate = new Subject<string>();
   toRangeUpdate = new Subject<string>();
+  animal: string;
+  name: string;
 
   // =====NEED TO CLEAN UP CODE=========
 
@@ -301,6 +307,20 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
           return this.salesService.getCustomerList(value);
         }),
       );
+
+    this.filteredCustomerList.subscribe((data)=>{
+      data.forEach((element)=>{
+        this.salesService.relayCustomer(element.name).subscribe((data)=>{
+          if(this.filteredCustomerDetailList){
+            this.filteredCustomerDetailList.push({
+              customerName: data.customer_name,
+              mobileNo: data.mobile_no ? data.mobile_no : '-'
+            })
+          }    
+        })
+      })
+    })
+
 
     this.filteredWarehouseList = this.salesCustomerDetialsForm
       .get('warehouse')
@@ -412,6 +432,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
+        mobileNo: new FormControl('')
       },
       // {
       //   validators: [this.dueDateValidator, this.creditLimitValidator],
@@ -780,7 +801,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   customerChanged(customer, postingDate?) {
-    if (customer.credit_days) {
+    if (customer.hasOwnProperty("credit_days")) {
       let date;
       postingDate ? (date = new Date(postingDate)) : (date = new Date());
       date.setDate(date.getDate() + customer.credit_days);
@@ -1450,10 +1471,24 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
 
   makeDraft() {
     console.log("Making Draft....")
+    this.dialog.open(DraftListComponent, {height: '540px',
+    width: '600px',})
+
   };
   submitPayment() {
-    this.dialog.open(PaymentDialogueComponent, {height: '500px',
+    this.dialog.open(PaymentDialogueComponent, {height: '540px',
     width: '600px',})
   };
+  onCreateCustomer(){
+    const dialogRef = this.dialog.open(CustomerCreateDialogComponent, {
+      width: '500px',
+      data: {name: this.name,age: this.animal,territoryList:this.territoryList},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.animal = result;
+    });
+  }
 
 }

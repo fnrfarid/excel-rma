@@ -14,6 +14,7 @@ import { SettingsService } from '../../../system-settings/aggregates/settings/se
 import {
   FRAPPE_API_GET_USER_INFO_ENDPOINT,
   FRAPPE_API_GET_CUSTOMER_ENDPOINT,
+  FRAPPE_API_GET_CUSTOMER_GROUP_ENDPOINT,
 } from '../../../constants/routes';
 
 @Injectable()
@@ -122,6 +123,22 @@ export class CustomerAggregateService extends AggregateRoot {
     }).pipe(
       switchMap(({ headers, settings }) => {
         const url = `${settings.authServerURL}${FRAPPE_API_GET_CUSTOMER_ENDPOINT}/${name}`;
+        return this.http
+          .get(url, {
+            headers,
+          })
+          .pipe(map(res => res.data));
+      }),
+    );
+  }
+
+  customerGroupListFetch() {
+    return forkJoin({
+      headers: this.clientToken.getServiceAccountApiHeaders(),
+      settings: this.settings.find(),
+    }).pipe(
+      switchMap(({ headers, settings }) => {
+        const url = `${settings.authServerURL}${FRAPPE_API_GET_CUSTOMER_GROUP_ENDPOINT}`;
         return this.http
           .get(url, {
             headers,

@@ -8,6 +8,7 @@ import { ViewSalesInvoicePageModule } from './view-sales-invoice/view-sales-invo
 import { ViewSalesInvoiceSubjectService } from './view-sales-invoice/view-sales-invoice-subject.service';
 import { CommonComponentModule } from '../common/components/common-component.module';
 
+
 @NgModule({
   declarations: [],
 

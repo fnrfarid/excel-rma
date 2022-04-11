@@ -8,8 +8,7 @@ import { MaterialModule } from '../../material/material.module';
 import { InlineEditComponent } from './inline-edit/inline-edit.component';
 import { KeyDownDetectorDirective } from './on-key-down-directive';
 import { AppCommonModule } from '../../common/app-common.module';
-import { MatButtonModule} from '@angular/material/button';
-
+import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
 
 const routes: Routes = [
   {
@@ -27,13 +26,13 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     MaterialModule,
     ReactiveFormsModule,
-    MatButtonModule
   ],
   declarations: [
     AddSalesInvoicePage,
     InlineEditComponent,
     KeyDownDetectorDirective,
+    CustomerCreateDialogComponent
   ],
-  exports: [InlineEditComponent, KeyDownDetectorDirective],
+  exports: [InlineEditComponent, KeyDownDetectorDirective,CustomerCreateDialogComponent],
 })
 export class AddSalesInvoicePageModule {}

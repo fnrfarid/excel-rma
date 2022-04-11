@@ -57,7 +57,8 @@ import {
   RELAY_GET_MODE_OF_PAYMENT_ENDPOINT,
   RELAY_GET_POS_PROFILE_ENDPOINT,
   ERPNEXT_POS_PROFILE_ENDPOINT,
-  IMAGE_ITEMS_ENDPOINT
+  IMAGE_ITEMS_ENDPOINT,
+  CUSTOMER_GROUP_LIST
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -925,5 +926,15 @@ export class SalesService {
           });
         },
       });
+  }
+
+  customerGroupList() {
+    const url = CUSTOMER_GROUP_LIST;
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<any>(url, { headers });
+      }),
+      map(res => res.data),
+    );
   }
 }

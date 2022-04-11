@@ -50,32 +50,6 @@
             <ion-col>
               <mat-form-field class="example-half-width">
                 <input
-                  matInput
-                  placeholder="Naming Series"
-                  readonly
-                  value="SINV-####"
-                />
-              </mat-form-field>
-            </ion-col>
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
-                  matInput
-                  required
-                  placeholder="Company"
-                  readonly
-                  formControlName="company"
-                />
-                <mat-error *ngIf="f.company.hasError('required')">
-                  Company is <strong>required</strong>
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-         
-
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
                   required
                   type="text"
                   placeholder="Select Customer"
@@ -90,14 +64,23 @@
                   [displayWith]="getOptionText"
                   (optionSelected)="customerChanged($event.option.value)"
                 >
-           
+                 <div *ngIf = "!f.customer.hasError('falseValse'); else errorBlock">
                   <mat-option
                     *ngFor="let option of filteredCustomerList | async "
                     [value]="option"
-                  >
+                    >
                     {{ option.customer_name }}
                     <small class="text-muted"> {{option.customer_name}} </small>
-                  </mat-option>
+                    </mat-option>
+                 </div>
+                 <ng-template #errorBlock>
+                  <mat-option>
+                    <button class="button" type="submit" (click)="onCreateCustomer()">Create Customer</button>
+
+                  </mat-option> 
+
+                 </ng-template>
+
              
                
                 </mat-autocomplete>
@@ -110,30 +93,108 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-
+            <ion-col >
+              <mat-form-field class="example-half-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select mobileNo"
+                  matInput
+                  formControlName="mobileNo"
+                  (focusout)="validateInput(f.mobileNo, territoryList)"
+                  [matAutocomplete]="mobileNo"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #mobileNo="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let customerDetail of filteredCustomerDetailList"
+                    [value]="customerDetail.mobileNo"
+                  >
+                    {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.mobileNo.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.mobileNo.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
 
             <ion-col>
               <mat-form-field class="example-half-width">
                 <input
-                  required
                   matInput
-                  [matDatepicker]="postingDate"
-                  placeholder="Posting Date"
+                  placeholder="Remaining Balance"
                   readonly
-                  formControlName="postingDate"
-                  (dateChange)="selectedPostingDate($event)"
+                  formControlName="balance"
+                  [value]="salesCustomerDetialsForm.get('balance').value | curFormat | async"
                 />
-                <mat-datepicker-toggle
-                  matSuffix
-                  [for]="postingDate"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #postingDate disabled="false"></mat-datepicker>
-                <mat-error *ngIf="f.postingDate.hasError('required')">
-                  Posting Date is <strong>required</strong>
+                <mat-error
+                  *ngIf="f.balance.errors && f.balance.hasError('min')"
+                >
+                  Credit limit exceeded
                 </mat-error>
               </mat-form-field>
             </ion-col>
-        
+            <ion-col >
+              <mat-form-field class="example-half-width">
+                <input
+                  required
+                  matInput
+                  [matDatepicker]="dueDate"
+                  placeholder="Due Date"
+                  readonly
+                  formControlName="dueDate"
+                  (dateChange)="selectedDueDate($event)"
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="dueDate"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #dueDate disabled="false"></mat-datepicker>
+                <mat-error
+                  *ngIf="f.dueDate.errors && f.dueDate.hasError('required')"
+                >
+                  Due Date is <strong>required</strong>
+                </mat-error>
+                <mat-error
+                  *ngIf="f.dueDate.errors && f.dueDate.hasError('dueDate')"
+                >
+                  Due Date cannot be before posting date
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
+          
+            <ion-col >
+              <mat-form-field class="example-half-width">
+                <input
+                  required
+                  type="text"
+                  placeholder="Select territory"
+                  matInput
+                  formControlName="territory"
+                  (focusout)="validateInput(f.territory, territoryList)"
+                  [matAutocomplete]="territory"
+                />
+                <mat-autocomplete
+                  autoActiveFirstOption
+                  #territory="matAutocomplete"
+                >
+                  <mat-option
+                    *ngFor="let territory of territoryList | async"
+                    [value]="territory"
+                  >
+                    {{ territory }}
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="f.territory.hasError('falseValse')">
+                  You should select a value from dropdown only.
+                  <strong>'{{f.territory.value}}'</strong> is not allowed.
+                </mat-error>
+              </mat-form-field>
+            </ion-col>
             <ion-col>
               <mat-form-field class="example-half-width">
                 <input
@@ -166,85 +227,6 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
-
-
-
-            <ion-col >
-              <mat-form-field class="example-half-width">
-                <input
-                  required
-                  matInput
-                  [matDatepicker]="dueDate"
-                  placeholder="Due Date"
-                  readonly
-                  formControlName="dueDate"
-                  (dateChange)="selectedDueDate($event)"
-                />
-                <mat-datepicker-toggle
-                  matSuffix
-                  [for]="dueDate"
-                ></mat-datepicker-toggle>
-                <mat-datepicker #dueDate disabled="false"></mat-datepicker>
-                <mat-error
-                  *ngIf="f.dueDate.errors && f.dueDate.hasError('required')"
-                >
-                  Due Date is <strong>required</strong>
-                </mat-error>
-                <mat-error
-                  *ngIf="f.dueDate.errors && f.dueDate.hasError('dueDate')"
-                >
-                  Due Date cannot be before posting date
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-         
-       
-            <ion-col>
-              <mat-form-field class="example-half-width">
-                <input
-                  matInput
-                  placeholder="Remaining Balance"
-                  readonly
-                  formControlName="balance"
-                  [value]="salesCustomerDetialsForm.get('balance').value | curFormat | async"
-                />
-                <mat-error
-                  *ngIf="f.balance.errors && f.balance.hasError('min')"
-                >
-                  Credit limit exceeded
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
-         
-          
-            <ion-col >
-              <mat-form-field class="example-half-width">
-                <input
-                  required
-                  type="text"
-                  placeholder="Select territory"
-                  matInput
-                  formControlName="territory"
-                  (focusout)="validateInput(f.territory, territoryList)"
-                  [matAutocomplete]="territory"
-                />
-                <mat-autocomplete
-                  autoActiveFirstOption
-                  #territory="matAutocomplete"
-                >
-                  <mat-option
-                    *ngFor="let territory of territoryList | async"
-                    [value]="territory"
-                  >
-                    {{ territory }}
-                  </mat-option>
-                </mat-autocomplete>
-                <mat-error *ngIf="f.territory.hasError('falseValse')">
-                  You should select a value from dropdown only.
-                  <strong>'{{f.territory.value}}'</strong> is not allowed.
-                </mat-error>
-              </mat-form-field>
-            </ion-col>
           </ion-row>
         <ion-row class="search_bar">
           <ion-col size-md="8" >
@@ -253,14 +235,6 @@
               <textarea matInput formControlName="remarks" placeholder="Cash Collected on place"></textarea>
             </mat-form-field>
           </ion-col>
-            <ion-col>
-              <mat-form-field class="mat-input-wrapper" appearance="none">
-                <mat-checkbox matInput formControlName="campaign">
-                  Campaign Invoice
-                </mat-checkbox>
-                <input matInput disabled />
-              </mat-form-field>
-            </ion-col>
           </ion-row>
         </ion-grid>
       </ion-card-content>
