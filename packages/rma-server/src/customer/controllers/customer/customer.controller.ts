@@ -107,4 +107,12 @@ export class CustomerController {
   relayCustomer(@Param('name') name) {
     return this.aggregate.relayCustomer(name);
   }
+
+  @Get('v1/customer_group')
+  @UseGuards(TokenGuard)
+  customerGroup(@Req() req) {
+    return this.aggregate.customerGroupListFetch()
+  }
+
+
 }

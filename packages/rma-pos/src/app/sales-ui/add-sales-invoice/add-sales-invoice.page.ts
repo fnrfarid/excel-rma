@@ -1,4 +1,5 @@
 import { PaymentDialogueComponent } from './payment-dialogue/payment-dialogue.component';
+import {DraftListComponent} from './draft-list/draft-list.component'
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
@@ -19,7 +20,7 @@ import {
   map,
   mergeMap,
   toArray,
-  concatMap,
+  concatMap
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import {
@@ -130,6 +131,8 @@ export class AddSalesInvoicePage implements OnInit {
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
+  filteredCustomerDetailList: any= [];
+  filteredCustomerDetailListSearch : any = [];
   salesInvoiceItemsForm = new FormGroup({
     items: new FormArray([], this.itemValidator),
     total: new FormControl(0),
@@ -222,6 +225,8 @@ export class AddSalesInvoicePage implements OnInit {
     public dialog: MatDialog
   ) {}
 
+  showdetails;
+
   ngOnInit() {
     
     this.createFormGroup();
@@ -296,6 +301,39 @@ export class AddSalesInvoicePage implements OnInit {
           return this.salesService.getCustomerList(value);
         }),
       );
+
+    this.filteredCustomerList.subscribe((data)=>{
+      this.filteredCustomerDetailList = []
+      this.filteredCustomerDetailListSearch = []
+      data.forEach((element)=>{
+        this.salesService.relayCustomer(element.name).subscribe((data)=>{
+          if(this.filteredCustomerDetailList){
+            this.filteredCustomerDetailList.push({
+              customerName: data.customer_name,
+              mobileNo: data.mobile_no ? data.mobile_no : '-',
+              name : data.name
+            })
+
+            this.filteredCustomerDetailListSearch.push({
+              customerName : data.customer_name,
+              mobileNo: data.mobile_no ? data.mobile_no : '-',
+              name : data.name
+
+            })
+
+          }    
+        })
+      })
+    })
+
+    this.salesCustomerDetialsForm.get('mobileNo').valueChanges.subscribe((searchVal) => {
+      this.filteredCustomerDetailList = this.filterValues(searchVal)
+
+    })
+
+  
+
+
 
     this.filteredWarehouseList = this.salesCustomerDetialsForm
       .get('warehouse')
@@ -396,6 +434,8 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   createFormGroup() {
+    let MOBILE_PATTERN = /[0-9\+\-\ ]/;
+
     this.salesCustomerDetialsForm = new FormGroup(
       {
         warehouse: new FormControl('', [Validators.required]),
@@ -407,6 +447,7 @@ export class AddSalesInvoicePage implements OnInit {
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
+        mobileNo: new FormControl('',[Validators.pattern(MOBILE_PATTERN)])
       },
       // {
       //   validators: [this.dueDateValidator, this.creditLimitValidator],
@@ -540,6 +581,7 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   updateItem(row: Item, index: number, item: Item) {
+
     if (item == null) {
       return;
     }
@@ -776,6 +818,10 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   customerChanged(customer, postingDate?) {
+    var customerDetailObj = this.filteredCustomerDetailListSearch.filter((element)=>
+      customer.name == element.name)
+    this.salesCustomerDetialsForm.get('mobileNo').setValue(customerDetailObj[0].mobileNo)
+  
     if (customer.hasOwnProperty("credit_days")) {
       let date;
       postingDate ? (date = new Date(postingDate)) : (date = new Date());
@@ -1542,18 +1588,32 @@ export class AddSalesInvoicePage implements OnInit {
         amount: total_amount
       };
       
-      this.dataSource1.push(draft)
-      this.dataSource2 = new MatTableDataSource(this.dataSource1)
-      this.dataSource3.push(posDraftDetails)
+      this.dataSource1.push(draft) // holding all draft objects
+      this.dataSource2 = new MatTableDataSource(this.dataSource1) // show draft content on Ui 
+      this.dataSource3.push(posDraftDetails) // array of draft lists
       this.clearFields()
-      console.log(this.dataSource3)
     }
     else{
       this.snackbar.open("Please provide all required fields", CLOSE, {
         duration: 3000,
       });  
     }  
-  }
+    // const dialogRef = this.dialog.open(DraftListComponent,  {
+    //   height: '540px',
+    //   width: '600px',
+    //   data:{
+    //     name:'ali',
+    //     email:'alihaider'
+    //   }
+    
+    // })
+  
+    // dialogRef.afterClosed().subscribe(result =>{
+    //   this.showdetails=result;
+    //   // console.log(`here the data results  ${result}`)
+    // })
+  
+    };
 
   editDraftList(event){
     var targetedObject :any = "";
@@ -1606,5 +1666,19 @@ export class AddSalesInvoicePage implements OnInit {
       this.animal = result;
     });
   }
+
+  filterValues(name){
+    if(this.filteredCustomerDetailListSearch){
+      return this.filteredCustomerDetailListSearch.filter(value=>
+        value.mobileNo.toLowerCase().indexOf(name.toLowerCase()) !== -1);
+    }
+
+  }
+
+  mobileNoChanged(args :any){
+    var customerDetails : any  = args.option._element.nativeElement.innerText.split('\n')
+    this.getCustomer(customerDetails[2])
+  }
+
 
 }
