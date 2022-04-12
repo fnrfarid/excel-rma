@@ -350,20 +350,11 @@ export class SalesService {
         }),
       ); 
   }
-  getItemGroupList(value: string, pageIndex = 0, pageSize = 30) {
+  getItemGroupList() {
     const url = RELAY_GET_ITEM_GROUP_ENDPOINT;
-
-    const params = new HttpParams({
-      fromObject: {
-        fields: '["*"]',
-        filters: `[["name","like","%${value}%"]]`,
-        limit_page_length: pageSize.toString(),
-        limit_start: (pageIndex * pageSize).toString(),
-      },
-    });
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get(url, { headers, params });
+        return this.http.get(url, { headers });
       }),
       map((data: any) => data.data),
     );
