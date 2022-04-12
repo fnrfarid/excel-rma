@@ -21,7 +21,6 @@ import {
   mergeMap,
   toArray,
   concatMap,
-  flatMap,
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import {
@@ -227,6 +226,8 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     private readonly loadingController: LoadingController,
     public dialog: MatDialog
   ) {}
+
+  showdetails;
 
   ngOnInit() {
     this.createFormGroup();
@@ -565,6 +566,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   updateItem(row: Item, index: number, item: Item) {
+
     if (item == null) {
       return;
     }
@@ -1470,12 +1472,24 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   makeDraft() {
-    console.log("Making Draft....")
-    this.dialog.open(DraftListComponent, {height: '540px',
-    width: '600px',})
+    const dialogRef = this.dialog.open(DraftListComponent,  {
+    height: '540px',
+    width: '600px',
+    data:{
+      name:'ali',
+      email:'alihaider'
+    }
+  
+  })
+
+  dialogRef.afterClosed().subscribe(result =>{
+    this.showdetails=result;
+    // console.log(`here the data results  ${result}`)
+  })
 
   };
   submitPayment() {
+  
     this.dialog.open(PaymentDialogueComponent, {height: '540px',
     width: '600px',})
   };
