@@ -258,7 +258,7 @@ export class DetailsComponent implements OnInit {
   }
 }
 //Interface for making-draft
-export class PosDraftDetails {
+export class PosDraftDetails{
   uuid: string;
   company: string;
   customer: string;
