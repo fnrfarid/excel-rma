@@ -9,7 +9,8 @@ import {
 
 import {
   FormControl,
-  FormGroup
+  FormGroup,
+  Validators
 } from '@angular/forms';
 import { SalesService } from '../../services/sales.service';
 import {
@@ -110,7 +111,7 @@ export class CustomerCreateDialogComponent implements OnInit {
       customerGroup: new FormControl(''),
       territory: new FormControl(''),
       emailId : new FormControl(''),
-      mobileNo : new FormControl(''),
+      mobileNo : new FormControl('',[Validators.required, Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]),
       address : new FormControl(''),
       city : new FormControl('')
     })

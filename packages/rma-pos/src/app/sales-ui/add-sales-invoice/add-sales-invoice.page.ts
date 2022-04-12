@@ -20,7 +20,7 @@ import {
   map,
   mergeMap,
   toArray,
-  concatMap,
+  concatMap
 } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import {
@@ -136,6 +136,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
   filteredCustomerDetailList: any= [];
+  filteredCustomerDetailListSearch : any = [];
   salesInvoiceItemsForm = new FormGroup({
     items: new FormArray([], this.itemValidator),
     total: new FormControl(0),
@@ -310,17 +311,36 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
       );
 
     this.filteredCustomerList.subscribe((data)=>{
+      this.filteredCustomerDetailList = []
+      this.filteredCustomerDetailListSearch = []
       data.forEach((element)=>{
         this.salesService.relayCustomer(element.name).subscribe((data)=>{
           if(this.filteredCustomerDetailList){
             this.filteredCustomerDetailList.push({
               customerName: data.customer_name,
-              mobileNo: data.mobile_no ? data.mobile_no : '-'
+              mobileNo: data.mobile_no ? data.mobile_no : '-',
+              name : data.name
             })
+
+            this.filteredCustomerDetailListSearch.push({
+              customerName : data.customer_name,
+              mobileNo: data.mobile_no ? data.mobile_no : '-',
+              name : data.name
+
+            })
+
           }    
         })
       })
     })
+
+    this.salesCustomerDetialsForm.get('mobileNo').valueChanges.subscribe((searchVal) => {
+      this.filteredCustomerDetailList = this.filterValues(searchVal)
+
+    })
+
+  
+
 
 
     this.filteredWarehouseList = this.salesCustomerDetialsForm
@@ -422,6 +442,8 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   createFormGroup() {
+    let MOBILE_PATTERN = /[0-9\+\-\ ]/;
+
     this.salesCustomerDetialsForm = new FormGroup(
       {
         warehouse: new FormControl('', [Validators.required]),
@@ -433,7 +455,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
         campaign: new FormControl(false),
         balance: new FormControl(0),
         remarks: new FormControl(''),
-        mobileNo: new FormControl('')
+        mobileNo: new FormControl('',[Validators.pattern(MOBILE_PATTERN)])
       },
       // {
       //   validators: [this.dueDateValidator, this.creditLimitValidator],
@@ -803,6 +825,10 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   customerChanged(customer, postingDate?) {
+    var customerDetailObj = this.filteredCustomerDetailListSearch.filter((element)=>
+      customer.name == element.name)
+    this.salesCustomerDetialsForm.get('mobileNo').setValue(customerDetailObj[0].mobileNo)
+  
     if (customer.hasOwnProperty("credit_days")) {
       let date;
       postingDate ? (date = new Date(postingDate)) : (date = new Date());
@@ -1504,5 +1530,19 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
       this.animal = result;
     });
   }
+
+  filterValues(name){
+    if(this.filteredCustomerDetailListSearch){
+      return this.filteredCustomerDetailListSearch.filter(value=>
+        value.mobileNo.toLowerCase().indexOf(name.toLowerCase()) !== -1);
+    }
+
+  }
+
+  mobileNoChanged(args :any){
+    var customerDetails : any  = args.option._element.nativeElement.innerText.split('\n')
+    this.getCustomer(customerDetails[2])
+  }
+
 
 }

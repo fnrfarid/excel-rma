@@ -18,6 +18,7 @@
         <input
           matInput
           required
+          type="text"
           placeholder="Full Name"
           formControlName="fullName"
         />
@@ -97,7 +98,7 @@
     </mat-form-field>
     <br /><br />
 
-    <h5>primary Contact Details</h5>
+    <h5>Primary Contact Details</h5>
     <ion-grid>
       <ion-row>
         <ion-col>
@@ -131,11 +132,12 @@
             <input
               matInput
               required
-              placeholder="Email Id"
+              type="email"
+              placeholder="Email ID"
               formControlName="emailId"
             />
             <mat-error *ngIf="f.emailId.hasError('required')">
-              Email id is <strong>required</strong>
+              Please enter a valid<strong> email address</strong>
             </mat-error>
           </mat-form-field><br />
 
