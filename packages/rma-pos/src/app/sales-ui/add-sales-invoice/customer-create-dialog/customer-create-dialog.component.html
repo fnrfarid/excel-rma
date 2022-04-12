@@ -1,18 +1,6 @@
-  <form [formGroup] = "salesCustomerDialogForm">
+  <form [formGroup] = "salesCustomerDialogForm" (ngSubmit)="customerCreation($event)">
     <div mat-dialog-content>
-      <h5>New Customer </h5>
-
-      <mat-form-field class="example-full-width">
-        <input
-          matInput
-          required
-          placeholder="Series"
-          formControlName="series"
-        />
-        <mat-error *ngIf="f.series.hasError('required')">
-          Series is <strong>required</strong>
-        </mat-error>
-      </mat-form-field><br />
+      <h5>Create a New Customer </h5>
 
       <mat-form-field class="example-full-width">
         <input
@@ -161,7 +149,7 @@
   </div>
   <div mat-dialog-actions>
     <button mat-button color="primary" (click)="onNoClick()">No Thanks</button>
-    <button mat-button [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
+    <button mat-button type="submit" [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
   </div>
 
   </form>

@@ -937,4 +937,16 @@ export class SalesService {
       map(res => res.data),
     );
   }
+
+  createCustomer(data){
+    const url = CUSTOMER_ENDPOINT;
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, data, {
+          headers,
+        });
+      }),
+    );
+  }
 }
