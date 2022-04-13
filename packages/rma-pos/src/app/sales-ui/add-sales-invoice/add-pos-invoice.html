@@ -363,11 +363,14 @@
           <div>
             <mat-chip-list
               aria-label="Fish selection" 
-              *ngFor="let item of itemGroupList">
+              *ngFor="let item of displayItemGroupList">
                 <mat-chip color="primary" selected>
-                  {{item.name}}
+                  {{item.item_group_name}}
                 </mat-chip>
             </mat-chip-list>
+            <mat-chip (click)="showMoreItems()" color="primary" selected>
+              More
+            </mat-chip>
           </div>
           <!-- end code for item chips -->
           <div class="grid-container horizontal-boxes" *ngIf="!isSkeletonTextVisible">

@@ -71,7 +71,6 @@ import {
 } from '../../constants/app-string';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SerialSearchFields } from '../../common/interfaces/search-fields.interface';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -79,7 +78,6 @@ export class SalesService {
   salesInvoiceList: Array<SalesInvoice>;
   itemList: Array<Item>;
   image_name:any=[];
-
   constructor(
     private http: HttpClient,
     private storage: StorageService,
@@ -88,8 +86,7 @@ export class SalesService {
     this.salesInvoiceList = [];
 
     this.itemList = [];
-  }
-
+  } 
   getBundleItem(item_codes: { [key: string]: number }) {
     const params = new HttpParams().set(
       'item_codes',
@@ -350,11 +347,19 @@ export class SalesService {
         }),
       ); 
   }
-  getItemGroupList() {
+  // API for getting ItemGoupList
+  getItemGroupList(pageIndex, pageSize) {  
     const url = RELAY_GET_ITEM_GROUP_ENDPOINT;
+    const params = new HttpParams({
+      fromObject: {
+        fields: '["item_group_name"]',
+        limit_page_length: pageSize.toString(),
+        limit_start: (pageIndex * pageSize).toString(),
+      },
+    });
     return this.getHeaders().pipe(
       switchMap(headers => {
-        return this.http.get(url, { headers });
+        return this.http.get(url, { headers, params });
       }),
       map((data: any) => data.data),
     );

@@ -99,7 +99,8 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
-  itemGroupList: any;
+  displayItemGroupList:any =[];
+  numOfItemGroup: number = 10;
   PosDraftDetails = [];
   dataSource3 = [];
   dataSource: ItemsDataSource;
@@ -235,12 +236,9 @@ export class AddSalesInvoicePage implements OnInit {
         this.gridItems = [...res.items];
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
-        // code for generating list for chips i.e itemGroupList
-        this.salesService.getItemGroupList().subscribe((items)=>{
-          this.itemGroupList = items;
-        })
       },
     });
+    this.itemGroup();
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
@@ -1682,6 +1680,25 @@ export class AddSalesInvoicePage implements OnInit {
     var customerDetails : any  = args.option._element.nativeElement.innerText.split('\n')
     this.getCustomer(customerDetails[2])
   }
-
-
+  // Fetching Items Group and saved them into an Array
+  itemGroup() {
+    this.salesService
+      .getItemGroupList(0,this.numOfItemGroup)
+        .subscribe((items)=>{
+          for(let i=0 ; i<items.length ;i++){
+            if(items[i]['item_group_name']=="All Item Groups"){
+              continue;
+            }
+            else {
+              this.displayItemGroupList.push(items[i]); // Push object into array
+            }
+          }
+    });
+  }
+  // More Items to chips
+  showMoreItems(){
+    this.numOfItemGroup += 10;
+    this.displayItemGroupList =[]; // re initialize array of itemGroup
+    this.itemGroup();
+  }
 }
