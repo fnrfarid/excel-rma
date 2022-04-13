@@ -9,6 +9,7 @@ import { InlineEditComponent } from './inline-edit/inline-edit.component';
 import { KeyDownDetectorDirective } from './on-key-down-directive';
 import { AppCommonModule } from '../../common/app-common.module';
 import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
+import { DraftListComponent } from './draft-list/draft-list.component';
 
 const routes: Routes = [
   {
@@ -31,8 +32,9 @@ const routes: Routes = [
     AddSalesInvoicePage,
     InlineEditComponent,
     KeyDownDetectorDirective,
-    CustomerCreateDialogComponent
+    CustomerCreateDialogComponent,
+    DraftListComponent
   ],
-  exports: [InlineEditComponent, KeyDownDetectorDirective,CustomerCreateDialogComponent],
+  exports: [InlineEditComponent, KeyDownDetectorDirective,CustomerCreateDialogComponent, DraftListComponent],
 })
 export class AddSalesInvoicePageModule {}

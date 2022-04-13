@@ -112,7 +112,7 @@
 .label-form mat-form-field:not(.remarks-label) .mat-form-field-infix:not(.ng-tns-c164-8){
   background: #b7e2f3;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 15px;
   position: relative;
 padding:10px;
 }
@@ -164,10 +164,13 @@ position: absolute;
 
 .label-form ion-col.md.hydrated {
   border-right: 1px solid #ccc;
-  padding:0px;
+  padding: 0px;
   width: auto;
-  margin: 0 auto;
+  margin: 0;
   text-align: center;
+  padding-inline-start: 15px;
+  padding-inline-end: 15px;
+  max-width: fit-content;
 }
 
 .label-form  .mat-form-field-suffix {
@@ -271,12 +274,13 @@ background: #b7e2f3;
   border: 20px solid #fff;
   border-radius: 10px;
   margin-right: 11px;
+  border-top:0
 }
 
 .horizontal-boxes ion-row {
   width: max-content;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   display: flex;
   flex-wrap: nowrap;
 }
@@ -426,4 +430,29 @@ app-add-sales-invoice ion-card{
 }
 .search-table  .mat-form-field-prefix{
   padding:0px 20px
+}
+ion-card-title.invBtn.ion-inherit-color.md.hydrated {
+  background: #b7e2f3;
+  height: 60px;
+  border-radius: 15px;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+ion-card-title.invBtn.ion-inherit-color.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated {
+  color: #000;
+}
+.label-form .search_bar .md.hydrated:first-child {padding: 0;}
+ion-card-header+.card-content-md{padding-bottom:0px;}
+ion-card.md.hydrated {
+  margin-bottom: 0;
+}
+.label-form ion-row.align.md.hydrated ion-col.md.hydrated:first-child {
+  padding-left: 0;
+}
+
+.label-form ion-row.align.md.hydrated ion-col.md.hydrated:last-child {
+  padding-right: 0;
 }

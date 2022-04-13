@@ -213,6 +213,7 @@ export class AddSalesInvoicePage implements OnInit {
     return this.paymentForm.controls;
   }
 
+
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
@@ -1591,6 +1592,20 @@ export class AddSalesInvoicePage implements OnInit {
       this.dataSource1.push(draft) // holding all draft objects
       this.dataSource2 = new MatTableDataSource(this.dataSource1) // show draft content on Ui 
       this.dataSource3.push(posDraftDetails) // array of draft lists
+      const dialogRef = this.dialog.open(DraftListComponent,  {
+        height: '540px',
+        width: '600px',
+        data:{ 
+          UI:this.dataSource1,
+          source: this.dataSource3,
+          formgroup:this.salesCustomerDetialsForm
+        },
+      })
+    
+      dialogRef.afterClosed().subscribe(result =>{
+        this.showdetails=result;
+      })
+     
       this.clearFields()
     }
     else{
@@ -1598,24 +1613,12 @@ export class AddSalesInvoicePage implements OnInit {
         duration: 3000,
       });  
     }  
-    // const dialogRef = this.dialog.open(DraftListComponent,  {
-    //   height: '540px',
-    //   width: '600px',
-    //   data:{
-    //     name:'ali',
-    //     email:'alihaider'
-    //   }
-    
-    // })
   
-    // dialogRef.afterClosed().subscribe(result =>{
-    //   this.showdetails=result;
-    //   // console.log(`here the data results  ${result}`)
-    // })
   
     };
 
   editDraftList(event){
+    debugger
     var targetedObject :any = "";
 
     // get targeted object from array of drafts
