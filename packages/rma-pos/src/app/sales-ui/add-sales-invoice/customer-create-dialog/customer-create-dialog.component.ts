@@ -38,8 +38,6 @@ export class CustomerCreateDialogComponent implements OnInit {
   customerGroupList: any;
   copyCustomerGroupList: any;
 
-
-
   get f() {
     return this.salesCustomerDialogForm.controls;
   }
@@ -105,15 +103,15 @@ export class CustomerCreateDialogComponent implements OnInit {
 
   createFormGroup(){
     this.salesCustomerDialogForm = new FormGroup({
-      series: new FormControl(''),
-      fullName : new FormControl(''),
-      type : new FormControl(''),
-      customerGroup: new FormControl(''),
-      territory: new FormControl(''),
-      emailId : new FormControl(''),
-      mobileNo : new FormControl('',[Validators.required, Validators.pattern("^((\\+91-?)|0)?[0-9]{10}$")]),
-      address : new FormControl(''),
-      city : new FormControl('')
+      series: new FormControl('', [Validators.required]),
+      fullName : new FormControl('', [Validators.required, Validators.maxLength(140)]),
+      type : new FormControl('', [Validators.required]),
+      customerGroup: new FormControl('', [Validators.required]),
+      territory: new FormControl('', [Validators.required]),
+      emailId : new FormControl('', [Validators.required, Validators.email]),
+      mobileNo : new FormControl('',[Validators.required, Validators.pattern("^((\\+880-?)|0)?[0-9]{10}$")]),
+      address : new FormControl('', [Validators.required]),
+      city : new FormControl('', [Validators.required])
     })
   }
 

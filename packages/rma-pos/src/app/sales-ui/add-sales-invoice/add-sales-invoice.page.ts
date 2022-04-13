@@ -1,5 +1,4 @@
 import { PaymentDialogueComponent } from './payment-dialogue/payment-dialogue.component';
-import {DraftListComponent} from './draft-list/draft-list.component'
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
@@ -100,6 +99,7 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
+  itemGroupList: any;
   PosDraftDetails = [];
   dataSource3 = [];
   dataSource: ItemsDataSource;
@@ -236,9 +236,12 @@ export class AddSalesInvoicePage implements OnInit {
         this.gridItems = [...res.items];
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
+        // code for generating list for chips i.e itemGroupList
+        this.salesService.getItemGroupList().subscribe((items)=>{
+          this.itemGroupList = items;
+        })
       },
     });
-
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
