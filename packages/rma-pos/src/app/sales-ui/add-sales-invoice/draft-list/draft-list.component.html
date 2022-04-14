@@ -1,3 +1,54 @@
+<!-- <header mat-dialog-title>
+
+</header>
+<ion-item-divider></ion-item-divider>
+<ion-grid>
+<ion-row>
+  <h2>{{receivedrow.name}}</h2>
+  <ion-col size="5">
+    <br>
+
+  </ion-col>
+</ion-row>
+<ion-item-divider></ion-item-divider>
+
+</ion-grid> -->
 
 
-  <h1>{{receivedrow.name}}</h1>
+
+
+<ion-card class="card-main-invoice-list">
+  <ion-card-footer>
+    <ion-row class="align">
+      
+      <ion-col>
+        <ion-card-title>
+          <ion-text color="tertiary"> Draft Invioce List </ion-text>
+        </ion-card-title>
+      </ion-col>
+    </ion-row>
+  </ion-card-footer>
+  <ion-card-content>
+    <mat-table [dataSource]="dataSource2">
+      <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumnsItems">
+        <th mat-header-cell class="draft-table" *matHeaderCellDef>{{column}}</th>
+        <td mat-cell class="draft-table" *matCellDef="let row"> <a (click)="editDraftList($event)" >{{row[column]}}</a> </td>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumnsItems; sticky: true"></mat-header-row>
+
+      <mat-row *matRowDef="let row; columns: displayedColumnsItems"></mat-row>
+
+    </mat-table>
+
+
+  </ion-card-content>
+
+</ion-card>
+
+
+<div class="header-text">
+  <ion-button size="small" (click)="closeDialog()" class="header-btn" color="danger">
+    close
+  </ion-button>
+</div>

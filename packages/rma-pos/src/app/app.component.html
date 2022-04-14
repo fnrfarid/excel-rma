@@ -1,6 +1,6 @@
 <ion-app>
   <ion-header>
-    <ion-toolbar>
+    <ion-toolbar class="toolbar-strip-top">
       <div *ngIf="!loggedIn" slot="end">
         <ion-chip
           routerDirection="'root'"
@@ -37,18 +37,26 @@
               {{ counter | formatTime }}
             </ng-container>
           </ion-text>
-          <ion-title slot="start"> POS System </ion-title>
-          <ion-chip slot="end" *ngIf="loggedIn && imageURL">
+          <ion-row class="navTopButton">
+            <button mat-button color="primary">Home</button> 
+            <button mat-button color="primary">Sales Invoice</button>
+            <button mat-button color="primary">Sales Return </button>
+            <button mat-button color="primary">Settings</button>
+          </ion-row>
+          
+          <ion-chip slot="end" *ngIf="loggedIn && imageURL" class="iconAcc-login">
+            <ion-label> {{ fullName }}</ion-label>
             <ion-avatar>
               <img src="{{ imageURL }}" />
             </ion-avatar>
-            <ion-label> {{ fullName }}</ion-label>
+            
           </ion-chip>
-          <ion-chip slot="end" *ngIf="loggedIn && !imageURL">
+          <ion-chip slot="end" *ngIf="loggedIn && !imageURL" class="iconAcc-logout">
+            <ion-label>{{ fullName }}</ion-label>
             <ion-avatar>
               <img src="../assets/alternative.svg" />
             </ion-avatar>
-            <ion-label>{{ fullName }}</ion-label>
+            
           </ion-chip>
         </ion-item>
         <ion-menu-toggle auto-hide="false">

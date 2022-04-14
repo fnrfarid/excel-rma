@@ -11,15 +11,15 @@
 </ion-header>
 
 <!-- <ion-content class="page-background"> -->
-  <ion-content>
-      <ion-fab
+  <ion-content class="main-content-block">
+      <!-- <ion-fab
     class="ion-margin-end"
     slot="fixed"
     vertical="top"
     color="light"
     horizontal="end"
-  >
-    <ion-fab-button
+  > -->
+    <!-- <ion-fab-button
       *ngIf="calledFrom === 'add'"
       class="fab-position"
       [disabled]="salesCustomerDetialsForm.invalid"
@@ -35,14 +35,12 @@
     >
       <ion-icon name="create"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 
   <form [formGroup]="salesCustomerDetialsForm"  class="label-form">
     <ion-card>
       <ion-card-header>
-        <ion-card-title>
-          <ion-text color="tertiary"> Details </ion-text>
-        </ion-card-title>
+       
       </ion-card-header>
       <ion-card-content>
         <ion-grid class="ion-no-padding">
@@ -251,6 +249,17 @@
                 </mat-error>
               </mat-form-field>
             </ion-col>
+            <ion-col>
+              <ion-card-title class="invBtn">
+                <ion-text color="tertiary"> Draft Invoice List </ion-text>
+              </ion-card-title>
+            </ion-col>
+
+
+
+
+
+            
           </ion-row>
         <ion-row class="search_bar">
           <ion-col size-md="8" >
@@ -300,7 +309,7 @@
 
   <ion-grid>
     <ion-row >
-      <ion-col size="9">
+      <ion-col size="8">
         <form [formGroup]="salesInvoiceItemsForm">
           <ion-grid>
             <ion-row>
@@ -315,7 +324,7 @@
                   />
                 </mat-form-field>
               </ion-col>
-              <ion-col  size="12">
+              <!-- <ion-col  size="12">
                 <mat-form-field class="example-full-width">
                   <mat-label>Filter from</mat-label>
                   <mat-select formControlName="filterKey">
@@ -324,7 +333,7 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-              </ion-col>
+              </ion-col> -->
             
             </ion-row>
           </ion-grid>
@@ -360,7 +369,7 @@
             </ion-grid>
           </div>
           <!-- start code for item chips -->
-          <div>
+          <div class="chip-main-wrapper horizontal-boxes">
             <mat-chip-list
               aria-label="Fish selection" 
               *ngFor="let item of displayItemGroupList">
@@ -373,28 +382,26 @@
             </mat-chip>
           </div>
           <!-- end code for item chips -->
-          <div class="grid-container horizontal-boxes" *ngIf="!isSkeletonTextVisible">
+          <div class="grid-container horizontal-boxes item-scroll-box" *ngIf="!isSkeletonTextVisible">
             <ion-grid>
               <ion-row>
-                <ion-col size="3" *ngFor="let item of gridItems">
+                <ion-col size="3" *ngFor="let item of gridItems ">
                   <ion-card
-                    class="grid-card"
+                    class="grid-card item-prod-wrapper"
                     (click)="addFromItemsGrid(item)"
                     matTooltip="{{item.serial_no}}"
                     matTooltipPosition="above"
                   >
                   <ion-card-header>
                     <ion-row>
-                      <ion-col class="ion-text-left pieces-num" size="6">
+                      <ion-col class="ion-text-left pieces-num count-pcs" size="6">
                         {{item.safety_stock}} {{item.stock_uom}}
                       </ion-col>
                     </ion-row>
                   </ion-card-header>
                     <ion-card-content>
-
                       <ion-row color="primary">
-                        
-                        <ion-img class="item-image" src='http://0.0.0.0:8000{{item.website_image}}'></ion-img>
+                        <ion-img class="item-image prd-slid-img" src='http://0.0.0.0:8000{{item.website_image}}'></ion-img>
                       </ion-row>
                       <ion-button
                         fill="clear"
@@ -650,7 +657,78 @@
         </form>
       </ion-col >
 
-      <ion-col size="3" class="draft_box">
+     
+
+
+      <ion-col size="4" class="draft_box form-pos-box">
+
+        <ion-text color="tertiary promo-offer-box-heading">Promotional Offers</ion-text>
+<div class="main-promo-offer-box">
+        <div class="grid-container horizontal-boxes item-scroll-box" *ngIf="!isSkeletonTextVisible">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="3" *ngFor="let item of gridItems1 ">
+              <ion-card
+                class="grid-card item-prod-wrapper"
+                (click)="addFromItemsGrid(item)"
+                matTooltip="{{item.serial_no}}"
+                matTooltipPosition="above"
+              >
+              <ion-card-header>
+                <ion-row>
+                  <ion-col class="ion-text-left pieces-num count-pcs" size="6">
+                    {{item.safety_stock}} {{item.stock_uom}}
+                  </ion-col>
+                </ion-row>
+              </ion-card-header>
+                <ion-card-content>
+                  <ion-row color="primary">
+                    <ion-img class="item-image prd-slid-img" src='http://0.0.0.0:8000{{item.website_image}}'></ion-img>
+                  </ion-row>
+                  <ion-button
+                    fill="clear"
+                    size="small"
+                    color="primary"
+                    *ngIf="item.rate">
+                  </ion-button>
+                </ion-card-content>
+                <ion-card-footer>
+                  <ion-card-subtitle> {{item.item_name}} </ion-card-subtitle>
+                  <ion-card-subtitle color="primary"
+                    >{{item.serial_no?item.serial_no:''}}</ion-card-subtitle
+                  >
+                  <ion-col class="box-price">
+                    ${{item.rate}}
+                  </ion-col>
+                </ion-card-footer>
+              </ion-card>
+            </ion-col>
+        
+          </ion-row>
+          <!-- <ion-row>
+            <ion-col>
+              <ion-progress-bar
+                type="indeterminate"
+                color="primary"
+                *ngIf="isDataLoading"
+              ></ion-progress-bar>
+  
+              <center>
+                <ion-button
+                  fill="outline"
+                  *ngIf="isLoadMoreVisible"
+                  color="primary"
+                  (click)="loadMoreData()"
+                >
+                  Load More</ion-button
+                >
+              </center>
+            </ion-col>
+          </ion-row> -->
+        </ion-grid>
+      </div>
+    </div>
+
         <!-- <ion-card>
           <ion-card-header>
             <ion-row class="align">
@@ -677,11 +755,11 @@
 
         </ion-card-content>
 
-        </ion-card> -->
+        </ion-card>  -->
 
         <form [formGroup]="paymentForm">
           <ion-card>
-            <ion-card-header>
+            <!-- <ion-card-header>
               <ion-row class="align">
                 <ion-col>
                   <ion-card-title>
@@ -689,11 +767,12 @@
                   </ion-card-title>
                 </ion-col>
               </ion-row>
-            </ion-card-header>
+            </ion-card-header> -->
             <ion-card-content>
               <ion-grid class="ion-no-padding">
-                <ion-row class="align">
+                <ion-row class="align main-filed-pos-form">
                   <ion-col>
+                    <ion-text color="tertiary"> POS Profile </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -702,7 +781,7 @@
                         matInput
                         formControlName="posProfile"
                         (focusout)="validateInput(paymentFormControls.posProfile, filteredPosProfileList)"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -726,6 +805,7 @@
                     </mat-form-field>
                   </ion-col>
                   <ion-col>
+                    <ion-text color="tertiary"> Mode of Payment </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -757,6 +837,7 @@
                     </mat-form-field>
                   </ion-col>
                   <ion-col>
+                    <ion-text color="tertiary"> VAT </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -764,7 +845,7 @@
                         placeholder="VAT"
                         matInput
                         formControlName="vat"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -789,6 +870,7 @@
                   </ion-col>
 
                   <ion-col>
+                    <ion-text color="tertiary"> Discount </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -796,7 +878,7 @@
                         placeholder="Discount"
                         matInput
                         formControlName="discount"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -821,6 +903,7 @@
                   </ion-col>
 
                   <ion-col>
+                    <ion-text color="tertiary"> Grand Total </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -828,7 +911,7 @@
                         placeholder="Grand Total"
                         matInput
                         formControlName="grandTotal"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -853,6 +936,7 @@
                   </ion-col>
 
                   <ion-col>
+                    <ion-text color="tertiary"> Received Amount </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -860,7 +944,7 @@
                         placeholder="Received Amount"
                         matInput
                         formControlName="receivedAmount"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -885,6 +969,7 @@
                   </ion-col>
 
                   <ion-col>
+                    <ion-text color="tertiary"> Change </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -892,7 +977,7 @@
                         placeholder="Change"
                         matInput
                         formControlName="change"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -917,6 +1002,7 @@
                   </ion-col>
 
                   <ion-col>
+                    <ion-text color="tertiary"> Due </ion-text>
                     <mat-form-field class="example-full-width">
                       <input
                         required
@@ -924,7 +1010,7 @@
                         placeholder="Due"
                         matInput
                         formControlName="due"
-                        [matAutocomplete]="profile"
+                        
                       />
                       <mat-autocomplete
                         autoActiveFirstOption
@@ -951,13 +1037,13 @@
               </ion-grid>
             </ion-card-content>
           </ion-card>
-          </form>
+        </form>
           <!-- <ion-col size="9"> -->
             <div>
-              <div style='float: left;'>
-                <button class="draft-payment" mat-stroked-button (click)="makeDraft()" color="primary">Make Draft</button>
+              <div class="payment-draft-btn-box">
+                <button class="draft-payment" mat-stroked-button (click)="makeDraft()" color="primary">CreateDraft</button>
                 &nbsp;&nbsp;
-                <button class="submit-payment" mat-stroked-button (click)="submitPayment()" color="primary">Pay and Submit</button>
+                <button class="submit-payment" mat-stroked-button (click)="submitPayment()" color="primary">Submit</button>
               </div>
             </div>
         <!-- </ion-col> -->

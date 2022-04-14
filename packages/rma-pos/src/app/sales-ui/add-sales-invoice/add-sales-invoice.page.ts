@@ -79,6 +79,7 @@ import {
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
+import { DraftListComponent } from './draft-list/draft-list.component';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -152,6 +153,7 @@ export class AddSalesInvoicePage implements OnInit {
   itemMap: any = {};
 
   gridItems: Item[] = [];
+  gridItems1: Item[] = [];
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
   serialDataSource: SerialDataSource;
@@ -214,6 +216,7 @@ export class AddSalesInvoicePage implements OnInit {
     return this.paymentForm.controls;
   }
 
+
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
@@ -234,6 +237,15 @@ export class AddSalesInvoicePage implements OnInit {
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
+      
+        for(let i =0 ;i<this.gridItems.length;i++){
+          this.salesService.getImageList(this.gridItems[i].name).subscribe((data)=>{
+          this.gridItems[i]['website_image']=data['data'].website_image
+         })
+        }
+        for(let i=0;i<4;i++){
+          this.gridItems1.push(this.gridItems[i]);
+        }
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
       },
@@ -1592,6 +1604,20 @@ export class AddSalesInvoicePage implements OnInit {
       this.dataSource1.push(draft) // holding all draft objects
       this.dataSource2 = new MatTableDataSource(this.dataSource1) // show draft content on Ui 
       this.dataSource3.push(posDraftDetails) // array of draft lists
+      const dialogRef = this.dialog.open(DraftListComponent,  {
+        height: '540px',
+        width: '600px',
+        data:{ 
+          UI:this.dataSource1,
+          source: this.dataSource3,
+          formgroup:this.salesCustomerDetialsForm
+        },
+      })
+    
+      dialogRef.afterClosed().subscribe(result =>{
+        this.showdetails=result;
+      })
+     
       this.clearFields()
     }
     else{
@@ -1599,24 +1625,12 @@ export class AddSalesInvoicePage implements OnInit {
         duration: 3000,
       });  
     }  
-    // const dialogRef = this.dialog.open(DraftListComponent,  {
-    //   height: '540px',
-    //   width: '600px',
-    //   data:{
-    //     name:'ali',
-    //     email:'alihaider'
-    //   }
-    
-    // })
   
-    // dialogRef.afterClosed().subscribe(result =>{
-    //   this.showdetails=result;
-    //   // console.log(`here the data results  ${result}`)
-    // })
   
     };
 
   editDraftList(event){
+    debugger
     var targetedObject :any = "";
 
     // get targeted object from array of drafts
