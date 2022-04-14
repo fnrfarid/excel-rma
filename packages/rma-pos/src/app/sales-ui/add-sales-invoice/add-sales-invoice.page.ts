@@ -79,6 +79,7 @@ import {
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
+import { DraftListComponent } from './draft-list/draft-list.component';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -151,6 +152,7 @@ export class AddSalesInvoicePage implements OnInit {
   itemMap: any = {};
 
   gridItems: Item[] = [];
+  gridItems1: Item[] = [];
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
   serialDataSource: SerialDataSource;
@@ -234,14 +236,24 @@ export class AddSalesInvoicePage implements OnInit {
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
+      
+        for(let i =0 ;i<this.gridItems.length;i++){
+          this.salesService.getImageList(this.gridItems[i].name).subscribe((data)=>{
+          this.gridItems[i]['website_image']=data['data'].website_image
+         })
+        }
+        for(let i=0;i<4;i++){
+          this.gridItems1.push(this.gridItems[i]);
+        }
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
         // code for generating list for chips i.e itemGroupList
-        this.salesService.getItemGroupList().subscribe((items)=>{
-          this.itemGroupList = items;
-        })
+      
       },
     });
+    this.salesService.getItemGroupList().subscribe((items)=>{
+      this.itemGroupList = items;
+    })
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';

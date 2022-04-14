@@ -16,23 +16,18 @@
 
 
 
-<h4 class="header-text">
-  <ion-button size="small" (click)="closeDialog()" class="header-btn" color="danger">
-    close
-  </ion-button>
-</h4>
 
-<ion-card>
-  <ion-card-header>
+<ion-card class="card-main-invoice-list">
+  <ion-card-footer>
     <ion-row class="align">
       
       <ion-col>
         <ion-card-title>
-          <ion-text color="tertiary"> Draft List </ion-text>
+          <ion-text color="tertiary"> Draft Invioce List </ion-text>
         </ion-card-title>
       </ion-col>
     </ion-row>
-  </ion-card-header>
+  </ion-card-footer>
   <ion-card-content>
     <mat-table [dataSource]="dataSource2">
       <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumnsItems">
@@ -50,3 +45,10 @@
   </ion-card-content>
 
 </ion-card>
+
+
+<div class="header-text">
+  <ion-button size="small" (click)="closeDialog()" class="header-btn" color="danger">
+    close
+  </ion-button>
+</div>
