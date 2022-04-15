@@ -87,6 +87,7 @@ export interface AggregatedDocument {
 }
 
 export interface draftList {
+  uuid: string,
   customerName ?: String,
   amount ?: number
 }

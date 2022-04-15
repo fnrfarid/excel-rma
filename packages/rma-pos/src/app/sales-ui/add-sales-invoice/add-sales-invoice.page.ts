@@ -1,5 +1,4 @@
 import { PaymentDialogueComponent } from './payment-dialogue/payment-dialogue.component';
-import {DraftListComponent} from './draft-list/draft-list.component'
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import {
@@ -32,6 +31,7 @@ import { ItemsDataSource } from './items-datasource';
 import { SalesService } from '../services/sales.service';
 import {
   Payments,
+  PosDraftDetails,
   SalesInvoiceDetails,
 } from '../view-sales-invoice/details/details.component';
 import {
@@ -41,6 +41,7 @@ import {
   BEARER_TOKEN_PREFIX,
   DELIVERED_SERIALS_DISPLAYED_COLUMNS,
 } from '../../constants/storage';
+import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
 import {
   DRAFT,
   CLOSE,
@@ -78,7 +79,7 @@ import {
 import { DeliveredSerialsState } from '../../common/components/delivered-serials/delivered-serials.component';
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
-import { CustomerCreateDialogComponent } from './customer-create-dialog/customer-create-dialog.component';
+import { DraftListComponent } from './draft-list/draft-list.component';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -99,17 +100,12 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
+  itemGroupList: any;
+  PosDraftDetails = [];
+  dataSource3 = [];
   dataSource: ItemsDataSource;
-  dataSource1: draftList[]= [{
-    customerName: "hamza",
-    amount : 1000
-  },
-  {
-    customerName : "ali haider",
-    amount: 2000
-  }
-];
-dataSource2 = new MatTableDataSource(this.dataSource1)
+  dataSource1: draftList[] = [];
+  dataSource2 = new MatTableDataSource(this.dataSource1);
   series: string;
   initial: { [key: string]: number } = {
     warehouse: 0,
@@ -128,6 +124,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     'delete',
   ];
   displayedColumnsItems = [
+    'uuid',
     'customerName',
     'amount'
   ]
@@ -155,6 +152,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   itemMap: any = {};
 
   gridItems: Item[] = [];
+  gridItems1: Item[] = [];
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
   serialDataSource: SerialDataSource;
@@ -189,6 +187,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   warehouseFormControl = new FormControl('', [Validators.required]);
   costCenterFormControl = new FormControl('', [Validators.required]);
   salesInvoiceDetails: SalesInvoiceDetails;
+  posdraftdetails: PosDraftDetails;
   submit: boolean = false;
   rangePickerState = {
     prefix: '',
@@ -216,6 +215,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     return this.paymentForm.controls;
   }
 
+
   constructor(
     private readonly route: ActivatedRoute,
     private salesService: SalesService,
@@ -228,22 +228,32 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     public dialog: MatDialog
   ) {}
 
+  showdetails;
+
   ngOnInit() {
+    
     this.createFormGroup();
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
+      
         for(let i =0 ;i<this.gridItems.length;i++){
           this.salesService.getImageList(this.gridItems[i].name).subscribe((data)=>{
           this.gridItems[i]['website_image']=data['data'].website_image
          })
         }
-        console.log(this.gridItems)
+        for(let i=0;i<4;i++){
+          this.gridItems1.push(this.gridItems[i]);
+        }
         this.showLoadMore(res.totalLength);
         this.isSkeletonTextVisible = false;
+        // code for generating list for chips i.e itemGroupList
+      
       },
     });
-
+    this.salesService.getItemGroupList().subscribe((items)=>{
+      this.itemGroupList = items;
+    })
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
@@ -509,6 +519,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
 
   addItem() {
     const data = this.dataSource.data();
+    // console.log("for Data\n",data)
     const item = {} as Item;
     item.item_name = '';
     item.qty = 0;
@@ -586,6 +597,7 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   updateItem(row: Item, index: number, item: Item) {
+
     if (item == null) {
       return;
     }
@@ -1368,7 +1380,9 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   selectedDueDate($event) {
+    console.log($event.value)
     this.dueDate = this.getParsedDate($event.value);
+    
   }
 
   getFrappeTime() {
@@ -1387,11 +1401,12 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
   }
 
   getOptionText(option) {
+    
     if (option) {
       if (option.customer_name) {
         return `${option.customer_name} (${option.name})`;
       }
-      return option.name;
+      return option;
     }
   }
 
@@ -1494,16 +1509,171 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     return option.name;
   }
 
-  makeDraft() {
-    console.log("Making Draft....")
-    this.dialog.open(DraftListComponent, {height: '540px',
-    width: '600px',})
+  clearFields() {
+    this.salesCustomerDetialsForm
+      .get('customer')
+        .setValue("");
+    this.salesCustomerDetialsForm
+      .get('remarks',)
+        .setValue("");
+    this.salesCustomerDetialsForm
+      .get('dueDate')
+        .setValue("");
+    this.salesCustomerDetialsForm
+      .get('warehouse')
+        .setValue("");
+    this.salesCustomerDetialsForm
+      .get('territory',)
+        .setValue("");
+    this.salesCustomerDetialsForm
+      .get('campaign',)
+        .setValue(0);
+    this.salesCustomerDetialsForm
+      .get('balance',)
+        .setValue(0)
 
-  };
+    this.dataSource.data()
+      .splice(0,this.dataSource.data().length);
+    this.itemsControl
+      .removeAt(this.dataSource.data().length);
+    this.calculateTotal(
+      this.dataSource.data().slice());
+    this.dataSource
+      .update(this.dataSource.data());
+  }
+  validateReqfields(){
+    if (this.salesCustomerDetialsForm
+          .get('customer').value != "" &&
+        this.salesCustomerDetialsForm
+          .get('dueDate').value != "" &&
+        this.salesCustomerDetialsForm
+          .get('warehouse').value != "" &&
+        this.salesCustomerDetialsForm
+          .get('territory',).value != "")
+        {
+          return true;
+      }
+      return false;
+  }
+
+  makeDraft() {
+    const posDraftDetails = {} as PosDraftDetails;
+    let customer_name: string = null;
+    let total_amount: number = 0;
+    let uuid: string = null;
+    posDraftDetails.items = [];
+    let draft: draftList;
+
+    // get data for draft list 
+    posDraftDetails.customer = this.salesCustomerDetialsForm
+      .get('customer',).value.name;
+    posDraftDetails.company = this.salesCustomerDetialsForm
+      .get('company',).value;
+    posDraftDetails.posting_date = this.getParsedDate(this.salesCustomerDetialsForm
+      .get('postingDate').value,);
+    posDraftDetails.due_date = this.getParsedDate(this.salesCustomerDetialsForm
+      .get('dueDate').value,);
+    posDraftDetails.territory = this.salesCustomerDetialsForm
+      .get('territory',).value;
+    posDraftDetails.warehouse = this.salesCustomerDetialsForm
+      .get('warehouse',).value;
+    posDraftDetails.remarks = this.salesCustomerDetialsForm
+      .get('remarks',).value;
+    posDraftDetails.remaining_balance = this.salesCustomerDetialsForm
+      .get('balance',).value;
+    posDraftDetails.isCampaign = this.salesCustomerDetialsForm
+      .get('campaign',).value;
+    posDraftDetails.total = this.salesInvoiceItemsForm.controls.total.value;
+    posDraftDetails.uuid = Math.random().toString(16).slice(2)
+
+    total_amount = posDraftDetails.total;
+    customer_name =  posDraftDetails.customer;
+    uuid = posDraftDetails.uuid;
+    if (this.validateReqfields())
+    {
+      for (let i = 0; i < this.dataSource.data().length; i++) {
+        if (this.dataSource.data()[i].item_code != '') {
+          posDraftDetails.items.push(
+            this.dataSource.data()[i]);
+        }
+      };
+
+      draft  = {
+        uuid: uuid,
+        customerName: customer_name,
+        amount: total_amount
+      };
+      
+      this.dataSource1.push(draft) // holding all draft objects
+      this.dataSource2 = new MatTableDataSource(this.dataSource1) // show draft content on Ui 
+      this.dataSource3.push(posDraftDetails) // array of draft lists
+      const dialogRef = this.dialog.open(DraftListComponent,  {
+        height: '540px',
+        width: '600px',
+        data:{ 
+          UI:this.dataSource1,
+          source: this.dataSource3,
+          formgroup:this.salesCustomerDetialsForm
+        },
+      })
+    
+      dialogRef.afterClosed().subscribe(result =>{
+        this.showdetails=result;
+      })
+     
+      this.clearFields()
+    }
+    else{
+      this.snackbar.open("Please provide all required fields", CLOSE, {
+        duration: 3000,
+      });  
+    }  
+  
+  
+    };
+
+  editDraftList(event){
+    debugger
+    var targetedObject :any = "";
+
+    // get targeted object from array of drafts
+    for (let i = 0; i < this.dataSource3.length; i++) {
+      if (this.dataSource3[i].uuid == event.target.innerHTML) {
+        targetedObject = this.dataSource3[i];
+      }
+    };
+    
+    // set customer details
+    this.salesCustomerDetialsForm
+      .get('territory',)
+        .setValue(targetedObject.territory);
+    this.salesCustomerDetialsForm
+      .get('warehouse')
+        .setValue(targetedObject.warehouse);
+    this.salesCustomerDetialsForm
+      .get('campaign',)
+        .setValue(targetedObject.isCampaign);
+    this.salesCustomerDetialsForm
+      .get('balance')
+        .setValue(targetedObject.remaining_balance);
+    this.salesCustomerDetialsForm
+      .get('remarks')
+        .setValue(targetedObject.remarks);    
+    this.salesCustomerDetialsForm
+      .get('customer')
+        .setValue(targetedObject.customer);
+    this.salesCustomerDetialsForm
+      .get('dueDate')
+        .setValue(new Date(targetedObject.due_date));
+
+    // set Items
+    for (let i = 0; i < targetedObject.items.length; i++){
+      this.addFromItemsGrid(targetedObject.items[i])
+    }
+  }
   submitPayment() {
-    this.dialog.open(PaymentDialogueComponent, {height: '540px',
-    width: '600px',})
-  };
+    this.dialog.open(PaymentDialogueComponent, {height: '540px', width: '600px',});
+  }
   onCreateCustomer(){
     const dialogRef = this.dialog.open(CustomerCreateDialogComponent, {
       width: '500px',
@@ -1511,7 +1681,6 @@ dataSource2 = new MatTableDataSource(this.dataSource1)
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
       this.animal = result;
     });
   }
