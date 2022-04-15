@@ -1700,12 +1700,12 @@ export class AddSalesInvoicePage implements OnInit {
       .getItemGroupList(0,this.numOfItemGroup)
         .subscribe((items)=>{
           for(let i=0 ; i<items.length ;i++){
-            if(items[i]['item_group_name']=="All Item Groups"){
-              continue;
-            }
-            else {
+            // if(items[i]['item_group_name']=="All Item Groups"){
+              // continue;
+            // }
+            // else {
               this.displayItemGroupList.push(items[i]); // Push object into array
-            }
+            // }
           }
     });
   }
@@ -1714,5 +1714,16 @@ export class AddSalesInvoicePage implements OnInit {
     this.numOfItemGroup += 10;
     this.displayItemGroupList =[]; // re initialize array of itemGroup
     this.itemGroup();
+  }
+  filterItemByGroup(event){
+    this.gridItems = [];
+
+    this.getItemList(0, {item_group: event.target.innerText})
+      .subscribe({
+        next: res => {
+          this.gridItems = [...res.items];
+          this.showLoadMore(res.totalLength);
+      },
+    });
   }
 }

@@ -373,7 +373,7 @@
             <mat-chip-list
               aria-label="Fish selection" 
               *ngFor="let item of displayItemGroupList">
-                <mat-chip color="primary" selected>
+                <mat-chip (click)="filterItemByGroup($event)" color="primary" selected>
                   {{item.item_group_name}}
                 </mat-chip>
             </mat-chip-list>
