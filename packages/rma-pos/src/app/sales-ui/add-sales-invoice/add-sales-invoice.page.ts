@@ -80,6 +80,7 @@ import { DeliveredSerialsState } from '../../common/components/delivered-serials
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
 import { DraftListComponent } from './draft-list/draft-list.component';
+import { element } from 'protractor';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -1630,7 +1631,6 @@ export class AddSalesInvoicePage implements OnInit {
     };
 
   editDraftList(event){
-    debugger
     var targetedObject :any = "";
 
     // get targeted object from array of drafts
@@ -1696,18 +1696,21 @@ export class AddSalesInvoicePage implements OnInit {
   }
   // Fetching Items Group and saved them into an Array
   itemGroup() {
-    this.salesService
-      .getItemGroupList(0,this.numOfItemGroup)
-        .subscribe((items)=>{
-          for(let i=0 ; i<items.length ;i++){
-            // if(items[i]['item_group_name']=="All Item Groups"){
-              // continue;
-            // }
-            // else {
-              this.displayItemGroupList.push(items[i]); // Push object into array
-            // }
-          }
-    });
+    this.salesService.getGroupList(this.numOfItemGroup.toString()).subscribe((data) =>{
+          for(let i=0 ; i<data.docs.length ;i++){
+            if(data.docs[i]['item_group']=="All Item Groups"){
+              continue;
+            }
+            else {
+              var found = this.displayItemGroupList.find((element)=>
+                element.item_group === data.docs[i]['item_group'])
+
+              if(!found){
+                this.displayItemGroupList.push(data.docs[i])
+              }
+            }
+      }
+    })
   }
   // More Items to chips
   showMoreItems(){
@@ -1717,8 +1720,7 @@ export class AddSalesInvoicePage implements OnInit {
   }
   filterItemByGroup(event){
     this.gridItems = [];
-
-    this.getItemList(0, {item_group: event.target.innerText})
+    this.getItemList(0,{item_group: event.target.innerText})
       .subscribe({
         next: res => {
           this.gridItems = [...res.items];
