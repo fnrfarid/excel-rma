@@ -144,7 +144,7 @@ export class AddSalesInvoicePage implements OnInit {
   itemsControl: FormArray = this.salesInvoiceItemsForm.get(
     'items',
   ) as FormArray;
-
+  number_items:number=0;
   salesCustomerDetialsForm: FormGroup;
   paymentForm: FormGroup;
   validateInput: any = ValidateInputSelected;
@@ -237,7 +237,6 @@ export class AddSalesInvoicePage implements OnInit {
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
-      
         for(let i =0 ;i<this.gridItems.length;i++){
           this.salesService.getImageList(this.gridItems[i].name).subscribe((data)=>{
           this.gridItems[i]['website_image']=data['data'].website_image
@@ -516,7 +515,6 @@ export class AddSalesInvoicePage implements OnInit {
 
   addItem() {
     const data = this.dataSource.data();
-    // console.log("for Data\n",data)
     const item = {} as Item;
     item.item_name = '';
     item.qty = 0;
@@ -675,6 +673,7 @@ export class AddSalesInvoicePage implements OnInit {
               horizontalPosition: 'right',
               verticalPosition: 'top',
             });
+            this.number_items++;
           }
         },
       });
@@ -715,7 +714,7 @@ export class AddSalesInvoicePage implements OnInit {
     }
   }
 
-  setFilter() {
+  setFilter() { 
     this.isSkeletonTextVisible = true;
     this.gridItems = [];
     if (this.salesInvoiceItemsForm.controls.filterKey.value === 'Serial No') {
@@ -1630,7 +1629,6 @@ export class AddSalesInvoicePage implements OnInit {
     };
 
   editDraftList(event){
-    debugger
     var targetedObject :any = "";
 
     // get targeted object from array of drafts

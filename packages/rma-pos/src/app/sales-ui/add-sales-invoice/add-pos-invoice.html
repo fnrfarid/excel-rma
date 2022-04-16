@@ -324,7 +324,7 @@
                   />
                 </mat-form-field>
               </ion-col>
-              <!-- <ion-col  size="12">
+              <ion-col  size="12">
                 <mat-form-field class="example-full-width">
                   <mat-label>Filter from</mat-label>
                   <mat-select formControlName="filterKey">
@@ -333,7 +333,7 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-              </ion-col> -->
+              </ion-col>
             
             </ion-row>
           </ion-grid>
@@ -651,9 +651,12 @@
                     *matFooterRowDef="displayedColumns; sticky: true"
                   ></mat-footer-row>
                 </mat-table>
+            
               </ion-item>
             </ion-card-content>
           </ion-card>
+          <ion-text color="tertiary"> Number Of Items</ion-text>
+          <ion-text color="tertiary"> {{number_items}}</ion-text>
         </form>
       </ion-col >
 
