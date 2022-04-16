@@ -161,4 +161,10 @@ export class ItemController {
     }
     return this.aggregate.syncItems(file, req);
   }
+
+  @Get('v1/get_item_groups')
+  @UseGuards(TokenGuard)
+  async getItemByGroups(@Req() req){
+    return this.aggregate.retrieveItemByGroup(req.query.name)
+  }
 }
