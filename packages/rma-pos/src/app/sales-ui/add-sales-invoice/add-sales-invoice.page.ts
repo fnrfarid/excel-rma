@@ -80,7 +80,6 @@ import { DeliveredSerialsState } from '../../common/components/delivered-serials
 import { LoadingController } from '@ionic/angular';
 import { draftList } from '../../common/interfaces/sales.interface';
 import { DraftListComponent } from './draft-list/draft-list.component';
-import { element } from 'protractor';
 
 @Component({
   selector: 'app-add-sales-invoice',
@@ -103,6 +102,7 @@ export class AddSalesInvoicePage implements OnInit {
   calledFrom: string;
   displayItemGroupList:any =[];
   numOfItemGroup: number = 10;
+  numOfItemNames: number = 500;
   PosDraftDetails = [];
   dataSource3 = [];
   dataSource: ItemsDataSource;
@@ -154,6 +154,8 @@ export class AddSalesInvoicePage implements OnInit {
   itemMap: any = {};
 
   gridItems: Item[] = [];
+  gridNames:Item[] =[];
+  gridRename:Item[] =[];
   gridItems1: Item[] = [];
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
@@ -235,6 +237,12 @@ export class AddSalesInvoicePage implements OnInit {
   ngOnInit() {
     
     this.createFormGroup();
+    
+    this.salesService.getGroupList(this.numOfItemNames.toString()).subscribe((data) =>{
+      this.gridNames=data.docs
+      this.gridRename=this.gridNames
+})
+
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
@@ -243,6 +251,7 @@ export class AddSalesInvoicePage implements OnInit {
           this.gridItems[i]['website_image']=data['data'].website_image
          })
         }
+        //Loop for filtering only 4 items for promotional offers.
         for(let i=0;i<4;i++){
           this.gridItems1.push(this.gridItems[i]);
         }
@@ -713,6 +722,25 @@ export class AddSalesInvoicePage implements OnInit {
     } else {
       this.isLoadMoreVisible = true;
     }
+  }
+
+  getValue(value:string){
+    //method to find item in list.
+      this.gridNames= this.gridRename.filter((e) =>{
+        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase());
+     })
+  }
+  findValue(value:string){
+    //method to search item when clicked from dropdown list
+    this.getItemList(0, {
+      item_code: value,
+    }).subscribe({
+      next: res => {
+        this.isSkeletonTextVisible = false;
+        this.gridItems = [...res.items];
+        this.showLoadMore(res.totalLength);
+      },
+    });
   }
 
   setFilter() { 
