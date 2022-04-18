@@ -15,7 +15,6 @@
       <ion-list>
         <ion-item
           *ngIf="loggedIn"
-          (click)="isSalesMenuVisible = !isSalesMenuVisible"
           lines="none"
         >
           <ion-button
@@ -37,21 +36,33 @@
               {{ counter | formatTime }}
             </ng-container>
           </ion-text>
+          
           <ion-row class="navTopButton">
-            <button mat-button color="primary">Home</button> 
-            <button mat-button color="primary">Sales Invoice</button>
-            <button mat-button color="primary">Sales Return </button>
+            <button mat-button color="primary"
+            routerLink="/home"
+            >Home</button> 
+            <button mat-button color="primary"
+            routerLink="/sales"
+            >Sales Invoice</button>
+            <button mat-button color="primary"
+            routerLink="/jobs"
+            >Sales Return </button>
             <button mat-button color="primary">Settings</button>
           </ion-row>
           
-          <ion-chip slot="end" *ngIf="loggedIn && imageURL" class="iconAcc-login">
+          <ion-chip slot="end" *ngIf="loggedIn && imageURL" class="iconAcc-login" 
+          
+         
+          >
             <ion-label> {{ fullName }}</ion-label>
-            <ion-avatar>
+            <ion-avatar >
               <img src="{{ imageURL }}" />
             </ion-avatar>
             
           </ion-chip>
-          <ion-chip slot="end" *ngIf="loggedIn && !imageURL" class="iconAcc-logout">
+          <ion-chip slot="end" *ngIf="loggedIn && !imageURL" class="iconAcc-logout"
+          (click)="isSalesMenuVisible = !isSalesMenuVisible"
+          >
             <ion-label>{{ fullName }}</ion-label>
             <ion-avatar>
               <img src="../assets/alternative.svg" />
