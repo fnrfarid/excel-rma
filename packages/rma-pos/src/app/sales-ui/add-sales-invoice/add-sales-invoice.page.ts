@@ -124,6 +124,7 @@ export class AddSalesInvoicePage implements OnInit {
     'rate',
     'total',
     'delete',
+    'edit',
   ];
   displayedColumnsItems = [
     'uuid',
@@ -245,6 +246,7 @@ export class AddSalesInvoicePage implements OnInit {
         this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
         this.gridNames[i]['website_image']=data['data'].website_image
        })
+      console.log(data.docs[i].website_image)
       }
       this.gridRename=this.gridNames
 })

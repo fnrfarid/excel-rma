@@ -337,6 +337,12 @@
                 (click)="findValue(item.item_code)"
               >
                 {{ item.item_name}}
+                <small>
+                  <ion-img 
+                    class="search-item-image prd-slid-img" 
+                    src='http://0.0.0.0:8000{{item.website_image}}'>
+                  </ion-img>
+                </small>
                 
               </mat-option>
             </mat-autocomplete>
@@ -656,6 +662,19 @@
                         color="danger"
                       >
                         <ion-icon slot="icon-only" name="trash"></ion-icon>
+                      </ion-button>
+                    </mat-cell>
+                    <mat-footer-cell *matFooterCellDef></mat-footer-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="edit">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                      <ion-button
+                        fill="clear"
+                        class="ion-no-padding"
+                        color="danger"
+                      >
+                      <ion-icon name="create-outline"></ion-icon>
                       </ion-button>
                     </mat-cell>
                     <mat-footer-cell *matFooterCellDef></mat-footer-cell>

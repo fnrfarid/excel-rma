@@ -935,10 +935,10 @@ export class SalesService {
     );
   }
 
-  getGroupList(name){
+  getGroupList(numOfRecord){
     const params = new HttpParams().set(
-      'name',
-    name,
+      'numOfRecord',
+      numOfRecord
     );
     return this.getHeaders().pipe(
       switchMap(headers => {
