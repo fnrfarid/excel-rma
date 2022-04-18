@@ -317,11 +317,29 @@
                 <mat-form-field class="search-table example-full-width">
                   <mat-icon matPrefix>search</mat-icon>
                   <input
+                  #box
                     matInput
                     placeholder="Scan/Search Item Here"
                     formControlName="filterValue"
                     (keyup.enter)="setFilter()"
+                    (keyup)="getValue(box.value)"
+                    [matAutocomplete]="filterValue"
                   />
+
+                  <mat-autocomplete
+                  autoActiveFirstOption
+                  #filterValue="matAutocomplete"
+          
+                >
+                <mat-option
+                *ngFor="let item of gridNames"
+                [value]="item.item_name"
+                (click)="findValue(item.item_code)"
+              >
+                {{ item.item_name}}
+                
+              </mat-option>
+            </mat-autocomplete>
                 </mat-form-field>
               </ion-col>
               <ion-col  size="12">
@@ -374,7 +392,7 @@
               aria-label="Fish selection" 
               *ngFor="let item of displayItemGroupList">
                 <mat-chip (click)="filterItemByGroup($event)" color="primary" selected>
-                  {{item.item_group_name}}
+                  {{item.item_group}}
                 </mat-chip>
             </mat-chip-list>
             <mat-chip (click)="showMoreItems()" color="primary" selected>

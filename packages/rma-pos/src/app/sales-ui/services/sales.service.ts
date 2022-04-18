@@ -58,7 +58,8 @@ import {
   RELAY_GET_POS_PROFILE_ENDPOINT,
   ERPNEXT_POS_PROFILE_ENDPOINT,
   IMAGE_ITEMS_ENDPOINT,
-  CUSTOMER_GROUP_LIST
+  CUSTOMER_GROUP_LIST,
+  GROUP_ITEMS_ENDPOINT
 } from '../../constants/url-strings';
 import { SalesInvoiceDetails } from '../view-sales-invoice/details/details.component';
 import { StorageService } from '../../api/storage/storage.service';
@@ -933,4 +934,17 @@ export class SalesService {
       map(res => res.data),
     );
   }
+
+  getGroupList(name){
+    const params = new HttpParams().set(
+      'name',
+    name,
+    );
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.get<APIResponse>(GROUP_ITEMS_ENDPOINT, { headers,params });
+      }),
+    ); 
+}
+// 
 }

@@ -1,6 +1,8 @@
 export const DIRECT_PROFILE_ENDPOINT = '/api/direct/v1/profile';
 export const LIST_ITEMS_ENDPOINT = 'api/item/v1/list';
 export const IMAGE_ITEMS_ENDPOINT = 'api/item/v1/image_list';
+export const GROUP_ITEMS_ENDPOINT = 'api/item/v1/get_item_groups';
+
 export const RELAY_LIST_COMPANIES_ENDPOINT =
   '/api/settings/v1/relay_list_companies';
 export const GET_GLOBAL_DEFAULTS_ENDPOINT =

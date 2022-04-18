@@ -102,6 +102,7 @@ export class AddSalesInvoicePage implements OnInit {
   calledFrom: string;
   displayItemGroupList:any =[];
   numOfItemGroup: number = 10;
+  numOfItemNames: number = 500;
   PosDraftDetails = [];
   dataSource3 = [];
   dataSource: ItemsDataSource;
@@ -153,6 +154,8 @@ export class AddSalesInvoicePage implements OnInit {
   itemMap: any = {};
 
   gridItems: Item[] = [];
+  gridNames:Item[] =[];
+  gridRename:Item[] =[];
   gridItems1: Item[] = [];
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
@@ -234,6 +237,18 @@ export class AddSalesInvoicePage implements OnInit {
   ngOnInit() {
     
     this.createFormGroup();
+    
+    this.salesService.getGroupList(this.numOfItemNames.toString()).subscribe((data) =>{
+      // debugger
+      this.gridNames=data.docs
+      for(let i =0 ;i<data.docs.length;i++){
+        this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
+        this.gridNames[i]['website_image']=data['data'].website_image
+       })
+      }
+      this.gridRename=this.gridNames
+})
+
     this.getItemList().subscribe({
       next: res => {
         this.gridItems = [...res.items];
@@ -242,6 +257,7 @@ export class AddSalesInvoicePage implements OnInit {
           this.gridItems[i]['website_image']=data['data'].website_image
          })
         }
+        //Loop for filtering only 4 items for promotional offers.
         for(let i=0;i<4;i++){
           this.gridItems1.push(this.gridItems[i]);
         }
@@ -712,6 +728,26 @@ export class AddSalesInvoicePage implements OnInit {
     } else {
       this.isLoadMoreVisible = true;
     }
+  }
+
+  getValue(value:string){
+    //method to find item in list.
+      this.gridNames= this.gridRename.filter((e) =>{
+        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase());
+     })
+     console.log(this.gridNames)
+  }
+  findValue(value:string){
+    //method to search item when clicked from dropdown list
+    this.getItemList(0, {
+      item_code: value,
+    }).subscribe({
+      next: res => {
+        this.isSkeletonTextVisible = false;
+        this.gridItems = [...res.items];
+        this.showLoadMore(res.totalLength);
+      },
+    });
   }
 
   setFilter() { 
@@ -1694,18 +1730,21 @@ export class AddSalesInvoicePage implements OnInit {
   }
   // Fetching Items Group and saved them into an Array
   itemGroup() {
-    this.salesService
-      .getItemGroupList(0,this.numOfItemGroup)
-        .subscribe((items)=>{
-          for(let i=0 ; i<items.length ;i++){
-            // if(items[i]['item_group_name']=="All Item Groups"){
-              // continue;
-            // }
-            // else {
-              this.displayItemGroupList.push(items[i]); // Push object into array
-            // }
-          }
-    });
+    this.salesService.getGroupList(this.numOfItemGroup.toString()).subscribe((data) =>{
+          for(let i=0 ; i<data.docs.length ;i++){
+            if(data.docs[i]['item_group']=="All Item Groups"){
+              continue;
+            }
+            else {
+              var found = this.displayItemGroupList.find((element)=>
+                element.item_group === data.docs[i]['item_group'])
+
+              if(!found){
+                this.displayItemGroupList.push(data.docs[i])
+              }
+            }
+      }
+    })
   }
   // More Items to chips
   showMoreItems(){
@@ -1715,8 +1754,7 @@ export class AddSalesInvoicePage implements OnInit {
   }
   filterItemByGroup(event){
     this.gridItems = [];
-
-    this.getItemList(0, {item_group: event.target.innerText})
+    this.getItemList(0,{item_group: event.target.innerText})
       .subscribe({
         next: res => {
           this.gridItems = [...res.items];
