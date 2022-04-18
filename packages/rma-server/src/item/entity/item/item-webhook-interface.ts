@@ -77,6 +77,7 @@ export interface ItemApiResponseInterface {
   attributes: any[];
   item_defaults: ItemDefaultsInterface[];
   taxes: any[];
+  website_image:string;
   brand?: string;
 }
 

@@ -165,6 +165,6 @@ export class ItemController {
   @Get('v1/get_item_groups')
   @UseGuards(TokenGuard)
   async getItemByGroups(@Req() req){
-    return this.aggregate.retrieveItemByGroup(req.query.name)
+    return this.aggregate.retrieveItemByGroup(req.query.numOfRecord)
   }
 }
