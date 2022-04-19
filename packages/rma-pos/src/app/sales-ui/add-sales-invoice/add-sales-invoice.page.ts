@@ -101,7 +101,8 @@ export class AddSalesInvoicePage implements OnInit {
   invoiceUuid: string;
   calledFrom: string;
   displayItemGroupList:any =[];
-  numOfItemGroup: number = 10;
+  skipItemGroup: number = 0;
+  takeItemGroup: number = 10;
   numOfItemNames: number = 500;
   PosDraftDetails = [];
   dataSource3 = [];
@@ -239,16 +240,16 @@ export class AddSalesInvoicePage implements OnInit {
     
     this.createFormGroup();
     
-    this.salesService.getGroupList(this.numOfItemNames.toString()).subscribe((data) =>{
-      // debugger
-      this.gridNames=data.docs
-      for(let i =0 ;i<data.docs.length;i++){
-        this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
-        this.gridNames[i]['website_image']=data['data'].website_image
-       })
-      console.log(data.docs[i].website_image)
-      }
-      this.gridRename=this.gridNames
+this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
+  // debugger
+  this.gridNames=data.docs
+  for(let i =0 ;i<data.docs.length;i++){
+  //   this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
+  //   this.gridNames[i]['website_image']=data['data'].website_image
+  //  })
+  // console.log(data.docs[i].website_image)
+  }
+  this.gridRename=this.gridNames
 })
 
     this.getItemList().subscribe({
@@ -737,7 +738,6 @@ export class AddSalesInvoicePage implements OnInit {
       this.gridNames= this.gridRename.filter((e) =>{
         return e.item_name.toLowerCase().includes(value.toLocaleLowerCase());
      })
-     console.log(this.gridNames)
   }
   findValue(value:string){
     //method to search item when clicked from dropdown list
@@ -1414,7 +1414,6 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   selectedDueDate($event) {
-    console.log($event.value)
     this.dueDate = this.getParsedDate($event.value);
     
   }
@@ -1732,7 +1731,9 @@ export class AddSalesInvoicePage implements OnInit {
   }
   // Fetching Items Group and saved them into an Array
   itemGroup() {
-    this.salesService.getGroupList(this.numOfItemGroup.toString()).subscribe((data) =>{
+    this.salesService.getGroupList(
+      this.skipItemGroup, this.takeItemGroup)
+        .subscribe((data) =>{
           for(let i=0 ; i<data.docs.length ;i++){
             if(data.docs[i]['item_group']=="All Item Groups"){
               continue;
@@ -1750,8 +1751,7 @@ export class AddSalesInvoicePage implements OnInit {
   }
   // More Items to chips
   showMoreItems(){
-    this.numOfItemGroup += 10;
-    this.displayItemGroupList =[]; // re initialize array of itemGroup
+    this.skipItemGroup += 10;
     this.itemGroup();
   }
   filterItemByGroup(event){
