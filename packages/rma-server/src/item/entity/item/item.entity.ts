@@ -142,5 +142,8 @@ export class Item extends BaseEntity {
   mrp: number;
 
   @Column()
+  image:string;
+
+  @Column()
   bundle_items: ItemBundleItemWebhookInterface[];
 }

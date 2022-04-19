@@ -670,3 +670,28 @@ ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.md.hydrated {
 ion-col.draft_box.form-pos-box.md.hydrated {
   margin-top: -50px;
 }
+.mat-standard-chip.more-btn {
+  border-radius: 19px !important;
+  padding: 20px 25px;
+  background-color: #499bc0 !important;
+  color: #000 !important;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-right: 32px;
+  margin-left: 10px;
+}
+
+mat-table.mat-table.cdk-table.striped {
+  height: 450px !important;
+  overflow: auto  !important;
+}
+ion-col.pro-tot-strip.md.hydrated {display: block;width: 100%;background: #ebebeb;padding: 10px 20px;}
+
+ion-col.pro-tot-strip.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated {
+    color: #000;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.prod-data-list {
+  width: 100% !important;
+}

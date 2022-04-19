@@ -46,6 +46,7 @@ export interface ItemWebhookInterface {
   is_sales_item: number;
   isSynced?: boolean;
   brand?: string;
+  image:string;
 }
 
 export interface ItemApiResponseInterface {
@@ -77,7 +78,10 @@ export interface ItemApiResponseInterface {
   attributes: any[];
   item_defaults: ItemDefaultsInterface[];
   taxes: any[];
+  image:string;
   brand?: string;
+ 
+
 }
 
 export interface ItemBundleWebhookInterface {
