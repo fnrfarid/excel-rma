@@ -100,9 +100,10 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
-  displayItemGroupList:any =[];
-  skipItemGroup: number = 0;
-  takeItemGroup: number = 10;
+  displayItemGroupList1:any=[];
+  displayItemGroupList:any=[];
+  startItemGroup: number = 0;
+  endItemGroup: number = 10;
   numOfItemNames: number = 500;
   PosDraftDetails = [];
   dataSource3 = [];
@@ -168,7 +169,7 @@ export class AddSalesInvoicePage implements OnInit {
   disableDeliveredSerialsCard: boolean = false;
   remaining: number = 0;
   index: number = 0;
-  size: number = 10;
+  size: number = 460;
 
   deliveredSerialsState: DeliveredSerialsState = {
     deliveredSerialsDisplayedColumns:
@@ -241,16 +242,28 @@ export class AddSalesInvoicePage implements OnInit {
     this.createFormGroup();
     
 this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
-  // debugger
   this.gridNames=data.docs
+  // Item Group - UPDATED WORK
   for(let i =0 ;i<data.docs.length;i++){
+    if(data.docs[i]['item_group']=="All Item Groups"){
+      continue;
+    }
+    else {
+      var found = this.displayItemGroupList1.find((element)=>
+        element.item_group === data.docs[i]['item_group'])
+
+      if(!found){
+        this.displayItemGroupList1.push(data.docs[i])
+      }
+    }
   //   this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
   //   this.gridNames[i]['website_image']=data['data'].website_image
   //  })
-  // console.log(data.docs[i].website_image)
+  // console.log(data.docs[i].item_group)
   }
+  this.itemGroup();
   this.gridRename=this.gridNames
-})
+});
 
     this.getItemList().subscribe({
       next: res => {
@@ -268,7 +281,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         this.isSkeletonTextVisible = false;
       },
     });
-    this.itemGroup();
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
@@ -736,11 +748,13 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
   getValue(value:string){
     //method to find item in list.
       this.gridNames= this.gridRename.filter((e) =>{
-        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase());
+        
+        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_code.toLowerCase().includes(value.toLocaleLowerCase());
      })
+     this.gridItems=this.gridNames
   }
   findValue(value:string){
-    //method to search item when clicked from dropdown list
+    //method to search item when clssicked from dropdown list
     this.getItemList(0, {
       item_code: value,
     }).subscribe({
@@ -865,6 +879,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
+    this.number_items--;
   }
 
   customerChanged(customer, postingDate?) {
@@ -1729,30 +1744,20 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     var customerDetails : any  = args.option._element.nativeElement.innerText.split('\n')
     this.getCustomer(customerDetails[2])
   }
-  // Fetching Items Group and saved them into an Array
+  // Fetching Items Group and saved them into an Array -UPDATED
   itemGroup() {
-    this.salesService.getGroupList(
-      this.skipItemGroup, this.takeItemGroup)
-        .subscribe((data) =>{
-          for(let i=0 ; i<data.docs.length ;i++){
-            if(data.docs[i]['item_group']=="All Item Groups"){
-              continue;
-            }
-            else {
-              var found = this.displayItemGroupList.find((element)=>
-                element.item_group === data.docs[i]['item_group'])
-
-              if(!found){
-                this.displayItemGroupList.push(data.docs[i])
-              }
-            }
-      }
-    })
+    this.displayItemGroupList1
+      .slice(this.startItemGroup,this.endItemGroup)
+        .forEach(element => {
+          this.displayItemGroupList.push(element)
+    });
   }
   // More Items to chips
   showMoreItems(){
-    this.skipItemGroup += 10;
+    this.startItemGroup = this.endItemGroup;
+    this.endItemGroup += 11;
     this.itemGroup();
+    
   }
   filterItemByGroup(event){
     this.gridItems = [];
