@@ -43,6 +43,7 @@ export class Item {
   source_warehouse?: string;
   target_warehouse?: string;
   warranty_date?: Date;
+  barcodes:any[];
 }
 
 export class ItemDefaults {

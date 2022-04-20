@@ -240,14 +240,20 @@ export class AddSalesInvoicePage implements OnInit {
     
     this.salesService.getGroupList(this.numOfItemNames.toString()).subscribe((data) =>{
       this.gridNames=data.docs
-      // for(let i =0 ;i<data.docs.length;i++){
+      this.gridRename=this.gridNames
+      
+      for(let i =0 ;i<this.gridNames.length;i++){
       // //   this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
       // //   this.gridNames[i]['website_image']=data['data'].website_image
       // //  })
       
-      // console.log(data.docs[i].image)
-      // }
-      this.gridRename=this.gridNames
+        // if(this.gridNames[i].barcodes[0])
+        // {
+        //   console.log( this.gridRename[i].barcodes[0])
+        // }
+      
+      }
+      
 })
 
     this.getItemList().subscribe({
@@ -733,11 +739,19 @@ export class AddSalesInvoicePage implements OnInit {
 
   getValue(value:string){
     //method to find item in list.
+  
+  //  this.gridRename.filter((e) => {
+      
+  //       e.barcodes.filter((e)=> { console.log( e.name === value) }); 
+     
+  //   })
       this.gridNames= this.gridRename.filter((e) =>{
-        
-        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_code.toLowerCase().includes(value.toLocaleLowerCase());
+
+        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_code.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_group.toLowerCase().includes(value.toLocaleLowerCase()) ;
      })
      this.gridItems=this.gridNames
+     
+
   }
   findValue(value:string){
     //method to search item when clicked from dropdown list

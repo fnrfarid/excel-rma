@@ -47,6 +47,7 @@ export interface ItemWebhookInterface {
   isSynced?: boolean;
   brand?: string;
   image:string;
+  barcode:string;
 }
 
 export interface ItemApiResponseInterface {
@@ -80,8 +81,7 @@ export interface ItemApiResponseInterface {
   taxes: any[];
   image:string;
   brand?: string;
- 
-
+  barcode: string;
 }
 
 export interface ItemBundleWebhookInterface {
