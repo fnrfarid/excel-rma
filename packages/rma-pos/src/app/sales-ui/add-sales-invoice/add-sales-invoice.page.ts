@@ -105,6 +105,7 @@ export class AddSalesInvoicePage implements OnInit {
   startItemGroup: number = 0;
   endItemGroup: number = 10;
   numOfItemNames: number = 500;
+  totalQuantity: number = 0;
   PosDraftDetails = [];
   dataSource3 = [];
   dataSource: ItemsDataSource;
@@ -324,6 +325,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
             this.itemsControl.push(new FormControl(item));
           });
           this.calculateTotal(res.items);
+          this.getTotalQuantity(res.items);
           this.salesCustomerDetialsForm
             .get('campaign')
             .setValue(res.isCampaign);
@@ -636,6 +638,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
           row.rate = item.rate;
           row.stock = res.message;
           this.calculateTotal(this.dataSource.data().slice());
+          this.getTotalQuantity(this.dataSource.data().slice());
           this.dataSource.update(copy);
         },
       });
@@ -644,6 +647,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       row.rate = item.rate;
       row.stock = 'Please Select a Warehouse';
       this.calculateTotal(this.dataSource.data().slice());
+      this.getTotalQuantity(this.dataSource.data().slice());
       this.dataSource.update(copy);
     }
     this.itemsControl.controls[index].setValue(item);
@@ -679,6 +683,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
             }
             item[index].serial_no.push(serial);
             this.calculateTotal(this.dataSource.data().slice());
+            this.getTotalQuantity(this.dataSource.data().slice());
             this.dataSource.update(item);
             this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
               duration: DURATION,
@@ -697,6 +702,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
               : 'Please Select a Warehouse';
             item.push({ ...newItem, serial_no: [serial] });
             this.calculateTotal(item.slice());
+            this.getTotalQuantity(item.slice());
             this.dataSource.update(item);
             this.itemsControl.push(new FormControl(newItem));
             this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
@@ -856,6 +862,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     const copy = this.dataSource.data().slice();
     row.qty = quantity;
     this.calculateTotal(this.dataSource.data().slice());
+    this.getTotalQuantity(this.dataSource.data().slice());
     this.dataSource.update(copy);
   }
 
@@ -870,6 +877,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       row.rate = rate;
     }
     this.calculateTotal(this.dataSource.data().slice());
+    this.getTotalQuantity(this.dataSource.data().slice());
 
     this.dataSource.update(copy);
   }
@@ -878,6 +886,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     this.dataSource.data().splice(i, 1);
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
+    this.getTotalQuantity(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
     this.number_items--;
   }
@@ -1422,6 +1431,13 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     });
     this.salesInvoiceItemsForm.get('total').setValue(sum);
   }
+  getTotalQuantity(itemList: Item[]) {
+    let totalquan = 0;
+    itemList.forEach(item=> {
+      totalquan += item.qty;
+    });
+    this.totalQuantity = totalquan;
+  }
 
   selectedPostingDate($event) {
     this.postingDate = this.getParsedDate($event.value);
@@ -1586,8 +1602,11 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       .removeAt(this.dataSource.data().length);
     this.calculateTotal(
       this.dataSource.data().slice());
+    this.getTotalQuantity(
+        this.dataSource.data().slice());
     this.dataSource
       .update(this.dataSource.data());
+      this.number_items = 0;
   }
   validateReqfields(){
     if (this.salesCustomerDetialsForm
@@ -1682,7 +1701,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
 
   editDraftList(event){
     var targetedObject :any = "";
-
+    console.log("...Hit...")
     // get targeted object from array of drafts
     for (let i = 0; i < this.dataSource3.length; i++) {
       if (this.dataSource3[i].uuid == event.target.innerHTML) {

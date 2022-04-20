@@ -403,7 +403,7 @@
                 </mat-chip>
             </mat-chip-list>
             <mat-chip (click)="showMoreItems()" color="primary" selected class="more-btn"> 
-              More
+              <ion-icon style="font-size:25px;" name="caret-forward-outline"></ion-icon>
             </mat-chip>
           </div>
           <!-- end code for item chips -->
@@ -654,7 +654,7 @@
                     >
                   </ng-container>
                   <ng-container matColumnDef="delete">
-                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef>Remove</mat-header-cell>
                     <mat-cell *matCellDef="let row ; let i = index">
                       <ion-button
                         (click)="deleteRow(i)"
@@ -694,8 +694,12 @@
             </ion-card-content>
           </ion-card>
           <ion-col class="pro-tot-strip">
-            <ion-text color="tertiary"> Number Of Items</ion-text>
+            <ion-text color="tertiary"> Number Of Items: </ion-text>
             <ion-text color="tertiary"> {{number_items}}</ion-text>
+            <span style="float:right;">
+              <ion-text color="tertiary"> Total Qty: </ion-text>
+              <ion-text color="tertiary"> {{totalQuantity}}</ion-text>
+            </span>
           </ion-col>
         </form>
       </ion-col >
