@@ -125,4 +125,19 @@ export class CustomerCreateDialogComponent implements OnInit {
 
   }
 
+  customerCreation(args){
+    var obj : any = {
+      "customer_name" : this.salesCustomerDialogForm.get('fullName').value,
+      "customer_type": this.salesCustomerDialogForm.get('type').value,
+      "customer_group" : this.salesCustomerDialogForm.get('customerGroup').value,
+      "territory" : this.salesCustomerDialogForm.get('territory').value,
+      "email_id" : this.salesCustomerDialogForm.get('emailId').value,
+      "mobile_no" : this.salesCustomerDialogForm.get('mobileNo').value,
+      "address" : this.salesCustomerDialogForm.get('address').value,
+      "city": this.salesCustomerDialogForm.get('city').value
+    }
+
+    this.salesService.createCustomer(obj);
+  }
+
 }

@@ -949,4 +949,15 @@ export class SalesService {
       }),
     ); 
 }
+  createCustomer(data){
+    const url = CUSTOMER_ENDPOINT;
+
+    return this.getHeaders().pipe(
+      switchMap(headers => {
+        return this.http.post(url, data, {
+          headers,
+        });
+      }),
+    );
+  }
 }
