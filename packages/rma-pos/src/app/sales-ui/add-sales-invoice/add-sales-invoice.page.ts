@@ -262,10 +262,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         this.displayItemGroupList1.push(data.docs[i])
       }
     }
-    //   this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
-    //   this.gridNames[i]['website_image']=data['data'].website_image
-    //  })
-    // console.log(data.docs[i].item_group)
   }
   this.itemGroup();
   this.gridRename=this.gridNames
@@ -768,6 +764,11 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         this.showLoadMore(res.totalLength);
       },
     });
+  }
+
+  hideDialog($event){
+    
+    document.getElementById('promotionalOffer').style.display='none';
   }
 
   setFilter() { 
@@ -1672,7 +1673,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     
       dialogRef.afterClosed().subscribe(result =>{
         this.showdetails=result.data;
-      debugger
         this.dataSource.update(this.showdetails)
       })
      

@@ -136,7 +136,7 @@
                 <mat-form-field class="example-half-width">
                   <input
                     matInput
-                    placeholder="Remaining Balance"
+                    placeholder="Credit"
                     readonly
                     formControlName="balance"
                     [value]="salesCustomerDetialsForm.get('balance').value | curFormat | async"
@@ -154,7 +154,7 @@
                     required
                     matInput
                     [matDatepicker]="dueDate"
-                    placeholder="Due Date"
+                    placeholder="Date"
                     writeonly
                     formControlName="dueDate"
                     (dateChange)="selectedDueDate($event)"
@@ -182,7 +182,7 @@
                   <input
                     required
                     type="text"
-                    placeholder="Select territory"
+                    placeholder="Territory"
                     matInput
                     formControlName="territory"
                     (focusout)="validateInput(f.territory, territoryList)"
@@ -210,7 +210,7 @@
                   <input
                     required
                     type="text"
-                    placeholder="Select Warehouse"
+                    placeholder="Warehouse"
                     matInput
                     formControlName="warehouse"
                     (focusout)="validateInput(f.warehouse, filteredWarehouseList)"
@@ -701,8 +701,10 @@
 
   <ion-col size-lg="3" size-sm="12" class="draft_box form-pos-box">
 
-    <ion-text color="tertiary promo-offer-box-heading">Promotional Offers</ion-text>
-<div class="main-promo-offer-box">
+    <ion-text color="tertiary promo-offer-box-heading"
+    (click)="hideDialog($event)"
+    >Promotional Offers</ion-text>
+<div class="main-promo-offer-box"  id="promotionalOffer">
     <div class="grid-container horizontal-boxes item-scroll-box" *ngIf="!isSkeletonTextVisible">
     <ion-grid>
       <ion-row>
