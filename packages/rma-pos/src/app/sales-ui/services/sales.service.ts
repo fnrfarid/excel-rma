@@ -935,10 +935,13 @@ export class SalesService {
     );
   }
 
-  getGroupList(name){
+  getGroupList(start,end){
     const params = new HttpParams().set(
-      'name',
-    name,
+      'startOfRecord',
+      start.toString()
+    ).set(
+      'endOfRecord',
+      end.toString()
     );
     return this.getHeaders().pipe(
       switchMap(headers => {
@@ -946,5 +949,4 @@ export class SalesService {
       }),
     ); 
 }
-// 
 }

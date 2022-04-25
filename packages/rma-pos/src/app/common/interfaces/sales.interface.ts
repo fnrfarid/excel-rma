@@ -44,6 +44,7 @@ export class Item {
   target_warehouse?: string;
   warranty_date?: Date;
   barcodes:any[];
+  barcode : string;
 }
 
 export class ItemDefaults {

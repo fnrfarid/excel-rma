@@ -112,6 +112,9 @@ export class Item extends BaseEntity {
   taxes: any[];
 
   @Column()
+  website_image: any[];
+
+  @Column()
   attributes: any[];
 
   @Column()

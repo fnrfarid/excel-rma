@@ -39,7 +39,7 @@
         </mat-error>
       </mat-form-field><br />
 
-      <mat-form-field class="example-full-width">
+      <mat-form-field class="example-full-width option-input">
         <input
           required
           type="text"
@@ -69,7 +69,7 @@
       <br /><br />
 
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field class="example-full-width option-input">
       <input
         required
         type="text"
@@ -96,9 +96,11 @@
         <strong>'{{f.territory.value}}'</strong> is not allowed.
       </mat-error>
     </mat-form-field>
-    <br /><br />
-
-    <h5>Primary Contact Details</h5>
+    <div class="mid-section-sale">   
+      <hr class="divider" />
+      <h5 class="secondry-heading">Primary Contact Details</h5>
+    </div>
+ 
     <ion-grid>
       <ion-row>
         <ion-col>
@@ -162,8 +164,8 @@
   
   </div>
   <div mat-dialog-actions>
-    <button mat-button color="primary" (click)="onNoClick()">No Thanks</button>
-    <button mat-button [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
+    <button mat-button class="cancel-btn" color="primary" (click)="onNoClick()">Cancel</button>
+    <button mat-button class="confirm-btn" [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
   </div>
 
   </form>
