@@ -45,6 +45,7 @@ export interface ItemWebhookInterface {
   country_of_origin: string;
   is_sales_item: number;
   isSynced?: boolean;
+  website_image:string;
   brand?: string;
 }
 
@@ -77,6 +78,7 @@ export interface ItemApiResponseInterface {
   attributes: any[];
   item_defaults: ItemDefaultsInterface[];
   taxes: any[];
+  website_image:string;
   brand?: string;
 }
 
