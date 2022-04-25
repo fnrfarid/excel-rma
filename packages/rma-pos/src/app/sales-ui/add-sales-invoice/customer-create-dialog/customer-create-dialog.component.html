@@ -152,8 +152,9 @@
   
   </div>
   <div mat-dialog-actions>
-    <button mat-button color="primary" (click)="onNoClick()">No Thanks</button>
-    <button mat-button type="submit" [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
+
+    <button mat-button class="cancel-btn" color="primary" (click)="onNoClick()">Cancel</button>
+    <button mat-button class="confirm-btn" [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
   </div>
 
   </form>
