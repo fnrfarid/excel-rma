@@ -266,7 +266,6 @@ export class AddSalesInvoicePage implements OnInit {
       }
       this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
         this.searchData = data.docs
-
         this.searchData.forEach((element : any,index,modified_arr) => {
           this.salesService.getImageList(element.name).subscribe((data:any)=>{
             if(element.hasOwnProperty("website_image")){
@@ -277,6 +276,44 @@ export class AddSalesInvoicePage implements OnInit {
           })
         })
       })
+      if(this.searchData.length == 0){
+        if(data.filterKey!= ""){
+          var filter = JSON.stringify({ item_code : data.filterValue})
+        }else{
+          var filter = JSON.stringify({})
+        }
+      this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
+        this.searchData = data.docs
+        this.searchData.forEach((element : any,index,modified_arr) => {
+          this.salesService.getImageList(element.name).subscribe((data:any)=>{
+            if(element.hasOwnProperty("website_image")){
+              element.website_image = data.data.image
+            } else{
+              this.searchData[index]['website_image']= data.data.image
+            }
+          })
+        })
+      })
+    }
+    else if(this.searchData.length == 0){
+      if(data.filterKey!= ""){
+        var filter = JSON.stringify({ barcode : data.filterValue})
+      }else{
+        var filter = JSON.stringify({})
+      }
+    this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
+      this.searchData = data.docs
+      this.searchData.forEach((element : any,index,modified_arr) => {
+        this.salesService.getImageList(element.name).subscribe((data:any)=>{
+          if(element.hasOwnProperty("website_image")){
+            element.website_image = data.data.image
+          } else{
+            this.searchData[index]['website_image']= data.data.image
+          }
+        })
+      })
+    })
+  }
     })
     
 this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
@@ -805,7 +842,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
   }
 
   hideDialog($event){
-    
+
     document.getElementById('promotionalOffer').style.display='none';
   }
 
@@ -1684,8 +1721,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     {
       for (let i = 0; i < this.dataSource.data().length; i++) {
         if (this.dataSource.data()[i].item_code != '') {
-          posDraftDetails.items.push(
-            this.dataSource.data()[i]);
+          posDraftDetails.items.push(this.dataSource.data()[i]);
         }
       };
 

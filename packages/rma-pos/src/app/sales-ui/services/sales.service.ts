@@ -349,7 +349,7 @@ export class SalesService {
       ); 
   }
   // API for getting ItemGoupList
-  getItemGroupList(pageIndex, pageSize) {  
+  getItemGroupList(value: string, pageIndex = 0, pageSize = 30) {  
     const url = RELAY_GET_ITEM_GROUP_ENDPOINT;
     const params = new HttpParams({
       fromObject: {
