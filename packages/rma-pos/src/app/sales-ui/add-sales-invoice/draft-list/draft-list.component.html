@@ -22,14 +22,14 @@
     <ion-row class="align">
       
       <ion-col>
-        <ion-card-title>
+        <ion-card-title class="modal-heading">
           <ion-text color="tertiary"> Draft Invioce List </ion-text>
         </ion-card-title>
       </ion-col>
     </ion-row>
   </ion-card-footer>
   <ion-card-content>
-    <mat-table [dataSource]="dataSource2">
+    <mat-table [dataSource]="dataSource2" class="striped" style="width: 100%">
       <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumnsItems">
         <th mat-header-cell class="draft-table" *matHeaderCellDef>{{column}}</th>
         <td mat-cell class="draft-table" *matCellDef="let row"> <a (click)="editDraftList($event)" >{{row[column]}}</a> </td>
@@ -47,7 +47,7 @@
 </ion-card>
 
 
-<div class="header-text">
+<div class="header-text card-main-invoice-list-footer">
   <ion-button size="small" (click)="closeDialog()" class="header-btn" color="danger">
     close
   </ion-button>

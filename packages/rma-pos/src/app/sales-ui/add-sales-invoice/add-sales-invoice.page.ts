@@ -100,8 +100,10 @@ export class AddSalesInvoicePage implements OnInit {
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
   calledFrom: string;
-  displayItemGroupList:any =[];
-  numOfItemGroup: number = 10;
+  displayItemGroupList1:any=[];
+  displayItemGroupList:any=[];
+  startItemGroup: number = 0;
+  endItemGroup: number = 10;
   numOfItemNames: number = 500;
   PosDraftDetails = [];
   dataSource3 = [];
@@ -168,7 +170,7 @@ export class AddSalesInvoicePage implements OnInit {
   disableDeliveredSerialsCard: boolean = false;
   remaining: number = 0;
   index: number = 0;
-  size: number = 10;
+  size: number = 460;
 
   deliveredSerialsState: DeliveredSerialsState = {
     deliveredSerialsDisplayedColumns:
@@ -276,6 +278,36 @@ export class AddSalesInvoicePage implements OnInit {
         })
       })
     })
+    
+this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
+  this.gridNames=data.docs
+  // Item Group - UPDATED WORK
+  for(let i =0 ;i<data.docs.length;i++){
+    data.docs[i]['barcode']=''
+    if(data.docs[i].barcodes[0]){
+      var barcode=data.docs[i].barcodes[0].name;
+      data.docs[i]['barcode']=barcode
+    }
+    
+    if(data.docs[i]['item_group']=="All Item Groups"){
+      continue;
+    }
+    else {
+      var found = this.displayItemGroupList1.find((element)=>
+        element.item_group === data.docs[i]['item_group'])
+
+      if(!found){
+        this.displayItemGroupList1.push(data.docs[i])
+      }
+    }
+    //   this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
+    //   this.gridNames[i]['website_image']=data['data'].website_image
+    //  })
+    // console.log(data.docs[i].item_group)
+  }
+  this.itemGroup();
+  this.gridRename=this.gridNames
+});
 
     this.getItemList().subscribe({
       next: res => {
@@ -293,7 +325,6 @@ export class AddSalesInvoicePage implements OnInit {
         this.isSkeletonTextVisible = false;
       },
     });
-    this.itemGroup();
     this.dataSource = new ItemsDataSource();
     this.salesInvoice = {} as SalesInvoice;
     this.series = '';
@@ -386,10 +417,6 @@ export class AddSalesInvoicePage implements OnInit {
       this.filteredCustomerDetailList = this.filterValues(searchVal)
 
     })
-
-  
-
-
 
     this.filteredWarehouseList = this.salesCustomerDetialsForm
       .get('warehouse')
@@ -711,7 +738,9 @@ export class AddSalesInvoicePage implements OnInit {
             item.push({ ...newItem, serial_no: [serial] });
             this.calculateTotal(item.slice());
             this.dataSource.update(item);
-            this.itemsControl.push(new FormControl(newItem));
+            
+            // console.log(this.dataSource)
+            // this.itemsControl.push(new FormControl(newItem));
             this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
               duration: DURATION,
               horizontalPosition: 'right',
@@ -757,16 +786,17 @@ export class AddSalesInvoicePage implements OnInit {
       this.isLoadMoreVisible = true;
     }
   }
+  
 
   getValue(value:string){
     //method to find item in list.
-      this.gridNames= this.gridRename.filter((e) =>{
-        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase());
+    this.gridNames= this.gridRename.filter((e) =>{
+        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_code.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_group.toLowerCase().includes(value.toLocaleLowerCase())|| e.barcode.toLowerCase().includes(value.toLocaleLowerCase());
      })
-     console.log(this.gridNames)
+     this.gridItems=this.gridNames
   }
-  findValue(value:string){
-    //method to search item when clicked from dropdown list
+  findValue(value:string) {
+    //method to search item when clssicked from dropdown list
     this.getItemList(0, {
       item_code: value,
     }).subscribe({
@@ -891,6 +921,7 @@ export class AddSalesInvoicePage implements OnInit {
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
+    this.number_items--;
   }
 
   customerChanged(customer, postingDate?) {
@@ -1440,7 +1471,6 @@ export class AddSalesInvoicePage implements OnInit {
   }
 
   selectedDueDate($event) {
-    console.log($event.value)
     this.dueDate = this.getParsedDate($event.value);
     
   }
@@ -1670,6 +1700,7 @@ export class AddSalesInvoicePage implements OnInit {
       const dialogRef = this.dialog.open(DraftListComponent,  {
         height: '540px',
         width: '600px',
+        id:'draft-list-dialog-container',
         data:{ 
           UI:this.dataSource1,
           source: this.dataSource3,
@@ -1678,7 +1709,9 @@ export class AddSalesInvoicePage implements OnInit {
       })
     
       dialogRef.afterClosed().subscribe(result =>{
-        this.showdetails=result;
+        this.showdetails=result.data;
+      debugger
+        this.dataSource.update(this.showdetails)
       })
      
       this.clearFields()
@@ -1736,6 +1769,7 @@ export class AddSalesInvoicePage implements OnInit {
   onCreateCustomer(){
     const dialogRef = this.dialog.open(CustomerCreateDialogComponent, {
       width: '500px',
+      id:"customer-create-dialog",
       data: {name: this.name,age: this.animal,territoryList:this.territoryList},
     });
 
@@ -1756,29 +1790,20 @@ export class AddSalesInvoicePage implements OnInit {
     var customerDetails : any  = args.option._element.nativeElement.innerText.split('\n')
     this.getCustomer(customerDetails[2])
   }
-  // Fetching Items Group and saved them into an Array
+  // Fetching Items Group and saved them into an Array -UPDATED
   itemGroup() {
-    this.salesService.getGroupList(this.numOfItemGroup.toString()).subscribe((data) =>{
-          for(let i=0 ; i<data.docs.length ;i++){
-            if(data.docs[i]['item_group']=="All Item Groups"){
-              continue;
-            }
-            else {
-              var found = this.displayItemGroupList.find((element)=>
-                element.item_group === data.docs[i]['item_group'])
-
-              if(!found){
-                this.displayItemGroupList.push(data.docs[i])
-              }
-            }
-      }
-    })
+    this.displayItemGroupList1
+      .slice(this.startItemGroup,this.endItemGroup)
+        .forEach(element => {
+          this.displayItemGroupList.push(element)
+    });
   }
   // More Items to chips
   showMoreItems(){
-    this.numOfItemGroup += 10;
-    this.displayItemGroupList =[]; // re initialize array of itemGroup
+    this.startItemGroup = this.endItemGroup;
+    this.endItemGroup += 11;
     this.itemGroup();
+    
   }
   filterItemByGroup(event){
     this.gridItems = [];

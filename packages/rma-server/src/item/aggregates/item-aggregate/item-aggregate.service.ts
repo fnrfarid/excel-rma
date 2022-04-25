@@ -224,8 +224,8 @@ export class ItemAggregateService extends AggregateRoot {
     );
   }
 
-  async retrieveItemByGroup(take) {
-    const item = await this.itemService.list(0,Number(take),{ name: 'asc' });
+  async retrieveItemByGroup(skip,take) {
+    const item = await this.itemService.list(Number(skip),Number(take),{ name: 'asc' });
     if (!item) throw new NotFoundException();
     return item;
   }

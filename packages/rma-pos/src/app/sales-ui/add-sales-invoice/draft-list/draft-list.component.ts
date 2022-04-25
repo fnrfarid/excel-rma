@@ -2,6 +2,7 @@ import { Component, OnInit ,Inject} from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AddSalesInvoicePage } from '../add-sales-invoice.page';
 import { MatTableDataSource } from '@angular/material/table';
+import { ItemsDataSource } from '../items-datasource';
 import {
   FormGroup
 } from '@angular/forms';
@@ -12,10 +13,12 @@ import {
   styleUrls: ['./draft-list.component.scss'],
 })
 export class DraftListComponent implements OnInit {
+  dataSource: ItemsDataSource;
   dataSource2;
   dataSource3;
   salesCustomerDetialsForm: FormGroup;
   addsales:any;
+  number_items:any;
 
   public dialog: MatDialog
 
@@ -34,6 +37,7 @@ export class DraftListComponent implements OnInit {
     }
       
   ngOnInit() {
+    this.dataSource = new ItemsDataSource();
   }
   closeDialog() {
     this.dialogRef.close()
@@ -42,6 +46,8 @@ export class DraftListComponent implements OnInit {
 
     console.log("payment submitted !!")
   };
+
+
 
   editDraftList(event){
 
@@ -67,7 +73,7 @@ export class DraftListComponent implements OnInit {
       .get('balance')
         .setValue(targetedObject.remaining_balance);
         this.data.formgroup
-      .get('remarks')
+      .get('remarks') 
         .setValue(targetedObject.remarks);    
         this.data.formgroup
       .get('customer')
@@ -75,11 +81,15 @@ export class DraftListComponent implements OnInit {
         this.data.formgroup
       .get('dueDate')
         .setValue(new Date(targetedObject.due_date));
-    for (let i = 0; i < targetedObject.items.length; i++){
+      this.number_items=4
+      // this.dataSource.update(targetedObject.items)
+      
 
-      this.addsales.addFromItemsGrid(targetedObject.items[i])
-    }
-    this.dialogRef.close()
+    // for (let i = 0; i < targetedObject.items.length; i++){
+
+    //   this.addsales.addFromItemsGrid(targetedObject.items[i])
+    // }
+    this.dialogRef.close({data:targetedObject.items})
   }
 
 }

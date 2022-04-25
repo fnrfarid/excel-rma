@@ -112,10 +112,19 @@ export class Item extends BaseEntity {
   taxes: any[];
 
   @Column()
+  website_image: any[];
+
+  @Column()
   attributes: any[];
 
   @Column()
   uoms: Uom[];
+
+  @Column()
+  barcodes: Barcodes[];
+  
+  @Column()
+  barcode: string;
 
   @Column()
   item_defaults: ItemDefaults[];
@@ -142,7 +151,7 @@ export class Item extends BaseEntity {
   mrp: number;
 
   @Column()
-  website_image: string;
+  image:string;
 
   @Column()
   bundle_items: ItemBundleItemWebhookInterface[];
