@@ -160,6 +160,7 @@ export class AddSalesInvoicePage implements OnInit {
   gridNames:Item[] =[];
   gridRename:Item[] =[];
   gridItems1: Item[] = [];
+  searchData: any[] = []
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
   serialDataSource: SerialDataSource;
@@ -240,6 +241,43 @@ export class AddSalesInvoicePage implements OnInit {
   ngOnInit() {
     
     this.createFormGroup();
+
+    this.itemPriceService.findItems(JSON.stringify({}),JSON.stringify({ name: 'asc' }),0,30).subscribe((data)=>{
+      this.searchData = data.docs
+
+      this.searchData.forEach((element : any,index) => {
+        this.salesService.getImageList(element.name).subscribe((data:any)=>{
+          if(element.hasOwnProperty("website_image")){
+            element.website_image = data.data.image
+          } else{
+            this.searchData[index]['website_image']= data.data.image
+          }
+        })
+      })
+    })
+
+    //fetching items for search
+
+    this.salesInvoiceItemsForm.valueChanges.subscribe((data)=>{
+      if(data.filterKey!= ""){
+        var filter = JSON.stringify({item_name : data.filterValue})
+      }else{
+        var filter = JSON.stringify({})
+      }
+      this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
+        this.searchData = data.docs
+
+        this.searchData.forEach((element : any,index,modified_arr) => {
+          this.salesService.getImageList(element.name).subscribe((data:any)=>{
+            if(element.hasOwnProperty("website_image")){
+              element.website_image = data.data.image
+            } else{
+              this.searchData[index]['website_image']= data.data.image
+            }
+          })
+        })
+      })
+    })
     
 this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
   this.gridNames=data.docs

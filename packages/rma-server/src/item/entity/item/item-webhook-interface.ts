@@ -45,6 +45,7 @@ export interface ItemWebhookInterface {
   country_of_origin: string;
   is_sales_item: number;
   isSynced?: boolean;
+  website_image:string;
   brand?: string;
   image:string;
   barcode:string;

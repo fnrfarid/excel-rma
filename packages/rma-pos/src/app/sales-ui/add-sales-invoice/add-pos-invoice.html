@@ -331,7 +331,7 @@
       
             >
             <mat-option
-            *ngFor="let item of gridNames"
+            *ngFor="let item of searchData"
             [value]="item.item_name"
             (click)="findValue(item.item_code)"
           >
@@ -340,7 +340,7 @@
             <small>
               <ion-img 
                 class="search-item-image prd-slid-img" 
-                src='http://0.0.0.0:8000{{item.image}}'>
+                src='http://0.0.0.0:8000{{item.website_image}}'>
               </ion-img>
             </small>
             
