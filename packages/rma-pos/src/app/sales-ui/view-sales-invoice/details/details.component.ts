@@ -257,11 +257,11 @@ export class DetailsComponent implements OnInit {
     return { color: this.statusColor[status] };
   }
 }
-//Interface for making-draft
+//Interface for making-draft - Added mobile and change customer type
 export class PosDraftDetails{
   uuid: string;
   company: string;
-  customer: string;
+  customer: any;
   posting_date: string;
   warehouse: string;
   due_date: string;
@@ -271,6 +271,7 @@ export class PosDraftDetails{
   isCampaign?: boolean;
   items?: Item[];
   total?: number;
+  mobile?: string;
   // Payments?: [];
 };
 

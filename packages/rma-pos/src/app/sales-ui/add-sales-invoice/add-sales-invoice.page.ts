@@ -99,6 +99,7 @@ export class AddSalesInvoicePage implements OnInit {
   isSkeletonTextVisible: boolean = true;
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
+  draftUuid: string = "";
   calledFrom: string;
   displayItemGroupList1:any=[];
   displayItemGroupList:any=[];
@@ -233,7 +234,7 @@ export class AddSalesInvoicePage implements OnInit {
     private readonly router: Router,
     private readonly time: TimeService,
     private readonly loadingController: LoadingController,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {}
 
   showdetails;
@@ -326,6 +327,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
           });
           this.calculateTotal(res.items);
           this.getTotalQuantity(res.items);
+          this.getNumberItems(res.items);
           this.salesCustomerDetialsForm
             .get('campaign')
             .setValue(res.isCampaign);
@@ -639,6 +641,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
           row.stock = res.message;
           this.calculateTotal(this.dataSource.data().slice());
           this.getTotalQuantity(this.dataSource.data().slice());
+          this.getNumberItems(this.dataSource.data().slice());
           this.dataSource.update(copy);
         },
       });
@@ -648,6 +651,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       row.stock = 'Please Select a Warehouse';
       this.calculateTotal(this.dataSource.data().slice());
       this.getTotalQuantity(this.dataSource.data().slice());
+      this.getNumberItems(this.dataSource.data().slice());
       this.dataSource.update(copy);
     }
     this.itemsControl.controls[index].setValue(item);
@@ -684,6 +688,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
             item[index].serial_no.push(serial);
             this.calculateTotal(this.dataSource.data().slice());
             this.getTotalQuantity(this.dataSource.data().slice());
+            this.getNumberItems(this.dataSource.data().slice());
             this.dataSource.update(item);
             this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
               duration: DURATION,
@@ -703,6 +708,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
             item.push({ ...newItem, serial_no: [serial] });
             this.calculateTotal(item.slice());
             this.getTotalQuantity(item.slice());
+            this.getNumberItems(item.slice());
             this.dataSource.update(item);
             this.itemsControl.push(new FormControl(newItem));
             this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
@@ -710,7 +716,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
               horizontalPosition: 'right',
               verticalPosition: 'top',
             });
-            this.number_items++;
+            // this.number_items++;
           }
         },
       });
@@ -863,6 +869,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     row.qty = quantity;
     this.calculateTotal(this.dataSource.data().slice());
     this.getTotalQuantity(this.dataSource.data().slice());
+    this.getNumberItems(this.dataSource.data().slice());
     this.dataSource.update(copy);
   }
 
@@ -878,6 +885,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     }
     this.calculateTotal(this.dataSource.data().slice());
     this.getTotalQuantity(this.dataSource.data().slice());
+    this.getNumberItems(this.dataSource.data().slice());
 
     this.dataSource.update(copy);
   }
@@ -887,8 +895,9 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     this.itemsControl.removeAt(i);
     this.calculateTotal(this.dataSource.data().slice());
     this.getTotalQuantity(this.dataSource.data().slice());
+    this.getNumberItems(this.dataSource.data().slice());
     this.dataSource.update(this.dataSource.data());
-    this.number_items--;
+    // this.number_items--;
   }
 
   customerChanged(customer, postingDate?) {
@@ -1438,6 +1447,13 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     });
     this.totalQuantity = totalquan;
   }
+  getNumberItems(itemList: Item[]){
+    let total_items = 0;
+    itemList.forEach(item=>{
+      total_items += 1;
+    })
+    this.number_items = total_items
+  }
 
   selectedPostingDate($event) {
     this.postingDate = this.getParsedDate($event.value);
@@ -1578,6 +1594,9 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       .get('customer')
         .setValue("");
     this.salesCustomerDetialsForm
+      .get('mobileNo')
+        .setValue("");
+    this.salesCustomerDetialsForm
       .get('remarks',)
         .setValue("");
     this.salesCustomerDetialsForm
@@ -1604,9 +1623,11 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       this.dataSource.data().slice());
     this.getTotalQuantity(
         this.dataSource.data().slice());
+    this.getNumberItems(
+      this.dataSource.data().slice());
     this.dataSource
       .update(this.dataSource.data());
-      this.number_items = 0;
+    this.draftUuid = "";
   }
   validateReqfields(){
     if (this.salesCustomerDetialsForm
@@ -1631,9 +1652,11 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     posDraftDetails.items = [];
     let draft: draftList;
 
-    // get data for draft list 
+    // get data for draft list - Added mobile No
     posDraftDetails.customer = this.salesCustomerDetialsForm
-      .get('customer',).value.name;
+      .get('customer',).value;
+    posDraftDetails.mobile = this.salesCustomerDetialsForm
+      .get('mobileNo',).value;
     posDraftDetails.company = this.salesCustomerDetialsForm
       .get('company',).value;
     posDraftDetails.posting_date = this.getParsedDate(this.salesCustomerDetialsForm
@@ -1651,10 +1674,16 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     posDraftDetails.isCampaign = this.salesCustomerDetialsForm
       .get('campaign',).value;
     posDraftDetails.total = this.salesInvoiceItemsForm.controls.total.value;
-    posDraftDetails.uuid = Math.random().toString(16).slice(2)
 
+    // generate unique key based on condition
+    if(!this.draftUuid){
+      posDraftDetails.uuid = Math.random().toString(16).slice(2);
+    }
+    else{
+      posDraftDetails.uuid = this.draftUuid;
+    }
     total_amount = posDraftDetails.total;
-    customer_name =  posDraftDetails.customer;
+    customer_name =  posDraftDetails.customer.name; // set customer name
     uuid = posDraftDetails.uuid;
     if (this.validateReqfields())
     {
@@ -1664,44 +1693,67 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
             this.dataSource.data()[i]);
         }
       };
-
       draft  = {
         uuid: uuid,
         customerName: customer_name,
         amount: total_amount
       };
+      //Code to show unique drafts on draft component.
+      if (!this.draftUuid){
+        this.dataSource1.push(draft);
+      }
+      else{
+        for (let i in this.dataSource1){
+          if (this.dataSource1[i].uuid.includes(draft.uuid)){
+            this.dataSource1[i].amount = posDraftDetails.total;
+            this.dataSource1[i].customerName = posDraftDetails.customer.name;
+            break;
+          }
+        }
+      }
+      // update existing draft object
+      if (this.draftUuid) {
+        for (let i=0; i< this.dataSource3.length; i++){
+          if(this.dataSource3[i].uuid == this.draftUuid){
+            this.dataSource3[i]['uuid'] = this.draftUuid
+            this.dataSource3[i] = posDraftDetails
+          }
+        }
+      }
+      else{
+        this.dataSource3.push(posDraftDetails);
+      }
       
-      this.dataSource1.push(draft) // holding all draft objects
-      this.dataSource2 = new MatTableDataSource(this.dataSource1) // show draft content on Ui 
-      this.dataSource3.push(posDraftDetails) // array of draft lists
       const dialogRef = this.dialog.open(DraftListComponent,  {
         height: '540px',
         width: '600px',
         data:{ 
           UI:this.dataSource1,
           source: this.dataSource3,
-          formgroup:this.salesCustomerDetialsForm
+          formgroup:this.salesCustomerDetialsForm,
+          form:this.salesInvoiceItemsForm
         },
-      })
+      });
     
-      dialogRef.afterClosed().subscribe(result =>{
-        this.showdetails=result;
-      })
-     
       this.clearFields()
+      // Draft Dialog close
+      dialogRef.afterClosed().subscribe(result =>{
+        this.draftUuid = result.uuid;
+        this.dataSource.update(result.data.items);
+        this.calculateTotal(result.data.items);
+        this.getTotalQuantity(result.data.items);
+        this.getNumberItems(result.data.items);
+      });
     }
     else{
       this.snackbar.open("Please provide all required fields", CLOSE, {
         duration: 3000,
       });  
     }  
-  
-  
     };
 
   editDraftList(event){
     var targetedObject :any = "";
-    console.log("...Hit...")
     // get targeted object from array of drafts
     for (let i = 0; i < this.dataSource3.length; i++) {
       if (this.dataSource3[i].uuid == event.target.innerHTML) {
@@ -1786,6 +1838,26 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
           this.gridItems = [...res.items];
           this.showLoadMore(res.totalLength);
       },
+    });
+  }
+  // open Draft table from Draft Invoice List button
+  openDraftList(){
+    const dialogRef =this.dialog.open(DraftListComponent,  {
+      height: '540px',
+      width: '600px',
+      data:{ 
+        UI:this.dataSource1,
+        source: this.dataSource3,
+        formgroup:this.salesCustomerDetialsForm,
+        form:this.salesInvoiceItemsForm
+      },
+    });
+    dialogRef.afterClosed().subscribe(result =>{
+      this.draftUuid = result.uuid;
+      this.dataSource.update(result.data.items);
+      this.calculateTotal(result.data.items);
+      this.getTotalQuantity(result.data.items);
+      this.getNumberItems(result.data.items);
     });
   }
 }

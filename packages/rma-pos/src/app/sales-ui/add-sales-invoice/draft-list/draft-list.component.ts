@@ -2,8 +2,10 @@ import { Component, OnInit ,Inject} from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AddSalesInvoicePage } from '../add-sales-invoice.page';
 import { MatTableDataSource } from '@angular/material/table';
+import { ItemsDataSource } from '../items-datasource';
 import {
-  FormGroup
+  FormGroup,
+  FormArray,
 } from '@angular/forms';
 
 @Component({
@@ -12,10 +14,15 @@ import {
   styleUrls: ['./draft-list.component.scss'],
 })
 export class DraftListComponent implements OnInit {
+  dataSource: ItemsDataSource;
   dataSource2;
   dataSource3;
+  draft_uuid: string;
   salesCustomerDetialsForm: FormGroup;
   addsales:any;
+  itemsControl: FormArray = this.data.form.get(
+    'items',
+  ) as FormArray;
 
   public dialog: MatDialog
 
@@ -34,6 +41,7 @@ export class DraftListComponent implements OnInit {
     }
       
   ngOnInit() {
+    this.dataSource = new ItemsDataSource();
   }
   closeDialog() {
     this.dialogRef.close()
@@ -53,13 +61,16 @@ export class DraftListComponent implements OnInit {
         targetedObject = this.dataSource3[i];
       }
     };
-    
+    this.draft_uuid = targetedObject.uuid // added uuid
     this.data.formgroup
       .get('territory',)
         .setValue(targetedObject.territory);
         this.data.formgroup
       .get('warehouse')
         .setValue(targetedObject.warehouse);
+        this.data.formgroup
+      .get('mobileNo')
+        .setValue(targetedObject.mobile);
         this.data.formgroup
       .get('campaign',)
         .setValue(targetedObject.isCampaign);
@@ -75,11 +86,7 @@ export class DraftListComponent implements OnInit {
         this.data.formgroup
       .get('dueDate')
         .setValue(new Date(targetedObject.due_date));
-    for (let i = 0; i < targetedObject.items.length; i++){
-
-      this.addsales.addFromItemsGrid(targetedObject.items[i])
-    }
-    this.dialogRef.close()
+    this.dialogRef.close({data:targetedObject,uuid:this.draft_uuid}) // sent uuid to parent comp
   }
 
 }
