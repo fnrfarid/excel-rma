@@ -135,7 +135,7 @@ export class AddSalesInvoicePage implements OnInit {
     'customerName',
     'amount'
   ]
-
+  mobileNolist: any=[]; // Added by ibad
   filteredWarehouseList: Observable<any[]>;
   territoryList: Observable<any[]>;
   filteredCustomerList: Observable<any[]>;
@@ -162,6 +162,7 @@ export class AddSalesInvoicePage implements OnInit {
   gridNames:Item[] =[];
   gridRename:Item[] =[];
   gridItems1: Item[] = [];
+  searchData: any[] = []
   filterOptions: any[] = ['Item Code', 'Serial No'];
   isDataLoading = false;
   serialDataSource: SerialDataSource;
@@ -242,11 +243,91 @@ export class AddSalesInvoicePage implements OnInit {
   ngOnInit() {
     
     this.createFormGroup();
+
+    this.itemPriceService.findItems(JSON.stringify({}),JSON.stringify({ name: 'asc' }),0,30).subscribe((data)=>{
+      this.searchData = data.docs
+
+      this.searchData.forEach((element : any,index) => {
+        this.salesService.getImageList(element.name).subscribe((data:any)=>{
+          if(element.hasOwnProperty("website_image")){
+            element.website_image = data.data.image
+          } else{
+            this.searchData[index]['website_image']= data.data.image
+          }
+        })
+      })
+    })
+
+    //fetching items for search
+
+    this.salesInvoiceItemsForm.valueChanges.subscribe((data)=>{
+      if(data.filterKey!= ""){
+        var filter = JSON.stringify({item_name : data.filterValue})
+      }else{
+        var filter = JSON.stringify({})
+      }
+      this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
+        this.searchData = data.docs
+        this.searchData.forEach((element : any,index,modified_arr) => {
+          this.salesService.getImageList(element.name).subscribe((data:any)=>{
+            if(element.hasOwnProperty("website_image")){
+              element.website_image = data.data.image
+            } else{
+              this.searchData[index]['website_image']= data.data.image
+            }
+          })
+        })
+      })
+      if(this.searchData.length == 0){
+        if(data.filterKey!= ""){
+          var filter = JSON.stringify({ item_code : data.filterValue})
+        }else{
+          var filter = JSON.stringify({})
+        }
+      this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
+        this.searchData = data.docs
+        this.searchData.forEach((element : any,index,modified_arr) => {
+          this.salesService.getImageList(element.name).subscribe((data:any)=>{
+            if(element.hasOwnProperty("website_image")){
+              element.website_image = data.data.image
+            } else{
+              this.searchData[index]['website_image']= data.data.image
+            }
+          })
+        })
+      })
+    }
+    else if(this.searchData.length == 0){
+      if(data.filterKey!= ""){
+        var filter = JSON.stringify({ barcode : data.filterValue})
+      }else{
+        var filter = JSON.stringify({})
+      }
+    this.itemPriceService.findItems(filter ,JSON.stringify({ name: 'asc' }),0,10).subscribe((data)=>{
+      this.searchData = data.docs
+      this.searchData.forEach((element : any,index,modified_arr) => {
+        this.salesService.getImageList(element.name).subscribe((data:any)=>{
+          if(element.hasOwnProperty("website_image")){
+            element.website_image = data.data.image
+          } else{
+            this.searchData[index]['website_image']= data.data.image
+          }
+        })
+      })
+    })
+  }
+    })
     
 this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
   this.gridNames=data.docs
   // Item Group - UPDATED WORK
   for(let i =0 ;i<data.docs.length;i++){
+    data.docs[i]['barcode']=''
+    if(data.docs[i].barcodes[0]){
+      var barcode=data.docs[i].barcodes[0].name;
+      data.docs[i]['barcode']=barcode
+    }
+    
     if(data.docs[i]['item_group']=="All Item Groups"){
       continue;
     }
@@ -258,10 +339,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         this.displayItemGroupList1.push(data.docs[i])
       }
     }
-  //   this.salesService.getImageList(this.gridNames[i].item_code).subscribe((data)=>{
-  //   this.gridNames[i]['website_image']=data['data'].website_image
-  //  })
-  // console.log(data.docs[i].item_group)
   }
   this.itemGroup();
   this.gridRename=this.gridNames
@@ -348,7 +425,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
           return this.salesService.getCustomerList(value);
         }),
       );
-
     this.filteredCustomerList.subscribe((data)=>{
       this.filteredCustomerDetailList = []
       this.filteredCustomerDetailListSearch = []
@@ -373,14 +449,15 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       })
     })
 
+    // for (let i=0 ; i < this.filteredCustomerDetailList.length ; i++){
+    //   this.mobileNolist.push(this.filteredCustomerDetailList[i].mobileNo)
+    // }
+    // console.log("after list populated",this.mobileNolist)
+
     this.salesCustomerDetialsForm.get('mobileNo').valueChanges.subscribe((searchVal) => {
       this.filteredCustomerDetailList = this.filterValues(searchVal)
 
     })
-
-  
-
-
 
     this.filteredWarehouseList = this.salesCustomerDetialsForm
       .get('warehouse')
@@ -402,7 +479,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
           return of([]);
         }),
       );
-
     this.getSalesInvoice(this.route.snapshot.params.invoiceUuid);
 
     this.serialDataSource = new SerialDataSource();
@@ -478,8 +554,9 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         },
         error: error => {},
       });
-  }
 
+  }
+  
   createFormGroup() {
     let MOBILE_PATTERN = /[0-9\+\-\ ]/;
 
@@ -710,7 +787,9 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
             this.getTotalQuantity(item.slice());
             this.getNumberItems(item.slice());
             this.dataSource.update(item);
-            this.itemsControl.push(new FormControl(newItem));
+            
+            // console.log(this.dataSource)
+            // this.itemsControl.push(new FormControl(newItem));
             this.snackbar.open(`Added ${newItem.item_name}`, 'Close', {
               duration: DURATION,
               horizontalPosition: 'right',
@@ -756,16 +835,16 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       this.isLoadMoreVisible = true;
     }
   }
+  
 
   getValue(value:string){
     //method to find item in list.
-      this.gridNames= this.gridRename.filter((e) =>{
-        
-        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_code.toLowerCase().includes(value.toLocaleLowerCase());
+    this.gridNames= this.gridRename.filter((e) =>{
+        return e.item_name.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_code.toLowerCase().includes(value.toLocaleLowerCase()) || e.item_group.toLowerCase().includes(value.toLocaleLowerCase())|| e.barcode.toLowerCase().includes(value.toLocaleLowerCase());
      })
      this.gridItems=this.gridNames
   }
-  findValue(value:string){
+  findValue(value:string) {
     //method to search item when clssicked from dropdown list
     this.getItemList(0, {
       item_code: value,
@@ -776,6 +855,11 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         this.showLoadMore(res.totalLength);
       },
     });
+  }
+
+  hideDialog($event){
+
+    document.getElementById('promotionalOffer').style.display='none';
   }
 
   setFilter() { 
@@ -1514,6 +1598,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     );
   }
 
+  // refactore the code for mobile dropdown validation - start
   getCustomer(name: string) {
     this.salesService.getCustomer(name).subscribe({
       next: res => {
@@ -1521,7 +1606,11 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
         this.customerChanged(res);
       },
     });
+    for (let i=0 ; i < this.filteredCustomerDetailList.length ; i++){
+      this.mobileNolist.push(this.filteredCustomerDetailList[i].mobileNo)
+    }
   }
+  // refactore the code for mobile dropdown validation - end
 
   getRemainingBalance() {
     forkJoin({
@@ -1689,8 +1778,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     {
       for (let i = 0; i < this.dataSource.data().length; i++) {
         if (this.dataSource.data()[i].item_code != '') {
-          posDraftDetails.items.push(
-            this.dataSource.data()[i]);
+          posDraftDetails.items.push(this.dataSource.data()[i]);
         }
       };
       draft  = {
@@ -1727,6 +1815,7 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       const dialogRef = this.dialog.open(DraftListComponent,  {
         height: '540px',
         width: '600px',
+        id:'draft-list-dialog-container',
         data:{ 
           UI:this.dataSource1,
           source: this.dataSource3,
@@ -1786,15 +1875,22 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
 
     // set Items
     for (let i = 0; i < targetedObject.items.length; i++){
-      this.addFromItemsGrid(targetedObject.items[i])
+      this.addFromItemsGrid(targetedObject.items[i].name)
     }
   }
   submitPayment() {
+    // for (let i=0 ; i < this.filteredCustomerDetailList.length ; i++){
+    //   this.mobileNolist.push(this.filteredCustomerDetailList[i].mobileNo)
+    // }
+    // console.log("from submit button",this.mobileNolist)
+
+
     this.dialog.open(PaymentDialogueComponent, {height: '540px', width: '600px',});
   }
   onCreateCustomer(){
     const dialogRef = this.dialog.open(CustomerCreateDialogComponent, {
       width: '500px',
+      id:"customer-create-dialog",
       data: {name: this.name,age: this.animal,territoryList:this.territoryList},
     });
 

@@ -121,6 +121,12 @@ export class Item extends BaseEntity {
   uoms: Uom[];
 
   @Column()
+  barcodes: Barcodes[];
+  
+  @Column()
+  barcode: string;
+
+  @Column()
   item_defaults: ItemDefaults[];
 
   @Column()

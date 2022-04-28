@@ -1,18 +1,6 @@
-  <form [formGroup] = "salesCustomerDialogForm">
+  <form [formGroup] = "salesCustomerDialogForm" (ngSubmit)="customerCreation($event)">
     <div mat-dialog-content>
-      <h5>New Customer </h5>
-
-      <mat-form-field class="example-full-width">
-        <input
-          matInput
-          required
-          placeholder="Series"
-          formControlName="series"
-        />
-        <mat-error *ngIf="f.series.hasError('required')">
-          Series is <strong>required</strong>
-        </mat-error>
-      </mat-form-field><br />
+      <h5>Create a New Customer </h5>
 
       <mat-form-field class="example-full-width">
         <input
@@ -39,14 +27,14 @@
         </mat-error>
       </mat-form-field><br />
 
-      <mat-form-field class="example-full-width">
+      <mat-form-field class="example-full-width option-input">
         <input
           required
           type="text"
           placeholder="Select Customer Group"
           matInput
           formControlName="customerGroup"
-          (focusout)="validateInput(f.customerGroup, customerGroupList)"
+          (focusout)="validateInput(f.customerGroup, customerGroupValidation)"
           [matAutocomplete]="customerGroup"
         />
         <mat-autocomplete
@@ -69,7 +57,7 @@
       <br /><br />
 
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field class="example-full-width option-input">
       <input
         required
         type="text"
@@ -96,9 +84,11 @@
         <strong>'{{f.territory.value}}'</strong> is not allowed.
       </mat-error>
     </mat-form-field>
-    <br /><br />
-
-    <h5>Primary Contact Details</h5>
+    <div class="mid-section-sale">   
+      <hr class="divider" />
+      <h5 class="secondry-heading">Primary Contact Details</h5>
+    </div>
+ 
     <ion-grid>
       <ion-row>
         <ion-col>
@@ -162,8 +152,9 @@
   
   </div>
   <div mat-dialog-actions>
-    <button mat-button color="primary" (click)="onNoClick()">No Thanks</button>
-    <button mat-button [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
+
+    <button mat-button class="cancel-btn" color="primary" (click)="onNoClick()">Cancel</button>
+    <button mat-button type= "submit" class="confirm-btn" [mat-dialog-close]="data.age" cdkFocusInitial>Ok</button>
   </div>
 
   </form>

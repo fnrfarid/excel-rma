@@ -23,6 +23,7 @@ export class DraftListComponent implements OnInit {
   itemsControl: FormArray = this.data.form.get(
     'items',
   ) as FormArray;
+  number_items:any;
 
   public dialog: MatDialog
 
@@ -51,6 +52,8 @@ export class DraftListComponent implements OnInit {
     console.log("payment submitted !!")
   };
 
+
+
   editDraftList(event){
 
     var targetedObject :any = "";
@@ -78,7 +81,7 @@ export class DraftListComponent implements OnInit {
       .get('balance')
         .setValue(targetedObject.remaining_balance);
         this.data.formgroup
-      .get('remarks')
+      .get('remarks') 
         .setValue(targetedObject.remarks);    
         this.data.formgroup
       .get('customer')

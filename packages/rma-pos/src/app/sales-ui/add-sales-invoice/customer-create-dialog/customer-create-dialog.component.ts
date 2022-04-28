@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, Inject, OnInit } from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DialogData } from '../../../common/interfaces/sales.interface';
 import { Observable, of } from 'rxjs';
@@ -34,7 +34,7 @@ export class CustomerCreateDialogComponent implements OnInit {
     customerGroup:0
   };
   validateInput: any = ValidateInputSelected;
-
+  customerGroupValidation: any=[]; // Added by ibad for validation
   customerGroupList: any;
   copyCustomerGroupList: any;
 
@@ -86,6 +86,9 @@ export class CustomerCreateDialogComponent implements OnInit {
 
     this.salesService.customerGroupList().subscribe((data) =>{
       this.customerGroupList = data
+      data.forEach(element => {
+        this.customerGroupValidation.push(element.name);
+      });
     });
 
     //search function that searches from a duplicate list and renders the results
@@ -123,6 +126,21 @@ export class CustomerCreateDialogComponent implements OnInit {
         value.name.toLowerCase().indexOf(name.toLowerCase()) !== -1);
     }
 
+  }
+
+  customerCreation(args){
+    var obj : any = {
+      "customer_name" : this.salesCustomerDialogForm.get('fullName').value,
+      "customer_type": this.salesCustomerDialogForm.get('type').value,
+      "customer_group" : this.salesCustomerDialogForm.get('customerGroup').value,
+      "territory" : this.salesCustomerDialogForm.get('territory').value,
+      "email_id" : this.salesCustomerDialogForm.get('emailId').value,
+      "mobile_no" : this.salesCustomerDialogForm.get('mobileNo').value,
+      "address" : this.salesCustomerDialogForm.get('address').value,
+      "city": this.salesCustomerDialogForm.get('city').value
+    }
+
+    this.salesService.createCustomer(obj);
   }
 
 }
