@@ -96,6 +96,7 @@ import { DraftListComponent } from './draft-list/draft-list.component';
 })
 export class AddSalesInvoicePage implements OnInit {
   isLoadMoreVisible: boolean = true;
+  isMoreGroupsVisible: boolean = false;
   isSkeletonTextVisible: boolean = true;
   salesInvoice: SalesInvoice;
   invoiceUuid: string;
@@ -1784,7 +1785,10 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
       draft  = {
         uuid: uuid,
         customerName: customer_name,
-        amount: total_amount
+        amount: total_amount,
+        time: this.getFrappeTime(),     // needs to confirm
+        date: posDraftDetails.due_date  // needs to confirm
+        
       };
       //Code to show unique drafts on draft component.
       if (!this.draftUuid){
@@ -1879,12 +1883,6 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     }
   }
   submitPayment() {
-    // for (let i=0 ; i < this.filteredCustomerDetailList.length ; i++){
-    //   this.mobileNolist.push(this.filteredCustomerDetailList[i].mobileNo)
-    // }
-    // console.log("from submit button",this.mobileNolist)
-
-
     this.dialog.open(PaymentDialogueComponent, {height: '540px', width: '600px',});
   }
   onCreateCustomer(){
@@ -1916,7 +1914,10 @@ this.salesService.getGroupList(0,this.numOfItemNames).subscribe((data) =>{
     this.displayItemGroupList1
       .slice(this.startItemGroup,this.endItemGroup)
         .forEach(element => {
-          this.displayItemGroupList.push(element)
+          if (element){
+            this.displayItemGroupList.push(element);
+            this.isMoreGroupsVisible = true;
+          }
     });
   }
   // More Items to chips

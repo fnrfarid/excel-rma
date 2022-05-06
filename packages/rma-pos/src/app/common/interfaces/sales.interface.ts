@@ -1,5 +1,6 @@
 // import { Customer } from './customer.interface';
 
+import { Time } from '@angular/common';
 import { DeliveryNoteItemInterface } from 'src/app/sales-ui/view-sales-invoice/serials/serials-datasource';
 
 export class SalesInvoice {
@@ -91,7 +92,9 @@ export interface AggregatedDocument {
 export interface draftList {
   uuid: string,
   customerName ?: String,
-  amount ?: number
+  amount ?: number,   // add by ibad
+  date: string,
+  time: string
 }
 
 export interface DialogData {

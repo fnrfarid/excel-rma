@@ -28,9 +28,11 @@ export class DraftListComponent implements OnInit {
   public dialog: MatDialog
 
   displayedColumnsItems = [
-    'uuid',
+    'date',
+    'time',
     'customerName',
-    'amount'
+    'amount',
+    'uuid'
   ]
   constructor(
     private dialogRef: MatDialogRef<AddSalesInvoicePage> ,

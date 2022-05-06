@@ -598,7 +598,7 @@ export class AddSalesReturnPage implements OnInit {
       serialItem.against_sales_invoice = this.salesInvoiceDetails.name;
       salesReturn.total += serialItem.amount;
       salesReturn.total_qty += serialItem.qty;
-      salesReturn.items.push(serialItem);
+      // salesReturn.items.push(serialItem);
     }
     salesReturn.posting_date = this.getParsedDate(
       this.postingDateFormControl.value,
@@ -767,10 +767,10 @@ export class AddSalesReturnPage implements OnInit {
           );
           return true;
         }
-        this.assignRangeSerial(
-          element,
-          csvJsonObj[element.item_name].serial_no,
-        );
+        // this.assignRangeSerial(
+        //   element,
+        //   csvJsonObj[element.item_name].serial_no,
+        // );
         return false;
       }
     });
