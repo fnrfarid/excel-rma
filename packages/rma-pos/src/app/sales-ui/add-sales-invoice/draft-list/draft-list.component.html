@@ -29,7 +29,7 @@
     </ion-row>
   </ion-card-footer>
   <ion-card-content>
-    <mat-table [dataSource]="dataSource2" class="striped" style="width: 100%">
+    <mat-table [dataSource]="dataSource2" class="striped drt-inv-list" style="width: 100%">
       <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumnsItems">
         <th mat-header-cell class="draft-table" *matHeaderCellDef>{{column}}</th>
         <td mat-cell class="draft-table" *matCellDef="let row"> <a (click)="editDraftList($event)" >{{row[column]}}</a> </td>

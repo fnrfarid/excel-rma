@@ -111,10 +111,10 @@
 
 .label-form mat-form-field:not(.remarks-label) .mat-form-field-infix:not(.ng-tns-c164-8){
   background: #b7e2f3;
-  text-align: center;
   border-radius: 15px;
   position: relative;
-padding:10px;
+  text-align: left;
+  text-indent: 15px;
 }
 
 .card-content-md .mat-form-field-infix {
@@ -131,7 +131,7 @@ padding:10px;
 padding-top:10px;
 }
 .label-form .mat-input-element{
-  margin-top:10px;
+  margin-top:1vw;
   display: inline-block;
   vertical-align: middle;
 }
@@ -159,15 +159,15 @@ position: absolute;
   transform: none;
   top: 0;
   color:#000;
-  font-size:12px;
+  font-size:0.878vw;
 }
 
 .label-form .mat-form-field-appearance-legacy.mat-form-field-invalid:not(.mat-focused) .mat-form-field-ripple {
   height: 0;
 }
 
-.label-form ion-col.md.hydrated {
-  border-right: 1px solid #ccc;
+.label-form ion-col.md.hydrated,.label-form ion-col.ios.hydrated {
+  // border-right: 1px solid #ccc;
   padding: 0px;
   width: auto;
   margin: 0;
@@ -225,25 +225,25 @@ display:none !important;
 .label-form .mat-form-field-appearance-legacy .mat-form-field-wrapper {
   padding-bottom: 0px;
 }
-.label-form ion-row.align.md.hydrated {
+.label-form ion-row.align.md.hydrated,.label-form ion-row.align.ios.hydrated {
   // margin-bottom: 20px;
   // overflow-x: scroll;
     flex-wrap: nowrap;
 }
-.label-form ion-col.md.hydrated:last-child {
+.label-form ion-col.md.hydrated:last-child,.label-form ion-col.ios.hydrated:last-child {
   border: none;
 }
 .search_bar{
   flex-wrap: unset;
 }
-.label-form .search_bar .md.hydrated:first-child {
+.label-form .search_bar .md.hydrated:first-child,.label-form .search_bar .ios.hydrated:first-child {
   border-right: 0px;
   margin-right: 30px;
 }
 .label-form .search_bar,.label-form .search_bar .mat-form-field-flex{
   justify-content: flex-start;
 }
-.search_bar ion-col.md.hydrated{
+.search_bar ion-col.md.hydrated,.search_bar ion-col.ios.hydrated{
   margin-right: auto;
   margin-left: 0;
 }
@@ -255,7 +255,7 @@ position: relative;
 padding: 10px;
 }
 
-.draft_box ion-card.md.hydrated {
+.draft_box ion-card.md.hydrated,.draft_box ion-card.ios.hydrated  {
 background: transparent;
 box-shadow: none;
 }
@@ -264,8 +264,9 @@ box-shadow: none;
 color: #000;
 margin: 0px;
 }
-.draft_box ion-text.ion-color.ion-color-tertiary.md.hydrated {
+.draft_box ion-text.ion-color.ion-color-tertiary.md.hydrated ,.draft_box ion-text.ion-color.ion-color-tertiary.ios.hydrated {
 color: #000;
+font-size: 1.025vw;
 }
 .draft_box .mat-table {
 background: #b7e2f3;
@@ -297,7 +298,7 @@ background: #b7e2f3;
   width:100%;
 }
 
-.horizontal-boxes ion-col.ng-star-inserted.md.hydrated {
+.horizontal-boxes ion-col.ng-star-inserted.md.hydrated ,.horizontal-boxes ion-col.ng-star-inserted.ios.hydrated {
   display: inline-block;
   width: 20% !important;
   max-width: 280px !important;
@@ -319,7 +320,7 @@ background: #b7e2f3;
 
 }
 
-.horizontal-boxes  ion-card-subtitle.ion-inherit-color.md.hydrated {
+.horizontal-boxes  ion-card-subtitle.ion-inherit-color.md.hydrated,.horizontal-boxes  ion-card-subtitle.ion-inherit-color.ios.hydrated {
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -407,10 +408,16 @@ background-color: #ccc;
 }
 
 .striped mat-header-row mat-header-cell {
-  font-size: medium;
+  font-size: 1.171vw;
   font-weight: bold;
   color: #000;
+  min-height: 4.173vw;
 }
+
+.striped .mat-cell,.striped .mat-footer-cell{
+  font-size: 1.025vw;
+}
+
 // .table-card{
 //   padding:15px 0px;
 // }
@@ -440,7 +447,7 @@ app-add-sales-invoice ion-card{
 .search-table  .mat-form-field-prefix{
   padding:0px 20px
 }
-ion-card-title.invBtn.ion-inherit-color.md.hydrated {
+ion-card-title.invBtn.ion-inherit-color.md.hydrated,ion-card-title.invBtn.ion-inherit-color.ios.hydrated {
   background: #b7e2f3;
   height: 60px;
   border-radius: 15px;
@@ -450,7 +457,7 @@ ion-card-title.invBtn.ion-inherit-color.md.hydrated {
   justify-content: center;
   cursor: pointer;
 }
-ion-row.search_place.md.hydrated {
+ion-row.search_place.md.hydrated,ion-row.search_place.ios.hydrated  {
   display: block;
   width: 50%;
   left: 30px;
@@ -468,23 +475,23 @@ ion-row.search_place.md.hydrated {
 .search_place-container{
   padding: 0;
 }
-ion-card-title.invBtn.ion-inherit-color.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated {
+ion-card-title.invBtn.ion-inherit-color.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated ,ion-card-title.invBtn.ion-inherit-color.ios.hydrated ion-text.ion-color.ion-color-tertiary.ios.hydrated {
   color: #000;
 }
-.label-form .search_bar .md.hydrated:first-child {padding: 0;}
+.label-form .search_bar .md.hydrated:first-child ,.label-form .search_bar .ios.hydrated:first-child {padding: 0;}
 ion-card-header+.card-content-md{padding-bottom:0px;}
-ion-card.md.hydrated {
+ion-card.md.hydrated ,ion-card.ios.hydrated {
   margin-bottom: 0;
 }
-.label-form ion-row.align.md.hydrated ion-col.md.hydrated:first-child {
+.label-form ion-row.align.md.hydrated ion-col.md.hydrated:first-child,.label-form ion-row.align.ios.hydrated ion-col.ios.hydrated:first-child {
   padding-left: 0;
 }
 
-.label-form ion-row.align.md.hydrated ion-col.md.hydrated:last-child {
+.label-form ion-row.align.md.hydrated ion-col.md.hydrated:last-child ,.label-form ion-row.align.ios.hydrated ion-col.ios.hydrated:last-child {
   padding-right: 0;
 }
 
- ion-row.navTopButton.md.hydrated {
+ ion-row.navTopButton.md.hydrated, ion-row.navTopButton.ios.hydrated {
   padding-left: 12px;
   // margin-top: 10px;
   
@@ -492,19 +499,19 @@ ion-card.md.hydrated {
 ion-header ion-list.list-md{
   padding: 0px;
 }
- ion-row.navTopButton.md.hydrated button.mat-focus-indicator.mat-button.mat-button-base.mat-primary {
+ ion-row.navTopButton.md.hydrated button.mat-focus-indicator.mat-button.mat-button-base.mat-primary, ion-row.navTopButton.ios.hydrated button.mat-focus-indicator.mat-button.mat-button-base.mat-primary {
 background: #f4c343;
 margin-right: 35px;
 display: flex;
 align-items: center;
 border-radius: 10px;
-padding: 3px 25px;
+padding: 0.4vw 1.830vw;
 margin-bottom: 5px;
 }
 
- ion-row.navTopButton.md.hydrated button.mat-focus-indicator.mat-button.mat-button-base.mat-primary span.mat-button-wrapper {
+ ion-row.navTopButton.md.hydrated button.mat-focus-indicator.mat-button.mat-button-base.mat-primary span.mat-button-wrapper, ion-row.navTopButton.ios.hydrated button.mat-focus-indicator.mat-button.mat-button-base.mat-primary span.mat-button-wrapper {
 color: #4a4a4a;
-font-size: 20px;
+font-size: 1.464vw;
 font-weight: 600;
 letter-spacing: 1px;
 // line-height: 1.5;
@@ -532,12 +539,12 @@ letter-spacing: 1px;
   font-size: 22px;
 }
 
-.iconAcc-logout ion-avatar.md.hydrated {
+.iconAcc-logout ion-avatar.md.hydrated,.iconAcc-logout ion-avatar.ios.hydrated {
   width: 45px;
   height: 45px;
 }
 
-.iconAcc-logout ion-avatar.md.hydrated img {
+.iconAcc-logout ion-avatar.md.hydrated img,.iconAcc-logout ion-avatar.ios.hydrated img {
   width: 100%;
   height: 100%;
 }
@@ -546,12 +553,12 @@ letter-spacing: 1px;
 //   --offset-top: -36px !important;
 // }
 
-ion-card-header.ion-inherit-color.md.hydrated {
+ion-card-header.ion-inherit-color.md.hydrated,ion-card-header.ion-inherit-color.ios.hydrated {
   padding-top: 0;padding-bottom: 0;
 }
 
-ion-card-subtitle.ion-inherit-color.md.hydrated{padding-top: 16px;}
-ion-card-title.ion-inherit-color.md.hydrated{padding-bottom: 16px;}
+ion-card-subtitle.ion-inherit-color.md.hydrated,ion-card-subtitle.ion-inherit-color.ios.hydrated{padding-top: 16px;}
+ion-card-title.ion-inherit-color.md.hydrated,ion-card-title.ion-inherit-color.ios.hydrated{padding-bottom: 16px;}
 .invBtn {
   padding-bottom: 0 !important;
 }
@@ -571,7 +578,7 @@ ion-card-title.ion-inherit-color.md.hydrated{padding-bottom: 16px;}
 
 .chip-main-wrapper mat-chip-list mat-chip.mat-chip.mat-focus-indicator {
   border-radius: 0;
-  padding: 20px 25px;
+  padding: 1.464vw 1.830vw;
   background-color: #499bc0 !important;
   color: #fff !important;
   font-weight: 600;
@@ -582,20 +589,20 @@ ion-card-title.ion-inherit-color.md.hydrated{padding-bottom: 16px;}
   margin-right: -15px;
 }
 
-.main-filed-pos-form ion-col.md.hydrated {
+.main-filed-pos-form ion-col.md.hydrated,.main-filed-pos-form ion-col.ios.hydrated {
   // flex-basis: auto;
   // flex-grow: 0;
   display: flex;
 }
 
-.main-filed-pos-form ion-col.md.hydrated mat-form-field {
+.main-filed-pos-form ion-col.md.hydrated mat-form-field,.main-filed-pos-form ion-col.ios.hydrated mat-form-field {
   width: 70%;
   padding-left: 20px;
   border-left: 1px solid #ccc;
 }
 
-.main-filed-pos-form ion-col.md.hydrated ion-text.ion-color {
-  width: 200px;
+.main-filed-pos-form ion-col.md.hydrated ion-text.ion-color,.main-filed-pos-form ion-col.ios.hydrated ion-text.ion-color {
+  width: 14.641vw;
   display: inline-block;
   justify-content: flex-start;
   align-items: flex-start;
@@ -606,20 +613,21 @@ ion-card-title.ion-inherit-color.md.hydrated{padding-bottom: 16px;}
 }
 
 
-.main-filed-pos-form ion-col.md.hydrated mat-form-field .mat-form-field-wrapper {
+.main-filed-pos-form ion-col.md.hydrated mat-form-field .mat-form-field-wrapper,.main-filed-pos-form ion-col.ios.hydrated mat-form-field .mat-form-field-wrapper {
   border: 0;
 }
 
-.main-filed-pos-form ion-col.md.hydrated mat-form-field .mat-form-field-wrapper .mat-form-field-infix {
+.main-filed-pos-form ion-col.md.hydrated mat-form-field .mat-form-field-wrapper .mat-form-field-infix,.main-filed-pos-form ion-col.ios.hydrated mat-form-field .mat-form-field-wrapper .mat-form-field-infix {
   border: none;
 }
 .main-filed-pos-form .mat-form-field-appearance-legacy .mat-form-field-underline,.main-filed-pos-form  .mat-form-field-appearance-legacy.mat-form-field-invalid:not(.mat-focused) .mat-form-field-ripple{height:0}
 .payment-draft-btn-box {display: flex;}
-.payment-draft-btn-box button.draft-payment {background: #ea5255;font-size: 10px;padding: 10px 30px !important;border-radius: 10px;margin-right: 23px;}
-.payment-draft-btn-box button.draft-payment span.mat-button-wrapper {line-height: 18px; white-space: break-spaces;font-size: 1.2vw;width:100%;display: block;}
-.payment-draft-btn-box button.submit-payment {background: #a5c536;font-size: 20px;padding: 10px 30px !important;border-radius: 10px;margin-right: 23px;}
+.payment-draft-btn-box button.draft-payment {background: #ea5255;font-size: 10px;padding: 0.732vw 2.196vw !important;border-radius: 0.732vw;margin-right: 23px;    max-width: 11.201vw;}
+input.mat-input-element,.mat-form-field-appearance-legacy .mat-form-field-label{font-size: 1.025vw;}
+.payment-draft-btn-box button.draft-payment span.mat-button-wrapper {line-height: 1.318vw; white-space: break-spaces;font-size: 1.2vw;width:100%;display: block;}
+.payment-draft-btn-box button.submit-payment {background: #a5c536;font-size: 20px;padding: 0.732vw 0 !important;border-radius: 0.732vw;margin-right: 1.684vw;width: 12.445vw;}
 .payment-draft-btn-box button.submit-payment span.mat-button-wrapper {line-height: 1.2;white-space: nowrap;font-size: 1.2vw;width: 100%;display: block;}
-.item-scroll-box ion-card.mat-tooltip-trigger.grid-card.md.hydrated {
+.item-scroll-box ion-card.mat-tooltip-trigger.grid-card.md.hydrated,.item-scroll-box ion-card.mat-tooltip-trigger.grid-card.ios.hydrated {
   margin: 0;
   width: 100%;
 }
@@ -627,15 +635,15 @@ ion-card-title.ion-inherit-color.md.hydrated{padding-bottom: 16px;}
   top: 28px;
 }
 
-.item-scroll-box ion-col.ng-star-inserted.md.hydrated {
-  max-width: 190px !important;
+.item-scroll-box ion-col.ng-star-inserted.md.hydrated,.item-scroll-box ion-col.ng-star-inserted.ios.hydrated {
+  max-width: 13.909vw !important;
   margin-right: 30px;
 }
 
 .item-scroll-box  .horizontal-boxes ion-card-content {
   max-width: 50px !important;
 }
-.item-scroll-box ion-card-subtitle.ion-inherit-color.md.hydrated {
+.item-scroll-box ion-card-subtitle.ion-inherit-color.md.hydrated,.item-scroll-box ion-card-subtitle.ion-inherit-color.ios.hydrated {
   padding: 0;
   font-size: 0.95vw;
 }
@@ -648,7 +656,7 @@ ion-col.box-price {
 .item-scroll-box ion-button.ng-star-inserted.ion-color.ion-color-primary.md.button.button-small.button-clear.ion-activatable.ion-focusable.hydrated {
   display: none;
 }
-ion-img.item-image.prd-slid-img.md.hydrated{  width: 60px;
+ion-img.item-image.prd-slid-img.md.hydrated,ion-img.item-image.prd-slid-img.ios.hydrated{  width: 60px;
   width: 8vw;
   height: 3.5vw;
   margin: 0 auto;
@@ -669,7 +677,7 @@ ion-img.item-image.prd-slid-img.md.hydrated{  width: 60px;
   font-size: 12px;
   padding:  3px 8px;
 }
-.item-scroll-box ion-card.mat-tooltip-trigger.grid-card.md.hydrated {
+.item-scroll-box ion-card.mat-tooltip-trigger.grid-card.md.hydrated,.item-scroll-box ion-card.mat-tooltip-trigger.grid-card.ios.hydrated {
   padding-bottom: 5px;
 }
 
@@ -681,18 +689,18 @@ ion-img.item-image.prd-slid-img.md.hydrated{  width: 60px;
 
 
 
-.main-promo-offer-box .grid-container.horizontal-boxes ion-row.md.hydrated {
+.main-promo-offer-box .grid-container.horizontal-boxes ion-row.md.hydrated,.main-promo-offer-box .grid-container.horizontal-boxes ion-row.ios.hydrated {
     flex-wrap: wrap;
     width: 100%;
 }
 
-.main-promo-offer-box .grid-container.horizontal-boxes ion-row.md.hydrated ion-col.ng-star-inserted {
+.main-promo-offer-box .grid-container.horizontal-boxes ion-row.md.hydrated ion-col.ng-star-inserted,.main-promo-offer-box .grid-container.horizontal-boxes ion-row.ios.hydrated ion-col.ng-star-inserted {
     width: 50% !important;
     max-width: 100% !important;
     margin: 0;
     flex: 0 0 calc(calc(2 / var(--ion-grid-columns, 04)) * 100%) !important;
 }
-ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.md.hydrated {
+ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.md.hydrated,ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.ios.hydrated {
   background: #f4c343;
   display: block;
   padding: 0.2vw 0;
@@ -712,7 +720,7 @@ ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.md.hydrated {
   padding-bottom: 5px;
   overflow: hidden;
 }
-ion-col.draft_box.form-pos-box.md.hydrated {
+ion-col.draft_box.form-pos-box.md.hydrated,ion-col.draft_box.form-pos-box.ios.hydrated  {
   // margin-top: -50px;
   margin-top: 10px;
 }
@@ -732,22 +740,23 @@ ion-col.draft_box.form-pos-box.md.hydrated {
   margin-left: 10px;
 }
 mat-table.mat-table.cdk-table.striped {
-
   height: 100%;
-  min-height: 27.6vh !important;
+  min-height: 27.5vh !important;
   overflow: auto !important;
+  max-height: 13.031vw;
 }
-ion-col.pro-tot-strip.md.hydrated {display: block;width: 100%;background: #ebebeb;padding: 10px 20px;}
+ion-col.pro-tot-strip.md.hydrated,ion-col.pro-tot-strip.ios.hydrated  {display: block;width: 100%;background: #ebebeb;padding: 10px 20px;}
 
-ion-col.pro-tot-strip.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated {
+ion-col.pro-tot-strip.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated,ion-col.pro-tot-strip.ios.hydrated ion-text.ion-color.ion-color-tertiary.ios.hydrated {
     color: #000;
     font-weight: 600;
     letter-spacing: 0.5px;
+    font-size: 1.171vw;
 }
 .prod-data-list {
   width: 100% !important;
 }
-ion-card.card-main-invoice-list.md.hydrated {
+ion-card.card-main-invoice-list.md.hydrated,ion-card.card-main-invoice-list.ios.hydrated  {
   box-shadow: none;
 }
 .modal-heading {
@@ -791,6 +800,7 @@ border: 0;
 }
 app-customer-create-dialog h5{
   text-align: center;
+  margin-bottom: 30px;
 }
 app-customer-create-dialog mat-form-field{
   width: 100%;
@@ -902,7 +912,8 @@ app-customer-create-dialog  .mid-section-sale{
 }
 .paymentForm-inner ion-card-content{
   padding-top: 0;
-  padding-bottom: 5px;
+  padding-bottom: 0;
+  margin-bottom: 0.05vw;
 }
 .topbar-form ion-row:not(.search_bar) ion-col {
   padding: 0px 0.8vw !important;
@@ -921,12 +932,26 @@ app-customer-create-dialog  .mid-section-sale{
   display:block;
 }
 .topbar-form ion-row:not(.search_bar) ion-col ion-card-title.invBtn{
-  font-size:1.2vw;
-  padding: 0.2vw;
-  min-width:auto !important;
+  font-size: 1.1vw;
+    padding: 0.2vw 0.5vw;
+    min-width: auto !important;
+    min-height: 3vw;
 }
-
-
+.mat-input-element {
+  width: 80% !important;
+}
+.card-content-md .mat-form-field-infix {
+   min-height: 1.977vw;
+}
+.mat-chip.mat-standard-chip.mat-chip-selected.mat-primary {
+  font-size: 1.025vw;
+}
+mat-footer-row.mat-footer-row.cdk-footer-row.footer.ng-star-inserted.mat-table-sticky {
+  display: none;
+}
+ion-content.main-content-block.ios.overscroll.hydrated {
+  --keyboard-offset: 0px !important;
+}
 // Responsive Design
 @media(max-width:786px){
   .navTopButton{
@@ -947,21 +972,21 @@ app-customer-create-dialog  .mid-section-sale{
     font-size: 16px;
   }
 
-  ion-img.item-image.prd-slid-img.md.hydrated{
+  ion-img.item-image.prd-slid-img.md.hydrated,ion-img.item-image.prd-slid-img.ios.hydrated{
     width: 100%;
     height: 55px;
   }
   .horizontal-boxes ion-card{
     padding: 20px 0px;
   }
-  .item-scroll-box ion-card-subtitle.ion-inherit-color.md.hydrated{
+  .item-scroll-box ion-card-subtitle.ion-inherit-color.md.hydrated,.item-scroll-box ion-card-subtitle.ion-inherit-color.ios.hydrated{
     font-size: 12px;
   }
   ion-col.box-price{
     font-size: 12px;
     line-height: 1.2;
   }
-  ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.md.hydrated{
+  ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.md.hydrated,  ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.ios.hydrated{
     padding: 10px 0;
     font-size: 16px;
   }
@@ -975,14 +1000,15 @@ app-customer-create-dialog  .mid-section-sale{
   .prod-data-list{
     width: max-content !important;
   }
-  .item-scroll-box ion-col.ng-star-inserted.md.hydrated{
+  .item-scroll-box ion-col.ng-star-inserted.md.hydrated,  .item-scroll-box ion-col.ng-star-inserted.ios.hydrated{
     max-width: 150px !important;
+    min-width: 145px !important;
   }
-  .main-promo-offer-box .grid-container.horizontal-boxes ion-row.md.hydrated ion-col.ng-star-inserted{
-    max-width: 150px !important;
+  .main-promo-offer-box .grid-container.horizontal-boxes ion-row.md.hydrated ion-col.ng-star-inserted,.main-promo-offer-box .grid-container.horizontal-boxes ion-row.ios.hydrated ion-col.ng-star-inserted{
+    max-width: 50% !important;
     margin: auto;
   }
-  ion-row.search_place.md.hydrated{
+  ion-row.search_place.md.hydrated,ion-row.search_place.ios.hydrated{
     position: relative;
     width: 100%;
     top: 0;
@@ -990,14 +1016,117 @@ app-customer-create-dialog  .mid-section-sale{
     padding: 5px 10px;
 
   }
-
+  .customer-hide-mobile-field {
+    position: absolute;
+    color: #fff;
+    z-index: -1;
+}
   .search_bar{
     display: block;
   }
   .label-form ion-card-content{
     padding: 0;
   }
-  .label-form ion-row.align.md.hydrated{
+  .label-form ion-row.align.md.hydrated, .label-form ion-row.align.ios.hydrated{
     overflow-x: scroll;
   }
+  .form-info-invoice .topbar-form ion-row:not(.search_bar) ion-col .mat-form-field-label {
+    font-size: 15px !important;
+}
+
+.form-info-invoice #cdk-overlay-1 .mat-option-text {
+    margin: 16px 0 !important;
+    display: block !important;
+}
+
+.form-info-invoice .mat-option {
+    height: 90px;
+    border-bottom: 1px solid #bfbfbf;
+}
+
+.form-info-invoice ion-card-header.ion-inherit-color.ios.hydrated,.form-info-invoice ion-card-header.ion-inherit-color.md.hydrated  {
+    padding: 0;
+}
+
+.form-info-invoice ion-text.ion-color.ion-color-tertiary.ios.hydrated,.form-info-invoice ion-text.ion-color.ion-color-tertiary.md.hydrated  {
+    font-size: 15px;
+}
+
+.form-info-invoice ion-row.align.ios.hydrated,.form-info-invoice ion-row.align.md.hydrated {
+    display: block;
+}
+
+.form-info-invoice .remarks-label .mat-form-field-label-wrapper{    min-width: 60px;width: fit-content;}
+
+.form-info-invoice  .mat-form-field-infix{border-radius: 50px !important;}
+
+.mat-option{height:90px !important}
+
+.invioce-main-wrapper .mat-form-field-prefix.ng-tns-c164-7.ng-star-inserted {
+    padding: 6px 20px 3px 20px;
+}
+
+.invioce-main-wrapper ion-row.search_place.ios.hydrated,.invioce-main-wrapper ion-row.search_place.md.hydrated {
+    max-width: 95%;
+    margin: 0 auto;
+}
+
+.invioce-main-wrapper .grid-card[_ngcontent-muw-c341] {
+    width: fit-content;
+}
+mat-table.mat-table.cdk-table.striped{min-height: 400px  !important;}
+ion-col.draft_box.form-pos-box.ios.hydrated {
+  margin-top: 50px;
+}
+ion-row.search_bar.ios.hydrated ion-col.ios.hydrated {
+  margin: 0;
+  padding: 0;
+}
+mat-cell:first-of-type, mat-header-cell:first-of-type, mat-footer-cell:first-of-type {
+  justify-content: flex-start !important;
+}
+.main-filed-pos-form ion-col.md.hydrated mat-form-field, .main-filed-pos-form ion-col.ios.hydrated mat-form-field{    width: 50%;}
+ion-text.ion-color.ion-color-tertiary.promo-offer-box-heading.ios.hydrated{margin-bottom: 10px; }
+.payment-draft-btn-box button.draft-payment,.payment-draft-btn-box button.submit-payment {
+  width: 50%;
+  padding: 7px 0 !important;
+  margin-bottom: 10px !important;
+
+  min-width: 145px;
+}
+.card-main-invoice-list {
+  margin: 0 -10px;
+}
+.card-main-invoice-list mat-table.mat-table.cdk-table.striped {
+  min-height: 40vh !important;
+}
+.mat-option {
+  height: auto !important;
+  border-bottom: 1px solid #ccc;
+}
+.cus-name-list {
+  padding: 9px !important;
+  font-size: 12px !important;
+}
+mat-header-row.mat-header-row.cdk-header-row.ng-star-inserted.mat-table-sticky,mat-row.mat-row.cdk-row.ng-star-inserted {
+  min-width: 500px;
+}
+.mat-input-element {
+  width: 90% !important;
+}
+#promotionalOffer .horizontal-boxes {
+   width: 100%;
+}
+.chip-main-wrapper mat-chip-list mat-chip.mat-chip.mat-focus-indicator {
+  background: none !important;
+  color: #499bc0 !important;
+  padding: 0;
+  padding-right: 15px;
+  border-right: 1px solid #499bc0;
+  margin-right: 15px;
+}
+.main-filed-pos-form ion-col.md.hydrated ion-text.ion-color, .main-filed-pos-form ion-col.ios.hydrated ion-text.ion-color{width:50%}
+input.mat-input-element, .mat-form-field-appearance-legacy .mat-form-field-label,.label-form .mat-form-field-appearance-legacy .mat-form-field-label,.remarks-label .mat-form-field-infix textarea,.mat-chip.mat-standard-chip.mat-chip-selected.mat-primary,.striped mat-header-row mat-header-cell,.striped .mat-cell, .striped .mat-footer-cell,ion-col.pro-tot-strip.md.hydrated ion-text.ion-color.ion-color-tertiary.md.hydrated, ion-col.pro-tot-strip.ios.hydrated ion-text.ion-color.ion-color-tertiary.ios.hydrated,.draft_box ion-text.ion-color.ion-color-tertiary.md.hydrated, .draft_box ion-text.ion-color.ion-color-tertiary.ios.hydrated{font-size:12px;}
+.modal-heading ion-text{font-size: 25px;}
+
 }

@@ -1,6 +1,6 @@
 // import { Customer } from './customer.interface';
 
-import { Time } from '@angular/common';
+// import { Time } from '@angular/common';
 import { DeliveryNoteItemInterface } from 'src/app/sales-ui/view-sales-invoice/serials/serials-datasource';
 
 export class SalesInvoice {

@@ -35,9 +35,9 @@
       <ion-icon name="create"></ion-icon>
     </ion-fab-button>
   </ion-fab> -->
-<ion-row>
+<ion-row class="invioce-main-wrapper">
   <ion-col size-lg="9" size-sm="12">
-    <form [formGroup]="salesCustomerDetialsForm"  class="label-form">
+    <form [formGroup]="salesCustomerDetialsForm"  class="label-form form-info-invoice">
       <ion-card>
         <ion-card-header>
          
@@ -64,7 +64,7 @@
                     (optionSelected)="customerChanged($event.option.value)"
                   >
                    <div *ngIf = "!f.customer.hasError('falseValse'); else errorBlock">
-                    <mat-option
+                    <mat-option class="cus-name-list"
                       *ngFor="let option of filteredCustomerList | async "
                       [value]="option"
                       >
@@ -109,11 +109,11 @@
                     (optionSelected)="mobileNoChanged($event)"
                   >
                   <div *ngIf = "!f.mobileNo.hasError('falseValse'); else errorBlock1">
-                    <mat-option
+                    <mat-option class="cell-inv-drop"
                       *ngFor="let customerDetail of filteredCustomerDetailList"
                       [value]="customerDetail.mobileNo"
                     >
-                    {{ customerDetail.customerName }} <br> {{customerDetail.mobileNo}} <br class="somethinglist"> {{customerDetail.name}}
+                    <div class="customer-hide-mobile-field">  {{ customerDetail.customerName }}</div>  {{customerDetail.mobileNo}} <div class="customer-hide-mobile-field"> {{customerDetail.name}}</div>
                     </mat-option>
   
                   </div>
@@ -313,7 +313,7 @@
     <form [formGroup]="salesInvoiceItemsForm">
       <ion-grid class="search_place-container">
         <ion-row class="search_place">
-          <ion-col size="6" size-sm="12">
+          <ion-col size="6" size-sm="12" size-xs="12" class="search-prod-field">
            <mat-form-field class="search-table example-full-width">
               <mat-icon matPrefix>search</mat-icon>
               <input
